@@ -1,0 +1,294 @@
+<%- include('../../layout/layout-starting.ejs') %>
+
+
+    <div class="wraper container-fluid">
+        <div class="page-title">
+            <h3 class="title"><%= __("Campaign.View") %>: <%= statistics==null ? 0 : statistics.name %>
+            </h3>
+        </div>
+
+            <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="widget-panel widget-style-2 white-bg">
+                        <i class="ion-eye text-success"></i>
+                        <h2 class="m-0 counter">
+                            <%= statistics==null ? 0 : statistics.is_opened%>
+                        </h2>
+                        <div>
+                            <%= __("Campaign.NFC.Stat.ISOpen") %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="widget-panel widget-style-2 white-bg">
+                        <i class="ion-android-contacts text-warning"></i>
+                        <h2 class="m-0 counter">
+                            <%= statistics==null ? 0 : statistics.is_downloaded%>
+                        </h2>
+                        <div>
+                            <%= __("Campaign.NFC.Stat.ISDownload") %>
+                        </div>
+                    </div>
+                </div>
+    
+              <!--  <div class="col-lg-3 col-sm-6">
+                    <div class="widget-panel widget-style-2 white-bg">
+                        <i class="fa fa-folder-open text-pink"></i>
+                        <h2 class="m-0 counter">
+                            <%= statistics==null ? 0 : statistics.is_submitted%>
+                        </h2>
+                        <div>
+                            <%= __("Campaign.NFC.Stat.ISSubmitted") %>
+                        </div>
+                    </div>
+                </div> -->
+                <div class="col-lg-3 col-sm-6">
+                    <div class="widget-panel widget-style-2 white-bg">
+                        <i class="fa fa-hand-o-up text-danger"></i>
+                        <h2 class="m-0 counter">
+                            <%= statistics==null ? 0 : statistics.is_interacted%>
+                        </h2>
+                        <div>
+                            <%= __("Campaign.NFC.Stat.ISInteracted") %>
+                        </div>
+                    </div>
+                </div>
+    
+            </div> <!-- end row -->
+    
+            <div class="row">
+                <div class="col-lg-3 col-sm-6">
+                    <div class="widget-panel widget-style-2 white-bg">
+                        <i class="ion-qr-scanner text-pink"></i>
+                        <h2 class="m-0 counter">
+                            <%= statistics==null ? 0 : statistics.number_of_scans%>
+                        </h2>
+                        <div>
+                            <%= __("Campaign.NFC.Stat.NumberofScans") %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="widget-panel widget-style-2 white-bg">
+                        <i class="ion-document-text text-purple"></i>
+                        <h2 class="m-0 counter">
+                            <%= statistics==null ? 0 : statistics.is_submitted%>
+                        </h2>
+                        <div>
+                            <%= __("Home.Submitted.Data") %>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6">
+                    <div class="widget-panel widget-style-2 white-bg">
+                        <i class="ion-paperclip text-warning"></i>
+                        <h2 class="m-0 counter">
+                            <%= statistics==null ? 0 : statistics.is_downloaded%>
+                        </h2>
+                        <div>
+                            <%= __("Home.Attachment.Open") %>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="portlet"><!-- /primary heading -->
+                        <div class="portlet-heading">
+                            <h3 class="portlet-title text-dark text-uppercase">
+                                <%= __("Campaign.NFC.Risk.Assessment") %>
+                                
+                            </h3>
+                            <div class="portlet-widgets">
+                                <a href="javascript:;" data-toggle="reload"><i class="ion-refresh"></i></a>
+                                <span class="divider"></span>
+                                <a data-toggle="collapse" data-parent="#accordion1" href="#portlet3"><i
+                                        class="ion-minus-round"></i></a>
+                                <span class="divider"></span>
+                                <a href="#" data-toggle="remove"><i class="ion-close-round"></i></a>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                        <div id="portlet3" class="panel-collapse collapse in">
+                            <div class="portlet-body">
+                                <div id="donut-chart">
+                                    <div id="donut-chart-container" class="flot-chart" style="height: 320px;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- /Portlet -->
+                </div> <!-- end col -->
+           
+
+
+            </div> <!-- end row -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                    <table id="datatable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                            <th>#</th>
+                            
+                                <th data-priority="1"><%= __("Campaign.NFC.NFCCode") %></th>
+                                <th data-priority="3"><%= __("Campaign.NFC.URL") %></th>
+                                
+                            </tr>
+                        </thead>
+
+                
+                        <tbody>
+                            <% if(typeof nfcUrls !==undefined || nfcUrls !==null){
+                                nfcUrls.forEach((device,index)=> { %>
+                            <tr>
+                                <td>NFC Tag # <%=index+1%></td>
+                                <td><%=device.nfc_code %></td>
+                                <td>                 
+                                    <button class="copyUrlButton" data-url="<%=tvbs_backend_url%>?nfc_code=<%= device.nfc_code %>">Copy URL</button>
+                                    
+                                </td>
+                            </tr> 
+                            <% })}else{%>
+                                <tr>
+                                    <td><%= __("Campaign.View.notFound") %></td>
+                                                <td><%= __("Campaign.View.notFound") %></td>
+                                                <td><%= __("Campaign.View.notFound") %></td>
+                                                
+                                            
+                                </tr>
+                                <%}%> 
+                        </tbody>
+                    </table>
+                </div>
+                    
+                </div>
+            </div>
+
+    </div>
+
+
+    <%- include('../../layout/footer.js') %>
+        <%- include('../../layout/layout-ending.ejs') %>
+
+        <script>
+            $(document).ready(function () {
+                // Append multiple script tags properly
+                $('#datatable').dataTable();
+                $("body").append(
+                     
+                    '<script src="/assets/flot-chart/jquery.flot.js" />' +
+                    '<script src="/assets/flot-chart/jquery.flot.pie.js" />' +
+                    '<script src="/assets/flot-chart/jquery.flot.init.js" />'
+                );
+                var donutlabels = <%- JSON.stringify(statisticsDonutGraphLabels) %>
+                //   console.log(donutlabels)
+                    var donutdatas = <%- JSON.stringify(statisticsDonutGraphData) %>                
+                 //   console.log(donutdatas)
+                    var donutcolors = <%- JSON.stringify(statisticsDonutGraphColors) %>
+                  // console.log(donutcolors)
+                    createDonutGraph("#donut-chart #donut-chart-container", donutlabels, donutdatas, donutcolors);
+                    
+                // Use event delegation to handle dynamically generated buttons
+                $('table').on('click', '.copyUrlButton', function () {
+                    const url = $(this).data('url'); // Get the URL from the data-url attribute
+                    navigator.clipboard.writeText(url) // Copy URL to clipboard
+                        .then(() => {
+                            //alert("Copied: "); // Notify the user
+                            $.Notification.autoHideNotify('success', 'top right', 
+                                'Copied')
+                        })
+                        .catch(err => {
+                            console.error('Failed to copy URL: ', err);
+                        });
+                });
+
+                 
+
+                });
+
+
+
+                function createDonutGraph(selector, labels, datas, colors) {
+                    var data = [{
+                        label: labels[0],
+                        data: datas[0]
+                    }, {
+                        label: labels[1],
+                        data: datas[1]
+                    }, {
+                        label: labels[2],
+                        data: datas[2]
+                    },
+                    {
+                        label: labels[3],
+                        data: datas[3]
+                    }, {
+                        label: labels[4],
+                        data: datas[4]
+                    }, {
+                        label: labels[5],
+                        data: datas[5]
+                    }
+                    ];
+                    var options = {
+                        series: {
+                            pie: {
+                                show: true,
+                                innerRadius: 0.5,
+                                show: true
+                            }
+                        },
+                        legend: {
+                            show: false
+                        },
+                        grid: {
+                            hoverable: true,
+                            clickable: true
+                        },
+                        colors: colors,
+                        tooltip: true,
+                        tooltipOpts: {
+                            defaultTheme: false
+                        }
+                    };
+
+                    $.plot($(selector), data, options);
+                }
+              
+
+                function createPieGraph(selector, labels, datas, colors) {
+                    var data = [{
+                        label: labels[0],
+                        data: datas[0]
+                    }, {
+                        label: labels[1],
+                        data: datas[1]
+                    }, {
+                        label: labels[2],
+                        data: datas[2]
+                    }];
+                    var options = {
+                        series: {
+                            pie: {
+                                show: true
+                            }
+                        },
+                        legend: {
+                            show: false
+                        },
+                        grid: {
+                            hoverable: true,
+                            clickable: true
+                        },
+                        colors: colors,
+                        tooltip: true,
+                        tooltipOpts: {
+                            defaultTheme: false
+                        }
+                    };
+
+                    $.plot($(selector), data, options);
+                }
+
+            </script>

@@ -1,0 +1,139 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex-1">
+      <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
+        <a href="/phm/index" class="hover:text-gray-700 transition">
+          <%= __("menu.phishmagnus.dashboard") %>
+        </a>
+        <span class="text-gray-400">›</span>
+        <span class="font-semibold text-gray-900">
+          <%= __(breadcrumbs) %>
+        </span>
+      </nav>
+      <h3 class="text-3xl font-medium">
+        <%= __(breadcrumbs) %>
+      </h3>
+    </div>
+    <div>
+      <%if(!disableOption.disableCreateTemplate) { %>
+        <a href="<%= typeof organization !== 'undefined' ? '/phm/template/create' : '/template/create' %>"
+          class="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-teal-600 text-white font-semibold shadow hover:bg-teal-700 transition-all duration-200 border border-teal-600 hover:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 lg:order-2"
+          title="<%= __('system_template.homescreen.btnCreateTemplate') %>">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+            <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              d="M12 8v8m-4-4h8" />
+          </svg>
+          <span class="hidden sm:inline"><%= __('system_template.homescreen.btnCreateTemplate') %></span>
+        </a>
+      <%}%>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-col p-6 pt-0">
+  <div class="flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm">
+    <div class="p-6">
+      <table id="filter-table" class="min-w-full border-none text-sm text-left text-gray-700">
+        <thead class="bg-gray-50 text-gray-600 text-xs">
+          <tr>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              <%= __("system_template.homescreen.labelTemplateName") %>
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              <%= __("system_template.homescreen.labelPhishType") %>
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              <%= __("system_template.homescreen.labelSubject") %>
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              <%= __("system_template.homescreen.labelLanguage") %>
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              <%= __("system_template.homescreen.labelCategory") %>
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              <%= __("system_template.homescreen.labelAction") %>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof templates !=='undefined' ) { templates.forEach(tpl=> { %>
+            <tr class="bg-white border-b hover:bg-gray-50">
+              <td class="px-6 py-3">
+                <%= tpl.name %>
+              </td>
+              <td class="px-6 py-3 whitespace-nowrap">
+                <%= tpl.PhishingCampaignType.name %>
+              </td>
+              <td class="px-6 py-3 whitespace-nowrap">
+                <%= tpl.subject %>
+              </td>
+              <td class="px-6 py-3 whitespace-nowrap">
+                <%= tpl.language==='en' ? 'English' : tpl.language==='ar' ? 'Arabic' : tpl.language %>
+              </td>
+              <td class="px-6 py-3 whitespace-nowrap">
+                <%= tpl.PhishingCategory ? tpl.PhishingCategory.name : __('Unknown') %>
+              </td>
+              <td class="px-6 py-3 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <!-- Edit -->
+                  <%if(!disableOption.disableEdit) {%>
+                    <a href="<%= typeof organization === 'undefined' ? '/template/view/' + tpl.id : '/phm/template/view/' + tpl.id %>"
+                      class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-blue-600 hover:bg-blue-700 text-white transition"
+                      role="button" data-toggle="tooltip" data-placement="left"
+                      title="<%= __('system_template.homescreen.btnEditTemplate') %>">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5h6M4 21l7-7 9-9-4-4-9 9-7 7z">
+                        </path>
+                      </svg>
+                    </a>
+                    <%}%>
+                      <%if (!disableOption.disableDelete) {%>
+
+                        <!-- Delete -->
+                        <a href="<%= typeof organization === 'undefined' ? '/template/delete/' + tpl.id : '/phm/template/delete/' + tpl.id %>"
+                          class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-amber-500 hover:bg-amber-600 text-white transition"
+                          role="button" data-toggle="tooltip" data-placement="left"
+                          title="<%= __('system_template.homescreen.btnDeleteTemplate') %>">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M19 7L5 7M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2">
+                            </path>
+                          </svg>
+                        </a>
+                        <%}%>
+                          <!-- Clone Template Only visible in System Templates -->
+                          <%if (!disableOption.disableCloneOption) {%>
+                            <a href="<%= '/template/duplicate/' + tpl.id%>"
+                              class="inline-flex items-center justify-center w-9 h-9 rounded-md bg-green-600 hover:bg-green-700 text-white transition"
+                              role="button" data-toggle="tooltip" data-placement="left"
+                              title="<%= __('tooltp-Template-Duplicate') %>">
+                              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
+                                focusable="false">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M8 7H6a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
+                                <rect x="9" y="3" width="11" height="11" rx="2" ry="2" stroke-linecap="round"
+                                  stroke-linejoin="round"></rect>
+                              </svg>
+                            </a>
+                            <%}%>
+                </div>
+              </td>
+            </tr>
+            <% }); } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

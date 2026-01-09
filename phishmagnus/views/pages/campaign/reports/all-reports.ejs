@@ -1,0 +1,57 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900"><%= __("breadcrumbs.reports") %></span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900">Campaign Reports</h3>
+  </div>
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm uppercase tracking-wider text-gray-400 mb-2">Report Center</p>
+      <p class="text-sm text-gray-500 mt-1">View detailed reports for all your phishing campaigns.</p>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-col p-6 pt-0">
+  <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white p-6 lg:p-10 lg:px-40">
+    <h2 class="text-xl text-center font-semibold mb-4">Campaign Reporting</h2>
+
+    <!-- Responsive grid: margin-x-6 (24px) on mobile; resets to mx-0 at md and up if you wish -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mx-6 md:mx-0">
+      <a href="/phm/campaign/email/report" id="mail"
+        class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
+        <img src="/securemagnus_2025/images/img/c-mail.svg" class="size-20" alt="">
+        Email
+      </a>
+      <a href="#" id="sms" data-modal-target="sms"
+        class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
+        <img src="/securemagnus_2025/images/img/c-sms.svg" class="size-20" alt="">
+        SMS
+      </a>
+      <a href="#" id="usb" data-modal-target="usb"
+        class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
+        <img src="/securemagnus_2025/images/img/c-usb.svg" class="size-20" alt="">
+        USB
+      </a>
+      <a href="/phm/campaign/nfc/report" id="nfc" data-modal-target="nfc"
+        class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
+        <img src="/securemagnus_2025/images/img/c-nfc.svg" class="size-20" alt="">
+        NFC
+      </a>
+      <a href="/phm/campaign/qr/report" id="qr" data-modal-target="qr"
+        class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
+        <img src="/securemagnus_2025/images/img/c-qr.svg" class="size-20" alt="">
+        QR
+      </a>
+      <a href="/phm/campaign/qr/report" id="wp" data-modal-target="wp"
+        class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
+        <img src="/securemagnus_2025/images/img/c-wp.svg" class="size-20" alt="">
+        WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
+

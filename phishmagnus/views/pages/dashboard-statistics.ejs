@@ -1,0 +1,296 @@
+<div class="row">
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="ion-android-contacts text-success"></i>
+            <h2 class="m-0 counter">
+                <%= totalCampaigns %>
+            </h2>
+            <div>
+                Total Campaigns Initiated
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg" >
+            <i class="ion-android-contacts text-success" style="line-height: 100px;"></i>
+            <h2 class="m-0 counter">
+                <%= lastCampaignDate %>
+            </h2>
+            <div>
+                Last Campaign Date
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="ion-android-contacts text-success"></i>
+            <h2 class="m-0 counter">
+                <%= phishingTypesData?.emailData.total_campaign_initiaged%>
+            </h2>
+            <div>
+                Email Phishing Campaigns
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="ion-android-contacts text-success"></i>
+            <h2 class="m-0 counter">
+                <%= phishingTypesData?.usbData.total_campaign_initiaged%>
+            </h2>
+            <div>
+                USB Phishing Campaigns
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<div class="row">
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="ion-android-contacts text-success"></i>
+            <h2 class="m-0 counter">
+                <%= phishingTypesData?.qrData.total_campaign_initiaged %>
+            </h2>
+            <div>
+                QR Phishing Campaigns
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="ion-android-contacts text-success"></i>
+            <h2 class="m-0 counter">
+                <%= phishingTypesData?.smsData.total_campaign_initiaged %>
+            </h2>
+            <div>
+                SMS Phishing Campaigns
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="ion-android-contacts text-success"></i>
+            <h2 class="m-0 counter">
+                <%= phishingTypesData?.nfcData.total_campaign_initiaged %>
+            </h2>
+            <div>
+               NFC Phishing Campaigns
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="ion-android-contacts text-success" style="line-height: 90px;"></i>
+            <h2 class="m-0 counter">
+                <%= phishingTypesData?.whatsappData.total_campaign_initiaged %>
+            </h2>
+            <div>
+                Whatsapp Phishing Campaigns
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-hand-o-up text-danger" style="line-height: 66px;"></i>
+            <h2 class="m-0 counter">
+                <%= phishingStatisticsByEmailCategories[0]?.is_phish_msg_link_opened %>
+            </h2>
+            <div>
+                Clicked Links
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="ion-eye text-pink"></i>
+            <h2 class="m-0 counter">
+                <%= phishingStatisticsByEmailCategories[0]?.is_phish_msg_data_entered_in_form %>
+            </h2>
+            <div>
+                Interact Form
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="ion-document-text text-purple"></i>
+            <h2 class="m-0 counter">
+                <%= phishingStatisticsByEmailCategories[0]?.is_phish_msg_data_entered_submited_in_form %>
+            </h2>
+            <div>
+               Form Submit
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="ion-paperclip text-warning"></i>
+            <h2 class="m-0 counter">
+                <%= phishingStatisticsByEmailCategories[0]?.is_phish_msg_file_downloaded %>
+            </h2>
+            <div>
+                Attachment Open
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<div class="row">
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-send-o text-success" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= inviteesEmailSentStatistics[0]?.sent_count %>
+            </h2>
+            <div>
+                Emails Sent
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-folder-open text-pink" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= inviteesEmailSentStatistics[0]?.is_phish_msg_opened %>
+            </h2>
+            <div>
+                Emails Opened
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-send-o text-success" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= statistics==null ? 0 : statistics.is_phish_msg_data_entered_submited_in_form %>
+            </h2>
+            <div>
+                SMS Sent
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-folder-open text-pink" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= statistics==null ? 0 : statistics.is_phish_msg_file_downloaded%>
+            </h2>
+            <div>
+                SMS Opened
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-send-o text-success" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= phishingStatisticsByUSB[0]?.total_usb_created %>
+            </h2>
+            <div>
+                USBs Created
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-folder-open text-pink" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= phishingStatisticsByUSB[0]?.is_clicked || 0 %>
+            </h2>
+            <div>
+                USBs Opened
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-send-o text-success" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= phishingStatisticsByQR[0]?.total_qrs_created || 0%>
+            </h2>
+            <div>
+                QR Created
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-folder-open text-pink" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= phishingStatisticsByQR[0]?.number_of_scans || 0%>
+            </h2>
+            <div>
+                QR Scanned
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<div class="row">
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-send-o text-success" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= phishingStatisticsByNFC[0]?.total_qrs_created || 0 %>
+            </h2>
+            <div>
+                NFC Created
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-folder-open text-pink" style="line-height: 36px;"></i>
+            <h2 class="m-0 counter">
+                <%= phishingStatisticsByNFC[0]?.number_of_scans || 0 %>
+            </h2>
+            <div>
+                NFC Scanned
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-send-o text-success" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= statistics==null ? 0 : statistics.is_phish_msg_data_entered_submited_in_form%>
+            </h2>
+            <div>
+                Whatsapp Messages Sent
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="widget-panel widget-style-2 white-bg">
+            <i class="fa fa-folder-open text-pink" style="line-height: 68px;"></i>
+            <h2 class="m-0 counter">
+                <%= statistics==null ? 0 : statistics.is_phish_msg_file_downloaded%>
+            </h2>
+            <div>
+                Whatsapp Messages Opened
+            </div>
+        </div>
+    </div>
+</div>
+ 

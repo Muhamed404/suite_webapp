@@ -1,0 +1,286 @@
+<div class="flex flex-col p-6 gap">
+
+  <div class="flex items-center justify-between">
+    <h3 class="text-3xl font-medium">AwareMagnus Dashboard</h3>
+    <div class="  p-0 text-sm ">
+      <ul class="flex items-center gap-2">
+
+        <a href=""
+          class="md:flex  hidden items-center justify-center gap-3 px-6 py-3 rounded-full bg-white text-[var(--darkblue)] border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+          <span class="iconify" data-icon="lucide:calendar" data-width="18" data-height="18"></span>
+          View Campaign
+        </a>
+        <a href=""
+          class="md:flex  hidden items-center justify-center gap-3 px-6 py-3 rounded-full bg-white text-[var(--darkblue)] border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+          <span class="iconify" data-icon="iconoir:notes" data-width="18" data-height="18"></span>
+          View Report</a>
+
+
+        <a id="openModal"
+          class="flex items-center justify-center gap-3 px-6 max-sm:px-3 py-3  rounded-full bg-[var(--teal)] text-white border border-transparent transition-all duration-300 hover:bg-[var(--mainblue)] hover:border-[var(--mainblue)]">
+          <img src="/securemagnus_2025/images/img/add.svg" class="size-5" alt="">
+          <p class="md:flex  hidden">New Campaign</p>
+        </a>
+
+        <!-- First Modal (Center Modal) -->
+        <div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+          <div class="bg-white rounded-3xl p-6 lg:p-10 lg:px-40 w-full max-w-3xl relative m-3">
+            <!-- Close Button -->
+            <button id="closeModal" class="absolute top-3 right-3 text-gray-500 hover:text-black text-xl">
+              <img src="/securemagnus_2025/images/img/close.svg" alt="">
+            </button>
+
+            <h2 class="text-xl text-center font-semibold mb-4">Create New Campaign</h2>
+
+            <!-- Responsive grid: margin-x-6 (24px) on mobile; resets to mx-0 at md and up if you wish -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mx-6 md:mx-0">
+              <a href="#" class="modal-option flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                <img src="/securemagnus_2025/images/img/c-mail.svg" class="size-20" alt="">
+                Email
+              </a>
+              <a href="#" class="modal-option flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                <img src="/securemagnus_2025/images/img/c-sms.svg" class="size-20" alt="">
+                SMS
+              </a>
+              <a href="#" class="modal-option flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                <img src="/securemagnus_2025/images/img/c-usb.svg" class="size-20" alt="">
+                USB
+              </a>
+              <a href="#" class="modal-option flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                <img src="/securemagnus_2025/images/img/c-nfc.svg" class="size-20" alt="">
+                NFC
+              </a>
+              <a href="#" class="modal-option flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                <img src="/securemagnus_2025/images/img/c-qr.svg" class="size-20" alt="">
+                QR
+              </a>
+              <a href="#" class="modal-option flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                <img src="/securemagnus_2025/images/img/c-wp.svg" class="size-20" alt="">
+                WhatsApp
+              </a>
+            </div>
+          </div>
+
+
+
+
+        </div>
+
+        <!-- Right Popup Modal -->
+        <div id="rightModalOverlay" class="fixed inset-0 bg-black/50 z-50 hidden flex justify-end">
+          <div id="rightModal"
+            class="bg-white  rounded-3xl m-[30px] w-full max-w-md transform translate-x-full transition-transform duration-300 shadow-xl relative overflow-y-auto">
+            <div class="p-6 h-full justify-between flex flex-col relative">
+              <div> <!-- Close Button -->
+                <button id="closeRightModal" class="absolute top-4 right-4 text-gray-500 hover:text-black text-xl">
+                  <img src="/securemagnus_2025/images/img/close.svg" alt="Close" />
+                </button>
+
+                <!-- Header -->
+                <h2 class="text-2xl text-[var(--mainblue)] font-medium mb-6">Create
+                  Campaign</h2>
+
+                <div class="w-full h-px bg-gray-200 mb-4"></div>
+
+                <!-- Campaign Name -->
+                <div class="mb-4">
+                  <label class="block text-[var(--mainblue)] mb-1">Campaign
+                    Name</label>
+                  <input type="text" placeholder="Enter Campaign Name"
+                    class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-500" />
+                </div>
+
+                <!-- Description -->
+                <div class="mb-4">
+                  <label class="block text-[var(--mainblue)] mb-1">Description</label>
+                  <textarea placeholder="Write your phishing mail" rows="3"
+                    class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-500"></textarea>
+                </div>
+
+                <!-- Templates Option -->
+                <div class="mb-4">
+                  <label class="inline-flex items-center">
+                    <input aria-label="Radio" type="radio" name="demo-radio-custom"
+                      class="radio size-4 mr-1.5 border-black text-black checked:border-[var(--teal)] checked:bg-[var(--teal)] checked:text-[var(--teal)]" />
+                    <span class="text-sm text-[var(--mainblue)]">My Templates</span>
+                  </label>
+                </div>
+
+                <!-- Start & End Time -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label class="block text-[var(--mainblue)] mb-1">Start
+                      Time</label>
+                    <div class="dropdown dropdown-start mt-1 w-full">
+                      <div role="button" class="input flex w-full p-0 border-none items-center gap-2" tabindex="0">
+                        <input
+                          class="grow border border-gray-200 rounded-lg p-1 px-4 [appearance:none] [&amp;::-webkit-calendar-picker-indicator]:hidden"
+                          placeholder="Pick a day" id="input-cally-target" type="date">
+                        <div class="border border-gray-200 rounded-lg p-2 btn-ghost">
+                          <span class="iconify" data-icon="lucide:calendar" data-width="14" data-height="14"></span>
+                        </div>
+                      </div>
+                      <div class="dropdown-content mt-2" tabindex="0">
+                        <calendar-date class="cally bg-base-100 rounded-box shadow-md transition-all hover:shadow-lg"
+                          id="input-cally-element" value="-">
+                          <span class="iconify lucide--chevron-left" slot="previous"></span>
+                          <span class="iconify lucide--chevron-right" slot="next"></span>
+                          <calendar-month></calendar-month>
+                        </calendar-date>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <label class="block text-[var(--mainblue)] mb-1">End
+                      Time</label>
+                    <div class="dropdown dropdown-start mt-1 w-full">
+                      <div role="button" class="input flex w-full p-0 border-none items-center gap-2" tabindex="0">
+                        <input
+                          class="grow border border-gray-200 rounded-lg p-1 px-4 [appearance:none] [&amp;::-webkit-calendar-picker-indicator]:hidden"
+                          placeholder="Pick a day" id="input-cally-target" type="date">
+                        <div class="border border-gray-200 rounded-lg p-2 btn-ghost">
+                          <span class="iconify" data-icon="lucide:calendar" data-width="14" data-height="14"></span>
+                        </div>
+                      </div>
+                      <div class="dropdown-content mt-2" tabindex="0">
+                        <calendar-date class="cally bg-base-100 rounded-box shadow-md transition-all hover:shadow-lg"
+                          id="input-cally-element" value="-">
+                          <span class="iconify lucide--chevron-left" slot="previous"></span>
+                          <span class="iconify lucide--chevron-right" slot="next"></span>
+                          <calendar-month></calendar-month>
+                        </calendar-date>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Department Options -->
+                <div class="mb-4">
+                  <label class="block text-[var(--mainblue)] mb-1">Department</label>
+                  <div class="flex items-center gap-6 text-sm">
+                    <label class="inline-flex items-center">
+                      <input aria-label="Radio" type="radio" name="demo-radio-custom"
+                        class="radio size-4 mr-1.5 border-black text-black checked:border-[var(--teal)] checked:bg-[var(--teal)] checked:text-[var(--teal)]" />
+                      All Departments
+                    </label>
+                    <label class="inline-flex items-center">
+                      <input aria-label="Radio" type="radio" name="demo-radio-custom"
+                        class="radio size-4 mr-1.5 border-black text-black checked:border-[var(--teal)] checked:bg-[var(--teal)] checked:text-[var(--teal)]" />
+                      Custom Department
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Select Group -->
+                <div class="mb-6">
+                  <label class="block text-[var(--mainblue)] mb-1">Select
+                    Group</label>
+                  <input type="text" placeholder="Select Your Group"
+                    class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-500" />
+                </div>
+
+
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex justify-between gap-4">
+                <a href=""
+                  class="flex items-center w-full justify-center gap-3 mt-8 px-6 py-3 rounded-full bg-transparent text-[var(--teal)] border border-[var(--teal)] transition-all duration-300 hover:bg-[var(--teal)] hover:border-[var(--teal)] hover:text-white">
+                  <!-- <span class="iconify lucide--log-in size-4"></span> -->
+                  Test Campaign
+                </a>
+                <a href="createCampaign.html"
+                  class="flex items-center w-full justify-center gap-3 mt-8 px-6 py-3 rounded-full bg-[var(--teal)] text-white border border-transparent transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+                  <!-- <span class="iconify lucide--log-in size-4"></span> -->
+                  Launch Campaign
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="flex flex-col  p-6 pt-0">
+
+
+
+  <!-- first section  -->
+
+
+  <div class="grid grid-cols-12 auto-rows-auto gap-4 max-sm:grid-cols-2 max-sm:auto-rows-auto">
+    <!-- Total User Licenses -->
+    <div
+      class="col-span-3 row-span-4 max-sm:col-span-1 rounded-3xl p-6 text-white bg-gradient-to-br from-cyan-600 to-teal-400">
+      <div class="flex flex-col items-start justify-between h-full">
+        <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-15" alt="">
+        <div class="flex flex-col gap-0">
+          <div class="text-5xl font-semibold mt-8">
+            <%= awmPurchasedLicense%>
+          </div>
+          <div class="text-base">Total User Licenses</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consumed Licenses -->
+
+    <div class="flex flex-col gap-3 col-span-3 row-span-4 max-sm:col-span-1">
+      <div class="rounded-3xl bg-white  p-6 flex flex-col items-center justify-center">
+        <div class="relative w-40 h-40">
+          <svg class="w-full h-full rotate-[-90deg]">
+            <circle cx="80" cy="80" r="70" stroke="#C1EBEA" stroke-width="10" fill="none" />
+            <circle id="progressCircleRemainingBalance" cx="80" cy="80" r="70" stroke="var(--teal)" stroke-width="10"
+              fill="none" stroke-linecap="round" />
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center text-3xl font-semibold text-[var(--teal)]"
+            id="remaininglicenseBalance">
+            <%=awmConsumeLicense%>
+          </div>
+        </div>
+        <p class="mt-2 text-base text-gray-600 max-sm:text-center leading-tight">Consumed
+          Licenses</p>
+      </div>
+
+    </div>
+
+
+
+
+
+
+    <!-- Phishing Campaigns -->
+    <div class="col-span-6 row-span-7 max-sm:col-span-2 bg-white rounded-3xl p-6 flex flex-col justify-between">
+      <div class="flex justify-between items-start gap-2">
+        <div>
+          <h2 class="font-semibold lg:text-2xl text-xl mb-2">Phishing Campaigns</h2>
+          <p class="text-base text-gray-500">Last Campaign Date :  <%=awmLicenseExpiry%>
+          </p>
+        </div>
+        <a href=""
+          class="flex items-center justify-center gap-3 lg:px-6 text-sm lg:py-3 rounded-full bg-white text-[var(--teal)] lg:text-[var(--darkblue)] lg:border border-[var(--strokeGray)] transition-all duration-300 lg:hover:bg-transparent lg:hover:border-[var(--teal)] lg:hover:text-[var(--teal)]">
+          View Campaign
+        </a>
+      </div>
+      <div id="layout-content">
+        <div id="campaignChart" class="flex justify-center"></div>
+      </div>
+    </div>
+
+
+
+
+
+  </div>
+
+
+
+
+</div>

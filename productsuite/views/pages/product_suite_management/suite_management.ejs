@@ -1,0 +1,317 @@
+<div class="flex flex-col p-6 gap">
+<% if(locals_phm_subscription){%>
+
+    <%if(magnusAdmin===false) {%>
+        <div class="flex justify-between gap-4 ">
+            <h3 class="text-3xl font-semibold mb-6">
+                <%= __("productsuite.labels.screenTitle") %>
+            </h3>
+            <a href="/suite_management_dashboard/dashboard">
+                <img src="/securemagnus_2025/images/toggle.svg" alt="">
+            </a>
+        </div>
+        <%}%>
+
+
+            <!-- first section  -->
+
+
+            <div class="flex flex-col gap-6 p-6 bg-[#FAFBFC] rounded-3xl mb-5">
+
+                <%if(magnusAdmin===false) {%>
+                    <div class="flex max-sm:flex-col max-sm:items-start gap-2.5 items-center justify-between ">
+                        <img src="/securemagnus_2025/images/phishmagnus_logo.svg" class="max-w-64" alt="">
+
+                        <div class="flex items-center gap-3">
+                            <a href="/phm/index"
+                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-transparent text-[var(--teal)] border border-[var(--teal)] transition-all duration-300 hover:bg-[var(--teal)] hover:text-white">
+                                <%= __("productsuite.btn.dashboard") %>
+                            </a>
+
+                            <a href="/organization/subscription-history"
+                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-transparent text-[var(--teal)] border border-[var(--teal)] transition-all duration-300 hover:bg-[var(--teal)] hover:text-white">
+                                <%= __("productsuite.btn.subscription") %>
+                            </a>
+
+                            <a href="/phm/index"
+                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-[var(--teal)] text-white border border-[var(--teal)] transition-all duration-300 hover:bg-transparent hover:text-[var(--teal)]">
+                                <%= __("productsuite.btn.openProduct") %>
+
+                            </a>
+                        </div>
+                    </div>
+
+                    <%}%>
+
+                        <div class="grid grid-cols-12  gap-4 max-sm:grid-cols-2 max-sm:grid-rows-1">
+
+
+
+                            <!-- Phishing Campaigns -->
+                            <div
+                                class="col-span-6 row-span-7 max-sm:col-span-2 [background:linear-gradient(135deg,_#ffffff_0%,_#ffffff_50%,_#00E2C150_100%)] bg-center bg-cover bg-no-repeat rounded-3xl p-6 flex flex-col items-center justify-center">
+
+
+                                <img src="/securemagnus_2025/images/phishMagnusLogo.svg" class="h-10" alt="">
+                            </div>
+
+
+                            <!-- Total User Licenses -->
+
+
+                            <div
+                                class="rounded-3xl p-6 pb-[32px] col-span-3 row-span-4 max-sm:col-span-1 max-sm:pb-6 flex flex-col items-start justify-between bg-[linear-gradient(to_bottom_right,#0891b2_0%,#2dd4bf_100%)] text-white">
+
+                                <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-15" alt="">
+                                <div class="text-5xl font-semibold mt-8 text-white">
+                                    <%= phmPurchasedLicense %>
+                                </div>
+                                <div class="text-base text-white pt-2 leading-tight">
+                                                    <%= __("productsuite.labels.totalLicense") %>
+                                    
+                                </div>
+
+                            </div>
+
+
+
+                            <!-- Consumed Licenses -->
+
+
+                            <div
+                                class="rounded-3xl bg-white p-6 flex flex-col items-center justify-center  col-span-3 row-span-4 max-md:col-span-1">
+                                <div class="relative w-40 h-40">
+                                    <svg class="w-full h-full rotate-[-90deg]">
+                                        <circle cx="80" cy="80" r="70" stroke="#C1EBEA" stroke-width="10" fill="none" />
+                                        <circle id="progressCircle1" cx="80" cy="80" r="70" stroke="var(--teal)"
+                                            stroke-width="10" fill="none" stroke-linecap="round" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center text-3xl font-semibold text-[var(--teal)]"
+                                        id="progressText1">
+                                        <%=phmConsumeLicense%>
+                                        
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-base text-gray-600 max-sm:text-center leading-tight">
+                                    <%= __("productsuite.labels.usedLicense") %>
+                                </p>
+                            </div>
+
+
+
+                            <%if(magnusAdmin===false) {%>
+
+                                <div class="lg:row-span-3 lg:col-span-6 max-sm:col-span-2">
+                                    <div
+                                        class="py-7 px-5 bg-[#EBF7F7] rounded-3xl flex flex-row gap-4 justify-between items-center flex-wrap">
+                                        <!-- Date Section -->
+                                        <div class="flex flex-row gap-4 items-center">
+                                            <img src="/securemagnus_2025/images/calanderteal.svg" alt="Calendar" />
+                                            <div class="flex flex-col">
+                                                <p class="text-2xl font-semibold">
+                                                    <%= phmLicenseExpiry %>
+                                                </p>
+                                                <p class="text-sm font-light">
+                                                                    <%= __("productsuite.labels.licenseExpiry") %>
+                                                    
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Contact Section -->
+                                        <div class="flex flex-col gap-2.5 items-end">
+                                            <p class="text-xl font-semibold">
+                                                <%= __("productsuite.labels.contactSupport") %>
+                                            </p>
+                                            <div class="flex flex-row gap-2">
+                                                <img src="/securemagnus_2025/images/messageteal.svg" alt="Message"
+                                                    class="w-8 h-8" />
+                                                <img src="/securemagnus_2025/images/headphoneteal.svg" alt="Support"
+                                                    class="w-8 h-8" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <%}else{%>
+
+                                    <div class="lg:row-span-1 lg:col-span-6 max-sm:col-span-2">
+                                        <a href="/phm/index"
+                                            class="flex items-center justify-center gap-3 lg:px-6 py-3 rounded-full bg-[var(--teal)] text-white border border-[var(--teal)] transition-all duration-300 hover:bg-transparent hover:text-[var(--teal)]">
+                                            <%= __("productsuite.btn.dashboard") %>
+
+                                        </a>
+                                    </div>
+                                    <%}%>
+                        </div>
+
+
+            </div>
+
+            <!-- second section -->
+            <div class="flex flex-col gap-6 p-6 bg-[#FAFBFC] rounded-3xl ">
+
+                <%if(magnusAdmin===false) {%>
+                    <div class="flex max-sm:flex-col max-sm:items-start gap-2.5 items-center justify-between ">
+                        <img src="/securemagnus_2025/images/awarenessMagnus-logo.svg" class="max-w-64" alt="">
+
+                        <div class="flex items-center gap-3">
+                            <a href="/awm/index"
+                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-transparent text-[var(--blue)] border border-[var(--blue)] transition-all duration-300 hover:bg-[var(--blue)] hover:text-white">
+                                <%= __("productsuite.btn.dashboard") %>
+                            </a>
+
+                            <a href="#"
+                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-transparent text-[var(--blue)] border border-[var(--blue)] transition-all duration-300 hover:bg-[var(--blue)] hover:text-white">
+                                <%= __("productsuite.btn.subscription") %>
+                            </a>
+
+                            <a href="#"
+                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-[var(--blue)] text-white border border-[var(--blue)] transition-all duration-300 hover:bg-transparent hover:text-[var(--blue)]">
+                                <%= __("productsuite.btn.openProduct") %>
+
+                            </a>
+                        </div>
+                    </div>
+                    <%}%>
+                        <div class="grid grid-cols-12  gap-4 max-sm:grid-cols-2 max-sm:grid-rows-1">
+
+
+
+                            <!-- Phishing Campaigns -->
+                            <div
+                                class="col-span-6 row-span-7 max-sm:col-span-2 [background:linear-gradient(135deg,_#ffffff_0%,_#66CAFE_400%)] rounded-3xl p-6 flex flex-col items-center justify-center">
+
+
+                                <img src="/securemagnus_2025/images/awarenessMagnus-logo.svg" class="" alt="">
+                            </div>
+
+
+                            <!-- Total User Licenses -->
+
+
+                            <div
+                                class="rounded-3xl p-6 pb-[42px] col-span-3 row-span-4 max-sm:col-span-1 max-sm:pb-6 flex flex-col items-start justify-between bg-[linear-gradient(to_bottom_right,#1C80FF,#66CAFE)]">
+
+                                <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-15" alt="">
+                                <div class="text-5xl font-semibold mt-8 text-white">
+                                    <%=awmPurchasedLicense%>
+                                </div>
+                                <div class="text-base text-white pt-2 leading-tight">                <%= __("productsuite.labels.totalLicense") %>
+</div>
+
+                            </div>
+
+
+
+                            <!-- Consumed Licenses -->
+
+
+                            <div
+                                class="rounded-3xl bg-white p-6 flex flex-col items-center justify-center  col-span-3 row-span-4 max-md:col-span-1">
+                                <div class="relative w-40 h-40">
+                                    <svg class="w-full h-full rotate-[-90deg]">
+                                        <circle cx="80" cy="80" r="70" stroke="#C1EBEA" stroke-width="10" fill="none" />
+                                        <circle id="progressCircle2" cx="80" cy="80" r="70" stroke="var(--blue)"
+                                            stroke-width="10" fill="none" stroke-linecap="round" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center text-3xl font-semibold text-[var(--blue)]"
+                                        id="progressText2">
+                                        <%=awmConsumeLicense%>
+                                    </div>
+                                </div>
+                                <p class="mt-2 text-base text-gray-600 max-sm:text-center leading-tight"><%= __("productsuite.labels.usedLicense") %></p>
+                            </div>
+
+
+
+                        <%if(magnusAdmin===false) {%>
+
+                            <div class="lg:row-span-3 lg:col-span-6 max-sm:col-span-2">
+                                <div
+                                    class="py-7 px-5 bg-[#EDF4FA] rounded-3xl flex flex-row gap-4 justify-between items-center flex-wrap">
+                                    <!-- Date Section -->
+                                    <div class="flex flex-row gap-4 items-center">
+                                        <img src="/securemagnus_2025/images/calanderblue.svg" alt="Calendar" />
+                                        <div class="flex flex-col">
+                                            <p class="text-2xl font-semibold">
+                                                <%= awmLicenseExpiry %>
+                                            </p>
+                                            <p class="text-sm font-light"><%= __("productsuite.labels.licenseExpiry") %></p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Contact Section -->
+                                    <div class="flex flex-col gap-2.5 items-end">
+                                        <p class="text-xl font-semibold"><%= __("productsuite.labels.contactSupport") %></p>
+                                        <div class="flex flex-row gap-2">
+                                            <img src="/securemagnus_2025/images/messageblue.svg" alt="Message"
+                                                class="w-8 h-8" />
+                                            <img src="/securemagnus_2025/images/headphoneblue.svg" alt="Support"
+                                                class="w-8 h-8" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                                <%}else{%>
+                                    <div class="lg:row-span-1 lg:col-span-6 max-sm:col-span-2">
+        <a href="#"
+          class="flex items-center justify-center gap-3 lg:px-6 py-3 rounded-full bg-[var(--blue)] text-white border border-[var(--blue)] transition-all duration-300 hover:bg-transparent hover:text-[var(--blue)]">
+          <%= __("productsuite.btn.dashboard") %>
+
+        </a>
+      </div>
+      <%}%>
+
+                        </div>
+
+
+            </div>
+
+
+<%}else {%>
+
+    <div class="flex flex-col items-center justify-center min-h-[300px] bg-white rounded-2xl shadow-md p-8 mt-8">
+      <div class="flex items-center justify-center mb-4">
+        <!-- Heroicons Exclamation Circle SVG -->
+        <svg class="w-12 h-12 text-yellow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-semibold text-gray-800 mb-2"><%= __("productsuite.labels.noActiveSubscription") %></h2>
+      <p class="text-gray-600 text-center mb-4">
+        <%= __("productsuite.messages.noActiveSubscriptionMessage") %>
+      </p>
+      <a href="/organization/subscription-history"
+         class="inline-block px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition">
+        <%= __("productsuite.btn.viewSubscriptionOptions") %>
+      </a>
+    </div>
+
+    <%}%>
+</div>
+
+
+
+<div id="licenseStatsData"
+  data-phm-purchased="<%= phmPurchasedLicense || 0 %>"
+  data-phm-consumed="<%= phmConsumeLicense || 0 %>"
+  data-awm-purchased="<%= awmPurchasedLicense || 0 %>"
+  data-awm-consumed="<%= awmConsumeLicense || 0 %>"></div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const statsEl = document.getElementById("licenseStatsData");
+    if (!statsEl || typeof setProgress !== "function") return;
+
+    const phmPurchasedLicense = Number(statsEl.dataset.phmPurchased || 0);
+    const phmConsumeLicense = Number(statsEl.dataset.phmConsumed || 0);
+    const awmPurchasedLicense = Number(statsEl.dataset.awmPurchased || 0);
+    const awmConsumeLicense = Number(statsEl.dataset.awmConsumed || 0);
+
+    setProgress("progressCircle1", "progressText1", phmConsumeLicense, phmPurchasedLicense);
+    setProgress("progressCircle2", "progressText2", awmConsumeLicense, awmPurchasedLicense);
+  });
+</script>

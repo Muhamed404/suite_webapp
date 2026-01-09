@@ -1,0 +1,766 @@
+<div class="flex flex-col p-6 pt-0">
+    <!-- Header Section -->
+    <div class="flex flex-col gap-4 mt-3">
+        <!-- Title -->
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-semibold my-2">
+                    <%= __("sms.campaign_details.title") || "SMS Campaign Details" %>
+                </h1>
+                <p class="text-gray-500">
+                    <%= campaign?.name || "Campaign Name" %>
+                </p>
+            </div>
+            <div class="flex gap-2">
+                <a href="/phm/campaign/sms/<%= campaign?.id %>/edit"
+                    class="px-4 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition">
+                    <i class="fas fa-edit mr-2"></i>
+                    <%= __("sms.campaign_details.edit") || "Edit" %>
+                </a>
+                <a href="/phm/campaign/sms"
+                    class="px-4 py-2 rounded-full bg-gray-300 text-gray-800 hover:bg-gray-400 transition">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <%= __("sms.campaign_details.back") || "Back" %>
+                </a>
+            </div>
+        </div>
+
+        <!-- Top Metrics - SMS Specific -->
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mt-4">
+            <!-- Total SMS Sent -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between gap-2 mb-4">
+                    <p class="text-gray-600 text-xs font-medium">
+                        <%= __("sms.campaign_details.total_sms_sent") || "SMS Sent" %>
+                    </p>
+                    <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-envelope text-blue-600 text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-gray-900">
+                    <%= campaign?.smsStats?.totalSMSSent || 0 %>
+                </p>
+            </div>
+
+            <!-- SMS Delivered -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between gap-2 mb-4">
+                    <p class="text-gray-600 text-xs font-medium">
+                        <%= __("sms.campaign_details.sms_delivered") || "Delivered" %>
+                    </p>
+                    <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-600 text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-green-600">
+                    <%= campaign?.smsStats?.totalDelivered || 0 %>
+                </p>
+            </div>
+
+            <!-- Link Clicked -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between gap-2 mb-4">
+                    <p class="text-gray-600 text-xs font-medium">
+                        <%= __("sms.campaign_details.link_clicked") || "Link Clicked" %>
+                    </p>
+                    <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-link text-purple-600 text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-purple-600">
+                    <%= campaign?.smsStats?.is_link_clicked || 0 %>
+                </p>
+            </div>
+
+            <!-- Page Visited -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between gap-2 mb-4">
+                    <p class="text-gray-600 text-xs font-medium">
+                        <%= __("sms.campaign_details.page_visited") || "Page Visited" %>
+                    </p>
+                    <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-globe text-orange-600 text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-orange-600">
+                    <%= campaign?.smsStats?.is_page_visited || 0 %>
+                </p>
+            </div>
+
+            <!-- Form Submitted -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between gap-2 mb-4">
+                    <p class="text-gray-600 text-xs font-medium">
+                        <%= __("sms.campaign_details.form_submitted") || "Form Submitted" %>
+                    </p>
+                    <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-check text-teal-600 text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-teal-600">
+                    <%= campaign?.smsStats?.is_form_submitted || 0 %>
+                </p>
+            </div>
+
+            <!-- File Downloaded -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between gap-2 mb-4">
+                    <p class="text-gray-600 text-xs font-medium">
+                        <%= __("sms.campaign_details.file_downloaded") || "File Downloaded" %>
+                    </p>
+                    <div class="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-download text-red-600 text-sm"></i>
+                    </div>
+                </div>
+                <p class="text-2xl font-bold text-red-600">
+                    <%= campaign?.smsStats?.is_file_downloaded || 0 %>
+                </p>
+            </div>
+        </div>
+
+        <!-- Main Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
+            <!-- Campaign Metrics Bar Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 lg:col-span-2">
+                <h2 class="text-lg font-semibold mb-6 text-gray-900">
+                    <%= __("sms.campaign_details.interaction_metrics") || "Interaction Metrics" %>
+                </h2>
+                <div id="campaignMetricsChart" style="height: 350px;"></div>
+            </div>
+
+            <!-- SMS Interaction Summary - Donut Chart -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-semibold mb-6 text-gray-900">
+                    <%= __("sms.campaign_details.interaction_summary") || "Interaction Summary" %>
+                </h2>
+                <div id="interactionSummaryChart" style="height: 350px;"></div>
+            </div>
+        </div>
+
+        <!-- Detailed Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <!-- SMS Reply Stats -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-semibold mb-4 text-gray-900">
+                    <%= __("sms.campaign_details.sms_reply_stats") || "SMS Reply Stats" %>
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">
+                            <%= __("sms.campaign_details.sms_replied") || "SMS Replied" %>
+                        </span>
+                        <span class="font-semibold text-lg text-blue-600">
+                            <%= campaign?.smsStats?.is_sms_replied || 0 %>
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">
+                            <%= __("sms.campaign_details.call_made") || "Call Made" %>
+                        </span>
+                        <span class="font-semibold text-lg text-orange-600">
+                            <%= campaign?.smsStats?.is_call_made || 0 %>
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">
+                            <%= __("sms.campaign_details.otp_shared") || "OTP Shared" %>
+                        </span>
+                        <span class="font-semibold text-lg text-red-600">
+                            <%= campaign?.smsStats?.is_otp_shared || 0 %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campaign Details -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-semibold mb-4 text-gray-900">
+                    <%= __("sms.campaign_details.campaign_details") || "Campaign Details" %>
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">
+                            <%= __("sms.campaign_details.campaign_name") || "Campaign Name" %>
+                        </span>
+                        <span class="font-medium text-gray-900">
+                            <%= campaign?.name || "N/A" %>
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">
+                            <%= __("sms.campaign_details.template_name") || "Template" %>
+                        </span>
+                        <span class="font-medium text-gray-900">
+                            <%= campaign?.template?.name || "N/A" %>
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">
+                            <%= __("sms.campaign_details.launch_date") || "Launch Date" %>
+                        </span>
+                        <span class="font-medium text-gray-900">
+                            <%= campaign?.launchDate || "N/A" %>
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-600">
+                            <%= __("sms.campaign_details.status") || "Status" %>
+                        </span>
+                        <span
+                            class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full <%= campaign?.campaignStatus === 'Active' ? 'bg-green-100 text-green-800' : campaign?.campaignStatus === 'Completed' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800' %>">
+                            <%= campaign?.campaignStatus || "Unknown" %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Performance -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-lg font-semibold mb-4 text-gray-900">
+                    <%= __("sms.campaign_details.delivery_performance") || "Delivery Performance" %>
+                </h2>
+                <div class="space-y-4">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600 text-sm">
+                                <%= __("sms.campaign_details.delivery_rate") || "Delivery Rate" %>
+                            </span>
+                            <span class="font-semibold text-teal-600">
+                                <%= campaign?.smsStats?.deliveryRate || "0%" %>
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-teal-600 h-2 rounded-full"
+                                style="width: <%= campaign?.smsStats?.deliveryRate?.replace('%', '') || 0 %>%">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600 text-sm">
+                                <%= __("sms.campaign_details.interaction_rate") || "Interaction Rate" %>
+                            </span>
+                            <span class="font-semibold text-blue-600">
+                                <% const interactionRate=((campaign?.smsStats?.is_link_clicked || 0) /
+                                    (campaign?.smsStats?.totalSMSSent || 1) * 100).toFixed(2) %>
+                                    <%= interactionRate %>%
+                            </span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: <%= interactionRate %>%">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interaction Breakdown Charts -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+            <!-- Link Interaction -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-link text-purple-600 text-lg"></i>
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <%= __("sms.campaign_details.link_interaction") || "Link Clicked" %>
+                    </h3>
+                </div>
+                <div id="linkInteractionChart"></div>
+            </div>
+
+            <!-- Form Interaction -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-check text-teal-600 text-lg"></i>
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <%= __("sms.campaign_details.form_interaction") || "Form Interacted" %>
+                    </h3>
+                </div>
+                <div id="formInteractionChart"></div>
+            </div>
+
+            <!-- Page Visit -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-globe text-orange-600 text-lg"></i>
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <%= __("sms.campaign_details.page_visit") || "Page Visited" %>
+                    </h3>
+                </div>
+                <div id="pageVisitChart"></div>
+            </div>
+
+            <!-- File Download -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center gap-2 mb-4">
+                    <i class="fas fa-download text-red-600 text-lg"></i>
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        <%= __("sms.campaign_details.file_download") || "File Downloaded" %>
+                    </h3>
+                </div>
+                <div id="fileDownloadChart"></div>
+            </div>
+        </div>
+
+        <!-- Invitee Response Table -->
+        <div class="mt-6 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <div class="flex items-center justify-between gap-3 px-6 py-5 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900">
+                    <%= __("sms.campaign_details.invitee_responses") || "Invitee Responses" %>
+                </h2>
+                <div class="relative flex-1 max-w-xs">
+                    <input type="text" id="responseSearchInput" placeholder="<%= __(" generic_label.search_here")
+                        || 'Search...' %>"
+                    class="w-full pl-10 pr-4 py-2 rounded-full bg-gray-50 text-sm border border-gray-300
+                    focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-[#FAFBFC] border-b border-gray-200">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap">
+                                <%= __("sms.campaign_details.invitee_name") || "Invitee Name" %>
+                            </th>
+                            <th class="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap text-center">
+                                <%= __("sms.campaign_details.sms_delivered") || "Delivered" %>
+                            </th>
+                            <th class="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap text-center">
+                                <%= __("sms.campaign_details.link_clicked") || "Link Clicked" %>
+                            </th>
+                            <th class="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap text-center">
+                                <%= __("sms.campaign_details.page_visited") || "Page Visited" %>
+                            </th>
+                            <th class="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap text-center">
+                                <%= __("sms.campaign_details.form_interacted") || "Form Interacted" %>
+                            </th>
+                            <th class="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap text-center">
+                                <%= __("sms.campaign_details.form_submitted") || "Form Submitted" %>
+                            </th>
+                            <th class="px-6 py-4 font-semibold text-gray-700 whitespace-nowrap text-center">
+                                <%= __("sms.campaign_details.sms_interacted") || "Interacted" %>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="inviteeTableBody">
+                        <!-- Rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <!-- Pagination Controls -->
+            <div
+                class="px-6 py-4 border-t border-gray-200 flex flex-col gap-3 md:flex-row items-center justify-between">
+                <div class="text-sm text-gray-600">
+                    <span id="paginationInfo">Showing 0 of 0</span>
+                </div>
+                <div class="flex flex-wrap gap-1 justify-center">
+                    <button id="prevBtn"
+                        class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm whitespace-nowrap">
+                        <i class="fas fa-chevron-left mr-1"></i>
+                        <%= __("generic_label.previous") || "Previous" %>
+                    </button>
+                    <div id="pageNumbers" class="flex flex-wrap gap-1 justify-center"></div>
+                    <button id="nextBtn"
+                        class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm whitespace-nowrap">
+                        <%= __("generic_label.next") || "Next" %>
+                            <i class="fas fa-chevron-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ApexCharts CDN -->
+
+<script>
+    // Pass data from EJS to JavaScript
+    window.CampaignData = {
+        campaign_name: '<%= campaign?.name || "N/A" %>',
+        total_sms: <%= campaign?.smsStats?.totalSMSSent || 0 %>,
+        delivered: <%= campaign?.smsStats?.totalDelivered || 0 %>,
+            link_clicked: <%= campaign?.smsStats?.is_link_clicked || 0 %>,
+                page_visited: <%= campaign?.smsStats?.is_page_visited || 0 %>,
+                    form_interacted: <%= campaign?.smsStats?.is_form_interacted || 0 %>,
+                        form_submitted: <%= campaign?.smsStats?.is_form_submitted || 0 %>,
+                            file_downloaded: <%= campaign?.smsStats?.is_file_downloaded || 0 %>,
+                                sms_replied: <%= campaign?.smsStats?.is_sms_replied || 0 %>,
+                                    call_made: <%= campaign?.smsStats?.is_call_made || 0 %>,
+                                        otp_shared: <%= campaign?.smsStats?.is_otp_shared || 0 %>,
+                                            sms_interacted: <%= campaign?.smsStats?.is_sms_interacted || 0 %>,
+                                                totalSMSSent: <%= campaign?.smsStats?.totalSMSSent || 0 %>
+    };
+
+    // Initialize Charts
+    document.addEventListener('DOMContentLoaded', () => {
+        // Campaign Metrics Bar Chart
+        const metricsChart = new ApexCharts(document.getElementById('campaignMetricsChart'), {
+            series: [{
+                name: '<%= __("sms.campaign_details.count") || "Count" %>',
+                data: [
+                    window.CampaignData.link_clicked,
+                    window.CampaignData.page_visited,
+                    window.CampaignData.form_interacted,
+                    window.CampaignData.form_submitted,
+                    window.CampaignData.file_downloaded
+
+                ]
+            }],
+            chart: {
+                type: 'bar',
+                height: 350,
+                toolbar: { show: false }
+            },
+            plotOptions: {
+                bar: { columnWidth: '55%', borderRadius: 4, dataLabels: { position: 'top' } }
+            },
+            dataLabels: { enabled: true, offsetY: -20, style: { fontSize: '12px', colors: ['#304758'] } },
+            xaxis: {
+                categories: [
+                    '<%= __("sms.campaign_details.link_clicked") || "Link Clicked" %>',
+                    '<%= __("sms.campaign_details.page_visited") || "Page Visited" %>',
+                    '<%= __("sms.campaign_details.form_interacted") || "Form Interacted" %>',
+                    '<%= __("sms.campaign_details.form_submitted") || "Form Submitted" %>',
+                    '<%= __("sms.campaign_details.file_downloaded") || "File Downloaded" %>'
+                ],
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            colors: ['#14b8a6']
+        });
+        metricsChart.render();
+
+        // Interaction Summary Donut Chart
+        const summaryChart = new ApexCharts(document.getElementById('interactionSummaryChart'), {
+            series: [
+                window.CampaignData.totalSMSSent - window.CampaignData.sms_interacted,
+                window.CampaignData.sms_interacted
+            ],
+            chart: { type: 'donut', height: 350 },
+            labels: [
+                '<%= __("sms.campaign_details.no_interaction") || "No Interaction" %>',
+                '<%= __("sms.campaign_details.interacted") || "Interacted" %>'
+            ],
+            colors: ['#10b981', '#ef4444'],  // Changed: Green for No Interaction, Red for Interacted
+            plotOptions: {
+                pie: {
+                    donut: {
+                        size: '65%',
+                        labels: {
+                            show: true,
+                            name: { show: true },
+                            value: { show: true }
+                        }
+                    }
+                }
+            }
+        });
+        summaryChart.render();
+
+        // Link Interaction Radial Chart
+        const linkChart = new ApexCharts(document.getElementById('linkInteractionChart'), {
+            series: [Math.round((window.CampaignData.link_clicked / window.CampaignData.total_sms) * 100) || 0],
+            chart: { type: 'radialBar', height: 200 },
+            plotOptions: {
+                radialBar: {
+                    startAngle: -90,
+                    endAngle: 90,
+                    hollow: { size: '70%' },
+                    dataLabels: { name: { show: false }, value: { show: true, fontSize: '18px', fontWeight: 'bold' } }
+                }
+            },
+            colors: ['#a855f7'],
+            labels: ['%']
+        });
+        linkChart.render();
+
+        // Form Interaction Radial Chart
+        const formChart = new ApexCharts(document.getElementById('formInteractionChart'), {
+            series: [Math.round((window.CampaignData.form_interacted / window.CampaignData.total_sms) * 100) || 0],
+            chart: { type: 'radialBar', height: 200 },
+            plotOptions: {
+                radialBar: {
+                    startAngle: -90,
+                    endAngle: 90,
+                    hollow: { size: '70%' },
+                    dataLabels: { name: { show: false }, value: { show: true, fontSize: '18px', fontWeight: 'bold' } }
+                }
+            },
+            colors: ['#14b8a6'],
+            labels: ['%']
+        });
+        formChart.render();
+
+        // Page Visit Radial Chart
+        const pageChart = new ApexCharts(document.getElementById('pageVisitChart'), {
+            series: [Math.round((window.CampaignData.page_visited / window.CampaignData.total_sms) * 100) || 0],
+            chart: { type: 'radialBar', height: 200 },
+            plotOptions: {
+                radialBar: {
+                    startAngle: -90,
+                    endAngle: 90,
+                    hollow: { size: '70%' },
+                    dataLabels: { name: { show: false }, value: { show: true, fontSize: '18px', fontWeight: 'bold' } }
+                }
+            },
+            colors: ['#f97316'],
+            labels: ['%']
+        });
+        pageChart.render();
+
+        // File Download Radial Chart
+        const fileChart = new ApexCharts(document.getElementById('fileDownloadChart'), {
+            series: [Math.round((window.CampaignData.file_downloaded / window.CampaignData.total_sms) * 100) || 0],
+            chart: { type: 'radialBar', height: 200 },
+            plotOptions: {
+                radialBar: {
+                    startAngle: -90,
+                    endAngle: 90,
+                    hollow: { size: '70%' },
+                    dataLabels: { name: { show: false }, value: { show: true, fontSize: '18px', fontWeight: 'bold' } }
+                }
+            },
+            colors: ['#ef4444'],
+            labels: ['%']
+        });
+        fileChart.render();
+
+        // Search functionality
+        document.getElementById('responseSearchInput')?.addEventListener('keyup', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('table tbody tr');
+
+            rows.forEach(row => {
+                const name = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
+                if (name.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+
+<script>
+    const ITEMS_PER_PAGE = 10;
+    const CAMPAIGN_ID = '<%= campaign?.id %>';
+    let currentPage = 1;
+    let totalPages = 1;
+    let searchTerm = '';
+
+    // Initialize pagination on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        renderTable(currentPage);
+        setupEventListeners();
+    });
+
+    // Fetch table data via AJAX
+    function renderTable(page) {
+        const tbody = document.getElementById('inviteeTableBody');
+        tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-8 text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+
+        const params = new URLSearchParams({
+            page: page,
+            pageSize: ITEMS_PER_PAGE,
+            search: searchTerm
+        });
+
+        fetch(`/phm/campaign/sms/${CAMPAIGN_ID}/invitees?${params}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch invitees');
+                return response.json();
+            })
+            .then(result => {
+                if (result.success) {
+                    renderTableRows(result.data);
+                    totalPages = result.pagination.totalPages;
+                    currentPage = result.pagination.page;
+
+                    // Update pagination info
+                    const startIdx = (page - 1) * ITEMS_PER_PAGE + 1;
+                    const endIdx = Math.min(page * ITEMS_PER_PAGE, result.pagination.total);
+                    document.getElementById('paginationInfo').textContent =
+                        `Showing ${startIdx}-${endIdx} of ${result.pagination.total}`;
+
+                    renderPaginationControls();
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-gray-500">Error loading data</td></tr>`;
+                }
+            })
+            .catch(error => {
+                logger.error('Error fetching invitees:', error);
+                tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-red-500">Error: ${error.message}</td></tr>`;
+            });
+    }
+
+    // Render table rows
+    function renderTableRows(invitees) {
+        const tbody = document.getElementById('inviteeTableBody');
+        tbody.innerHTML = '';
+
+        if (invitees.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+                        No invitee responses yet
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        invitees.forEach(response => {
+            // Convert to boolean if needed
+            const isSmsDelivered = response.is_sms_delivered === 1 || response.is_sms_delivered === true || response.is_sms_delivered === 'true';
+            const isLinkClicked = response.is_link_clicked === 1 || response.is_link_clicked === true || response.is_link_clicked === 'true';
+            console.log('isLinkClicked:', isLinkClicked);
+            const isPageVisited = response.is_page_visited === 1 || response.is_page_visited === true || response.is_page_visited === 'true';
+            const isFormInteracted = response.is_form_interacted === 1 || response.is_form_interacted === true || response.is_form_interacted === 'true';
+            const isFormSubmitted = response.is_form_submitted === 1 || response.is_form_submitted === true || response.is_form_submitted === 'true';
+            const isSmsInteracted = response.is_sms_interacted === 1 || response.is_sms_interacted === true || response.is_sms_interacted === 'true';
+
+            const row = document.createElement('tr');
+            row.className = 'border-b border-gray-200 hover:bg-blue-50 transition-colors';
+            row.innerHTML = `
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user text-teal-600 text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="font-medium text-gray-900">${response.inviteeName || "Unknown"}</p>
+                            <p class="text-xs text-gray-500">${response.inviteeEmail || "N/A"}</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full ${isSmsDelivered ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}">
+                        <i class="fas ${isSmsDelivered ? 'fa-check' : 'fa-times'} text-xs"></i>
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full ${response.is_link_clicked ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}">
+                        <i class="fas ${response.is_link_clicked ? 'fa-check' : 'fa-times'} text-xs"></i>
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full ${response.is_page_visited ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-600'}">
+                        <i class="fas ${response.is_page_visited ? 'fa-check' : 'fa-times'} text-xs"></i>
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full ${response.is_form_interacted ? 'bg-teal-100 text-teal-600' : 'bg-gray-100 text-gray-600'}">
+                        <i class="fas ${response.is_form_interacted ? 'fa-check' : 'fa-times'} text-xs"></i>
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full ${response.is_form_submitted ? 'bg-teal-100 text-teal-600' : 'bg-gray-100 text-gray-600'}">
+                        <i class="fas ${response.is_form_submitted ? 'fa-check' : 'fa-times'} text-xs"></i>
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full ${response.is_sms_interacted ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}">
+                        <i class="fas ${response.is_sms_interacted ? 'fa-check' : 'fa-times'} text-xs"></i>
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    // Render pagination buttons
+    // Render pagination buttons with smart pagination
+    function renderPaginationControls() {
+        const pageNumbersContainer = document.getElementById('pageNumbers');
+        pageNumbersContainer.innerHTML = '';
+
+        const maxVisiblePages = 5; // Show maximum 5 page buttons
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Adjust start page if end page is at the limit
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // First page button
+        if (startPage > 1) {
+            const firstBtn = document.createElement('button');
+            firstBtn.innerHTML = '<i class="fas fa-step-backward"></i>';
+            firstBtn.className = 'px-2 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition text-sm';
+            firstBtn.title = 'First page';
+            firstBtn.addEventListener('click', () => {
+                currentPage = 1;
+                renderTable(currentPage);
+            });
+            pageNumbersContainer.appendChild(firstBtn);
+
+            const dots = document.createElement('span');
+            dots.textContent = '...';
+            dots.className = 'px-1 py-2 text-gray-500 text-xs';
+            pageNumbersContainer.appendChild(dots);
+        }
+
+        // Page number buttons
+        for (let i = startPage; i <= endPage; i++) {
+            const btn = document.createElement('button');
+            btn.textContent = i;
+            btn.className = `px-3 py-2 rounded-lg transition text-sm ${i === currentPage
+                    ? 'bg-teal-600 text-white font-semibold'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`;
+            btn.addEventListener('click', () => {
+                currentPage = i;
+                renderTable(currentPage);
+            });
+            pageNumbersContainer.appendChild(btn);
+        }
+
+        // Last page button
+        if (endPage < totalPages) {
+            const dots = document.createElement('span');
+            dots.textContent = '...';
+            dots.className = 'px-1 py-2 text-gray-500 text-xs';
+            pageNumbersContainer.appendChild(dots);
+
+            const lastBtn = document.createElement('button');
+            lastBtn.innerHTML = '<i class="fas fa-step-forward"></i>';
+            lastBtn.className = 'px-2 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition text-sm';
+            lastBtn.title = 'Last page';
+            lastBtn.addEventListener('click', () => {
+                currentPage = totalPages;
+                renderTable(currentPage);
+            });
+            pageNumbersContainer.appendChild(lastBtn);
+        }
+
+        // Update prev/next buttons
+        document.getElementById('prevBtn').disabled = currentPage === 1;
+        document.getElementById('nextBtn').disabled = currentPage === totalPages;
+    }
+    // Setup event listeners
+    function setupEventListeners() {
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentPage > 1) {
+                renderTable(currentPage - 1);
+            }
+        });
+
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                renderTable(currentPage + 1);
+            }
+        });
+
+        document.getElementById('responseSearchInput')?.addEventListener('keyup', function (e) {
+            searchTerm = e.target.value;
+            currentPage = 1;
+            renderTable(currentPage);
+        });
+    }
+</script>

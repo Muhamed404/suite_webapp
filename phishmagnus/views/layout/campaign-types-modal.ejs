@@ -1,0 +1,90 @@
+<div id="campaign-panel-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+    style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content p-0 b-0">
+            <div class="panel panel-color panel-primary">
+                <div class="panel-heading">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    <h3 class="panel-title">
+                        <%= __("Campaign.Choose.Type") %>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-3 col-sm-6">
+                            <a href="/phm/campaign/email/m">
+                                <div class="widget-panel widget-style-2 white-bg">
+                                    <i class="ion-ios7-email-outline text-success"  ></i>
+                                    <h2>
+                                        <%= __("Campaign.Choose.Email") %>
+                                    </h2>
+
+                                </div>
+
+
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-sm-6">
+                            <a href="/phm/campaign/sms/m/">
+                                <div class="widget-panel widget-style-2 white-bg" style="padding-bottom: 40px; ">
+                                    <i class="fa fa-mobile-phone text-warning" style="font-size: 70px;"></i>
+                                    <h2 >
+                                        <%= __("Campaign.Choose.SMS") %>
+                                    </h2>
+
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-sm-6">
+                            <a href="/phm/campaign/usb/m">
+                                <div class="widget-panel widget-style-2 white-bg">
+                                    <i class="ion-usb text-pink" ></i>
+                                    <h2  >
+                                        <%= __("Campaign.Choose.USB") %>
+                                    </h2>
+
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-lg-3 col-sm-6">
+                            <a href="/phm/campaign/nfc/m/">
+                                <div class="widget-panel widget-style-2 white-bg">
+                                    <i class="ion-social-rss-outline text-info" ></i>
+                                    <h2  >
+                                        <%= __("Campaign.Choose.NFC") %>
+                                    </h2>
+
+                                </div>
+                            </a>
+                        </div>
+                        
+
+                    </div>
+
+                    <div class="row">
+                       
+                       
+                        <div class="col-lg-3 col-sm-6">
+                            <a href="/phm/campaign/qr/m/">
+                                <div class="widget-panel widget-style-2 white-bg">
+                                    <i class="ion-qr-scanner text-info" ></i>
+                                    <h2  >
+                                        <%= __("Campaign.Choose.QR") %>
+                                    </h2>
+
+                                </div>
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <%= __("btn.Close") %>
+                    </button>
+                    <!-- <button type="button" class="btn btn-primary"><%= __("Campaign.Choose.Type") %></button> -->
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

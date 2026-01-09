@@ -1,0 +1,165 @@
+<div class="flex flex-col  p-6 pt-0">
+
+
+
+    <!-- first section  -->
+
+    <div class="">
+
+        <div id="invoice" class="flex flex-col p-8 gap-4 mt-3 rounded-3xl bg-white">
+            <!-- Header -->
+            <div class="flex justify-between items-center border-b pb-4 mb-6">
+                <div class="flex items-center gap-2">
+                    <img src="/securemagnus_2025/images/logo.svg" alt="Logo">
+
+                </div>
+                <div class="text-right text-gray-600">
+                    <p class="text-sm"><%= __("Invoice.number") %></p>
+                    <p class="font-semibold">2015-04-23654789</p>
+                </div>
+            </div>
+
+            <!-- Organization Info -->
+            <div class="mb-6">
+                <p class="text-gray-800 font-semibold"><%= __("Invoice.organizationName") %>: <span class="font-normal"><%=invoiceData.name%></span>
+                </p>
+                <p><span class="font-semibold"><%= __("Invoice.mainAddress") %>:</span> <%=invoiceData.Subscription[0].SubscriptionOrder.res_address%>
+                      <%=invoiceData.Subscription[0].SubscriptionOrder.ResCountry.name%>,
+                                              <%=invoiceData.Subscription[0].SubscriptionOrder.ResStates.name%>,
+                                              <%=invoiceData.Subscription[0].SubscriptionOrder.ResCity.name%></p>
+                <p><span class="font-semibold"><%= __("Invoice.billingAddress") %>:</span> <%=invoiceData.Subscription[0].SubscriptionOrder.bil_address%> , 
+                                              <%=invoiceData.Subscription[0].SubscriptionOrder.BilCountry.name%>,
+                                              <%=invoiceData.Subscription[0].SubscriptionOrder.BilStates.name%>,
+                                              <%=invoiceData.Subscription[0].SubscriptionOrder.BilCity.name%></p>
+                <p><span class="font-semibold"><%= __("Invoice.contact") %>:</span> <%=invoiceData.Subscription[0].SubscriptionOrder.mobile %></p>
+                <p><span class="font-semibold"><%= __("Invoice.email") %>:</span> <%=invoiceData.Subscription[0].SubscriptionOrder.email%></p>
+            </div>
+
+            <!-- Order Info -->
+            <div class="mb-6 flex justify-between text-gray-700">
+                <div></div>
+                <div>
+                    <p><span class="font-semibold"><%= __("Invoice.orderDate") %>:</span> <%=invoiceData.Subscription[0].SubscriptionOrder.creation_date %></p>
+                    <p><span class="font-semibold"><%= __("Invoice.orderStatus") %>:</span> 
+                        <% if(invoiceData.Subscription[0].SubscriptionOrder.payment_status_id === enums.paymentStatus.BankProgress){%>
+                            <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-sm"><%= __("Enums.BankProgress") %></span>
+                                            <%}else if(invoiceData.Subscription[0].SubscriptionOrder.payment_status_id === enums.paymentStatus.Unpaid){%>
+                                                <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-sm"><%= __("Enums.Unpaid") %></span>
+                                                <%}else if(invoiceData.Subscription[0].SubscriptionOrder.payment_status_id === enums.paymentStatus.InProgress){%>
+                                                    <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-sm"><%= __("Enums.InProgress") %></span>
+                                                <%}else if(invoiceData.Subscription[0].SubscriptionOrder.payment_status_id === enums.paymentStatus.Disputed){%>
+                                                    <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-sm"><%= __("Enums.Disputed") %></span>
+                                                    <%}else if(invoiceData.Subscription[0].SubscriptionOrder.payment_status_id === enums.paymentStatus.Cancelled){%>
+                                                        <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-sm"><%= __("Enums.Cancelled") %></span>
+                                                    <%}else if(invoiceData.Subscription[0].SubscriptionOrder.payment_status_id === enums.paymentStatus.Free){%>
+                                                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm"><%= __("Enums.Free") %></span>
+                                                        <%}else if(invoiceData.Subscription[0].SubscriptionOrder.payment_status_id === enums.paymentStatus.Paid){%>
+                                                            <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-sm"><%= __("Enums.Paid") %></span>
+                                                            <%}else{%>
+                                                                <span class="bg-orange-100 text-orange-700 px-2 py-1 rounded text-sm"><%= __("Enums.Unpaid") %></span>
+                                                            <%}%>
+
+                        </p>
+                    <p><span class="font-semibold"><%= __("Invoice.orderID") %>:</span> <%=invoiceData.Subscription[0].SubscriptionOrder.id %></p>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto mb-6">
+                <table class="w-full border border-gray-200 text-left text-sm">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            
+                            <th class="px-4 py-2 border">#</th>
+                            <th class="px-4 py-2 border"><%= __("Invoice.Application") %></th>
+                            <th class="px-4 py-2 border"><%= __("Invoice.Services") %></th>
+                            <th class="px-4 py-2 border"><%= __("Invoice.perUserCost") %></th>
+                            <th class="px-4 py-2 border"><%= __("Invoice.numberOfUser") %></th>
+                            <th class="px-4 py-2 border"><%= __("Invoice.stDate") %></th>
+                            <th class="px-4 py-2 border"><%= __("Invoice.expiryDate") %></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                         <tr>
+                                <td class="px-4 py-2 border"><%=invoiceData.Subscription[0].SubscriptionOrder.id %></td>
+                                <td class="px-4 py-2 border"><%=invoiceData.Subscription[0].SubscribedService[0].ApplicationServices.Applications.name %></td>
+                                <%
+                                const services = invoiceData.Subscription[0].SubscribedService;
+
+                                const serviceNames = services.map(s => s.ApplicationServices.service_name).join(', ');
+                                const licenseCost = invoiceData.Subscription[0].SubscriptionOrder.total_cost;
+                                const discountPercentage = invoiceData.Subscription[0].SubscriptionOrder.discount;
+                                const discountFactor = 1 - (discountPercentage / 100);
+                                const originalAmount = licenseCost / discountFactor;
+                                %>
+                                <td class="px-4 py-2 border"><%=serviceNames%></td>
+                                <td class="px-4 py-2 border"><%=originalAmount %></td>
+                                <td class="px-4 py-2 border"><%=invoiceData.Subscription[0].user_licenses %></td>
+                                <td class="px-4 py-2 border"><%=invoiceData.Subscription[0].start_date %></td>
+                                <td class="px-4 py-2 border"><%=invoiceData.Subscription[0].expiry_date %></td>
+                                <% let totalCost =2  * invoiceData.Subscription[0].user_licenses   %>
+                                
+                            </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Summary -->
+            <div class="border-t pt-4 text-right">
+                <p class="text-gray-700"><span class="font-semibold"><%= __("Invoice.subTotal") %>:</span> SAR <%=originalAmount %></p>
+                <p class="text-gray-700"><span class="font-semibold"><%= __("Invoice.discount") %>:</span> <%=invoiceData.Subscription[0].SubscriptionOrder.discount %> %</p>
+                <p class="text-xl font-bold mt-2"><%= __("Invoice.totalPayable") %>: SAR <%=invoiceData.Subscription[0].SubscriptionOrder.payment_amount %></p>
+            </div>
+
+            <!-- Download Button -->
+            <div class="mt-6 flex justify-end">
+                <button id="download-pdf"
+                    class="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-lg border border-green-300 hover:bg-green-200">
+                    Download as PDF
+                </button>
+                <button class="btn btn-primary" onclick="goBack()"><%= __("Invoice.back") %></button>
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+
+</div>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+
+    
+    function goBack() {
+      window.history.back();
+    }
+    
+
+    document.getElementById('download-pdf').addEventListener('click', async () => {
+      const { jsPDF } = window.jspdf;
+      const invoice = document.getElementById('invoice');
+
+      const canvas = await html2canvas(invoice, { scale: 2 });
+      const imgData = canvas.toDataURL('image/png');
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidth = pageWidth;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      pdf.save('invoice.pdf');
+    });
+  </script>

@@ -1,0 +1,126 @@
+<!-- Modal -->
+<div id="popup" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white rounded-2xl  w-[950px] max-h-[90vh] flex flex-col">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center p-5 border-b bg-gradient-to-r rounded-t-2xl">
+      <h2 class="text-xl font-bold">Selected Users</h2>
+      <button onclick="closeModal()" class=" text-2xl hover:text-red-400">&times;</button>
+    </div>
+    <!-- Select Dropdown -->
+    <div class="flex items-center gap-4 px-5 py-3 bg-gray-50 border-b">
+      <label for="userActionSelect" class="text-gray-700 font-medium">Select Product:</label>
+      <select id="userActionSelect" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-400 bg-white text-gray-700">
+        <option value="">Choose a product</option>
+        <option value="awm">AwareMagnus</option>
+        <option value="phm">PhishMagnus</option>
+        <option value="grc">GRC</option>
+      </select>
+    </div>
+
+    <!-- Body -->
+    <div class="flex gap-6 p-6 flex-1 overflow-y-auto">
+
+      <!-- Enrolled -->
+      <div class="flex-1 border rounded-xl p-4   bg-white flex flex-col">
+        <input type="text" id="enrolledSearch" onkeyup="filterTable('enrolledSearch','enrolledTable')"
+          placeholder="Search Enrolled"
+          class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-400 mb-4 text-sm">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">Enrolled</h3>
+
+        <!-- Modern Table -->
+        <div class="overflow-hidden rounded-lg flex-1 flex flex-col border">
+          <div class="overflow-y-auto max-h-64">
+            <table class="w-full text-sm text-left border-collapse" id="enrolledTable">
+              <thead class="bg-gray-100 sticky top-0 z-10 text-gray-700">
+                <tr>
+                  <th class="px-4 py-2 border text-center w-12">
+                    <input type="checkbox" onclick="toggleAll(this,'enrolledCheckbox')">
+                  </th>
+                  <th class="px-4 py-2 border">First Name</th>
+                  <th class="px-4 py-2 border">Last Name</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+               
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <button onclick="moveToUnenrolled()"
+          class="mt-4 px-4 py-2 bg-red-100 text-red-700 border border-red-300 rounded-lg hover:bg-red-200 transition">
+          Move to Unenrolled
+        </button>
+      </div>
+
+      <!-- Unenrolled -->
+      <div class="flex-1 border rounded-xl p-4   bg-white flex flex-col">
+        <input type="text" id="unenrolledSearch" onkeyup="filterTable('unenrolledSearch','unenrolledTable')"
+          placeholder=" Search Unenrolled"
+          class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-400 mb-4 text-sm">
+        <h3 class="text-lg font-semibold text-gray-800 mb-3">Unenrolled</h3>
+
+        <!-- Modern Table -->
+        <div class="overflow-hidden rounded-lg   flex-1 flex flex-col border">
+          <div class="overflow-y-auto max-h-64">
+            <table class="w-full text-sm text-left border-collapse" id="unenrolledTable">
+              <thead class="bg-gray-100 sticky top-0 z-10 text-gray-700">
+                <tr>
+                  <th class="px-4 py-2 border text-center w-12">
+                    <input type="checkbox" onclick="toggleAll(this,'unenrolledCheckbox')">
+                  </th>
+                  <th class="px-4 py-2 border">First Name</th>
+                  <th class="px-4 py-2 border">Last Name</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                 
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <button onclick="moveToEnrolled()"
+          class="mt-4 px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded-lg hover:bg-green-200 transition">
+          Move to Enrolled
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="p-5 border-t bg-gray-50 flex justify-center">
+      <button onclick="closeModal()"
+        class="px-8 py-3 bg-teal-500  text-white font-semibold rounded-full   hover:opacity-90 transition">
+        Done
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
+
+  <!-- Unenroll Confirmation Modal JQuery-->
+  <div id="unenrollConfirmModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-40 flex items-center justify-center">
+    <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center">
+      <h2 class="text-xl font-semibold text-gray-800 mb-4">Confirm Unenrollment</h2>
+      <p class="text-gray-600 mb-6">Are you sure you want to unenroll the selected users?</p>
+      <div class="flex justify-center gap-4">
+        <button id="unenrollConfirmYes" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">Yes, Unenroll</button>
+        <button id="unenrollConfirmNo" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enroll Confirmation Modal -->
+<div id="enrollConfirmModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-40 flex items-center justify-center">
+  <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-sm text-center">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Confirm Enrollment</h2>
+    <p class="text-gray-600 mb-6">Are you sure you want to enroll the selected users?</p>
+    <div class="flex justify-center gap-4">
+      <button id="enrollConfirmYes" class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition">Yes, Enroll</button>
+      <button id="enrollConfirmNo" class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition">Cancel</button>
+    </div>
+  </div>
+</div>

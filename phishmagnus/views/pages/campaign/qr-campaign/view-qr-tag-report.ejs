@@ -1,0 +1,339 @@
+<div class="flex flex-col p-6 pt-0">
+
+
+
+  <!-- first section  -->
+
+  <div class="flex flex-col gap-4 mt-3">
+
+
+
+
+    <!-- Title -->
+    <h1 class="my-2 text-2xl font-semibold">QR Image Report : <%=qrReportProfile.qr_code%>
+    </h1>
+
+        <!-- Top Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">Total Not Scans</p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Report_Admin.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=interactionStats.number_of_scans%>
+
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">Open</p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Opened_by_people.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=interactionStats.is_opened%>
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">Download</p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/not_opened.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=interactionStats.is_downloaded%>
+
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">Total Submitted</p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/link_Clicked.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=interactionStats.is_submitted%>
+
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">Total Interact</p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Report_Admin.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=interactionStats.is_interacted%>
+
+                </p>
+            </div>
+        </div>
+
+    <!-- Main Section -->
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <!-- Bar Chart -->
+      <div class="col-span-2 p-6 bg-white rounded-xl">
+        <h2 class="mb-4 text-lg font-semibold">Campaign Metrics</h2>
+        <div id="chart"></div>
+      </div>
+
+      <!-- Phishing Success -->
+      <div class="flex flex-col items-start justify-start p-6 bg-white rounded-xl gap-11">
+        <h2 class="mb-4 text-lg font-semibold">Phishing Success</h2>
+
+        <div class="flex items-center justify-between w-full gap-10">
+          <!-- Left Side Labels -->
+          <div class="space-y-6">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-[#38bdf8]"></span>
+              <div>
+                <p class="text-sm text-gray-500">QR View</p>
+                <p class="text-lg font-bold text-gray-900" id="qrScanned">
+                    
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-[#f87171]"></span>
+              <div>
+                <p class="text-sm text-gray-500">Form Interacted</p>
+                <p class="text-lg font-bold text-gray-900" id="formInteract">
+                   
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-[#34d399]"></span>
+              <div>
+                <p class="text-sm text-gray-500">Total Activity </p>
+                <p class="text-lg font-bold text-gray-900" id="targetCompromisedText">
+                  
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Donut Chart -->
+          <div id="successChart" style="width:50%; height:50%;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Row -->
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <!-- Employees Phishing Segments -->
+      <div class="p-6 bg-white rounded-xl ">
+        <h2 class="mb-4 text-lg font-semibold">
+          Phishing Segments
+        </h2>
+        <div id="userPhishingSegmentsChart"></div>
+      </div>
+
+
+
+      <!-- Employee Details -->
+      <div class="p-6 bg-white rounded-xl ">
+        <h2 class="mb-6 text-lg font-semibold text-gray-800">QR & Campaign Details</h2>
+        <div class="space-y-4">
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">QR Image Code</span>
+            <span class="font-medium text-gray-800">
+              <%=qrReportProfile.qr_code%>
+            </span>
+          </div>
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Campaign Name</span>
+            <span class="font-medium text-gray-800">
+              <%=campaignDetails.name%>
+            </span>
+          </div>
+ 
+          <div class="flex justify-between text-sm">
+            <span class="text-gray-500">Campaign Date</span>
+            <span class="font-medium text-gray-800">              <%=campaignDetails.start_datetime%>
+</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- last table  -->
+
+    <!-- <div class="flex flex-col gap-4 mt-3 bg-white rounded-3xl">
+      <div class="flex items-center justify-between gap-3 px-5 pt-5">
+
+        <div class="relative">
+          <h2 class="mb-4 text-2xl">Interaction Report</h2>
+
+        </div>
+
+
+        <div class="flex gap-4">
+
+
+
+
+          <button class="hidden lg:block ms-auto">
+            <div class="relative">
+              <input type="text" placeholder="Search here..."
+                class="pl-14 pr-10 py-3 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+              <img src="/securemagnus_2025/images/img/search.svg"
+                class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-7 top-1/2" alt="">
+            </div>
+
+          </button>
+          <button class="hidden lg:block ms-auto">
+            <a href=""
+              class=" flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+
+              Sort by
+              <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
+            </a>
+
+          </button>
+        </div>
+
+
+        <a href="" class="block lg:hidden">
+          <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
+        </a>
+      </div>
+      <div class="overflow-x-auto hide-scrollbar">
+        <table class="min-w-full text-sm text-left">
+          <thead class="bg-[#FAFBFC]">
+            <tr>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">Campaign Name</th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">Date</th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">Risk Score</th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <img src="/securemagnus_2025/images/email-opned.svg" class="w-5 h-5" alt="">
+                  Open Email
+                </div>
+              </th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <img src="/securemagnus_2025/images/Links-Interaction.svg" class="w-5 h-5" alt="">
+                  Clicked Linked
+                </div>
+              </th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <img src="/securemagnus_2025/images/eye.svg" class="w-5 h-5" alt="">
+                  Interact Form
+                </div>
+              </th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <img src="/securemagnus_2025/images/form-submit.svg" class="w-5 h-5" alt="">
+                  Form Submit
+                </div>
+              </th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <img src="/securemagnus_2025/images/attachmentopened.svg" class="w-5 h-5" alt="">
+                  Attachment Opened
+                </div>
+              </th>
+              
+              </th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <img src="/securemagnus_2025/images/email-letter-mail-document.svg" class="w-5 h-5" alt="">
+                  Reported to Admin
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+    
+        <tr class="transition-colors border-t hover:bg-blue-50">
+              <td class="px-6 py-6 whitespace-nowrap">
+                111
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+               11
+              </td>
+              <td class="px-2 py-6 whitespace-nowrap">
+                <span
+                  class="inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50">
+                  Excellent
+                </span>
+
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+              111
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+            11
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+                11
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+                11
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+                11
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+               11
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+                11
+              </td>
+              
+          </tr>
+
+
+          </tbody>
+        </table>
+      </div>
+
+      <div class="flex items-center justify-between px-6 mt-16">
+
+        <p class="text-[#656972]">
+          Showing 1-8 out of 32 Entries
+        </p>
+
+
+        <div class="flex flex-wrap items-center justify-center gap-2 py-7 pb-9">
+          <button
+            class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] duration-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+            </svg>
+          </button>
+          <button
+            class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">1</button>
+          <button class="w-8 h-8 rounded-full bg-teal-50 text-[var(--teal)] border border-[var(--teal)]">2</button>
+          <button
+            class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">3</button>
+          <button
+            class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">4</button>
+          <button
+            class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] duration-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div> -->
+  </div>
+</div>
+
+
+
+<script>
+ 
+ 
+</script>
+<script>
+
+  // Pass user interaction timeline data to JavaScript
+  window.interactionTimeline = <%- JSON.stringify(interactionTimeline || []) %>;
+  window.interactionStats = <%- JSON.stringify(interactionStats || []) %>;
+
+
+
+</script>
+<script src="/securemagnus_2025/js/qr-tag-report.js"></script>

@@ -1,0 +1,6 @@
+<% var enableSuiteManagementLeftMenu = typeof enableSuiteManagementLeftMenu !== 'undefined' ? enableSuiteManagementLeftMenu : false; %>
+<% if (enableSuiteManagementLeftMenu) { %>
+  <%- include('layout_suite_mgmt_left_navbar') %>
+<% } else { %>
+  <%- include('layout_product_left_navbar') %>
+<% } %>

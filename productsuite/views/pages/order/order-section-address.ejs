@@ -1,0 +1,112 @@
+<section style="position: static">
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="orgAddress"
+      ><%= __("Order.Address") %> </label
+    >
+    <div class="col-lg-10">
+      <input
+        class="form-control required"
+        id="orgAddress"
+        name="orgAddress"
+        type="text"
+        value="<%= organization.address %>"
+      />
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="country">
+      <%= __("Order.Country") %></label
+    >
+    <div class="col-lg-10">
+      <select
+        class="form-control"
+        name="country"
+        id="country"
+        required
+      >
+        <option value="" selected disabled><%= __("Order.selCountry") %>   </option>
+        <% countries.forEach(c => { %>
+        <option value="<%= c.id %>"<%= c.id === organization.country_id ? 'selected' : '' %> > <%= c.name %> </option>
+        <% }); %>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="state"
+      ><%= __("Order.State") %> </label
+    >
+    <div class="col-lg-10">
+      <select
+        required
+        class="form-control"
+        name="state"
+        id="state"
+      >
+        <option value="" selected disabled><%= __("Order.selState") %>   </option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="ciy"><%= __("Order.City") %> </label>
+    <div class="col-lg-10">
+      <select class="form-control" name="city" id="city" required>
+        <option value="" selected disabled><%= __("Order.selCity") %></option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="postalCode"
+      ><%= __("Order.PostalCode") %>  </label
+    >
+    <div class="col-lg-10">
+      <input
+        id="postalCode"
+        name="postalCode"
+        type="text"
+        class="required form-control"
+        oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+        min="1"
+        value="<%= organization.postal_code %>"
+      />
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="email"
+      ><%= __("Order.Email") %> </label
+    >
+    <div class="col-lg-10">
+      
+      <div class="input-group m-t-10">
+        <input 
+        id="email"
+        name="email"
+        type="email"
+        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        class="required form-control"
+        value="<%= user.email %>"
+        class="form-control" placeholder="Email">
+        <span class="input-group-addon"><i class="fa fa-envelope-o"></i></span>
+    </div>
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="contact"
+      ><%= __("Order.Contact") %> </label
+    >
+    <div class="col-lg-10">
+      <input
+        id="contact"
+        name="contact"
+        pattern="[0-9]{10}"
+        type="text"
+        class="required form-control"
+        value="<%= user.contact %>"
+      />
+
+     </div>
+
+    <input type="hidden" value="<%=organization.state_id%>" id="hidState" name='hidState'  />
+    <input type="hidden" value="<%=organization.city_id%>" id="hidCity" name='hidCity' />
+  </div>
+</section>

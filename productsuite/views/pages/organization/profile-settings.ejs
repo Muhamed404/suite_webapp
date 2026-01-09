@@ -1,0 +1,77 @@
+<div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white">
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 rounded-3xl p-6 bg-white">
+    <!-- Departments -->
+    <a href="/department/list/<%= profile.id %>?On=<%- encodeURIComponent(profile.name || '') %>"
+      class="flex items-center justify-between bg-[#F1F5F8] rounded-full px-4 py-3 cursor-pointer hover:bg-gray-200 transition">
+      <div class="flex items-center gap-3">
+        <div><img src="/securemagnus_2025/images/departments.svg" alt="Departments"></div>
+        <span class="text-gray-800 font-medium"><%= __("organization.profile.tabSettings.btnDepartment") %></span>
+      </div>
+      <span><img src="/securemagnus_2025/images/next.svg" alt="Next"></span>
+    </a>
+
+    <!-- Group -->
+    <a href="/group/list/<%=profile.id%>?On=<%- encodeURIComponent(profile.name || '') %>"
+      class="flex items-center justify-between bg-[#F1F5F8] rounded-full px-4 py-3 cursor-pointer hover:bg-gray-200 transition">
+      <div class="flex items-center gap-3">
+        <div><img src="/securemagnus_2025/images/group.svg" alt="Group"></div>
+        <span class="text-gray-800 font-medium"><%= __("organization.profile.tabSettings.btnGroup") %></span>
+      </div>
+      <span><img src="/securemagnus_2025/images/next.svg" alt="Next"></span>
+    </a>
+<%if(magnusAdmin===false) {%>
+    <!-- Enroll User -->
+    <a href="/user/suite-users/<%=profile.id%>"
+      class="flex items-center justify-between bg-[#F1F5F8] rounded-full px-4 py-3 cursor-pointer hover:bg-gray-200 transition">
+      <div class="flex items-center gap-3">
+        <div><img src="/securemagnus_2025/images/enrollUser.svg" alt="Enroll User"></div>
+        <span class="text-gray-800 font-medium"><%= __("organization.profile.tabSettings.btnUser") %></span>
+      </div>
+      <span><img src="/securemagnus_2025/images/next.svg" alt="Next"></span>
+    </a>
+<%}%>
+    <!-- SMTP Settings -->
+    <a href="/settings/smtp/<%=profile.id%>?On=<%- encodeURIComponent(profile.name || '') %>"
+      class="flex items-center justify-between bg-[#F1F5F8] rounded-full px-4 py-3 cursor-pointer hover:bg-gray-200 transition">
+      <div class="flex items-center gap-3">
+        <div><img src="/securemagnus_2025/images/SMTPSettings.svg" alt="SMTP Settings"></div>
+        <span class="text-gray-800 font-medium"><%= __("organization.profile.tabSettings.btnSMTP") %></span>
+      </div>
+      <span><img src="/securemagnus_2025/images/next.svg" alt="Next"></span>
+    </a>
+<%if(magnusAdmin===false) {%>
+
+    <!-- Dashboard -->
+    <a href="/suite/management/<%= profile.id %>"
+      class="flex items-center justify-between bg-[#F1F5F8] rounded-full px-4 py-3 cursor-pointer hover:bg-gray-200 transition">
+      <div class="flex items-center gap-3">
+        <div><img src="/securemagnus_2025/images/dashboard.svg" alt="Dashboard"></div>
+        <span class="text-gray-800 font-medium"><%= __("organization.profile.tabSettings.btnSuiteDashboard") %></span>
+      </div>
+      <span><img src="/securemagnus_2025/images/next.svg" alt="Next"></span>
+    </a>
+<%}%>
+    
+    <!-- Audit Log -->
+    <a href="/audit/<%= profile.id %>?On=<%- encodeURIComponent(profile.name || '') %>"
+      class="flex items-center justify-between bg-[#F1F5F8] rounded-full px-4 py-3 cursor-pointer hover:bg-gray-200 transition">
+      <div class="flex items-center gap-3">
+        <div><img src="/securemagnus_2025/images/champaignLog.svg" alt="Campaign Log"></div>
+        <span class="text-gray-800 font-medium"> <%= __("organization.profile.tabSettings.btnAuditLog") %></span>
+      </div>
+      <span><img src="/securemagnus_2025/images/next.svg" alt="Next"></span>
+    </a>
+
+        <!-- SMS Settings -->
+    <a href="/sms/settings/<%=profile.id%>?On=<%- encodeURIComponent(profile.name || '') %>"
+      class="flex items-center justify-between bg-[#F1F5F8] rounded-full px-4 py-3 cursor-pointer hover:bg-gray-200 transition">
+      <div class="flex items-center gap-3">
+        <div><img src="/securemagnus_2025/images/SMTPSettings.svg" alt="SMS Settings"></div>
+        <span class="text-gray-800 font-medium"><%= __("organization.profile.tabSettings.btnSMS") %></span>
+      </div>
+      <span><img src="/securemagnus_2025/images/next.svg" alt="Next"></span>
+    </a>
+    
+  </div>  
+</div>

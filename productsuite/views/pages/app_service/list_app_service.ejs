@@ -1,0 +1,134 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex-1">
+      <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
+        <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+        <span class="text-gray-400">›</span>
+        <span class="font-semibold text-gray-900"><%= __("breadcrumbs.appService") %></span>
+      </nav>
+      <h3 class="text-3xl font-medium"><%= __("appservice.homescreen.title") %></h3>
+    </div>
+    <div class="p-0 text-sm lg:order-3">
+      <ul class="flex items-center gap-2">
+        <!-- You can add tab/filter items here if needed -->
+      </ul>
+    </div>
+    <a href="/app_service/create"
+      class="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-teal-600 text-white font-semibold shadow hover:bg-teal-700 transition-all duration-200 border border-teal-600 hover:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 lg:order-2"
+      title="<%= __('appservice.homescreen.btnCreateService') %>">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+        <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          d="M12 8v8m-4-4h8" />
+      </svg>
+    </a>
+  </div>
+</div>
+
+<div class="flex flex-col  p-6 pt-0">
+  <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
+    <!-- Search & Filter -->
+    <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
+      <!-- Dropdown outside -->
+      <div style="margin-bottom: 1rem;">
+        <select id="filter">
+          <option value=""><%= __("appservice.homescreen.optionAll") %></option>
+          <option value="AWM"><%= __("appservice.homescreen.optionAWM") %></option>
+          <option value="PhishMagnus"><%= __("appservice.homescreen.optionPhishMagnus") %></option>
+        </select>
+      </div>
+
+
+      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700">
+        <thead class="bg-gray-50 text-gray-600  text-xs">
+          <tr>
+
+            <th class="px-4 py-55 text-sm font-normal">
+              <%= __("appservice.homescreen.productName") %><img src="/securemagnus_2025/images/package_management/sort.svg" 
+                class="size-3.5 ml-3 inline">
+            </th>
+            <th class="px-4 py-5 text-sm font-normal">
+              <%= __("appservice.homescreen.serviceName") %>
+              <img src="/securemagnus_2025/images/package_management/sort.svg" 
+                class="size-3.5 ml-3 inline">
+            </th>
+            <th class="px-4 py-5 text-sm font-normal">
+              <%= __("appservice.homescreen.serviceType") %>
+              <img src="/securemagnus_2025/images/package_management/sort.svg" 
+                class="size-3.5 ml-3 inline">
+            </th>
+            <th class="px-4 py-5">
+              <img src="/securemagnus_2025/images/package_management/Package_Management_Type.svg" 
+                class=" inline">
+              <%= __("appservice.homescreen.serviceCost") %>
+
+              <span></span><img src="/securemagnus_2025/images/package_management/sort.svg" 
+                class="size-3.5 ml-3 inline">
+            </th>
+            <th class="px-4 py-5">
+              <img src="/securemagnus_2025/images/package_management/Package_Management_Type.svg" 
+                class=" inline">
+              <%= __("appservice.homescreen.serviceAction") %>
+
+              <span></span><img src="/securemagnus_2025/images/package_management/sort.svg" 
+                class="size-3.5 ml-3 inline">
+            </th>
+
+
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof appServices !=='undefined' ){ appServices.forEach(srv=> {%>
+
+            <tr>
+
+              <td class="px-6 py-6 whitespace-nowrap">
+                <%=srv.Applications.name %>
+
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap  ">
+                <%= srv.service_name %>
+
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap  ">
+                <%= srv.service_type %>
+
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap  ">
+                <%= srv.per_service_cost %>
+
+              </td>
+
+
+              <td class="px-4 py-5 text-sm font-normal relative">
+                <div class="relative inline-block text-left">
+                  <button type="button" onclick="this.nextElementSibling.classList.toggle('hidden')"
+                    class="p-2 rounded hover:bg-gray-100 transition" aria-haspopup="true" aria-expanded="false">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="1.5" />
+                      <circle cx="19" cy="12" r="1.5" />
+                      <circle cx="5" cy="12" r="1.5" />
+                    </svg>
+                  </button>
+                  <ul class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 hidden">
+                    <li>
+                      <a href="/app_service/remove/${srv.id}"
+                        class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
+                        <i class="ion-android-trash mr-2"></i>
+                        <%= __("appservice.homescreen.btnDelete") %>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+
+            </tr>
+
+            <% });}%>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

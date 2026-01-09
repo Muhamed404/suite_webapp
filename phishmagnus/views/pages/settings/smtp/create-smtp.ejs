@@ -1,0 +1,107 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+      <span class="text-gray-400">›</span>
+      <a href="/organization/profile/<%= org %>" class="hover:text-gray-700 transition"><%= Organization %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900"><%= __("breadcrumbs.smtp") %></span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900">
+      <%= Organization %> - <%= __("smtp.labelSMTPConfiguration") %>
+    </h3>
+  </div>
+</div>
+
+<div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white">
+
+  <div class="bg-white  w-full mt-3 p-8">
+
+
+
+    <!--  Title -->
+    <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10">
+      <%= __("smtp.labelSMTPConfiguration") %>
+    </h1>
+
+    <!-- Main Form -->
+    <form id="smtpSettingsForm" class="grid grid-cols-1 md:grid-cols-2 gap-8" action="/settings/smtp/<%= org %>"
+      method="post">
+      <!-- Organization name -->
+      <div class="md:col-span-1">
+        <label class="block text-gray-700 font-medium mb-3"><%= __("smtp.labelOrganizationName") %></label>
+        <input type="text"   id="org" readonly name="org" required
+          value="<%= Organization  %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+
+      <!-- Host name -->
+      <div class="md:col-span-1">
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelHostName") %>
+        </label>
+        <input type="text"   id="host" name="host" required
+          value="<%= typeof host !== 'undefined' && host? host : '' %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+      <!-- Post -->
+      <div class="md:col-span-1">
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelPort") %>
+        </label>
+        <input type="number"   type="number" id="port" name="port" min="1" max="65535" required
+          value="<%= typeof port !== 'undefined' && port   ? port : '' %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+      <!-- Service Account -->
+      <div class="md:col-span-1">
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelServiceAccount") %>
+        </label>
+        <input   type="text" id="smtp_account" name="smtp_account" required
+          value="<%= typeof smtp_account !== 'undefined'  && smtp_account  ? smtp_account : '' %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+
+      <!-- Password -->
+      <div class="md:col-span-1">
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelPassword") %>
+        </label>
+        <input type="password"   name="smtp_password" id="smtp_password" required
+          value="<%= typeof smtp_password !== 'undefined'  && smtp_password  ? smtp_password : '' %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+
+
+      <!-- Buttons -->
+      <div class="flex justify-end gap-4 mt-10">
+        <button type="submit" id="saveButton" disabled
+          class="px-8 py-2 rounded-lg bg-gray-400 text-white font-semibold cursor-not-allowed transition disabled:opacity-50">
+          <%= __("smtp.btnSaveSettings") %>
+        </button>
+        <button type="button" id="testConnection"
+          class="px-8 py-2 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600 transition">
+          <%= __("smtp.btnTestConfiguration") %>
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<!-- Custom SMTP Validator -->
+<script src="/securemagnus_2025/js/custom_script/smtp-validator.js"></script>
+
+<script>
+  // Initialize SMTP form validator with configuration
+  initSMTPFormValidator({
+    orgId: '<%= org %>',
+    hasExistingData: '<%= typeof host !== "undefined" && host ? "true" : "false" %>' === 'true'
+  });
+</script>

@@ -1,0 +1,54 @@
+<%- include('layout/layout_starting.ejs') %>
+<%- include('layout/layout_left_navbar.ejs') %>
+
+
+<% if (typeof enableSuiteManagementLeftMenu !== 'undefined' && enableSuiteManagementLeftMenu) { %>
+    <div class="flex-1 flex flex-col h-[98vh]  max-sm:h-full bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-3xl"> 
+<% } else { %>
+            <div class="flex-1 flex flex-col h-[98vh]  max-sm:h-full bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-r-3xl">
+
+<% } %>
+
+<% 
+  // Sanitize and escape message and alertType for safe output
+  const toastMessage = (Array.isArray(message) && message.length > 0 && typeof message[0] === 'string') ? message[0] : null;
+  const toastAlertType = (Array.isArray(alertType) && alertType.length > 0 && typeof alertType[0] === 'string') ? alertType[0] : 'info';
+%>
+
+<% if (toastMessage) { %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Use EJS escaping for message and alertType to prevent XSS
+      showCustomToast(
+        '<%- toastAlertType.replace(/'/g, "&#39;") %>',
+        '<%- toastMessage.replace(/'/g, "&#39;").replace(/\"/g, "&quot;") %>'
+      );
+    });
+  </script>
+<% } %>
+   
+
+            <!-- Main Scrollable Content -->
+            <main class="flex-1 overflow-y-auto">
+
+            <!-- In layout_center.ejs, replace line 28: -->
+          <% if (typeof username !== 'undefined' && username) { %>
+            <%- include('layout/layout_top_navbar') %>
+          <% } %>
+
+<%- body %>
+
+              <div id="toast-container" class="fixed top-8 right-8 z-50 space-y-4"></div>
+
+<%- include('layout/layout_ending.ejs') %>
+ <!-- Inject per-page scripts if any -->
+    <!-- Page-specific scripts -->
+<!-- Page-specific scripts -->
+ 
+ 
+
+
+  
+</body>
+
+</html>

@@ -1,0 +1,456 @@
+<div class="flex flex-col p-6 gap pb-0">
+  <div class="flex items-center justify-between">
+    <h3 class="text-3xl font-medium">
+      <%= __("user.labelTitleUserManagement") %>
+    </h3>
+    <div class="flex flex-row gap-4">
+      <% if (typeof hasCreatePermission !== 'undefined' && hasCreatePermission) { %>
+        <!-- Bulk License Assignment -->
+        <button id="userEnrollmentBtn"
+          class="flex items-center gap-2 px-5 py-2 rounded-lg bg-yellow-100 text-yellow-800 font-semibold border border-yellow-300 shadow hover:bg-yellow-200 transition open-modal"
+          title="Bulk License Assignment">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="4" y="8" width="16" height="8" rx="2" />
+            <path d="M12 4v4m0 8v4m-4-4h8" />
+          </svg>
+          <span class="hidden sm:inline">Bulk Assign</span>
+        </button>
+
+        <!-- Import Users -->
+        <a href="/user/create/bulk"
+          class="flex items-center gap-2 px-5 py-2 rounded-lg bg-teal-600 text-white font-semibold border border-teal-600 shadow hover:bg-teal-700 transition"
+          title="Import Users">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 20h16" />
+          </svg>
+          <span class="hidden sm:inline">Import</span>
+        </a>
+
+        <!-- Create User -->
+        <a href="/user/create"
+          class="flex items-center gap-2 px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold border border-blue-600 shadow hover:bg-blue-700 transition"
+          title="Create User">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 20v-2a6 6 0 0112 0v2" />
+          </svg>
+          <span class="hidden sm:inline">Add User</span>
+        </a>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+
+<div class="flex flex-col  p-6 pt-0">
+  <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
+    <!-- Search & Filter -->
+    <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
+
+
+      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700">
+        <thead class="bg-gray-50 text-gray-600  text-xs">
+          <tr>
+
+            <th class="px-4 py-5 text-sm font-normal">
+              <%= __("Users.FullName") %>
+                <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                  class="size-3.5 ml-3 inline">
+            </th>
+            <th class="px-4 py-5">
+              <img src="/securemagnus_2025/images/package_management/Package_Management_Type.svg" alt="Type"
+                class=" inline">
+              <%= __("Users.Email") %>
+
+                <span></span><img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                  class="size-3.5 ml-3 inline">
+            </th>
+
+            <th class="px-4 py-5">
+              <img src="/securemagnus_2025/images/package_management/package_management_user_range_form.svg"
+                alt="User From" class=" inline">
+              <%= __("Users.RoleAssigned") %>
+
+
+                <span class="text-sm font-normal"></span><img
+                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                  class="size-3.5 ml-3 inline">
+            </th>
+            <th class="px-4 py-5">
+              <img src="/securemagnus_2025/images/package_management/package_management_user_range_form.svg"
+                alt="User From" class=" inline">
+              PhishMagnus License Status
+
+
+              <span class="text-sm font-normal"></span><img src="/securemagnus_2025/images/package_management/sort.svg"
+                alt="License Cost" class="size-3.5 ml-3 inline">
+            </th>
+            <th class="px-4 py-5">
+              <img src="/securemagnus_2025/images/package_management/package_management_user_range_form.svg"
+                alt="User From" class=" inline">
+              Awareness License Status
+
+
+              <span class="text-sm font-normal"></span><img src="/securemagnus_2025/images/package_management/sort.svg"
+                alt="License Cost" class="size-3.5 ml-3 inline">
+            </th>
+            <th class="px-4 py-5">
+              <img src="/securemagnus_2025/images/package_management/package_management_user_range_to.svg" alt="User To"
+                class=" inline">
+              <%= __("Users.UserStatus") %>
+
+
+                <span class="text-sm font-normal"></span><img
+                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                  class="size-3.5 ml-3 inline">
+            </th>
+            <th class="px-4 py-5">
+              <img src="/securemagnus_2025/images/package_management/package_management_subscription_duration.svg"
+                alt="Subscription" class=" inline">
+              <%= __("Users.Action") %>
+
+
+                <span class="text-sm font-normal"></span><img
+                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                  class="size-3.5 ml-3 inline">
+            </th>
+
+
+
+          </tr>
+        </thead>
+        <tbody>
+          <% if (Array.isArray(users)) { users.forEach(u=> { %>
+
+            <tr class="bg-white border-b hover:bg-gray-50">
+
+              <td class="px-6 py-6 whitespace-nowrap">
+                <%= u?.first_name %>
+                  <%= u?.last_name %>
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+                <%= u?.email %>
+              </td>
+
+              <td class="px-6 py-6 whitespace-nowrap">
+                <%= u.user?.UserRoles || '' %>
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+                <div class="relative inline-block text-left">
+                  <% if (Array.isArray(u.productNames) && u.productNames.includes('PhishMagnus')) { %>
+                    <button type="button"
+                      class="licenseStatusBtn 
+                      inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50 hover:bg-green-100 transition"
+                      aria-haspopup="true" aria-expanded="false">
+                      Licensed
+                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <ul
+                      class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+                      <!-- <li>
+                        <a href="#" class="block px-4 py-2 text-sm text-yellow-600 hover:bg-gray-100 change-status"
+                          data-user-id="<%= u.user?.id || "" %>" data-status="pending">
+                          Set as Pending
+                        </a>
+                      </li> -->
+                      <li>
+                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
+                          data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
+                          Set as Unlicensed
+                        </a>
+                      </li>
+                    </ul>
+                    <% } else { %>
+                      <button type="button"
+                        class="licenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50 hover:bg-red-100 transition"
+                        aria-haspopup="true" aria-expanded="false">
+                        Unlicensed
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
+                          viewBox="0 0 24 24">
+                          <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </button>
+                      <ul
+                        class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+                        <li>
+                          <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
+                            data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
+                            Set as Licensed
+                          </a>
+                        </li>
+                      </ul>
+                      <% } %>
+                </div>
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+                <div class="relative inline-block text-left">
+                  <% if (Array.isArray(u.productNames) && u.productNames.length> 0 &&
+                    u.productNames.includes('AwareMagnus')) { %>
+                    <button type="button"
+                      class="AwareMagnuslicenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50 hover:bg-green-100 transition"
+                      aria-haspopup="true" aria-expanded="false">
+                      Licensed
+                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                    </button>
+                    <ul
+                      class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+
+                      <li>
+                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
+                          data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
+                          Set as Unlicensed
+                        </a>
+                      </li>
+                    </ul>
+                    <% } else { %>
+                      <button type="button"
+                        class="AwareMagnuslicenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50 hover:bg-red-100 transition"
+                        aria-haspopup="true" aria-expanded="false">
+                        Unlicensed
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
+                          viewBox="0 0 24 24">
+                          <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                      </button>
+                      <ul
+                        class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+                        <li>
+                          <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
+                            data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
+                            Set as Licensed
+                          </a>
+                        </li>
+                      </ul>
+                      <% } %>
+                </div>
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+                <% if(u.user.status === true || u.user.status === "true"){ %>
+                  
+                  <span
+                    class="inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50">
+
+
+                    Active
+                  </span>
+                  <%}else {%>
+                    <span
+                      class="inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50">
+                      Inactive
+
+                    </span>
+                    <% } %>
+
+              </td>
+              <td class="px-4 py-5 text-sm font-normal relative">
+                <div class="relative inline-block text-left">
+                  <button type="button" onclick="this.nextElementSibling.classList.toggle('hidden')"
+                    class="p-2 rounded hover:bg-gray-100 transition" aria-haspopup="true" aria-expanded="false">
+                    <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="1.5" />
+                      <circle cx="19" cy="12" r="1.5" />
+                      <circle cx="5" cy="12" r="1.5" />
+                    </svg>
+                  </button>
+                  <ul class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 hidden">
+                    <li>
+                      <a href="/user/delete/<%= u.userProfileId || "" %>"
+                        class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
+                        <i class="ion-android-trash mr-2"></i>
+                        Delete
+                      </a>
+                    </li>
+                    <li>
+                      <a href="/user/show/<%= u.userProfileId || "" %>"
+                        class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
+                        <i class="ion-android-trash mr-2"></i>
+                        Edit
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+
+
+            </tr>
+            <% }) } %>
+
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+
+
+<%- include('./user-enrollment.ejs') %>
+
+
+  <div id="licenseConfirmModal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+      <h2 class="text-lg font-semibold mb-4">Confirm License Assignment</h2>
+      <p class="mb-6">Are you sure you want to set this user as <span class="font-bold text-green-600">Licensed</span>?
+      </p>
+      <div class="flex justify-end gap-3">
+        <button id="cancelLicenseConfirm" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">Cancel</button>
+        <button id="confirmLicenseBtn"
+          class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="/securemagnus_2025/js/user-license-multiselect-enrollment-jquery.js"></script>
+
+  <script src="/securemagnus_2025/js/custom_script/user-license-multiselect-enrollment.js"></script>
+
+
+
+
+  <script>
+    let pendingLicenseUserId = null;
+    let pendingLicenseStatus = null;
+    let actionProduct = null;
+    let saveUserAllocationLicense = `/user/update-license-status/false`;
+
+
+    document.addEventListener('click', function (e) {
+      // Handle dropdown toggle
+      if (e.target.closest('.licenseStatusBtn') || e.target.closest('.AwareMagnuslicenseStatusBtn')) {
+        e.preventDefault();
+        const PhishMagnusBtn = e.target.closest('.licenseStatusBtn');
+        const AwareMagnusBtn = e.target.closest('.AwareMagnuslicenseStatusBtn');
+        actionProduct = PhishMagnusBtn ? 'phm' : 'awm';
+        const btn = PhishMagnusBtn || AwareMagnusBtn;
+        const menu = btn.parentElement.querySelector('.licenseDropdownMenu');
+        if (menu) {
+          menu.classList.toggle('hidden');
+          // Close other dropdowns
+          document.querySelectorAll('.licenseDropdownMenu').forEach(other => {
+            if (other !== menu) other.classList.add('hidden');
+          });
+        }
+        return; // Prevent further handling for dropdown button clicks
+      }
+
+      // Handle status change click
+      const link = e.target.closest('.change-status');
+      if (link) {
+        e.preventDefault();
+        const userId = link.getAttribute('data-user-id');
+        const newStatus = link.getAttribute('data-status');
+        if (newStatus === 'licensed' || newStatus === 'unlicensed') {
+          pendingLicenseUserId = userId;
+          pendingLicenseStatus = newStatus;
+          // Update modal text
+          let actionText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+          document.querySelector('#licenseConfirmModal span.font-bold').textContent = actionText;
+          document.getElementById('licenseConfirmModal').classList.remove('hidden');
+        }
+        return;
+      }
+
+      // Close dropdowns when clicking outside
+      document.querySelectorAll('.licenseDropdownMenu').forEach(menu => {
+        if (!menu.parentElement.contains(e.target)) menu.classList.add('hidden');
+      });
+    });
+
+    // Modal button handlers
+    document.getElementById('cancelLicenseConfirm').addEventListener('click', function () {
+      document.getElementById('licenseConfirmModal').classList.add('hidden');
+      pendingLicenseUserId = null;
+      pendingLicenseStatus = null;
+    });
+
+    document.getElementById('confirmLicenseBtn').addEventListener('click', function () {
+      if (pendingLicenseUserId && pendingLicenseStatus) {
+        // AJAX call to update license status
+        if (pendingLicenseStatus === 'unlicensed') {
+          saveUserAllocationLicense = `/user/update-license-status/true?actionProduct=${actionProduct}`;
+        } else {
+          saveUserAllocationLicense = `/user/update-license-status/false?actionProduct=${actionProduct}`;
+        }
+        fetch(saveUserAllocationLicense, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            selectedUsers: [pendingLicenseUserId],
+            status: pendingLicenseStatus
+          })
+        })
+          .then(response => response.json())
+          .then(data => {
+            // Handle success (show toast, reload, etc.)
+            if (data.success) {
+              showCustomToast('success', 'Status updated successfully!');
+              setTimeout(() => window.location.reload(), 1200);
+            } else {
+              showCustomToast('error', 'Failed to update status: ' + (data.message || 'Unknown error'));
+            }
+          })
+          .catch(err => {
+            showCustomToast('error', 'Error updating status');
+          })
+          .finally(() => {
+            document.getElementById('licenseConfirmModal').classList.add('hidden');
+            pendingLicenseUserId = null;
+            pendingLicenseStatus = null;
+          });
+      }
+    });
+
+    // Unenroll confirmation
+    let unenrollUserIds = [];
+    document.getElementById('unenrollConfirmYes').addEventListener('click', function () {
+      // Get selected user IDs
+      unenrollUserIds = Array.from(document.querySelectorAll('input[name="user-select"]:checked')).map(el => el.value);
+      if (unenrollUserIds.length > 0) {
+        // AJAX call to unenroll users
+        fetch('/user/unenroll', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            userIds: unenrollUserIds
+          })
+        })
+          .then(response => response.json())
+          .then(data => {
+            // Handle success (show toast, reload, etc.)
+            if (data.success) {
+              showCustomToast('success', 'Users unenrolled successfully!');
+              setTimeout(() => window.location.reload(), 1200);
+            } else {
+              showCustomToast('error', 'Failed to unenroll users: ' + (data.message || 'Unknown error'));
+            }
+          })
+          .catch(err => {
+            showCustomToast('error', 'Error unenrolling users');
+          })
+          .finally(() => {
+            document.getElementById('unenrollConfirmModal').classList.add('hidden');
+            unenrollUserIds = [];
+          });
+      } else {
+        document.getElementById('unenrollConfirmModal').classList.add('hidden');
+      }
+    });
+
+    document.getElementById('unenrollConfirmNo').addEventListener('click', function () {
+      document.getElementById('unenrollConfirmModal').classList.add('hidden');
+    });
+  </script>

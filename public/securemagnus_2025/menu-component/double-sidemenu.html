@@ -1,0 +1,152 @@
+    <!-- Sidebar -->
+    <div class="flex h-screen">
+      <!-- Primary Menu -->
+      <div id="primaryMenu" class="w-48 bg-[#142133] text-white transition-all duration-300">
+        <a href="#" class="absolute flex items-center gap-3 px-4 py-4 font-bold transition  group">
+
+          <img src="images/menu-logo.svg" alt="">
+          <span class=" menu-text"><img src="images/menu-logo-name.svg" alt=""></span>
+        </a>
+        <div class="relative  "> <!-- Set height (h-12) as needed for your layout -->
+          <button onclick="toggleMenus()" class="absolute right-0 top-7 font-bold py-1 h-14 px-1 bg-[#00CCC440] rounded-l-2xl" style="z-index:20;">
+
+<span class="text-2xl font-light scale-x-[-1]  inline-block" id="flip">›</span>
+          </button>
+        </div>
+
+
+        <div class="relative grow overflow-hidden custom-scroll">
+          <div data-simplebar class="h-[95vh] mt-[88px] flex-1 overflow-y-auto  overflow-x-hidden">
+            <div class=" flex flex-col gap-3.5 h-[90%] justify-between">
+              <!-- Navigation Links -->
+
+              <div>
+                <a href="#" class="relative flex items-center gap-3 px-4 py-4 font-bold transition hover:bg-white/10 group">
+                  <!-- <div class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full bg-[var(--teal)]"></div> -->
+                  <img src="images/icons/primary-suit.svg" class="size-5" alt="">
+                  <span class="text-sm font-medium menu-text">Suit Management</span>
+                </a>
+
+                <a href="suiteManagement.html"
+                  class="relative flex items-center gap-3 px-4 py-4 font-bold transition hover:bg-white/10 group">
+
+                  <img src="images/icons/primary-organization.svg" class="size-5" alt="">
+                  <span class="text-sm font-normal menu-text">Organization</span>
+                </a>
+
+                <a href="#"
+                  class="relative flex items-center gap-3 px-4 py-4 font-bold transition hover:bg-white/10 group">
+                  <img src="images/icons/primary-uses.svg" class="size-5" alt="">
+                  <span class="text-sm font-normal menu-text">Users</span>
+                </a>
+
+                <div>
+                  <!-- Package Button -->
+                  <button onclick="toggleMenu('menuA', this)"
+                    class="w-full flex items-center justify-between gap-3 px-4 py-4 font-bold hover:bg-white/10 rounded group">
+                    <div class="flex items-center gap-3">
+                      <img src="images/icons/primary-department.svg" class="size-5">
+                      <span class="text-sm font-normal menu-text">Department</span>
+                    </div>
+                    <span class="transition-transform duration-300 group-[.open]:rotate-90 text-2xl menu-text">›</span>
+                  </button>
+
+                  <!-- Level A -->
+                  <div id="menuA" class="mt-2 hidden flex-col space-y-2 pl-4">
+                    <a href="#" class="block px-4 py-2 rounded hover:bg-white/10 text-sm">A1</a>
+
+                    <!-- A2 -->
+                    <div>
+                      <button onclick="toggleMenu('menuB', this)"
+                        class="w-full text-left flex justify-between items-center px-4 py-2 rounded hover:bg-white/10 group">
+                        A2
+                        <span class="transition-transform duration-300 group-[.open]:rotate-90">›</span>
+                      </button>
+
+                      <!-- Level B -->
+                      <div id="menuB" class="mt-2 ml-4 hidden flex-col space-y-2">
+                        <a href="#" class="block px-4 py-2 rounded hover:bg-white/10 text-sm">B1</a>
+
+                        <!-- B2 -->
+                        <div>
+                          <button onclick="toggleMenu('menuC', this)"
+                            class="w-full text-left flex justify-between items-center px-4 py-2 rounded hover:bg-white/10 group">
+                            B2
+                            <span class="transition-transform duration-300 group-[.open]:rotate-90">›</span>
+                          </button>
+
+                          <!-- Level C -->
+                          <div id="menuC" class="mt-2 ml-4 hidden flex-col space-y-2">
+                            <a href="#" class="block px-4 py-2 rounded hover:bg-white/10 text-sm">C1</a>
+                            <a href="#" class="block px-4 py-2 rounded hover:bg-white/10 text-sm">C2</a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <a href="#"
+                  class="relative flex items-center gap-3 px-4 py-4 font-bold transition hover:bg-white/10 group">
+                  <img src="images/icons/primary_group.svg" class="size-5" alt="">
+                  <span class="text-sm font-normal menu-text">Group</span>
+                </a>
+
+                <a href="#"
+                  class="relative flex items-center gap-3 px-4 py-4 font-bold transition hover:bg-white/10 group ">
+                  <img src="images/icons/primary_subscription.svg" class="size-5" alt="">
+                  <span class="text-sm font-normal menu-text">Subscription History</span>
+                </a>
+
+                <a href="#"
+                  class="relative flex items-center gap-3 px-4 py-4 font-bold transition hover:bg-white/10 group ">
+                  <img src="images/icons/primary_products.svg" class="size-5" alt="">
+                  <span class="text-sm font-normal menu-text">Products</span>
+                </a>
+              </div>
+
+
+              <!-- Divider -->
+
+              <div>
+                <a href="#"
+                  class="relative flex items-center gap-3 px-4 py-4 font-bold transition hover:bg-white/10 group">
+                  <img src="images/icons/Settings.svg" class="size-5" alt="">
+                  <span class="text-sm font-normal menu-text">Settings</span>
+                </a>
+
+                <a href="#"
+                  class="relative flex items-center gap-3 px-4 py-4 font-bold transition hover:bg-white/10 group">
+                  <img src="images/icons/logout.svg" class="size-5" alt="">
+                  <span class="text-base font-normal   menu-text">Logout</span>
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub Menu -->
+      <div id="subMenu" class="w-16 bg-[var(--mainblue)] text-gray-800   transition-all duration-300 overflow-hidden">
+
+        <div class="flex py-8 px-5 gap-3">
+          <img src="images/phys-logo-menu.svg" alt=""> <img src="images/phys-name-menu.svg" class="menu-text hidden"
+            alt="">
+        </div>
+        <ul class="text-white">
+          <li class="px-4 py-4 flex items-center  gap-3 hover:bg-white/10 cursor-pointer"><span><img
+                src="images/icons/second-menu-dashboard-active.svg" alt=""></span><span
+              class="menu-text hidden">Dashboard</span></li>
+          <li class="px-4 py-4 flex items-center gap-3 hover:bg-white/10 cursor-pointer"><span><img
+                src="images/icons/secondmenu-license.svg" alt=""></span><span class="menu-text hidden">License
+              User</span></li>
+          <li class="px-4 py-4 flex items-center gap-3 hover:bg-white/10 cursor-pointer"><span><img
+                src="images/icons/second-menu-template.svg" alt=""></span><span class="menu-text hidden">My
+              Template</span></li>
+
+        </ul>
+      </div>
+
+
+    </div>

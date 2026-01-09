@@ -1,0 +1,78 @@
+<section style="position: static">
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="billAddress"
+      ><%= __("Order.Billing.Address") %> *</label
+    >
+    <div class="col-lg-6">
+      <input
+        class="form-control required"
+        id="billAddress"
+        name="billAddress"
+        type="text"
+        value="<%= organization.address %>"
+      />
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="billCountry">
+      <%= __("Order.Billing.Country") %>*</label
+    >
+    <div class="col-lg-6">
+      <select
+        class="form-control"
+        name="billCountry"
+        id="billCountry"
+        required
+      >
+        <option value="" selected disabled><%= __("Order.Billing.selCountry") %> </option>
+        <% countries.forEach(c => { %>
+        <!-- <option value="<%= c.id %>"><%= c.name %></option> -->
+        <option value="<%= c.id %>"<%= c.id === organization.country_id ? 'selected' : '' %> > <%= c.name %> </option>
+        <% }); %>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="billState"
+      ><%= __("Order.Billing.State") %></label
+    >
+    <div class="col-lg-6">
+      <select
+        required
+        class="form-control"
+        name="billState"
+        id="billState"
+      >
+        <option value="" selected disabled><%= __("Order.Billing.selState") %> </option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="billCity"
+      ><%= __("Order.Billing.City") %></label
+    >
+    <div class="col-lg-6">
+      <select
+        class="form-control"
+        name="billCity"
+        id="billCity"
+        required
+      >
+        <option value="" selected disabled><%= __("Order.Billing.selCity") %> </option>
+      </select>
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="billPostalCode"
+      ><%= __("Order.Billing.Postal") %></label
+    >
+    <div class="col-lg-6">
+      <input id="billPostalCode" name="billPostalCode" type="text"
+      class="required form-control oninput="this.value =
+      this.value.replace(/[^0-9]/g, '');
+      if(this.value.startsWith('-')) this.value =
+      this.value.substr(1);" min="1" />
+    </div>
+  </div>
+</section>

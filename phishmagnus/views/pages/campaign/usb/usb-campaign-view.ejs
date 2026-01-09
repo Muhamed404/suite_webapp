@@ -1,0 +1,301 @@
+<div class="flex flex-col  p-6 pt-0">
+
+
+
+    <!-- first section  -->
+
+    <div class="flex flex-col gap-4 mt-3">
+
+
+
+
+        <!-- Title -->
+        <h1 class="text-2xl font-semibold my-2">USB Campaign View Report</h1>
+
+        <!-- Top Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">Total USB Initiated</p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Email_Sent.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=totalDevices%>
+
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm"> USB Plugged</p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Opened_by_people.svg" alt=""
+                        style="color: black;">
+                </div>
+                <p class="text-4xl">
+
+                    <%=campaigns.total_plugged_usb%>
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm"> USB Plugged</p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Opened_by_people.svg" alt=""
+                        style="color: black;">
+                </div>
+                <p class="text-4xl">
+
+                    <%=campaigns.total_unplugged_usb%>
+                </p>
+            </div>
+
+
+
+
+        </div>
+
+        <!-- Main Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Bar Chart -->
+            <div class="bg-white p-6 rounded-xl   col-span-2">
+                <h2 class="text-lg font-semibold mb-4">USB Campaign Metrics</h2>
+                <div id="barChart"></div>
+            </div>
+
+            <!-- Campaign Details -->
+            <div class="bg-white p-6 rounded-xl  ">
+                <h2 class="text-lg font-semibold text-gray-800 mb-6">
+                    <%= __("campaign.email_campaign_detail.labelCampaignDetails") %>
+                </h2>
+                <div class="space-y-4">
+
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">
+                            Campaign Name
+                        </span>
+                        <span class="text-gray-800 font-medium">
+                            <%=campaigns.campaign_name%>
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">
+                            <%= __("campaign.email_campaign_detail.labelLaunchDate") %>
+                        </span>
+                        <span class="text-gray-800 font-medium">
+                            <%=campaigns.start_datetime%>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- last table  -->
+
+        <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
+            <div class="flex items-center justify-between gap-3 px-5 pt-5">
+
+                <div class="relative">
+                    <h2 class="text-2xl mb-4">Download USB Package</h2>
+
+                </div>
+
+
+                <div class="flex gap-4">
+
+
+
+
+                    <button class="hidden lg:block ms-auto">
+                        <div class="relative">
+                            <input type="text" placeholder="Search here..."
+                                class="pl-14 pr-10 py-3 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+                            <img src="/securemagnus_2025/images/img/search.svg"
+                                class="w-5 h-5 text-gray-400 absolute left-7 top-1/2 transform -translate-y-1/2" alt="">
+                        </div>
+
+                    </button>
+                    <button class="hidden lg:block ms-auto">
+                        <a href=""
+                            class=" flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+
+                            Sort by
+                            <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
+                        </a>
+
+                    </button>
+                </div>
+
+
+                <a href="" class="block lg:hidden">
+                    <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
+                </a>
+            </div>
+
+
+
+
+
+
+            <div class="bg-white rounded-xl shadow mt-8">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                #</th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <%= __("usb_campaign.device_code") %>
+                            </th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <%= __("usb_campaign.description") %>
+                            </th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <%= __("usb_campaign.start_date") %>
+                            </th>
+                            
+                            <th
+                                class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                Download
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        <% if (paginatedDevices.length) { %>
+                            <% paginatedDevices.forEach((device, idx)=> { %>
+                                <tr class="hover:bg-gray-50 transition">
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-800 font-medium">
+                                        <%= startIdx + idx + 1 %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-800">
+                                        <%= device.usb_code %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-800">
+                                        <%= device.description %>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-800">
+                                        <%= new Date(device.createdAt).toLocaleString() %>
+                                    </td>
+                                     
+                                    <td>
+                                        <button type="button" title="Download"
+                                            data-url="/phm/campaign/usb/package/download/<%= device.campaign_id %>/<%= device.usb_code %>">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="h-6 w-6 text-yellow-500 cursor-pointer" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <% }) %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                                                <%= __("usb_campaign.no_records") %>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                    </tbody>
+                </table>
+                <!-- Pagination Controls -->
+                <div class="flex justify-center items-center py-6 gap-2">
+                    <% if (currentPage> 1) { %>
+                        <form method="get" class="inline">
+                            <input type="hidden" name="page" value="<%= currentPage - 1 %>">
+                            <button type="submit"
+                                class="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:text-white hover:bg-teal-600 duration-300">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                        </form>
+                        <% } %>
+                            <% for (let i=1; i <=totalPages; i++) { %>
+                                <form method="get" class="inline">
+                                    <input type="hidden" name="page" value="<%= i %>">
+                                    <button type="submit"
+                                        class="w-8 h-8 rounded-full flex items-center justify-center <%= currentPage === i ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700' %> duration-300">
+                                        <%= i %>
+                                    </button>
+                                </form>
+                                <% } %>
+                                    <% if (currentPage < totalPages) { %>
+                                        <form method="get" class="inline">
+                                            <input type="hidden" name="page" value="<%= currentPage + 1 %>">
+                                            <button type="submit"
+                                                class="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:text-white hover:bg-teal-600 duration-300">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        d="M9 5l7 7-7 7"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                        <% } %>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+
+
+    window.metrices = {
+        totalDevices: <%= typeof campaigns !== 'undefined' && campaigns.total_usb_devices || 0 %>,
+        totalPlugged: <%= typeof campaigns !== 'undefined' && campaigns.total_plugged_usb || 0 %>,
+        totalUnPlugged: <%= typeof campaigns !== 'undefined' && campaigns.total_unplugged_usb || 0 %>,
+    };
+</script>
+<script src="/securemagnus_2025/js/JQuery_usb_phishing_campaign_report.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        document.querySelectorAll('button[data-url]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const url = this.getAttribute('data-url');
+                let fileName = 'default-name.zip';
+                this.style.opacity = '0.5'; // Optional: show loading
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) throw new Error('Failed to download file.');
+                        const contentDisposition = response.headers.get('Content-Disposition');
+                        if (contentDisposition && contentDisposition.indexOf('attachment') !== -1) {
+                            const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+                            if (fileNameMatch && fileNameMatch[1]) fileName = fileNameMatch[1];
+                        }
+                        return response.blob();
+                    })
+                    .then(blob => {
+                        const downloadUrl = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = downloadUrl;
+                        a.download = fileName;
+                        document.body.appendChild(a);
+                        a.click();
+                        a.remove();
+                        URL.revokeObjectURL(downloadUrl);
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Could not download the file.');
+                    })
+                    .finally(() => {
+                        this.style.opacity = '1'; // Reset loading
+                    });
+            });
+        });
+
+
+    });
+</script>

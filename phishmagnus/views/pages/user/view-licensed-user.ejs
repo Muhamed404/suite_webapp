@@ -1,0 +1,152 @@
+<%- include('../../layout/layout-starting.ejs') %>
+
+
+  <div class="wraper container-fluid">
+    <div class="page-title">
+      <h3 class="title">User List</h3>
+    </div>
+
+    <div class="panel">
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="m-b-30">
+              <%if(hasCreatePermission){%>
+                <a href="/user/<%=organization.id%>" class="btn btn-icon btn-primary m-b-5" data-toggle="tooltip"
+                  data-placement="left" title="" data-original-title="Create User"> <i class="fa fa-plus"></i> </a>
+                <%if(hasCreatePermission){%>
+                  <button class="btn btn-icon btn-success m-b-5" data-toggle="modal" data-target="#panel-modal"
+                    data-placement="left" data-value="0" title="" data-original-title="Imprt User"> <i
+                      class="ion-upload"></i> </button>
+
+                  <!-- <button class="btn btn-icon btn-default m-b-5"   data-toggle="modal"  data-target="#panel-modal" data-placement="left" data-value="0" 
+              title="" data-original-title="Upload on Departments"> <i class="fa fa-group"></i> </button> -->
+                  <%}%>
+                    <%}%>
+            </div>
+
+          </div>
+        </div>
+        <table class="table table-bordered table-striped" id="datatable-editable">
+          <thead>
+            <tr>
+              <th>
+                <%= __("Users.OrganizationName") %>
+              </th>
+              <th>
+                <%= __("Users.FullName") %>
+              </th>
+              <th>
+                <%= __("Users.Email") %>
+              </th>
+              <th>
+                <%= __("Users.Password") %>
+              </th>
+              <th>
+                <%= __("Users.RoleAssigned") %>
+              </th>
+              <th>
+                <%= __("Users.UserStatus") %>
+              </th>
+              <th>
+                <%= __("Users.Action") %>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (typeof user !=='undefined' && Array.isArray(user)){ user.forEach(u=> { %>
+              <tr class="gradeX">
+                <td>
+                  <%= organization?.name || 'Secure Magnus' %>
+                </td>
+                <td>
+                  <%= u.first_name %>
+                    <%= u.last_name %>
+                </td>
+                <td>
+                  <%= u.email %>
+                </td>
+                <td>*********</td>
+
+                <td>
+                  <%= u.User.UserRole.role_name%>
+                </td>
+                <td>
+                  <% if (u.User.status) { %> Active <% } else { %> Inactive <% } %>
+                </td>
+                <td class="actions">
+                  <input type="hidden" value="<%=u.User.id%>" name="userId" id="userId" />
+                  <a href="#" class="hidden on-editing save-row"><i class="fa fa-save"></i></a>
+                  <a href="#" class="hidden on-editing cancel-row"><i class="fa fa-times"></i></a>
+                  <a href="#" class="on-default edit-row"><i class="fa fa-pencil"></i></a>
+                  <a href="#" class="on-default remove-row"><i class="fa fa-trash-o"></i></a>
+                </td>
+              </tr>
+              <% }); } %>
+          </tbody>
+        </table>
+      </div>
+      <!-- end: page -->
+    </div>
+    <!-- end Panel -->
+  </div>
+
+  <input type="hidden" value="<%=organization.id%>" name="org" id="org" />
+
+  <div id="dialog" class="modal-block mfp-hide">
+    <section class="panel panel-info panel-color">
+      <header class="panel-heading">
+        <h2 class="panel-title">Are you sure?</h2>
+      </header>
+      <div class="panel-body">
+        <div class="modal-wrapper">
+          <div class="modal-text">
+            <p>Are you sure that you want to delete this row?</p>
+          </div>
+        </div>
+
+        <div class="row m-t-20">
+          <div class="col-md-12 text-right">
+            <button id="dialogConfirm" class="btn btn-primary">Confirm</button>
+            <button id="dialogCancel" class="btn btn-default">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <%- include('../../layout/footer.js') %>
+    <%- include('../../layout/layout-ending.ejs') %>
+      <%- include('./import-users.ejs') %>
+        <script>
+          $(document).ready(function () {
+            $("body").append(
+              '<script src="/assets/jquery-datatables-editable/users-datatables.editable.init.js" />'
+            );
+            const subscriptionStr = `<%- JSON.stringify(subscription || {}) %>`;
+            const subscription = JSON.parse(subscriptionStr);
+            if (subscription && Object.keys(subscription).length > 0) {
+
+              const selectedSubscription = document.getElementById('subscription');
+              selectedSubscription.value = subscription.id;
+              // alert(selectedSubscription.value)
+              if (subscription.available_quota == 0) {
+                $("#btnSaveImportUserModal").css("visibility", "hidden");
+              } else {
+                $("#btnSaveImportUserModal").css("visibility", "visible");
+              }
+              //alert(selectedSubscription.available_quota)
+              const userQuotaAlert = document.getElementById('divUserQuotaAlert');
+              userQuotaAlert.innerHTML = 'By choosing the service, you can upload only ' + subscription.available_quota + ' users.';
+              $("#divUserQuotaAlert").css("visibility", "visible");
+            } 
+            // else {
+            //   // Clear input if no valid selection
+            //   document.getElementById('availableQuota').value = '';
+            // }
+
+            $('#panel-modal').on('shown.bs.modal', function () {
+              // alert('eee' + subscriptionObj.available_quota)
+            });
+          });
+        </script>

@@ -1,0 +1,84 @@
+<div class="flex flex-col  p-6 pt-0">
+
+  <!-- first section  -->
+
+  <div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white">
+     
+      <form class="bg-white  w-full mt-3 p-8" id="createSubscription" name="createSubscription" action="/subscription/create/<%=organization.id%>" method="post">
+        <!-- Stepper Navigation -->
+        <div id="stepper" class="flex items-center justify-between mb-10">
+          <div class="flex items-center gap-2">
+            <div
+              class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white font-bold text-xs">
+              1</div>
+            <span class="font-medium step-label text-teal-700 text-sm">
+              <%= __("subscription.create.stepper1") %>
+            </span>
+          </div>
+          <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
+          <div class="flex items-center gap-2">
+            <div
+              class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-white border-2 border-teal-300 text-teal-400 font-bold text-xs">
+              2</div>
+            <span class="font-medium step-label text-gray-400 text-sm">
+              <%= __("subscription.create.stepper2") %>
+            </span>
+          </div>
+          <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
+          <div class="flex items-center gap-2">
+            <div
+              class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-white border-2 border-teal-300 text-teal-400 font-bold text-xs">
+              3</div>
+            <span class="font-medium step-label text-gray-400 text-sm">
+              <%= __("subscription.create.stepper3") %>
+            </span>
+          </div>
+          <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
+          <div class="flex items-center gap-2">
+            <div
+              class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-white border-2 border-teal-300 text-teal-400 font-bold text-xs">
+              4</div>
+            <span class="font-medium step-label text-gray-400 text-sm">
+              <%= __("subscription.create.stepper4") %>
+            </span>
+          </div>
+        </div>
+
+        <div id="steps">
+          <%- include('./trial-and-subscription.ejs') %>
+
+            <!-- 2nd -->
+
+            <%- include('./select-services.ejs') %>
+
+              <!-- 3rd -->
+            <%- include('./billing-address.ejs') %>
+
+                <!-- 4th -->
+
+                <%- include('./cost-and-confirmation.ejs') %>
+        </div>
+
+
+      </form>
+
+      <!-- Buttons -->
+      <div class="flex justify-end gap-4 mt-10">
+        <button id="backBtn" type="button"
+          class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition">Back</button>
+        <button id="nextBtn" type="submit"
+          class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition">Next</button>
+      </div>
+ 
+
+  </div>
+
+</div>
+ 
+<script src="/securemagnus_2025/js/form_stepper.js"></script>
+
+<!-- jQuery Validate plugin -->
+
+
+<script src="/securemagnus_2025/js/custom_script/add-subscription-validator.js"></script>
+ 

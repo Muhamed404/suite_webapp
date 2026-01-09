@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aware Magnus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fondamento:ital@0;1&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
+    rel="stylesheet">
+
+  <!-- <script src="js/tailwind_3.js"></script> -->
+  <script src="/securemagnus_2025/js/tailwind_3.js"></script>
+
+  <link rel="stylesheet" href="/securemagnus_2025/css/style.css">
+
+
+</head>
+
+<body class="bg-white">
+
+
+  <div class="grid grid-cols-12 min-h-screen">
+
+    <!-- Login (Always Visible) -->
+    <div class="flex flex-col justify-between  col-span-12 sm:col-span-6 h-screen lg:p-10 p-4">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between ">
+        <a href="">
+          <img src="/securemagnus_2025/images/awarenessMagnus-logo.svg" class="h-10" alt="">
+        </a>
+
+
+        <a href=""
+          class="rounded-full text-sm py-1.5 px-4 border border-[var(--blue)] hover:bg-[var(--blue)] hover:text-white transform duration-300">
+          عربي
+
+        </a>
+
+      </div>
+
+
+      <!-- Login Form -->
+       
+<div class="flex items-center justify-center">
+  <form id="loginForm" action="/login" method="POST" class="flex flex-col max-w-2xl items-stretch">
+    <h3 class="text-center text-3xl font-semibold md:mt-12 lg:mt-24">Welcome to AwareMagnus</h3>
+
+    <div class="mt-6 md:mt-10">
+      <fieldset class="fieldset">
+        <label
+          class="flex items-center w-full px-5 py-3.5 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300">
+          <input 
+            id="email" name="email"
+            placeholder="Email Address"
+            class="bg-transparent border-none outline-none text-[14px] w-full" 
+            required
+          />
+        </label>
+      </fieldset>
+
+      <p id="emailError" class="text-red-600 text-sm mb-2 hidden">Email is invalid, please enter a valid email.</p>
+
+      <fieldset class="fieldset">
+        <label
+          class="flex items-center w-full px-5 py-3.5 mt-3 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300">
+          <input 
+            id="password"
+            name="password" id="password"
+            class="bg-transparent border-none outline-none text-[14px] grow" 
+            placeholder="Password" 
+            type="password" 
+            required
+          />
+        </label>
+      </fieldset>
+
+      <div class="flex justify-between mt-3">
+        <div class="flex items-center gap-2 ">
+          <input 
+            type="checkbox" 
+            id="agreement"
+            class="accent-[var(--blue)] text-white w-4 h-4 rounded" 
+            aria-label="Custom checkbox" 
+          />
+          <label for="agreement" class="text-sm">
+            Remember me
+          </label>
+        </div>
+
+        <div>
+          <a class="label-text text-[var(--blue)] text-base-content/80 text-xs" href="">
+            Forgot Password?
+          </a>
+        </div>
+      </div>
+
+      <button 
+        type="submit"
+        class="flex w-full items-center justify-center gap-3 mt-8 px-6 py-3 rounded-full bg-[var(--blue)] text-white border border-transparent transition-all duration-300 hover:bg-transparent hover:border-[var(--blue)] hover:text-[var(--blue)]"
+      >
+        Login
+      </button>
+
+      <p class="text-base-content/80 mt-4 text-center text-sm md:mt-6">
+        Don't have an account?
+        <a class="text-[var(--blue)] ms-1 hover:underline" href="./onboarding1-eng.html">
+          Signup
+        </a>
+      </p>
+    </div>
+  </form>
+</div>
+
+
+
+      <div>
+        <p class="text-xs text-gray-600 mt-4">
+          © 2025 Securemagnus
+        </p>
+      </div>
+
+
+
+    </div>
+
+
+
+
+    <!-- Hero (Hidden on Small Screens) -->
+    <div class="hidden sm:block col-span-6  lg:p-5 p-4">
+      <div class="w-full h-full flex justify-center items-center rounded-3xl bg-[#E7F4FF] overflow-hidden">
+        <!-- Background Image -->
+        <img src="/securemagnus_2025/images/awaremagnuslogin.png" class=" w-1/2 object-contain" alt="Background" />
+
+
+      </div>
+
+
+
+
+    </div>
+  </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('loginForm');
+    const emailInput = document.getElementById('email');
+    const emailError = document.getElementById('emailError');
+
+    form.addEventListener('submit', function(event) {
+      const emailValue = emailInput.value.trim();
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailPattern.test(emailValue)) {
+        event.preventDefault(); // prevent form submission
+        emailError.classList.remove('hidden');
+        emailInput.classList.add('border-red-600');
+        emailInput.focus();
+      } else {
+        emailError.classList.add('hidden');
+        emailInput.classList.remove('border-red-600');
+        // proceed with submission or further processing
+      }
+    });
+
+    emailInput.addEventListener('input', () => {
+      emailError.classList.add('hidden');
+      emailInput.classList.remove('border-red-600');
+    });
+  });
+</script>
+
+
+</body>
+
+</html>

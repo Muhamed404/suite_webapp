@@ -1,0 +1,119 @@
+<%- include('../layout/layout-starting.ejs') %>
+
+<!-- Page Content Start -->
+<!-- ================== -->
+
+<div class="wraper container-fluid">
+  <div class="page-title">
+    <h3 class="title">Create Package</h3>
+  </div>
+
+  <div class="row">
+    <!-- Basic example -->
+    <div class="col-md-6">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">Package Details</h3>
+        </div>
+        <div class="panel-body">
+          <form action="/package/update" method="post">
+            <input
+              type="hidden"
+              class="form-control"
+              id="id"
+              name="id"
+              value="<%= package.id %>"
+            />
+            <div class="form-group">
+              <label for="exampleInputEmail1">Package Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                placeholder="Enter Name"
+                required
+                value="<%= package.name %>"
+              />
+            </div>
+            <div class="form-group">
+              <label for="description">Description</label>
+              <input
+                type="text"
+                class="form-control"
+                id="description"
+                name="description"
+                placeholder="Enter Description"
+                required
+                value="<%= package.description %>"
+              />
+            </div>
+            <div class="form-group">
+              <label for="perLicenseCost">Per License Cost</label>
+              <input
+                type="text"
+                class="form-control"
+                id="perLicenseCost"
+                name="perLicenseCost"
+                placeholder="Enter Per License Cost"
+                required
+                value="<%= package.perLicenseCost %>"
+                oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+              />
+            </div>
+            <div class="form-group">
+              <label for="licenseRangeFrom">License Range From</label>
+              <input
+                type="text"
+                class="form-control"
+                id="licenseRangeFrom"
+                name="licenseRangeFrom"
+                placeholder="Enter License Range From"
+                required
+                value="<%= package.licenseRangeFrom %>"
+                oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+              />
+            </div>
+            <div class="form-group">
+              <label for="licenseRangeTo">License Range To</label>
+              <input
+                type="text"
+                class="form-control"
+                id="licenseRangeTo"
+                name="licenseRangeTo"
+                value="<%= package.licenseRangeTo %>"
+                placeholder="Enter License Range To"
+                required
+                oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+              />
+            </div>
+            <div class="form-group">
+              <label for="durationDays">Duration No# of days</label>
+              <input
+                type="text"
+                class="form-control"
+                id="durationDays"
+                name="durationDays"
+                placeholder="Duration No# of Days"
+                required
+                value="<%= package.durationDays %>"
+                oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+              />
+            </div>
+
+            <button type="submit" class="btn btn-purple">Submit</button>
+          </form>
+        </div>
+        <!-- panel-body -->
+      </div>
+      <!-- panel -->
+    </div>
+    <!-- col-->
+  </div>
+  <!-- End row -->
+</div>
+<!-- Page Content Ends -->
+<!-- ================== -->
+
+<%- include('../layout/footer.js') %> <%- include('../layout/layout-ending.ejs')
+%>

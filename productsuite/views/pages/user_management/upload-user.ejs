@@ -1,0 +1,59 @@
+<div class="flex flex-col  p-6 pt-0">
+
+  <!-- first section  -->
+
+  <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
+
+    <form action="/user/create/bulk" method="post" name="uploadBulkUser" id="uploadBulkUser" 
+    enctype="multipart/form-data" class="bg-white  w-full mt-3 p-8">
+      <!-- Stepper Navigation -->
+      <div id="stepper" class="flex items-center justify-between mb-10">
+        <div class="flex items-center gap-2">
+          <div
+            class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white font-bold text-xs">
+            1</div>
+          <span class="font-medium step-label text-teal-700 text-sm">
+            Choose Product
+          </span>
+        </div>
+        <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
+        <div class="flex items-center gap-2">
+          <div
+            class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-white border-2 border-teal-300 text-teal-400 font-bold text-xs">
+            2</div>
+          <span class="font-medium step-label text-gray-400 text-sm">
+            Choose File
+          </span>
+        </div>
+
+      </div>
+
+      <div id="steps">
+        <!-- Step 1: Trial and Subscription Details -->
+        <%- include('./select_product.ejs') %>
+
+          <!-- Step 2: Select Department & Group -->
+
+          <%- include('./select_file.ejs') %>
+
+
+      </div>
+
+
+    </form>
+
+    <!-- Buttons -->
+    <div class="flex justify-end gap-4 mt-10 p-8">
+      <button id="backBtn" type="button"
+        class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition">Back</button>
+      <button id="nextBtn" type="submit"
+        class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition">Next</button>
+    </div>
+
+
+  </div>
+
+</div>
+
+<script src="/securemagnus_2025/js/form_stepper.js"></script>
+<script src="/securemagnus_2025/js/custom_script/import-bulk-user-validation.js"></script>

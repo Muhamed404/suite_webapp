@@ -1,0 +1,58 @@
+<div id="panel-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50" role="dialog" aria-modal="true">
+  <div class="bg-white rounded-3xl shadow-lg w-full max-w-lg relative">
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-3xl bg-blue-600">
+      <h3 class="text-lg font-semibold text-white"><%= __("btn-CS-LibPosters") %></h3>
+      <button type="button" class="modal-close text-white text-2xl font-bold hover:text-red-200 transition" aria-label="Close">&times;</button>
+    </div>
+    <!-- Modal Body -->
+    <div class="p-6">
+      <form
+        class="space-y-6"
+        id="uploadCyberLibraryForm"
+        name="uploadCyberLibraryForm"
+        method="post"
+        enctype="multipart/form-data"
+        action="/file/filePostersUpload/"
+      >
+        <div class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <span class="block sm:inline"><%= __("noti.LibPosters") %></span>
+        </div>
+        <div>
+          <label for="category" class="block text-sm font-medium mb-1">
+            <%= __("sel-CS-LibPosters-Category") %> *
+          </label>
+          <select class="form-control w-full border rounded px-3 py-2" name="category" id="category" required>
+            <option value="" selected disabled hidden><%= __("sel-CS-LibPosters-Category") %></option>
+            <% categories.forEach(cat => { %>
+              <option value="<%= cat.code %>"><%= cat.name %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div>
+          <label for="postersFile" class="block text-sm font-medium mb-1">
+            <%= __("sel-CS-LibPosters") %> *
+          </label>
+          <input
+            class="form-control w-full border rounded px-3 py-2"
+            id="postersFile"
+            name="postersFile"
+            type="file"
+            accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
+            required
+          />
+        </div>
+        <input type="hidden" id="categoryId" name="categoryId" value="">
+        <!-- Modal Footer -->
+        <div class="flex justify-end gap-2 mt-6">
+          <button type="button" class="modal-close px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 transition">
+            <%= __("btn-CS-LibPosters-Cancel") %>
+          </button>
+          <button type="submit" id="btnSaveImportUserModal" class="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition">
+            <%= __("btn-CS-LibPosters-Upload") %>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

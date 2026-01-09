@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Magnus</title>
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fondamento:ital@0;1&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
+    rel="stylesheet">
+
+
+  <script src="/securemagnus_2025/js/tailwind_3.js"></script>
+
+  <link rel="stylesheet" href="/securemagnus_2025/css/style.css">
+
+
+</head>
+
+<body class="bg-white">
+
+
+  <div class="grid grid-cols-12 min-h-screen">
+
+    <!-- Login (Always Visible) -->
+    <div class="flex flex-col justify-between  col-span-12 sm:col-span-6 h-screen lg:p-10 p-4">
+
+      <!-- Header -->
+      <div class="flex items-center justify-between ">
+        <a href="">
+          <img src="/securemagnus_2025/images/logo.svg" alt="">
+        </a>
+
+
+        <a href=""
+          class="rounded-full text-sm py-1.5 px-4 border border-[var(--teal)] hover:bg-[var(--teal)] hover:text-white transform duration-300">
+          عربي
+
+        </a>
+
+      </div>
+
+
+      <!-- Login Form -->
+      <form id="loginForm" action="/login" method="POST">
+
+        <div class="flex items-center justify-center">
+          <div class="flex flex-col max-w-2xl items-stretch ">
+
+            <h3 class="text-center text-4xl font-semibold md:mt-12 lg:mt-24">Welcome to SecureMagnus</h3>
+
+            <div class="mt-6 md:mt-10">
+              <fieldset class="fieldset">
+
+                <label
+                  class="flex items-center w-full p-5 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--teal)] transition-colors duration-300">
+                  <input type="email" placeholder="Email Address" name="email"
+                    class="bg-transparent border-none outline-none text-[14px] w-full" />
+                </label>
+              </fieldset>
+              <fieldset class="fieldset">
+
+                <label
+                  class="flex items-center w-full p-5 mt-3 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--teal)] transition-colors duration-300">
+                  <input class="bg-transparent border-none outline-none text-[14px] grow" placeholder="Password" name="password"
+                    id="password" type="password" />
+
+                </label>
+
+              </fieldset>
+              <div class="flex justify-between mt-3">
+                <div class="flex items-center gap-3 ">
+                  <input type="checkbox" class="accent-[var(--teal)] text-white w-5 h-5 rounded"
+                    aria-label="Custom checkbox" />
+
+                  <label for="agreement" class="text-sm ">
+                    Remember me
+                  </label>
+                </div>
+
+                <div class="">
+                  <a class="label-text text-[var(--teal)] text-base-content/80 text-xs" href="">
+                    Forgot Password?
+                  </a>
+                </div>
+
+              </div>
+
+
+              <button type="submit"
+                class="w-full flex items-center justify-center gap-3 mt-8 px-6 py-3 rounded-full bg-[var(--teal)] text-white border border-transparent transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+                <!-- <span class="iconify lucide--log-in size-4"></span> -->
+                Login
+              </button>
+
+              <p class="text-base-content/80 mt-4 text-center text-sm md:mt-6">
+                Don't have an account?
+                <a class="text-[var(--teal)] ms-1 hover:underline" href="./onboarding1-eng.html">
+                  Singup
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </form>
+      <div>
+        <p class="text-sm text-gray-600 mt-4">
+          © 2025 Securemagnus
+        </p>
+      </div>
+
+
+
+    </div>
+
+
+
+
+    <!-- Hero (Hidden on Small Screens) -->
+    <div class="hidden sm:block col-span-6  lg:p-5 p-4">
+      <div class="w-full h-full relative rounded-3xl bg-[#020C1E] overflow-hidden">
+        <!-- Background Image -->
+        <img src="/securemagnus_2025/images/img/magnus-bg.png"
+          class="absolute bottom-0 right-0 max-h-full max-w-full object-contain" alt="Background" />
+
+        <!-- Text Overlay -->
+        <div class="relative z-10 p-16">
+          <h5 class="text-white text-5xl font-semibold leading-snug">
+            Empowering Future,<br />
+            <span class="text-[var(--teal)]">Securing</span> Today
+          </h5>
+        </div>
+      </div>
+
+
+
+
+    </div>
+  </div>
+
+
+
+</body>
+
+</html>

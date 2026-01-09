@@ -1,0 +1,102 @@
+<div class="flex flex-col  p-6 pt-0">
+
+
+
+  <!-- first section  -->
+
+  <div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white">
+
+    <div class="bg-white  w-full mt-3 p-8">
+
+      <div id="steps">
+        <div class="step fade-enter-active">
+          <!-- Section Title -->
+          <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10">Edit User Details</h1>
+          <!-- Main Form -->
+          <form class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start" action="/user/update/<%= user.id %>" method="post">
+            <!-- Left Side: App/License/Duration -->
+            <div class="flex flex-col gap-6">
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">First Name</label>
+                <input placeholder="Enter first name" type="text" id="firstName" name="firstName"
+                  value="<%= user.UserProfile?.first_name || '' %>"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                  readonly />
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">Email</label>
+                <input placeholder="Enter email" type="text" value="<%= user.UserProfile?.email || '' %>" id="email"
+                  name="email"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                  readonly />
+              </div>
+
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">New Password</label>
+                <input placeholder="Enter new password" type="password" id="newPassword" name="newPassword" value=""
+                  autocomplete="off"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] 
+                  bg-transparent"
+                   />
+              </div>
+              <div>
+                <a href="/user/list"
+                  class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition">Cancel</a>
+                <button type="submit"
+                  class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition">Save</button>
+              </div>
+
+             
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">Status</label>
+                <select name="status"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] 
+                  bg-transparent">
+                  <option value="true" <%=user.status ? 'selected' : '' %>>Active</option>
+                  <option value="false" <%=!user.status ? 'selected' : '' %>>Inactive</option>
+                </select>
+              </div>
+              <!-- Buttons -->
+              <div>
+                <a href="/user/list"
+                  class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition">Cancel</a>
+                <button type="submit"
+                  class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition">Save</button>
+              </div>
+            </div>
+
+            <!-- Right Side: Package/Start Date -->
+            <div class="flex flex-col gap-6">
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">Last Name</label>
+                <input placeholder="Enter last name" type="text" id="lastName" name="lastName"
+                  value="<%= user.UserProfile?.last_name || '' %>"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                  readonly />
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">Role Assigned</label>
+                <input placeholder="Enter role assigned" type="text" value="<%= user.UserRole?.role_name || '' %>"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                  readonly />
+              </div>
+
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">Confirm Password</label>
+                <input placeholder="Enter confirm password" type="password" id="confirmPassword" name="confirmPassword"
+                  autocomplete="off"
+                  value="" 
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                   />
+              </div>
+            </div>
+            <!-- </form> -->
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+
+</div>

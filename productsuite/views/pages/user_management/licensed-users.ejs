@@ -1,0 +1,156 @@
+<div class="flex flex-col p-5 gap">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900"><%= __("breadcrumbs.licensedUsers") %></span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900">
+      <%= __("breadcrumbs.licensedUsers") %>
+    </h3>
+  </div>
+</div>
+
+<div class="flex flex-col p-2 pt-0">
+  <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
+    <!-- Search & Filter -->
+    <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
+      <table id="filter-table" class="min-w-full border-none text-sm text-left text-gray-700">
+        <thead class="bg-gray-50 text-gray-600 text-xs">
+          <tr>
+            <th class="px-4 py-5 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                class="size-3.5 ml-3 inline">
+              #
+            </th>
+            <th class="px-4 py-5 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                class="size-3.5 ml-3 inline">
+              First Name
+            </th>
+            <th class="px-4 py-5 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                class="size-3.5 ml-3 inline">
+              Last Name
+            </th>
+            <th class="px-4 py-5 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                class="size-3.5 ml-3 inline">
+              Email
+            </th>
+            <th class="px-4 py-5 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                class="size-3.5 ml-3 inline">
+              Role
+            </th>
+            <th class="px-4 py-5 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                class="size-3.5 ml-3 inline">
+              License Status
+            </th>
+            <th class="px-4 py-5 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                class="size-3.5 ml-3 inline">
+              Allocated
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <% users.forEach((item, idx)=> { %>
+            <tr class="bg-white border-b hover:bg-gray-50">
+              <td class="px-6 py-6 whitespace-nowrap"><%= idx + 1 %></td>
+              <td class="px-6 py-6 whitespace-nowrap"><%= item.UserProfile.first_name %></td>
+              <td class="px-6 py-6 whitespace-nowrap"><%= item.UserProfile.last_name %></td>
+              <td class="px-6 py-6 whitespace-nowrap"><%= item.UserProfile.email %></td>
+              <td class="px-6 py-6 whitespace-nowrap"><%= item.UserProfile.User.UserRole.role_name %></td>
+              <td class="px-6 py-6 whitespace-nowrap">
+                <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
+                  <%= item.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
+                  <%= item.status %>
+                </span>
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap"><%= item.licenses_allocation_date_formatted %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="p-5 border-t bg-gray-50 flex justify-center">
+      <div class="flex justify-center items-center space-x-1">
+        <% const totalPages = Math.ceil(total / pageSize); %>
+        <% for(let p=1; p <= totalPages; p++) { %>
+          <button
+            class="px-3 py-1 rounded-lg border font-semibold
+              <%= p === page ? 'bg-blue-600 text-white border-blue-600 shadow' : 'bg-white text-blue-600 border-gray-300 hover:bg-blue-50' %>
+              transition"
+            onclick="fetchLicensedUsers(<%= p %>)">
+            <%= p %>
+          </button>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<script>
+  // pageSize and productId should be set in your EJS context or globally
+  const pageSize = <%= typeof pageSize !== 'undefined' ? pageSize : 10 %>;
+  // const productId = <%= typeof productId !== 'undefined' ? productId : '' %>;
+  const productId = <%- JSON.stringify(productId) %>;
+function fetchLicensedUsers(page) {
+  const url = `/user/licensed-users/${productId}?page=${page}&pageSize=${pageSize}&requestType=ajax`;
+  fetch(url)
+    .then(res => res.json())
+    .then(json => {
+      const tbody = document.getElementById('users-table-body');
+      tbody.innerHTML = '';
+      const users = Array.isArray(json.users) ? json.users : [];
+      users.forEach((item, idx) => {
+        const statusClass = item.status === 'Active'
+          ? 'bg-green-100 text-green-700'
+          : 'bg-red-100 text-red-700';
+        const tr = document.createElement('tr');
+        tr.className = 'bg-white border-b hover:bg-gray-50';
+        tr.innerHTML = `
+          <td class="px-6 py-6 whitespace-nowrap">${idx + 1}</td>
+          <td class="px-6 py-6 whitespace-nowrap">${item.UserProfile.first_name}</td>
+          <td class="px-6 py-6 whitespace-nowrap">${item.UserProfile.last_name}</td>
+          <td class="px-6 py-6 whitespace-nowrap">${item.UserProfile.email}</td>
+          <td class="px-6 py-6 whitespace-nowrap">${item.UserProfile.User.UserRole.role_name}</td>
+          <td class="px-6 py-6 whitespace-nowrap">
+            <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">
+              ${item.status || 'Inactive'}
+            </span>
+          </td>
+          <td class="px-6 py-6 whitespace-nowrap">${item.licenses_allocation_date_formatted || ''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+      // Re-render pagination controls with the current page
+      renderPagination(json.page, json.pageSize, json.total);
+    });
+}
+
+  function renderPagination(currentPage, pageSize, total) {
+  const totalPages = Math.ceil(total / pageSize);
+  const paginationDiv = document.querySelector('.p-5.border-t.bg-gray-50 .flex.justify-center.items-center.space-x-1');
+  if (!paginationDiv) return;
+  paginationDiv.innerHTML = '';
+  for (let p = 1; p <= totalPages; p++) {
+    const btn = document.createElement('button');
+    btn.className = `px-3 py-1 rounded-lg border font-semibold transition ${
+      p === currentPage
+        ? 'bg-blue-600 text-white border-blue-600 shadow'
+        : 'bg-white text-blue-600 border-gray-300 hover:bg-blue-50'
+    }`;
+    btn.textContent = p;
+    btn.onclick = () => fetchLicensedUsers(p);
+    paginationDiv.appendChild(btn);
+  }
+}
+</script>

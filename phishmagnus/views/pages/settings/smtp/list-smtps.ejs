@@ -1,0 +1,83 @@
+<%- include('../../layout/layout-starting.ejs') %>
+
+<!-- Page Content Start -->
+<!-- ================== -->
+
+<div class="wraper container-fluid">
+  <div class="page-title">
+    <h3 class="title"><%= __("SMTP.Configuration") %></h3>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"></h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <table id="datatable" class="table table-striped table-bordered">
+                <thead>
+                  <tr>
+                    <th><%= __("SMTP.OrganizationName") %></th>
+                    <th><%= __("SMTP.SMTPHostName") %></th>
+                    <th><%= __("SMTP.SMTPPort") %></th>
+                    <th><%= __("SMTP.SMTPUserAccount") %></th>
+                    <th><%= __("SMTP.Action") %></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (typeof SMTP !== 'undefined'){ SMTP.forEach(u => { %>
+                  <tr>
+                    <td><%= u.Organization.name %></td>
+                    <td><%= u.host %></td>
+                    <td><%= u.port %></td>
+                    <td><%= u.smtp_account %></td>
+                    <td><%= u.smtp_password %></td>
+
+                    <td>
+                      <div class="btn-group dropdown">
+                        <button type="button" class="btn btn-success">
+                          <i class="fa fa-wrench"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-success dropdown-toggle"
+                          data-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          <i class="caret"></i>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                          <li>
+                            <a href="/organization/profile/<%= u.id%>"><%= __("SMTP.View") %></a>
+                          </li>
+                          <li>
+                            <a href="/order/"><%= __("SMTP.Order") %></a>
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                  <% }); }
+                  %>
+                  <%  else { %>
+                    <p><%= __("SMTP.NotAvailable") %></p>
+                <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Row -->
+</div>
+
+<!-- Page Content Ends -->
+<!-- ================== -->
+
+<%- include('../../layout/footer.js') %> <%-
+include('../../layout/layout-ending.ejs') %>

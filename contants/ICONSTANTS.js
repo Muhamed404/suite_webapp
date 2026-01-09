@@ -1,0 +1,22 @@
+// constants.js
+module.exports = {
+  OrgSubAdmin: 4,
+  OrgSuperAdmin: 3,
+  MagSuperOrganization: 1,
+  OrgUser: 5,
+  Guest: 6,
+  MagSubAdmin: 2,
+  MagSuperAdmin: 1,
+  CreateOrder:700,
+  PendingInvoice:701,
+  UpdateInvoice:702,
+  PAID:703,
+  SubExpired:703,
+  SubDeActive:704,
+  HTTP_OK:200,
+  HTTP_CREATED: 201,
+  HTTP_BAD_REQUEST: 400,
+  HTTP_UnAuthorized:401,
+  HTTP_NOT_FOUND:404,
+  HTTP_INTERNAL_SERVER: 500,
+};

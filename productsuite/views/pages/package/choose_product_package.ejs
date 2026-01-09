@@ -1,0 +1,51 @@
+<div class="step fade-enter-active" id="step-1">
+ 
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Left Side: App/License/Duration -->
+        <div class="flex flex-col gap-6">
+            <div>
+                <label class="block text-gray-700 font-medium mb-3">
+ 
+                    
+                    <%= __("package.create.optionSelectProduct") %>
+                </label>
+
+                <select name="application" id="application" required
+                    class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50">
+                    <option value="" disabled selected><%= __("package.create.optionSelectProduct") %></option>
+                    <% applications.forEach(application=> { %>
+                        <option value="<%= application.id %>">
+                            <%= application.name %>
+                        </option>
+                        <% }); %>
+
+                </select>
+            </div>
+      
+
+
+        </div>
+
+        <!-- Right Side: Package/Start Date -->
+        <div class="flex flex-col gap-6">
+            <div>
+                <label class="block text-gray-700 font-medium mb-3">
+                    <%= __("package.create.optionSelectPackageType") %>
+                </label>
+
+                <select name="package_type" id="package_type" required
+                    class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50">
+                    <option value="" selected disabled>
+                        <%= __("package.create.optionSelectPackageType") %>
+                    </option>
+                    <option value="On Premise"><%= __("package.create.optionSelectPackageTypeOnPremise") %></option>
+                    <option value="On Cloud"><%= __("package.create.optionSelectPackageTypeCloud") %></option>
+
+                </select>
+            </div>
+
+
+        </div>
+    </div>
+</div>

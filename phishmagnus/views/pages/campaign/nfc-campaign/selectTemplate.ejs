@@ -1,0 +1,92 @@
+<div class="step fade-enter-active" id="step-1">
+    <!--  Title -->
+    <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10">NFC Campaign</h1>
+
+    <!-- Main Form -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="md:col-span-1">
+            <label class="block text-gray-700 font-medium mb-3">
+                <%= __("nfc_campaign.name") %><span class="text-red-500">*</span>
+            </label>
+            <input type="text"  id="name" name="name"
+                class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+        </div>
+
+
+        <div class="md:col-span-1">
+            <label class="block text-gray-700 font-medium mb-3">
+                <%= __("generic_label.description") %>
+            </label>
+            <input type="text"  
+            id="description" name="description"
+            class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
+            bg-gray-50" />
+        </div>
+
+        <!-- Template Selection -->
+
+
+        <div class="md:col-span-1 flex flex-col gap-4">
+            <div class="flex gap-6">
+                <label
+                    class="flex items-center gap-2 px-4 py-2 rounded-2xl cursor-pointer transition peer-checked:bg-teal-50 peer-checked:text-teal-600">
+                    <input type="radio" checked id="myTemplate" name="templateOption" value="myTemplates"
+                        class="template-radio peer hidden">
+                    <svg class="w-5 h-5 text-gray-400 peer-checked:text-teal-500" fill="none" stroke="currentColor"
+                        stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="5" class="fill-current"></circle>
+                    </svg>
+                    <span>
+                        <%= __("generic_label.my_template") %>
+                    </span>
+                </label>
+                <label
+                    class="flex items-center gap-2 px-4 py-2 rounded-2xl cursor-pointer transition peer-checked:bg-teal-50 peer-checked:text-teal-600">
+                    <input type="radio" id="systemTemplate" name="templateOption" value="systemTemplates"
+                        class="template-radio peer hidden">
+                    <svg class="w-5 h-5 text-gray-400 peer-checked:text-teal-500" fill="none" stroke="currentColor"
+                        stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="5" class="fill-current"></circle>
+                    </svg>
+                    <span>
+                        <%= __("generic_label.system_template") %>
+                    </span>
+                </label>
+
+            </div>
+
+
+            <div id="templateSelection" class="space-y-6">
+               
+                <div class="relative">
+                    <select id="templateSelect"
+                        class="groupSelect w-full px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-teal-400 focus:outline-none">
+                        <option value="" disabled selected><%= __("generic_label.select_template") %></option>
+                    </select>
+                </div>
+                <div class="selectedTags flex flex-wrap gap-2 mt-3"></div>
+
+            </div>
+
+
+        </div>
+            <!-- Preview -->
+        <div class="md:col-span-1">
+            <label class="block text-gray-700 font-medium mb-3">
+                <%= __("generic_label.preview") %>
+            </label>
+            <textarea id="message" rows="10" placeholder="Type your message here..."
+            
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 bg-gray-50 text-gray-900 overflow-y-auto">
+            <html>
+                <body>
+                    <h1><%= __("generic_label.preview") %></h1>
+                </body>
+            </html>
+            </textarea>
+
+        </div>
+    </div>
+</div>

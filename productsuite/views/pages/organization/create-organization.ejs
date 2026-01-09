@@ -1,0 +1,181 @@
+<div class="flex flex-col  p-6">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+      <span class="text-gray-400">›</span>
+      <a href="/organization/" class="hover:text-gray-700 transition"><%= __("breadcrumbs.organization") %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900"><%= __("breadcrumbs.organizationCreate") %></span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900">
+      <%= __("breadcrumbs.organizationCreate") %>
+    </h3>
+  </div>
+
+  <!-- first section  -->
+
+  <div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white">
+
+    <div class="bg-white  w-full mt-3 p-8">
+
+      <!-- Stepper Navigation -->
+      <div id="stepper" class="flex items-center justify-between mb-10">
+        <div class="flex items-center gap-2">
+          <div
+            class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white font-bold text-xs">
+            1</div>
+          <span class="font-medium step-label text-teal-700 text-sm"><%= __("organization.create.stepper1") %></span>
+        </div>
+        <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
+        <div class="flex items-center gap-2">
+          <div
+            class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-white border-2 border-teal-300 text-teal-400 font-bold text-xs">
+            2</div>
+          <span class="font-medium step-label text-gray-400 text-sm"><%= __("organization.create.stepper2") %></span>
+        </div>
+      </div>
+
+      <div id="steps">
+        <div class="step fade-enter-active">
+          
+          <!-- Main Form -->
+          <form name="createOrganization" id="createOrganization" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start" 
+          action="/organization/" method="post">
+            <!-- Left Side: App/License/Duration -->
+            <div class="flex flex-col gap-6">
+              <div>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgName") %></label>
+                <input placeholder="Enter organization name" type="text" value="" id="name" name="name"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgAddress") %></label>
+                <input placeholder="Enter organization address" type="text" value="" id="address" name="address"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+              </div>
+
+              <div>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgPostalCode") %></label>
+                <input placeholder="Enter postcode" type="text" value=""
+                  oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+                  min="1" id="postalCode" name="postalCode"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+              </div>
+
+              <div>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgContactNumber") %></label>
+                <input placeholder="Enter contact number"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+                  min="1" id="contact" name="contact" type="text" value=""
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+              </div>
+            </div>
+
+            <!-- Right Side: Package/Start Date -->
+            <div class="flex flex-col gap-6">
+              <div>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgCountry") %></label>
+                <select name="country" id="country"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-white">
+                  <option value="">
+                    <%= __("organization.create.optionOrgSelectCountry") %>
+                  </option>
+                  <% countries.forEach(c=> { %>
+                    <option value="<%= c.id %>">
+                      <%= c.name %>
+                    </option>
+                    <% }); %>
+                </select>
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgState") %></label>
+                <select name="state" id="state"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-white">
+
+                  <option value="" selected disabled>
+                    <%= __("organization.create.optionOrgSelectState") %>
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgCity") %></label>
+                <select name="city" id="city"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-white">
+                  <option value="" selected disabled>
+                    <%= __("organization.create.optionOrgSelectCity") %>
+                  </option>
+                </select>
+              </div>
+            </div>
+          <!-- </form> -->
+        </div>
+
+
+
+
+
+        <!-- 2nd -->
+
+        <div class="step hidden">
+           <!-- Main Form -->
+          <!-- <form class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start"> -->
+            <!-- Left Side: App/License/Duration -->
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+            <div class="flex flex-col gap-6">
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">
+                  <%= __("organization.create.labelAdminFirstName") %> *
+                </label>
+                <input type="text" value="" id="firstName" name="firstName"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">
+                  <%= __("organization.create.labelAdminEmail") %> *
+                </label>
+                <input type="email" value="" id="email" name="email"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+              </div>
+
+
+            </div>
+
+            <!-- Right Side: Package/Start Date -->
+            <div class="flex flex-col gap-6">
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">
+                  <%= __("organization.create.labelAdminLastName") %> *
+                </label>
+                <input type="text" value="" id="lastName" name="lastName"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+              </div>
+
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">
+                  <%= __("organization.create.labelAdminPassword") %> *
+                </label>
+                <input type="password" value="" id="password" name="password"
+                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+              </div>
+            </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+      <!-- Buttons -->
+      <div class="flex justify-end gap-4 mt-10">
+        <button id="backBtn" type="button"
+          class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition"><%= __("organization.create.btnBack") %></button>
+        <button id="nextBtn" type="submit"
+          class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition"><%= __("organization.create.btnNext") %></button>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+<script src="/securemagnus_2025/js/form_stepper.js"></script>
+<script src="/securemagnus_2025/js/custom_script/create-organization-validation.js"></script>

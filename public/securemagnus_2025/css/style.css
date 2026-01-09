@@ -1,0 +1,592 @@
+@import "tailwindcss";
+
+
+
+*{
+  font-family: "Nunito Sans", sans-serif;
+}
+
+
+
+:root{
+    --bg:#FAFBFC;
+    --teal:#00CCC4;
+    --gray:#F1F5F8;
+    --darkgray:#656972;
+    --strokeGray:#DAE1E5;
+    --mainblue:#051226;
+    --lightBlue:#66CAFE;
+    --blue:#41A5FE;
+    --cardbg:linear-gradient(
+        90deg,
+  #0075A1 23%,
+  #0075A1 26%,
+  #00B1BD 62%
+  
+);
+--email:#57ABE6;
+--emaillight:#D9E5F3;
+
+
+--sms:
+
+}
+
+    .cke_notifications_area {
+        display: none !important;
+    }
+
+
+
+.bg-white{
+    background-color: var(--bg);
+}
+
+/* Super thin, modern, always-visible scrollbar */
+.custom-scroll {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  overflow-y: auto;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 4px; /* Thin but visible */
+  height: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.custom-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4); /* Slightly brighter on hover */
+}
+
+
+.hide-scrollbar {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* Internet Explorer 10+ */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;                  /* Chrome, Safari and Opera */
+}
+
+
+
+   /* Ensure fixed width on Rate cell, even when hovered */
+    .rate-cell {
+      width: 15rem; /* matches Tailwind w-60 */
+      min-width: 15rem;
+      max-width: 15rem;
+    }
+    /* Optional: smooth transition for progress bar */
+    .progress-bar {
+      transition: width 0.8s cubic-bezier(.4,0,.2,1);
+    }
+
+
+
+     .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.95rem;
+      background: #e6fcf8;
+      color: black;
+      border-radius: 6px;
+      margin-right: 0.5rem;
+      margin-bottom: 0.25rem;
+    }
+    .tag button { background: none; border: none; color: black; font-size: 1.1em; cursor: pointer; padding: 0;}
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      opacity: 0;
+    }
+
+
+
+    .round-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  border: 2px solid #17b1a8;
+  background: #fff;
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.round-checkbox:checked {
+  background: #17b1a8;
+  border-color: #17b1a8;
+}
+
+.round-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 0.33rem;
+  top: 0;
+  width: 0.4rem;
+  height: 0.8rem;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+  /* creates the tick */
+}
+
+
+
+    /* Mountain Mist: round checkbox & radio styles */
+    .mm-checkbox, .mm-radio {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 1.2rem;
+      height: 1.2rem;
+      border-radius: 9999px;
+      border: 2px solid #17b1a8;
+      background: #fff;
+      transition: box-shadow .2s, border-color .2s;
+      cursor: pointer;
+      position: relative;
+      vertical-align: middle;
+    }
+    .mm-checkbox:checked {
+      background-color: #17b1a8;
+      border-color: #17b1a8;
+    }
+    .mm-checkbox:checked::after {
+      content: '';
+      position: absolute;
+      left: 0.30rem;
+      top: 0.17rem;
+      width: 0.4rem;
+      height: 0.65rem;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: rotate(45deg);
+    }
+    .mm-radio {
+      border-radius: 9999px;
+    }
+    .mm-radio:checked {
+      background-color: #17b1a8;
+      border-color: #17b1a8;
+    }
+    .mm-radio:checked::after {
+      content: '';
+      position: absolute;
+      left: 0.32rem;
+      top: 0.32rem;
+      width: 0.36rem;
+      height: 0.36rem;
+      background: #fff;
+      border-radius: 9999px;
+    }
+
+
+
+        .fade-enter {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    .fade-enter-active {
+      opacity: 1;
+      transform: translateX(0);
+      transition: all 0.4s ease;
+    }
+    .fade-exit {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .fade-exit-active {
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: all 0.4s ease;
+    }
+
+
+
+
+
+
+  /* Apply to any element with this class */
+  .thin-scrollbar {
+    /* Firefox */
+    scrollbar-width: thin;              /* ultra-thin in Firefox */
+    scrollbar-color: #d9e1ed transparent; /* thumb | track */
+  }
+
+  /* WebKit (Chrome, Edge, Safari) */
+  .thin-scrollbar::-webkit-scrollbar {
+    height: 1px;  /* horizontal scrollbar thickness */
+    width:  1px;  /* vertical scrollbar thickness */
+    background: transparent;
+  }
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #94a3b8, #64748b);
+    border-radius: 9999px;
+  }
+
+  /* Slightly clearer thumb on hover/active (still keeps 1px thickness) */
+  .thin-scrollbar:hover::-webkit-scrollbar-thumb,
+  .thin-scrollbar:active::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #14b8a6, #0ea5e9); /* teal → sky */
+  }
+
+  /* Hide default calendar/clock icons in datetime-local */
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    display: none;
+    -webkit-appearance: none;
+  }
+  input[type="datetime-local"]::-webkit-clear-button {
+    display: none;
+  }
+  input[type="datetime-local"]::-webkit-inner-spin-button {
+    display: none;
+  }
+
+
+
+  .datatable-input  {
+  padding: 0.75rem 2.5rem; /* 12px */
+  padding-left: 1.5rem; /* 56px */
+  border-radius: 9999px;
+  background-color: #ffffff;
+  font-size: 0.875rem; /* 14px */
+  border-width: 1px;
+  border-color: #d1d5db;
+}
+
+.datatable-input:focus  {
+  outline: 1px solid transparent;
+  outline-offset: 1px;
+  box-shadow: 0 0 0 calc(.5px + .5px) var(--teal); /* This assumes a custom property named --teal */
+}
+
+
+#filter{
+
+ 
+  padding: 0.75rem 2.5rem; /* 12px */
+  padding-left: 1.5rem; /* 56px */
+ 
+  border-radius: 9999px;
+  background-color: #ffffff;
+  font-size: 0.875rem; /* 14px */
+  border-width: 1px;
+  border-color: #d1d5db;
+}
+
+
+
+.datatable-bottom{
+  margin: 40px 0;
+}
+
+
+
+/* Pagination container */
+.datatable-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+/* Pagination list */
+.datatable-pagination-list {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Pagination items */
+.datatable-pagination-list-item {
+  display: inline-block;
+}
+
+/* Buttons */
+.datatable-pagination-list-item-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 1px solid #d0e4e4; /* light teal border */
+  background-color: transparent;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Active page */
+.datatable-pagination-list-item.datatable-active .datatable-pagination-list-item-link {
+  background-color: #e6f7f7; /* light teal background */
+  border-color: #36b6b6; /* teal border */
+  color: #36b6b6;
+  
+}
+
+/* Hover effect */
+.datatable-pagination-list-item-link:hover {
+  background-color: #f0fafa;
+  border-color: #36b6b6;
+  color: #36b6b6;
+}
+
+/* Disabled arrows */
+.datatable-pagination-list-item.datatable-disabled .datatable-pagination-list-item-link {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Optional: Arrows smaller */
+.datatable-pagination-list-item-link {
+  font-size: 16px;
+}
+
+
+
+
+
+
+/* buttons */
+
+.pill-btn {
+  font-size: 0.875rem; /* 14px */
+  font-weight: 500;
+  border-radius: 9999px; /* Pill shape */
+  padding: 0.25rem 0.75rem;
+  cursor: default;
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+/* Red */
+.pill-btn.red {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+.pill-btn.red:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.6);
+  font-weight: 600;
+}
+
+/* Orange */
+.pill-btn.orange {
+  color: #f97316;
+  background-color: rgba(249, 115, 22, 0.08);
+  border-color: rgba(249, 115, 22, 0.3);
+}
+.pill-btn.orange:hover {
+  background-color: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.6);
+  font-weight: 600;
+}
+
+/* Yellow */
+.pill-btn.yellow {
+  color: #eab308;
+  background-color: rgba(234, 179, 8, 0.08);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+.pill-btn.yellow:hover {
+  background-color: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.6);
+  font-weight: 600;
+}
+
+/* Green */
+.pill-btn.green {
+  color: #22c55e;
+  background-color: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+.pill-btn.green:hover {
+  background-color: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.6);
+  font-weight: 600;
+}
+
+/* Blue */
+.pill-btn.blue {
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.3);
+}
+.pill-btn.blue:hover {
+  background-color: rgba(37, 99, 235, 0.15);
+  border-color: rgba(37, 99, 235, 0.6);
+  font-weight: 600;
+}
+
+/* Indigo */
+.pill-btn.indigo {
+  color: #4f46e5;
+  background-color: rgba(79, 70, 229, 0.08);
+  border-color: rgba(79, 70, 229, 0.3);
+}
+.pill-btn.indigo:hover {
+  background-color: rgba(79, 70, 229, 0.15);
+  border-color: rgba(79, 70, 229, 0.6);
+  font-weight: 600;
+}
+
+/* Violet */
+.pill-btn.violet {
+  color: #a855f7;
+  background-color: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+.pill-btn.violet:hover {
+  background-color: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.6);
+  font-weight: 600;
+}
+
+
+
+    /* <button class="pill-btn red">45%</button>
+<button class="pill-btn orange">45%</button>
+<button class="pill-btn yellow">45%</button>
+<button class="pill-btn green">45%</button>
+<button class="pill-btn blue">45%</button>
+<button class="pill-btn indigo">45%</button>
+<button class="pill-btn violet">45%</button> */
+
+
+
+/* Wrapper */
+.custom-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+
+/* Hidden Checkbox */
+.hidden-checkbox {
+  display: none;
+}
+
+/* Custom Circle */
+.custom-circle {
+  
+  width: 24px;
+  height: 24px;
+  border: 2px solid #9ca3af; /* gray-400 */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  top: 5px;
+  transition: all 0.3s ease;
+}
+
+/* Tick mark inside the circle */
+.custom-circle::after {
+  content: '';
+  width: 8px;
+  height: 14px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: rotate(45deg);
+  position: absolute;
+  top: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* When checkbox is checked */
+.hidden-checkbox:checked + .custom-circle {
+  background-color: #10b981; /* green-500 */
+  border-color: #10b981;
+}
+
+.hidden-checkbox:checked + .custom-circle::after {
+  opacity: 1;
+}
+
+/* Text content */
+.text-content .title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827; /* gray-900 */
+}
+
+.text-content .desc {
+  font-size: 0.875rem;
+  color: #6b7280; /* gray-500 */
+}
+
+
+
+  .ck.ck-editor__editable_inline {
+    min-height: 300px !important; /* Bigger height */
+    border-radius: 8px; /* Rounded like your design */
+    background: #f9fafb; /* Match input background */
+  }
+
+
+
+/* Hide the original radio */
+.custom-radio input[type="radio"] {
+  display: none;
+}
+
+/* Outer circle */
+.custom-radio .radio-circle {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #d1d5db; /* gray-300 */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: border 0.3s ease;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* When checked */
+.custom-radio input[type="radio"]:checked + .radio-circle {
+  border: 2px solid #00CCC4; /* teal */
+}
+
+.custom-radio input[type="radio"]:checked + .radio-circle::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background-color: #00CCC4;
+  border-radius: 50%;
+}
+
+/* Fix label alignment */
+.custom-radio {
+  display: flex;
+  align-items: center; /* Vertical center */
+  gap: 12px; /* Space between circle and text */
+  cursor: pointer;
+}

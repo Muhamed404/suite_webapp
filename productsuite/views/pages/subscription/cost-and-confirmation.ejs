@@ -1,0 +1,84 @@
+<div class="step hidden" id="step-4">
+
+  <!-- Section Title -->
+  <!-- <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10">Cost & Confirmation</h1> -->
+
+   
+
+    <!-- Payment Description -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-3">
+        <%= __("subscription.create.labelPackageDescription") %>
+      </label>
+      <input
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        id="pymtDesc" name="pymtDesc" type="text" />
+
+    </div>
+
+    <!-- Service Cost -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-3"><%= __("subscription.create.labelServiceCost") %></label>
+      <input class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+       id="serviceCost" name="serviceCost"
+        oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+        type="number" />
+      
+    </div>
+
+    <!-- Package Cost -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-3"><%= __("subscription.create.labelPackageCost") %></label>
+      <input class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-gray-50 focus:outline-none"
+       id="packageCost" name="packageCost"
+        oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+        type="number" />
+    
+    </div>
+
+    <!-- Total User License -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-3"><%= __("subscription.create.labelTotalUsers") %></label>
+      <input class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-gray-50 focus:outline-none"
+       id="totalUsers" name="totalUsers"
+        oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+        type="number" readonly />
+      
+    </div>
+
+    <!-- Discount -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-3"><%= __("subscription.create.labelDiscount") %></label>
+      <input class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+       id="discount" name="discount" min="0" max="100" type="number" value="0" />
+     
+    </div>
+
+    <!-- Total Payment Amount -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-3"><%= __("subscription.create.labelTotalCost") %></label>
+    <input  class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-gray-50 focus:outline-none"
+    id="ttlPayableAmt" name="ttlPayableAmt"
+        oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+        type="number" readonly />
+        
+    </div>
+
+    <!-- Choose Organization Admin -->
+    <div class="md:col-span-1">
+      <label class="block text-sm font-medium text-gray-700 mb-3"><%= __("subscription.create.optionSelectAdminUser") %></label>
+       <select class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        name="allocatedOrgAdminUser" id="allocatedOrgAdminUser">
+        <option value="" selected disabled>
+          <%= __("subscription.create.optionSelectAdminUser") %>
+        </option>
+        <% superUsers.forEach(function(user) { %>
+          <option value="<%= user.id %>">
+            <%= user.email %>
+          </option>
+          <% }); %>
+      </select>
+      
+    </div>
+ 
+</div>

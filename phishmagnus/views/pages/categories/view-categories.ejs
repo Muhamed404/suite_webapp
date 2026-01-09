@@ -1,0 +1,128 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex-1">
+      <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
+        <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+        <span class="text-gray-400">›</span>
+        <span class="font-semibold text-gray-900">Cybersecurity Categories</span>
+      </nav>
+      <h3 class="text-3xl font-medium">
+        <%= __("CS-List") %>
+      </h3>
+    </div>
+    <div>
+
+
+
+      <button type="button" data-modal-id="panel-modal"
+        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        <%= __("btn-CS-LibPosters-Upload-Document") %>
+      </button>
+      <a href="/cybersecurity/categories"
+        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        <%= __("CS-CreateCategory") %>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="flex flex-col  p-6 pt-0">
+  <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
+    <!-- Search & Filter -->
+    <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
+      <!-- Dropdown outside -->
+
+      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700">
+        <thead class="bg-gray-50 text-gray-600  text-xs">
+          <tr>
+
+            <th class="px-4 py-55 text-sm font-normal">#</th>
+            <th class="px-4 py-55 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                class="size-3.5 ml-3 inline">
+              <%= __("CS-Name") %>
+            </th>
+            <th class="px-4 py-55 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
+                class="size-3.5 ml-3 inline">
+              <%= __("CS-Code") %>
+            </th>
+            <th class="px-4 py-55 text-sm font-normal">
+              <%= __("CS-Description") %>
+            </th>
+            <th class="px-4 py-55 text-sm font-normal">
+              <%= __("CS-Action") %>
+            </th>
+
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof categories !=='undefined' ){ categories.forEach((cat,index)=> { %>
+            <tr>
+
+              <td class="px-6 py-6 whitespace-nowrap">
+                <%=index%>
+
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap  ">
+                <%=cat.name %>
+
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap  ">
+                <%=cat.code %>
+
+              </td>
+
+              <td class="px-6 py-6 whitespace-nowrap  ">
+                <%=cat.description %>
+              </td>
+              <td>
+                <div class="px-6 py-6 whitespace-nowrap relative">
+                  <!-- Settings Button -->
+                  <button type="button" onclick="this.nextElementSibling.classList.toggle('hidden')"
+                    class="inline-flex items-center justify-center p-2 rounded hover:bg-gray-100 transition"
+                    aria-haspopup="true" aria-expanded="false" title="Actions">
+                    <i class="ion-android-settings"></i>
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="1.5" />
+                      <circle cx="19" cy="12" r="1.5" />
+                      <circle cx="5" cy="12" r="1.5" />
+                    </svg>
+                  </button>
+                  <!-- Dropdown Menu -->
+                  <ul class="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded shadow-lg z-10 hidden">
+                    <li>
+                      <a href='/cybersecurity/categories/disableCategory/<%= cat.id %>'
+                        class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
+                        <i class="ion-android-trash mr-2"></i>
+                        <%= __("btn-CS-LibPosters-Delete") %>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
+              </td>
+
+
+            </tr>
+
+            <% });}%>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+
+
+
+<%- include('../categories/upload-library-posters.ejs') %>

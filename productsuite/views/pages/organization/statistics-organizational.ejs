@@ -1,0 +1,176 @@
+<%- include('layout/layout-starting.ejs') %>
+<div class="wraper container-fluid">
+    <div class="page-title">
+        <h3 class="title"><%= __("Profile.OrganizationalPhishingStatistics") %>
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-lg-3 col-sm-6">
+            <div class="widget-panel widget-style-2 white-bg">
+                <i class="fa fa-send-o text-success"></i>
+                <h2 class="m-0 counter">
+                    <%= statistics==null ? 0 : statistics.sent_count%>
+                </h2>
+                <div>
+                    <%= __("Home.Email.Sent") %>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="widget-panel widget-style-2 white-bg">
+                <i class="ion-android-contacts text-warning"></i>
+                <h2 class="m-0 counter">
+                    <%= statistics==null ? 0 : statistics.unsent_count%>
+                </h2>
+                <div>
+                    <%= __("Home.Campaigns.Pending") %>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="widget-panel widget-style-2 white-bg">
+                <i class="ion-android-contacts text-success"></i>
+                <h2 class="m-0 counter">
+                    <%= statistics==null ? 0 : statistics.total_campaign_initiated%>
+                </h2>
+                <div>
+                    <%= __("Home.Campaigns.Initiated") %>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="col-lg-3 col-sm-6">
+            <div class="widget-panel widget-style-2 white-bg">
+                <i class="fa fa-folder-open text-pink"></i>
+                <h2 class="m-0 counter">
+                    <%= statistics==null ? 0 : statistics.is_phish_msg_opened%>
+                </h2>
+                <div>
+                    <%= __("Home.Email.Open") %>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-sm-6">
+            <div class="widget-panel widget-style-2 white-bg">
+                <i class="fa fa-hand-o-up text-danger"></i>
+                <h2 class="m-0 counter">
+                    <%= statistics==null ? 0 : statistics.is_phish_msg_link_opened%>
+                </h2>
+                <div>
+                    <%= __("Home.Click.Links") %>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="widget-panel widget-style-2 white-bg">
+                <i class="ion-eye text-pink"></i>
+                <h2 class="m-0 counter">
+                    <%= statistics==null ? 0 : statistics.is_phish_msg_data_entered_in_form%>
+                </h2>
+                <div>
+                    <%= __("Home.Enter.Data") %>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="widget-panel widget-style-2 white-bg">
+                <i class="ion-document-text text-purple"></i>
+                <h2 class="m-0 counter">
+                    <%= statistics==null ? 0 : statistics.is_phish_msg_data_entered_submited_in_form%>
+                </h2>
+                <div>
+                    <%= __("Home.Submitted.Data") %>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <div class="widget-panel widget-style-2 white-bg">
+                <i class="ion-paperclip text-warning"></i>
+                <h2 class="m-0 counter">
+                    <%= statistics==null ? 0 : statistics.is_phish_msg_file_downloaded%>
+                </h2>
+                <div>
+                    <%= __("Home.Attachment.Open") %>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="portlet"><!-- /primary heading -->
+                <div class="portlet-heading">
+                    <h3 class="portlet-title text-dark">
+                        <%= __("Home.Graph.Organization") %>
+                    </h3>
+                    <div class="portlet-widgets">
+                        <a href="javascript:;" data-toggle="reload"><i class="ion-refresh"></i></a>
+                        <span class="divider"></span>
+                        <a data-toggle="collapse" data-parent="#accordion1" href="#portlet3"><i
+                                class="ion-minus-round"></i></a>
+                        <span class="divider"></span>
+                        <a href="#" data-toggle="remove"><i class="ion-close-round"></i></a>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div id="portlet3" class="panel-collapse collapse in">
+                    <div class="portlet-body">
+                        <div id="combine-chart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+ 
+<%- include('layout/footer.js') %> <%-
+include('layout/layout-ending.ejs') %>
+<script>
+    const yearMonths = <%- JSON.stringify(yearMonths) %>;
+    const campaignInitiated = <%- JSON.stringify(campaignInitiated) %>;
+    const openEmail = <%- JSON.stringify(openEmail) %>;
+    const clickEmail = <%- JSON.stringify(clickEmail) %>;
+    const interactForm = <%- JSON.stringify(interactForm) %>;
+    const formSubmit = <%- JSON.stringify(formSubmit) %>;
+    const attachmentOpen = <%- JSON.stringify(attachmentOpen) %>;
+    jQuery(document).ready(function ($) {
+        generateOrganizationalPhishingResponseGraph();
+       
+    });
+    function generateOrganizationalPhishingResponseGraph() {
+        // Define your dynamic data
+        const columns = [
+            yearMonths,
+            // ['x','2024-09-01', '2024-11-01'],
+            campaignInitiated,
+            openEmail, clickEmail, interactForm, formSubmit, attachmentOpen
+        
+
+        ];
+        const types = {
+            campaignInitiated: 'bar',
+            openEmail: 'bar',
+            clickEmail: 'spline',
+            interactForm: 'line',
+            formSubmit: 'bar',
+            attachmentOpen: 'spline',
+        };
+        const colors = {
+            campaignInitiated: '#33b86c',
+            openEmail: '#F13C6E',
+            clickEmail: '#cb2a2a',
+            interactForm: '#F13C6E',
+            formSubmit: '#551A8B',
+            attachmentOpen: '#ebc142'
+        };
+        $.ChartC3.init(columns, types, colors);
+    }
+</script>

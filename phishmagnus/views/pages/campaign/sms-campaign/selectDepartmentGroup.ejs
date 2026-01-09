@@ -1,0 +1,54 @@
+<div class="step hidden" id="step-2">
+
+    <!--  Title -->
+    <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10"><%= __("sms.create_campaign.select_target_audience") %></h1>
+
+    <!-- Main Form -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="md:col-span-1">
+
+            <div class="tag-selector" style="display: block;">
+                <label class="block text-gray-700 font-semibold mb-2"><%= __("sms.create_campaign.select_department") %></label>
+                <div class="relative">
+                    <select
+                        class="groupSelect w-full px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-teal-400 focus:outline-none">
+                        <option value="" disabled="" selected=""><%= __("sms.create_campaign.select_department") %></option>
+                        <% if (department && department.length) { %>
+                            <% department.forEach(function(dept) { %>
+                                <option value="<%= dept.id %>">
+                                    <%= dept.name %>
+                                </option>
+                                <% }); %>
+                                    <% } %>
+                    </select>
+
+                </div>
+                <div class="selectedTags flex flex-wrap gap-2 mt-3"></div>
+            </div>
+        </div>
+
+
+        <div class="md:col-span-1">
+            <div class="tag-selector" style="display: block;">
+                <label class="block text-gray-700 font-semibold mb-2"><%= __("sms.create_campaign.select_group") %></label>
+                <div class="relative">
+                    <select
+                        class="groupSelect w-full px-4 py-2 border border-gray-300 rounded-lg appearance-none focus:ring-2 focus:ring-teal-400 focus:outline-none">
+                        <option value="" disabled="" selected=""><%= __("sms.create_campaign.select_group") %></option>
+                        <% if (group && group.length) { %>
+                            <% group.forEach(function(grp) { %>
+                                <option value="<%= grp.id %>">
+                                    <%= grp.name %>
+                                </option>
+                                <% }); %>
+                                    <% } %>
+                    </select>
+
+                </div>
+                <div class="selectedTags flex flex-wrap gap-2 mt-3"></div>
+            </div>
+        </div>
+
+
+    </div>
+</div>

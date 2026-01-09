@@ -1,0 +1,38 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex flex-col">
+    <div class="w-full">
+      <div class="bg-white rounded-2xl shadow-md">
+        <div class="border-b px-8 py-6">
+          <h3 class="text-xl font-semibold text-[var(--mainblue)]">
+             <%= organizationDetails.Organization?.name %>
+          </h3>
+        </div>
+        <div class="px-8 py-6">
+          <form id="wizard-validation-form" action="/organization/edit/<%= profileId %>" method="post">
+            <div class="space-y-8">
+              <div>
+                <h3 class="text-lg font-semibold mb-4 text-gray-700">
+                  <%= __("organization.edit.tabOrganizationDetails") %>
+                </h3>
+                <%- include('./edit-organization-section-account.ejs') %>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold mb-4 text-gray-700">
+                  <%= __("organization.edit.tabAdminDetails") %>
+                </h3>
+                <%- include('./edit-organization-section-admin.ejs') %>
+              </div>
+            </div>
+            <!-- Save Button -->
+            <div class="mt-8 flex justify-end">
+              <button type="submit"
+                class="px-6 py-2 rounded-full bg-teal-600 text-white font-semibold shadow hover:bg-teal-700 transition-all duration-200 border border-teal-600 hover:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                <%= __("generic_label.submit") %>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

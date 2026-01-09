@@ -1,0 +1,528 @@
+<div class="flex flex-col  p-6 pt-0">
+    <!-- first section  -->
+    <div class="flex flex-col gap-4 mt-3">
+        <!-- Title -->
+        <h1 class="text-2xl font-semibold my-2">
+            <%= __( "qr_campaign.phishingCampaignResponseMetrics" ) %>
+        </h1>
+
+        <!-- Top Metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">
+                        <%= __( "qr_campaign.totalQrImagesCreated" ) %>
+                    </p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Email_Sent.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=openSegmentStats.totalQRCodeCount%>
+
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">
+                        <%= __( "qr_campaign.notScanQrImages" ) %>
+                    </p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Report_Admin.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=campaignStats.number_of_total_not_scans%>
+
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">
+                        <%= __( "qr_campaign.totalQrScans" ) %>
+                    </p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Report_Admin.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=campaignStats.number_of_scans%>
+
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">
+                        <%= __( "qr_campaign.scanAndOpenUrl" ) %>
+                    </p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Opened_by_people.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=campaignStats.is_opened%>
+                </p>
+            </div>
+
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">
+                        <%= __( "qr_campaign.submittedForm" ) %>
+                    </p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/link_Clicked.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=campaignStats.is_submitted%>
+
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">
+                        <%= __( "qr_campaign.totalInteract" ) %>
+                    </p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/Report_Admin.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=campaignStats.is_interacted%>
+
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">
+                        <%= __( "qr_campaign.downloadFile" ) %>
+                    </p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/not_opened.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    <%=campaignStats.is_downloaded%>
+
+                </p>
+            </div>
+
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">
+                        <%= __( "qr_campaign.totalUniqueIps" ) %>
+                    </p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/not_opened.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    10000
+
+                </p>
+            </div>
+            <div class="bg-white p-4 flex flex-col rounded-xl">
+                <div class="flex items-center justify-between gap-2 mb-8">
+                    <p class="text-gray-500 text-sm">
+                        <%= __( "qr_campaign.capturedUserData" ) %>
+                    </p>
+                    <img src="/securemagnus_2025/images/Icons_Campaign_Report/not_opened.svg" alt="">
+                </div>
+                <p class="text-4xl">
+                    10000
+
+                </p>
+            </div>
+
+
+        </div>
+
+        <!-- Main Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <!-- Bar Chart -->
+            <div class="bg-white p-6 rounded-xl   col-span-2">
+                <h2 class="text-lg font-semibold mb-4">
+                    <%= __( "qr_campaign.campaignMetrics" ) %>
+                </h2>
+                <div id="barChart"></div>
+            </div>
+
+            <!-- Phishing Success -->
+            <div class="bg-white p-6 rounded-xl gap-11  flex flex-col items-start  justify-start">
+                <h2 class="text-lg font-semibold mb-4">Phishing Success</h2>
+
+                <div class="flex items-center  gap-10 w-full justify-between">
+                    <!-- Left Side Labels -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span> <!-- Blue -->
+                            <div>
+                                <p class="text-gray-500 text-sm"><%= __( "qr_campaign.tagScan" ) %></p>
+                                <p class="text-lg font-bold text-gray-900" id="scanText"> People</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-[#9ca3af]"></span> <!-- Gray -->
+                            <div>
+                                <p class="text-gray-500 text-sm"><%= __( "qr_campaign.notScanTag" ) %></p>
+                                <p class="text-lg font-bold text-gray-900" id="notScanText"> People</p>
+                            </div>
+
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-[#fb923c]"></span> <!-- Orange -->
+                            <div>
+                                <p class="text-gray-500 text-sm"><%= __( "generic_label.formInteraction" ) %></p>
+                                <p class="text-lg font-bold text-gray-900" id="formInteractionText"> People</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-[#34d399]"></span> <!-- Green -->
+                            <div>
+                                <p class="text-gray-500 text-sm"><%= __( "generic_label.attachmentOpened" ) %></p>
+                                <p class="text-lg font-bold text-gray-900" id="attachmentDownloadedText"> People</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-[#ef4444]"></span> <!-- Red -->
+                            <div>
+                                <p class="text-gray-500 text-sm"><%= __( "generic_label.targetCompromised" ) %></p>
+
+                                <p class="text-lg font-bold text-gray-900" id="targetCompromisedText"> People</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Donut Chart -->
+                    <div id="successChart" style="width:50%; height:50%;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Row -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Employees Phishing Segments -->
+            <div class="bg-white p-6 rounded-xl  ">
+                <h2 class="text-lg font-semibold mb-4">
+                    <%= __( "qr_campaign.employeesPhishingSegments" ) %>
+                </h2>
+                <div id="segmentsChart"></div>
+            </div>
+
+            <!-- Reported To Admin -->
+            <div class="bg-white p-6 rounded-xl  ">
+                <h2 class="text-lg font-semibold mb-4">
+                    <%= __( "qr_campaign.adminReportSegments" ) %>
+                </h2>
+                <div id="adminReportChart"></div>
+            </div>
+
+            <!-- Campaign Details -->
+            <div class="bg-white p-6 rounded-xl  ">
+                <h2 class="text-lg font-semibold text-gray-800 mb-6">
+                    <%= __( "qr_campaign.campaignDetails" ) %>
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">
+                            <%= __( "qr_campaign.campaignName" ) %>
+                        </span>
+                        <span class="text-gray-800 font-medium">
+                            <%= campaignDetails.name %>
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">
+                            <%= __( "qr_campaign.url" ) %>
+                        </span>
+                        <span class="text-gray-800 font-medium">
+
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">
+                            <%= __( "qr_campaign.templateName" ) %>
+                        </span>
+                        <span class="text-gray-800 font-medium">
+                            <%= templateDetails.name %>
+
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">
+                            <%= __( "qr_campaign.phishingPage" ) %>
+                        </span>
+                        <span class="text-gray-800 font-medium">
+
+                        </span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">
+                            <%= __( "qr_campaign.launchDate" ) %>
+                        </span>
+                        <span class="text-gray-800 font-medium">
+                            <%= campaignDetails.start_datetime %>
+
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Charts -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+            <!-- Links Interaction -->
+
+
+
+            <div class="bg-white p-6 rounded-xl   text-center">
+
+                <div class="flex items-center justify-start mb-9 gap-2">
+                    <img src="/securemagnus_2025/images/Links-Interaction.svg" alt="">
+                    <label for="Links Interaction">
+                        <%= __( "qr_campaign.linksInteraction" ) %>
+                    </label>
+                </div>
+
+                <div>
+                    <div class="qrSemiChartLink" uniqueScan="<%=openSegmentStats?.uniqueScanCount%>"
+                        repeatedScan="<%=openSegmentStats?.repeatedScanCount%>"
+                        noScan="<%=openSegmentStats?.noScanCount%>">
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- Form Interact -->
+            <div class="bg-white p-6 rounded-xl   text-center">
+
+                <div class="flex items-center justify-start mb-9 gap-2">
+                    <img src="/securemagnus_2025/images/interactfrom.svg" alt="">
+                    <label for="Interact Form ">
+                        <%= __( "qr_campaign.interactForm" ) %>
+                    </label>
+                </div>
+
+                <div>
+                    <div class="qrSemiChartInteract"
+                        uniqueScan="<%=formInteractionSegmentStats?.uniqueInteractedCount%>"
+                        repeatedScan="<%=formInteractionSegmentStats?.repeatedInteractedCount%>"
+                        noScan="<%=formInteractionSegmentStats?.noInteractedCount%>">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Submitted -->
+            <div class="bg-white p-6 rounded-xl   text-center">
+
+                <div class="flex items-center justify-start mb-9 gap-2">
+                    <img src="/securemagnus_2025/images/formsubmitted.svg" alt="">
+                    <label for="Form Submitted">
+                        <%= __( "qr_campaign.formSubmitted" ) %>
+                    </label>
+                </div>
+
+                <div>
+                    <div class="qrSemiChartSubmitted" uniqueScan="<%=formSubmittedSegmentStats?.uniqueSubmittedCount%>"
+                        repeatedScan="<%=formSubmittedSegmentStats?.repeatedSubmittedCount%>"
+                        noScan="<%=formSubmittedSegmentStats?.noSubmittedCount%>">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attachment Opened -->
+            <div class="bg-white p-6 rounded-xl   text-center">
+
+                <div class="flex items-center justify-start mb-9 gap-2">
+                    <img src="/securemagnus_2025/images/attachmentopened.svg" alt="">
+                    <label for="Attachment Opened">
+                        <%= __( "qr_campaign.attachmentOpened" ) %>
+                    </label>
+                </div>
+
+                <div>
+                    <div class="qrSemiChartDownload" uniqueScan="<%=downloadSegmentStats?.uniqueDownloadCount%>"
+                        repeatedScan="<%=downloadSegmentStats?.repeatedDownloadCount%>"
+                        noScan="<%=downloadSegmentStats?.noDownloadCount%>">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- last table  -->
+
+        <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
+            <div class="flex items-center justify-between gap-3 px-5 pt-5">
+
+                <div class="relative">
+                    <h2 class="text-2xl mb-4">
+                        <%= __( "qr_campaign.interactionReportByEachQRCode" ) %>
+                    </h2>
+
+                </div>
+
+
+                <div class="flex gap-4">
+
+
+
+
+                    <button class="hidden lg:block ms-auto">
+                        <div class="relative">
+                            <input type="text" placeholder="Search here..."
+                                class="pl-14 pr-10 py-3 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+                            <img src="/securemagnus_2025/images/img/search.svg"
+                                class="w-5 h-5 text-gray-400 absolute left-7 top-1/2 transform -translate-y-1/2" alt="">
+                        </div>
+
+                    </button>
+                    <button class="hidden lg:block ms-auto">
+                        <a href=""
+                            class=" flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+
+                            <%= __( "qr_campaign.sortBy" ) %>
+                                <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
+                        </a>
+
+                    </button>
+                </div>
+
+
+                <a href="" class="block lg:hidden">
+                    <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
+                </a>
+            </div>
+            <div class="overflow-x-auto hide-scrollbar">
+                <table class="min-w-full text-sm text-left">
+                    <thead class="bg-[#FAFBFC]">
+                        <tr>
+                            <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap">
+                                <%= __( "qr_campaign.tagSequence" ) %>
+                            </th>
+                            <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap">
+                                <%= __( "qr_campaign.tagCode" ) %>
+                            </th>
+                            <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap">
+                                <%= __( "qr_campaign.downloadQRCode" ) %>
+                            </th>
+                            <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap">
+                                <%= __( "qr_campaign.viewReport" ) %>
+                            </th>
+
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(typeof qrImageUrls !==undefined || qrImageUrls !==null){
+                            qrImageUrls.forEach((images,index)=> { %>
+
+                            <tr class="border-t hover:bg-blue-50 transition-colors">
+                                <td class="px-6 py-6 whitespace-nowrap editable">
+                                    <%=index+1%>
+                                </td>
+                                <td class="px-6 py-6 whitespace-nowrap editable">
+                                    <%=images.qr_code %>
+                                </td>
+                                <td class="px-6 py-6 whitespace-nowrap editable">
+                                    <div class="flex gap-2">
+                                        <button type="button"
+                                            class="flex gap-1 text-teal-500 hover:text-white hover:bg-teal-500 border border-teal-500 px-2 py-1.5 p-1 rounded-lg transition"
+                                            title="Download" data-url="<%= images.download_url %>"
+                                            data-toggle="tooltip">
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                                stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M12 3v12m0 0l-4-4m4 4l4-4m-7 7h10" />
+                                            </svg>
+                                        </button>
+
+                                    </div>
+                                </td>
+
+
+
+
+
+                                <td class="px-6 py-4 text-start flex items-center gap-2">
+                                    <div class="flex gap-2">
+                                        <a class="p-2 rounded-full hover:bg-blue-50" title="View Details"
+                                            href="/phm/campaign/qr/tag/report/<%= campaignDetails.id %>/<%=images.qr_code %>">
+                                            <svg xmlns="http://www.w3.org/2000/svg"
+                                                class="w-5 h-5 text-blue-600 hover:text-blue-800" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                </path>
+                                            </svg>
+                                        </a>
+
+                                    </div>
+
+
+                                </td>
+                            </tr>
+                            <% })}%>
+
+                    </tbody>
+                </table>
+            </div>
+
+
+
+
+
+            <div class="flex justify-between items-center px-6 mt-16">
+
+                <p class="text-[#656972]">
+
+                </p>
+
+
+                <div class=" py-7 pb-9 flex flex-wrap items-center justify-center gap-2">
+                    <button
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] duration-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <button
+                        class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">1</button>
+                    <button
+                        class="w-8 h-8 rounded-full bg-teal-50 text-[var(--teal)] border border-[var(--teal)]">2</button>
+                    <button
+                        class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">3</button>
+                    <button
+                        class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">4</button>
+                    <button
+                        class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] duration-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('button[title="Download"][data-url]').forEach(btn => {
+            btn.addEventListener('click', (event) => {
+                const url = btn.getAttribute('data-url');
+                if (url) {
+                    window.location.href = url;
+                } else {
+                    alert('Invalid download URL.');
+                }
+            });
+        });
+    });
+
+    window.CampaignMetrics = {
+        openedLink: <%= typeof campaignStats !== 'undefined' && campaignStats?.is_opened || 0 %>,
+        interactForm: <%= typeof campaignStats !== 'undefined' && campaignStats?.is_interacted || 0 %>,
+        submitForm: <%= typeof campaignStats !== 'undefined' && campaignStats?.is_submitted || 0 %>,
+        attachmentDownloaded: <%= typeof campaignStats !== 'undefined' && campaignStats?.is_downloaded || 0 %>,
+        totalQRImages: <%= typeof openSegmentStats !== 'undefined' && openSegmentStats?.totalQRCodeCount || 0 %>,
+        totalScans: <%= typeof campaignStats !== 'undefined' && campaignStats?.number_of_scans || 0 %>,
+        totalNotScans: <%= typeof openSegmentStats !== 'undefined' && openSegmentStats?.noScanCount || 0 %>,
+    };
+
+
+
+
+</script>
+<script src="/securemagnus_2025/js/qr_camp_view.js"></script>

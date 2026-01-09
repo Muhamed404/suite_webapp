@@ -1,0 +1,210 @@
+<div class="flex items-center mb-4">
+  <div class="flex-1">
+    <!-- You can put a title or leave empty for spacing -->
+  </div>
+  <% if(isPermitToCreateInvoice){ %>
+    <div class="ml-auto">
+      
+      <a href="/subscription/create/<%= profile.id %>"
+        class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        <%= __("organization.profile.tabSubscription.btnCreateSubscription") %>
+      </a>
+    </div>
+  <% } %>
+</div>
+
+
+<table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700">
+  <thead class="bg-gray-50 text-gray-600  text-xs">
+    <tr>
+
+      <th class="px-4 py-55 text-sm font-normal">
+        <%= __("organization.profile.tabSubscription.labelProductName") %><img src="/securemagnus_2025/images/package_management/sort.svg"
+            class="size-3.5 ml-3 inline">
+      </th>
+      <th class="px-4 py-5">
+        <img src="/securemagnus_2025/images/package_management/package_management_per_license_cost.svg"
+          class=" inline">
+        <span class="text-sm font-normal">
+          <%= __("organization.profile.tabSubscription.labelPurchaseDate") %>
+        </span><img src="/securemagnus_2025/images/package_management/sort.svg"
+          class="size-3.5 ml-3 inline">
+      </th>
+      <th class="px-4 py-5">
+        <img src="/securemagnus_2025/images/package_management/package_management_user_range_form.svg" alt="User From"
+          class=" inline">
+        <span class="text-sm font-normal">
+          <%= __("organization.profile.tabSubscription.labelStartDate") %>
+        </span><img src="/securemagnus_2025/images/package_management/sort.svg"
+          class="size-3.5 ml-3 inline">
+      </th>
+      <th class="px-4 py-5">
+        <img src="/securemagnus_2025/images/package_management/package_management_user_range_to.svg" alt="User To"
+          class=" inline">
+        <span class="text-sm font-normal">
+          <%= __("organization.profile.tabSubscription.labelExpiryDate") %>
+        </span><img src="/securemagnus_2025/images/package_management/sort.svg"
+          class="size-3.5 ml-3 inline">
+      </th>
+      <th class="px-4 py-5">
+        <img src="/securemagnus_2025/images/package_management/package_management_subscription_duration.svg"
+          alt="Subscription" class=" inline">
+        <span class="text-sm font-normal">
+          <%= __("organization.profile.tabSubscription.labelUserLicenses") %>
+        </span><img src="/securemagnus_2025/images/package_management/sort.svg"
+          class="size-3.5 ml-3 inline">
+      </th>
+
+      <th class="px-4 py-5">
+        <img src="/securemagnus_2025/images/package_management/package_management_subscription_duration.svg"
+          alt="Subscription" class=" inline">
+        <span class="text-sm font-normal">
+          <%= __("organization.profile.tabSubscription.labelAvailableUser") %>
+        </span><img src="/securemagnus_2025/images/package_management/sort.svg"
+          class="size-3.5 ml-3 inline">
+      </th>
+      <th class="px-4 py-5">
+        <img src="/securemagnus_2025/images/package_management/package_management_subscription_duration.svg"
+          alt="Subscription" class=" inline">
+        <span class="text-sm font-normal">
+          <%= __("organization.profile.tabSubscription.labelService") %>
+        </span><img src="/securemagnus_2025/images/package_management/sort.svg"
+          class="size-3.5 ml-3 inline">
+      </th>
+
+      <th class="px-4 py-5">
+        <img src="/securemagnus_2025/images/package_management/package_management_subscription_duration.svg"
+          alt="Subscription" class=" inline">
+        <span class="text-sm font-normal">
+          <%= __("organization.profile.tabSubscription.labelStatus") %>
+        </span><img src="/securemagnus_2025/images/package_management/sort.svg"
+          class="size-3.5 ml-3 inline">
+      </th>
+
+
+      <th class="px-4 py-5">
+        <img src="/securemagnus_2025/images/package_management/package_management_subscription_duration.svg"
+          alt="Subscription" class=" inline">
+        <span class="text-sm font-normal">
+          <%= __("organization.profile.tabSubscription.labelOrderStatus") %>
+        </span><img src="/securemagnus_2025/images/package_management/sort.svg"
+          class="size-3.5 ml-3 inline">
+      </th>
+
+      <th class="px-4 py-5">
+        <img src="/securemagnus_2025/images/package_management/package_management_subscription_duration.svg"
+          alt="Subscription" class=" inline">
+        <span class="text-sm font-normal">
+          <%= __("organization.profile.tabSubscription.labelAction") %>
+        </span><img src="/securemagnus_2025/images/package_management/sort.svg"
+          class="size-3.5 ml-3 inline">
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (typeof profile !=='undefined' ){ profile.Subscription.forEach((sub,index)=> { %>
+
+      <tr class="bg-white border-b hover:bg-gray-50">
+
+        <td class="px-4 py-5 text-sm font-normal">
+          <%= sub.SubscribedService[0]?.ApplicationServices?.Applications?.name || 'N/A' %>
+        </td>
+        <td class="px-4 py-5 text-sm font-normal">
+          <%= sub.purchased_date %>
+        </td>
+        <td class="px-4 py-5 text-sm font-normal">
+          <%= sub.start_date %>
+        </td>
+        <td class="px-4 py-5 text-sm font-normal">
+          <%= sub.expiry_date %>
+        </td>
+        <td class="px-4 py-5 text-sm font-normal">
+          <%= sub.user_licenses %>
+        </td>
+        <td class="px-4 py-5 text-sm font-normal">
+          <%= sub.available_quota %>
+        </td>
+        <td class="px-6 py-6 whitespace-nowrap  ">
+
+          <button id="openServicesModal-<%= index %>" class="openServicesModalBtn" data-subscription="<%= sub.id %>"
+            data-index="<%= index %>">
+            <img class="px-4 py-1 rounded-full bg-[var(--teal)]" src="/securemagnus_2025/images/Basket.svg" alt="">
+          </button>
+        </td>
+
+        <% if(sub?.SubscriptionOrder){ 
+          const expiryDate=new Date(sub.expiry_date); 
+          const today=new Date(currentDate);
+          const isExpired=expiryDate <=today; 
+          %>
+
+           <td class="px-4 py-5 text-sm font-normal">
+            <span class="label <%= sub.subscription_order_status == enums.orderStatus.Active ? 'label-success' : 'label-warning' %>">
+              <%= orderStatusNames[sub.subscription_order_status] || __("Unknown") %>
+            </span>
+          </td>
+
+          <% var paymentId = sub.SubscriptionOrder?.payment_status_id || 0; %>
+            <td class="px-4 py-5 text-sm font-normal">
+              <span class="label <%= paymentStatusLabelClass[paymentId] || 'label-warning' %>">
+                <%= paymentStatusNames[paymentId] || __("Unknown") %>
+              </span>
+            </td>  
+            <td class="px-4 py-5 text-sm font-normal flex gap-2">
+              <button
+                type="button"
+                title="<%= __('organization.profile.tabSubscription.btnInvoice') %>"
+                class="p-2 rounded-full bg-blue-50 hover:bg-blue-100 text-blue-600 hover:text-blue-800 transition flex items-center justify-center"
+                onclick="window.location.href='/order/invoice/<%= sub.organization_id %>/<%= sub.SubscriptionOrder.subscription_id %>/<%= sub.SubscriptionOrder.id %>'"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 11v6m3-3h-6m7 7H5a2 2 0 01-2-2V7a2 2 0 012-2h5l5 5v11a2 2 0 01-2 2z"/>
+                </svg>
+                <span class="sr-only"><%= __('organization.profile.tabSubscription.btnInvoice') %></span>
+              </button>
+
+              <% if (sub.subscription_order_status == enums.orderStatus.PendingInvoice && allowUpdateInvoice) { %>
+                <button
+                  type="button"
+                  id="openUpdateInvoiceModal-<%= index %>"
+                  class="p-2 rounded-full bg-green-50 hover:bg-green-100 text-green-600 hover:text-green-800 transition flex items-center justify-center"
+                  data-subscription="<%= sub.id %>"
+                  data-order="<%= sub.SubscriptionOrder.id %>"
+                  data-org="<%= sub.organization_id %>"
+                  data-index="<%= index %>"
+                  title="<%= __('organization.profile.tabSubscription.btnUpdatePayment') %>"
+                >
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <rect x="2" y="7" width="20" height="10" rx="2" />
+                    <path d="M2 11h20" />
+                  </svg>
+                  <span class="sr-only"><%= __('organization.profile.tabSubscription.btnUpdatePayment') %></span>
+                </button>
+              <% } %>
+            </td>
+     
+          <% }%>
+
+
+
+      </tr>
+
+      <% })}%>
+
+  </tbody>
+</table>
+
+
+
+
+
+<%- include('../subscription/services_modal.ejs') %>
+
+<%- include('../subscription/update-invoice.ejs') %>
+
+
+ 
+  <script src="/securemagnus_2025/js/subscription/update_invoice_modal.js"></script>

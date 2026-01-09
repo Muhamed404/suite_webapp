@@ -1,0 +1,83 @@
+
+<div id="panel-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content p-0 b-0">
+            <div class="panel panel-color panel-primary">
+                <div class="panel-heading"> 
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button> 
+                    <h3 class="panel-title"><%= __("Import-Users") %></h3> 
+                </div> 
+                <div class="panel-body"> 
+                  <div class="form">
+                    <form class="cmxform form-horizontal tasi-form"
+                    novalidate="novalidate" id="importUserForm" class="cmxform form-horizontal tasi-form"  
+                    action="/phm/file/upload/<%=organization.id%>" method="post" enctype="multipart/form-data">
+                    <div class="alert alert-info alert-dismissable">
+                        <button
+                          type="button"
+                          class="close"
+                          data-dismiss="alert"
+                          aria-hidden="true"
+                        >
+                          ×
+                        </button>
+                        Format of csv: <br />
+                        email,first_name,last_name,password
+                        user1@example.com,John,Doe,password123
+                    </div>
+                    <div class="alert alert-info alert-dismissable" id="divUserQuotaAlert" style="visibility: hidden;">
+                      <button
+                        type="button"
+                        class="close"
+                        data-dismiss="alert"
+                        aria-hidden="true"
+                      >
+                        ×
+                      </button> 
+                  </div>
+                   
+                    
+                    <% 
+                          if (typeof departments !== 'undefined' && departments.length > 0) {%>
+                    <div class="form-group">
+                      <label for="department" class="control-label col-lg-4"
+                        ><%= __("Import-SelDepartment") %> *</label     >
+                      <div class="col-lg-6">
+                        <select class="form-control" name="department" id="idDepartment" required onchange="onChangeDepartment()">
+                          <option value="" selected disabled><%= __("Import-SelDepartment") %></option>
+                          <%  departments.forEach(dept => { %>
+                            <option value="<%= dept.id %>"><%= dept.name %></option>
+                            <% });%>
+                                                 
+                        </select>
+                      </div>
+                    </div>                    
+                 <% } %>  
+                    <div class="form-group">
+                      <label for="csvFile" class="control-label col-lg-4"
+                        ><%= __("Import-selFile") %> *</label
+                      >
+                      <div class="col-lg-6">
+                        <input
+                        class="form-control"
+                          id="csvFile"
+                          name="csvFile"
+                          type="file"
+                          required
+                        />
+                      </div>
+                    </div>  
+                      <input type="hidden" id="hiddenFieldValue" name="hiddenFieldValue" value="">
+                      <input type="hidden" id="actionType" name="actionType" value="<%=actionType%>">
+                      <input type="hidden" id="organization" name="organization" value="<%= organization %>">                      
+                      <input type="hidden" id="subscription" name="subscription" value="">             
+                <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal"><%= __("Import-BtnClose") %></button>
+                <button type="submit" style="visibility: hidden;" id="btnSaveImportUserModal" class="btn btn-primary"><%= __("Import-BtnUpload") %></button>
+            </form>
+          </div>
+            </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

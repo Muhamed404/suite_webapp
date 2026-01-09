@@ -1,0 +1,140 @@
+<div class="flex flex-col  p-6">
+  <div class="flex flex-col gap-2 mb-3 border-b border-gray-100 pb-3">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+      <span class="text-gray-400">›</span>
+      <a href="/organization/" class="hover:text-gray-700 transition"><%= __("breadcrumbs.organization") %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900"><%= profile?.name || __("breadcrumbs.organizationProfile") %></span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900">
+      <%= profile?.name || __("organization.profile.tabInfo.labelTitle") %>
+    </h3>
+  </div>
+  <!-- Filter Buttons -->
+  <div id="topFilterButtons"
+    class="bg-white p-1 rounded-full flex items-center justify-start gap-4 w-fit text-sm font-medium mt-4">
+
+    <button
+      class="filter-btn bg-gray-900 text-white px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
+      data-toggle="tab" data-target="#aboutme">
+      <i data-lucide="info" class="icon size-5 transition-all duration-300"></i>
+      <%= __("organization.profile.tabInfo.labelTabTitle") %>
+    </button>
+
+    <!-- <button
+      class="filter-btn text-gray-600 hover:text-black px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
+      data-toggle="tab" data-target="#userTab">
+      <i data-lucide="user" class="icon size-5 transition-all duration-300"></i>
+      User
+    </button>
+
+    <button
+      class="filter-btn text-gray-600 hover:text-black px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
+      data-toggle="tab" data-target="#departmentTab">
+      <i data-lucide="layers" class="icon size-5 transition-all duration-300"></i>
+      Department
+    </button> -->
+
+    <button
+      class="filter-btn text-gray-600 hover:text-black px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
+      data-toggle="tab" data-target="#settingsTab">
+      <i data-lucide="shield-check" class="icon size-5 transition-all duration-300"></i>
+      <%= __("organization.profile.tabSettings.labelTabTitle") %>
+    </button>
+
+    <button
+      class="filter-btn text-gray-600 hover:text-black px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
+      data-toggle="tab" data-target="#subscriptionTab">
+      <i data-lucide="credit-card" class="icon size-5 transition-all duration-300"></i>
+      <%= __("organization.profile.tabSubscription.labelTabTitle") %>
+    </button>
+
+    <!-- Sample extra tabs for testing -->
+    <!-- <button
+      class="filter-btn text-gray-600 hover:text-black px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
+      data-toggle="tab" data-target="#sampleTab1">
+      <i data-lucide="star" class="icon size-5 transition-all duration-300"></i>
+      Sample 1
+    </button>
+    <button
+      class="filter-btn text-gray-600 hover:text-black px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
+      data-toggle="tab" data-target="#sampleTab2">
+      <i data-lucide="zap" class="icon size-5 transition-all duration-300"></i>
+      Sample 2
+    </button> -->
+  </div>
+
+  <!-- Tab Contents -->
+  <div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white tab-content" id="aboutme">
+    <%- include('./profile-organization-about.ejs') %>
+  </div>
+  <div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white tab-content hidden" id="userTab">
+    <div class="p-8">User tab content goes here.</div>
+  </div>
+  <div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white tab-content hidden" id="departmentTab">
+    <div class="p-8">Department tab content goes here.</div>
+  </div>
+  <div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white tab-content hidden" id="settingsTab">
+    <div class="p-8">
+      <!-- settings -->
+      <%- include('./profile-settings.ejs') %>
+
+    </div>
+  </div>
+  <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white tab-content hidden" id="subscriptionTab">
+    <div class="p-8">
+      <%- include('./profile-subscription.ejs') %>
+    </div>
+  </div>
+  <div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white tab-content hidden" id="sampleTab1">
+    <div class="p-8">Sample 1 tab content goes here.</div>
+  </div>
+  <div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white tab-content hidden" id="sampleTab2">
+    <div class="p-8">Sample 2 tab content goes here.</div>
+  </div>
+</div>
+
+<script>
+  // Tab switching logic
+  document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.filter-btn[data-toggle="tab"]');
+    const tabs = document.querySelectorAll('.tab-content');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', function () {
+        // Remove active styles from all buttons
+        buttons.forEach(b => b.classList.remove('bg-gray-900', 'text-white'));
+        buttons.forEach(b => b.classList.add('text-gray-600'));
+        // Add active style to clicked button
+        btn.classList.add('bg-gray-900', 'text-white');
+        btn.classList.remove('text-gray-600');
+
+        // Hide all tabs
+        tabs.forEach(tab => tab.classList.add('hidden'));
+        // Show the selected tab
+        const target = btn.getAttribute('data-target');
+        const tab = document.querySelector(target);
+        if (tab) tab.classList.remove('hidden');
+      });
+    });
+
+    if (!document.getElementById('filter-table') || typeof simpleDatatables === 'undefined' || typeof simpleDatatables.DataTable === 'undefined') {
+      console.warn('simple-datatables not found or table missing');
+      return;
+    }
+
+    const dataTable = new simpleDatatables.DataTable('#filter-table');
+
+    const filter = document.getElementById('filter');
+    filter.addEventListener('change', function () {
+      const value = this.value;
+
+      if (value === '') {
+        dataTable.search(''); // Clear filter
+      } else {
+        dataTable.search(value); // Search all columns
+      }
+    });
+  });
+</script>

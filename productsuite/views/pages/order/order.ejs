@@ -1,0 +1,64 @@
+<%- include('../../layout/layout-starting.ejs') %>
+
+<div class="wraper container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><%= __("Order.Create") %></h3>
+        </div>
+        <div class="panel-body">
+          <form
+            id="wizard-validation-form"
+            action="/order/create/<%= orgId %>/<%= subId %>/<%= packageId %>"
+            method="post"  
+          >
+            <div>
+              <h3><%= __("Order.TabAddress") %></h3>
+
+              <%- include('./order-section-address.ejs') %>
+              
+              <h3><%= __("Order.TabBilling") %></h3>
+              
+              <%- include('./order-section-billing.ejs') %>
+              
+              
+              <h3><%= __("Order.TabPackageDetails") %></h3>
+              <%- include('./order-section-package-details.ejs') %>
+            </div>
+          </form>
+        </div>
+        <!-- End panel-body -->
+      </div>
+      <!-- End panel -->
+    </div>
+    <!-- end col -->
+  </div>
+  <!-- End row -->
+</div>
+<!-- Page Content Ends -->
+<!-- ================== -->
+
+<%- include('../../layout/footer.js') %> <%-
+include('../../layout/layout-ending.ejs')%>
+
+<script>
+  $(document).ready(function () {
+    $("body").append(
+      '<script src="/phishmagnus/form-validations/order-validation.js" />'
+    );
+  }); 
+
+  function calculatePayableAmount() {
+
+  // Get references to the input fields and the span to display payable amount
+  var totalAmount = $('#totalUserLicense').val() * $('#totalCost').val()
+
+  var discountPercentage = $('#discount').val();
+  var discountAmount = (totalAmount * discountPercentage) / 100;
+  var payableAmount = totalAmount - discountAmount;
+  var payableAmountSpan = document.getElementById("ttlPayableAmt");
+  payableAmountSpan.value = payableAmount.toFixed(2);
+ 
+}
+</script>

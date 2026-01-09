@@ -1,0 +1,540 @@
+<div class="flex flex-col p-6 gap pb-0">
+    <div class="flex flex-col gap-2 mb-4 pb-4">
+        <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
+            <a href="/phm/index" class="hover:text-gray-700 transition"><%= __("menu.phishmagnus.dashboard") %></a>
+            <span class="text-gray-400">›</span>
+            <a href="/template/list" class="hover:text-gray-700 transition"><%= __("breadcrumbs.systemTemplate") %></a>
+            <span class="text-gray-400">›</span>
+            <span class="font-semibold text-gray-900">
+                <%= template?.name || 'View Template' %>
+            </span>
+        </nav>
+        <h3 class="text-3xl font-medium text-gray-900">
+            <%= template?.name || 'View Template' %>
+        </h3>
+    </div>
+</div>
+
+<div class="flex flex-col p-6 pt-0">
+    <!-- first section  -->
+    <div class="flex flex-col p-8 gap-4 mt-3 rounded-3xl bg-white border border-gray-100 shadow-sm">
+        <!-- Progress Bar -->
+        <div id="progress" class="flex items-center mb-6"></div>
+        <form class="space-y-6" id="templateCreationForm" method="post" 
+        action="<%=typeof postMethodUrl !== 'undefined' ? postMethodUrl: '/template/update/' + (template?.id) %>"
+        data-difficulty='<%- template?.difficulty || [] %>'>
+            <!-- Steps -->
+            <div class="step hidden w-full lg:w-3/4">
+                <!-- Page Heading -->
+                <h1 class="text-3xl font-bold mb-2">Template Details</h1>
+                <p class="text-gray-600 mb-8">
+                    Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore
+                    Et
+                    Dolore Magna Aliqua.
+                </p>
+
+                <!-- Template Name -->
+                <div class="mb-6">
+                    <label class="block text-lg font-medium mb-2">Template Name</label>
+                    <input type="text"   id="name" name="name" value="<%= template?.name || '-' %>"
+                        class="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                </div>
+
+                <!-- Purpose -->
+                <div class="mb-6">
+                    <label class="block text-lg font-medium mb-2">Purpose / Reason (Optional)</label>
+                    <input type="text"   name="description_purpose" id="description_purpose"
+					value="<%= template?.description_purpose || '-' %>"
+                        class="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                </div>
+
+                <!-- Language Dropdown -->
+                <div class="mb-6 relative">
+                    <label class="block text-lg font-medium mb-2">Select Language</label>
+                    <div class="relative">
+                        <select name="language" id="language"
+                            class="appearance-none w-full border border-gray-300 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                            <option value="en" <%= (template && String(template.language) === 'en') ? 'selected' : '' %>>English</option>
+                            <option value="ar" <%= (template && String(template.language) === 'ar') ? 'selected' : '' %>>Arabic</option>
+                        </select>
+                        <!-- Custom Dropdown Icon -->
+                        <svg class="w-5 h-5 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+                <!-- Phishing Type -->
+                <div class="mb-6">
+				
+                    <label class="block text-lg font-medium mb-4">Phishing Type</label>
+                    <div class="flex flex-wrap gap-4">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="phishType" value="email" <%= template.selPhish === 'email' ? 'checked' : '' %> disabled class="hidden peer">
+                            <div
+                                class="px-6 py-2 border rounded-lg peer-checked:border-teal-500 peer-checked:bg-teal-50">
+                                Email</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="phishType" value="nfc" <%= template.selPhish === 'nfc' ? 'checked' : '' %> disabled class="hidden peer">
+                            <div
+                                class="px-6 py-2 border rounded-lg peer-checked:border-teal-500 peer-checked:bg-teal-50">
+                                NFC</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="phishType" value="qr" <%= template.selPhish === 'qr' ? 'checked' : '' %> disabled class="hidden peer">
+                            <div
+                                class="px-6 py-2 border rounded-lg peer-checked:border-teal-500 peer-checked:bg-teal-50">
+                                QR
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="phishType" value="sms" <%= template.selPhish === 'sms' ? 'checked' : '' %> disabled class="hidden peer">
+                            <div
+                                class="px-6 py-2 border rounded-lg peer-checked:border-teal-500 peer-checked:bg-teal-50">
+                                SMS</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="phishType" value="whatsapp" <%= template.selPhish === 'whatsapp' ? 'checked' : '' %> disabled class="hidden peer">
+                            <div
+                                class="px-6 py-2 border rounded-lg peer-checked:border-teal-500 peer-checked:bg-teal-50">
+                                WhatsApp</div>
+                        </label>
+
+
+                    </div>
+                </div>
+            </div>
+            <div class="step hidden">
+                <h2 class="text-2xl font-bold mb-2" id="step-heading">Tracking Details</h2>
+                <p class="text-gray-500 mb-4  w-full lg:w-3/4" id="step-subheading">Lorem ipsum dolor sit amet,
+                    consectetur
+                    adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+                    veniam, quis nostrud exercitation ullamco laboris.</p>
+
+                <div id="checkbox-options" class="space-y-4">
+                    <!-- Dynamic options will be injected here -->
+                </div>
+            </div>
+            <div class="step hidden">
+                <h2 class="text-2xl font-bold mb-2" id="step-heading">Setup File Attachment</h2>
+                <p class="text-gray-500 mb-6">
+                    You can enter file extension and name. We will provide you the new file automatically as an
+                    attachment
+                    in your phishing message to be downloaded.
+                </p>
+
+                <!-- Dropdown -->
+                <div class="mb-6 relative  w-full lg:w-3/4">
+                    <label class="block text-lg font-medium mb-2">Setup File Extension</label>
+                    <div class="relative">
+                        <select name="file_extension" id="file_extension"
+                            class="appearance-none w-full border border-gray-300 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                            <option value="pdf" <%= template.attachmentExt === 'pdf' ? 'selected' : '' %>>PDF</option>
+                            <option value="docx" <%= template.attachmentExt === 'docx' ? 'selected' : '' %>>DOCX</option>
+                            <option value="xlsx" <%= template.attachmentExt === 'xlsx' ? 'selected' : '' %>>XLSX</option>
+                            <option value="exe" <%= template.attachmentExt === 'exe' ? 'selected' : '' %>>EXE</option>
+                            <option value="" <%= !template.attachmentExt ? 'selected' : '' %>>-</option>
+
+                        </select>
+                        <!-- Custom Dropdown Icon -->
+                        <svg class="w-5 h-5 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                </div>
+
+
+                <!-- Input -->
+                <div>
+                    <label class="block text-base font-semibold mb-2">File Name</label>
+                    <input type="text"   name="file_name" value="<%=template?.file_name%>"
+                        class="w-full lg:w-3/4 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
+                </div>
+            </div>
+            <div class="step hidden">
+                <h2 class="text-2xl font-bold mb-2">Phishing Message Details</h2>
+                <p class="text-gray-500 mb-8">
+                    Text
+                </p>
+
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-max">
+                    <!-- Email Subject -->
+                    <div id="email-content">
+                        <label class="block text-base font-semibold mb-2">Email Subject</label>
+                        <input type="text"   name="subject" value="<%= template?.subject || '' %>"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
+                    </div>
+
+                    <!-- Sender Email -->
+                    <div id="divSenderEmail">
+                        <label class="block text-base font-semibold mb-2">
+                            <%= __("Template.senderEmail") %>
+                        </label>
+                        <input type="text"   name="sender_email" id="sender_email" value="<%= template?.sender_email_or_contact || '' %>"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
+                    </div>
+
+                    <!-- Sender Name -->
+                    <div>
+                        <label class="block text-base font-semibold mb-2">
+                            <%= __("Template.senderName") %>
+                        </label>
+                        <input type="text"  name="sender_display_name" id="sender_display_name" value="<%= template?.sender_display_name || '' %>"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
+                    </div>
+
+                    <!-- Simulated Company Name -->
+                    <div>
+                        <label class="block text-base font-semibold mb-2">
+                            <%= __("Template.companyName") %>
+                        </label>
+                        <input type="text"   name="company_name" id="companyName" value="<%= template?.company_name || '' %>"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
+                    </div>
+                </div>
+
+
+                <!-- Company Domain -->
+                <div class="my-6">
+                    <label class="block text-base font-semibold mb-2">
+                        <%= __("Template.companyDomain") %>
+                    </label>
+                    <input type="text"   name="company_domain" id="companyDomain" value="<%= template?.company_domain || '' %>"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
+                </div>
+
+                <!-- Email Message with CKEditor -->
+                <div>
+                    <label class="block text-base font-semibold mb-2">
+                        <%= __("Template.phishPage") %>
+                    </label>
+                    <!-- <textarea name="editor1" id="editor1" rows="10" cols="80"></textarea> -->
+
+                    <textarea name="phishing_content" id="phishing_content" rows="10" cols="80">
+                        <%= template?.phishing_content || '' %>
+                    </textarea>
+                </div>
+
+
+            </div>
+            <!--URL Phish Page Setting (Optional)-->
+            <div class="step hidden">
+                <!-- Heading -->
+                <h2 class="text-2xl font-bold mb-2">URL Phish Page Setting</h2>
+                <p class="text-gray-500 mb-6">
+                    You can create an HTML page that will be opened after user click dedicated phishing URL Link
+                </p>
+
+                <!-- Options -->
+                <div class="flex flex-col gap-6">
+                    <% const selectedPhishOption = String(template?.phish_option || 'simple').toLowerCase(); %>
+
+                <!-- Option 1 -->
+                <label class="flex items-start gap-4 custom-radio">
+                    <input type="radio" name="phish_option" value="simple"
+                    <%= selectedPhishOption === 'simple' ? 'checked' : '' %>
+                    <%= selectedPhishOption && selectedPhishOption !== 'simple' ? 'disabled' : '' %> >
+                    <span class="radio-circle"></span>
+                    <span class="text-lg font-medium">
+                    Simple Phishing Web Page To Track User Click
+                    </span>
+                </label>
+
+                <!-- Option 2 -->
+                <label class="flex items-start gap-4 custom-radio">
+                    <input type="radio" name="phish_option" value="data_entry"
+                    <%= selectedPhishOption === 'data_entry' ? 'checked' : '' %>
+                    <%= selectedPhishOption && selectedPhishOption !== 'data_entry' ? 'disabled' : '' %> >
+                    <span class="radio-circle"></span>
+                    <span class="text-lg font-medium">
+                    Data Entry Based Phishing Web Page To Track User Click And Data Submission
+                    </span>
+                </label>
+
+                <!-- Option 3 -->
+                <label style="display: none;"  class="flex items-start gap-4 custom-radio">
+                    <input type="radio" name="phish_option" value="custom_url"
+                    <%= selectedPhishOption === 'custom_url' ? 'checked' : '' %>
+                    <%= selectedPhishOption && selectedPhishOption !== 'custom_url' ? 'disabled' : '' %> >
+                    <span class="radio-circle"></span>
+                    <span class="text-lg font-medium">
+                    Import Webpage From An External URL (Custom) To Track User Click Or Data Submission
+                    </span>
+                </label>
+                </div>
+
+                <!-- Conditional Input -->
+                <div id="custom-url-input" class="mt-6 hidden">
+                    <label for="website" class="block text-sm text-gray-700 mb-2">Enter website to import</label>
+                    <input type="text" id="website"  
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400">
+                </div>
+            </div>
+            <div class="step hidden">
+                <!-- Heading -->
+                <h1 class="text-2xl font-semibold mb-1">Create Phishing Web Page</h1>
+                <p class="text-gray-500 mb-6">You Can Create An HTML Page That Will Be Opened After User Click Dedicated
+                    Phishing URL Link</p>
+
+                <!-- Email Message Label -->
+                <label for="editor" class="block text-gray-700 font-medium mb-2">Email Message</label>
+
+                <!-- CKEditor container -->
+                <div class="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                    <!-- <textarea id="editor2" placeholder="Enter domain"></textarea> -->
+
+                    <textarea name="phishing_page_content" id="phishing_page_content" rows="10" cols="80"><%- template?.phishing_page_content || '' %></textarea>
+                </div>
+            </div>
+            <div class="step hidden">
+                <!-- Heading -->
+                <h1 class="text-2xl font-semibold mb-1">Landing Page Settings</h1>
+                <p class="text-gray-500 mb-6">You Can Create An HTML Page That Will Be Opened After User Click Dedicated
+                    Phishing URL Link</p>
+
+                <!-- Radio Buttons -->
+                <div class="space-y-4 mb-6">
+                    <label class="flex items-center custom-radio cursor-pointer">
+                        <input type="radio" name="landing_option" value="link">
+                        <span class="radio-circle"></span>
+                        <span class="text-gray-700">I like to redirect the user to a link</span>
+                    </label>
+
+                    <label class="flex items-center custom-radio cursor-pointer">
+                        <input type="radio" name="landing_option" value="custom" <%=template?.landing_page_content ? 'checked' : '' %>  >
+                        <span class="radio-circle"></span>
+                        <span class="text-gray-700">I like to redirect the user to a custom landing page</span>
+                    </label>
+                </div>
+
+
+                <!-- Custom Page Setting (hidden initially) -->
+                <div id="editor-container">
+                    <label for="editor" style="display: none;" class="block text-gray-700 font-medium mb-2">Custom Page
+                        Setting</label>
+                    <div class="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
+                
+                    <textarea name="landing_page_content" id="landing_page_content" rows="10" cols="80"><%- template?.landing_page_content || '' %></textarea>
+
+                    </div>
+                </div>
+                <!-- <pre id="preview" class="bg-gray-100 p-3 rounded"></pre> -->
+            </div>
+            <!-- Dynamic Placeholder Buttons (only for this step) -->
+                        <div id="placeholder-buttons" class="flex flex-wrap gap-3" style="display:none;">
+                            <button type="button" id="tag_first_name"
+                                class="px-4 py-2 text-teal-500 border border-teal-500 rounded-full hover:bg-teal-50"
+                                onclick="insertPlaceholder('first_name')">First Name</button>
+                            <button type="button" id="tag_last_name"
+                                class="px-4 py-2 text-teal-500 border border-teal-500 rounded-full hover:bg-teal-50"
+                                onclick="insertPlaceholder('last_name')">Last Name</button>
+                            <button type="button" id="tag_email"
+                                class="px-4 py-2 text-teal-500 border border-teal-500 rounded-full hover:bg-teal-50"
+                                onclick="insertPlaceholder('email')">Email</button>
+                            <button type="button" id="tag_current_date"
+                                class="px-4 py-2 text-teal-500 border border-teal-500 rounded-full hover:bg-teal-50"
+                                onclick="insertPlaceholder('current_date')">Current Date</button>
+                            <button type="button" id="tag_current_time"
+                                class="px-4 py-2 text-teal-500 border border-teal-500 rounded-full hover:bg-teal-50"
+                                onclick="insertPlaceholder('current_time')">Current Time</button>
+                            <button type="button" id="tag_phishing_url"
+                                class="px-4 py-2 text-teal-500 border border-teal-500 rounded-full hover:bg-teal-50"
+                                onclick="insertPlaceholder('phishing_url')">Phishing Link</button>
+                            <button type="button" id="tag_phishing_file"
+                                class="px-4 py-2 text-teal-500 border border-teal-500 rounded-full hover:bg-teal-50"
+                                onclick="insertPlaceholder('phishing_file')">Phishing File</button>
+                            <button type="button" id="tag_sender"
+                                class="px-4 py-2 text-teal-500 border border-teal-500 rounded-full hover:bg-teal-50"
+                                onclick="insertPlaceholder('sender')">Sender</button>
+                            <button type="button" id="tag_company"
+                                class="px-4 py-2 text-teal-500 border border-teal-500 rounded-full hover:bg-teal-50"
+                                onclick="insertPlaceholder('company')">Company</button>
+                            <button type="button" id="tag_company_domain"
+                                class="px-4 py-2 text-teal-500 border border-teal-500 rounded-full hover:bg-teal-50"
+                                onclick="insertPlaceholder('company_domain')">Company Domain</button>
+                        </div>
+
+                        <!-- Import HTML from URL for Landing Page (missing in original) -->
+                        <div id="import-html-url-container" class="mb-6" style="display:none;">
+                            <label for="import-html-url" class="block text-gray-700 font-medium mb-2">
+                                <%= __('system_template.create.labelImportHtmlUrl') || 'Import HTML Template from URL' %>
+                            </label>
+                            <div class="flex gap-2">
+                                <input type="url" id="import-html-url" name="import_html_url" placeholder="https://example.com/template.html" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400">
+                                <button type="button" id="fetch-html-template" class="bg-teal-400 text-white px-4 py-2 rounded-lg hover:bg-teal-500 transition">Fetch</button>
+                            </div>
+                            <div id="import-html-url-error" class="text-red-500 text-sm mt-2" style="display:none;"></div>
+                        </div>
+
+                        <!-- SMS Content Step (missing in original) -->
+                        <div class="step hidden">
+                            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                                <%= __("system_template.create.sms_content") || "SMS Template Content" %>
+                            </h2>
+                            <div class="mb-6">
+                                <label for="sms_content" class="block text-gray-700 font-medium mb-3">
+                                    <%= __("system_template.create.sms_message") || "SMS Message" %>
+                                    <span class="text-red-500">*</span>
+                                </label>
+                                <textarea id="sms_content" name="sms_content" rows="6" maxlength="160"
+                                    placeholder="<%= __('system_template.create.sms_placeholder') || 'Enter SMS message (max 160 characters)' %>"
+                                    class="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"><%= template?.sms_content || '' %></textarea>
+                                <div class="text-sm text-gray-500 mt-2">
+                                    <span id="sms-char-count">0</span> / 160 characters
+                                </div>
+                            </div>
+                            <div id="placeholder-buttons-sms" class="flex flex-wrap gap-3 mt-4">
+                                <button type="button"
+                                    class="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition"
+                                    onclick="insertSMSPlaceholder('first_name')">
+                                    <%= __("system_template.placeHolder_firstName") || "First Name" %>
+                                </button>
+                                <button type="button"
+                                    class="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition"
+                                    onclick="insertSMSPlaceholder('last_name')">
+                                    <%= __("system_template.placeHolder_lastName") || "Last Name" %>
+                                </button>
+                                <button type="button"
+                                    class="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition"
+                                    onclick="insertSMSPlaceholder('phishing_url')">
+                                    <%= __("system_template.placeHolder_phishingLink") || "URL" %>
+                                </button>
+                                <button type="button" id="tag_sms_phishing_file" style="display: none;"
+                                    class="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition"
+                                    onclick="insertSMSPlaceholder('phishing_file')">
+                                    <%= __("system_template.placeHolder_phishingFile") || "File" %>
+                                </button>
+                                <button type="button"
+                                    class="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition"
+                                    onclick="insertSMSPlaceholder('company')">
+                                    <%= __("system_template.placeHolder_company") || "Company Name" %>
+                                </button>
+                            </div>
+                        </div>
+            <!-- Buttons -->
+            <div class="flex justify-end gap-4 mt-6">
+                <button id="prev" type="button"
+                    class="border border-teal-400 text-teal-500 font-medium px-6 py-2 rounded-full hover:bg-teal-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                    Back
+                </button>
+                <button id="next" type="button"
+                    class="bg-teal-400 text-white font-medium px-6 py-2 rounded-full hover:bg-teal-500 transition">
+                    Next
+                </button>
+            </div>
+         </form>
+    </div>
+</div>
+
+
+<script>
+
+    // i18n step titles for stepper navigation
+    window.i18n = {
+        stepTitles: [
+            "<%= __('system_template.stepper1') %>",
+            "<%= __('system_template.stepper2') %>",
+            "<%= __('system_template.stepper3') %>",
+            "<%= __('system_template.stepper4') %>",
+            "<%= __('system_template.stepper5') %>",
+            "<%= __('system_template.stepper6') %>",
+            "<%= __('system_template.stepper7') %>",
+            "<%= __('system_template.stepper8') %>"
+        ]
+    };
+    window.disableSaveEdit = <%= typeof disableSaveEdit !== 'undefined' ? disableSaveEdit : false %>;
+</script>
+
+<script src="/securemagnus_2025/js/system_view_template.js"></script>
+<script>
+// Show import field when 'link' is selected, hide otherwise
+document.addEventListener('DOMContentLoaded', function() {
+    const linkRadio = document.getElementById('landing_option_link');
+    const customRadio = document.getElementById('landing_option_custom');
+    const importContainer = document.getElementById('import-html-url-container');
+    const fetchBtn = document.getElementById('fetch-html-template');
+    const urlInput = document.getElementById('import-html-url');
+    const errorDiv = document.getElementById('import-html-url-error');
+    const landingPageContent = document.getElementById('landing_page_content');
+
+    function toggleImportField() {
+        if (linkRadio && linkRadio.checked) {
+            importContainer.style.display = '';
+        } else {
+            importContainer.style.display = 'none';
+            errorDiv.style.display = 'none';
+        }
+    }
+    if (linkRadio && customRadio) {
+        linkRadio.addEventListener('change', toggleImportField);
+        customRadio.addEventListener('change', toggleImportField);
+        // On page load
+        toggleImportField();
+    }
+
+    // Fetch HTML from URL using backend proxy and insert into landing_page_content
+    if (fetchBtn && urlInput && landingPageContent) {
+        fetchBtn.addEventListener('click', async function() {
+            const url = urlInput.value.trim();
+            errorDiv.style.display = 'none';
+            if (!url) {
+                errorDiv.textContent = 'Please enter a valid URL.';
+                errorDiv.style.display = '';
+                return;
+            }
+            try {
+                fetchBtn.disabled = true;
+                fetchBtn.textContent = 'Fetching...';
+                const response = await fetch('/template/api/fetch-html', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Failed to fetch HTML.');
+                const html = result.html;
+                landingPageContent.value = html;
+                if (window.CKEDITOR && CKEDITOR.instances['landing_page_content']) {
+                    CKEDITOR.instances['landing_page_content'].setData(html);
+                }
+                fetchBtn.textContent = 'Fetch';
+                fetchBtn.disabled = false;
+            } catch (err) {
+                errorDiv.textContent = 'Error: ' + err.message;
+                errorDiv.style.display = '';
+                fetchBtn.textContent = 'Fetch';
+                fetchBtn.disabled = false;
+            }
+        });
+    }
+});
+</script>
+<script>
+// Character counter for SMS
+const smsContent = document.getElementById('sms_content');
+const charCount = document.getElementById('sms-char-count');
+
+if (smsContent && charCount) {
+  smsContent.addEventListener('input', function() {
+    charCount.textContent = this.value.length;
+  });
+}
+
+// Insert placeholder into SMS textarea
+function insertSMSPlaceholder(placeholder) {
+  const textarea = document.getElementById('sms_content');
+  if (!textarea) return;
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+  const placeholderText = '<' + '%=' + placeholder + '%' + '>';
+  textarea.value = text.substring(0, start) + placeholderText + text.substring(end);
+  textarea.focus();
+  textarea.selectionStart = textarea.selectionEnd = start + placeholderText.length;
+  document.getElementById('sms-char-count').textContent = textarea.value.length;
+}
+</script>

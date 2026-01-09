@@ -1,0 +1,266 @@
+<%- include('../../layout/layout-starting.ejs') %>
+
+<div class="wraper container-fluid">
+  <div class="page-title">
+    <h3 class="title">Dashboard / Branding</h3>
+  </div>
+
+  <div class="row">
+    <form
+      class="form-horizontal"
+      action="/organization/branding/<%= id %>"
+      method="post"
+    >
+      <div class="col-md-6">
+        <!-- panel -->
+        <%= id %>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Dashboard / Branding</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="control-label col-md-3">Header Color</label>
+              <div class="col-md-4 col-xs-11">
+                <div
+                  data-color-format="rgb"
+                  data-color="rgb(255, 146, 180)"
+                  class="input-append colorpicker-default color input-group"
+                >
+                  <input
+                    type="text"
+                    name="headerColor"
+                    id="headerColor"
+                    readonly=""
+                    value=""
+                    class="form-control"
+                  />
+                  <span class="input-group-btn add-on">
+                    <button
+                      class="btn btn-white"
+                      type="button"
+                      style="padding: 8px"
+                    >
+                      <i style="background-color: rgb(124, 66, 84)"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-3">Navigation Color</label>
+              <div class="col-md-4 col-xs-11">
+                <div
+                  data-color-format="rgb"
+                  data-color="rgb(255, 146, 180)"
+                  class="input-append colorpicker-default color input-group"
+                >
+                  <input
+                    type="text"
+                    readonly=""
+                    name="navigationColor"
+                    id="navigationColor"
+                    value=""
+                    class="form-control"
+                  />
+                  <span class="input-group-btn add-on">
+                    <button
+                      class="btn btn-white"
+                      type="button"
+                      style="padding: 8px"
+                    >
+                      <i style="background-color: rgb(124, 66, 84)"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-3">Background Color</label>
+              <div class="col-md-4 col-xs-11">
+                <div
+                  data-color-format="rgb"
+                  data-color="rgb(255, 146, 180)"
+                  class="input-append colorpicker-default color input-group"
+                >
+                  <input
+                    type="text"
+                    readonly=""
+                    name="backgroundColor"
+                    id="backgroundColor"
+                    value=""
+                    class="form-control"
+                  />
+                  <span class="input-group-btn add-on">
+                    <button
+                      class="btn btn-white"
+                      type="button"
+                      style="padding: 8px"
+                    >
+                      <i style="background-color: rgb(124, 66, 84)"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-3">Footer Color</label>
+              <div class="col-md-4 col-xs-11">
+                <div
+                  data-color-format="rgb"
+                  data-color="rgb(255, 146, 180)"
+                  class="input-append colorpicker-default color input-group"
+                >
+                  <input
+                    type="text"
+                    readonly=""
+                    name="footerColor"
+                    id="footerColor"
+                    value=""
+                    class="form-control"
+                  />
+                  <span class="input-group-btn add-on">
+                    <button
+                      class="btn btn-white"
+                      type="button"
+                      style="padding: 8px"
+                    >
+                      <i style="background-color: rgb(124, 66, 84)"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-3">Font Color</label>
+              <div class="col-md-4 col-xs-11">
+                <div
+                  data-color-format="rgb"
+                  data-color="rgb(255, 146, 180)"
+                  class="input-append colorpicker-default color input-group"
+                >
+                  <input
+                    type="text"
+                    readonly=""
+                    name="fontColor"
+                    id="fontColor"
+                    value=""
+                    class="form-control"
+                  />
+                  <span class="input-group-btn add-on">
+                    <button
+                      class="btn btn-white"
+                      type="button"
+                      style="padding: 8px"
+                    >
+                      <i style="background-color: rgb(124, 66, 84)"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="control-label col-md-3">BG Color</label>
+              <div class="col-md-4 col-xs-11">
+                <div
+                  data-color-format="rgb"
+                  data-color="rgb(255, 146, 180)"
+                  class="input-append colorpicker-default color input-group"
+                >
+                  <input
+                    type="text"
+                    readonly=""
+                    name="bgColor"
+                    id="bgColor"
+                    value=""
+                    class="form-control"
+                  />
+                  <span class="input-group-btn add-on">
+                    <button
+                      class="btn btn-white"
+                      type="button"
+                      style="padding: 8px"
+                    >
+                      <i style="background-color: rgb(124, 66, 84)"></i>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-info btn-rounded m-b-5">save</button>
+            <button type="button" class="btn btn-primary btn-rounded m-b-5">preview</button>
+          </div>
+          <!-- panel-body -->
+        </div>
+        <!-- panel -->
+      </div>
+
+      <div class="col-md-6">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Images and Logo</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <div class="input-group">
+                <label class="input-group-text" for="fileUpload"
+                  >Header Banner</label
+                >
+                <input
+                  type="file"
+                  class="form-control"
+                  id="headerBanner"
+                  name="headerBanner"
+                  aria-describedby="inputGroupFileAddon04"
+                  aria-label="Upload"
+                />
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <label class="input-group-text" for="fileUpload"
+                  >Logo Image</label
+                >
+                <input
+                  type="file"
+                  class="form-control"
+                  id="logoImage"
+                  name="logoImage"
+                  aria-describedby="inputGroupFileAddon04"
+                  aria-label="Upload"
+                />
+              </div>
+            </div>
+          </div>
+          <!-- panel-body -->
+        </div>
+        <!-- panel -->
+      </div>
+      
+    </form>
+    <!-- col -->
+  </div>
+  <!-- End row -->
+</div>
+
+<%- include('../../layout/footer.js') %> <%-
+include('../../layout/layout-ending.ejs') %>
+<script>
+  $(document).ready(function () {
+    // Date Picker
+    $("body").append(
+      '<script type="text/javascript" src="/assets/colorpicker/bootstrap-colorpicker.js"/>'
+    );
+    //colorpicker start
+
+    $(".colorpicker-default").colorpicker({
+      format: "hex",
+    });
+  });
+</script>

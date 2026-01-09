@@ -1,0 +1,24 @@
+NODE_ENV=Development
+HOST=127.0.0.1
+PORT=8000
+BACKEND_EP=http://127.0.0.1:3000
+
+REDIS_URL=redis://127.0.0.1:6379
+REDIS_SERVER_IP=127.0.0.1
+REDIS_SERVER_PORT=6379
+REDIS_SESSION_SECRET_KEY=P@ssword123w
+COOKIE_JWT_TOKEN_EXPIRY=200   # JWT token expiry time in minutes
+
+SECURE_MAGNUS_WORKSPACE=c:\secure_magnus_workspace # Secure Magnus Workspace directory path
+ 
+
+# Backend TVBS Configuration
+BACKEND_TVBS_URL=http://127.0.0.1:9000
+
+# Logger
+LOGS_DIR=C:\SecureMagnus\application logs
+LOGS_FILENAME="frontend"
+
+
+
+BACKEND_SUITE_PRIVATE_KEY_PATH=C:\secure_magnus_workspace\keys\private.pem

@@ -1,0 +1,64 @@
+<!-- Tailwind-style Update Invoice Modal -->
+<div id="updateInvoiceModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+  <div class="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6 relative">
+    <!-- Close Button -->
+    <button id="closeUpdateInvoiceModal" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 text-xl">
+      &times;
+    </button>
+    <h3 class="text-xl font-semibold mb-4">
+      <%= __("Header.updateInvoice") %>
+    </h3>
+
+
+    <div class="space-y-4">
+      <form id="updateInvoice" action="/order/updateInvoice" method="post">
+        <div>
+          <label class="block mb-1" for="paymentMethod">
+            <%= __("Payment.mode") %>
+          </label>
+          <select class="w-full border rounded-lg p-2" name="paymentMethod" id="paymentMethod" required>
+            <option value="" selected disabled>
+              <%= __("selPayment.mode") %>
+            </option>
+            <% paymentTypes.forEach(c=> { %>
+              <option value="<%= c.id %>">
+                <%= c.method_name %>
+              </option>
+              <% }); %>
+          </select>
+        </div>
+        <div>
+          <label class="block mb-1" for="paymentStatus">
+            <%= __("Payment.status") %>
+          </label>
+          <select class="w-full border rounded-lg p-2" name="paymentStatus" id="paymentStatus" required>
+            <option value="" selected disabled>
+              <%= __("selPayment.status") %>
+            </option>
+            <% paymentStatus.forEach(c=> { %>
+              <option value="<%= c.id %>">
+                <%= c.status_name %>
+              </option>
+              <% }); %>
+          </select>
+        </div>
+        <input type="hidden" id="subscription" name="subscription" value="">
+        <input type="hidden" id="order" name="order" value="">
+        <input type="hidden" id="org" name="org" value="">
+       
+
+        <div class="mt-6 space-y-3">
+          <button type="submit" class="w-full bg-teal-500 text-white py-2 rounded-full" >
+             <%= __("Order.Modal.Save") %>
+          </button>
+          <button type="button" id="closeUpdateInvoiceModalBtn"  class="w-full bg-gray-100 py-2 rounded-full">
+            <%= __("Order.Modal.Close") %>
+          </button>
+        </div>
+      </form>
+    </div>
+
+
+
+  </div>
+</div>

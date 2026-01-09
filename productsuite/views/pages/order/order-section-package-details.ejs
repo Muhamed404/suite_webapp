@@ -1,0 +1,81 @@
+<section style="position: static">
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="pymtDesc"
+      ><%= __("Order.Package.Description") %></label
+    >
+    <div class="col-lg-6">
+      <input
+        class="form-control required"
+        id="pymtDesc"
+        name="pymtDesc"
+        type="text"
+      />
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="totalCost">
+      <%= __("Order.Package.LicenseCost") %></label
+    >
+    <div class="col-lg-6">
+      <input
+        class="form-control required"
+        id="totalCost"
+        name="totalCost"
+        oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+        type="number"
+        value="<%= pkgCost %>"
+        readonly
+      />
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="totalUserLicense">
+      <%= __("Order.Package.TotalUserLicense") %></label
+    >
+    <div class="col-lg-6">
+      <input
+        class="form-control required"
+        id="totalUserLicense"
+        name="totalUserLicense"
+        oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+        type="number"
+        readonly
+        value="<%= totalUserLicense %>"
+      />
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="discount"
+      ><%= __("Order.Package.Discount") %> %</label
+    >
+    <div class="col-lg-6">
+      <input
+        class="form-control required"
+        id="discount"
+        name="discount"
+        min="0"
+        max="100"
+        type="number"
+        value="0"
+        onchange="calculatePayableAmount()"
+      />
+    </div>
+  </div>
+  <div class="form-group clearfix">
+    <label class="col-lg-2 control-label" for="ttlPayableAmt"
+      ><%= __("Order.Package.Total") %></label
+    >
+    <div class="col-lg-6">
+      <input
+      class="form-control required"
+      id="ttlPayableAmt"
+      name="ttlPayableAmt"
+      oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+      type="number"
+      readonly
+      value="<%= totalPayableCost %>"
+      />
+    </div>
+  </div>
+   
+</section>

@@ -1,0 +1,68 @@
+
+
+<div class="step hidden" id="step-3">
+
+
+  <!-- Section Title -->
+  <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10"><%= __("subscription.create.labelBillingAddress") %></h1>
+
+  <!-- Main Form -->
+  
+    <!-- Billing Address -->
+    <div>
+      <label class="block text-gray-700 font-medium mb-3"><%= __("subscription.create.labelBillingAddress") %> *</label>
+      <input class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50"
+       id="billAddress" name="billAddress" type="text"
+        value="<%= organization.address %>" />
+      
+    </div>
+
+    <!-- Billing Country -->
+    <div>
+      <label class="block text-gray-700 font-medium mb-3"><%= __("subscription.create.optionSelectCountry") %>*</label>
+      <select class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50"
+       name="billCountry" id="billCountry" >
+        <option value="<%=organization.Country.id%>" selected>
+          <%=organization.Country.name%>
+        </option>
+
+      </select>
+      
+    </div>
+
+    <!-- Billing State -->
+    <div>
+      <label class="block text-gray-700 font-medium mb-3"><%= __("subscription.create.optionSelectState") %></label>
+       <select   class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50"
+        name="billState" id="billState">
+        <option value="<%=organization.State.id%>" selected>
+          <%=organization.State.name%>
+        </option>
+      </select>
+      
+    </div>
+
+    <!-- Billing City -->
+    <div>
+      <label class="block text-gray-700 font-medium mb-3"><%= __("subscription.create.optionSelectCity") %></label>
+      <select class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50"
+       name="billCity" id="billCity" >
+        <option value="<%=organization.City.id%>" selected>
+          <%=organization.City.name%>
+        </option>
+      </select>
+       
+    </div>
+
+    <!-- Postal Code -->
+    <div class="md:col-span-1">
+      <label class="block text-gray-700 font-medium mb-3"><%= __("subscription.create.labelPostalCode") %></label>
+      <input id="billPostalCode" name="billPostalCode" type="text" value="<%=organization.postal_code%>"
+        class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" 
+        oninput="this.value=this.value.replace(/[^0-9]/g, '' );
+        if(this.value.startsWith('-')) this.value=this.value.substr(1);" min="1" />
+   
+      
+    </div> 
+
+</div>

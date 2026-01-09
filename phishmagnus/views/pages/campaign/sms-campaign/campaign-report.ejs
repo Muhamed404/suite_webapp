@@ -1,0 +1,301 @@
+<div class="flex flex-col p-6 pt-0">
+    <!-- Header Section -->
+    <div class="flex flex-col gap-4 mt-3">
+        <!-- Title -->
+        <h1 class="my-2 text-2xl font-semibold">
+            <%= __("sms.campaign_report.title") || "SMS Campaign Reports" %>
+        </h1>
+
+        <!-- Alert Messages -->
+        <% if (message) { %>
+            <div class="mb-4 p-4 rounded-lg <%= alertType === 'error' ? 'bg-red-50 border border-red-200' : 'bg-green-50 border border-green-200' %>">
+                <div class="flex items-center">
+                    <i class="fas <%= alertType === 'error' ? 'fa-exclamation-circle text-red-600' : 'fa-check-circle text-green-600' %> mr-3"></i>
+                    <span class="<%= alertType === 'error' ? 'text-red-700' : 'text-green-700' %>">
+                        <%= message %>
+                    </span>
+                </div>
+            </div>
+        <% } %>
+
+        <!-- Empty State -->
+        <% if (hasMessages) { %>
+            <div class="bg-white rounded-3xl p-12 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-inbox text-gray-400 text-6xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">
+                    <%= emptyMessage %>
+                </h3>
+                <p class="text-gray-600 mb-6">
+                    <%= __("sms.campaign_report.empty_description") || "Create your first SMS campaign to see reports here." %>
+                </p>
+                <a href="/phm/campaign/sms/create" class="inline-block bg-teal-600 text-white px-6 py-2 rounded-full hover:bg-teal-700 transition">
+                    <i class="fas fa-plus mr-2"></i>
+                    <%= __("sms.campaign_report.create_campaign") || "Create Campaign" %>
+                </a>
+            </div>
+        <% } else { %>
+
+        <!-- Campaigns Table Section -->
+        <div class="flex flex-col gap-4 mt-3 bg-white rounded-3xl">
+            <!-- Header with Search and Sort -->
+            <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3 px-5 pt-5">
+                <div>
+                    <h2 class="text-2xl font-semibold"><%= __("sms.campaign_report.campaigns") || "SMS Campaigns" %></h2>
+                </div>
+
+                <div class="flex flex-col lg:flex-row gap-4 w-full lg:w-auto">
+                    <!-- Search Input -->
+                    <div class="relative flex-1 lg:flex-initial">
+                        <input type="text" 
+                               id="searchInput" 
+                               placeholder="<%= __("generic_label.search_here") || 'Search here...' %>"
+                               class="w-full lg:w-64 pl-10 pr-4 py-2 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+
+                    <!-- Sort Button -->
+                    <button class="hidden lg:flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-transparent text-gray-900 border border-gray-300 transition-all duration-300 hover:border-[var(--teal)] hover:text-[var(--teal)]">
+                        <i class="fas fa-sort text-sm"></i>
+                        <%= __("generic_label.sort_by") || "Sort by" %>
+                    </button>
+
+                    <!-- Mobile Sort Icon -->
+                    <button class="lg:hidden p-2 rounded-full hover:bg-gray-100 transition">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Table Container with Horizontal Scrollbar -->
+            <div class="overflow-x-auto px-5">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-[#FAFBFC] sticky top-0">
+                        <tr class="border-b border-gray-200">
+                            <th class="px-4 py-4 font-semibold text-gray-700 whitespace-nowrap">
+                                <%= __("sms.campaign_report.campaign_name") || "Campaign Name" %>
+                            </th>
+                            <th class="px-4 py-4 font-semibold text-gray-700 whitespace-nowrap">
+                                <%= __("sms.campaign_report.template") || "Template" %>
+                            </th>
+                            <th class="px-4 py-4 font-semibold text-gray-700 whitespace-nowrap text-center">
+                                <%= __("sms.campaign_report.total_invitees") || "Total Invitees" %>
+                            </th>
+                            <th class="px-4 py-4 font-semibold text-gray-700 whitespace-nowrap text-center">
+                                <%= __("sms.campaign_report.delivered") || "Delivered" %>
+                            </th>
+                            <th class="px-4 py-4 font-semibold text-gray-700 whitespace-nowrap text-center">
+                                <%= __("sms.campaign_report.delivery_rate") || "Delivery Rate" %>
+                            </th>
+                            <th class="px-4 py-4 font-semibold text-gray-700 whitespace-nowrap">
+                                <%= __("sms.campaign_report.status") || "Status" %>
+                            </th>
+                            <th class="px-4 py-4 font-semibold text-gray-700 whitespace-nowrap">
+                                <%= __("sms.campaign_report.activity") || "Activity" %>
+                            </th>
+                            <th class="px-4 py-4 font-semibold text-gray-700 whitespace-nowrap text-center">
+                                <%= __("sms.campaign_report.actions") || "Actions" %>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% campaigns.forEach(campaign => { %>
+                            <tr class="border-b border-gray-200 hover:bg-blue-50 transition-colors">
+                                <!-- Campaign Name -->
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-comments text-teal-600 text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <a href="/phm/campaign/sms/report/campaign/<%= campaign.id %>" class="font-medium text-teal-600 hover:text-teal-700 block">
+                                                <%= campaign.name %>
+                                            </a>
+                                            <p class="text-xs text-gray-500">ID: <%= campaign.campaign_identifier %></p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <!-- Template Name -->
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <span class="text-gray-700"><%= campaign.templateName %></span>
+                                </td>
+
+                                <!-- Total Invitees -->
+                                <td class="px-4 py-4 whitespace-nowrap text-center">
+                                    <span class="font-semibold text-gray-900">
+                                        <%= campaign.totalInvitees %>
+                                    </span>
+                                </td>
+
+                                <!-- Delivered -->
+                                <td class="px-4 py-4 whitespace-nowrap text-center">
+                                    <span class="font-semibold text-green-600">
+                                        <%= campaign.totalDelivered %>
+                                    </span>
+                                </td>
+
+                                <!-- Delivery Rate -->
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-2 justify-center">
+                                        <div class="w-12 bg-gray-200 rounded-full h-1.5">
+                                            <div class="bg-teal-600 h-1.5 rounded-full" 
+                                                 style="width: <%= campaign.deliveryRate.replace('%', '') %>%">
+                                            </div>
+                                        </div>
+                                        <span class="text-xs font-medium text-gray-900 w-10">
+                                            <%= campaign.deliveryRate %>
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <!-- Campaign Status -->
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium <%= campaign.statusBadgeColor %> rounded-full">
+                                        <i class="fas fa-circle mr-1" style="font-size: 0.35rem;"></i>
+                                        <%= campaign.campaignStatus %>
+                                    </span>
+                                </td>
+
+                                <!-- Active Status -->
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2 py-1 text-xs font-medium <%= campaign.activeBadgeColor %> rounded-full">
+                                        <i class="fas <%= campaign.isActive ? 'fa-check-circle' : 'fa-circle' %> mr-1 text-xs"></i>
+                                        <%= campaign.isActive ? __("sms.campaign_report.active") || "Active" : __("sms.campaign_report.inactive") || "Inactive" %>
+                                    </span>
+                                </td>
+
+                                <!-- Actions -->
+                                <td class="px-4 py-4 whitespace-nowrap">
+                                    <div class="flex gap-3 justify-center">
+                                        <a href="/phm/campaign/sms/report/campaign/<%= campaign.id %>" 
+                                           class="text-teal-600 hover:text-teal-900 transition hover:scale-110"
+                                           title="<%= __("sms.campaign_report.view_details") || "View Details" %>">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="/phm/campaign/sms/<%= campaign.id %>/edit" 
+                                           class="text-blue-600 hover:text-blue-900 transition hover:scale-110"
+                                           title="<%= __("sms.campaign_report.edit") || "Edit" %>">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="/phm/campaign/sms/<%= campaign.id %>/delete" 
+                                           onclick="return confirm('<%= __("sms.campaign_report.confirm_delete") || "Are you sure?" %>')"
+                                           class="text-red-600 hover:text-red-900 transition hover:scale-110"
+                                           title="<%= __("sms.campaign_report.delete") || "Delete" %>">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Footer -->
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-4 px-5 py-4 border-t border-gray-200">
+                <p class="text-sm text-[#656972]">
+                    <%= __("sms.campaign_report.showing") || "Showing" %>
+                    <span class="font-medium"><%= pagination.startItem %></span>
+                    <%= __("sms.campaign_report.to") || "-" %>
+                    <span class="font-medium"><%= pagination.endItem %></span>
+                    <%= __("sms.campaign_report.of") || "of" %>
+                    <span class="font-medium"><%= pagination.totalCampaigns %></span>
+                    <%= __("sms.campaign_report.entries") || "Entries" %>
+                </p>
+
+                <div class="flex flex-wrap items-center justify-center gap-1">
+                    <!-- First Page Button -->
+                    <% if (pagination.hasPreviousPage) { %>
+                        <a href="?page=1&pageSize=<%= pagination.pageSize %>"
+                            class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] transition-all duration-300">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </a>
+                    <% } else { %>
+                        <button disabled class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-300 cursor-not-allowed">
+                            <i class="fas fa-chevron-left text-xs"></i>
+                        </button>
+                    <% } %>
+
+                    <!-- Page Numbers -->
+                    <% 
+                    const startPage = Math.max(1, pagination.currentPage - 2);
+                    const endPage = Math.min(pagination.totalPages, pagination.currentPage + 2);
+                    for (let i = startPage; i <= endPage; i++) { 
+                    %>
+                        <% if (i === pagination.currentPage) { %>
+                            <button class="w-8 h-8 rounded-full bg-teal-50 text-[var(--teal)] border border-[var(--teal)] font-medium text-sm">
+                                <%= i %>
+                            </button>
+                        <% } else { %>
+                            <a href="?page=<%= i %>&pageSize=<%= pagination.pageSize %>"
+                                class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] transition-all duration-300 text-sm">
+                                <%= i %>
+                            </a>
+                        <% } %>
+                    <% } %>
+
+                    <!-- Next Page Button -->
+                    <% if (pagination.hasNextPage) { %>
+                        <a href="?page=<%= pagination.totalPages %>&pageSize=<%= pagination.pageSize %>"
+                            class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] transition-all duration-300">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </a>
+                    <% } else { %>
+                        <button disabled class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-300 cursor-not-allowed">
+                            <i class="fas fa-chevron-right text-xs"></i>
+                        </button>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+
+        <% } %>
+    </div>
+</div>
+
+<style>
+    /* Horizontal scrollbar styling */
+    .overflow-x-auto {
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e0 #f1f5f8;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-track {
+        background: #f1f5f8;
+        border-radius: 10px;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 10px;
+    }
+
+    .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+        background: #a0aec0;
+    }
+</style>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput')?.addEventListener('keyup', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr');
+        
+        rows.forEach(row => {
+            const campaignName = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase() || '';
+            const template = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+            
+            if (campaignName.includes(searchTerm) || template.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>

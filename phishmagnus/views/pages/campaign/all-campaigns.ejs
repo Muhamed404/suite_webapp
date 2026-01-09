@@ -1,0 +1,139 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900"><%= __("breadcrumbs.allCampaigns") %></span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900">All Campaigns</h3>
+  </div>
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-sm uppercase tracking-wider text-gray-400 mb-2">Campaign Center</p>
+      <p class="text-sm text-gray-500 mt-1">Track every phishing touchpoint from a single view.</p>
+    </div>
+    <div class="p-0 text-sm">
+      <ul class="flex items-center gap-2">
+        <% if (magnusAdmin === false) { %>
+          <a id="openModal"
+            class="flex items-center justify-center gap-3 px-6 max-sm:px-3 py-3 rounded-full bg-[var(--teal)] text-white border border-transparent transition-all duration-300 hover:bg-[var(--mainblue)] hover:border-[var(--mainblue)] cursor-pointer">
+            <img src="/securemagnus_2025/images/img/add.svg" class="size-5" alt="">
+            <p class="md:flex hidden">New Campaign</p>
+          </a>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<% if (magnusAdmin === false) { %>
+  <div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-3xl p-6 lg:p-10 lg:px-40 w-full max-w-3xl relative m-3">
+      <button id="closeModal" class="absolute top-3 right-3 text-gray-500 hover:text-black text-xl">
+        <img src="/securemagnus_2025/images/img/close.svg" alt="">
+      </button>
+      <h2 class="text-xl text-center font-semibold mb-4">Create New Campaign</h2>
+      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mx-6 md:mx-0">
+        <a href="/phm/campaign/email" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+          <img src="/securemagnus_2025/images/img/c-mail.svg" class="size-20" alt="">
+          Email
+        </a>
+        <a href="#" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+          <img src="/securemagnus_2025/images/img/c-sms.svg" class="size-20" alt="">
+          SMS
+        </a>
+        <a href="#" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+          <img src="/securemagnus_2025/images/img/c-usb.svg" class="size-20" alt="">
+          USB
+        </a>
+        <a href="/phm/campaign/nfc/create" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+          <img src="/securemagnus_2025/images/img/c-nfc.svg" class="size-20" alt="">
+          NFC
+        </a>
+        <a href="/phm/campaign/qr/create" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+          <img src="/securemagnus_2025/images/img/c-qr.svg" class="size-20" alt="">
+          QR
+        </a>
+        <a href="#" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+          <img src="/securemagnus_2025/images/img/c-wp.svg" class="size-20" alt="">
+          WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<div class="flex flex-col p-6 pt-0">
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-6">
+    <div id="statusTabs"
+      class="flex items-center justify-start gap-4 p-1 text-sm font-medium bg-white rounded-full w-fit"></div>
+
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div class="relative">
+        <input id="searchInput" type="text" placeholder="Search campaigns..."
+          class="pl-12 pr-10 py-3 w-[260px] sm:w-[320px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+        <img src="/securemagnus_2025/images/img/search.svg"
+          class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-4 top-1/2" alt="Search icon">
+      </div>
+
+      <select id="filterType"
+        class="px-4 py-2 rounded-full border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+        <option value="all">All Types</option>
+        <% typeOptions.forEach(type => { %>
+          <option value="<%= type.key %>"><%= type.label %></option>
+        <% }) %>
+      </select>
+    </div>
+  </div>
+
+  <div class="overflow-x-auto bg-white hide-scrollbar rounded-2xl">
+    <table class="min-w-full text-sm text-left">
+      <thead class="bg-[#FAFBFC]">
+        <tr>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Campaign</th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Type</th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Template</th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Start Date</th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">End Date</th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Status</th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Total Targets</th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div class="flex flex-col gap-3 mt-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-2 text-sm">
+      <span class="text-gray-500">Rows per page:</span>
+      <select id="rowsPerPage" class="px-2 py-1 border rounded">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+        <option value="20">20</option>
+      </select>
+    </div>
+    <div id="pagination" class="space-x-2 text-sm text-gray-600"></div>
+  </div>
+</div>
+
+<div id="campaignsData" 
+  data-campaigns='<%- JSON.stringify(campaigns || []) %>'
+  data-type-options='<%- JSON.stringify(typeOptions || []) %>'
+  style="display: none;"></div>
+
+<script>
+  (function() {
+    const dataEl = document.getElementById('campaignsData');
+    if (dataEl) {
+      window.allCampaignsData = {
+        campaigns: JSON.parse(dataEl.getAttribute('data-campaigns') || '[]'),
+        typeOptions: JSON.parse(dataEl.getAttribute('data-type-options') || '[]')
+      };
+    } else {
+      window.allCampaignsData = { campaigns: [], typeOptions: [] };
+    }
+  })();
+</script>
+<script src="/securemagnus_2025/js/all_campaigns_table.js"></script>
+

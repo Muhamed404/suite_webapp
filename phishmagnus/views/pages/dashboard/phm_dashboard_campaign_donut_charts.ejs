@@ -1,0 +1,1102 @@
+<!-- mail -->
+
+<div class="flex flex-col gap-4 mt-6 bg-white rounded-3xl">
+
+    <div class="flex items-center gap-3 px-5 pt-5">
+
+        <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
+            <img src="/securemagnus_2025/images/mail-large.svg" alt="">
+            <p>Email Campaign</p>
+        </div>
+        <button class="hidden lg:block ms-auto">
+            <a href=""
+                class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+
+                This Month
+                <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
+            </a>
+
+        </button>
+
+        <a href="" class="block lg:hidden">
+            <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
+        </a>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 p-5 auto-rows-auto max-sm:grid-cols-2 max-sm:auto-rows-auto">
+
+
+        <div class="col-span-4 row-span-4">
+            <div class="dashboardEmailSemiChart" sent="<%=inviteesEmailSentUnSentStats?.sentCount %>"
+                opened="<%=uniqueEmailInteractionsCount?.openEmail%>" admin="<%=emailInteractions?.reportedToAdminCount%>"
+                color1="#CFE2FF" color2="#4BA6FF" color3="#85DE7D">
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#57ABE6]"
+                                    alt="">
+                            </span> Links Clicked
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#57ABE6]"></span>
+                                Clicked <span class="ml-1">
+                                    <%=uniqueEmailInteractionsCount?.linkOpened %>
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#D9E5F3]"></span>
+                                Ignored <span class="ml-1">
+                                    <%=inviteesEmailSentUnSentStats?.sentCount - uniqueEmailInteractionsCount?.linkOpened %>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#57ABE6" value="<%=uniqueEmailInteractionsCount?.linkOpened %>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#57ABE6]"
+                                    alt="">
+                            </span> Interact Form
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#57ABE6]"></span>
+                                Clicked <span class="ml-1">
+                                    <%=uniqueEmailInteractionsCount?.dataEnteredInForm %>
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#D9E5F3]"></span>
+                                Ignored <span class="ml-1">
+                                    <%=inviteesEmailSentUnSentStats?.sentCount - uniqueEmailInteractionsCount?.dataEnteredInForm %>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#57ABE6" value="<%=uniqueEmailInteractionsCount?.linkOpened %>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#57ABE6]"
+                                    alt="">
+                            </span> Form Submit
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#57ABE6]"></span>
+                                Submitted <span class="ml-1">
+                                    <%=uniqueEmailInteractionsCount?.dataEnteredSubmittedInForm %>
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#D9E5F3]"></span>
+                                Ignored <span class="ml-1">
+                                    <%=inviteesEmailSentUnSentStats?.sentCount - uniqueEmailInteractionsCount?.dataEnteredSubmittedInForm %>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#57ABE6" value="<%=uniqueEmailInteractionsCount?.dataEnteredSubmittedInForm %>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#57ABE6]"
+                                    alt="">
+                            </span> Attachment Open
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#57ABE6]"></span>
+                                Opened <span class="ml-1">
+                                    <%=uniqueEmailInteractionsCount?.fileDownloaded %>
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#D9E5F3]"></span>
+                                Ignored <span class="ml-1">
+                                    <%=inviteesEmailSentUnSentStats?.sentCount - uniqueEmailInteractionsCount?.fileDownloaded %>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#57ABE6" value="<%=uniqueEmailInteractionsCount?.fileDownloaded %>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+
+</div>
+
+
+
+
+
+<!-- SMS -->
+
+<div class="flex flex-col gap-4 mt-6 bg-white rounded-3xl">
+
+    <div class="flex items-center gap-3 px-5 pt-5">
+
+        <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
+            <img src="/securemagnus_2025/images/Icon_SMS.svg" alt="">
+            <p>SMS Campaign</p>
+        </div>
+        <button class="hidden lg:block ms-auto">
+            <a href=""
+                class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+
+                This Month
+                <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
+            </a>
+
+        </button>
+
+        <a href="" class="block lg:hidden">
+            <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
+        </a>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 p-5 auto-rows-auto max-sm:grid-cols-2 max-sm:auto-rows-auto">
+
+
+        <div class="col-span-4 row-span-4">
+            <div class="dashboardSmsSemiChart" sent="<%=smsSentUnSentCount.sentCount %>" unsent="<%=smsSentUnSentCount.unsentCount %>" open="<%= uniqueSMSInteractionsCount?.linkClicked %>" color1="#F2E9E0" color2="#FAA139" color3="#ff4b4eff">
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#FAA139]"
+                                    alt="">
+                            </span> Links Clicked
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#FAA139]"></span>
+                                Clicked <span class="ml-1"><%= uniqueSMSInteractionsCount?.linkClicked %></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#F2E9E0]"></span>
+                                Ignored <span class="ml-1"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.linkClicked %></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#FAA139" value="<%= uniqueSMSInteractionsCount?.linkClicked %>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#FAA139]"
+                                    alt="">
+                            </span> Interact Form
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#FAA139]"></span>
+                                Clicked <span class="ml-1"><%= uniqueSMSInteractionsCount?.formInteracted %></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#F2E9E0]"></span>
+                                Ignored <span class="ml-1"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.formInteracted %></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#FAA139" value="<%= uniqueSMSInteractionsCount?.formInteracted %>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#FAA139]"
+                                    alt="">
+                            </span> Form Submit
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#FAA139]"></span>
+                                Submitted <span class="ml-1"><%= uniqueSMSInteractionsCount?.formSubmitted %></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#F2E9E0]"></span>
+                                Ignored <span class="ml-1"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.formSubmitted %></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#FAA139" value="<%= uniqueSMSInteractionsCount?.formSubmitted %>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#FAA139]"
+                                    alt="">
+                            </span> Attachment Open
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#FAA139]"></span>
+                                Downloaded <span class="ml-1"><%= uniqueSMSInteractionsCount?.fileDownloaded %></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#F2E9E0]"></span>
+                                Ignored <span class="ml-1"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.fileDownloaded %></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#FAA139" value="<%= uniqueSMSInteractionsCount?.fileDownloaded %>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+
+</div>
+
+
+
+
+<!-- USB Campaign -->
+
+<div class="flex flex-col gap-4 mt-6 bg-white rounded-3xl">
+
+    <div class="flex items-center gap-3 px-5 pt-5">
+
+        <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
+            <img src="/securemagnus_2025/images/Icon_USB.svg" alt="">
+            <p>USB Campaign</p>
+        </div>
+        <button class="hidden lg:block ms-auto">
+            <a href=""
+                class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+
+                This Month
+                <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
+            </a>
+
+        </button>
+
+        <a href="" class="block lg:hidden">
+            <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
+        </a>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 p-5 auto-rows-auto max-sm:grid-cols-2 max-sm:auto-rows-auto">
+
+
+        <div class="col-span-4 row-span-4">
+            <div class="dashboardUsbSemiChart" created="<%= usbTotalCreated.createdCount %>" plugged="<%=usbTotalInteracted.is_plugged %>" color1="#E2E7EB" color2="#A3B5C3" >
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#A3B5C3]"
+                                    alt="">
+                            </span> plugged USB
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#A3B5C3]"></span>
+                                Plugged <span class="ml-1"><%= usbTotalInteracted.is_plugged %></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#E2E7EB]"></span>
+                                Ignored <span class="ml-1"><%= usbTotalCreated.createdCount - usbTotalInteracted.is_plugged %></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#A3B5C3" value="<%= usbTotalCreated.createdCount - usbTotalInteracted.is_plugged %>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#A3B5C3]"
+                                    alt="">
+                            </span> Interact Form
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#A3B5C3]"></span>
+                                Clicked <span class="ml-1">0</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#E2E7EB]"></span>
+                                Ignored <span class="ml-1">0</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#A3B5C3" value="0"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#A3B5C3]"
+                                    alt="">
+                            </span> Form Submit
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#A3B5C3]"></span>
+                                Submitted <span class="ml-1">0</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#E2E7EB]"></span>
+                                Ignored <span class="ml-1">0</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#A3B5C3" value="0"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#A3B5C3]"
+                                    alt="">
+                            </span> Attachment Open
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#A3B5C3]"></span>
+                                Opened <span class="ml-1">0</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#E2E7EB]"></span>
+                                Ignored <span class="ml-1">0</span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#A3B5C3" value="0"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+
+</div>
+
+
+
+
+
+<!-- QR Campaign -->
+
+<div class="flex flex-col gap-4 mt-6 bg-white rounded-3xl">
+
+    <div class="flex items-center gap-3 px-5 pt-5">
+
+        <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
+            <img src="/securemagnus_2025/images/Icon_QR.svg" alt="">
+            <p>QR Campaign</p>
+        </div>
+        <button class="hidden lg:block ms-auto">
+            <a href=""
+                class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+
+                This Month
+                <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
+            </a>
+
+        </button>
+
+        <a href="" class="block lg:hidden">
+            <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
+        </a>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 p-5 auto-rows-auto max-sm:grid-cols-2 max-sm:auto-rows-auto">
+
+
+        <div class="col-span-4 row-span-4">
+
+            <div class="dashboardQRSemiChart" totalQRCodes="<%=qrCreatedAndScannedStats.total_qrs_created%>"
+                totalScannedQRCodes="<%=uniqueQRInteractionsCount.scan%>"   color1="#DEEDF0"
+                color2="#45D8DD"  >
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#45D8DD]"
+                                    alt="">
+                            </span> QR Scanned
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#45D8DD]"></span>
+                                Scanned <span class="ml-1">
+                                    <%=uniqueQRInteractionsCount?.scan %>
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
+                                Ignored <span class="ml-1">
+                                   <%=qrCreatedAndScannedStats.total_qrs_created - uniqueQRInteractionsCount?.scan %>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#45D8DD" value="<%=uniqueQRInteractionsCount?.scan%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#45D8DD]"
+                                    alt="">
+                            </span> Interact Form
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#45D8DD]"></span>
+                                Clicked <span class="ml-1">
+                                    <%=uniqueQRInteractionsCount?.formInteracted %>
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
+                                Ignored <span class="ml-1">
+                                    <%=qrCreatedAndScannedStats.total_qrs_created - uniqueQRInteractionsCount?.formInteracted %>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#45D8DD" value="<%=uniqueQRInteractionsCount?.formInteracted%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#45D8DD]"
+                                    alt="">
+                            </span> Form Submit
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#45D8DD]"></span>
+                                Submitted <span class="ml-1">
+                                    <%=uniqueQRInteractionsCount?.formSubmitted %>
+                                  
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
+                                Ignored <span class="ml-1">
+                                      <%=qrCreatedAndScannedStats.total_qrs_created - uniqueQRInteractionsCount?.formSubmitted %>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#45D8DD" value="<%=uniqueQRInteractionsCount?.formSubmitted%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#45D8DD]"
+                                    alt="">
+                            </span> Attachment Open
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#45D8DD]"></span>
+                                Opened <span class="ml-1">
+                                      <%=uniqueQRInteractionsCount?.fileDownloaded %>
+                                </span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
+                                Ignored <span class="ml-1">
+                                   <%=qrCreatedAndScannedStats.total_qrs_created - uniqueQRInteractionsCount?.fileDownloaded %>
+                                </span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#45D8DD" value="<%=uniqueQRInteractionsCount?.fileDownloaded%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+
+</div>
+
+
+
+<!-- NFC Campaign -->
+
+<div class="flex flex-col gap-4 mt-6 bg-white rounded-3xl">
+
+    <div class="flex items-center gap-3 px-5 pt-5">
+
+        <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
+            <img src="/securemagnus_2025/images/Icon_NFC.svg" alt="">
+            <p>NFC Campaign</p>
+        </div>
+        <button class="hidden lg:block ms-auto">
+            <a href=""
+                class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+
+                This Month
+                <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
+            </a>
+
+        </button>
+
+        <a href="" class="block lg:hidden">
+            <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
+        </a>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 p-5 auto-rows-auto max-sm:grid-cols-2 max-sm:auto-rows-auto">
+
+
+        <div class="col-span-4 row-span-4">
+
+            <div class="dashboardNFCSemiChart" totalNFCCodes="<%=nfcCreatedAndScannedStats.total_nfc_created%>"
+                totalScannedNFCCodes="<%=uniqueNFCInteractionsCount.scan%>"  color1="#DEEDF0"
+                color2="#45D8DD" >
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#AE62E9]"
+                                    alt="">
+                            </span> Links Clicked
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#AE62E9]"></span>
+                                Clicked <span class="ml-1"><%=uniqueNFCInteractionsCount.scan%></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
+                                Ignored <span class="ml-1"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.scan %></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#AE62E9" value="<%=uniqueNFCInteractionsCount.scan%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#AE62E9]"
+                                    alt="">
+                            </span> Interact Form
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#AE62E9]"></span>
+                                Clicked <span class="ml-1"><%=uniqueNFCInteractionsCount.formInteracted%></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
+                                Ignored <span class="ml-1"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.formInteracted %></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#AE62E9" value="<%=uniqueNFCInteractionsCount.formInteracted%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#AE62E9]"
+                                    alt="">
+                            </span> Form Submit
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#AE62E9]"></span>
+                                Submitted <span class="ml-1"><%=uniqueNFCInteractionsCount.formSubmitted%></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
+                                Ignored <span class="ml-1"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.formSubmitted %></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#AE62E9" value="<%=uniqueNFCInteractionsCount.formSubmitted%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#AE62E9]"
+                                    alt="">
+                            </span> Attachment Open
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#AE62E9]"></span>
+                                Opened <span class="ml-1"><%=uniqueNFCInteractionsCount.fileDownloaded%></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
+                                Ignored <span class="ml-1"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.fileDownloaded %></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#AE62E9" value="<%=uniqueNFCInteractionsCount.fileDownloaded%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+
+</div>
+
+
+
+
+
+
+<!-- Whatsapp Campaign -->
+
+<div class="flex flex-col gap-4 mt-6 bg-white rounded-3xl">
+
+    <div class="flex items-center gap-3 px-5 pt-5">
+
+        <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
+            <img src="/securemagnus_2025/images/Icon_Whatsapp.svg" alt="">
+            <p>Whatsapp Campaign</p>
+        </div>
+        <button class="hidden lg:block ms-auto">
+            <a href=""
+                class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+
+                This Month
+                <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
+            </a>
+
+        </button>
+
+        <a href="" class="block lg:hidden">
+            <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
+        </a>
+    </div>
+
+    <div class="grid grid-cols-12 gap-4 p-5 auto-rows-auto max-sm:grid-cols-2 max-sm:auto-rows-auto">
+
+
+        <div class="col-span-4 row-span-4">
+            <div class="dashboardWhatsappSemiChart" sent="<%=whatsappSentUnSentCount.sentCount%>" opened="<%=uniqueWhatsappInteractionsCount.open%>" color1="#DDF3EE" color2="#47E7C5" >
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#47E7C5]"
+                                    alt="">
+                            </span> Links Clicked
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#47E7C5]"></span>
+                                Clicked <span class="ml-1"><%=uniqueWhatsappInteractionsCount.clickLink%></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DDF3EE]"></span>
+                                Ignored <span class="ml-1"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.clickLink%></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#47E7C5" value="<%=uniqueWhatsappInteractionsCount.clickLink%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#47E7C5]"
+                                    alt="">
+                            </span> Interact Form
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#47E7C5]"></span>
+                                Clicked <span class="ml-1"><%=uniqueWhatsappInteractionsCount.formInteracted%></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DDF3EE]"></span>
+                                Ignored <span class="ml-1"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.formInteracted%></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#47E7C5" value="<%=uniqueWhatsappInteractionsCount.formInteracted%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#47E7C5]"
+                                    alt="">
+                            </span> Form Submit
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#47E7C5]"></span>
+                                Submitted <span class="ml-1"><%=uniqueWhatsappInteractionsCount.formSubmitted%></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DDF3EE]"></span>
+                                Ignored <span class="ml-1"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.formSubmitted%></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#47E7C5" value="<%=uniqueWhatsappInteractionsCount.formSubmitted%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+        <div class="col-span-4 row-span-2">
+            <div class="bg-[var(--bg)] p-4 rounded-3xl border border-[#EBF3F7]">
+
+                <div class="flex flex-row items-start justify-between gap-2">
+                    <div class="flex flex-col gap-12">
+                        <div class="flex items-center gap-2 text-lg font-semibold text-gray-800">
+                            <span>
+                                <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#47E7C5]"
+                                    alt="">
+                            </span> Attachment Open
+                        </div>
+                        <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#47E7C5]"></span>
+                                Opened <span class="ml-1"><%=uniqueWhatsappInteractionsCount.fileDownloaded%></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-[#DDF3EE]"></span>
+                                Ignored <span class="ml-1"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.fileDownloaded%></span>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="leadchart" color="#47E7C5" value="<%=uniqueWhatsappInteractionsCount.fileDownloaded%>"></div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+    </div>
+
+
+
+</div>

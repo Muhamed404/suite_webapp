@@ -1,0 +1,538 @@
+<div class="flex flex-col p-6 gap">
+
+  <div class="flex items-center justify-between">
+    <h3 class="text-3xl font-medium">PhishMagnus Dashboard</h3>
+    <div class="  p-0 text-sm ">
+      <ul class="flex items-center gap-2">
+
+        <%if(magnusAdmin===false) {%>
+          <a href=""
+            class="md:flex  hidden items-center justify-center gap-3 px-6 py-3 rounded-full bg-white text-[var(--darkblue)] border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+            <span class="iconify" data-icon="lucide:calendar" data-width="18" data-height="18"></span>
+            View Campaign
+          </a>
+
+          <a id="openReportingModal"
+            class="md:flex  hidden items-center justify-center gap-3 px-6 py-3 rounded-full bg-white text-[var(--darkblue)] border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+            <span class="iconify" data-icon="iconoir:notes" data-width="18" data-height="18"></span>
+            View Report
+          </a>
+
+          <a id="openModal" class="flex items-center justify-center gap-3 px-6 max-sm:px-3 py-3  
+          rounded-full bg-[var(--teal)] text-white border border-transparent transition-all duration-300 hover:bg-[var(--mainblue)] 
+          hover:border-[var(--mainblue)]">
+            <img src="/securemagnus_2025/images/img/add.svg" class="size-5" alt="">
+            <p class="md:flex  hidden">New Campaign</p>
+          </a>
+          <%}%>
+            <!-- New Campaign Modal (Center Modal) -->
+            <div id="modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+              <div class="bg-white rounded-3xl p-6 lg:p-10 lg:px-40 w-full max-w-3xl relative m-3">
+                <!-- Close Button -->
+                <button id="closeModal" class="absolute top-3 right-3 text-gray-500 hover:text-black text-xl">
+                  <img src="/securemagnus_2025/images/img/close.svg" alt="">
+                </button>
+
+                <h2 class="text-xl text-center font-semibold mb-4">Create New Campaign</h2>
+
+                <!-- Responsive grid: margin-x-6 (24px) on mobile; resets to mx-0 at md and up if you wish -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mx-6 md:mx-0">
+                  <a href="/phm/campaign/email" id="mail"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-mail.svg" class="size-20" alt="">
+                    Email
+                  </a>
+                  <a href="/phm/campaign/sms/create" id="sms" data-modal-target="sms"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-sms.svg" class="size-20" alt="">
+                    SMS
+                  </a>
+                  <a href="/phm/campaign/usb" id="usb" data-modal-target="usb"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-usb.svg" class="size-20" alt="">
+                    USB
+                  </a>
+                  <a href="/phm/campaign/nfc/create" id="nfc" data-modal-target="nfc"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-nfc.svg" class="size-20" alt="">
+                    NFC
+                  </a>
+                  <a href="/phm/campaign/qr/create" id="qr" data-modal-target="qr"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-qr.svg" class="size-20" alt="">
+                    QR
+                  </a>
+                  <a href="/phm/campaign/whatsapp/create" id="wp" data-modal-target="wp"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-wp.svg" class="size-20" alt="">
+                    WhatsApp
+                  </a>
+                </div>
+              </div>
+            </div>
+
+
+            <!-- Reporting Campaign Modal (Center Modal) -->
+            <div id="modalReporting" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+              <div class="bg-white rounded-3xl p-6 lg:p-10 lg:px-40 w-full max-w-3xl relative m-3">
+                <!-- Close Button -->
+                <button id="closeModal" class="absolute top-3 right-3 text-gray-500 hover:text-black text-xl">
+                  <img src="/securemagnus_2025/images/img/close.svg" alt="">
+                </button>
+
+                <h2 class="text-xl text-center font-semibold mb-4">Campaign Reporting</h2>
+
+                <!-- Responsive grid: margin-x-6 (24px) on mobile; resets to mx-0 at md and up if you wish -->
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mx-6 md:mx-0">
+                  <a href="/phm/campaign/email/report" id="mail"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-mail.svg" class="size-20" alt="">
+                    Email
+                  </a>
+                  <a href="/phm/campaign/sms/report" id="sms" data-modal-target="sms"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-sms.svg" class="size-20" alt="">
+                    SMS
+                  </a>
+                  <a href="/phm/campaign/usb/report" id="usb" data-modal-target="usb"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-usb.svg" class="size-20" alt="">
+                    USB
+                  </a>
+                  <a href="/phm/campaign/nfc/report" id="nfc" data-modal-target="nfc"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-nfc.svg" class="size-20" alt="">
+                    NFC
+                  </a>
+                  <a href="/phm/campaign/qr/report" id="qr" data-modal-target="qr"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-qr.svg" class="size-20" alt="">
+                    QR
+                  </a>
+                  <a href="/phm/campaign/whatsapp/report" id="wp" data-modal-target="wp"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-wp.svg" class="size-20" alt="">
+                    WhatsApp
+                  </a>
+                </div>
+              </div>
+            </div>
+
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="flex flex-col  p-6 pt-0">
+  <!-- first section  -->
+  <div class="grid grid-cols-12 auto-rows-auto gap-4 max-sm:grid-cols-2 max-sm:auto-rows-auto">
+    <!-- Total User Licenses -->
+    <div
+      class="rounded-3xl p-6 pb-[25px] col-span-3 row-span-4 max-sm:col-span-1 max-sm:pb-6 flex flex-col items-start justify-between bg-[linear-gradient(to_bottom_right,#0891b2_0%,#2dd4bf_100%)] text-white">
+      <div class="flex flex-col items-start justify-between h-full">
+        <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-15" alt="">
+        <div class="flex flex-col gap-0">
+          <div class="text-5xl font-semibold mt-8">
+            <%= phmTotalPurchaseUserLicense %>
+          </div>
+          <div class="text-base">Total User Licenses</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consumed Licenses -->
+
+    <div class="flex flex-col gap-3 col-span-3 row-span-4 max-sm:col-span-1">
+      <div class="rounded-3xl bg-white  p-6 flex flex-col items-center justify-center">
+        <div class="relative w-40 h-40">
+          <svg class="w-full h-full rotate-[-90deg]">
+            <circle cx="80" cy="80" r="70" stroke="#C1EBEA" stroke-width="10" fill="none" />
+            <circle id="progressCircleRemainingBalance" cx="80" cy="80" r="70" stroke="var(--teal)" stroke-width="10"
+              fill="none" stroke-linecap="round" />
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center text-3xl font-semibold text-[var(--teal)]"
+            id="remaininglicenseBalance">
+            <%=phmConsumedUserLicense%>
+          </div>
+        </div>
+        <p class="mt-2 text-base text-gray-600 max-sm:text-center leading-tight">Consumed
+          Licenses</p>
+      </div>
+
+    </div>
+
+
+
+
+
+
+    <!-- Phishing Campaigns -->
+    <div class="col-span-6 row-span-7 max-sm:col-span-2 bg-white rounded-3xl p-6 flex flex-col justify-between">
+      <div class="flex justify-between items-start gap-2">
+        <div>
+          <h2 class="font-semibold lg:text-2xl text-xl mb-2">Phishing Campaigns</h2>
+          <p class="text-base text-gray-500">Last Campaign Date : <%=lastCampaignDate%>
+          </p>
+        </div>
+        <%if(magnusAdmin===false) {%>
+        <a href="/phm/campaign/all-campaigns"
+          class="flex items-center justify-center gap-3 lg:px-6 text-sm lg:py-3 rounded-full bg-white text-[var(--teal)] lg:text-[var(--darkblue)] lg:border border-[var(--strokeGray)] transition-all duration-300 lg:hover:bg-transparent lg:hover:border-[var(--teal)] lg:hover:text-[var(--teal)]">
+          View Campaign
+        </a>
+        <%}%>
+      </div>
+      <div id="layout-content">
+        <div id="campaignChart" class="flex justify-center"></div>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="col-span-6 row-span-3 max-sm:col-span-2 rounded-3xl bg-white py-4 px-8 text-[14px] text-[#09121F]">
+      <!-- Header -->
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="font-semibold text-xl text-black">Total Interaction</h2>
+        <!-- <button class="text-sm text-gray-500 hover:text-black">Sell All</button> -->
+      </div>
+
+      <!-- Content: 2 columns (left = 4 items, right = 3 items) -->
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Column 1: 4 items -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <img src="/securemagnus_2025/images/links-clicked.svg" alt="Links Clicked" class="w-5 h-5" />
+            <div class=" flex w-full justify-between ">
+              <p>Links Clicked</p>
+              <p class="font-semibold">
+                <%= totalUserPhishingTypeCategoryInteractions?.linkClicked || 0 %>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="/securemagnus_2025/images/qr-scans.svg" alt="QR Scans" class="w-5 h-5" />
+            <div class=" flex w-full justify-between ">
+              <p>QR Scans</p>
+              <p class="font-semibold">
+                <%= totalUserPhishingTypeCategoryInteractions?.numberOfScans || 0 %>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="/securemagnus_2025/images/interact-form.svg" alt="Open Campaign" class="w-5 h-5" />
+            <div class=" flex w-full justify-between ">
+              <p>Open Campaign</p>
+              <p class="font-semibold">
+                <%= totalUserPhishingTypeCategoryInteractions?.interactForm || 0 %>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="/securemagnus_2025/images/message-replied.svg" alt="Message Replied" class="w-5 h-5" />
+            <div class=" flex w-full justify-between ">
+              <p>Message Replied</p>
+              <p class="font-semibold">
+                <%= totalUserPhishingTypeCategoryInteractions?.textReplyCount || 0 %>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Column 2: 3 items -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <img src="/securemagnus_2025/images/form-submit.svg" alt="Form Submit" class="w-5 h-5" />
+            <div class=" flex w-full justify-between ">
+              <p>Form Submit</p>
+              <p class="font-semibold">
+                <%= totalUserPhishingTypeCategoryInteractions?.formSubmit || 0 %>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="/securemagnus_2025/images/reported-admin.svg" alt="Reported to Admin" class="w-5 h-5" />
+            <div class=" flex w-full justify-between ">
+              <p>Reported to Admin</p>
+              <p class="font-semibold">
+                <%= totalUserPhishingTypeCategoryInteractions?.reportedToAdminCount || 0 %>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="/securemagnus_2025/images/attachment-open.svg" alt="Attachment Open" class="w-5 h-5" />
+            <div class=" flex w-full justify-between ">
+              <p>Attachment Open</p>
+              <p class="font-semibold">
+                <%= totalUserPhishingTypeCategoryInteractions?.attachmentOpen || 0 %>
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <img src="/securemagnus_2025/images/interact-form.svg" alt="Open Email" class="w-5 h-5" />
+            <div class=" flex w-full justify-between ">
+              <p>Open Email</p>
+              <p class="font-semibold">
+                <%= totalUserPhishingTypeCategoryInteractions?.openedCount || 0 %>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+  </div>
+
+  <%-include('./phm_dashboard_campaign_donut_charts')%>
+    <!-- last table  -->
+
+    <div class="flex flex-col gap-4 mt-6 rounded-3xl bg-white">
+      <div class="flex items-center gap-3 px-5 pt-5">
+
+        <span class="font-medium text-2xl max-sm:text-xl">PhishMagnus Simulation Campaign
+          Report</span>
+        <button class="hidden lg:block ms-auto">
+          <a href=""
+            class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
+            <img src="/securemagnus_2025/images/img/filter.svg" alt="">
+            Sort By
+            <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
+          </a>
+
+        </button>
+
+        <a href="" class="block lg:hidden">
+          <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
+        </a>
+      </div>
+      <div class="overflow-x-auto ">
+        <table class="min-w-full text-sm text-left whitespace-nowrap">
+          <thead class="text-gray-500 bg-white">
+            <tr>
+              <th class="py-4 px-6 font-medium">Champaign Name</th>
+              <th class="py-4 px-6 font-medium">Sent</th>
+              <th class="py-4 px-6 font-medium">Opened</th>
+              <th class="py-4 px-6 font-medium">Click Percentage</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <!-- Email -->
+            <tr class="group hover:bg-blue-50 transition-colors">
+              <td class="flex items-center gap-3 py-4 px-6">
+                <span class="">
+                  <!-- Email icon -->
+                  <img src="/securemagnus_2025/images/img/c-mail.svg" class="size-7" alt="">
+                </span>
+                Email
+              </td>
+              <% 
+                var emailSent = inviteesEmailSentUnSentStats?.sentCount || 0;
+                var emailOpened = uniqueEmailInteractionsCount?.openEmail || 0;
+                var emailOpenPercent = emailSent > 0 ? ((emailOpened / emailSent) * 100).toFixed(1) : '0.0';
+              %>
+              <td class="px-6"><%=inviteesEmailSentUnSentStats?.sentCount %></td>
+              <td class="px-6"><%=uniqueEmailInteractionsCount?.openEmail%></td>
+              <td class="px-6">
+                <span
+                  class="inline-block px-4 py-1 text-blue-500 border border-blue-200 rounded-full bg-blue-50 font-medium text-xs transition-colors group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-500">
+                  <%= emailOpenPercent %>%
+                </span>
+              </td>
+            </tr>
+            <!-- SMS -->
+            <tr class="group hover:bg-yellow-50 transition-colors">
+              <td class="flex items-center gap-3 py-4 px-6">
+                <span class="">
+                  <!-- SMS icon -->
+                  <img src="/securemagnus_2025/images/img/c-sms.svg" class="size-7" alt="">
+                </span>
+                SMS
+              </td>
+              <td class="px-6"><%=smsSentUnSentCount.sentCount %></td>
+              <td class="px-6"><%= uniqueSMSInteractionsCount?.linkClicked %></td>
+             
+              <td class="px-6">
+                <span
+                  class="inline-block px-4 py-1 text-yellow-500 border border-yellow-200 rounded-full bg-yellow-50 font-medium text-xs transition-colors group-hover:bg-yellow-500 group-hover:text-white group-hover:border-yellow-500">
+                  <% 
+                    var smsSent = smsSentUnSentCount.sentCount || 0;
+                    var smsOpened = uniqueSMSInteractionsCount?.linkClicked || 0;
+                    var smsOpenPercent = smsSent > 0 ? ((smsOpened / smsSent) * 100).toFixed(1) : '0.0';
+                  %>
+                  <%= smsOpenPercent %>%
+                </span>
+              </td>
+            </tr>
+            <!-- USB -->
+            <tr class="group hover:bg-purple-50 transition-colors">
+              <td class="flex items-center gap-3 py-4 px-6">
+                <span class="">
+                  <!-- USB icon -->
+                  <img src="/securemagnus_2025/images/img/c-usb.svg" class="size-7" alt="">
+                  </svg>
+                </span>
+                USB
+              </td>
+              <td class="px-6"><%=usbTotalCreated.createdCount %></td>
+              <td class="px-6"><%=usbTotalInteracted.is_plugged %></td>
+           
+              <td class="px-6">
+                <span
+                  class="inline-block px-4 py-1 text-purple-500 border border-purple-200 rounded-full bg-purple-50 font-medium text-xs transition-colors group-hover:bg-purple-500 group-hover:text-white group-hover:border-purple-500">
+                  <% 
+                    var usbSent = usbTotalCreated.createdCount || 0;
+                    var usbOpened = usbTotalInteracted.is_plugged || 0;
+                    var usbOpenPercent = usbSent > 0 ? ((usbOpened / usbSent) * 100).toFixed(1) : '0.0';
+                  %>
+                  <%= usbOpenPercent %>%
+                </span>
+              </td>
+            </tr>
+            <!-- QR -->
+            <tr class="group hover:bg-blue-50 transition-colors">
+              <td class="flex items-center gap-3 py-4 px-6">
+                <span class="">
+                  <!-- QR icon -->
+                  <img src="/securemagnus_2025/images/img/c-qr.svg" class="size-7" alt="">
+                </span>
+                QR
+              </td>
+              <td class="px-6"><%=qrCreatedAndScannedStats.total_qrs_created%></td>
+              <td class="px-6"><%=uniqueQRInteractionsCount.scan%></td>
+              <td class="px-6">
+                <span
+                  class="inline-block px-4 py-1 text-blue-500 border border-blue-200 rounded-full bg-blue-50 font-medium text-xs transition-colors group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-500">
+                  <% 
+                    var qrSent = qrCreatedAndScannedStats.total_qrs_created || 0;
+                    var qrOpened = uniqueQRInteractionsCount.scan || 0;
+                    var qrOpenPercent = qrSent > 0 ? ((qrOpened / qrSent) * 100).toFixed(1) : '0.0';
+                  %>
+                  <%= qrOpenPercent %>%
+                </span>
+              </td>
+            </tr>
+            <!-- NFC -->
+            <tr class="group hover:bg-purple-50 transition-colors">
+              <td class="flex items-center gap-3 py-4 px-6">
+                <span class="">
+                  <!-- NFC icon -->
+                  <img src="/securemagnus_2025/images/img/c-nfc.svg" class="size-7" alt="">
+                </span>
+                NFC
+              </td>
+              <td class="px-6"><%=nfcCreatedAndScannedStats.total_nfc_created%></td>
+              <td class="px-6"><%=uniqueNFCInteractionsCount.scan%></td>
+              <td class="px-6">
+                <span
+                  class="inline-block px-4 py-1 text-purple-500 border border-purple-200 rounded-full bg-purple-50 font-medium text-xs transition-colors group-hover:bg-purple-500 group-hover:text-white group-hover:border-purple-500">
+                  <% 
+                    var nfcSent = nfcCreatedAndScannedStats.total_nfc_created || 0;
+                    var nfcOpened = uniqueNFCInteractionsCount.scan || 0;
+                    var nfcOpenPercent = nfcSent > 0 ? ((nfcOpened / nfcSent) * 100).toFixed(1) : '0.0';
+                  %>
+                  <%= nfcOpenPercent %>%
+                </span>
+              </td>
+            </tr>
+            <!-- Whatsapp -->
+            <tr class="group hover:bg-green-50 transition-colors">
+              <td class="flex items-center gap-3 py-4 px-6">
+                <span class="">
+                  <!-- Whatsapp icon -->
+                  <img src="/securemagnus_2025/images/img/c-wp.svg" class="size-7" alt="">
+                </span>
+                Whatsapp
+              </td>
+              <td class="px-6"><%=whatsappSentUnSentCount.sentCount%></td>
+              <td class="px-6"><%=uniqueWhatsappInteractionsCount.open%></td>
+              <td class="px-6">
+                <span
+                  class="inline-block px-4 py-1 text-green-500 border border-green-200 rounded-full bg-green-50 font-medium text-xs transition-colors group-hover:bg-green-500 group-hover:text-white group-hover:border-green-500">
+                  <% 
+                    var whatsappSent = whatsappSentUnSentCount?.sentCount || 0;
+                    var whatsappOpened = uniqueWhatsappInteractionsCount?.open || 0;
+                    var whatsappOpenPercent = whatsappSent > 0 ? ((whatsappOpened / whatsappSent) * 100).toFixed(1) : '0.0';
+                  %>
+                  <%= whatsappOpenPercent %>%
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+</div>
+
+
+
+
+<script>
+  // Open modalReporting when any trigger is clicked (works even if id is duplicated)
+  document.querySelectorAll('#openReportingModal').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const modal = document.getElementById('modalReporting');
+      if (!modal) return console.warn('modalReporting not found');
+      modal.classList.remove('hidden');
+      // optional: prevent background scroll
+      document.body.classList.add('overflow-hidden');
+    });
+  });
+
+  // Close modalReporting for each close button inside it
+  document.querySelectorAll('#modalReporting [id="closeModal"]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const modal = document.getElementById('modalReporting');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    });
+  });
+
+  // also close when clicking the backdrop (optional)
+  (function () {
+    const modal = document.getElementById('modalReporting');
+    if (!modal) return;
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+    });
+  })();
+</script>
+
+<script>
+  // below is for chart.js library
+  // Phishing Campaigns Chart Data
+  window.campaignChartData = {
+    emailCount: <%= typeof emailStats !== 'undefined' && emailStats?.total_campaign_initiaged != null ? emailStats.total_campaign_initiaged : 0 %>,
+    smsCount: <%= typeof smsStats !== 'undefined' && smsStats?.total_campaign_initiaged != null ? smsStats.total_campaign_initiaged : 0 %>,
+    usbCount: <%= typeof usbStats !== 'undefined' && usbStats?.total_campaign_initiaged != null ? usbStats.total_campaign_initiaged : 0 %>,
+    nfcCount: <%= typeof nfcStats !== 'undefined' && nfcStats?.total_campaign_initiaged != null ? nfcStats.total_campaign_initiaged : 0 %>,
+    qrCount: <%= typeof qrStats !== 'undefined' && qrStats?.total_campaign_initiaged != null ? qrStats.total_campaign_initiaged : 0 %>,
+    whatsappCount: <%= typeof whatsappStats !== 'undefined' && whatsappStats?.total_campaign_initiaged != null ? whatsappStats.total_campaign_initiaged : 0 %>
+  };
+
+
+  // Debug: Print chart data to console for verification
+  //console.log("campaignChartData:", window.campaignChartData);
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Defensive: Ensure setProgress exists before calling
+    if (typeof setProgress === "function") {
+      const phmTotalPurchaseUserLicense = <%= typeof phmTotalPurchaseUserLicense !== 'undefined' ? phmTotalPurchaseUserLicense : 0 %>;
+      const phmConsumedUserLicense = <%= typeof phmConsumedUserLicense !== 'undefined' ? phmConsumedUserLicense : 0 %>;
+      setProgress("progressCircleRemainingBalance", "remaininglicenseBalance", phmConsumedUserLicense, phmTotalPurchaseUserLicense);
+    } else {
+      console.warn("setProgress function is not defined.");
+    }
+  });
+
+
+ 
+</script>

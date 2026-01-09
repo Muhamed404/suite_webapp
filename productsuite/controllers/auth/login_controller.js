@@ -1,0 +1,106 @@
+const { logger } = require("../../../logger/logger");
+const jwt = require('jsonwebtoken');
+const getApiClient = require('../../../utility/api-client');
+const envConfig = require("../../../config/env.config");
+const RENDER_PAGE_URLS = require('../../../config/render_ejs_urls');
+
+
+exports.renderLoginPage = (req, res) => {
+    logger.info('[Render Login Page]: Product Suite Incoming request' + req.originalUrl)
+
+    if (req.originalUrl === '/phm/login') {
+
+        return res.render(RENDER_PAGE_URLS.PhishMagnus.LOGIN, { layout: false });
+
+    } else if (req.originalUrl === '/awm/login') {
+
+        return res.render(RENDER_PAGE_URLS.AwareMagnud.LOGIN, { layout: false });
+
+    } else {
+        logger.info('login else')
+
+        return res.render(RENDER_PAGE_URLS.ProductSuiteManagement.LOGIN, { layout: false });
+
+    }
+};
+
+
+
+
+exports.postLogin = async (req, res) => {
+    logger.info(`[PSuite Login Controller]: Original req` + req.originalUrl)
+    logger.info(`[PSuite Login Controller]: POST: Incoming request with values: ${JSON.stringify(req.body, null, 2)}`);
+
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        logger.warn("[PSuite Login Controller]: POST: Missing email or password");
+        return res.redirect(`/login?message=Missing credentials&alertType=error`);
+    }
+
+    const apiClient = getApiClient(req);
+    const loginUrl = `/login`;
+
+    logger.info(`[PSuite Login Controller]: POST: Authenticating via ${loginUrl}`);
+
+    try {
+        const { data } = await apiClient.post(loginUrl, { email, password });
+        logger.info(`[PSuite Login Controller]: POST: Received login response: ${JSON.stringify(data, null, 2)}`);
+        // const userData = data?.object?.user;
+        const userToken = data?.object?.userToken || null;
+        // const roleId = data?.object?.roleId || null;
+        // const permissions = data?.object?.permissions || [];
+        // const mfaRequired = data?.object?.mfaRequired || false;
+        const mfaRequired = false;
+
+        // const hasUserAWMSubscription = data?.object?.awmLicense || false;
+        // const hasUserPHMSubscription = data?.object?.phmLicense || false;
+
+
+        if (!userToken) {
+            logger.error(`[PSuite Login Controller]: POST: Incomplete login response: ${JSON.stringify(data)}`);
+            return res.redirect(`/login?message=Unexpected error&alertType=error`);
+        }
+
+        // 🚨 MFA required → Temporarily store pending session
+        if (mfaRequired === true) {
+            req.session.mfaPendingUser = {
+                id: userData.id,
+                email: userData.email,
+                user: userData,
+                jwtToken: userToken,
+                roleId,
+                permissions,
+                hasUserPHMSubscription,
+                hasUserAWMSubscription
+            };
+
+            logger.info(`[PSuite Login Controller]: POST: MFA required for ${email}, redirecting to MFA screen`);
+            return res.redirect("/psm/mfa");
+        }
+
+        // ✅ Set full session for authenticated user
+        // req.user = userData;
+        req.session.jwtToken = userToken;
+        
+        // req.user.role = { id: roleId };
+        // req.session.permissions = permissions;
+        // req.session.locals_awm_subscription = hasUserAWMSubscription;
+        // req.session.locals_phm_subscription = hasUserPHMSubscription;
+
+        logger.info(`[PSuite Login Controller]: POST: Session created for ${email}`);
+        return res.redirect("/home");
+
+    } catch (err) {
+        const message = err?.response?.data?.message || "Invalid Credentials";
+        logger.error(`[PSuite Login Controller]: POST: Authentication failed for ${email}: ${message}`);
+        logger.error(err);
+        logger.error(err.stack);
+        req.flash("message", message);
+        req.flash("alertType", "error");
+        return res.redirect(`/login`);
+    }
+};
+
+
+

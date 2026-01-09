@@ -1,0 +1,66 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-2xl shadow-lg max-w-2xl mx-auto">
+    <div class="border-b px-8 py-4 rounded-t-2xl bg-blue-600">
+      <h3 class="text-xl font-semibold text-white"><%= __("CS-Add") %></h3>
+    </div>
+    <div class="px-8 py-6">
+      <form
+        id="cybersecurityCategoriesForm"
+        method="POST"
+        action="/cybersecurity/categories/"
+        class="space-y-6"
+        novalidate
+      >
+        <div>
+          <label for="name" class="block text-sm font-medium mb-1">
+            <%= __("CS-Name") %> *
+          </label>
+          <input
+            class="form-control w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            id="name"
+            name="name"
+            type="text"
+            value=""
+            required
+          />
+        </div>
+        <div>
+          <label for="code" class="block text-sm font-medium mb-1">
+            <%= __("CS-Code") %> *
+          </label>
+          <input
+            class="form-control w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            id="code"
+            name="code"
+            type="text"
+            value=""
+            required
+          />
+        </div>
+        <div>
+          <label for="description" class="block text-sm font-medium mb-1">
+            <%= __("CS-Description") %> *
+          </label>
+          <input
+            class="form-control w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            id="description"
+            name="description"
+            type="text"
+            value=""
+            required
+          />
+        </div>
+        <div class="flex justify-start gap-3 pt-2">
+          <button class="px-6 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition" type="submit">
+            <%= __("btn-CS-Save") %>
+          </button>
+          <button class="px-6 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300 transition" type="button">
+            <%= __("btn-CS-Cancel") %>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+

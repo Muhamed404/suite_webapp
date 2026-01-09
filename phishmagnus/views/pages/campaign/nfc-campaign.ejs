@@ -1,0 +1,133 @@
+<%- include('../../../../phishmagnus/views/layout/layout-starting.ejs') %>
+
+
+  <!-- Page Content Start -->
+  <!-- ================== -->
+
+  <div class="wraper container-fluid">
+    <div class="page-title">
+      <h3 class="title">
+        <%= __("Campaign.NFC.Module") %>
+      </h3>
+    </div>
+
+    <!-- Tabs-style-1 -->
+    <div class="row">
+      <div class="row">
+        <div class="col-md-10">
+          <div class="grid-container"></div>
+        </div>
+
+        <div class="col-md-2">
+          <div class="grid-container">
+            <a href="/phm/campaign/nfc-create"><span class="label label-info">
+                Create
+                <i class="fa fa-plus"></i>
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-12">
+        <ul class="nav nav-tabs">
+          <li class="active">
+            <a href="#profile" data-toggle="tab" aria-expanded="true">
+              <span class="visible-xs"><i class="fa fa-user"></i></span>
+              <span class="hidden-xs">
+                <%= __("Campaign.NFC.ActiveCampaign") %>
+              </span>
+            </a>
+          </li>
+          <li class="">
+            <a href="#messages" data-toggle="tab" aria-expanded="false">
+              <span class="visible-xs"><i class="fa fa-envelope-o"></i></span>
+              <span class="hidden-xs">
+                <%= __("Campaign.NFC.HistoryCampaign") %>
+              </span>
+            </a>
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <div class="tab-pane active" id="profile">
+            <%- include('./nfc-report-campaign-tab-active.ejs') %>
+          </div>
+          <div class="tab-pane" id="messages">
+            <%- include('./nfc-report-campaign-tab-completed.ejs') %>
+          </div>
+        </div>
+      </div>
+    </div> <!-- End row -->
+
+  </div> <!-- END Wraper -->
+
+<%- include('../../../../phishmagnus/views/layout/footer.js') %> <%-
+include('../../../../phishmagnus/views/layout/layout-ending.ejs') %>
+      <script>
+        $(document).ready(function () {
+          // Initialize DataTable for active campaigns (if needed)
+          let dataTableActive = $('#datatable-active').DataTable();
+
+          // DataTable for completed campaigns
+          let dataTableCompleted = $('#datatable-completed').DataTable({
+            ajax: {
+              url: <%=nfcCompletedTabAPI%>, // Backend route to fetch completed campaigns
+              type: 'GET',
+              dataSrc: '',
+              success: function (data) {
+                //alert('vvvvvvvv')
+                // This will log the response data
+                console.log('Response from the backend:', data);
+
+                // If needed, you can also check the structure of the data
+                console.log('First item in the response:', data[0]); // Example to print the first record
+
+                // After logging the data, DataTable will be populated as usual
+                dataTableCompleted.clear().rows.add(data).draw();
+              },
+              error: function (xhr, status, error) {
+                console.error('Error fetching completed campaigns:', xhr.responseText || error);
+                alert('Failed to load completed campaigns. Check console logs.');
+              }
+            },
+            columns: [
+
+              { data: 'name', title: 'Name' },
+              { data: 'total_nfc_tags_count', title: 'Total NFC Tags' },
+              { data: 'scheduled_date', title: 'Scheduled Date' },
+              {
+                data: 'View', // Use 'null' to indicate no data, but we will use a custom value here
+                title: 'View',  // Title for the column
+                render: function (data, type, row) {
+                  //return 'Hardcoded Value';  // Hardcoded value for this column
+                  // Dynamically generate the link with values from the row data
+                  return `
+                      <a href="<%=nfcViewAPI%>${row.id}" 
+                        class="btn btn-icon"
+                        style="background-color: rgba(220, 78, 65, 0.1); color: #dc4e41;" 
+                        data-toggle="tooltip" 
+                        data-placement="left" 
+                        title="View">
+                        <i class="fa fa-line-chart"></i>
+                      </a>`;
+                }
+              },
+
+            ],
+          });
+
+
+          // Reload DataTable when the "History Campaign" tab is shown
+          let isLatestTableLoaded = false;
+
+          $('a[href="#messages"]').on('shown.bs.tab', function () {
+            dataTableCompleted.ajax.reload();
+            // alert('ssss2')
+            // if (!isLatestTableLoaded) {
+            //   dataTableCompleted.ajax.reload(null, false); // Reload the existing DataTable
+            //   isLatestTableLoaded = true;
+            // }
+          });
+        });
+      </script>

@@ -1,0 +1,130 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+      <span class="text-gray-400">›</span>
+      <a href="/phm/campaign/reports" class="hover:text-gray-700 transition"><%= __("breadcrumbs.reports") %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900"><%= __("breadcrumbs.nfcCampaignReport") %></span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900"><%= __("breadcrumbs.nfcCampaignReport") %></h3>
+  </div>
+</div>
+
+
+<div class="flex flex-col p-6 pt-0">
+    <div class="">
+        <div class="flex flex-row justify-between w-full gap-6 mb-6">
+            <!-- Tabs with counts -->
+            <div id="statusTabs"
+                class="flex items-center justify-start gap-4 p-1 text-sm font-medium bg-white rounded-full w-fit">
+            </div>
+            <!-- Search + Filter -->
+            <div class="flex items-center justify-between">
+                <div class="relative">
+                    <input id="searchInput" type="text" placeholder="Search here..."
+                        class="pl-14 pr-10 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+                    <img src="/securemagnus_2025/images/img/search.svg"
+                        class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-7 top-1/2" alt="">
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Table -->
+
+        <div class="overflow-x-auto bg-white hide-scrollbar rounded-2xl">
+            <table class="min-w-full text-sm text-left">
+                <thead class="bg-[#FAFBFC]">
+                    <tr>
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="name">
+                            <span class="inline-flex items-center gap-2">
+
+                                <%= __("Campaign.Report.CampName") %>
+                            </span>
+                        </th>
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="purchase_Date">
+                            <span class="inline-flex items-center gap-2">
+                                <img src="/securemagnus_2025/images/subscription_history/subscription_history_purchase_date.svg"
+                                    alt="">
+                                <%= __("Campaign.Report.TemplateName") %>
+                            </span>
+                        </th>
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
+                            <span class="inline-flex items-center gap-2">
+                                <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg"
+                                    alt="">
+                                Start Date
+                            </span>
+                        </th>
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
+                            <span class="inline-flex items-center gap-2">
+                                <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg"
+                                    alt="">
+                                End Date
+                            </span>
+                        </th>
+
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
+                            <span class="inline-flex items-center gap-2">
+
+                                Status
+                            </span>
+                        </th>
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
+                            <span class="inline-flex items-center gap-2">
+
+                                Total NFC Devices
+                            </span>
+                        </th>
+                                                 
+                                                 
+
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="action">
+                            <span class="inline-flex items-center gap-2">
+
+                                Action
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+
+                </tbody>
+            </table>
+        </div>
+
+
+
+
+        <!-- Pagination -->
+        <div class="flex items-center justify-between mt-4">
+            <select id="rowsPerPage" class="px-2 py-1 border rounded">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+            </select>
+            <div id="pagination" class="space-x-2"></div>
+        </div>
+    </div>
+
+
+
+
+</div>
+
+
+<!-- Pass data to JavaScript -->
+<script>
+    // Pass server data to JavaScript
+    window.campaignsData = {
+        campaigns: <%- JSON.stringify(campaigns) %>,
+        pagination: <%- JSON.stringify(pagination) %>,
+        filters: <%- JSON.stringify(filters) %>
+    };
+</script>
+
+
+
+<script src="/securemagnus_2025/js/nfc_camp_report_table.js"></script>
