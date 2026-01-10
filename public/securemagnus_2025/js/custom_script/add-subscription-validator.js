@@ -40,7 +40,10 @@ $(document).ready(function () {
     },
     errorPlacement: function(error, element) {
       error.addClass('text-red-500 text-xs mt-1');
-      if (element.parent('.input-group').length) {
+      // Special handling for service checkboxes
+      if (element.attr('name') === 'services[]') {
+        $('#services-error-container').html(error);
+      } else if (element.parent('.input-group').length) {
         error.insertAfter(element.parent());
       } else {
         error.insertAfter(element);
@@ -106,6 +109,14 @@ $(document).ready(function () {
         number: true,
         min: 0,
         max: 100
+      },
+      ttlPayableAmt: {
+        required: true,
+        number: true,
+        min: 0
+      },
+      allocatedOrgAdminUser: {
+        required: true
       }
     },
     messages: {
@@ -168,6 +179,14 @@ $(document).ready(function () {
         number: 'Enter a valid number.',
         min: 'Cannot be negative.',
         max: 'Cannot exceed 100%.'
+      },
+      ttlPayableAmt: {
+        required: 'Total payable amount is required.',
+        number: 'Enter a valid number.',
+        min: 'Cannot be negative.'
+      },
+      allocatedOrgAdminUser: {
+        required: 'Please select an organization admin user.'
       }
     }
   });
