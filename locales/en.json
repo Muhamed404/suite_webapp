@@ -384,6 +384,7 @@
 		"stepper6": "Create Phishing Webpage (Optional)",
 		"stepper7": "Landing Page (Optional)",
 		"stepper8": "SMS Template Content",
+		"stepper9":"WhatsApp Template Content",
 		"placeHolder_firstName": "First Name",
 		"placeHolder_lastName": "Last Name",
 		"placeHolder_email": "Email Address",

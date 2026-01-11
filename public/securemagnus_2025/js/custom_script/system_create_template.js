@@ -250,7 +250,6 @@ let currentStep = 0;
   }
 
   function saveDataForStep(idx) {
-    alert('save data alert');
     // alert('Saving data for step ' + (idx + 1));
     const stepEl = steps[idx];
     const inputs = Array.from(stepEl.querySelectorAll('input'));
@@ -267,17 +266,27 @@ let currentStep = 0;
         formData[key][name] = inp.value;
       }
     });
+
+    // Debug: Display all collected data for this step AND entire form
+    // alert('Save Data for Step ' + (idx + 1) + ':\n\n' +
+    //       'Step Key: ' + key + '\n\n' +
+    //       'Inputs Found: ' + inputs.length + '\n\n' +
+    //       'Current Step Data:\n' + JSON.stringify(formData[key], null, 2) + '\n\n' +
+    //       '========================================\n' +
+    //       'ENTIRE FORM DATA (All Steps):\n' +
+    //       '========================================\n' +
+    //       JSON.stringify(formData, null, 2));
   }
 
   function computeMatchingRule(phishType, selectedOptions) {
-    alert('compute matching rule alert');
+    // alert('compute matching rule alert');
     // alert('Computing matching rule for phishType: ' + phishType + '\nselectedOptions: ' + JSON.stringify(selectedOptions));
     // Debug: Show types and values
     // alert('computeMatchingRule called!\nphishType: ' + phishType + '\nselectedOptions: ' + JSON.stringify(selectedOptions) + '\nType: ' + typeof selectedOptions);
 
     // Always treat selectedOptions as array
     let opts = selectedOptions;
-    alert('Initial opts: ' + JSON.stringify(opts) + '\nType: ' + typeof opts);
+    // alert('Initial opts: ' + JSON.stringify(opts) + '\nType: ' + typeof opts);
     if (!Array.isArray(opts)) {
       opts = opts ? [opts] : [];
       // alert('selectedOptions was not array, converted to: ' + JSON.stringify(opts));
@@ -309,7 +318,7 @@ let currentStep = 0;
   }
 
   function buildActiveFlow(matchedRule) {
-    alert('build active flow alert');
+    // alert('build active flow alert');
     // alert('Building active flow based on matched rule: ' + JSON.stringify(matchedRule));
     if (!matchedRule) return Array.from({ length: steps.length }, (_, i) => i);
     const goToZeroBased = matchedRule.goTo.map(n => n - 1);
@@ -319,7 +328,7 @@ let currentStep = 0;
   }
 
   function renderOptions(type) {
-    alert('render options alert');
+    // alert('render options alert');
     // alert('Rendering options for type: ' + type);
     checkboxContainer.innerHTML = '';
 
@@ -343,7 +352,7 @@ let currentStep = 0;
 
 
   function handleNext() {
-    alert('handle next alert');
+    // alert('handle next alert');
     // alert('Handling Next for current step ' + (currentStep));
     // renderProgressBar();
     // alert('Handling Next for next step ' + (currentStep + 1));
@@ -352,7 +361,7 @@ let currentStep = 0;
     if (currentStep === 0) {
       // alert('currentStep Processing selections for step 0...');
       if (!sel) {
-        alert('Please choose a phishType to continue.');
+        alert('Please choose a phish Type to continue.');
         return;
       }
       selectedPhishType = sel;
@@ -431,7 +440,7 @@ let currentStep = 0;
   }
 
   function handlePrev() {
-    alert('Handling Prev for step ' + (currentStep + 1));
+    // alert('Handling Prev for step ' + (currentStep + 1));
     if (history.length <= 1) return;
     history.pop();
     const prev = history[history.length - 1];

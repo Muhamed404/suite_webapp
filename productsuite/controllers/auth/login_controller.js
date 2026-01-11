@@ -8,18 +8,34 @@ const RENDER_PAGE_URLS = require('../../../config/render_ejs_urls');
 exports.renderLoginPage = (req, res) => {
     logger.info('[Render Login Page]: Product Suite Incoming request' + req.originalUrl)
 
+    // Flash messages are already set in res.locals by server.js middleware
+    const message = res.locals.message && res.locals.message.length > 0 ? res.locals.message[0] : null;
+    const alertType = res.locals.alertType && res.locals.alertType.length > 0 ? res.locals.alertType[0] : 'error';
+
     if (req.originalUrl === '/phm/login') {
 
-        return res.render(RENDER_PAGE_URLS.PhishMagnus.LOGIN, { layout: false });
+        return res.render(RENDER_PAGE_URLS.PhishMagnus.LOGIN, {
+            layout: false,
+            message: message,
+            alertType: alertType
+        });
 
     } else if (req.originalUrl === '/awm/login') {
 
-        return res.render(RENDER_PAGE_URLS.AwareMagnud.LOGIN, { layout: false });
+        return res.render(RENDER_PAGE_URLS.AwareMagnud.LOGIN, {
+            layout: false,
+            message: message,
+            alertType: alertType
+        });
 
     } else {
         logger.info('login else')
 
-        return res.render(RENDER_PAGE_URLS.ProductSuiteManagement.LOGIN, { layout: false });
+        return res.render(RENDER_PAGE_URLS.ProductSuiteManagement.LOGIN, {
+            layout: false,
+            message: message,
+            alertType: alertType
+        });
 
     }
 };
@@ -82,11 +98,6 @@ exports.postLogin = async (req, res) => {
         // ✅ Set full session for authenticated user
         // req.user = userData;
         req.session.jwtToken = userToken;
-        
-        // req.user.role = { id: roleId };
-        // req.session.permissions = permissions;
-        // req.session.locals_awm_subscription = hasUserAWMSubscription;
-        // req.session.locals_phm_subscription = hasUserPHMSubscription;
 
         logger.info(`[PSuite Login Controller]: POST: Session created for ${email}`);
         return res.redirect("/home");
