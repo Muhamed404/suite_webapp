@@ -524,7 +524,7 @@ Redis is a **mandatory dependency** - the application will refuse to start witho
   - **Failure**: Application exits with code 1
 
 **Installation**:
-- **Windows**: Install Redis via WSL (Windows Subsystem for Linux) - see [WSL and Redis Installation](../Wsl_Redis_Installation.md)
+- **Windows**: Install Redis via WSL (Windows Subsystem for Linux) - see [WSL and Redis Installation](Wsl_Redis_Installation.md)
 - **Linux**: `sudo apt install redis-server -y`
 - **Verification**: Run `redis-cli ping` (should return `PONG`)
 

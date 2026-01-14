@@ -48,7 +48,7 @@ NPM (Node Package Manager) is required to install project dependencies and run t
 Install **Redis** for session management:
 
 **For Windows users:**
-- Follow the [WSL and Redis Installation](../Wsl_Redis_Installation.md) guide
+- Follow the [WSL and Redis Installation](Wsl_Redis_Installation.md) guide
 
 **For Linux users:**
 ```bash
