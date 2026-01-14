@@ -1,5 +1,13 @@
 # Suite WebApp - Frontend Application
 
+
+#### © Metaronical Software Solutions.
+
+#### This code is confidential and proprietary.
+
+#### Unauthorized copying or distribution is prohibited.
+
+
 The Frontend application server (suite webapp) acts as a middleware between a user and the backend system (service suite). It provides a user interface and renders pages according to the user role.
 
 It communicates with the Backend Server (Service Suite), Service TVBS using their exposed APIs.
