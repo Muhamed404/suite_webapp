@@ -41,7 +41,12 @@ module.exports = {
             CREATE: '/app_service/create',
             LIST: '/app_service/list',
             EDIT_SERVICE: (serviceId) => `/app-service/update/${serviceId}`,
-        }
+        },
+        Package_Management: {
+            CREATE_PACKAGE: '/package/create',
+            LIST_PACKAGES: '/package/list',
+            EDIT_PACKAGE: (packageId) => `/package/edit/${packageId}`,
+        },
 
     },
     PHISHMAGNUS: {

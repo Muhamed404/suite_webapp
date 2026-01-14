@@ -21,4 +21,4 @@ LOGS_FILENAME="frontend"
 
 
 
-BACKEND_SUITE_PRIVATE_KEY_PATH=C:\secure_magnus_workspace\keys\private.pem
+BACKEND_SUITE_PUBLIC_KEY_PATH=C:\secure_magnus_workspace\keys\public.pem

@@ -397,7 +397,7 @@
               showCustomToast('success', 'Status updated successfully!');
               setTimeout(() => window.location.reload(), 1200);
             } else {
-              showCustomToast('error', 'Failed to update status: ' + (data.message || 'Unknown error'));
+              showCustomToast('error', data.message || 'Unknown error');
             }
           })
           .catch(err => {

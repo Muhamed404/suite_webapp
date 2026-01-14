@@ -11,7 +11,8 @@ const difficulty_level_download_file = '2';
 const difficulty_level_url_click = '3';
 const difficulty_level_sms_short_message = '1';
 // const difficulty_level_sms_attach_url = '2';
-
+const radios = document.querySelectorAll('input[name="phish_option"]');
+const customInput = document.getElementById('custom-url-input');
 const editors = ['phishing_content', 'phishing_page_content', 'landing_page_content', 'sms_phishing_content'];
 // ✅ Conditions for step 2 options
 const conditions = {
@@ -265,15 +266,27 @@ let currentStep = 0;
         formData[key][name] = inp.value;
       }
     });
+
+    // Debug: Display all collected data for this step AND entire form
+    // alert('Save Data for Step ' + (idx + 1) + ':\n\n' +
+    //       'Step Key: ' + key + '\n\n' +
+    //       'Inputs Found: ' + inputs.length + '\n\n' +
+    //       'Current Step Data:\n' + JSON.stringify(formData[key], null, 2) + '\n\n' +
+    //       '========================================\n' +
+    //       'ENTIRE FORM DATA (All Steps):\n' +
+    //       '========================================\n' +
+    //       JSON.stringify(formData, null, 2));
   }
 
   function computeMatchingRule(phishType, selectedOptions) {
+    // alert('compute matching rule alert');
     // alert('Computing matching rule for phishType: ' + phishType + '\nselectedOptions: ' + JSON.stringify(selectedOptions));
     // Debug: Show types and values
     // alert('computeMatchingRule called!\nphishType: ' + phishType + '\nselectedOptions: ' + JSON.stringify(selectedOptions) + '\nType: ' + typeof selectedOptions);
 
     // Always treat selectedOptions as array
     let opts = selectedOptions;
+    // alert('Initial opts: ' + JSON.stringify(opts) + '\nType: ' + typeof opts);
     if (!Array.isArray(opts)) {
       opts = opts ? [opts] : [];
       // alert('selectedOptions was not array, converted to: ' + JSON.stringify(opts));
@@ -305,6 +318,7 @@ let currentStep = 0;
   }
 
   function buildActiveFlow(matchedRule) {
+    // alert('build active flow alert');
     // alert('Building active flow based on matched rule: ' + JSON.stringify(matchedRule));
     if (!matchedRule) return Array.from({ length: steps.length }, (_, i) => i);
     const goToZeroBased = matchedRule.goTo.map(n => n - 1);
@@ -314,6 +328,7 @@ let currentStep = 0;
   }
 
   function renderOptions(type) {
+    // alert('render options alert');
     // alert('Rendering options for type: ' + type);
     checkboxContainer.innerHTML = '';
 
@@ -337,6 +352,7 @@ let currentStep = 0;
 
 
   function handleNext() {
+    // alert('handle next alert');
     // alert('Handling Next for current step ' + (currentStep));
     // renderProgressBar();
     // alert('Handling Next for next step ' + (currentStep + 1));
@@ -345,7 +361,7 @@ let currentStep = 0;
     if (currentStep === 0) {
       // alert('currentStep Processing selections for step 0...');
       if (!sel) {
-        alert('Please choose a phishType to continue.');
+        alert('Please choose a phish Type to continue.');
         return;
       }
       selectedPhishType = sel;
@@ -470,8 +486,7 @@ function insertPlaceholder(placeholder) {
   }
 }
 
-const radios = document.querySelectorAll('input[name="phish_option"]');
-const customInput = document.getElementById('custom-url-input');
+
 
 radios.forEach(radio => {
   radio.addEventListener('change', () => {

@@ -8,9 +8,6 @@ const { log } = require("winston");
 async function saveUserAllocationLicense(req, res, next) {
     try {
         logger.info("Controller - Save User Allocation License: Incoming request.");
-        // logger.info("Controller - Save User Allocation License: Request params: " + JSON.stringify(req.params, null, 2));
-        // logger.info("Controller - Save User Allocation License: Request query: " + JSON.stringify(req.query, null, 2));
-        // logger.info("Controller - Save User Allocation License: Request body: " + JSON.stringify(req.body, null, 2));
         const { selectedUsers } = req.body;
         const productName = req.body?.productId || req.query?.actionProduct || null;
         console.log("Product Name in Save User Allocation License Controller:" + productName);

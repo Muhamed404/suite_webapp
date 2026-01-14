@@ -384,6 +384,7 @@
 		"stepper6": "Create Phishing Webpage (Optional)",
 		"stepper7": "Landing Page (Optional)",
 		"stepper8": "SMS Template Content",
+		"stepper9": "WhatsApp Template Content",
 		"placeHolder_firstName": "First Name",
 		"placeHolder_lastName": "Last Name",
 		"placeHolder_email": "Email Address",
@@ -447,7 +448,7 @@
 			"labelDetails_level3_radioOption1_Content": "Create Phishing Web Page",
 			"labelDetails_level3_radioOption2_WebContentTemplate": "WebPage Template Content",
 			"labelLandingPage_Title": "Landing Page Settings",
-			"labelLandingPage_radioOption1": "I like to redirect the user to a link",
+			"labelLandingPage_radioOption1": "Import Custom Landing Page",
 			"labelLandingPage_radioOption2": "I like to redirect the user to a custom landing page",
 			"labelLanguage": "Language",
 			"labelImportHtmlUrl": "Import Landing Page From An External URL"
@@ -885,6 +886,10 @@
 		"QR": {
 			"TagsQuantity": "Campaign.QR.TagsQuantity",
 			"Tag": "Campaign.QR.Tag"
+		},
+		"Report": {
+			"CampName": "Campaign.Report.CampName",
+			"TemplateName": "Campaign.Report.TemplateName"
 		}
 	},
 	" Campaign": {

@@ -33,6 +33,7 @@ class EmailCampaignStepper {
     }
 
     // Initialize all sub-modules
+    this.initValidation();
     this.initTemplateSelector();
     this.initTagSelectors();
     this.initModalHandlers();
@@ -40,6 +41,62 @@ class EmailCampaignStepper {
     this.updateUI();
 
     // alert('EmailCampaignStepper initialized successfully');
+  }
+
+  // ===== JQUERY VALIDATION SETUP =====
+  initValidation() {
+    if (!this.form || typeof $.fn.validate === 'undefined') {
+      console.warn('jQuery Validation not available');
+      return;
+    }
+
+    $(this.form).validate({
+      ignore: '.hidden :hidden:not(.groupSelect)',
+      rules: {
+        name: {
+          required: true,
+          minlength: 2
+        },
+        templateId: {
+          required: true
+        },
+        startTime: {
+          required: true
+        },
+        endTime: {
+          required: true
+        }
+      },
+      messages: {
+        name: "Campaign name is required (minimum 2 characters).",
+        templateId: "Please select a template.",
+        startTime: "Start date and time are required.",
+        endTime: "End date and time are required."
+      },
+      errorClass: "text-red-500 text-sm mt-1 block",
+      errorElement: "span",
+      highlight: function (element) {
+        $(element).addClass("border-red-500");
+      },
+      unhighlight: function (element) {
+        $(element).removeClass("border-red-500");
+      },
+      errorPlacement: function (error, element) {
+        error.insertAfter(element);
+      }
+    });
+
+    // Validate on blur for better UX
+    $('#name').on('blur', function () {
+      $(this).valid();
+    });
+
+    $('#templateSelect').on('change', function () {
+      const hiddenTemplateId = $('input[name="templateId"]');
+      if (hiddenTemplateId.length) {
+        hiddenTemplateId.valid();
+      }
+    });
   }
 
   // ===== MODAL HANDLERS =====
@@ -441,17 +498,19 @@ class EmailCampaignStepper {
     // Step 1: Validate campaign name
     if (this.currentStep === 0) {
       const nameInput = document.getElementById('name');
-      const nameError = document.getElementById('nameError');
-      
+      const validator = $(this.form).validate();
+
       if (nameInput && !nameInput.value.trim()) {
-        if (nameError) {
-          nameError.classList.remove('hidden');
-        }
+        validator.showErrors({
+          "name": "Campaign name is required (minimum 2 characters)."
+        });
+        $(nameInput).addClass('border-red-500');
         nameInput.focus();
         nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return false;
-      } else if (nameError) {
-        nameError.classList.add('hidden');
+      } else {
+        validator.resetForm();
+        $(nameInput).removeClass('border-red-500');
       }
     }
 
@@ -460,18 +519,18 @@ class EmailCampaignStepper {
       // Check for selected departments and groups from hidden inputs
       const departmentIds = document.querySelectorAll('input[name="departmentIds[]"]');
       const groupIds = document.querySelectorAll('input[name="groupIds[]"]');
-      
+
       console.log('Validation - Department IDs found:', departmentIds.length);
       console.log('Validation - Group IDs found:', groupIds.length);
-      
+
       const hasDepartments = departmentIds.length > 0;
       const hasGroups = groupIds.length > 0;
-      
+
       // Get all tag-selector containers and find department/group selects
       const tagSelectors = Array.from(document.querySelectorAll('.tag-selector'));
       let departmentSelect = null;
       let groupSelect = null;
-      
+
       tagSelectors.forEach(selector => {
         const label = selector.querySelector('label');
         if (label) {
@@ -483,24 +542,24 @@ class EmailCampaignStepper {
           }
         }
       });
-      
+
       // Check if there are any options available (excluding placeholder)
       const hasDepartmentOptions = departmentSelect && departmentSelect.options.length > 1;
       const hasGroupOptions = groupSelect && groupSelect.options.length > 1;
-      
+
       console.log('Department options available:', hasDepartmentOptions);
       console.log('Group options available:', hasGroupOptions);
-      
+
       if (!hasDepartmentOptions && !hasGroupOptions) {
-        alert('No departments or groups available. Please add users to departments or groups before creating a campaign.');
+        this.showValidationError('No departments or groups available. Please add users to departments or groups before creating a campaign.');
         return false;
       }
-      
+
       if (!hasDepartments && !hasGroups) {
-        alert('Please select at least one department or group to target.');
+        this.showValidationError('Please select at least one department or group to target.');
         return false;
       }
-      
+
       console.log('Step 2 validation passed!');
     }
 
@@ -511,6 +570,11 @@ class EmailCampaignStepper {
       for (const field of requiredFields) {
         if (!field.value || (field.type === 'checkbox' && !field.checked) || (field.type === 'radio' && !document.querySelector(`input[name="${field.name}"]:checked`))) {
           console.warn('Required field not filled:', field.name || field.id);
+          const validator = $(this.form).validate();
+          validator.showErrors({
+            [field.name]: `${field.name || field.id} is required.`
+          });
+          $(field).addClass('border-red-500');
           field.focus();
           field.scrollIntoView({ behavior: 'smooth', block: 'center' });
           return false;
@@ -520,6 +584,39 @@ class EmailCampaignStepper {
 
     console.log('All validations passed for step:', this.currentStep);
     return true;
+  }
+
+  showValidationError(message) {
+    // Create or get error message container
+    let errorContainer = document.getElementById('step-validation-error');
+
+    if (!errorContainer) {
+      errorContainer = document.createElement('div');
+      errorContainer.id = 'step-validation-error';
+      errorContainer.className = 'bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4';
+      errorContainer.setAttribute('role', 'alert');
+
+      // Insert at the beginning of current step
+      const currentStepElement = this.steps[this.currentStep];
+      if (currentStepElement) {
+        currentStepElement.insertBefore(errorContainer, currentStepElement.firstChild);
+      }
+    }
+
+    errorContainer.innerHTML = `
+      <div class="flex items-start">
+        <span class="flex-shrink-0 mr-2">⚠️</span>
+        <div class="flex-1">
+          <strong class="font-medium">Validation Error:</strong>
+          <span class="block mt-1">${message}</span>
+        </div>
+        <button type="button" class="ml-4 text-red-700 hover:text-red-900" onclick="this.parentElement.parentElement.remove()">
+          ✕
+        </button>
+      </div>
+    `;
+
+    errorContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   submitForm() {

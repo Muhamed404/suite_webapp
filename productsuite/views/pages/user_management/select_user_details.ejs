@@ -11,7 +11,8 @@
                 <label class="block text-gray-700 font-medium mb-3">Select Role </label>
 
                 <select name="role" id="role" required
-                    class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50">
+                    class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50"
+                    tabindex="1">
                     <option value="" disabled selected>Select User Role</option>
                     <% if (typeof roles !=='undefined' && roles) { %>
                         <% roles.forEach(role=> { %>
@@ -25,7 +26,8 @@
             <div>
                 <label class="block text-gray-700 font-medium mb-3">Last Name</label>
                 <input placeholder="Enter last name" type="text" value="" id="last_name" name="last_name" required
-                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                    tabindex="3" />
             </div>
 
             <div>
@@ -33,7 +35,8 @@
                 <input placeholder="Enter email" type="email" value="" id="email" name="email" required
                     pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
                     title="Enter a valid email address with full domain (e.g., user@example.com)"
-                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                    tabindex="5" />
             </div>
         </div>
 
@@ -42,13 +45,15 @@
             <div>
                 <label class="block text-gray-700 font-medium mb-3">First Name</label>
                 <input placeholder="Enter first name" type="text" value="" id="first_name" name="first_name" required
-                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                    tabindex="2" />
             </div>
             <div>
                 <label class="block text-gray-700 font-medium mb-3">Contact number</label>
-                <input placeholder="Enter contact number"  type="tel" value="" id="contact" name="contact" minlength="10"
+                <input placeholder="Enter contact number" type="tel" value="" id="contact" name="contact" minlength="10"
                   maxlength="15" pattern="\d{10,15}" required oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                    tabindex="4" />
             </div>
 
             <div>
@@ -56,7 +61,8 @@
                 <input placeholder="Enter password" type="password" value="" id="password" name="password" required
                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
                     title="Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
-                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                    tabindex="6" />
             </div>
         </div>
     </div>

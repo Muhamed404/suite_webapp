@@ -1,6 +1,6 @@
 const {create} = require('./create-user')
 const {submitCreationForm} = require('./create-user')
-const {renderUserList} = require('./render-user-list')
+// const {renderUserList} = require('./render-user-list')
 const {renderBulkUserModule} = require('./render-bulk-user-module')
 const {uploadBulkUsers} = require('./render-bulk-user-module')
 const { retrieveEnrolledPHMUsers } = require('./retrieve-enrolled-phm-users')
@@ -12,7 +12,7 @@ module.exports = {
   retrieveEnrolledPHMUsers,
   create,
   submitCreationForm,
-  renderUserList,
+  // renderUserList,
   renderBulkUserModule,
   uploadBulkUsers
 };

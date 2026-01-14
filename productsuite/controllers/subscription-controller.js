@@ -28,7 +28,7 @@ async function createSubscription(req, res, next) {
         const { object: applications } = applicationResp.data;
         const { object: organization } = organizationResponse.data;
         const { object: superUsers } = superOrgAdminResponse.data;
-        console.log('##############33 ' + JSON.stringify(organization))
+        // console.log('##############33 ' + JSON.stringify(organization))
         // if (org !== null) {
 
         res.render("pages/subscription/create-subscription", {
