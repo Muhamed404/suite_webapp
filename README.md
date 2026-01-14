@@ -189,7 +189,7 @@ Expected response:
 
 ## Technical Documentation
 
-For detailed technical information about the application architecture, folder structure, dependencies, routes, views, and more, please refer to the [Technical Documentation](TECHNICAL_DOCUMENTATION.md).
+For detailed technical information about the application architecture, folder structure, dependencies, routes, views, and more, please refer to the [Technical Documentation](technical_readme.md).
 
 The technical documentation includes:
 - Application Entry Point (server.js) - Detailed analysis
