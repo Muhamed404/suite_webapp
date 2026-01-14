@@ -123,6 +123,180 @@ async function fetchHtmlFromUrl(url) {
   return await response.text();
 }
 
+
+
+/**
+ * Validates password complexity requirements
+ * @param {string} password - The password to validate
+ * @param {Object} options - Optional configuration for password requirements
+ * @param {number} options.minLength - Minimum password length (default: 8)
+ * @param {boolean} options.requireUppercase - Require uppercase letter (default: true)
+ * @param {boolean} options.requireLowercase - Require lowercase letter (default: true)
+ * @param {boolean} options.requireNumber - Require number (default: true)
+ * @param {boolean} options.requireSpecialChar - Require special character (default: true)
+ * @param {string} options.specialChars - Allowed special characters (default: @$!%*?&)
+ * @returns {Object} - Validation result with isValid, message, and details
+ */
+function validatePasswordComplexity(password, options = {}) {
+  // Default options
+  const config = {
+    minLength: options.minLength || 8,
+    requireUppercase: options.requireUppercase !== false,
+    requireLowercase: options.requireLowercase !== false,
+    requireNumber: options.requireNumber !== false,
+    requireSpecialChar: options.requireSpecialChar !== false,
+    specialChars: options.specialChars || '@$!%*?&'
+  };
+
+  // Initialize validation result
+  const result = {
+    isValid: true,
+    message: '',
+    details: {
+      minLength: false,
+      hasUppercase: false,
+      hasLowercase: false,
+      hasNumber: false,
+      hasSpecialChar: false
+    }
+  };
+
+  // If password is empty or null
+  if (!password || typeof password !== 'string') {
+    return {
+      isValid: false,
+      message: 'Password is required',
+      details: result.details
+    };
+  }
+
+  // Check minimum length
+  result.details.minLength = password.length >= config.minLength;
+
+  // Check for uppercase letter
+  result.details.hasUppercase = /[A-Z]/.test(password);
+
+  // Check for lowercase letter
+  result.details.hasLowercase = /[a-z]/.test(password);
+
+  // Check for number
+  result.details.hasNumber = /\d/.test(password);
+
+  // Check for special character
+  const specialCharPattern = new RegExp(`[${config.specialChars.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}]`);
+  result.details.hasSpecialChar = specialCharPattern.test(password);
+
+  // Build validation result and error message
+  const failedRequirements = [];
+
+  if (!result.details.minLength) {
+    failedRequirements.push(`at least ${config.minLength} characters`);
+    result.isValid = false;
+  }
+
+  if (config.requireUppercase && !result.details.hasUppercase) {
+    failedRequirements.push('an uppercase letter');
+    result.isValid = false;
+  }
+
+  if (config.requireLowercase && !result.details.hasLowercase) {
+    failedRequirements.push('a lowercase letter');
+    result.isValid = false;
+  }
+
+  if (config.requireNumber && !result.details.hasNumber) {
+    failedRequirements.push('a number');
+    result.isValid = false;
+  }
+
+  if (config.requireSpecialChar && !result.details.hasSpecialChar) {
+    failedRequirements.push(`a special character (${config.specialChars})`);
+    result.isValid = false;
+  }
+
+  // Generate error message
+  if (!result.isValid) {
+    if (failedRequirements.length === 1) {
+      result.message = `Password must include ${failedRequirements[0]}.`;
+    } else if (failedRequirements.length === 2) {
+      result.message = `Password must include ${failedRequirements.join(' and ')}.`;
+    } else {
+      const lastRequirement = failedRequirements.pop();
+      result.message = `Password must include ${failedRequirements.join(', ')}, and ${lastRequirement}.`;
+    }
+  } else {
+    result.message = 'Password meets all requirements.';
+  }
+
+  return result;
+}
+
+/**
+ * Simple password strength validator (returns boolean)
+ * @param {string} password - The password to validate
+ * @returns {boolean} - True if password meets default requirements
+ */
+function isStrongPassword(password) {
+  if (!password || typeof password !== 'string') {
+    return false;
+  }
+
+  // Default strong password pattern:
+  // At least 8 characters, one uppercase, one lowercase, one number, one special character
+  const strongPasswordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return strongPasswordPattern.test(password);
+}
+
+/**
+ * Get password strength score (0-5)
+ * @param {string} password - The password to evaluate
+ * @returns {Object} - Strength score and label
+ */
+function getPasswordStrength(password) {
+  if (!password || typeof password !== 'string') {
+    return { score: 0, label: 'None', color: 'gray' };
+  }
+
+  let score = 0;
+
+  // Length criteria
+  if (password.length >= 8) score++;
+  if (password.length >= 12) score++;
+
+  // Complexity criteria
+  if (/[a-z]/.test(password)) score++; // Has lowercase
+  if (/[A-Z]/.test(password)) score++; // Has uppercase
+  if (/\d/.test(password)) score++; // Has number
+  if (/[@$!%*?&#^()_\-+={}[\]|\\:;"'<>,.~`]/.test(password)) score++; // Has special char
+
+  // Cap at 5
+  score = Math.min(score, 5);
+
+  const strengthMap = {
+    0: { label: 'None', color: 'gray' },
+    1: { label: 'Very Weak', color: 'red' },
+    2: { label: 'Weak', color: 'orange' },
+    3: { label: 'Fair', color: 'yellow' },
+    4: { label: 'Strong', color: 'green' },
+    5: { label: 'Very Strong', color: 'teal' }
+  };
+
+  return {
+    score,
+    ...strengthMap[score]
+  };
+}
+
 // append FileFetcher to exports
-module.exports = { formatDate, extractAttachmentInfo, readFiles, hasAccess,getStatusBadgeColor, fetchHtmlFromUrl };
+module.exports = {
+  formatDate,
+  extractAttachmentInfo,
+  readFiles,
+  hasAccess,
+  getStatusBadgeColor,
+  fetchHtmlFromUrl,
+  validatePasswordComplexity,
+  isStrongPassword,
+  getPasswordStrength
+};
 

@@ -33,9 +33,9 @@ router.get("/create", checkPermission(enums.ModuleNames.User_Management, [enums.
 router.post("/create", checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O]),
   async (req, res) => { userManagement.submitCreationForm(req, res); });
 
-router.get("/list",
-  checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O]),
-  userManagement.renderUserList);
+// router.get("/list",
+//   checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O]),
+//   userManagement.renderUserList);
 
 router.get("/suite-users/:organizationId?",
   checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O]),
