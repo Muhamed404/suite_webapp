@@ -82,9 +82,23 @@ jobs:
 
     - name: Create deployment package
       run: |
-        mkdir -p deployment
-        cp -r suite_webapp deployment/
-        cp -r scripts deployment/
+        mkdir -p deployment/suite_webapp
+        mkdir -p deployment/scripts
+
+        # Copy all application files, excluding unnecessary items
+        rsync -av --progress ./ deployment/suite_webapp/ \
+          --exclude 'node_modules' \
+          --exclude '.git' \
+          --exclude '.github' \
+          --exclude '.claude' \
+          --exclude '.env' \
+          --exclude '*.md' \
+          --exclude '*.txt' \
+          --exclude 'deployment' \
+          --exclude 'scripts'
+
+        # Copy deployment scripts
+        cp scripts/deploy.sh deployment/scripts/
 
     - name: Package deployment
       run: |
