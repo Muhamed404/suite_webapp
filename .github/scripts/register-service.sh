@@ -7,9 +7,9 @@ set -e
 SERVICE_NAME="suite_webapp"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 DEPLOY_DIR="/opt/secure-magnus/suite_webapp"
-WORKSPACE_DIR="/opt/secure-magnus/workspace"
+WORKSPACE_DIR="/opt/secure-magnus/secure_magnus_workspace"
 LOGS_DIR="/opt/secure-magnus/logs"
-KEYS_DIR="/opt/secure-magnus/workspace/keys"
+KEYS_DIR="/opt/secure-magnus/secure_magnus_workspace/keys"
 SERVICE_USER="ubuntu"
 NPM_PATH=$(which npm)
 

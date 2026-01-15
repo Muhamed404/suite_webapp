@@ -6,9 +6,9 @@ set -e
 
 DEPLOY_DIR="/opt/secure-magnus/suite_webapp"
 BACKUP_DIR="/opt/secure-magnus-backups/suite_webapp"
-WORKSPACE_DIR="/opt/secure-magnus/workspace"
+WORKSPACE_DIR="/opt/secure-magnus/secure_magnus_workspace"
 LOGS_DIR_PATH="/opt/secure-magnus/logs"
-KEYS_DIR="/opt/secure-magnus/workspace/keys"
+KEYS_DIR="/opt/secure-magnus/secure_magnus_workspace/keys"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 TEMP_DIR="/tmp/suite_webapp_deploy_$$"
 SERVICE_USER="ubuntu"
