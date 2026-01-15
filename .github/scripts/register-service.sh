@@ -11,7 +11,7 @@ WORKSPACE_DIR="/opt/secure-magnus/workspace"
 LOGS_DIR="/opt/secure-magnus/logs"
 KEYS_DIR="/opt/secure-magnus/workspace/keys"
 SERVICE_USER="ubuntu"
-NODE_PATH=$(which node)
+NPM_PATH=$(which npm)
 
 echo "Registering Suite Webapp as a systemd service..."
 
@@ -21,9 +21,9 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Check if Node.js is installed
-if [ -z "$NODE_PATH" ]; then
-    echo "Node.js not found. Please install Node.js first."
+# Check if npm is installed
+if [ -z "$NPM_PATH" ]; then
+    echo "npm not found. Please install Node.js first."
     exit 1
 fi
 
@@ -73,13 +73,14 @@ Type=simple
 User=$SERVICE_USER
 Group=$SERVICE_USER
 WorkingDirectory=$DEPLOY_DIR
-ExecStart=$NODE_PATH $DEPLOY_DIR/server.js
+ExecStart=$NPM_PATH run start
 Restart=on-failure
 RestartSec=10
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=$SERVICE_NAME
 Environment=NODE_ENV=production
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
 
 # Security hardening
 NoNewPrivileges=true
@@ -100,9 +101,9 @@ systemctl daemon-reload
 echo "Enabling service to start on boot..."
 systemctl enable "$SERVICE_NAME"
 
-# Start the service
-echo "Starting service..."
-systemctl start "$SERVICE_NAME"
+# Restart the service (handles both new and existing service)
+echo "Restarting service..."
+systemctl restart "$SERVICE_NAME"
 
 # Check service status
 echo "Checking service status..."

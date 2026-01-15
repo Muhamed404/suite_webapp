@@ -99,6 +99,7 @@ jobs:
 
         # Copy deployment scripts
         cp .github/scripts/deploy.sh deployment/scripts/
+        cp .github/scripts/register-service.sh deployment/scripts/
 
     - name: Package deployment
       run: |
@@ -146,9 +147,10 @@ jobs:
         # Transfer deployment package to server
         scp suite_webapp_deployment.tar.gz ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/suite_webapp_deployment.tar.gz
         scp deployment/scripts/deploy.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
+        scp deployment/scripts/register-service.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
 
         # Execute deployment with environment variables
-        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "chmod +x /tmp/deploy.sh && \
+        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "chmod +x /tmp/deploy.sh && chmod +x /tmp/register-service.sh && \
           REDIS_URL='$REDIS_URL' \
           REDIS_SERVER_IP='$REDIS_SERVER_IP' \
           REDIS_SERVER_PORT='$REDIS_SERVER_PORT' \

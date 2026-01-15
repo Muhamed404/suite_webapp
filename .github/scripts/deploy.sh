@@ -82,15 +82,16 @@ EOF
 # Set proper permissions for .env file (readable only by owner)
 chmod 600 "$DEPLOY_DIR/.env"
 
-# Restart the application using PM2
-echo "Restarting application..."
-if command -v pm2 &> /dev/null; then
-    pm2 delete suite_webapp 2>/dev/null || true
-    pm2 start server.js --name suite_webapp
-    pm2 save
+# Register and restart the application using systemd
+echo "Registering and restarting application service..."
+
+# Call register-service.sh to register the systemd service
+if [ -f "/tmp/register-service.sh" ]; then
+    echo "Running register-service.sh..."
+    sudo /tmp/register-service.sh
 else
-    echo "PM2 not found. Please install PM2 or start the application manually."
-    echo "Run: npm install -g pm2 && pm2 start server.js --name suite_webapp"
+    echo "ERROR: register-service.sh not found at /tmp/register-service.sh"
+    exit 1
 fi
 
 # Cleanup
@@ -98,6 +99,7 @@ echo "Cleaning up..."
 rm -rf "$TEMP_DIR"
 rm -f /tmp/suite_webapp_deployment.tar.gz
 rm -f /tmp/deploy.sh
+rm -f /tmp/register-service.sh
 
 # Health check
 echo "Performing health check..."
@@ -110,7 +112,7 @@ for i in $(seq 1 $MAX_RETRIES); do
     echo "Health check attempt $i of $MAX_RETRIES..."
     HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://${APP_HOST}:${APP_PORT}/" 2>/dev/null || echo "000")
 
-    if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "302" ] || [ "$HTTP_STATUS" = "301" ]; then
+    if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "302" ] || [ "$HTTP_STATUS" = "301" ] || [ "$HTTP_STATUS" = "401" ] || [ "$HTTP_STATUS" = "403" ]; then
         echo "Health check passed! HTTP Status: $HTTP_STATUS"
         echo ""
         echo "=========================================="
@@ -131,6 +133,7 @@ echo "=========================================="
 echo "WARNING: Health check failed after $MAX_RETRIES attempts"
 echo "Last HTTP Status: $HTTP_STATUS"
 echo "The application may still be starting up."
-echo "Please check logs: pm2 logs suite_webapp"
+echo "Please check logs: sudo journalctl -u suite_webapp -f"
+echo "Service status: sudo systemctl status suite_webapp"
 echo "=========================================="
 exit 1
