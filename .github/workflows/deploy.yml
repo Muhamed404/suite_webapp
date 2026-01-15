@@ -95,10 +95,10 @@ jobs:
           --exclude '*.md' \
           --exclude '*.txt' \
           --exclude 'deployment' \
-          --exclude 'scripts'
+          --exclude 'docs'
 
         # Copy deployment scripts
-        cp scripts/deploy.sh deployment/scripts/
+        cp .github/scripts/deploy.sh deployment/scripts/
 
     - name: Package deployment
       run: |
@@ -137,10 +137,11 @@ jobs:
 
     - name: Deploy to OCI server
       env:
+        # Redis Configuration
         REDIS_URL: ${{ secrets.REDIS_URL }}
         REDIS_SERVER_IP: ${{ secrets.REDIS_SERVER_IP }}
         REDIS_SERVER_PORT: ${{ secrets.REDIS_SERVER_PORT }}
-        REDIS_SESSION_SECRET_KEY: ${{ secrets.REDIS_SESSION_SECRET_KEY || 'secure-magnus-session-secret-2024' }}
+        REDIS_SESSION_SECRET_KEY: ${{ secrets.REDIS_SESSION_SECRET_KEY }}
       run: |
         # Transfer deployment package to server
         scp suite_webapp_deployment.tar.gz ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/suite_webapp_deployment.tar.gz
@@ -151,7 +152,6 @@ jobs:
           REDIS_URL='$REDIS_URL' \
           REDIS_SERVER_IP='$REDIS_SERVER_IP' \
           REDIS_SERVER_PORT='$REDIS_SERVER_PORT' \
-          REDIS_SESSION_SECRET_KEY='$REDIS_SESSION_SECRET_KEY' \
           /tmp/deploy.sh"
 
     - name: Notify deployment status
