@@ -17,20 +17,22 @@ jobs:
     - name: Checkout development branch
       uses: actions/checkout@v4
       with:
-        ref: development
+        ref: ${{ github.sha }}
         fetch-depth: 0
 
     - name: Verify branch content
       run: |
-        echo "Verifying development branch..."
+        echo "Verifying development branch deployment..."
+        echo "Triggered by: ${{ github.ref }}"
+        echo "Commit SHA: ${{ github.sha }}"
 
-        CURRENT_BRANCH=$(git branch --show-current)
-        if [ "$CURRENT_BRANCH" != "development" ]; then
-          echo "Not on development branch! Current: $CURRENT_BRANCH"
+        if [ "${{ github.ref }}" != "refs/heads/development" ]; then
+          echo "ERROR: Not triggered from development branch!"
+          echo "Actual ref: ${{ github.ref }}"
           exit 1
         fi
 
-        echo "Development branch verified"
+        echo "Development branch verified - deploying commit ${{ github.sha }}"
 
   # Test job
   suite_webapp_test:
@@ -45,7 +47,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: development
+        ref: ${{ github.sha }}
 
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -68,7 +70,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        ref: development
+        ref: ${{ github.sha }}
+
+    - name: Log deployment info
+      run: |
+        echo "=========================================="
+        echo "Deploying from: ${{ github.ref }}"
+        echo "Commit SHA: ${{ github.sha }}"
+        echo "Commit message: ${{ github.event.head_commit.message }}"
+        echo "=========================================="
 
     - name: Setup Node.js
       uses: actions/setup-node@v4

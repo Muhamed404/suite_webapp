@@ -27,10 +27,35 @@ mkdir -p "$TEMP_DIR"
 sudo chown -R $SERVICE_USER:$SERVICE_USER /opt/secure-magnus
 sudo chown -R $SERVICE_USER:$SERVICE_USER "$BACKUP_DIR"
 
-# Backup existing deployment if exists
+# Backup and remove existing deployment if exists
 if [ -d "$DEPLOY_DIR" ]; then
-    echo "Backing up existing deployment..."
-    sudo mv "$DEPLOY_DIR" "$BACKUP_DIR/suite_webapp_$TIMESTAMP" 2>/dev/null || true
+    echo "Backing up existing deployment to $BACKUP_DIR/suite_webapp_$TIMESTAMP..."
+
+    # Stop the service first to ensure clean backup
+    echo "Stopping suite_webapp service if running..."
+    sudo systemctl stop suite_webapp 2>/dev/null || true
+
+    # Create backup by copying (to preserve original in case of issues)
+    sudo cp -r "$DEPLOY_DIR" "$BACKUP_DIR/suite_webapp_$TIMESTAMP"
+
+    if [ -d "$BACKUP_DIR/suite_webapp_$TIMESTAMP" ]; then
+        echo "Backup created successfully at $BACKUP_DIR/suite_webapp_$TIMESTAMP"
+
+        # Now completely remove the existing deployment
+        echo "Removing existing deployment directory..."
+        sudo rm -rf "$DEPLOY_DIR"
+
+        if [ -d "$DEPLOY_DIR" ]; then
+            echo "ERROR: Failed to remove existing deployment directory"
+            exit 1
+        fi
+        echo "Existing deployment removed successfully"
+    else
+        echo "ERROR: Backup failed - aborting deployment"
+        exit 1
+    fi
+else
+    echo "No existing deployment found at $DEPLOY_DIR - fresh installation"
 fi
 
 # Extract new deployment
