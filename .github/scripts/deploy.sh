@@ -52,17 +52,24 @@ npm install --only=production --no-package-lock
 # Create .env file from environment variables
 echo "Creating environment configuration..."
 cat > "$DEPLOY_DIR/.env" << EOF
+# Server Configuration
+NODE_ENV=production
+HOST=${HOST:-127.0.0.1}
+PORT=${PORT:-8000}
+BACKEND_EP=${BACKEND_EP:-http://127.0.0.1:3000}
+
+
 # Redis Configuration
-REDIS_URL=${REDIS_URL:-}
+REDIS_URL=${REDIS_URL:-redis://127.0.0.1:6379}
 REDIS_SERVER_IP=${REDIS_SERVER_IP:-127.0.0.1}
 REDIS_SERVER_PORT=${REDIS_SERVER_PORT:-6379}
-REDIS_SESSION_SECRET_KEY=${REDIS_SESSION_SECRET_KEY:-secure-magnus-session-secret-2024}
+REDIS_SESSION_SECRET_KEY=${REDIS_SESSION_SECRET_KEY:-uftkPbVhr7IdY0pb51kcjiI1vKH7syxtzwXty}
 
 # JWT Configuration
-COOKIE_JWT_TOKEN_EXPIRY=${COOKIE_JWT_TOKEN_EXPIRY:-200}
+COOKIE_JWT_TOKEN_EXPIRY=${COOKIE_JWT_TOKEN_EXPIRY:-10}
 
 # Workspace Configuration
-SECURE_MAGNUS_WORKSPACE=${SECURE_MAGNUS_WORKSPACE:-/opt/secure-magnus/workspace}
+SECURE_MAGNUS_WORKSPACE=${SECURE_MAGNUS_WORKSPACE:-/opt/secure-magnus/secure_magnus_workspace}
 
 # Backend TVBS Configuration
 BACKEND_TVBS_URL=${BACKEND_TVBS_URL:-http://127.0.0.1:9000}
@@ -71,12 +78,7 @@ BACKEND_TVBS_URL=${BACKEND_TVBS_URL:-http://127.0.0.1:9000}
 LOGS_DIR=${LOGS_DIR:-/opt/secure-magnus/logs}
 LOGS_FILENAME=${LOGS_FILENAME:-suite_webapp}
 
-# Server Configuration
-NODE_ENV=production
-HOST=${HOST:-127.0.0.1}
-PORT=${PORT:-3000}
-BACKEND_EP=${BACKEND_EP:-http://127.0.0.1:3000}
-BACKEND_SUITE_PUBLIC_KEY_PATH=${BACKEND_SUITE_PUBLIC_KEY_PATH:-/opt/secure-magnus/workspace/keys/public.pem}
+BACKEND_SUITE_PUBLIC_KEY_PATH=${BACKEND_SUITE_PUBLIC_KEY_PATH:-/opt/secure-magnus/secure_magnus_workspace/keys/public.pem}
 EOF
 
 # Set proper permissions for .env file (readable only by owner)

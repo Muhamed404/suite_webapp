@@ -87,7 +87,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=$DEPLOY_DIR /opt/secure-magnus/logs /opt/secure-magnus/workspace
+ReadWritePaths=$DEPLOY_DIR /opt/secure-magnus/logs /opt/secure-magnus/secure_magnus_workspace
 
 [Install]
 WantedBy=multi-user.target
