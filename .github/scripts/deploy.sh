@@ -97,7 +97,7 @@ COOKIE_JWT_TOKEN_EXPIRY=${COOKIE_JWT_TOKEN_EXPIRY:-10}
 SECURE_MAGNUS_WORKSPACE=${SECURE_MAGNUS_WORKSPACE:-/opt/secure-magnus/secure_magnus_workspace}
 
 # Backend TVBS Configuration
-BACKEND_TVBS_URL=${BACKEND_TVBS_URL:-http://127.0.0.1:9000}
+BACKEND_TVBS_URL=${BACKEND_TVBS_URL:-https://dev-machine.securemagnus.com/tvb}
 
 # Logger Configuration
 LOGS_DIR=${LOGS_DIR:-/opt/secure-magnus/logs}
