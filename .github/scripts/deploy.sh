@@ -112,12 +112,12 @@ chmod 600 "$DEPLOY_DIR/.env"
 # Register and restart the application using systemd
 echo "Registering and restarting application service..."
 
-# Call register-service.sh to register the systemd service
-if [ -f "/tmp/register-service.sh" ]; then
-    echo "Running register-service.sh..."
-    sudo /tmp/register-service.sh
+# Call register-suite-webapp-service.sh to register the systemd service
+if [ -f "/tmp/register-suite-webapp-service.sh" ]; then
+    echo "Running register-suite-webapp-service.sh..."
+    sudo /tmp/register-suite-webapp-service.sh
 else
-    echo "ERROR: register-service.sh not found at /tmp/register-service.sh"
+    echo "ERROR: register-suite-webapp-service.sh not found at /tmp/register-suite-webapp-service.sh"
     exit 1
 fi
 
@@ -126,7 +126,7 @@ echo "Cleaning up..."
 rm -rf "$TEMP_DIR"
 rm -f /tmp/suite_webapp_deployment.tar.gz
 rm -f /tmp/deploy.sh
-rm -f /tmp/register-service.sh
+rm -f /tmp/register-suite-webapp-service.sh
 
 # Health check
 echo "Performing health check..."

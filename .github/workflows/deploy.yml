@@ -109,7 +109,7 @@ jobs:
 
         # Copy deployment scripts
         cp .github/scripts/deploy.sh deployment/scripts/
-        cp .github/scripts/register-service.sh deployment/scripts/
+        cp .github/scripts/register-suite-webapp-service.sh deployment/scripts/
 
     - name: Package deployment
       run: |
@@ -155,12 +155,15 @@ jobs:
         REDIS_SESSION_SECRET_KEY: ${{ secrets.REDIS_SESSION_SECRET_KEY }}
       run: |
         # Transfer deployment package to server
-        scp suite_webapp_deployment.tar.gz ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/suite_webapp_deployment.tar.gz
-        scp deployment/scripts/deploy.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
-        scp deployment/scripts/register-service.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
+        scp suite_webapp_deployment.tar.gz ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/suite_webapp_deployment.tar.gz || { echo "Failed to copy deployment package"; exit 1; }
+        scp deployment/scripts/deploy.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/ || { echo "Failed to copy deploy.sh"; exit 1; }
+        scp deployment/scripts/register-suite-webapp-service.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/ || { echo "Failed to copy register-suite-webapp-service.sh"; exit 1; }
+
+        # Verify files exist on remote server
+        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "ls -la /tmp/deploy.sh /tmp/register-suite-webapp-service.sh"
 
         # Execute deployment with environment variables
-        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "chmod +x /tmp/deploy.sh && chmod +x /tmp/register-service.sh && \
+        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "chmod +x /tmp/deploy.sh && chmod +x /tmp/register-suite-webapp-service.sh && \
           REDIS_URL='$REDIS_URL' \
           REDIS_SERVER_IP='$REDIS_SERVER_IP' \
           REDIS_SERVER_PORT='$REDIS_SERVER_PORT' \
