@@ -2,8 +2,8 @@
 <% if(locals_phm_subscription){%>
 
     <%if(magnusAdmin===false) {%>
-        <div class="flex justify-between gap-4 ">
-            <h3 class="text-3xl font-semibold mb-6">
+        <div class="flex flex-col md:flex-row justify-between gap-4 md:items-center">
+            <h3 class="text-2xl md:text-3xl font-semibold mb-2 md:mb-6">
                 <%= __("productsuite.labels.screenTitle") %>
             </h3>
             <a href="/suite_management_dashboard/dashboard">
@@ -16,25 +16,25 @@
             <!-- first section  -->
 
 
-            <div class="flex flex-col gap-6 p-6 bg-[#FAFBFC] rounded-3xl mb-5">
+            <div class="flex flex-col gap-6 p-4 md:p-6 bg-[#FAFBFC] rounded-3xl mb-5">
 
                 <%if(magnusAdmin===false) {%>
-                    <div class="flex max-sm:flex-col max-sm:items-start gap-2.5 items-center justify-between ">
-                        <img src="/securemagnus_2025/images/phishmagnus_logo.svg" class="max-w-64" alt="">
+                    <div class="flex flex-col md:flex-row md:items-center gap-4 items-start justify-between ">
+                        <img src="/securemagnus_2025/images/phishmagnus_logo.svg" class="max-w-48 md:max-w-64" alt="">
 
-                        <div class="flex items-center gap-3">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3 w-full md:w-auto">
                             <a href="/phm/index"
-                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-transparent text-[var(--teal)] border border-[var(--teal)] transition-all duration-300 hover:bg-[var(--teal)] hover:text-white">
+                                class="flex items-center justify-center gap-3 px-4 py-2 md:px-6 lg:px-9 md:py-2.5 lg:py-3 rounded-full bg-transparent text-[var(--teal)] border border-[var(--teal)] transition-all duration-300 hover:bg-[var(--teal)] hover:text-white text-sm md:text-base whitespace-nowrap">
                                 <%= __("productsuite.btn.dashboard") %>
                             </a>
 
                             <a href="/organization/subscription-history"
-                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-transparent text-[var(--teal)] border border-[var(--teal)] transition-all duration-300 hover:bg-[var(--teal)] hover:text-white">
+                                class="flex items-center justify-center gap-3 px-4 py-2 md:px-6 lg:px-9 md:py-2.5 lg:py-3 rounded-full bg-transparent text-[var(--teal)] border border-[var(--teal)] transition-all duration-300 hover:bg-[var(--teal)] hover:text-white text-sm md:text-base whitespace-nowrap">
                                 <%= __("productsuite.btn.subscription") %>
                             </a>
 
                             <a href="/phm/index"
-                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-[var(--teal)] text-white border border-[var(--teal)] transition-all duration-300 hover:bg-transparent hover:text-[var(--teal)]">
+                                class="flex items-center justify-center gap-3 px-4 py-2 md:px-6 lg:px-9 md:py-2.5 lg:py-3 rounded-full bg-[var(--teal)] text-white border border-[var(--teal)] transition-all duration-300 hover:bg-transparent hover:text-[var(--teal)] text-sm md:text-base whitespace-nowrap">
                                 <%= __("productsuite.btn.openProduct") %>
 
                             </a>
@@ -43,16 +43,16 @@
 
                     <%}%>
 
-                        <div class="grid grid-cols-12  gap-4 max-sm:grid-cols-2 max-sm:grid-rows-1">
+                        <div class="grid grid-cols-2 md:grid-cols-12 gap-3 md:gap-4">
 
 
 
                             <!-- Phishing Campaigns -->
                             <div
-                                class="col-span-6 row-span-7 max-sm:col-span-2 [background:linear-gradient(135deg,_#ffffff_0%,_#ffffff_50%,_#00E2C150_100%)] bg-center bg-cover bg-no-repeat rounded-3xl p-6 flex flex-col items-center justify-center">
+                                class="col-span-2 md:col-span-6 md:row-span-7 [background:linear-gradient(135deg,_#ffffff_0%,_#ffffff_50%,_#00E2C150_100%)] bg-center bg-cover bg-no-repeat rounded-3xl p-6 md:p-8 flex flex-col items-center justify-center min-h-[200px] md:min-h-0">
 
 
-                                <img src="/securemagnus_2025/images/phishMagnusLogo.svg" class="h-10" alt="">
+                                <img src="/securemagnus_2025/images/phishMagnusLogo.svg" class="h-8 md:h-10" alt="">
                             </div>
 
 
@@ -60,13 +60,13 @@
 
 
                             <div
-                                class="rounded-3xl p-6 pb-[32px] col-span-3 row-span-4 max-sm:col-span-1 max-sm:pb-6 flex flex-col items-start justify-between bg-[linear-gradient(to_bottom_right,#0891b2_0%,#2dd4bf_100%)] text-white">
+                                class="rounded-3xl p-4 md:p-6 pb-6 md:pb-[32px] col-span-1 md:col-span-3 md:row-span-4 flex flex-col items-start justify-between bg-[linear-gradient(to_bottom_right,#0891b2_0%,#2dd4bf_100%)] text-white">
 
-                                <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-15" alt="">
-                                <div class="text-5xl font-semibold mt-8 text-white">
+                                <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-10 md:size-12 lg:size-15" alt="">
+                                <div class="text-2xl md:text-3xl lg:text-5xl font-semibold mt-4 md:mt-6 lg:mt-8 text-white">
                                     <%= phmPurchasedLicense %>
                                 </div>
-                                <div class="text-base text-white pt-2 leading-tight">
+                                <div class="text-sm md:text-base text-white pt-2 leading-tight">
                                                     <%= __("productsuite.labels.totalLicense") %>
                                     
                                 </div>
@@ -79,20 +79,20 @@
 
 
                             <div
-                                class="rounded-3xl bg-white p-6 flex flex-col items-center justify-center  col-span-3 row-span-4 max-md:col-span-1">
-                                <div class="relative w-40 h-40">
+                                class="rounded-3xl bg-white p-4 md:p-6 flex flex-col items-center justify-center col-span-1 md:col-span-3 md:row-span-4">
+                                <div class="relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40">
                                     <svg class="w-full h-full rotate-[-90deg]">
-                                        <circle cx="80" cy="80" r="70" stroke="#C1EBEA" stroke-width="10" fill="none" />
-                                        <circle id="progressCircle1" cx="80" cy="80" r="70" stroke="var(--teal)"
-                                            stroke-width="10" fill="none" stroke-linecap="round" />
+                                        <circle cx="50%" cy="50%" r="45%" stroke="#C1EBEA" stroke-width="8" fill="none" />
+                                        <circle id="progressCircle1" cx="50%" cy="50%" r="45%" stroke="var(--teal)"
+                                            stroke-width="8" fill="none" stroke-linecap="round" />
                                     </svg>
-                                    <div class="absolute inset-0 flex items-center justify-center text-3xl font-semibold text-[var(--teal)]"
+                                    <div class="absolute inset-0 flex items-center justify-center text-xl md:text-2xl lg:text-3xl font-semibold text-[var(--teal)]"
                                         id="progressText1">
                                         <%=phmConsumeLicense%>
                                         
                                     </div>
                                 </div>
-                                <p class="mt-2 text-base text-gray-600 max-sm:text-center leading-tight">
+                                <p class="mt-2 text-sm md:text-base text-gray-600 text-center leading-tight">
                                     <%= __("productsuite.labels.usedLicense") %>
                                 </p>
                             </div>
@@ -101,17 +101,17 @@
 
                             <%if(magnusAdmin===false) {%>
 
-                                <div class="lg:row-span-3 lg:col-span-6 max-sm:col-span-2">
+                                <div class="col-span-2 md:col-span-6 md:row-span-3">
                                     <div
-                                        class="py-7 px-5 bg-[#EBF7F7] rounded-3xl flex flex-row gap-4 justify-between items-center flex-wrap">
+                                        class="py-4 md:py-6 lg:py-7 px-4 md:px-5 bg-[#EBF7F7] rounded-3xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
                                         <!-- Date Section -->
-                                        <div class="flex flex-row gap-4 items-center">
-                                            <img src="/securemagnus_2025/images/calanderteal.svg" alt="Calendar" />
+                                        <div class="flex flex-row gap-3 md:gap-4 items-center">
+                                            <img src="/securemagnus_2025/images/calanderteal.svg" alt="Calendar" class="w-8 h-8 md:w-10 md:h-10" />
                                             <div class="flex flex-col">
-                                                <p class="text-2xl font-semibold">
+                                                <p class="text-base md:text-lg lg:text-2xl font-semibold">
                                                     <%= phmLicenseExpiry %>
                                                 </p>
-                                                <p class="text-sm font-light">
+                                                <p class="text-xs md:text-sm font-light">
                                                                     <%= __("productsuite.labels.licenseExpiry") %>
                                                     
                                                 </p>
@@ -119,15 +119,15 @@
                                         </div>
 
                                         <!-- Contact Section -->
-                                        <div class="flex flex-col gap-2.5 items-end">
-                                            <p class="text-xl font-semibold">
+                                        <div class="flex flex-col gap-2.5 items-start md:items-end w-full md:w-auto">
+                                            <p class="text-base md:text-lg lg:text-xl font-semibold">
                                                 <%= __("productsuite.labels.contactSupport") %>
                                             </p>
                                             <div class="flex flex-row gap-2">
                                                 <img src="/securemagnus_2025/images/messageteal.svg" alt="Message"
-                                                    class="w-8 h-8" />
+                                                    class="w-7 h-7 md:w-8 md:h-8" />
                                                 <img src="/securemagnus_2025/images/headphoneteal.svg" alt="Support"
-                                                    class="w-8 h-8" />
+                                                    class="w-7 h-7 md:w-8 md:h-8" />
                                             </div>
                                         </div>
                                     </div>
@@ -135,9 +135,9 @@
                                 </div>
                                 <%}else{%>
 
-                                    <div class="lg:row-span-1 lg:col-span-6 max-sm:col-span-2">
+                                    <div class="col-span-2 md:col-span-6 md:row-span-1">
                                         <a href="/phm/index"
-                                            class="flex items-center justify-center gap-3 lg:px-6 py-3 rounded-full bg-[var(--teal)] text-white border border-[var(--teal)] transition-all duration-300 hover:bg-transparent hover:text-[var(--teal)]">
+                                            class="flex items-center justify-center gap-3 px-4 md:px-6 py-3 rounded-full bg-[var(--teal)] text-white border border-[var(--teal)] transition-all duration-300 hover:bg-transparent hover:text-[var(--teal)] text-sm md:text-base">
                                             <%= __("productsuite.btn.dashboard") %>
 
                                         </a>
@@ -149,41 +149,41 @@
             </div>
 
             <!-- second section -->
-            <div class="flex flex-col gap-6 p-6 bg-[#FAFBFC] rounded-3xl ">
+            <div class="flex flex-col gap-6 p-4 md:p-6 bg-[#FAFBFC] rounded-3xl ">
 
                 <%if(magnusAdmin===false) {%>
-                    <div class="flex max-sm:flex-col max-sm:items-start gap-2.5 items-center justify-between ">
-                        <img src="/securemagnus_2025/images/awarenessMagnus-logo.svg" class="max-w-64" alt="">
+                    <div class="flex flex-col md:flex-row md:items-center gap-4 items-start justify-between ">
+                        <img src="/securemagnus_2025/images/awarenessMagnus-logo.svg" class="max-w-48 md:max-w-64" alt="">
 
-                        <div class="flex items-center gap-3">
+                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3 w-full md:w-auto">
                             <a href="/awm/index"
-                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-transparent text-[var(--blue)] border border-[var(--blue)] transition-all duration-300 hover:bg-[var(--blue)] hover:text-white">
+                                class="flex items-center justify-center gap-3 px-4 py-2 md:px-6 lg:px-9 md:py-2.5 lg:py-3 rounded-full bg-transparent text-[var(--blue)] border border-[var(--blue)] transition-all duration-300 hover:bg-[var(--blue)] hover:text-white text-sm md:text-base whitespace-nowrap">
                                 <%= __("productsuite.btn.dashboard") %>
                             </a>
 
                             <a href="#"
-                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-transparent text-[var(--blue)] border border-[var(--blue)] transition-all duration-300 hover:bg-[var(--blue)] hover:text-white">
+                                class="flex items-center justify-center gap-3 px-4 py-2 md:px-6 lg:px-9 md:py-2.5 lg:py-3 rounded-full bg-transparent text-[var(--blue)] border border-[var(--blue)] transition-all duration-300 hover:bg-[var(--blue)] hover:text-white text-sm md:text-base whitespace-nowrap">
                                 <%= __("productsuite.btn.subscription") %>
                             </a>
 
                             <a href="#"
-                                class="flex items-center justify-center gap-3 px-9 py-3 rounded-full bg-[var(--blue)] text-white border border-[var(--blue)] transition-all duration-300 hover:bg-transparent hover:text-[var(--blue)]">
+                                class="flex items-center justify-center gap-3 px-4 py-2 md:px-6 lg:px-9 md:py-2.5 lg:py-3 rounded-full bg-[var(--blue)] text-white border border-[var(--blue)] transition-all duration-300 hover:bg-transparent hover:text-[var(--blue)] text-sm md:text-base whitespace-nowrap">
                                 <%= __("productsuite.btn.openProduct") %>
 
                             </a>
                         </div>
                     </div>
                     <%}%>
-                        <div class="grid grid-cols-12  gap-4 max-sm:grid-cols-2 max-sm:grid-rows-1">
+                        <div class="grid grid-cols-2 md:grid-cols-12 gap-3 md:gap-4">
 
 
 
                             <!-- Phishing Campaigns -->
                             <div
-                                class="col-span-6 row-span-7 max-sm:col-span-2 [background:linear-gradient(135deg,_#ffffff_0%,_#66CAFE_400%)] rounded-3xl p-6 flex flex-col items-center justify-center">
+                                class="col-span-2 md:col-span-6 md:row-span-7 [background:linear-gradient(135deg,_#ffffff_0%,_#66CAFE_400%)] rounded-3xl p-6 md:p-8 flex flex-col items-center justify-center min-h-[200px] md:min-h-0">
 
 
-                                <img src="/securemagnus_2025/images/awarenessMagnus-logo.svg" class="" alt="">
+                                <img src="/securemagnus_2025/images/awarenessMagnus-logo.svg" class="max-w-[200px] md:max-w-none" alt="">
                             </div>
 
 
@@ -191,13 +191,13 @@
 
 
                             <div
-                                class="rounded-3xl p-6 pb-[42px] col-span-3 row-span-4 max-sm:col-span-1 max-sm:pb-6 flex flex-col items-start justify-between bg-[linear-gradient(to_bottom_right,#1C80FF,#66CAFE)]">
+                                class="rounded-3xl p-4 md:p-6 pb-6 md:pb-[42px] col-span-1 md:col-span-3 md:row-span-4 flex flex-col items-start justify-between bg-[linear-gradient(to_bottom_right,#1C80FF,#66CAFE)]">
 
-                                <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-15" alt="">
-                                <div class="text-5xl font-semibold mt-8 text-white">
+                                <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-10 md:size-12 lg:size-15" alt="">
+                                <div class="text-2xl md:text-3xl lg:text-5xl font-semibold mt-4 md:mt-6 lg:mt-8 text-white">
                                     <%=awmPurchasedLicense%>
                                 </div>
-                                <div class="text-base text-white pt-2 leading-tight">                <%= __("productsuite.labels.totalLicense") %>
+                                <div class="text-sm md:text-base text-white pt-2 leading-tight">                <%= __("productsuite.labels.totalLicense") %>
 </div>
 
                             </div>
@@ -208,56 +208,56 @@
 
 
                             <div
-                                class="rounded-3xl bg-white p-6 flex flex-col items-center justify-center  col-span-3 row-span-4 max-md:col-span-1">
-                                <div class="relative w-40 h-40">
+                                class="rounded-3xl bg-white p-4 md:p-6 flex flex-col items-center justify-center col-span-1 md:col-span-3 md:row-span-4">
+                                <div class="relative w-24 h-24 md:w-32 md:h-32 lg:w-40 lg:h-40">
                                     <svg class="w-full h-full rotate-[-90deg]">
-                                        <circle cx="80" cy="80" r="70" stroke="#C1EBEA" stroke-width="10" fill="none" />
-                                        <circle id="progressCircle2" cx="80" cy="80" r="70" stroke="var(--blue)"
-                                            stroke-width="10" fill="none" stroke-linecap="round" />
+                                        <circle cx="50%" cy="50%" r="45%" stroke="#C1EBEA" stroke-width="8" fill="none" />
+                                        <circle id="progressCircle2" cx="50%" cy="50%" r="45%" stroke="var(--blue)"
+                                            stroke-width="8" fill="none" stroke-linecap="round" />
                                     </svg>
-                                    <div class="absolute inset-0 flex items-center justify-center text-3xl font-semibold text-[var(--blue)]"
+                                    <div class="absolute inset-0 flex items-center justify-center text-xl md:text-2xl lg:text-3xl font-semibold text-[var(--blue)]"
                                         id="progressText2">
                                         <%=awmConsumeLicense%>
                                     </div>
                                 </div>
-                                <p class="mt-2 text-base text-gray-600 max-sm:text-center leading-tight"><%= __("productsuite.labels.usedLicense") %></p>
+                                <p class="mt-2 text-sm md:text-base text-gray-600 text-center leading-tight"><%= __("productsuite.labels.usedLicense") %></p>
                             </div>
 
 
 
                         <%if(magnusAdmin===false) {%>
 
-                            <div class="lg:row-span-3 lg:col-span-6 max-sm:col-span-2">
+                            <div class="col-span-2 md:col-span-6 md:row-span-3">
                                 <div
-                                    class="py-7 px-5 bg-[#EDF4FA] rounded-3xl flex flex-row gap-4 justify-between items-center flex-wrap">
+                                    class="py-4 md:py-6 lg:py-7 px-4 md:px-5 bg-[#EDF4FA] rounded-3xl flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
                                     <!-- Date Section -->
-                                    <div class="flex flex-row gap-4 items-center">
-                                        <img src="/securemagnus_2025/images/calanderblue.svg" alt="Calendar" />
+                                    <div class="flex flex-row gap-3 md:gap-4 items-center">
+                                        <img src="/securemagnus_2025/images/calanderblue.svg" alt="Calendar" class="w-8 h-8 md:w-10 md:h-10" />
                                         <div class="flex flex-col">
-                                            <p class="text-2xl font-semibold">
+                                            <p class="text-base md:text-lg lg:text-2xl font-semibold">
                                                 <%= awmLicenseExpiry %>
                                             </p>
-                                            <p class="text-sm font-light"><%= __("productsuite.labels.licenseExpiry") %></p>
+                                            <p class="text-xs md:text-sm font-light"><%= __("productsuite.labels.licenseExpiry") %></p>
                                         </div>
                                     </div>
 
                                     <!-- Contact Section -->
-                                    <div class="flex flex-col gap-2.5 items-end">
-                                        <p class="text-xl font-semibold"><%= __("productsuite.labels.contactSupport") %></p>
+                                    <div class="flex flex-col gap-2.5 items-start md:items-end w-full md:w-auto">
+                                        <p class="text-base md:text-lg lg:text-xl font-semibold"><%= __("productsuite.labels.contactSupport") %></p>
                                         <div class="flex flex-row gap-2">
                                             <img src="/securemagnus_2025/images/messageblue.svg" alt="Message"
-                                                class="w-8 h-8" />
+                                                class="w-7 h-7 md:w-8 md:h-8" />
                                             <img src="/securemagnus_2025/images/headphoneblue.svg" alt="Support"
-                                                class="w-8 h-8" />
+                                                class="w-7 h-7 md:w-8 md:h-8" />
                                         </div>
                                     </div>
                                 </div>
 
                             </div>
                                 <%}else{%>
-                                    <div class="lg:row-span-1 lg:col-span-6 max-sm:col-span-2">
+                                    <div class="col-span-2 md:col-span-6 md:row-span-1">
         <a href="#"
-          class="flex items-center justify-center gap-3 lg:px-6 py-3 rounded-full bg-[var(--blue)] text-white border border-[var(--blue)] transition-all duration-300 hover:bg-transparent hover:text-[var(--blue)]">
+          class="flex items-center justify-center gap-3 px-4 md:px-6 py-3 rounded-full bg-[var(--blue)] text-white border border-[var(--blue)] transition-all duration-300 hover:bg-transparent hover:text-[var(--blue)] text-sm md:text-base">
           <%= __("productsuite.btn.dashboard") %>
 
         </a>

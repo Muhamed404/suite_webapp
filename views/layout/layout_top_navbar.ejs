@@ -51,10 +51,58 @@
           </div>
 
           <!-- Hamburger Button for small screens -->
-          <button id="hamburger" class="block lg:hidden">
+          <button id="hamburger" class="block lg:hidden" onclick="toggleMobileMenu()">
             <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </header>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden lg:hidden bg-[#FAFBFC] px-6 py-4 border-t border-gray-200">
+          <!-- Search Bar -->
+          <div class="flex items-center w-full bg-white rounded-full border border-gray-300 focus-within:ring-2 focus-within:ring-[var(--teal)] mb-4">
+            <img src="/securemagnus_2025/images/img/search.svg" class="w-4 h-4 ml-3 text-gray-400" alt="">
+            <input type="text" placeholder="Search here..." class="flex-1 py-2 pl-2 pr-10 bg-transparent text-sm focus:outline-none" />
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex gap-2 mb-4">
+            <button class="flex-1 w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-200 transition">
+              <img src="/securemagnus_2025/images/img/mail.svg" alt="">
+            </button>
+            <button class="flex-1 w-12 h-12 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-200 transition">
+              <img src="/securemagnus_2025/images/img/bell.svg" alt="">
+            </button>
+          </div>
+
+          <!-- Language Switcher -->
+          <div class="mb-4">
+            <select name="lang" id="langSwitcherMobile" onchange="handleLanguageChange(this.value)"
+              class="appearance-none w-full pl-4 pr-10 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--teal)] shadow-sm transition-all duration-200">
+              <option value="en" <%= locale === 'en' ? 'selected' : '' %>>English</option>
+              <option value="ar" <%= locale === 'ar' ? 'selected' : '' %>>العربية</option>
+            </select>
+          </div>
+
+          <!-- User Profile -->
+          <div class="flex gap-3 items-center">
+            <img src="/securemagnus_2025/images/img/profile.png" class="rounded-full w-12 h-12" alt="">
+            <div class="flex flex-col gap-0.5">
+              <h4 class="text-base">
+                <%=username%>
+              </h4>
+              <p class="text-sm text-gray-500">
+                <%=email%>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+          }
+        </script>
 
