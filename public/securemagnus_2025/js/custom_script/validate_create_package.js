@@ -160,7 +160,7 @@ $(document).ready(function() {
 
     // Expose validator globally for stepper to use
     window.validateFormAndToggleSubmit = function() {
-        return validator.form();
+        return validator.checkForm();
     };
 
     // Initial validation state check
