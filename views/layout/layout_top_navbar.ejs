@@ -7,11 +7,9 @@
           <!-- Right Section for lg and up -->
           <div class="hidden lg:flex items-center gap-4">
             <!-- Search Bar -->
-            <div class="relative">
-              <input type="text" placeholder="Search here..."
-                class="pl-14 pr-10 py-3 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]" />
-              <img src="/securemagnus_2025/images/img/search.svg"
-                class="w-5 h-5 text-gray-400 absolute left-7 top-1/2 transform -translate-y-1/2" alt="">
+            <div class="flex items-center w-48 bg-white rounded-full border border-gray-300 focus-within:ring-2 focus-within:ring-[var(--teal)]">
+              <img src="/securemagnus_2025/images/img/search.svg" class="w-4 h-4 ml-3 text-gray-400" alt="">
+              <input type="text" placeholder="Search here..." class="flex-1 py-2 pl-2 pr-10 bg-transparent text-sm focus:outline-none" />
             </div>
 
             <!-- Two Circle Buttons -->
@@ -42,9 +40,8 @@
             <div class="flex gap-3">
               <img src="/securemagnus_2025/images/img/profile.png" class="rounded-full w-12 h-12" alt="">
               <div class="flex flex-col gap-0.5">
-                <h4 class="flex gap-0.5 text-base">
+                <h4 class="text-base">
                   <%=username%>
-                  <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
                 </h4>
                 <p class="text-sm text-gray-500">
                   <%=email%>
