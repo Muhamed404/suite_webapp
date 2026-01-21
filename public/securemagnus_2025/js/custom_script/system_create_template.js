@@ -359,12 +359,21 @@ let currentStep = 0;
     // alert('Handling Next for current step ' + (currentStep));
     // renderProgressBar();
     // alert('Handling Next for next step ' + (currentStep + 1));
+    
+    // Validate current step before proceeding
+    if (typeof window.validateCurrentStep === 'function') {
+      const isValid = window.validateCurrentStep(currentStep, selectedPhishType);
+      if (!isValid) {
+        return; // Stop if validation fails
+      }
+    }
+    
     saveDataForStep(currentStep);
     const sel = formData.step1.phishType;
     if (currentStep === 0) {
       // alert('currentStep Processing selections for step 0...');
       if (!sel) {
-        alert('Please choose a phish Type to continue.');
+        // Validation already handled by validateCurrentStep
         return;
       }
       selectedPhishType = sel;
@@ -390,7 +399,7 @@ let currentStep = 0;
       // alert('currentStep Processing selections for step 1...');
       const selectedOptions = (formData.step2.options) ? formData.step2.options : [];
       if (selectedOptions.length === 0) {
-        alert('Please select at least one option.');
+        // Validation already handled by validateCurrentStep
         return;
       }
       const matched = computeMatchingRule(selectedPhishType, selectedOptions);
