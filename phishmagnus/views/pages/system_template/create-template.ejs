@@ -11,6 +11,9 @@
             <span class="text-gray-400">›</span>
             <span class="font-semibold text-gray-900">Create Template</span>
         </nav>
+        <div>
+            <%- include('../../partials/back-button', { label: 'Go Back' }) %>
+        </div>
         <h3 class="text-3xl font-medium text-gray-900">
             Create Template
         </h3>
@@ -21,9 +24,12 @@
     <!-- first section  -->
     <div class="flex flex-col p-8 gap-4 mt-3 rounded-3xl bg-white border border-gray-100 shadow-sm">
         <!-- Progress Bar -->
-        <div id="progress" class="flex items-center mb-6"></div>
+        <div class="overflow-x-auto mb-6">
+            <div id="progress" class="flex items-center min-w-max"></div>
+        </div>
         <form class="space-y-6" id="templateCreationForm" name="templateCreationForm" method="post"
             action="<%=typeof postMethodUrl !== 'undefined' ? postMethodUrl : '/template/' %>">
+            <!-- Steps -->
             <!-- Steps -->
             <div class="step hidden w-full lg:w-3/4">
                 <!-- Page Heading -->

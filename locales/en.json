@@ -980,6 +980,7 @@
 	},
 	"common": {
 		"search_here": "common.search_here",
-		"sort_by": "common.sort_by"
+		"sort_by": "common.sort_by",
+		"back": "common.back"
 	}
 }
