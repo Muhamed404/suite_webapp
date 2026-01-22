@@ -982,5 +982,7 @@
 		"search_here": "common.search_here",
 		"sort_by": "common.sort_by",
 		"back": "common.back"
-	}
+	},
+	"Search": "Search",
+	"entries per page": "entries per page"
 }

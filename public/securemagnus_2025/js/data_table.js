@@ -4,7 +4,9 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  const dataTable = new simpleDatatables.DataTable('#filter-table');
+  const dataTable = new simpleDatatables.DataTable('#filter-table', {
+    perPageSelect: [10, 20, 25, 50, 100]
+  });
 
   const filter = document.getElementById('filter');
   filter.addEventListener('change', function () {
