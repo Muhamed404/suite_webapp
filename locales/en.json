@@ -282,13 +282,13 @@
 			"btnDelete": "Delete"
 		},
 		"create": {
-			"title": "Create App Service",
+			"title": "Create Service",
 			"optionSelectProduct": "Select Product",
 			"optionSelectServiceType": "Select Service Type",
 			"optionSelectServiceTypeFixed": "Fixed",
 			"optionSelectServiceTypeAnnual": "Annual",
 			"labelServiceName": "Service Name",
-			"labelDescription": "Details",
+			"labelDescription": "Description",
 			"labelServiceCost": "Service Cost (USD)",
 			"btnBack": "Back",
 			"btnSubmit": "Submit",
