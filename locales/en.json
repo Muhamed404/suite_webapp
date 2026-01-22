@@ -279,7 +279,8 @@
 			"optionAWM": "Awaremagnus",
 			"optionPhishMagnus": "PhishMagnus",
 			"btnCreateService": "Create Service",
-			"btnDelete": "Delete"
+			"btnDelete": "Delete",
+			"optionGRCMagnus": "GRCMagnus"
 		},
 		"create": {
 			"title": "Create App Service",
