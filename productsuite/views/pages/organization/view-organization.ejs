@@ -39,66 +39,58 @@
         <thead class="bg-gray-50 text-gray-600  text-xs">
           <tr>
 
-            <th class="px-4 py-55 text-sm font-normal">
+            <th class="px-6 py-5 text-sm font-medium">
+              <img src="/securemagnus_2025/images/package_management/suitcase-work-job-document.svg" alt="Organization" class=" inline">&nbsp;
               <%= __("organization.homescreen.name") %>
                 <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
                   class="size-3.5 ml-3 inline">
             </th>
-            <th class="px-4 py-5 text-sm font-normal">
+            <th class="px-6 py-5 text-sm font-medium">
+              <img src="/securemagnus_2025/images/Icon_Mail.svg" alt="Admin" class=" inline size-4 opacity-50">&nbsp;
               <%= __("organization.homescreen.adminName") %><img src="/securemagnus_2025/images/package_management/sort.svg"
                   alt="License Cost" class="size-3.5 ml-3 inline">
             </th>
-            <th class="px-4 py-5">
+            <th class="px-6 py-5 text-sm font-medium">
               <img src="/securemagnus_2025/images/package_management/Package_Management_Type.svg" alt="Type"
-                class=" inline">
+                class=" inline mr-2">
               <%= __("organization.homescreen.adminEmail") %>
                 <span></span><img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
                   class="size-3.5 ml-3 inline">
             </th>
-            <th class="px-4 py-5">
+            <th class="px-6 py-5 text-sm font-medium">
               <img src="/securemagnus_2025/images/package_management/package_management_per_license_cost.svg"
-                alt="License Cost" class=" inline">
+                alt="License Cost" class=" inline mr-2">
               <%= __("organization.homescreen.activeSubscription") %>
-                <span class="text-sm font-normal"></span><img
-                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                  class="size-3.5 ml-3 inline">
+                <span class="text-sm font-normal"></span>
             </th>
-            <th class="px-4 py-5">
+            <th class="px-6 py-5 text-sm font-medium">
               <img src="/securemagnus_2025/images/package_management/package_management_user_range_form.svg"
-                alt="User From" class=" inline">
+                alt="User From" class=" inline mr-2">
               <%= __("organization.homescreen.pendingInvoice") %>
 
-                <span class="text-sm font-normal"></span><img
-                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                  class="size-3.5 ml-3 inline">
+                <span class="text-sm font-normal"></span>
             </th>
-            <th class="px-4 py-5">
+            <th class="px-6 py-5 text-sm font-medium">
               <img src="/securemagnus_2025/images/package_management/package_management_user_range_to.svg" alt="User To"
-                class=" inline">
+                class=" inline mr-2">
               <%= __("organization.homescreen.cancelledInvoice") %>
 
-                <span class="text-sm font-normal"></span><img
-                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                  class="size-3.5 ml-3 inline">
+                <span class="text-sm font-normal"></span>
             </th>
-            <th class="px-4 py-5">
+            <th class="px-6 py-5 text-sm font-medium">
               <img src="/securemagnus_2025/images/package_management/package_management_subscription_duration.svg"
-                alt="Subscription" class=" inline">
+                alt="Subscription" class=" inline mr-2">
               <%= __("organization.homescreen.subscriptionCancelled") %>
 
-                <span class="text-sm font-normal"></span><img
-                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                  class="size-3.5 ml-3 inline">
+                <span class="text-sm font-normal"></span>
             </th>
 
-            <th class="px-4 py-5">
+            <th class="px-6 py-5 text-sm font-medium">
               <img src="/securemagnus_2025/images/package_management/package_management_subscription_duration.svg"
-                alt="Subscription" class=" inline">
+                alt="Subscription" class=" inline mr-2">
               <%= __("organization.homescreen.action") %>
 
-                <span class="text-sm font-normal"></span><img
-                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                  class="size-3.5 ml-3 inline">
+                <span class="text-sm font-normal"></span>
             </th>
 
 
@@ -153,3 +145,16 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!document.getElementById('filter-table') || typeof simpleDatatables === 'undefined' || typeof simpleDatatables.DataTable === 'undefined') {
+      console.warn('simple-datatables not found or table missing');
+      return;
+    }
+
+    const dataTable = new simpleDatatables.DataTable('#filter-table', {
+      sortable: true
+    });
+  });
+</script>

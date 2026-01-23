@@ -283,13 +283,13 @@
 			"optionGRCMagnus": "GRCMagnus"
 		},
 		"create": {
-			"title": "Create App Service",
+			"title": "Create Service",
 			"optionSelectProduct": "Select Product",
 			"optionSelectServiceType": "Select Service Type",
 			"optionSelectServiceTypeFixed": "Fixed",
 			"optionSelectServiceTypeAnnual": "Annual",
 			"labelServiceName": "Service Name",
-			"labelDescription": "Details",
+			"labelDescription": "Description",
 			"labelServiceCost": "Service Cost (USD)",
 			"btnBack": "Back",
 			"btnSubmit": "Submit",
@@ -981,6 +981,9 @@
 	},
 	"common": {
 		"search_here": "common.search_here",
-		"sort_by": "common.sort_by"
-	}
+		"sort_by": "common.sort_by",
+		"back": "common.back"
+	},
+	"Search": "Search",
+	"entries per page": "entries per page"
 }

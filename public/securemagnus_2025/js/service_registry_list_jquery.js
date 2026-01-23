@@ -193,7 +193,7 @@ function renderTable() {
       </td>
       <td class="px-6 py-6 whitespace-nowrap">
         <div class="relative inline-block text-left">
-          <button type="button" onclick="this.nextElementSibling.classList.toggle('hidden')"
+          <button type="button" onclick="closeAllActionMenus(); this.nextElementSibling.classList.toggle('hidden')"
             class="p-2 rounded hover:bg-gray-100 transition" aria-haspopup="true" aria-expanded="false">
             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
               viewBox="0 0 24 24">
@@ -234,9 +234,9 @@ function viewCampaign(campaignId) {
   window.location.href = `/phm/campaign/nfc/details/${campaignId}`;
 }
 
-// function editCampaign(campaignId) {
-//   window.location.href = `/phm/campaign/email/edit/${campaignId}`;
-// }
+function closeAllActionMenus() {
+  document.querySelectorAll('ul.absolute.right-0.mt-2.w-40').forEach(ul => ul.classList.add('hidden'));
+}
 
 // ===============================
 // Render pagination buttons - Simplified with new styling
@@ -332,6 +332,13 @@ document.querySelectorAll("th[data-sort]").forEach(th => {
 
     renderTable();
   });
+});
+
+// Close action menus when clicking outside
+document.addEventListener('click', function(event) {
+  if (!event.target.closest('.relative.inline-block.text-left')) {
+    closeAllActionMenus();
+  }
 });
 
 // ===============================

@@ -11,6 +11,9 @@
             <span class="text-gray-400">›</span>
             <span class="font-semibold text-gray-900">Create Template</span>
         </nav>
+        <div>
+            <%- include('../../partials/back-button', { label: 'Go Back' }) %>
+        </div>
         <h3 class="text-3xl font-medium text-gray-900">
             Create Template
         </h3>
@@ -21,9 +24,12 @@
     <!-- first section  -->
     <div class="flex flex-col p-8 gap-4 mt-3 rounded-3xl bg-white border border-gray-100 shadow-sm">
         <!-- Progress Bar -->
-        <div id="progress" class="flex items-center mb-6"></div>
+        <div class="overflow-x-auto mb-6">
+            <div id="progress" class="flex items-center min-w-max"></div>
+        </div>
         <form class="space-y-6" id="templateCreationForm" name="templateCreationForm" method="post"
             action="<%=typeof postMethodUrl !== 'undefined' ? postMethodUrl : '/template/' %>">
+            <!-- Steps -->
             <!-- Steps -->
             <div class="step hidden w-full lg:w-3/4">
                 <!-- Page Heading -->
@@ -318,7 +324,7 @@
                     <label for="website" class="block text-sm text-gray-700 mb-2">
                         <%= __("system_template.create.labelDetails_level3_CustomPhishPageURL") %>
                     </label>
-                    <input type="text" id="website"
+                    <input type="text" id="website" name="phish_url"
                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400">
                 </div>
             </div>
@@ -678,20 +684,4 @@ function insertSMSPlaceholder(placeholder) {
   document.getElementById('sms-char-count').textContent = textarea.value.length;
 }
 </script>
-<script>
-    $("#templateCreationForm").validate({
-  rules: {
-    // ...existing rules...
-    sms_content: { 
-      required: function() {
-        return selectedPhishType === 'sms';
-      },
-      maxlength: 160 
-    }
-  },
-  messages: {
-    // ...existing messages...
-    sms_content: "SMS message is required (max 160 characters)."
-  }
-});
-</script>
+<script src="/securemagnus_2025/js/custom_script/system_create_template_validation.js"></script>
