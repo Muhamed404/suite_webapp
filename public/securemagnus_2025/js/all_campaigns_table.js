@@ -172,6 +172,12 @@ function renderTable() {
 
   // Update pagination
   renderPagination(filtered.length);
+
+  // Hide pagination controls if no data
+  const paginationControls = document.querySelector('.flex.flex-col.gap-3.mt-4');
+  if (paginationControls) {
+    paginationControls.style.display = filtered.length === 0 ? 'none' : 'flex';
+  }
 }
 
 // ===============================
@@ -322,5 +328,10 @@ if (data.length > 0) {
         All <span class="bg-gray-700 text-white text-xs px-2 py-0.5 rounded-full">0</span>
       </button>
     `;
+  }
+  // Hide pagination controls when no data
+  const paginationControls = document.querySelector('.flex.flex-col.gap-3.mt-4');
+  if (paginationControls) {
+    paginationControls.style.display = 'none';
   }
 }
