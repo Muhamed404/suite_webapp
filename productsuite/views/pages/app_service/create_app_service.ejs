@@ -27,7 +27,7 @@
         <div class="flex flex-col gap-6">
           <div>
             <label for="application" class="block text-gray-700 font-medium mb-3">
-              <%= __("appservice.create.optionSelectProduct") %>
+              <%= __("appservice.create.optionSelectProduct") %> *
             </label>
             <select name="application" id="application" required
               class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-white">
@@ -42,7 +42,7 @@
 
           <div>
             <label for="service_name" class="block text-gray-700 font-medium mb-3">
-              <%= __("appservice.create.labelServiceName") %>
+              <%= __("appservice.create.labelServiceName") %> *
             </label>
             <input type="text" id="service_name" name="service_name" required
               placeholder="Enter service name"
@@ -51,9 +51,9 @@
 
           <div>
             <label for="per_service_cost" class="block text-gray-700 font-medium mb-3">
-              <%= __("appservice.create.labelServiceCost") %>
+              <%= __("appservice.create.labelServiceCost") %> *
             </label>
-            <input type="number" id="per_service_cost" name="per_service_cost" min="1"
+            <input type="number" id="per_service_cost" name="per_service_cost" min="1" required
               placeholder="Enter service cost"
               oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
               class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
@@ -64,7 +64,7 @@
         <div class="flex flex-col gap-6">
           <div>
             <label for="service_type" class="block text-gray-700 font-medium mb-3">
-              <%= __("appservice.create.optionSelectServiceType") %>
+              <%= __("appservice.create.optionSelectServiceType") %> *
             </label>
             <select name="service_type" id="service_type" required
               class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-white">
@@ -76,7 +76,7 @@
 
           <div>
             <label for="service_detail" class="block text-gray-700 font-medium mb-3">
-              <%= __("appservice.create.labelDescription") %>
+              <%= __("appservice.create.labelDescription") %> *
             </label>
             <input type="text" id="service_detail" name="service_detail" required
               placeholder="Enter description"

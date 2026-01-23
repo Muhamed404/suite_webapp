@@ -192,9 +192,10 @@ let currentStep = 0;
       const isActive = i === currentIndexInFlow;
       const isCompleted = i < currentIndexInFlow;
       const circle = document.createElement('div');
-      circle.className = 'flex flex-col items-center text-center mx-2';
+      circle.className = 'flex flex-col items-start text-center flex-shrink-0';
+      circle.style.width = '125px';
       circle.innerHTML = `
-        <div class="w-8 h-8 flex items-center justify-center rounded-full border-2
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border-2 mx-auto
           ${isActive
           ? 'bg-teal-400 text-white border-teal-400'
           : isCompleted
@@ -202,14 +203,16 @@ let currentStep = 0;
             : 'bg-white text-gray-600 border-gray-300'}">
           ${i + 1}
         </div>
-        <div class="text-xs mt-1">${stepTitles[stepIndex]}</div>
+        <div class="text-xs mt-1 px-1 leading-tight w-full font-semibold" style="min-height: 32px; word-wrap: break-word;">${stepTitles[stepIndex]}</div>
       `;
       progressWrap.appendChild(circle);
       // alert(progressWrap.innerHTML);
       if (i < activeFlow.length - 1) {
         const isLineActive = i < currentIndexInFlow;
         const line = document.createElement('div');
-        line.className = `flex-1 h-1 ${isLineActive ? 'bg-teal-400' : 'bg-gray-200'}`;
+        line.className = `h-1 flex-shrink-0 ${isLineActive ? 'bg-teal-400' : 'bg-gray-200'}`;
+        line.style.width = '60px';
+        line.style.marginTop = '16px';
         progressWrap.appendChild(line);
       }
 
@@ -356,12 +359,21 @@ let currentStep = 0;
     // alert('Handling Next for current step ' + (currentStep));
     // renderProgressBar();
     // alert('Handling Next for next step ' + (currentStep + 1));
+    
+    // Validate current step before proceeding
+    if (typeof window.validateCurrentStep === 'function') {
+      const isValid = window.validateCurrentStep(currentStep, selectedPhishType);
+      if (!isValid) {
+        return; // Stop if validation fails
+      }
+    }
+    
     saveDataForStep(currentStep);
     const sel = formData.step1.phishType;
     if (currentStep === 0) {
       // alert('currentStep Processing selections for step 0...');
       if (!sel) {
-        alert('Please choose a phish Type to continue.');
+        // Validation already handled by validateCurrentStep
         return;
       }
       selectedPhishType = sel;
@@ -387,7 +399,7 @@ let currentStep = 0;
       // alert('currentStep Processing selections for step 1...');
       const selectedOptions = (formData.step2.options) ? formData.step2.options : [];
       if (selectedOptions.length === 0) {
-        alert('Please select at least one option.');
+        // Validation already handled by validateCurrentStep
         return;
       }
       const matched = computeMatchingRule(selectedPhishType, selectedOptions);
