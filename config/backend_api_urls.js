@@ -34,6 +34,7 @@ module.exports = {
         Application_Service: {
             LIST: '/app_service/list',
             CREATE: '/app_service/create',
+            DELETE: '/app_service/delete',
         },
 
         Subscription: {
