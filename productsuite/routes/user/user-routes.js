@@ -38,7 +38,7 @@ router.post("/create", checkPermission(enums.ModuleNames.User_Management, [enums
 //   userManagement.renderUserList);
 
 router.get("/suite-users/:organizationId?",
-  checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O]),
+  checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O, enums.Access_Types.RWD_ALL, enums.Access_Types.R_ALL]),
   renderSuiteUsers);
 
 router.get("/securemagnus-users",

@@ -129,97 +129,113 @@
                 <%= u.user?.UserRoles || '' %>
               </td>
               <td class="px-6 py-6 whitespace-nowrap">
-                <div class="relative inline-block text-left">
+                <% if (typeof isReadOnly !== 'undefined' && isReadOnly) { %>
                   <% if (Array.isArray(u.productNames) && u.productNames.includes('PhishMagnus')) { %>
-                    <button type="button"
-                      class="licenseStatusBtn 
-                      inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50 hover:bg-green-100 transition"
-                      aria-haspopup="true" aria-expanded="false">
-                      Licensed
-                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </button>
-                    <ul
-                      class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
-                      <!-- <li>
-                        <a href="#" class="block px-4 py-2 text-sm text-yellow-600 hover:bg-gray-100 change-status"
-                          data-user-id="<%= u.user?.id || "" %>" data-status="pending">
-                          Set as Pending
-                        </a>
-                      </li> -->
-                      <li>
-                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
-                          data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
-                          Set as Unlicensed
-                        </a>
-                      </li>
-                    </ul>
-                    <% } else { %>
+                    <span class="inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50">Licensed</span>
+                  <% } else { %>
+                    <span class="inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50">Unlicensed</span>
+                  <% } %>
+                <% } else { %>
+                  <div class="relative inline-block text-left">
+                    <% if (Array.isArray(u.productNames) && u.productNames.includes('PhishMagnus')) { %>
                       <button type="button"
-                        class="licenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50 hover:bg-red-100 transition"
+                        class="licenseStatusBtn 
+                        inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50 hover:bg-green-100 transition"
                         aria-haspopup="true" aria-expanded="false">
-                        Unlicensed
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
-                          viewBox="0 0 24 24">
+                        Licensed
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                           <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                       </button>
                       <ul
                         class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+                        <!-- <li>
+                          <a href="#" class="block px-4 py-2 text-sm text-yellow-600 hover:bg-gray-100 change-status"
+                            data-user-id="<%= u.user?.id || "" %>" data-status="pending">
+                            Set as Pending
+                          </a>
+                        </li> -->
                         <li>
-                          <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
-                            data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
-                            Set as Licensed
+                          <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
+                            data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
+                            Set as Unlicensed
                           </a>
                         </li>
                       </ul>
-                      <% } %>
-                </div>
+                      <% } else { %>
+                        <button type="button"
+                          class="licenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50 hover:bg-red-100 transition"
+                          aria-haspopup="true" aria-expanded="false">
+                          Unlicensed
+                          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                        </button>
+                        <ul
+                          class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+                          <li>
+                            <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
+                              data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
+                              Set as Licensed
+                            </a>
+                          </li>
+                        </ul>
+                        <% } %>
+                  </div>
+                <% } %>
               </td>
               <td class="px-6 py-6 whitespace-nowrap">
-                <div class="relative inline-block text-left">
-                  <% if (Array.isArray(u.productNames) && u.productNames.length> 0 &&
-                    u.productNames.includes('AwareMagnus')) { %>
-                    <button type="button"
-                      class="AwareMagnuslicenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50 hover:bg-green-100 transition"
-                      aria-haspopup="true" aria-expanded="false">
-                      Licensed
-                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </button>
-                    <ul
-                      class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
-
-                      <li>
-                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
-                          data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
-                          Set as Unlicensed
-                        </a>
-                      </li>
-                    </ul>
-                    <% } else { %>
+                <% if (typeof isReadOnly !== 'undefined' && isReadOnly) { %>
+                  <% if (Array.isArray(u.productNames) && u.productNames.length > 0 && u.productNames.includes('AwareMagnus')) { %>
+                    <span class="inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50">Licensed</span>
+                  <% } else { %>
+                    <span class="inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50">Unlicensed</span>
+                  <% } %>
+                <% } else { %>
+                  <div class="relative inline-block text-left">
+                    <% if (Array.isArray(u.productNames) && u.productNames.length> 0 &&
+                      u.productNames.includes('AwareMagnus')) { %>
                       <button type="button"
-                        class="AwareMagnuslicenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50 hover:bg-red-100 transition"
+                        class="AwareMagnuslicenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50 hover:bg-green-100 transition"
                         aria-haspopup="true" aria-expanded="false">
-                        Unlicensed
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
-                          viewBox="0 0 24 24">
+                        Licensed
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                           <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                       </button>
                       <ul
                         class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+
                         <li>
-                          <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
-                            data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
-                            Set as Licensed
+                          <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
+                            data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
+                            Set as Unlicensed
                           </a>
                         </li>
                       </ul>
-                      <% } %>
-                </div>
+                      <% } else { %>
+                        <button type="button"
+                          class="AwareMagnuslicenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50 hover:bg-red-100 transition"
+                          aria-haspopup="true" aria-expanded="false">
+                          Unlicensed
+                          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                        </button>
+                        <ul
+                          class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+                          <li>
+                            <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
+                              data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
+                              Set as Licensed
+                            </a>
+                          </li>
+                        </ul>
+                        <% } %>
+                  </div>
+                <% } %>
               </td>
               <td class="px-6 py-6 whitespace-nowrap">
                 <% if(u.user.status === true || u.user.status === "true"){ %>
@@ -240,6 +256,7 @@
 
               </td>
               <td class="px-4 py-5 text-sm font-normal relative">
+                <% if (typeof isReadOnly !== 'undefined' && !isReadOnly) { %>
                 <div class="relative inline-block text-left">
                   <button type="button"
                     class="p-2 rounded hover:bg-gray-100 transition" aria-haspopup="true" aria-expanded="false">
@@ -267,6 +284,9 @@
                     </li>
                   </ul>
                 </div>
+                <% } else { %>
+                <span class="text-gray-400 text-xs">Read Only</span>
+                <% } %>
               </td>
 
 

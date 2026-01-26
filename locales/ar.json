@@ -244,6 +244,7 @@
 			"optionAll": "الكل",
 			"optionAWM": "Awaremagnus",
 			"optionPhishMagnus": "PhishMagnus",
+			"optionGRCMagnus": "GRCMagnus",
 			"btnCreateService": "إنشاء خدمة",
 			"btnDelete": "حذف"
 		},
