@@ -87,6 +87,7 @@ app.use(requestLogger);
  * i18n and locale
  */
 app.use(i18n.init);
+app.use(localeMiddleware);
 app.use((req, res, next) => {
   res.locals.locale = req.getLocale();
   next();
@@ -103,7 +104,9 @@ app.use((req, res, next) => {
     FrontendApplicationAPI.LOGOUT.SIGNOUT
   ];
 
-  if (skipPaths.includes(req.originalUrl)) return next();
+  // Check path without query parameters
+  const pathWithoutQuery = req.path;
+  if (skipPaths.includes(pathWithoutQuery)) return next();
 
   // Validate session for all other paths
 

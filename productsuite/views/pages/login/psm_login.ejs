@@ -36,10 +36,13 @@
         </a>
 
 
-        <a href=""
+        <a href="?lang=en"
           class="rounded-full text-sm py-1.5 px-4 border border-[var(--teal)] hover:bg-[var(--teal)] hover:text-white transform duration-300">
-          عربي
-
+          English
+        </a> |
+        <a href="?lang=ar"
+          class="rounded-full text-sm py-1.5 px-4 border border-[var(--teal)] hover:bg-[var(--teal)] hover:text-white transform duration-300">
+          العربية
         </a>
 
       </div>
@@ -51,7 +54,7 @@
         <div class="flex items-center justify-center">
           <div class="flex flex-col max-w-2xl items-stretch ">
 
-            <h3 class="text-center text-4xl font-semibold md:mt-12 lg:mt-24">Welcome to SecureMagnus</h3>
+            <h3 class="text-center text-4xl font-semibold md:mt-12 lg:mt-24"><%= __('generic_label.welcomeToSecureMagnus') %></h3>
 
             <!-- Alert Message -->
             <% if (locals.message) { %>
@@ -67,7 +70,7 @@
 
                 <label
                   class="flex items-center w-full p-5 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--teal)] transition-colors duration-300">
-                  <input type="email" placeholder="Email Address" name="email"
+                  <input type="email" placeholder="<%= __('generic_label.emailAddress') %>" name="email"
                     class="bg-transparent border-none outline-none text-[14px] w-full" />
                 </label>
               </fieldset>
@@ -75,7 +78,7 @@
 
                 <label
                   class="flex items-center w-full p-5 mt-3 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--teal)] transition-colors duration-300">
-                  <input class="bg-transparent border-none outline-none text-[14px] grow" placeholder="Password" name="password"
+                  <input class="bg-transparent border-none outline-none text-[14px] grow" placeholder="<%= __('generic_label.password') %>" name="password"
                     id="password" type="password" />
 
                 </label>
@@ -87,13 +90,13 @@
                     aria-label="Custom checkbox" />
 
                   <label for="agreement" class="text-sm ">
-                    Remember me
+                    <%= __('generic_label.rememberMe') %>
                   </label>
                 </div>
 
                 <div class="">
                   <a class="label-text text-[var(--teal)] text-base-content/80 text-xs" href="">
-                    Forgot Password?
+                    <%= __('generic_label.forgotPassword') %>
                   </a>
                 </div>
 
@@ -103,13 +106,13 @@
               <button type="submit"
                 class="w-full flex items-center justify-center gap-3 mt-8 px-6 py-3 rounded-full bg-[var(--teal)] text-white border border-transparent transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
                 <!-- <span class="iconify lucide--log-in size-4"></span> -->
-                Login
+                <%= __('generic_label.login') %>
               </button>
 
               <p class="text-base-content/80 mt-4 text-center text-sm md:mt-6">
-                Don't have an account?
+                <%= __('generic_label.dontHaveAccount') %>
                 <a class="text-[var(--teal)] ms-1 hover:underline" href="./onboarding1-eng.html">
-                  Singup
+                  <%= __('generic_label.signup') %>
                 </a>
               </p>
             </div>

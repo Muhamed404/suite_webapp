@@ -12,7 +12,61 @@
 		"status": "الحالة",
 		"active": "نشط",
 		"inactive": "غير نشط",
-		"download": "تحميل"
+		"download": "تحميل",
+		"start_date": "تاريخ البدء",
+		"end_date": "تاريخ الانتهاء",
+		"schedule": "تاريخ الجدول",
+		"select_date_time": "اختر التاريخ والوقت",
+		"action": "الإجراء",
+		"my_template": "قالبي",
+		"system_template": "قالب النظام",
+		"select_template": "اختر القالب",
+		"description": "الوصف",
+		"preview": "معاينة",
+		"formInteraction": "تفاعل النموذج",
+		"formSubmitted": "تم إرسال النموذج",
+		"attachmentOpened": "تم فتح المرفق",
+		"targetCompromised": "تم اختراق الهدف",
+		"search_here": "ابحث هنا...",
+		"sort_by": "رتّب حسب",
+		"loading": "جارٍ التحميل...",
+		"error": "خطأ",
+		"success": "نجاح",
+		"warning": "تحذير",
+		"info": "معلومات",
+		"confirm": "تأكيد",
+		"actions": "الإجراءات",
+		"no_data": "لا توجد بيانات متاحة",
+		"page": "صفحة",
+		"total": "الأجمالي",
+		"results": "النتائج",
+		"previous": "السابق",
+		"showing": "عرض",
+		"of": "من",
+		"campaignName": "اسم الحملة",
+		"templateName": "اسم القالب",
+		"save": "حفظ",
+		"close": "اغلاق",
+		"update": "تحديث",
+		"firstName": "الاسم الأول",
+		"lastName": "الاسم الأخير",
+		"email": "البريد الالكتروني",
+		"password": "كلمة المرور",
+		"newPassword": "كلمة المرور الجديدة",
+		"enterFirstName": "أدخل الاسم الأول",
+		"enterLastName": "أدخل الاسم الأخير",
+		"enterEmail": "أدخل البريد الالكتروني",
+		"enterPassword": "أدخل كلمة المرور",
+		"enterNewPassword": "أدخل كلمة المرور الجديدة",
+		"login": "تسجيل الدخول",
+		"welcomeToSecureMagnus": "مرحباً بك في SecureMagnus",
+		"welcomeToPhishMagnus": "مرحباً بك في PhishMagnus", 
+		"welcomeToAwareMagnus": "مرحباً بك في AwareMagnus",
+		"emailAddress": "عنوان البريد الإلكتروني",
+		"rememberMe": "تذكرني",
+		"forgotPassword": "نسيت كلمة المرور؟",
+		"dontHaveAccount": "ليس لديك حساب؟",
+		"signup": "التسجيل"
 	},
 	"topnavbar": {
 		"welcome": "مرحباً"
@@ -49,7 +103,9 @@
 		"usbCampaignReport": "تقرير حملة USB",
 		"smsCampaignReport": "تقرير حملة SMS",
 		"systemTemplate": "قالب النظام",
-		"myTemplate": "قالباتي"
+		"myTemplate": "قالباتي",
+		"smsCampaign": "إنشاء حملة رسائل قصيرة",
+		"whatsappCampaign": "إنشاء حملة واتساب"
 	},
 	"productsuite": {
 		"btn": {
@@ -340,7 +396,18 @@
 		"labelRoleAssigned": "الدور المخصص",
 		"labelUserStatus": "حالة المستخدم",
 		"labelAction": "الإجراء",
-		"btnAddUser": "إضافة مستخدم"
+		"btnAddUser": "إضافة مستخدم",
+		"labelSecureMagnusUsers": "مستخدمي SecureMagnus",
+		"labelCreateUser": "إنشاء مستخدم",
+		"labelCreateSecureMagnusUser": "إنشاء مستخدم SecureMagnus",
+		"labelEditUserDetails": "تعديل بيانات المستخدم",
+		"labelChooseProduct": "اختر المنتج",
+		"labelEnterUserDetails": "إدخال بيانات المستخدم",
+		"btnDelete": "حذف",
+		"btnEdit": "تعديل",
+		"statusActive": "نشط",
+		"statusInactive": "غير نشط",
+		"labelSave": "حفظ"
 	},
 	"system_template": {
 		"stepper1": "تفاصيل القالب",
@@ -448,7 +515,13 @@
 			"labelInteractForm": "التفاعل مع النموذج",
 			"labelFormSubmit": "إرسال النموذج",
 			"labelAttachmentOpened": "تم فتح المرفق",
-			"labelAction": "الإجراء"
+			"labelAction": "الإجراء",
+			"labelPhishingWebContentEditor": "محتوى قالب صفحة التصيد الاحتيالي",
+			"labelLandingPageContentEditor": "محتوى قالب صفحة الوصول",
+			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)",
+			"sms_message": "نص الرسالة القصيرة",
+			"sms_content": "محتوى قالب الرسائل النصية",
+			"labelImportHtmlUrl": "استيراد صفحة الوصول من رابط خارجي"
 		}
 	},
 	"sms": {
@@ -477,6 +550,69 @@
 			"select_target_audience": "اختر الجمهور المستهدف",
 			"select_department": "اختر القسم",
 			"select_group": "اختر المجموعة"
+		},
+		"campaign_report": {
+			"title": "تقارير حملة الرسائل القصيرة",
+			"subtitle": "تتبع وادارة حملات التصيد الاحتيالي عبر الرسائل القصيرة",
+			"campaigns": "حملات الرسائل النصية القصيرة",
+			"campaign_name": "اسم الحملة",
+			"template": "القالب",
+			"total_invitees": "إجمالي المدعوين",
+			"delivered": "تم التسليم",
+			"delivery_rate": "معدل التسليم",
+			"status": "الحالة",
+			"activity": "النشاط",
+			"actions": "الإجراءات",
+			"view_details": "عرض التفاصيل",
+			"edit": "تعديل",
+			"delete": "حذف",
+			"confirm_delete": "هل أنت متأكد أنك تريد حذف هذه الحملة؟",
+			"create_campaign": "إنشاء حملة",
+			"empty_message": "لم يتم العثور على أي حملات رسائل قصيرة. أنشئ حملة جديدة للبدء.",
+			"empty_description": "أنشئ أول حملة رسائل قصيرة لك لعرض التقارير هنا.",
+			"showing": "عرض",
+			"to": "-",
+			"of": "من",
+			"entries": "سجلات",
+			"active": "نشط",
+			"inactive": "غير نشط"
+		},
+		"campaign_details": {
+			"title": "تفاصيل حملة الرسائل القصيرة",
+			"edit": "تعديل",
+			"back": "الرجوع",
+			"total_sms_sent": "تم إرسال الرسائل القصيرة",
+			"sms_delivered": "تم التسليم",
+			"link_clicked": "تم النقر على الرابط",
+			"page_visited": "تم زيارة الصفحة",
+			"form_submitted": "تم إرسال النموذج",
+			"file_downloaded": "تم تنزيل الملف",
+			"interaction_metrics": "مؤشرات التفاعل",
+			"interaction_summary": "ملخص التفاعل",
+			"count": "العدد",
+			"sms_reply_stats": "إحصائيات ردود الرسائل القصيرة",
+			"sms_replied": "تم الرد على الرسائل القصيرة",
+			"call_made": "تم إجراء المكالمة",
+			"otp_shared": "تم مشاركة رمز التحقق ",
+			"campaign_details": "تفاصيل الحملة",
+			"campaign_name": "اسم الحملة",
+			"template_name": "القالب",
+			"launch_date": "تاريخ الإطلاق",
+			"status": "الحالة",
+			"delivery_performance": "أداء التسليم",
+			"delivery_rate": "معدل التسليم",
+			"interaction_rate": "معدل التفاعل",
+			"link_interaction": "تم النقر على الرابط",
+			"form_interaction": "تم التفاعل مع النموذج",
+			"page_visit": "تم زيارة الصفحة",
+			"file_download": "تم تنزيل الملف",
+			"invitee_responses": "ردود المدعوين",
+			"invitee_name": "اسم المدعو",
+			"form_interacted": "تم التفاعل مع النموذج",
+			"sms_interacted": "تم التفاعل",
+			"no_interaction": "لا يوجد تفاعل",
+			"interacted": "تم التفاعل",
+			"no_invitees": "لا توجد ردود من المدعوين بعد"
 		}
 	},
 	"usb_campaign": {
@@ -485,6 +621,9 @@
 			"step2": "الجدولة",
 			"step3": "تفاصيل USB"
 		},
+		"device_code": "رمز الجهاز",
+		"description": "الوصف",
+		"start_date": "تاريخ البدء",
 		"steps": {
 			"campaignTitle": "حملة USB",
 			"step2Title": "اختر التاريخ والوقت",
@@ -516,6 +655,62 @@
 			"device_code": "رمز الجهاز",
 			"description": "الوصف",
 			"start_date": "تاريخ البدء"
+		},
+		"qr_campaign": {
+			"name": "اسم الحملة",
+			"description": "الوصف",
+			"templateName": "اسم القالب",
+			"totalImages": "إجمالي الصور",
+			"imageSetup": "إعداد صور QR",
+			"labelCreationNFCTag": "إنشاء بطاقات NFC",
+			"tagQuantity": "كمية البطاقات",
+			"uploadBrandLogo": "رفع شعار العلامة التجارية",
+			"phishingCampaignResponseMetrics": "مقاييس استجابة حملة التصيد الاحتيالي",
+			"totalQrImagesCreated": "إجمالي صور QR",
+			"notScanQrImages": "الصور التي لم يتم مسحها",
+			"totalQrScans": "إجمالي عمليات مسح QR",
+			"campaignMetrics": "مقاييس الحملة",
+			"phishingSuccess": "نجاح التصيد الاحتيالي",
+			"employeesPhishingSegments": "شرائح الموظفين في التصيد الاحتيالي",
+			"adminReportSegments": "شرائح تقرير المسؤول",
+			"scanAndOpenUrl": "مسح وفتح الرابط",
+			"submittedForm": "النموذج المرسل",
+			"totalInteract": "إجمالي التفاعل",
+			"downloadFile": "تنزيل الملف",
+			"totalUniqueIps": "إجمالي عناوين IP الفريدة",
+			"capturedUserData": "البيانات التي تم التقاطها للمستخدم",
+			"scanQrCode": "مسح رمز QR",
+			"people": "الأشخاص",
+			"openLink": "فتح الرابط",
+			"targetCompromised": "تم اختراق الهدف",
+			"campaignDetails": "تفاصيل الحملة",
+			"campaignName": "اسم الحملة",
+			"url": "عنوان الرابط",
+			"phishingPage": "صفحة التصيد الاحتيالي",
+			"launchDate": "تاريخ الإطلاق",
+			"linksInteraction": "التفاعل مع الروابط",
+			"interactForm": "التفاعل مع النموذج",
+			"formSubmitted": "تم إرسال النموذج",
+			"attachmentOpened": "تم فتح المرفق",
+			"interactionReportByEachQrCode": "تقرير التفاعل لكل رمز QR",
+			"tagSequence": "تسلسل الوسم #",
+			"tagCode": "رمز الوسم",
+			"downloadQrCode": "تنزيل رمز QR",
+			"viewReport": "عرض التقرير",
+			"searchHere": "ابحث هنا...",
+			"sortBy": "رتب حسب",
+			"prevPage": "السابق",
+			"nextPage": "التالي",
+			"interactionReportByEachQRCode": "تقرير التفاعل لكل رمز QR",
+			"downloadQRCode": "تنزيل رمز QR",
+			"tagScan": "تم مسح الوسم",
+			"notScanTag": "لم يتم مسح الوسم"
+		},
+		"nfc_campaign": {
+			"name": "اسم الحملة",
+			"templateName": "اسم القالب",
+			"totalTags": "إجمالي الوسوم",
+			"select_tag_quantity": "اختر كمية الوسوم"
 		},
 		"department": {
 			"labelTitleDepartmentManagement": "إدارة الأقسام",
@@ -751,5 +946,181 @@
 			"Close": "Order.Modal.Close"
 		}
 	},
-	"btn-Create": "btn-Create"
+	"btn-Create": "btn-Create",
+	"Template-System-Template": "قالب النظام",
+	"btn-Create-Template": "إنشاء قالب",
+	"Template-Organization": "الجهة",
+	"Template-TemplateName": "اسم القالب",
+	"Template-PhishType": "نوع التصيد",
+	"Template-Subject": "الموضوع",
+	"Template-Language": "اللغة",
+	"Template-Category": "الفئة",
+	"Template-Action": "الإجراء",
+	"tooltp-Template-Edit": "تعديل القالب",
+	"tooltp-Template-Delete": "حذف القالب",
+	"Users": {
+		"FullName": "الاسم الكامل",
+		"Email": "البريد الالكتروني",
+		"RoleAssigned": "تم تعيين الدور",
+		"UserStatus": "حالة المستخدم",
+		"Action": "الإجراء"
+	},
+	"btnEdit": "تعديل",
+	"btnDelete": "حذف",
+	"Template": {
+		"senderEmail": "البريد الالكتروني للمرسل",
+		"senderName": "اسم المرسل",
+		"companyName": "اسم الشركة",
+		"companyDomain": "نطاق الشركة",
+		"phishPage": "صفحة التصيد الاحتيالي"
+	},
+	"Audit": {
+		"CreationDate": "تاريخ الإنشاء",
+		"User": "المستخدم",
+		"ActionType": "نوع الإجراء",
+		"Module": "الوحدة",
+		"Description": "الوصف",
+		"IPAddress": "عنوان IP",
+		"UrlPath": "مسار الرابط"
+	},
+	"CS-List": "فئات الأمن السيبراني",
+	"btn-CS-LibPosters-Upload-Document": "رفع مستند",
+	"CS-CreateCategory": "إنشاء فئة",
+	"CS-Name": "الاسم",
+	"CS-Code": "الرمز",
+	"CS-Description": "الوصف",
+	"CS-Action": "الإجراء",
+	"btn-CS-LibPosters-Delete": "حذف",
+	"btn-CS-LibPosters": "مكتبة الملصقات",
+	"noti": {
+		"LibPosters": "مكتبة الملصقات"
+	},
+	"sel-CS-LibPosters-Category": "اختر الفئة",
+	"sel-CS-LibPosters": "اختر ملصق المكتبة",
+	"btn-CS-LibPosters-Cancel": "إلغاء ",
+	"btn-CS-LibPosters-Upload": "رفع",
+	"Campaign": {
+		"name": "اسم الحملة",
+		"description": "الوصف",
+		"myTemplate": "قوالبي",
+		"systemTemplates": "قوالب النظام",
+		"Preview": "معاينة",
+		"NFC": {
+			"TagsQuantity": "كمية وسوم NFC"
+		},
+		"create": "إنشاء حملة",
+		"USB": {
+			"Campaign": {
+				"Description": "وصف حملة USB",
+				"EnvVariables": "متغيرات البيئة"
+			},
+			"File": {
+				"Name": "اسم الملف"
+			}
+		},
+		"noOfUSB": "عدد وحدات USB",
+		"stDate": "تاريخ البدء",
+		"edDate": "تاريخ الانتهاء",
+		"launch": "الإطلاق",
+		"QR": {
+			"TagsQuantity": "كمية وسوم QR",
+			"Tag": "وسم QR"
+		},
+		"Report": {
+			"CampName": "اسم الحملة",
+			"TemplateName": "اسم القالب"
+		}
+	},
+	" Campaign": {
+		"description": " وصف الحملة"
+	},
+	"Department-list": "قائمة الأقسام",
+	"Department-Name": "اسم القسم",
+	"Department-Desc": "وصف القسم",
+	"Department-UserEnroll": "تسجيل المستخدمين بالقسم",
+	"Add-Department": "إضافة قسم",
+	"Department-Parent": "القسم الرئيسي",
+	"No-Sel": "غير محدد",
+	"Submit": "إرسال",
+	"tooltp-Template-Duplicate": "نسخ القالب",
+	"tooltp-Template-View": "عرض القالب",
+	"Organization": {
+		"SubscriptionHistory": "سجل الاشتراكات",
+		"Edit": "تعديل",
+		"Address": "العنوان",
+		"PostalCode": "الرمز البريدي",
+		"OrgContactNumber": "رقم التواصل",
+		"AdminEmail": "بريد المشرف",
+		"FirstName": "الاسم الاول",
+		"LastName": "اسم العائلة",
+		"Admin": {
+			"Password": "كلمة مرور المشرف"
+		},
+		"Mandatory": "إلزامي"
+	},
+	"SubscriptionHistory": {
+		"TotalSubscription": "إجمالي الاشتراكات",
+		"Active": "نشط"
+	},
+	"SubscriptionPendingInvoice": "فاتورة معلقة",
+	"Tab": {
+		"Subscription": {
+			"Application": "التطبيق",
+			"Purchase Date": "تاريخ الشراء",
+			"Start Date": "تاريخ البدء",
+			"Expiry Date": "تاريخ الانتهاء",
+			"User Licenses": "تراخيص المستخدمون",
+			"AvailableUser": "المستخدمون المتاحون",
+			"Service": "الخدمة",
+			"Status": "الحالة",
+			"Order": {
+				"Status": "حالة الطلب"
+			},
+			"Action": "الإجراء"
+		}
+	},
+	"btn": {
+		"createInvoice": "إنشاء فاتورة"
+	},
+	"Unknown": "غير معروف",
+	"Invoice": {
+		"number": "رقم الفاتورة",
+		"organizationName": "اسم الجهة",
+		"mainAddress": "العنوان الرئيسي",
+		"billingAddress": "عنوان الفاتورة",
+		"contact": "جهة الاتصال",
+		"email": "البريد الالكتروني",
+		"orderDate": "تاريخ الطلب",
+		"orderStatus": "حالة الطلب",
+		"orderID": "معرف الطلب",
+		"Application": "التطبيق",
+		"Services": "الخدمات",
+		"perUserCost": "تكلفة المستخدم الواحد",
+		"numberOfUser": "عدد المستخدمين",
+		"stDate": "تاريخ البدء",
+		"expiryDate": "تاريخ الانتهاء",
+		"subTotal": "الاجمالي الفرعي",
+		"discount": "الخصم",
+		"totalPayable": "اجمالي المبلغ المستحق",
+		"back": "رجوع"
+	},
+	"CS-Add": "إضافة فئة",
+	"btn-CS-Save": "حفظ",
+	"btn-CS-Cancel": "إلغاء",
+	" generic_label": {
+		"create": " إنشاء",
+		"search_here": " ابحث هنا"
+	},
+	"template": {
+		"sms_content": "محتوى قالب الرسائل النصية",
+		"sms_message": "نص الرسالة القصيرة",
+		"sms_placeholder": "نص الرسالة"
+	},
+	"common": {
+		"search_here": "ابحث هنا",
+		"sort_by": "رتّب حسب",
+		"back": "رجوع"
+	},
+	"Search": "بحث",
+	"entries per page": "عدد السجلات في الصفحة"
 }

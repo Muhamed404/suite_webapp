@@ -44,7 +44,17 @@
 		"showing": "showing",
 		"of": "of",
 		"campaignName": "Campaign Name",
-		"templateName": "Template Name"
+		"templateName": "Template Name",
+		"login": "Login",
+		"welcomeToSecureMagnus": "Welcome to SecureMagnus",
+		"welcomeToPhishMagnus": "Welcome to PhishMagnus", 
+		"welcomeToAwareMagnus": "Welcome to AwareMagnus",
+		"emailAddress": "Email Address",
+		"password": "Password",
+		"rememberMe": "Remember me",
+		"forgotPassword": "Forgot Password?",
+		"dontHaveAccount": "Don't have an account?",
+		"signup": "Signup"
 	},
 	"topnavbar": {
 		"welcome": "Welcome"
