@@ -82,6 +82,12 @@
   // templates & systemTemplate come from controller
   window._userTemplates = <%- JSON.stringify(templates || []) %>;
   window._systemTemplates = <%- JSON.stringify(systemTemplate || []) %>;
+  window.i18n = {
+    labels: {
+      next: "<%= __('generic_label.next') %>",
+      finish: "<%= __('generic_label.Finish') %>"
+    }
+  };
 </script>
 <script src="/securemagnus_2025/js/form_stepper.js"></script>
 <script src="/securemagnus_2025/js/time-validation.js"></script>

@@ -44,6 +44,7 @@
 		"showing": "عرض",
 		"of": "من",
 		"campaignName": "اسم الحملة",
+		"enter_campaign_name": "أدخل اسم الحملة",
 		"templateName": "اسم القالب",
 		"save": "حفظ",
 		"close": "اغلاق",
@@ -71,6 +72,7 @@
 	},
 	"validation_messages": {
 		"campaign_name_required": "اسم الحملة مطلوب (حد أدنى حرفين).",
+		"template_type_required": "يرجى اختيار نوع القالب.",
 		"template_required": "يرجى اختيار قالب.",
 		"start_time_required": "تاريخ ووقت البدء مطلوبان.",
 		"end_time_required": "تاريخ ووقت الانتهاء مطلوبان.",
@@ -1116,7 +1118,8 @@
 	"btn-CS-Cancel": "إلغاء",
 	" generic_label": {
 		"create": " إنشاء",
-		"search_here": " ابحث هنا"
+		"search_here": " ابحث هنا",
+		"campaignName": " generic_label.campaignName"
 	},
 	"template": {
 		"sms_content": "محتوى قالب الرسائل النصية",
@@ -1204,5 +1207,18 @@
 		"filterScheduled": "مجدول",
 		"filterCompleted": "مكتمل",
 		"filterDraft": "مسودة"
+	},
+	" sms": {
+		"create_campaign": {
+			"description": " sms.create_campaign.description"
+		}
+	},
+	"qr_campaign": {
+		"imageSetup": "qr_campaign.imageSetup",
+		"name": "qr_campaign.name",
+		"description": "qr_campaign.description",
+		"labelCreationNFCTag": "qr_campaign.labelCreationNFCTag",
+		"tagQuantity": "qr_campaign.tagQuantity",
+		"uploadBrandLogo": "qr_campaign.uploadBrandLogo"
 	}
 }

@@ -44,6 +44,7 @@
 		"showing": "showing",
 		"of": "of",
 		"campaignName": "Campaign Name",
+		"enter_campaign_name": "Enter Campaign Name",
 		"templateName": "Template Name",
 		"login": "Login",
 		"welcomeToSecureMagnus": "Welcome to SecureMagnus",
@@ -59,6 +60,7 @@
 	},
 	"validation_messages": {
 		"campaign_name_required": "Campaign name is required (minimum 2 characters).",
+		"template_type_required": "Please select a template type.",
 		"template_required": "Please select a template.",
 		"start_time_required": "Start date and time are required.",
 		"end_time_required": "End date and time are required.",

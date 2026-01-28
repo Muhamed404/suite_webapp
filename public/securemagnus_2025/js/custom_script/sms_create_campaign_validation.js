@@ -8,15 +8,15 @@ $(document).ready(function () {
       templateSelect: { required: true },
 
       // Step 3: Date & Time
-      startTime: { required: true },
+      // startTime: { required: true },
       endTime: { required: true }
     },
     messages: {
-      name: "Campaign name is required (min 2 characters).",
-      templateOption: "Please select a template type.",
-      templateSelect: "Please select a template.",
-      startTime: "Start date and time are required.",
-      endTime: "End date and time are required."
+      name: window.i18n?.validation_messages?.campaign_name_required || "Campaign name is required (min 2 characters).",
+      templateOption: window.i18n?.validation_messages?.template_type_required || "Please select a template type.",
+      templateSelect: window.i18n?.validation_messages?.template_required || "Please select a template.",
+      // startTime: window.i18n?.validation_messages?.start_time_required || "Start date and time are required.",
+      endTime: window.i18n?.validation_messages?.end_time_required || "End date and time are required."
     },
     errorClass: "text-red-500 text-sm mt-1",
     highlight: function (element) {
@@ -24,14 +24,19 @@ $(document).ready(function () {
     },
     unhighlight: function (element) {
       $(element).removeClass("border-red-500");
-    }
+    },
+    // Prevent validation on form initialization
+    onkeyup: false,
+    onfocusout: false,
+    onclick: false
   });
 
   // Validate on change/blur for better UX
   $('#name').on('blur', function () { $(this).valid(); });
   $('input[name="templateOption"]').on('change', function () { $(this).valid(); });
   $('#templateSelect').on('change', function () { $(this).valid(); });
-  $('#startTime, #endTime').on('change', function () { $(this).valid(); });
+  // $('#startTime, #endTime').on('change', function () { $(this).valid(); });
+  $('#endTime').on('change', function () { $(this).valid(); });
 
   // Initialize template option toggle
   initTemplateOptionToggle();
@@ -165,7 +170,7 @@ function initTemplateOptionToggle() {
     placeholder.value = '';
     placeholder.disabled = true;
     placeholder.selected = true;
-    placeholder.textContent = 'Select Template';
+    placeholder.textContent = window.i18n?.labels?.selectTemplate || 'Select Template';
     selectEl.appendChild(placeholder);
 
     if (!items || !items.length) return;
@@ -179,8 +184,8 @@ function initTemplateOptionToggle() {
 
     selectEl.selectedIndex = 0;
     
-    // Trigger validation after populating
-    $(selectEl).valid();
+    // Don't trigger validation immediately after populating
+    // $(selectEl).valid();
   }
 
   function update() {
