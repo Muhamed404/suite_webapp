@@ -8,8 +8,8 @@
           <div class="hidden lg:flex items-center gap-4">
             <!-- Search Bar -->
             <div class="flex items-center w-48 bg-white rounded-full border border-gray-300 focus-within:ring-2 focus-within:ring-[var(--teal)]">
-              <img src="/securemagnus_2025/images/img/search.svg" class="w-4 h-4 ml-3 text-gray-400" alt="">
-              <input type="text" placeholder="Search here..." class="flex-1 py-2 pl-2 pr-10 bg-transparent text-sm focus:outline-none" />
+              <img src="/securemagnus_2025/images/img/search.svg" class="w-4 h-4 <%= locals.locale === 'ar' ? 'mr-3' : 'ml-3' %> text-gray-400" alt="">
+              <input type="text" placeholder="<%= __('generic_label.search_here') %>" class="flex-1 py-2 <%= locals.locale === 'ar' ? 'pr-2 pl-10' : 'pl-2 pr-10' %> bg-transparent text-sm focus:outline-none <%= locals.locale === 'ar' ? 'text-right' : '' %>" />
             </div>
 
             <!-- Two Circle Buttons -->
@@ -62,8 +62,8 @@
         <div id="mobile-menu" class="hidden lg:hidden bg-[#FAFBFC] px-6 py-4 border-t border-gray-200">
           <!-- Search Bar -->
           <div class="flex items-center w-full bg-white rounded-full border border-gray-300 focus-within:ring-2 focus-within:ring-[var(--teal)] mb-4">
-            <img src="/securemagnus_2025/images/img/search.svg" class="w-4 h-4 ml-3 text-gray-400" alt="">
-            <input type="text" placeholder="Search here..." class="flex-1 py-2 pl-2 pr-10 bg-transparent text-sm focus:outline-none" />
+            <img src="/securemagnus_2025/images/img/search.svg" class="w-4 h-4 <%= locals.locale === 'ar' ? 'mr-3' : 'ml-3' %> text-gray-400" alt="">
+            <input type="text" placeholder="<%= __('generic_label.search_here') %>" class="flex-1 py-2 <%= locals.locale === 'ar' ? 'pr-2 pl-10' : 'pl-2 pr-10' %> bg-transparent text-sm focus:outline-none <%= locals.locale === 'ar' ? 'text-right' : '' %>" />
           </div>
 
           <!-- Buttons -->

@@ -142,9 +142,8 @@
 
         <!-- Text Overlay -->
         <div class="relative z-10 p-16">
-          <h5 class="text-white text-5xl font-semibold leading-snug">
-            Empowering Future,<br />
-            <span class="text-[var(--teal)]">Securing</span> Today
+          <h5 class="text-white text-5xl font-semibold leading-snug <%= locals.locale === 'ar' ? 'text-right' : '' %>">
+            <%- __('generic_label.heroText') %>
           </h5>
         </div>
       </div>
