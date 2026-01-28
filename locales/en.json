@@ -57,6 +57,18 @@
 		"signup": "Signup",
 		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today"
 	},
+	"validation_messages": {
+		"campaign_name_required": "Campaign name is required (minimum 2 characters).",
+		"template_required": "Please select a template.",
+		"start_time_required": "Start date and time are required.",
+		"end_time_required": "End date and time are required.",
+		"no_departments_groups": "No departments or groups available. Please add users to departments or groups before creating a campaign.",
+		"select_department_group": "Please select at least one department or group to target.",
+		"validation_error": "Validation Error:",
+		"no_members_in_selection": "The selected departments/groups have no members. Please select departments or groups with members, or add members to the selected ones.",
+		"some_empty_selections": "Warning: Some selections have no members. The campaign will only target departments/groups with members.",
+		"validation_failed": "Validation failed. Please try again."
+	},
 	"topnavbar": {
 		"welcome": "Welcome"
 	},
@@ -578,6 +590,18 @@
 			"select_target_audience": "Select Target Audience",
 			"select_department": "Select Department",
 			"select_group": "Select Group"
+		},
+		"validation_messages": {
+			"campaign_name_required": "Campaign name is required (minimum 2 characters).",
+			"template_required": "Please select a template.",
+			"start_time_required": "Start date and time are required.",
+			"end_time_required": "End date and time are required.",
+			"no_departments_groups": "No departments or groups available. Please add users to departments or groups before creating a campaign.",
+			"select_department_group": "Please select at least one department or group to target.",
+			"validation_error": "Validation Error:",
+			"no_members_in_selection": "The selected departments/groups have no members. Please select departments or groups with members, or add members to the selected ones.",
+			"some_empty_selections": "Warning: Some selections have no members. The campaign will only target departments/groups with members.",
+			"validation_failed": "Validation failed. Please try again."
 		},
 		"campaign_report": {
 			"title": "SMS Campaign Reports",
