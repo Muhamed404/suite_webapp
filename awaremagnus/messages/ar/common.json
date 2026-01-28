@@ -1,0 +1,11 @@
+{
+  "appName": "AwareMagnus",
+  "language": {
+    "switchToArabic": "عربي",
+    "switchToEnglish": "EN"
+  },
+  "errors": {
+    "networkError": "خطأ في الشبكة: تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقًا.",
+    "unknown": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
+  }
+}

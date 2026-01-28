@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@plugin '../hero.ts';
+
+@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    --font-sans: "Nunito Sans", sans-serif;
+    --font-mono: "monospace", monospace;
+}
+
+:root {
+    /* Legacy color variables */
+    --bg: #FAFBFC;
+    --teal: #00CCC4;
+    --gray: #F1F5F8;
+    --darkgray: #656972;
+    --strokeGray: #DAE1E5;
+    --mainblue: #051226;
+    --lightBlue: #66CAFE;
+    --blue: #41A5FE;
+    --email: #57ABE6;
+    --emaillight: #D9E5F3;
+}
+
+* {
+    font-family: "Nunito Sans", sans-serif;
+}
+
+html[lang="ar"] * {
+    font-family: "Tajawal", "Cairo", "Noto Kufi Arabic", "Noto Sans Arabic", "Nunito Sans", sans-serif;
+}
+
+/* Custom scrollbar for sidebar */
+.custom-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    overflow-y: auto;
+}
+
+.custom-scroll::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.custom-scroll:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.4);
+}
