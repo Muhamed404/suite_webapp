@@ -159,7 +159,8 @@
 			"department": "القسم",
 			"groups": "المجموعات",
 			"subscriptionHistory": "سجل الاشتراكات",
-			"products": "المنتجات"
+			"products": "المنتجات",
+			"logout": "تسجيل الخروج"
 		}
 	},
 	"organization": {
@@ -1161,5 +1162,23 @@
 		"totalQRImages": "إجمالي صور QR",
 		"created": "تم الإنشاء",
 		"unsent": "غير مرسل"
+	},
+	"all_campaigns": {
+		"campaignCenter": "مركز الحملات",
+		"campaignCenterDescription": "تتبع كل نقطة اتصال تصيد من منظور واحد.",
+		"searchCampaigns": "البحث في الحملات...",
+		"allTypes": "جميع الأنواع",
+		"campaignHeader": "الحملة",
+		"typeHeader": "النوع",
+		"templateHeader": "القالب",
+		"totalTargetsHeader": "إجمالي الأهداف",
+		"rowsPerPage": "عدد الصفوف لكل صفحة:",
+		"noCampaignsFound": "لم يتم العثور على حملات",
+		"createFirstCampaign": "أنشئ حملتك الأولى للبدء",
+		"filterAll": "الكل",
+		"filterActive": "نشط",
+		"filterScheduled": "مجدول",
+		"filterCompleted": "مكتمل",
+		"filterDraft": "مسودة"
 	}
 }

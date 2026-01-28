@@ -147,7 +147,8 @@
 			"department": "Department",
 			"groups": "Groups",
 			"subscriptionHistory": "Subscription History",
-			"products": "Products"
+			"products": "Products",
+			"logout": "Logout"
 		}
 	},
 	"organization": {
@@ -1053,5 +1054,23 @@
 		"totalQRImages": "Total QR Images",
 		"created": "Created",
 		"unsent": "Unsent"
+	},
+	"all_campaigns": {
+		"campaignCenter": "Campaign Center",
+		"campaignCenterDescription": "Track every phishing touchpoint from a single view.",
+		"searchCampaigns": "Search campaigns...",
+		"allTypes": "All Types",
+		"campaignHeader": "Campaign",
+		"typeHeader": "Type",
+		"templateHeader": "Template",
+		"totalTargetsHeader": "Total Targets",
+		"rowsPerPage": "Rows per page:",
+		"noCampaignsFound": "No campaigns found",
+		"createFirstCampaign": "Create your first campaign to get started",
+		"filterAll": "All",
+		"filterActive": "Active",
+		"filterScheduled": "Scheduled",
+		"filterCompleted": "Completed",
+		"filterDraft": "Draft"
 	}
 }
