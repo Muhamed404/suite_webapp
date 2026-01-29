@@ -65,6 +65,7 @@ const baseOptions = {
 
 document.addEventListener("DOMContentLoaded", function () {
   const data = window.campaignChartData || {};
+  const translations = window.chartTranslations || {};
   const campaignChartData = [
     data?.emailCount || 0,
     data?.smsCount || 0,
@@ -90,7 +91,7 @@ document.addEventListener("DOMContentLoaded", function () {
       dataLabels: { enabled: false },
 
       title: {
-        text: 'No Campaign Data',
+        text: translations.noCampaignData || 'No Campaign Data',
         align: 'center'
       },
 
@@ -115,7 +116,14 @@ document.addEventListener("DOMContentLoaded", function () {
     chartOptions = {
       ...baseOptions,
       series: campaignChartData,
-      labels: ['Email', 'SMS', 'USB', 'NFC', 'QR', 'WhatsApp'],
+      labels: [
+        translations.email || 'Email',
+        translations.sms || 'SMS',
+        translations.usb || 'USB',
+        translations.nfc || 'NFC',
+        translations.qr || 'QR',
+        translations.whatsapp || 'WhatsApp'
+      ],
       colors: ['#57ABE6', '#FAA139', '#A3B5C3', '#45D8DD', '#AE62E9', '#47E7C5']
     };
   }

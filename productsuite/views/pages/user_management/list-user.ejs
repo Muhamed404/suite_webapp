@@ -53,12 +53,12 @@
         <thead class="bg-gray-50 text-gray-600  text-xs">
           <tr>
 
-            <th class="px-4 py-5 text-sm font-normal">
+            <th class="px-4 py-5 text-sm font-bold">
               <%= __("Users.FullName") %>
                 <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
                   class="size-3.5 ml-3 inline">
             </th>
-            <th class="px-4 py-5">
+            <th class="px-4 py-5 text-sm font-bold">
               <img src="/securemagnus_2025/images/package_management/Package_Management_Type.svg" alt="Type"
                 class=" inline">
               <%= __("Users.Email") %>
@@ -67,53 +67,45 @@
                   class="size-3.5 ml-3 inline">
             </th>
 
-            <th class="px-4 py-5">
+            <th class="px-4 py-5 text-sm font-bold">
               <img src="/securemagnus_2025/images/package_management/package_management_user_range_form.svg"
                 alt="User From" class=" inline">
               <%= __("Users.RoleAssigned") %>
 
 
-                <span class="text-sm font-normal"></span><img
-                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                  class="size-3.5 ml-3 inline">
+                <span class="text-sm font-normal"></span>
             </th>
-            <th class="px-4 py-5">
+            <th class="px-4 py-5 text-sm font-bold">
               <img src="/securemagnus_2025/images/package_management/package_management_user_range_form.svg"
                 alt="User From" class=" inline">
               PhishMagnus License Status
 
 
-              <span class="text-sm font-normal"></span><img src="/securemagnus_2025/images/package_management/sort.svg"
-                alt="License Cost" class="size-3.5 ml-3 inline">
+              <span class="text-sm font-normal"></span>
             </th>
-            <th class="px-4 py-5">
+            <th class="px-4 py-5 text-sm font-bold">
               <img src="/securemagnus_2025/images/package_management/package_management_user_range_form.svg"
                 alt="User From" class=" inline">
               Awareness License Status
 
 
-              <span class="text-sm font-normal"></span><img src="/securemagnus_2025/images/package_management/sort.svg"
-                alt="License Cost" class="size-3.5 ml-3 inline">
+              <span class="text-sm font-normal"></span>
             </th>
-            <th class="px-4 py-5">
+            <th class="px-4 py-5 text-sm font-bold">
               <img src="/securemagnus_2025/images/package_management/package_management_user_range_to.svg" alt="User To"
                 class=" inline">
               <%= __("Users.UserStatus") %>
 
 
-                <span class="text-sm font-normal"></span><img
-                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                  class="size-3.5 ml-3 inline">
+                <span class="text-sm font-normal"></span>
             </th>
-            <th class="px-4 py-5">
+            <th class="px-4 py-5 text-sm font-bold">
               <img src="/securemagnus_2025/images/package_management/package_management_subscription_duration.svg"
                 alt="Subscription" class=" inline">
               <%= __("Users.Action") %>
 
 
-                <span class="text-sm font-normal"></span><img
-                  src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                  class="size-3.5 ml-3 inline">
+                <span class="text-sm font-normal"></span>
             </th>
 
 
@@ -125,7 +117,7 @@
 
             <tr class="bg-white border-b hover:bg-gray-50">
 
-              <td class="px-6 py-6 whitespace-nowrap">
+              <td class="px-6 py-6 whitespace-nowrap font-bold">
                 <%= u?.first_name %>
                   <%= u?.last_name %>
               </td>
@@ -137,97 +129,113 @@
                 <%= u.user?.UserRoles || '' %>
               </td>
               <td class="px-6 py-6 whitespace-nowrap">
-                <div class="relative inline-block text-left">
+                <% if (typeof isReadOnly !== 'undefined' && isReadOnly) { %>
                   <% if (Array.isArray(u.productNames) && u.productNames.includes('PhishMagnus')) { %>
-                    <button type="button"
-                      class="licenseStatusBtn 
-                      inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50 hover:bg-green-100 transition"
-                      aria-haspopup="true" aria-expanded="false">
-                      Licensed
-                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </button>
-                    <ul
-                      class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
-                      <!-- <li>
-                        <a href="#" class="block px-4 py-2 text-sm text-yellow-600 hover:bg-gray-100 change-status"
-                          data-user-id="<%= u.user?.id || "" %>" data-status="pending">
-                          Set as Pending
-                        </a>
-                      </li> -->
-                      <li>
-                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
-                          data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
-                          Set as Unlicensed
-                        </a>
-                      </li>
-                    </ul>
-                    <% } else { %>
+                    <span class="inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50">Licensed</span>
+                  <% } else { %>
+                    <span class="inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50">Unlicensed</span>
+                  <% } %>
+                <% } else { %>
+                  <div class="relative inline-block text-left">
+                    <% if (Array.isArray(u.productNames) && u.productNames.includes('PhishMagnus')) { %>
                       <button type="button"
-                        class="licenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50 hover:bg-red-100 transition"
+                        class="licenseStatusBtn 
+                        inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50 hover:bg-green-100 transition"
                         aria-haspopup="true" aria-expanded="false">
-                        Unlicensed
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
-                          viewBox="0 0 24 24">
+                        Licensed
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                           <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                       </button>
                       <ul
                         class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+                        <!-- <li>
+                          <a href="#" class="block px-4 py-2 text-sm text-yellow-600 hover:bg-gray-100 change-status"
+                            data-user-id="<%= u.user?.id || "" %>" data-status="pending">
+                            Set as Pending
+                          </a>
+                        </li> -->
                         <li>
-                          <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
-                            data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
-                            Set as Licensed
+                          <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
+                            data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
+                            Set as Unlicensed
                           </a>
                         </li>
                       </ul>
-                      <% } %>
-                </div>
+                      <% } else { %>
+                        <button type="button"
+                          class="licenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50 hover:bg-red-100 transition"
+                          aria-haspopup="true" aria-expanded="false">
+                          Unlicensed
+                          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                        </button>
+                        <ul
+                          class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+                          <li>
+                            <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
+                              data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
+                              Set as Licensed
+                            </a>
+                          </li>
+                        </ul>
+                        <% } %>
+                  </div>
+                <% } %>
               </td>
               <td class="px-6 py-6 whitespace-nowrap">
-                <div class="relative inline-block text-left">
-                  <% if (Array.isArray(u.productNames) && u.productNames.length> 0 &&
-                    u.productNames.includes('AwareMagnus')) { %>
-                    <button type="button"
-                      class="AwareMagnuslicenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50 hover:bg-green-100 transition"
-                      aria-haspopup="true" aria-expanded="false">
-                      Licensed
-                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </button>
-                    <ul
-                      class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
-
-                      <li>
-                        <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
-                          data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
-                          Set as Unlicensed
-                        </a>
-                      </li>
-                    </ul>
-                    <% } else { %>
+                <% if (typeof isReadOnly !== 'undefined' && isReadOnly) { %>
+                  <% if (Array.isArray(u.productNames) && u.productNames.length > 0 && u.productNames.includes('AwareMagnus')) { %>
+                    <span class="inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50">Licensed</span>
+                  <% } else { %>
+                    <span class="inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50">Unlicensed</span>
+                  <% } %>
+                <% } else { %>
+                  <div class="relative inline-block text-left">
+                    <% if (Array.isArray(u.productNames) && u.productNames.length> 0 &&
+                      u.productNames.includes('AwareMagnus')) { %>
                       <button type="button"
-                        class="AwareMagnuslicenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50 hover:bg-red-100 transition"
+                        class="AwareMagnuslicenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-green-500 border border-green-500 rounded-full bg-green-50 hover:bg-green-100 transition"
                         aria-haspopup="true" aria-expanded="false">
-                        Unlicensed
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
-                          viewBox="0 0 24 24">
+                        Licensed
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                           <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                       </button>
                       <ul
                         class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+
                         <li>
-                          <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
-                            data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
-                            Set as Licensed
+                          <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
+                            data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
+                            Set as Unlicensed
                           </a>
                         </li>
                       </ul>
-                      <% } %>
-                </div>
+                      <% } else { %>
+                        <button type="button"
+                          class="AwareMagnuslicenseStatusBtn inline-flex items-center px-3 py-1 text-sm text-red-500 border border-red-500 rounded-full bg-red-50 hover:bg-red-100 transition"
+                          aria-haspopup="true" aria-expanded="false">
+                          Unlicensed
+                          <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" />
+                          </svg>
+                        </button>
+                        <ul
+                          class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
+                          <li>
+                            <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
+                              data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
+                              Set as Licensed
+                            </a>
+                          </li>
+                        </ul>
+                        <% } %>
+                  </div>
+                <% } %>
               </td>
               <td class="px-6 py-6 whitespace-nowrap">
                 <% if(u.user.status === true || u.user.status === "true"){ %>
@@ -248,8 +256,9 @@
 
               </td>
               <td class="px-4 py-5 text-sm font-normal relative">
+                <% if (typeof isReadOnly !== 'undefined' && !isReadOnly) { %>
                 <div class="relative inline-block text-left">
-                  <button type="button" onclick="this.nextElementSibling.classList.toggle('hidden')"
+                  <button type="button"
                     class="p-2 rounded hover:bg-gray-100 transition" aria-haspopup="true" aria-expanded="false">
                     <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
                       viewBox="0 0 24 24">
@@ -258,7 +267,7 @@
                       <circle cx="5" cy="12" r="1.5" />
                     </svg>
                   </button>
-                  <ul class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 hidden">
+                  <ul class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 hidden actionDropdownMenu">
                     <li>
                       <a href="/user/delete/<%= u.userProfileId || "" %>"
                         class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
@@ -275,6 +284,9 @@
                     </li>
                   </ul>
                 </div>
+                <% } else { %>
+                <span class="text-gray-400 text-xs">Read Only</span>
+                <% } %>
               </td>
 
 
@@ -295,7 +307,7 @@
 
   <div id="licenseConfirmModal"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm ml-20 -mt-10">
       <h2 class="text-lg font-semibold mb-4">Confirm License Assignment</h2>
       <p class="mb-6">Are you sure you want to set this user as <span class="font-bold text-green-600">Licensed</span>?
       </p>
@@ -315,7 +327,31 @@
 
 
 
+<style>
+.datatable-search {
+  flex: 1;
+}
+.datatable-input {
+  width: 100%;
+}
+.datatable-length select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+</style>
+
   <script>
+if (!document.getElementById('filter-table') || typeof simpleDatatables === 'undefined' || typeof simpleDatatables.DataTable === 'undefined') {
+  console.warn('simple-datatables not found or table missing');
+} else {
+  const dataTable = new simpleDatatables.DataTable('#filter-table', {
+    searchable: true,
+    fixedHeight: true,
+  });
+}
+
     let pendingLicenseUserId = null;
     let pendingLicenseStatus = null;
     let actionProduct = null;
@@ -323,6 +359,21 @@
 
 
     document.addEventListener('click', function (e) {
+      // Handle action dropdown toggle
+      if (e.target.closest('.relative.inline-block.text-left button')) {
+        e.preventDefault();
+        const btn = e.target.closest('.relative.inline-block.text-left button');
+        const menu = btn.parentElement.querySelector('.actionDropdownMenu');
+        if (menu) {
+          // Close other action menus
+          document.querySelectorAll('.actionDropdownMenu').forEach(other => {
+            if (other !== menu) other.classList.add('hidden');
+          });
+          menu.classList.toggle('hidden');
+        }
+        return;
+      }
+
       // Handle dropdown toggle
       if (e.target.closest('.licenseStatusBtn') || e.target.closest('.AwareMagnuslicenseStatusBtn')) {
         e.preventDefault();
@@ -359,7 +410,7 @@
       }
 
       // Close dropdowns when clicking outside
-      document.querySelectorAll('.licenseDropdownMenu').forEach(menu => {
+      document.querySelectorAll('.licenseDropdownMenu, .actionDropdownMenu').forEach(menu => {
         if (!menu.parentElement.contains(e.target)) menu.classList.add('hidden');
       });
     });

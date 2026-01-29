@@ -118,7 +118,7 @@ function createPhishmagnusDashboardSemiDonutChart(el, values, labels, formatter,
       }
     },
     colors: [color1, color2, color3], // ✅ 3 colors
-    labels: labels || ['Sent', 'Opened', 'Reported To Admin'], // ✅ changed from "Other" → "Admin"
+    labels: labels,
     legend: {
       show: true,
       fontSize: '14px',
@@ -194,7 +194,7 @@ function createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noCl
       }
     },
     colors: [uniqueColor, repeatedClicksColor, noClicksColor], // ✅ 3 colors
-    labels: labels || ['Sent', 'Opened', 'Reported To Admin'], // ✅ changed from "Other" → "Admin"
+    labels: labels,
     legend: {
       show: true,
       fontSize: '14px',
@@ -242,7 +242,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const color1 = el.getAttribute('color1') || '#CFE2FF';
     const color2 = el.getAttribute('color2') || '#4BA6FF';
 
-    createPhishmagnusDashboardSemiDonutChart(el, [totalNFCCodes, totalScannedNFCCodes], ['Total NFC Codes', 'Total Scanned'], 'Scanned', color1, color2);
+    createPhishmagnusDashboardSemiDonutChart(el, [totalNFCCodes, totalScannedNFCCodes], [window.chartTranslations?.totalNFCCodes || 'Total NFC Codes', window.chartTranslations?.totalScanned || 'Total Scanned'], window.chartTranslations?.scanned || 'Scanned', color1, color2);
   });
 
 
@@ -252,7 +252,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const color1 = el.getAttribute('color1') || '#CFE2FF';
     const color2 = el.getAttribute('color2') || '#4BA6FF';
 
-    createPhishmagnusDashboardSemiDonutChart(el, [sent, opened], ['Sent', 'Opened'], 'Opened', color1, color2);
+    createPhishmagnusDashboardSemiDonutChart(el, [sent, opened], [window.chartTranslations?.sent || 'Sent', window.chartTranslations?.opened || 'Opened'], window.chartTranslations?.opened || 'Opened', color1, color2);
   });
 
   document.querySelectorAll('.dashboardEmailSemiChart').forEach((el) => {
@@ -263,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const color2 = el.getAttribute('color2') || '#4BA6FF';
     const color3 = el.getAttribute('color3') || '#FFB84B';
 
-    createPhishmagnusDashboardSemiDonutChart(el, [sent, opened, admin], ['Sent', 'Opened', 'Reported To Admin'], 'Opened', color1, color2, color3);
+    createPhishmagnusDashboardSemiDonutChart(el, [sent, opened, admin], [window.chartTranslations?.sent || 'Sent', window.chartTranslations?.opened || 'Opened', window.chartTranslations?.reportedToAdmin || 'Reported To Admin'], window.chartTranslations?.opened || 'Opened', color1, color2, color3);
   });
 
   document.querySelectorAll('.dashboardUsbSemiChart').forEach((el) => {
@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const plugged = parseInt(el.getAttribute('plugged'), 10) || 0;
     const color1 = el.getAttribute('color1') || '#CFE2FF';
     const color2 = el.getAttribute('color2') || '#4BA6FF';
-    createPhishmagnusDashboardSemiDonutChart(el, [created, plugged], ['Created', 'Plugged'], 'Plugged', color1, color2);
+    createPhishmagnusDashboardSemiDonutChart(el, [created, plugged], [window.chartTranslations?.created || 'Created', window.chartTranslations?.plugged || 'Plugged'], window.chartTranslations?.plugged || 'Plugged', color1, color2);
   });
 
 
@@ -284,7 +284,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const color2 = el.getAttribute('color2') || '#ff4b4eff';
     const color3 = el.getAttribute('color3') || '#FFB84B';
 
-    createPhishmagnusDashboardSemiDonutChart(el, [sent, Unsent, admin], ['Sent', 'Unsent', 'Open'], 'Unsent', color1, color2, color3);
+    createPhishmagnusDashboardSemiDonutChart(el, [sent, Unsent, admin], [window.chartTranslations?.sent || 'Sent', window.chartTranslations?.unsent || 'Unsent', window.chartTranslations?.reportedToAdmin || 'Open'], window.chartTranslations?.unsent || 'Unsent', color1, color2, color3);
   });
 
   document.querySelectorAll('.dashboardQRSemiChart').forEach((el) => {
@@ -295,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const color2 = el.getAttribute('color2') || '#4BA6FF';
     // const color3 = el.getAttribute('color3') || '#FFB84B';
 
-    createPhishmagnusDashboardSemiDonutChart(el, [totalQRCodes, totalScannedQRCodes], ['Total QR Images', 'Total Scanned'], 'Scanned', color1, color2);
+    createPhishmagnusDashboardSemiDonutChart(el, [totalQRCodes, totalScannedQRCodes], [window.chartTranslations?.totalQRImages || 'Total QR Images', window.chartTranslations?.totalScanned || 'Total Scanned'], window.chartTranslations?.scanned || 'Scanned', color1, color2);
   });
 
   document.querySelectorAll('.semichartLinksInteraction').forEach((el) => {

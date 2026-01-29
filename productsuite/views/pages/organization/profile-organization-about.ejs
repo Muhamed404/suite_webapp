@@ -43,7 +43,7 @@
   <!-- Organization Information -->
   <div>
     <h2 class="text-2xl font-semibold text-[var(--mainblue)] mb-8"><%= __("organization.profile.tabInfo.labelOrganizationInformation") %></h2>
-    <div class="flex flex-col md:flex-row gap-10">
+    <div class="flex flex-col md:flex-row gap-10 flex-wrap">
       <div>
         <span class="block text-xs text-gray-500 mb-2"><%= __("organization.profile.tabInfo.labelName") %></span>
         <span class="text-base text-[var(--mainblue)]">
@@ -72,6 +72,24 @@
         </span>
         <span class="text-base text-[var(--mainblue)]">
           <%=profile.City.name%>
+        </span>
+      </div>
+      <div>
+        <span class="block text-xs text-gray-500 mb-2"><%= __("organization.profile.tabInfo.labelAddress") %></span>
+        <span class="text-base text-[var(--mainblue)]">
+          <%=profile.address || '-'%>
+        </span>
+      </div>
+      <div>
+        <span class="block text-xs text-gray-500 mb-2"><%= __("organization.profile.tabInfo.labelPostalCode") %></span>
+        <span class="text-base text-[var(--mainblue)]">
+          <%=profile.postal_code || '-'%>
+        </span>
+      </div>
+      <div>
+        <span class="block text-xs text-gray-500 mb-2"><%= __("organization.profile.tabInfo.labelContactNumber") %></span>
+        <span class="text-base text-[var(--mainblue)]">
+          <%=profile.contact || '-'%>
         </span>
       </div>
     </div>

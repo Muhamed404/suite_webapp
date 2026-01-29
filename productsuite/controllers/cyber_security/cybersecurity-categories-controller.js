@@ -7,7 +7,14 @@ const getApiClient = require('../../../utility/api-client')
 exports.create = async (req, res) => {
   if (req.method === "GET") {
     logger.info("inside create method of cybersecurity");
-    return res.render('pages/categories/add-cybersecurity-categories',{enableSuiteManagementLeftMenu:true})
+    const message = req.query.message || null;
+    const alertType = req.query.alertType || null;
+    const formData = {
+      name: req.query.name || '',
+      code: req.query.code || '',
+      description: req.query.description || ''
+    };
+    return res.render('pages/categories/add-cybersecurity-categories',{enableSuiteManagementLeftMenu:true, message, alertType, formData})
          
   } else if (req.method === "POST") {
     const apiClient = getApiClient(req);
@@ -29,7 +36,16 @@ exports.create = async (req, res) => {
         logger.error(`${error.message}`);
         logger.error(error);
         logger.error(error.stack);
-        res.redirect("/?message=Contact to Administrator&alertType=error");
+        const errorMessage = error.response?.data?.message || error.message || 'Error creating category';
+        const alertType = error.response?.data?.alertType || 'error';
+        const queryParams = new URLSearchParams({
+          message: errorMessage,
+          alertType: alertType,
+          name: payload.name || '',
+          code: payload.code || '',
+          description: payload.description || ''
+        });
+        res.redirect(`/cybersecurity/categories/?${queryParams.toString()}`);
       });
   }
 };

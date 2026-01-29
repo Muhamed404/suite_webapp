@@ -135,7 +135,9 @@ function toggleMenus() {
   const subMenu = document.getElementById('subMenu');
   const icon = document.getElementById('flip');
 
-  if (!primaryMenu || !subMenu || !icon) return;
+  if (!primaryMenu || !subMenu || !icon) {
+    return;
+  }
 
   const primaryText = primaryMenu.querySelectorAll('.menu-text');
   const subText = subMenu.querySelectorAll('.menu-text');
@@ -143,20 +145,21 @@ function toggleMenus() {
   const isPrimaryCollapsed = primaryMenu.classList.contains('w-16');
   const isSubCollapsed = subMenu.classList.contains('w-16');
 
-  // If menus are already in the requested state, do nothing
-  if (!isPrimaryCollapsed && isSubCollapsed) return;
-
   if (isPrimaryCollapsed) {
-    primaryMenu.classList.replace('w-16', 'w-48');
-    subMenu.classList.replace('w-48', 'w-16');
+    primaryMenu.classList.remove('w-16');
+    primaryMenu.classList.add('w-48');
+    subMenu.classList.remove('w-48');
+    subMenu.classList.add('w-16');
 
     primaryText.forEach(el => el.classList.remove('hidden'));
     subText.forEach(el => el.classList.add('hidden'));
 
     icon.classList.add('scale-x-[-1]');
   } else {
-    primaryMenu.classList.replace('w-48', 'w-16');
-    subMenu.classList.replace('w-16', 'w-48');
+    primaryMenu.classList.remove('w-48');
+    primaryMenu.classList.add('w-16');
+    subMenu.classList.remove('w-16');
+    subMenu.classList.add('w-48');
 
     primaryText.forEach(el => el.classList.add('hidden'));
     subText.forEach(el => el.classList.remove('hidden'));
@@ -165,10 +168,13 @@ function toggleMenus() {
   }
 }
 
-// Run on page load to collapse primary menu by default
+// Run on page load
 document.addEventListener('DOMContentLoaded', () => {
   const icon = document.getElementById('flip');
-  if (icon) icon.classList.remove('scale-x-[-1]');
+  if (icon) {
+    icon.classList.add('rotated');
+    icon.style.transform = 'rotate(180deg)';
+  }
 });
 
 
@@ -176,19 +182,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   function toggleMainMenu() {
-    const menu = document.getElementById('mainMenu');
+    const menu = document.getElementById('primaryMenu');
     const menuTextElements = menu.querySelectorAll('.menu-text');
     const flipIcon = document.getElementById('flip');
 
-    menu.classList.toggle('w-48');
+    console.log('Toggling menu');
+
     menu.classList.toggle('w-16');
+    menu.classList.toggle('w-60');
 
     menuTextElements.forEach(el => {
       el.classList.toggle('hidden');
     });
 
-    flipIcon.classList.toggle('scale-x-[-1]');
-    flipIcon.classList.toggle('scale-x-[1]');
+    if (flipIcon.classList.contains('rotated')) {
+      flipIcon.style.transform = 'rotate(0deg)';
+      flipIcon.classList.remove('rotated');
+    } else {
+      flipIcon.style.transform = 'rotate(180deg)';
+      flipIcon.classList.add('rotated');
+    }
   }
 
   function toggleMenu(menuId, btn) {

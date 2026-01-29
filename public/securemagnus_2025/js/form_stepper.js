@@ -204,7 +204,7 @@ function updateStep(newStep) {
     backBtn.classList.toggle("bg-gray-300", currentStep === 0);
     backBtn.classList.toggle("bg-teal-500", currentStep !== 0);
     backBtn.classList.toggle("text-white", currentStep !== 0);
-    nextBtn.textContent = currentStep === steps.length - 1 ? "Finish" : "Next";
+    nextBtn.textContent = currentStep === steps.length - 1 ? (window.i18n?.labels?.finish || 'Finish') : (window.i18n?.labels?.next || 'Next');
 
     // Trigger validation check when step changes
     if (window.jQuery && typeof window.validateFormAndToggleSubmit === 'function') {

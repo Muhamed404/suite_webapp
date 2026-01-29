@@ -4,9 +4,9 @@
       <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
         <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
         <span class="text-gray-400">›</span>
-        <span class="font-semibold text-gray-900"><%= __("breadcrumbs.appService") %></span>
+        <span class="font-semibold text-gray-900">Service Management</span>
       </nav>
-      <h3 class="text-3xl font-medium"><%= __("appservice.homescreen.title") %></h3>
+      <h3 class="text-3xl font-medium">Service Management</h3>
     </div>
     <div class="p-0 text-sm lg:order-3">
       <ul class="flex items-center gap-2">
@@ -31,10 +31,11 @@
     <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
       <!-- Dropdown outside -->
       <div style="margin-bottom: 1rem;">
-        <select id="filter">
+        <select id="filter" style="width: 100px;" onchange="adjustWidth(this)">
           <option value=""><%= __("appservice.homescreen.optionAll") %></option>
           <option value="AWM"><%= __("appservice.homescreen.optionAWM") %></option>
           <option value="PhishMagnus"><%= __("appservice.homescreen.optionPhishMagnus") %></option>
+          <option value="GRCMagnus"><%= __("appservice.homescreen.optionGRCMagnus") %></option>
         </select>
       </div>
 
@@ -43,21 +44,27 @@
         <thead class="bg-gray-50 text-gray-600  text-xs">
           <tr>
 
-            <th class="px-4 py-55 text-sm font-normal">
+            <th class="px-4 py-5 text-sm font-bold">
+              <img src="/securemagnus_2025/images/package_management/suitcase-work-job-document.svg" 
+                class=" inline mr-2">
               <%= __("appservice.homescreen.productName") %><img src="/securemagnus_2025/images/package_management/sort.svg" 
                 class="size-3.5 ml-3 inline">
             </th>
-            <th class="px-4 py-5 text-sm font-normal">
+            <th class="px-4 py-5 text-sm font-bold">
+              <img src="/securemagnus_2025/images/package_management/cloud-storage-checkmark.svg" 
+                class=" inline mr-2">
               <%= __("appservice.homescreen.serviceName") %>
               <img src="/securemagnus_2025/images/package_management/sort.svg" 
                 class="size-3.5 ml-3 inline">
             </th>
-            <th class="px-4 py-5 text-sm font-normal">
+            <th class="px-4 py-5 text-sm font-bold">
+              <img src="/securemagnus_2025/images/package_management/on-premise.svg" 
+                class=" inline mr-2">
               <%= __("appservice.homescreen.serviceType") %>
               <img src="/securemagnus_2025/images/package_management/sort.svg" 
                 class="size-3.5 ml-3 inline">
             </th>
-            <th class="px-4 py-5">
+            <th class="px-4 py-5 text-sm font-bold">
               <img src="/securemagnus_2025/images/package_management/Package_Management_Type.svg" 
                 class=" inline">
               <%= __("appservice.homescreen.serviceCost") %>
@@ -65,13 +72,11 @@
               <span></span><img src="/securemagnus_2025/images/package_management/sort.svg" 
                 class="size-3.5 ml-3 inline">
             </th>
-            <th class="px-4 py-5">
+            <th class="px-4 py-5 text-sm font-bold">
               <img src="/securemagnus_2025/images/package_management/Package_Management_Type.svg" 
                 class=" inline">
               <%= __("appservice.homescreen.serviceAction") %>
 
-              <span></span><img src="/securemagnus_2025/images/package_management/sort.svg" 
-                class="size-3.5 ml-3 inline">
             </th>
 
 
@@ -113,7 +118,7 @@
                   </button>
                   <ul class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 hidden">
                     <li>
-                      <a href="/app_service/remove/${srv.id}"
+                      <a href="/app_service/remove/<%=srv.id%>"
                         class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
                         <i class="ion-android-trash mr-2"></i>
                         <%= __("appservice.homescreen.btnDelete") %>
@@ -132,3 +137,26 @@
     </div>
   </div>
 </div>
+
+<style>
+.datatable-search {
+  flex: 1;
+}
+.datatable-input {
+  width: 100%;
+}
+.datatable-length select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+</style>
+
+<script>
+function adjustWidth(sel) {
+  const text = sel.selectedOptions[0].text;
+  const minWidth = 100;
+  sel.style.width = Math.max(text.length * 10 + 50, minWidth) + 'px';
+}
+</script>

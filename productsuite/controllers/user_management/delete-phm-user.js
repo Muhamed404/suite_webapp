@@ -3,7 +3,6 @@ const enums = require('../../../contants/enum')
 const getApiClient = require('../../../utility/api-client');
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const backend_api_urls = require("../../../config/backend_api_urls");
-const { or } = require("sequelize");
 
 
 

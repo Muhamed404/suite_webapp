@@ -14,6 +14,7 @@ router.post("/calculate-service-cost", asyncHandler(Controller.calculateApplicat
 router.get('/list', asyncHandler(Controller.retrieveAppServices));
 router.get('/create', asyncHandler(Controller.renderCreateForm));
 router.post('/create', validateAppServiceForm, validationResultHandler,asyncHandler(Controller.createAppService));
+router.get('/remove/:id', asyncHandler(Controller.deleteAppService));
 
 
 

@@ -106,3 +106,40 @@ exports.createAppService = async (req, res) => {
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.App_Service.CREATE);
   }
 };
+
+// Delete app service
+exports.deleteAppService = async (req, res) => {
+  logger.info(`[APP SERVICE][DELETE] Delete app service - START`);
+  
+  try {
+    const { id } = req.params;
+    logger.info(`[APP SERVICE][DELETE] Deleting app service with id: ${id}`);
+
+    if (!id || isNaN(parseInt(id, 10))) {
+      logger.warn(`[APP SERVICE][DELETE] Invalid id provided: ${id}`);
+      return res.redirect(`${frontend_api_urls.PRODUCT_SUITE.App_Service.LIST}?message=${encodeURIComponent('Invalid service ID')}&alertType=error`);
+    }
+
+    const apiClient = getApiClient(req);
+    const apiUrl = `${backend_api_urls.PRODUCT_SUITE.Application_Service.DELETE}/${id}`;
+    logger.info(`[APP SERVICE][DELETE] Calling DELETE API: ${apiUrl}`);
+
+    const response = await apiClient.delete(apiUrl);
+    logger.info(`[APP SERVICE][DELETE] Delete response: ${JSON.stringify(response.data)}`);
+
+    const message = response.data?.message || response.data?.msg || 'Service deleted successfully';
+    const alertType = response.data?.alertType || 'success';
+
+    logger.info(`[APP SERVICE][DELETE] Redirecting to list with message: ${message}`);
+    return res.redirect(`${frontend_api_urls.PRODUCT_SUITE.App_Service.LIST}?message=${encodeURIComponent(message)}&alertType=${encodeURIComponent(alertType)}`);
+  } catch (error) {
+    logger.error(`[APP SERVICE][DELETE] Error deleting app service: ${error.message}`);
+    logger.error(`[APP SERVICE][DELETE] Error stack: ${error.stack}`);
+    
+    const message = error.response?.data?.message || error.response?.data?.msg || error.message || 'Error deleting service';
+    const alertType = error.response?.data?.alertType || 'error';
+
+    logger.error(`[APP SERVICE][DELETE] Redirecting to list with error: ${message}`);
+    return res.redirect(`${frontend_api_urls.PRODUCT_SUITE.App_Service.LIST}?message=${encodeURIComponent(message)}&alertType=${encodeURIComponent(alertType)}`);
+  }
+};

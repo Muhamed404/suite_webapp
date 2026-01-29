@@ -30,7 +30,4 @@ build/
 temp/
 tmp/
 *.tmp
-
-
-# Aware Magnus Assets
-awaremagnus/assets/images/
+awaremagnus/public/images/

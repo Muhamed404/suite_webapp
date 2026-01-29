@@ -152,7 +152,7 @@
 
               <td class="px-4 py-5 text-sm font-normal relative">
                 <div class="relative inline-block text-left">
-                  <button type="button" onclick="this.nextElementSibling.classList.toggle('hidden')"
+                  <button type="button" onclick="toggleDropdown(this)"
                     class="p-2 rounded hover:bg-gray-100 transition" aria-haspopup="true" aria-expanded="false">
                     <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
                       viewBox="0 0 24 24">
@@ -161,7 +161,7 @@
                       <circle cx="5" cy="12" r="1.5" />
                     </svg>
                   </button>
-                  <ul class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 hidden">
+                  <ul class="dropdown-menu absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 hidden">
                     <li>
                       <a href="/package/remove/<%= pkg.id %>"
                         class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
@@ -182,3 +182,16 @@
     </div>
   </div>
 </div>
+
+<script>
+function toggleDropdown(button) {
+  // Close all dropdown menus
+  document.querySelectorAll('.dropdown-menu').forEach(menu => {
+    if (menu !== button.nextElementSibling) {
+      menu.classList.add('hidden');
+    }
+  });
+  // Toggle the current dropdown
+  button.nextElementSibling.classList.toggle('hidden');
+}
+</script>
