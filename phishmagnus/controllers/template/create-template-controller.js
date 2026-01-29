@@ -165,7 +165,7 @@ exports.createTemplate = async (req, res) => {
     logger.info(`[Create System Template] Backend response: ${JSON.stringify(response.data)}`);
 
     // Handle backend response envelope
-    req.flash('message', 'Created successfully');
+    req.flash('message', req.__('system_template.create.successMessage'));
     req.flash('alertType', 'success');
     return res.redirect(`${frontend_api_urls.PHISHMAGNUS.Template.LIST}`);
 

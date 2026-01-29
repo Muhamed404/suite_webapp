@@ -9,13 +9,13 @@
                 <%= __("breadcrumbs.systemTemplate") %>
             </a>
             <span class="text-gray-400">›</span>
-            <span class="font-semibold text-gray-900">Create Template</span>
+            <span class="font-semibold text-gray-900"><%= __("system_template.create.title") %></span>
         </nav>
         <div>
-            <%- include('../../partials/back-button', { label: 'Go Back' }) %>
+            <%- include('../../partials/back-button') %>
         </div>
         <h3 class="text-3xl font-medium text-gray-900">
-            Create Template
+            <%= __("system_template.create.title") %>
         </h3>
     </div>
 </div>
@@ -559,11 +559,11 @@
                 <button id="prev" type="button"
                     class="border border-teal-400 text-teal-500 font-medium px-6 py-2 rounded-full hover:bg-teal-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled>
-                    Back
+                    <%= __("generic_label.back") %>
                 </button>
                 <button id="next" type="button"
                     class="bg-teal-400 text-white font-medium px-6 py-2 rounded-full hover:bg-teal-500 transition">
-                    Next
+                    <%= __("generic_label.next") %>
                 </button>
             </div>
         </form>
@@ -583,7 +583,32 @@
             "<%= __('system_template.stepper6') %>",
             "<%= __('system_template.stepper7') %>",
             "<%= __('system_template.stepper8') %>"
-        ]
+        ],
+        next: "<%= __('generic_label.next') %>",
+        finish: "<%= __('generic_label.Finish') %>",
+        validation_messages: {
+            template_name_required: "<%= __('validation_messages.template_name_required') %>",
+            phishing_type_required: "<%= __('validation_messages.phishing_type_required') %>",
+            sender_email_required: "<%= __('validation_messages.sender_email_required') %>",
+            email_subject_required: "<%= __('validation_messages.email_subject_required') %>",
+            company_name_required: "<%= __('validation_messages.company_name_required') %>",
+            sender_name_required: "<%= __('validation_messages.sender_name_required') %>",
+            company_domain_required: "<%= __('validation_messages.company_domain_required') %>",
+            email_content_required: "<%= __('validation_messages.email_content_required') %>",
+            valid_email_required: "<%= __('validation_messages.valid_email_required') %>",
+            file_name_required: "<%= __('validation_messages.file_name_required') %>",
+            phishing_page_content_required: "<%= __('validation_messages.phishing_page_content_required') %>"
+        },
+        __: function(key) {
+            const translations = {
+                "system_template.create.simplePhishingDescription": "<%= __('system_template.create.simplePhishingDescription') %>",
+                "system_template.create.downloadFileBasedTitle": "<%= __('system_template.create.downloadFileBasedTitle') %>",
+                "system_template.create.downloadFileBasedDescription": "<%= __('system_template.create.downloadFileBasedDescription') %>",
+                "system_template.create.urlClickBasedTitle": "<%= __('system_template.create.urlClickBasedTitle') %>",
+                "system_template.create.urlClickBasedDescription": "<%= __('system_template.create.urlClickBasedDescription') %>"
+            };
+            return translations[key] || key;
+        }
     };
 </script>
 

@@ -444,7 +444,17 @@
             "<%= __('system_template.stepper6') %>",
             "<%= __('system_template.stepper7') %>",
             "<%= __('system_template.stepper8') %>"
-        ]
+        ],
+        __: function(key) {
+            const translations = {
+                "system_template.create.simplePhishingDescription": "<%= __('system_template.create.simplePhishingDescription') %>",
+                "system_template.create.downloadFileBasedTitle": "<%= __('system_template.create.downloadFileBasedTitle') %>",
+                "system_template.create.downloadFileBasedDescription": "<%= __('system_template.create.downloadFileBasedDescription') %>",
+                "system_template.create.urlClickBasedTitle": "<%= __('system_template.create.urlClickBasedTitle') %>",
+                "system_template.create.urlClickBasedDescription": "<%= __('system_template.create.urlClickBasedDescription') %>"
+            };
+            return translations[key] || key;
+        }
     };
     window.disableSaveEdit = <%= typeof disableSaveEdit !== 'undefined' ? disableSaveEdit : false %>;
 </script>

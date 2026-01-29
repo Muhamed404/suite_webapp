@@ -58,7 +58,8 @@
 		"forgotPassword": "Forgot Password?",
 		"dontHaveAccount": "Don't have an account?",
 		"signup": "Signup",
-		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today"
+		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today",
+		"entries": "generic_label.entries"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -87,8 +88,19 @@
 		"usb_campaign_creation_error": "Issue in Creating a USB Campaign",
 		"qr_quantity_required": "Please enter a valid QR code quantity (minimum 1).",
 		"qr_image_required": "Please upload a valid image file (jpg, jpeg, png, gif).",
+		"template_name_required": "Template name is required.",
+		"phishing_type_required": "Please select a phishing type.",
 		"nfc_quantity_required": "Please enter a valid tag quantity (minimum 1).",
-		"min_value_validation": "Please enter a value greater than or equal to {0}."
+		"min_value_validation": "Please enter a value greater than or equal to {0}.",
+		"sender_email_required": "Sender email is required.",
+		"email_subject_required": "Email subject is required.",
+		"company_name_required": "Company name is required.",
+		"sender_name_required": "Sender name is required.",
+		"company_domain_required": "Company domain is required.",
+		"email_content_required": "Email content is required.",
+		"valid_email_required": "Please enter a valid email address.",
+		"file_name_required": "File name is required.",
+		"phishing_page_content_required": "Phishing page content is required."
 	},
 	"topnavbar": {
 		"welcome": "Welcome"
@@ -458,6 +470,7 @@
 			"btnDeleteTemplate": "system_template.homescreen.btnDeleteTemplate"
 		},
 		"create": {
+			"title": "Create Template",
 			"labelDetails": "Template Details",
 			"labelDescription": "You can create a new phishing template by filling out the details below.",
 			"labelName": "Template Name",
@@ -469,6 +482,11 @@
 			"labelTrackingEmailDetails_level1": "Open Email (Level 1) \n Simple phishing email template to monitor email open by users.",
 			"labelTrackingEmailDetails_level2": "Download File Based (Level 2) \n Phishing email template with file attached in the message to monitor download by users.",
 			"labelTrackingEmailDetails_level3": "URL Click Based (Level 3) \n Email template with a dedicated URL for testing users visiting the phishing page.",
+			"simplePhishingDescription": "Simple phishing email template to monitor email open by users.",
+			"downloadFileBasedTitle": "Download File Based (Level 2)",
+			"downloadFileBasedDescription": "Phishing email template with file attached in the message to monitor download by users.",
+			"urlClickBasedTitle": "URL Click Based (Level 3)",
+			"urlClickBasedDescription": "Email template with a dedicated URL for testing users visiting the phishing page.",
 			"labelDetails_level1_title": "Phishing Message Details",
 			"labelDetails_level1_Subject": "Email Subject",
 			"labelDetails_level1_SenderEmail": "Email Sender",
@@ -497,7 +515,9 @@
 			"labelLandingPage_radioOption1": "Import Custom Landing Page",
 			"labelLandingPage_radioOption2": "I like to redirect the user to a custom landing page",
 			"labelLanguage": "Language",
-			"labelImportHtmlUrl": "Import Landing Page From An External URL"
+			"labelImportHtmlUrl": "Import Landing Page From An External URL",
+			"successMessage": "Created successfully",
+			"validationSelectLandingPage": "Please select a landing page option."
 		}
 	},
 	"campaign": {
@@ -542,7 +562,6 @@
 			"labelUnique": "Unique",
 			"labelRepeated": "Repeated",
 			"labelNoInteraction": "No Interaction",
-			"labelRepeatedClicks": "Repeated Clicks",
 			"labelRepeatedScans": "Repeated Scans",
 			"labelRepeatedInteractions": "Repeated Interactions",
 			"labelRepeatedSubmitted": "Repeated Submitted",
@@ -1062,7 +1081,8 @@
 	"common": {
 		"search_here": "common.search_here",
 		"sort_by": "common.sort_by",
-		"back": "common.back"
+		"back": "common.back",
+		"goBack": "Go Back"
 	},
 	"Search": "Search",
 	"entries per page": "entries per page",
@@ -1144,7 +1164,8 @@
 		"filterActive": "Active",
 		"filterScheduled": "Scheduled",
 		"filterCompleted": "Completed",
-		"filterDraft": "Draft"
+		"filterDraft": "Draft",
+		"viewDetails": "View Details"
 	},
 	"nfcCampaign": "nfcCampaign",
 	"start_date": "start_date",
@@ -1155,5 +1176,11 @@
 	"filterAll": "filterAll",
 	"filterActive": "filterActive",
 	"InProgress": "InProgress",
-	"filterCompleted": "filterCompleted"
+	"filterCompleted": "filterCompleted",
+	"search_here": "search_here",
+	"no_data": "no_data",
+	"showing": "showing",
+	"to": "to",
+	"of": "of",
+	"entries": "entries"
 }

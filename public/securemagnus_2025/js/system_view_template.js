@@ -14,23 +14,23 @@ const disableSaveEdit = window.disableSaveEdit || false;
 // ✅ Conditions for step 2 options
 const conditions = {
   email: [
-    { id: 'open', title: 'Open Email (Level 1)', value: 'simple', difficulty_level: 1, desc: 'Simple phishing email template to monitor email open by users.' },
-    { id: 'download', title: 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: 'Phishing email template with file attached in the message to monitor download by users.' },
-    { id: 'url', title: 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: 'Email template with a dedicated URL for testing users visiting the phishing page.' }
+    { id: 'open', title: 'Open Email (Level 1)', value: 'simple', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.simplePhishingDescription') : 'Simple phishing email template to monitor email open by users.' },
+    { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing email template with file attached in the message to monitor download by users.' },
+    { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'Email template with a dedicated URL for testing users visiting the phishing page.' }
   ],
   nfc: [
-    { id: 'download', title: 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: 'Phishing nfc template with file attached in the message to monitor download by users.' },
-    { id: 'url', title: 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: 'NFC template with a dedicated URL for testing users visiting the phishing page.' }
+    { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing nfc template with file attached in the message to monitor download by users.' },
+    { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'NFC template with a dedicated URL for testing users visiting the phishing page.' }
   ],
   qr: [
-    { id: 'download', title: 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: 'Phishing qr template with file attached in the message to monitor download by users.' },
-    { id: 'url', title: 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: 'QR template with a dedicated URL for testing users visiting the phishing page.' }
+    { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing qr template with file attached in the message to monitor download by users.' },
+    { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'QR template with a dedicated URL for testing users visiting the phishing page.' }
   ],
 
   sms: [
     { id: 'short', title: 'Short Message (Level 1)', difficulty_level: 1, desc: 'Send a simple SMS message.' },
-    { id: 'download', title: 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: 'Phishing SMS template with file attached in the message to monitor download by users.' },
-    { id: 'url', title: 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: 'SMS template with a dedicated URL for testing users visiting the phishing page.' }
+    { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing SMS template with file attached in the message to monitor download by users.' },
+    { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'SMS template with a dedicated URL for testing users visiting the phishing page.' }
   ],
   whatsapp: [
     { id: 'short', title: 'Short Message', difficulty_level: 1, desc: 'Send a simple SMS message.' },
