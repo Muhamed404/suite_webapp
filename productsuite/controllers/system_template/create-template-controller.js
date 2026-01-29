@@ -169,7 +169,7 @@ exports.createTemplate = async (req, res) => {
     logger.error('[Create System Template] Error:', error);
     logger.error(error.stack);
     const errMsg = error.response?.data?.message || 'Error saving template';
-    req.flash('message', 'Unable to save template');
+    req.flash('message', req.__('system_template.create.errorMessage'));
     req.flash('alertType', 'error');
     return res.redirect(`${frontend_api_urls.PRODUCT_SUITE.System_Template.LIST}`);
 

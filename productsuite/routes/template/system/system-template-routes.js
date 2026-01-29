@@ -32,7 +32,11 @@ router.post('/api/fetch-html', async (req, res) => {
     const html = await fetchHtmlFromUrl(url);
     res.json({ html });
   } catch (err) {
-    res.status(400).json({ error: err.message || 'Server error.' });
+    let errorMessage = err.message || 'Server error.';
+    if (errorMessage === 'Invalid URL format.') {
+      errorMessage = req.__('system_template.create.invalidUrlFormat');
+    }
+    res.status(400).json({ error: errorMessage });
   }
 });
 

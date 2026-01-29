@@ -146,14 +146,14 @@ $(document).ready(function () {
       
       // Step 5 Messages
       phish_url: {
-        required: "Phishing URL is required.",
-        url: "Please enter a valid URL."
+        required: window.i18n?.validation_messages?.urlRequired || "URL is required.",
+        url: window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL."
       },
       
       // Step 6 Messages
       webpage_url: {
-        required: "Webpage URL is required.",
-        url: "Please enter a valid URL."
+        required: window.i18n?.validation_messages?.urlRequired || "URL is required.",
+        url: window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL."
       }
     },
     errorClass: "text-red-500 text-sm mt-1",

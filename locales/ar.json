@@ -533,12 +533,19 @@
 			"labelLanguage": "اللغة",
 			"labelPhishingWebContentEditor": "محتوى قالب صفحة التصيد الاحتيالي",
 			"successMessage": "تم الإنشاء بنجاح",
+			"errorMessage": "تعذر حفظ القالب",
 			"validationSelectLandingPage": "يرجى اختيار خيار صفحة الهبوط.",
-			"labelImportHtmlUrl": "system_template.create.labelImportHtmlUrl",
-			"labelLandingPageContentEditor": "system_template.create.labelLandingPageContentEditor",
-			"sms_content": "system_template.create.sms_content",
-			"sms_message": "system_template.create.sms_message",
-			"sms_placeholder": "system_template.create.sms_placeholder"
+			"validationEnterValidUrl": "يرجى إدخال رابط صحيح.",
+			"urlRequired": "الرابط مطلوب.",
+			"urlInvalid": "يرجى إدخال رابط صحيح.",
+			"invalidUrlFormat": "تنسيق الرابط غير صحيح.",
+			"fetchButtonText": "جلب",
+			"fetchingButtonText": "جاري الجلب...",
+			"labelImportHtmlUrl": "استيراد صفحة الوصول من رابط خارجي",
+			"labelLandingPageContentEditor": "محتوى قالب صفحة الوصول",
+			"sms_content": "محتوى قالب الرسائل النصية",
+			"sms_message": "نص الرسالة القصيرة",
+			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)"
 		},
 		"stepper8": "system_template.stepper8"
 	},
@@ -595,12 +602,7 @@
 			"labelSubmitData": "إرسال البيانات",
 			"labelEmailOpenedNotReported": "تم فتح البريد ولكن لم يتم الإبلاغ",
 			"labelEmailOpenedAndReported": "تم فتح البريد وتم الإبلاغ",
-			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ",
-			"labelLandingPageContentEditor": "محتوى قالب صفحة الوصول",
-			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)",
-			"sms_message": "نص الرسالة القصيرة",
-			"sms_content": "محتوى قالب الرسائل النصية",
-			"labelImportHtmlUrl": "استيراد صفحة الوصول من رابط خارجي"
+			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ"
 		}
 	},
 	"sms": {

@@ -517,7 +517,14 @@
 			"labelLanguage": "Language",
 			"labelImportHtmlUrl": "Import Landing Page From An External URL",
 			"successMessage": "Created successfully",
-			"validationSelectLandingPage": "Please select a landing page option."
+			"errorMessage": "Unable to save template",
+			"validationSelectLandingPage": "Please select a landing page option.",
+			"validationEnterValidUrl": "Please enter a valid URL.",
+			"urlRequired": "URL is required.",
+			"urlInvalid": "Please enter a valid URL.",
+			"invalidUrlFormat": "Invalid URL format.",
+			"fetchButtonText": "Fetch",
+			"fetchingButtonText": "Fetching..."
 		}
 	},
 	"campaign": {

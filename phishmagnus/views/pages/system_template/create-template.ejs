@@ -597,7 +597,12 @@
             email_content_required: "<%= __('validation_messages.email_content_required') %>",
             valid_email_required: "<%= __('validation_messages.valid_email_required') %>",
             file_name_required: "<%= __('validation_messages.file_name_required') %>",
-            phishing_page_content_required: "<%= __('validation_messages.phishing_page_content_required') %>"
+            phishing_page_content_required: "<%= __('validation_messages.phishing_page_content_required') %>",
+            validationEnterValidUrl: "<%= __('system_template.create.validationEnterValidUrl') %>",
+            urlRequired: "<%= __('system_template.create.urlRequired') %>",
+            urlInvalid: "<%= __('system_template.create.urlInvalid') %>",
+            fetchButtonText: "<%= __('system_template.create.fetchButtonText') %>",
+            fetchingButtonText: "<%= __('system_template.create.fetchingButtonText') %>"
         },
         __: function(key) {
             const translations = {
@@ -645,13 +650,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = urlInput.value.trim();
             errorDiv.style.display = 'none';
             if (!url) {
-                errorDiv.textContent = 'Please enter a valid URL.';
+                errorDiv.textContent = window.i18n.validation_messages.validationEnterValidUrl;
                 errorDiv.style.display = '';
                 return;
             }
             try {
                 fetchBtn.disabled = true;
-                fetchBtn.textContent = 'Fetching...';
+                fetchBtn.textContent = window.i18n.validation_messages.fetchingButtonText;
                 const response = await fetch('/template/api/fetch-html', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -667,12 +672,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.CKEDITOR && CKEDITOR.instances['landing_page_content']) {
                     CKEDITOR.instances['landing_page_content'].setData(html);
                 }
-                fetchBtn.textContent = 'Fetch';
+                fetchBtn.textContent = window.i18n.validation_messages.fetchButtonText;
                 fetchBtn.disabled = false;
             } catch (err) {
                 errorDiv.textContent = 'Error: ' + err.message;
                 errorDiv.style.display = '';
-                fetchBtn.textContent = 'Fetch';
+                fetchBtn.textContent = window.i18n.validation_messages.fetchButtonText;
                 fetchBtn.disabled = false;
             }
         });

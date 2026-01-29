@@ -451,7 +451,8 @@
                 "system_template.create.downloadFileBasedTitle": "<%= __('system_template.create.downloadFileBasedTitle') %>",
                 "system_template.create.downloadFileBasedDescription": "<%= __('system_template.create.downloadFileBasedDescription') %>",
                 "system_template.create.urlClickBasedTitle": "<%= __('system_template.create.urlClickBasedTitle') %>",
-                "system_template.create.urlClickBasedDescription": "<%= __('system_template.create.urlClickBasedDescription') %>"
+                "system_template.create.urlClickBasedDescription": "<%= __('system_template.create.urlClickBasedDescription') %>",
+                "system_template.create.validationEnterValidUrl": "<%= __('system_template.create.validationEnterValidUrl') %>"
             };
             return translations[key] || key;
         }
@@ -492,7 +493,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const url = urlInput.value.trim();
             errorDiv.style.display = 'none';
             if (!url) {
-                errorDiv.textContent = 'Please enter a valid URL.';
+                errorDiv.textContent = window.i18n.__('system_template.create.validationEnterValidUrl');
                 errorDiv.style.display = '';
                 return;
             }

@@ -172,7 +172,7 @@ exports.createTemplate = async (req, res) => {
   } catch (error) {
     logger.error('[Create System Template] Error:', error);
     logger.error(error.stack);
-    req.flash('message', 'Unable to save template');
+    req.flash('message', req.__('system_template.create.errorMessage'));
     req.flash('alertType', 'error');
     return res.redirect(`${frontend_api_urls.PHISHMAGNUS.Template.LIST}`);
 
