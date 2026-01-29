@@ -31,6 +31,7 @@
 		"sort_by": "رتّب حسب",
 		"loading": "جارٍ التحميل...",
 		"error": "خطأ",
+		"error_creating_nfc_campaign": "خطأ في إنشاء حملة NFC",
 		"success": "نجاح",
 		"warning": "تحذير",
 		"info": "معلومات",
@@ -45,6 +46,7 @@
 		"of": "من",
 		"campaignName": "اسم الحملة",
 		"enter_campaign_name": "أدخل اسم الحملة",
+		"type_your_message_here": "اكتب رسالتك هنا...",
 		"templateName": "اسم القالب",
 		"save": "حفظ",
 		"close": "اغلاق",
@@ -71,7 +73,7 @@
 		"welcomeToSecureMagnus": "مرحباً بك في SecureMagnus"
 	},
 	"validation_messages": {
-		"field_required": "هذا الحقل مطلوب.",
+		"field_required": "validation_messages.field_required",
 		"campaign_name_required": "اسم الحملة مطلوب (حد أدنى حرفين).",
 		"template_type_required": "يرجى اختيار نوع القالب.",
 		"template_required": "يرجى اختيار قالب.",
@@ -86,6 +88,7 @@
 		"invalid_invitees_selected": "المدعوون المحددون غير صالحين",
 		"invalid_template_selected": "القالب المحدد غير صالح",
 		"invalid_template_id": "معرف القالب غير صالح",
+		"invalid_qr_template_selected": "تم تحديد قالب QR غير صالح",
 		"error_submitting_sms_campaign": "حدث خطأ أثناء إرسال طلب إنشاء حملة الرسائل القصيرة",
 		"error_processing_request": "حدث خطأ أثناء معالجة الطلب في إنشاء حملة الرسائل القصيرة",
 		"organization_not_found": "المؤسسة غير موجودة",
@@ -94,7 +97,10 @@
 		"usb_env_variable_required": "متغير البيئة مطلوب.",
 		"usb_filename_required": "اسم الملف مطلوب.",
 		"usb_campaign_creation_error": "مشكلة في إنشاء حملة USB",
-		"field_required": "validation_messages.field_required"
+		"qr_quantity_required": "يرجى إدخال كمية صالحة لرموز QR (الحد الأدنى 1).",
+		"qr_image_required": "يرجى تحميل ملف صورة صالح (jpg، jpeg، png، gif).",
+		"nfc_quantity_required": "يرجى إدخال كمية علامات صالحة (الحد الأدنى 1).",
+		"min_value_validation": "يرجى إدخال قيمة أكبر من أو تساوي {0}."
 	},
 	"topnavbar": {
 		"welcome": "مرحباً"
@@ -747,12 +753,6 @@
 			"tagScan": "تم مسح الوسم",
 			"notScanTag": "لم يتم مسح الوسم"
 		},
-		"nfc_campaign": {
-			"name": "اسم الحملة",
-			"templateName": "اسم القالب",
-			"totalTags": "إجمالي الوسوم",
-			"select_tag_quantity": "اختر كمية الوسوم"
-		},
 		"department": {
 			"labelTitleDepartmentManagement": "إدارة الأقسام",
 			"labelDepartmentName": "اسم القسم",
@@ -1231,12 +1231,15 @@
 		}
 	},
 	"qr_campaign": {
-		"imageSetup": "qr_campaign.imageSetup",
-		"name": "qr_campaign.name",
-		"description": "qr_campaign.description",
-		"labelCreationNFCTag": "qr_campaign.labelCreationNFCTag",
-		"tagQuantity": "qr_campaign.tagQuantity",
-		"uploadBrandLogo": "qr_campaign.uploadBrandLogo"
+		"title": "حملة QR",
+		"imageSetup": "إعداد صورة QR",
+		"name": "اسم الحملة",
+		"description": "الوصف",
+		"select_template": "اختر القالب",
+		"labelCreationNFCTag": "إنشاء علامات NFC",
+		"tagQuantity": "كمية العلامات",
+		"uploadBrandLogo": "تحميل شعار العلامة التجارية",
+		"choose_file": "qr_campaign.choose_file"
 	},
 	"whatsapp": {
 		"create": {
@@ -1255,5 +1258,13 @@
 			"start_time": "وقت البدء *",
 			"end_time": "وقت الانتهاء"
 		}
-	}
+	},
+	"nfc_campaign": {
+		"select_tag_quantity": "اختر كمية العلامة",
+		"name": "اسم الحملة",
+		"totalTags": "إجمالي العلامات",
+		"title": "حملة NFC",
+		"success_message": "تم إنشاء حملة NFC بنجاح"
+	},
+	"nfcCampaign": "nfcCampaign"
 }

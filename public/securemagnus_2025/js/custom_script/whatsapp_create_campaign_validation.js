@@ -165,7 +165,7 @@ function initTemplateOptionToggle() {
     placeholder.value = '';
     placeholder.disabled = true;
     placeholder.selected = true;
-    placeholder.textContent = 'Select Template';
+    placeholder.textContent = window.i18n.labels.selectTemplate;
     selectEl.appendChild(placeholder);
 
     if (!items || !items.length) return;

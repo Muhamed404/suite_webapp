@@ -1,4 +1,9 @@
 $(document).ready(function () {
+  // Override jQuery Validate default messages with localized ones
+  $.extend($.validator.messages, {
+    min: window.i18n.validation_messages.min_value_validation.replace('{0}', '{0}')
+  });
+
   // NFC Campaign Form Validation
   $("#nfcCampaignForm").validate({
     rules: {
@@ -7,9 +12,9 @@ $(document).ready(function () {
   
     },
     messages: {
-      name: "Campaign name is required (min 2 characters).",
+      name: window.i18n.validation_messages.campaign_name_required,
  
-      noOfTags: "Please enter a valid tag quantity (minimum 1).",
+      noOfTags: window.i18n.validation_messages.tag_quantity_required
   
     },
     errorClass: "text-red-500 text-sm mt-1",

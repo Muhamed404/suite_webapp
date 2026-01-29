@@ -60,13 +60,14 @@ exports.createNFCCampaign = async (req, res) => {
           req.flash('alertType', 'error');
           return res.redirect(frontend_api_urls.PHISHMAGNUS.Campaign.NFC.CREATE);
         }
-        req.flash('message', data.message);
+        let message = req.__('nfc_campaign.success_message');
+        req.flash('message', message);
         req.flash('alertType', data.alertType);
         return res.redirect(frontend_api_urls.PHISHMAGNUS.Campaign.NFC.VIEW);
       } catch (apiError) {
         logger.error("Error creating NFC campaign: " + apiError.message);
         logger.error(apiError.stack);
-        req.flash('message', 'Error creating NFC campaign ');
+        req.flash('message', req.__('generic_label.error_creating_nfc_campaign'));
         req.flash('alertType', 'error');
         return res.redirect(frontend_api_urls.PHISHMAGNUS.Home.INDEX);
 
@@ -76,7 +77,7 @@ exports.createNFCCampaign = async (req, res) => {
     logger.error("NFC CAMPAIGN MODULE::: EXCEPTION IN CREATE NFC PHISHING CAMPAIGN");
     logger.error(error.message);
     logger.error(error.stack);
-    req.flash('message', 'Error creating NFC campaign ');
+    req.flash('message', req.__('generic_label.error_creating_nfc_campaign'));
     req.flash('alertType', 'error');
     return res.redirect(frontend_api_urls.PHISHMAGNUS.Home.INDEX);
   }
