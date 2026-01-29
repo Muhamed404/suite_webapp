@@ -1,0 +1,96 @@
+{
+  "header": {
+    "welcome": "مرحبًا {name}",
+    "searchPlaceholder": "ابحث هنا...",
+    "mail": "البريد",
+    "notifications": "الإشعارات",
+    "profileCompany": "بنك الراجحي",
+    "profileEmail": "info@user.com"
+  },
+  "page": {
+    "title": "لوحة التحكم AwareMagnus"
+  },
+  "cards": {
+    "totalUserLicenses": "إجمالي تراخيص المستخدمين",
+    "totalConsumedLicenses": "إجمالي التراخيص المستهلكة",
+    "organizationScore": "مؤشر المؤسسة",
+    "totalComplianceScore": "إجمالي درجة الالتزام",
+    "globalProgress": "التقدّم العام",
+    "totalXpTokens": "إجمالي نقاط الخبرة",
+    "totalAwarenessCampaigns": "إجمالي حملات التوعية المنفّذة",
+    "securityPosture": "الوضع الأمني",
+    "infoTitle": "تنبيه معلوماتي",
+    "infoBody": "مزيد من المعلومات حول هذا التنبيه تظهر هنا. هذا نص أطول لعرض المسافات داخل المحتوى.",
+    "viewMore": "عرض المزيد",
+    "inRisk": "ضمن المخاطر",
+    "securityAwarenessCampaign": "حملة التوعية الأمنية",
+    "viewAll": "عرض الكل",
+    "lastCampaignDate": "تاريخ آخر حملة: {date}",
+    "weeklyProgress": "التقدّم الأسبوعي",
+    "quizAccuracy": "دقة الاختبار",
+    "securityAwarenessScore": "درجة الوعي الأمني",
+    "good": "جيد",
+    "employeeRiskStates": "حالات مخاطر الموظفين",
+    "employeeCertification": "شهادات الموظفين",
+    "certified": "حاصلون على شهادة: {count}",
+    "notCertified": "غير حاصلين على شهادة: {count}",
+    "top3StrugglingTopics": "أكثر 3 مواضيع صعوبة",
+    "employeesNeedAttention": "يحتاج موظفوك إلى تحسين في هذه المواضيع",
+    "activeLearnersThisMonth": "المتعلمون النشطون هذا الشهر",
+    "trainingCompletionRate": "معدل إكمال التدريب"
+  },
+  "topics": {
+    "wifiSecurity": "أمن الواي فاي",
+    "physicalSecurity": "الأمن المادي",
+    "phishingSecurity": "أمن التصيّد"
+  },
+  "tables": {
+    "topHighRisk": "أفضل 10 موظفين مرتفعي المخاطر",
+    "topLowRisk": "أفضل 10 موظفين منخفضي المخاطر",
+    "sortBy": "الترتيب حسب",
+    "employeeName": "اسم الموظف",
+    "startDate": "تاريخ البدء",
+    "dueDate": "تاريخ الاستحقاق",
+    "badge": "🏆 شارة",
+    "exp": "⭐ نقاط",
+    "showingOf": "عرض {shown} من {total}"
+  },
+  "gamification": {
+    "title": "إحصائيات التوزيع المحفّز",
+    "courseCompleted": "الدورات المكتملة",
+    "studyTime": "وقت الدراسة",
+    "achievementGallery": "معرض الإنجازات",
+    "achievementSubtitle": "شارات المؤسسة المقفلة والمفتوحة",
+    "achievements": "الإنجازات",
+    "employeeAvatarLevel": "مستوى أفاتار الموظف",
+    "vulnerableNewbie": "مبتدئ\nمعرّض",
+    "levels": {
+      "alertApprentice": "متدرّب يقظ",
+      "cautiousLearner": "متعلّم حذر",
+      "informedDefender": "مدافع مطّلع",
+      "vigilantGuardian": "حارس يقظ",
+      "skilledSentinel": "مراقب ماهر",
+      "resilientProtector": "حامٍ صامد",
+      "advancedWatchman": "مراقب متقدّم",
+      "expertEnforcer": "منفّذ خبير"
+    }
+  },
+  "menu": {
+    "suitManagement": "إدارة البدلة",
+    "organization": "المؤسسة",
+    "users": "المستخدمون",
+    "department": "الأقسام",
+    "group": "المجموعات",
+    "subscriptionHistory": "سجل الاشتراك",
+    "products": "المنتجات",
+    "dashboard": "لوحة التحكم",
+    "quizzes": "الاختبارات",
+    "modules": "الوحدات",
+    "content": "المحتوى",
+    "licenseUser": "مستخدمو الترخيص",
+    "survey": "استبيان",
+    "trainingLibrary": "مكتبة التدريب"
+  }
+}
+
+
