@@ -50,7 +50,7 @@ exports.createUSBCampaign = async (req, res) => {
         logger.error(error);
         logger.error(error.stack);
         req.flash('alertType', 'error');
-        req.flash('message', 'Issue in Creating a USB Campaign');
+        req.flash('message', req.__('validation_messages.usb_campaign_creation_error'));
         return res.redirect(frontend_api_urls.PHISHMAGNUS.Campaign.USB.CREATE);
       }
     }
@@ -64,7 +64,7 @@ exports.createUSBCampaign = async (req, res) => {
     logger.error(error);
     logger.error(error.stack);
     req.flash('alertType', 'error');
-    req.flash('message', 'Issue in Creating a USB Campaign');
+    req.flash('message', req.__('validation_messages.usb_campaign_creation_error'));
     return res.redirect(frontend_api_urls.PHISHMAGNUS.Campaign.USB.CREATE);
   }
 };

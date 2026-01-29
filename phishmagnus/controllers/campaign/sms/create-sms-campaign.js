@@ -20,7 +20,7 @@ exports.renderFormController = async (req, res) => {
       const organization = Number(req?.user?.organization_id) || null;
       if (!organization) {
         logger.warn("Controller - Render Form: missing organization in session");
-        return res.redirect('/phm/?message=' + encodeURIComponent('Organization not found') + '&alertType=error');
+        return res.redirect('/phm/?message=' + encodeURIComponent(req.__('validation_messages.organization_not_found')) + '&alertType=error');
       }
 
       try {
@@ -70,7 +70,7 @@ exports.renderFormController = async (req, res) => {
       } catch (err) {
         logger.error(`Controller - Render Form: error in processing request ${err.message}`);
         logger.error(err.stack);
-        req.flash('message', 'Error processing request in creating email campaign');
+        req.flash('message', req.__('validation_messages.error_processing_request'));
         req.flash('alertType', 'error');
         return res.redirect('/home');
       }
@@ -81,7 +81,7 @@ exports.renderFormController = async (req, res) => {
     logger.error(`${error.message}`);
     logger.error(error);
     logger.error(error.stack);
-    req.flash('message', 'Error submitting request in creating email campaign');
+    req.flash('message', req.__('validation_messages.error_submitting_sms_campaign'));
     req.flash('alertType', 'error');
     res.redirect("/home");
   }
@@ -105,7 +105,7 @@ exports.submitFormController = async (req, res) => {
       // If both departmentIds and groupIds are empty -> error
       if ((departmentIds.length === 0) && (groupIds.length === 0)) {
         logger.warn('Controller - Create SMS Campaign: Invitees are empty - no departments or groups selected');
-        const message = 'Invalid Invitees Selected';
+        const message = req.__('validation_messages.invalid_invitees_selected');
         const alertType = 'error';
         req.flash('message', message);
         req.flash('alertType', alertType);
@@ -115,7 +115,7 @@ exports.submitFormController = async (req, res) => {
       // Validate and convert templateSelect to templateId
       if (!payload.templateSelect) {
         logger.warn('Controller - Create SMS Campaign: templateSelect is missing');
-        const message = 'Invalid Template Selected';
+        const message = req.__('validation_messages.invalid_template_selected');
         const alertType = 'error';
         req.flash('message', message);
         req.flash('alertType', alertType);
@@ -125,7 +125,7 @@ exports.submitFormController = async (req, res) => {
       const templateId = Number(payload.templateSelect);
       if (isNaN(templateId) || templateId <= 0) {
         logger.warn('Controller - Create SMS Campaign: Invalid templateId: ' + payload.templateSelect);
-        const message = 'Invalid Template ID';
+        const message = req.__('validation_messages.invalid_template_id');
         const alertType = 'error';
         req.flash('message', message);
         req.flash('alertType', alertType);
@@ -157,7 +157,7 @@ exports.submitFormController = async (req, res) => {
     logger.error(`${error.message}`);
     logger.error(error);
     logger.error(error.stack);
-    req.flash('message', 'Error submitting request in creating SMS campaign');
+    req.flash('message', req.__('validation_messages.error_submitting_sms_campaign'));
     req.flash('alertType', 'error');
     return res.redirect(frontend_api_urls.PHISHMAGNUS.Campaign.SMS.CREATE);
   }

@@ -68,9 +68,9 @@
     <!-- Buttons -->
     <div class="flex justify-end gap-4 mt-10 p-8">
       <button id="backBtn" type="button"
-        class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition">Back</button>
+        class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition"><%= __("generic_label.back") %></button>
       <button id="nextBtn" type="submit"
-        class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition">Next</button>
+        class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition"><%= __("generic_label.next") %></button>
     </div>
 
 
@@ -87,6 +87,14 @@
     labels: {
       next: "<%= __('generic_label.next') %>",
       finish: "<%= __('generic_label.Finish') %>"
+    },
+    validation: {
+      required: "<%= __('validation_messages.field_required') %>",
+      campaign_name_required: "<%= __('validation_messages.campaign_name_required') %>",
+      template_type_required: "<%= __('validation_messages.template_type_required') %>",
+      template_required: "<%= __('validation_messages.template_required') %>",
+      start_time_required: "<%= __('validation_messages.start_time_required') %>",
+      end_time_required: "<%= __('validation_messages.end_time_required') %>"
     }
   };
 </script>

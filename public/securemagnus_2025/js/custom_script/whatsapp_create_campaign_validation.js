@@ -1,22 +1,22 @@
 $(document).ready(function () {
   // QR Campaign Form Validation
-  $("#smsCampaignForm").validate({
+  $("#whatsappCampaignForm").validate({
     rules: {
       // Step 1: Campaign Name & Template
       name: { required: true, minlength: 2 },
       templateOption: { required: true },
-      templateSelect: { required: true },
+      // templateSelect: { required: true }, // Checked in custom validation
 
       // Step 3: Date & Time
       startTime: { required: true },
       endTime: { required: true }
     },
     messages: {
-      name: "Campaign name is required (min 2 characters).",
-      templateOption: "Please select a template type.",
-      templateSelect: "Please select a template.",
-      startTime: "Start date and time are required.",
-      endTime: "End date and time are required."
+      name: window.i18n.validation.campaign_name_required,
+      templateOption: window.i18n.validation.template_type_required,
+      // templateSelect: window.i18n.validation.template_required,
+      startTime: window.i18n.validation.start_time_required,
+      endTime: window.i18n.validation.end_time_required
     },
     errorClass: "text-red-500 text-sm mt-1",
     highlight: function (element) {
@@ -30,7 +30,7 @@ $(document).ready(function () {
   // Validate on change/blur for better UX
   $('#name').on('blur', function () { $(this).valid(); });
   $('input[name="templateOption"]').on('change', function () { $(this).valid(); });
-  $('#templateSelect').on('change', function () { $(this).valid(); });
+  // $('#templateSelect').on('change', function () { $(this).valid(); });
   $('#startTime, #endTime').on('change', function () { $(this).valid(); });
 
   // Initialize template option toggle

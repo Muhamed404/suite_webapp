@@ -68,10 +68,10 @@ class EmailCampaignStepper {
         }
       },
       messages: {
-        name: window.i18n?.validation?.campaign_name_required || "Campaign name is required (minimum 2 characters).",
-        templateId: window.i18n?.validation?.template_required || "Please select a template.",
-        startTime: window.i18n?.validation?.start_time_required || "Start date and time are required.",
-        endTime: window.i18n?.validation?.end_time_required || "End date and time are required."
+        name: window.i18n?.validation_messages?.campaign_name_required || "Campaign name is required (minimum 2 characters).",
+        templateId: window.i18n?.validation_messages?.template_required || "Please select a template.",
+        startTime: window.i18n?.validation_messages?.start_time_required || "Start date and time are required.",
+        endTime: window.i18n?.validation_messages?.end_time_required || "End date and time are required."
       },
       errorClass: "text-red-500 text-sm mt-1 block",
       errorElement: "span",
@@ -510,7 +510,7 @@ class EmailCampaignStepper {
 
       if (nameInput && !nameInput.value.trim()) {
         validator.showErrors({
-          "name": "Campaign name is required (minimum 2 characters)."
+          "name": window.i18n?.validation_messages?.campaign_name_required || "Campaign name is required (minimum 2 characters)."
         });
         $(nameInput).addClass('border-red-500');
         nameInput.focus();

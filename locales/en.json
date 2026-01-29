@@ -59,6 +59,7 @@
 		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today"
 	},
 	"validation_messages": {
+		"field_required": "This field is required.",
 		"campaign_name_required": "Campaign name is required (minimum 2 characters).",
 		"template_type_required": "Please select a template type.",
 		"template_required": "Please select a template.",
@@ -69,7 +70,18 @@
 		"validation_error": "Validation Error:",
 		"no_members_in_selection": "The selected departments/groups have no members. Please select departments or groups with members, or add members to the selected ones.",
 		"some_empty_selections": "Warning: Some selections have no members. The campaign will only target departments/groups with members.",
-		"validation_failed": "Validation failed. Please try again."
+		"validation_failed": "Validation failed. Please try again.",
+		"invalid_invitees_selected": "Invalid Invitees Selected",
+		"invalid_template_selected": "Invalid Template Selected",
+		"invalid_template_id": "Invalid Template ID",
+		"error_submitting_sms_campaign": "Error submitting request in creating SMS campaign",
+		"error_processing_request": "Error processing request in creating SMS campaign",
+		"organization_not_found": "Organization not found",
+		"usb_campaign_name_required": "Campaign name is required.",
+		"usb_no_of_usb_required": "Number of USBs is required and must be a positive number.",
+		"usb_env_variable_required": "Environment variable is required.",
+		"usb_filename_required": "File name is required.",
+		"usb_campaign_creation_error": "Issue in Creating a USB Campaign"
 	},
 	"topnavbar": {
 		"welcome": "Welcome"
@@ -679,9 +691,9 @@
 		},
 		"create": {
 			"title": "Create Whatsapp Campaign",
-			"step1": "Select Template",
-			"step2": "Select Group or Department",
-			"step3": "Schedule",
+			"step1": "Step 1",
+			"step2": "Step 2",
+			"step3": "Step 3",
 			"campaign_name": "Campaign Name",
 			"description": "Description",
 			"myTemplate": "My Templates",
