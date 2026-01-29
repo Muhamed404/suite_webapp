@@ -107,7 +107,7 @@ $(document).ready(function () {
       // Step 1 Messages
       name: {
         required: window.i18n?.validation_messages?.template_name_required || "Template name is required.",
-        minlength: "Template name must be at least 3 characters."
+        minlength: window.i18n?.validation_messages?.template_name_minlength || "Template name must be at least 3 characters."
       },
       phishType: window.i18n?.validation_messages?.phishing_type_required || "Please select a phishing type.",
       
@@ -115,13 +115,13 @@ $(document).ready(function () {
       file_extension: "Please select a file extension.",
       file_name: {
         required: window.i18n?.validation_messages?.file_name_required || "File name is required.",
-        minlength: "File name must be at least 2 characters."
+        minlength: window.i18n?.validation_messages?.file_name_minlength || "File name must be at least 2 characters."
       },
       
       // Step 4 Messages
       subject: {
         required: window.i18n?.validation_messages?.email_subject_required || "Email subject is required.",
-        minlength: "Subject must be at least 3 characters."
+        minlength: window.i18n?.validation_messages?.subject_minlength || "Subject must be at least 3 characters."
       },
       sender_email: {
         required: window.i18n?.validation_messages?.sender_email_required || "Sender email is required.",
@@ -129,19 +129,19 @@ $(document).ready(function () {
       },
       sender_display_name: {
         required: window.i18n?.validation_messages?.sender_name_required || "Sender name is required.",
-        minlength: "Sender name must be at least 2 characters."
+        minlength: window.i18n?.validation_messages?.sender_name_minlength || "Sender name must be at least 2 characters."
       },
       company_name: {
         required: window.i18n?.validation_messages?.company_name_required || "Company name is required.",
-        minlength: "Company name must be at least 2 characters."
+        minlength: window.i18n?.validation_messages?.company_name_minlength || "Company name must be at least 2 characters."
       },
       company_domain: {
         required: window.i18n?.validation_messages?.company_domain_required || "Company domain is required.",
-        minlength: "Company domain must be at least 3 characters."
+        minlength: window.i18n?.validation_messages?.company_domain_minlength || "Company domain must be at least 3 characters."
       },
       sms_content: {
-        required: "SMS message is required.",
-        maxlength: "SMS message must not exceed 160 characters."
+        required: window.i18n?.validation_messages?.sms_content_required || "SMS message is required.",
+        maxlength: window.i18n?.validation_messages?.sms_content_maxlength || "SMS message must not exceed 160 characters."
       },
       
       // Step 5 Messages

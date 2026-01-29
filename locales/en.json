@@ -100,7 +100,15 @@
 		"email_content_required": "Email content is required.",
 		"valid_email_required": "Please enter a valid email address.",
 		"file_name_required": "File name is required.",
-		"phishing_page_content_required": "Phishing page content is required."
+		"phishing_page_content_required": "Phishing page content is required.",
+		"sms_content_required": "SMS message is required.",
+		"template_name_minlength": "Template name must be at least 3 characters.",
+		"file_name_minlength": "File name must be at least 2 characters.",
+		"subject_minlength": "Subject must be at least 3 characters.",
+		"sender_name_minlength": "Sender name must be at least 2 characters.",
+		"company_name_minlength": "Company name must be at least 2 characters.",
+		"company_domain_minlength": "Company domain must be at least 3 characters.",
+		"sms_content_maxlength": "SMS message must not exceed 160 characters."
 	},
 	"topnavbar": {
 		"welcome": "Welcome"
@@ -499,7 +507,8 @@
 			"sms_placeholder": "Enter SMS message (max 160 characters)",
 			"sms_message": "SMS Message",
 			"sms_content": "SMS Template Content",
-			"labelDetails_level2_title": "Setup File Attachment",
+			"smsShortMessageTitle": "Short Message (Level 1)",
+			"smsShortMessageDescription": "Send a simple SMS message.",
 			"labelDetails_level2_Description": "You can enter file extension and name. We will provide you the new file automatically as an attachment in your phishing message to be downloaded.",
 			"labelDetails_level2_FileName": "File Name",
 			"labelDetails_level2_FileExtension": "File Extension",
@@ -524,7 +533,8 @@
 			"urlInvalid": "Please enter a valid URL.",
 			"invalidUrlFormat": "Invalid URL format.",
 			"fetchButtonText": "Fetch",
-			"fetchingButtonText": "Fetching..."
+			"fetchingButtonText": "Fetching...",
+			"labelDetails_level2_title": "system_template.create.labelDetails_level2_title"
 		}
 	},
 	"campaign": {

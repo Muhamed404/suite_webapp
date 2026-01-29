@@ -112,7 +112,15 @@
 		"email_content_required": "محتوى البريد الإلكتروني مطلوب.",
 		"valid_email_required": "يرجى إدخال عنوان بريد إلكتروني صالح.",
 		"file_name_required": "اسم الملف مطلوب.",
-		"phishing_page_content_required": "محتوى صفحة التصيد مطلوب."
+		"phishing_page_content_required": "محتوى صفحة التصيد مطلوب.",
+		"sms_content_required": "نص الرسالة القصيرة مطلوب.",
+		"template_name_minlength": "يجب أن يكون اسم القالب على الأقل 3 أحرف.",
+		"file_name_minlength": "يجب أن يكون اسم الملف على الأقل حرفين.",
+		"subject_minlength": "يجب أن يكون الموضوع على الأقل 3 أحرف.",
+		"sender_name_minlength": "يجب أن يكون اسم المرسل على الأقل حرفين.",
+		"company_name_minlength": "يجب أن يكون اسم الشركة على الأقل حرفين.",
+		"company_domain_minlength": "يجب أن يكون نطاق الشركة على الأقل 3 أحرف.",
+		"sms_content_maxlength": "يجب ألا يتجاوز نص الرسالة القصيرة 160 حرفًا."
 	},
 	"topnavbar": {
 		"welcome": "مرحباً"
@@ -545,9 +553,11 @@
 			"labelLandingPageContentEditor": "محتوى قالب صفحة الوصول",
 			"sms_content": "محتوى قالب الرسائل النصية",
 			"sms_message": "نص الرسالة القصيرة",
-			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)"
+			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)",
+			"smsShortMessageTitle": "رسالة قصيرة (المستوى 1)",
+			"smsShortMessageDescription": "إرسال رسالة نصية قصيرة بسيطة."
 		},
-		"stepper8": "system_template.stepper8"
+		"stepper8": "محتوى قالب الرسائل النصية"
 	},
 	"campaign": {
 		"email_campaign_detail": {

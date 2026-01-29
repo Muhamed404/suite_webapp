@@ -31,7 +31,7 @@ const conditions = {
   ],
 
   sms: [
-    { id: 'short', title: 'Short Message (Level 1)', difficulty_level: 1, desc: 'Send a simple SMS message.' },
+    { id: 'short', title: window.i18n ? window.i18n.__('system_template.create.smsShortMessageTitle') : 'Short Message (Level 1)', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.smsShortMessageDescription') : 'Send a simple SMS message.' },
     { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing SMS template with file attached in the message to monitor download by users.' },
     { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'SMS template with a dedicated URL for testing users visiting the phishing page.' }
   ],

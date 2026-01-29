@@ -602,7 +602,15 @@
             urlRequired: "<%= __('system_template.create.urlRequired') %>",
             urlInvalid: "<%= __('system_template.create.urlInvalid') %>",
             fetchButtonText: "<%= __('system_template.create.fetchButtonText') %>",
-            fetchingButtonText: "<%= __('system_template.create.fetchingButtonText') %>"
+            fetchingButtonText: "<%= __('system_template.create.fetchingButtonText') %>",
+            sms_content_required: "<%= __('validation_messages.sms_content_required') %>",
+            template_name_minlength: "<%= __('validation_messages.template_name_minlength') %>",
+            file_name_minlength: "<%= __('validation_messages.file_name_minlength') %>",
+            subject_minlength: "<%= __('validation_messages.subject_minlength') %>",
+            sender_name_minlength: "<%= __('validation_messages.sender_name_minlength') %>",
+            company_name_minlength: "<%= __('validation_messages.company_name_minlength') %>",
+            company_domain_minlength: "<%= __('validation_messages.company_domain_minlength') %>",
+            sms_content_maxlength: "<%= __('validation_messages.sms_content_maxlength') %>"
         },
         __: function(key) {
             const translations = {
@@ -610,7 +618,9 @@
                 "system_template.create.downloadFileBasedTitle": "<%= __('system_template.create.downloadFileBasedTitle') %>",
                 "system_template.create.downloadFileBasedDescription": "<%= __('system_template.create.downloadFileBasedDescription') %>",
                 "system_template.create.urlClickBasedTitle": "<%= __('system_template.create.urlClickBasedTitle') %>",
-                "system_template.create.urlClickBasedDescription": "<%= __('system_template.create.urlClickBasedDescription') %>"
+                "system_template.create.urlClickBasedDescription": "<%= __('system_template.create.urlClickBasedDescription') %>",
+                "system_template.create.smsShortMessageTitle": "<%= __('system_template.create.smsShortMessageTitle') %>",
+                "system_template.create.smsShortMessageDescription": "<%= __('system_template.create.smsShortMessageDescription') %>"
             };
             return translations[key] || key;
         }
