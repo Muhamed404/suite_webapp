@@ -1,0 +1,11 @@
+{
+  "appName": "AwareMagnus",
+  "language": {
+    "switchToArabic": "عربي",
+    "switchToEnglish": "EN"
+  },
+  "errors": {
+    "networkError": "Network error: Unable to connect to the server. Please try again later.",
+    "unknown": "An unexpected error occurred. Please try again."
+  }
+}

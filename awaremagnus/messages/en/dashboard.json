@@ -1,0 +1,96 @@
+{
+  "header": {
+    "welcome": "Welcome {name}",
+    "searchPlaceholder": "Search here...",
+    "mail": "Mail",
+    "notifications": "Notifications",
+    "profileCompany": "Alrajhi Bank",
+    "profileEmail": "info@user.com"
+  },
+  "page": {
+    "title": "AwareMagnus Dashboard"
+  },
+  "cards": {
+    "totalUserLicenses": "Total User Licenses",
+    "totalConsumedLicenses": "Total Consumed Licenses",
+    "organizationScore": "Organization Score",
+    "totalComplianceScore": "Total Compliance Score",
+    "globalProgress": "Global Progress",
+    "totalXpTokens": "Total XP Tokens",
+    "totalAwarenessCampaigns": "Total Awareness Campaigns conducted",
+    "securityPosture": "Security Posture",
+    "infoTitle": "This is an info alert",
+    "infoBody": "More info about this info alert goes here. This example text is longer to show spacing inside content.",
+    "viewMore": "View more",
+    "inRisk": "In Risk",
+    "securityAwarenessCampaign": "Security Awareness Campaign",
+    "viewAll": "View All",
+    "lastCampaignDate": "Last Campaign Date: {date}",
+    "weeklyProgress": "Weekly Progress",
+    "quizAccuracy": "Quiz Accuracy",
+    "securityAwarenessScore": "Security Awareness Score",
+    "good": "Good",
+    "employeeRiskStates": "Employee Risk States",
+    "employeeCertification": "Employee Certification",
+    "certified": "Certified: {count}",
+    "notCertified": "Not Certified: {count}",
+    "top3StrugglingTopics": "Top 3 Struggling Topics",
+    "employeesNeedAttention": "Your employees need attention on these topics",
+    "activeLearnersThisMonth": "Active Learners This Month",
+    "trainingCompletionRate": "Training Completion Rate"
+  },
+  "topics": {
+    "wifiSecurity": "WIFI Security",
+    "physicalSecurity": "Physical Security",
+    "phishingSecurity": "Phishing Security"
+  },
+  "tables": {
+    "topHighRisk": "Top 10 High Risk Employees",
+    "topLowRisk": "Top 10 Low Risk Employees",
+    "sortBy": "Sort by",
+    "employeeName": "Employee Name",
+    "startDate": "Start Date",
+    "dueDate": "Due Date",
+    "badge": "🏆 Badge",
+    "exp": "⭐ Exp",
+    "showingOf": "Showing {shown} of {total}"
+  },
+  "gamification": {
+    "title": "Gamified Distribution Statistics",
+    "courseCompleted": "Course Completed",
+    "studyTime": "Study Time",
+    "achievementGallery": "Achievement Gallery",
+    "achievementSubtitle": "Organization locked and unlocked badges",
+    "achievements": "Achievements",
+    "employeeAvatarLevel": "Employee Avatar Level",
+    "vulnerableNewbie": "Vulnerable\nNewbie",
+    "levels": {
+      "alertApprentice": "Alert Apprentice",
+      "cautiousLearner": "Cautious Learner",
+      "informedDefender": "Informed Defender",
+      "vigilantGuardian": "Vigilant Guardian",
+      "skilledSentinel": "Skilled Sentinel",
+      "resilientProtector": "Resilient Protector",
+      "advancedWatchman": "Advanced Watchman",
+      "expertEnforcer": "Expert Enforcer"
+    }
+  },
+  "menu": {
+    "suitManagement": "Suit Management",
+    "organization": "Organization",
+    "users": "Users",
+    "department": "Department",
+    "group": "Group",
+    "subscriptionHistory": "Subscription History",
+    "products": "Products",
+    "dashboard": "Dashboard",
+    "quizzes": "Quizzes",
+    "modules": "Modules",
+    "content": "Content",
+    "licenseUser": "License User",
+    "survey": "Survey",
+    "trainingLibrary": "Training Library"
+  }
+}
+
+
