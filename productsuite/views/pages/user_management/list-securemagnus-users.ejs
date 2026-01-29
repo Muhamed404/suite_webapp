@@ -115,7 +115,7 @@
 
               <td class="px-4 py-5 text-sm font-normal relative">
                 <div class="relative inline-block text-left">
-                  <button type="button" onclick="this.nextElementSibling.classList.toggle('hidden')"
+                  <button type="button" onclick="toggleDropdown(this)"
                     class="p-2 rounded hover:bg-gray-100 transition" aria-haspopup="true" aria-expanded="false">
                     <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="2"
                       viewBox="0 0 24 24">
@@ -154,5 +154,40 @@
   </div>
 </div>
 
+<script>
+function toggleDropdown(button) {
+  const allDropdowns = document.querySelectorAll('.relative.inline-block.text-left ul');
+  allDropdowns.forEach(dropdown => {
+    if (dropdown !== button.nextElementSibling) {
+      dropdown.classList.add('hidden');
+    }
+  });
+  
+  button.nextElementSibling.classList.toggle('hidden');
+}
+
+document.addEventListener('click', function(event) {
+  const dropdowns = document.querySelectorAll('.relative.inline-block.text-left ul');
+  const buttons = document.querySelectorAll('.relative.inline-block.text-left button');
+  
+  let isOutside = true;
+  buttons.forEach(button => {
+    if (button.contains(event.target)) {
+      isOutside = false;
+    }
+  });
+  dropdowns.forEach(dropdown => {
+    if (dropdown.contains(event.target)) {
+      isOutside = false;
+    }
+  });
+  
+  if (isOutside) {
+    dropdowns.forEach(dropdown => {
+      dropdown.classList.add('hidden');
+    });
+  }
+});
+</script>
 
 
