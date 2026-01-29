@@ -4,6 +4,7 @@
 const serverData = window.allCampaignsData || {};
 const originalCampaigns = serverData.campaigns || [];
 const typeOptions = serverData.typeOptions || [];
+const translations = serverData.translations || {};
 
 // Transform server data for table display
 const data = originalCampaigns.map(campaign => ({
@@ -40,9 +41,12 @@ const filterType  = document.getElementById("filterType");
 const rowsSelect  = document.getElementById("rowsPerPage");
 
 // ===============================
-// Render status tabs (with counts)
+// Get display name for status
 // ===============================
-function renderTabs() {
+function getStatusDisplayName(status) {
+  const key = `filter${status.charAt(0).toUpperCase() + status.slice(1)}`;
+  return translations[key] || status;
+}
   // Count how many items are in each status
   const counts = { All: data.length };
   ["active", "scheduled", "completed", "draft"].forEach(st => {
@@ -53,7 +57,7 @@ function renderTabs() {
   statusTabs.innerHTML = Object.entries(counts)
     .map(([status, count]) => {
       const isActive = currentTab === status;
-      const displayName = status.charAt(0).toUpperCase() + status.slice(1);
+      const displayName = getStatusDisplayName(status);
 
       // If active
       if (isActive) {
@@ -172,6 +176,12 @@ function renderTable() {
 
   // Update pagination
   renderPagination(filtered.length);
+
+  // Hide pagination controls if no data
+  const paginationControls = document.querySelector('.flex.flex-col.gap-3.mt-4');
+  if (paginationControls) {
+    paginationControls.style.display = filtered.length === 0 ? 'none' : 'flex';
+  }
 }
 
 // ===============================
@@ -310,8 +320,8 @@ if (data.length > 0) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="8" class="px-6 py-12 text-center text-gray-500">
-          <div class="text-lg font-medium mb-2">No campaigns found</div>
-          <p>Create your first campaign to get started.</p>
+          <div class="text-lg font-medium mb-2">${translations.noCampaignsFound || 'No campaigns found'}</div>
+          <p>${translations.createFirstCampaign || 'Create your first campaign to get started.'}</p>
         </td>
       </tr>
     `;
@@ -319,8 +329,13 @@ if (data.length > 0) {
   if (statusTabs) {
     statusTabs.innerHTML = `
       <button class="flex items-center gap-1 px-4 py-2 text-white bg-gray-900 rounded-full">
-        All <span class="bg-gray-700 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+        ${translations.filterAll || 'All'} <span class="bg-gray-700 text-white text-xs px-2 py-0.5 rounded-full">0</span>
       </button>
     `;
+  }
+  // Hide pagination controls when no data
+  const paginationControls = document.querySelector('.flex.flex-col.gap-3.mt-4');
+  if (paginationControls) {
+    paginationControls.style.display = 'none';
   }
 }

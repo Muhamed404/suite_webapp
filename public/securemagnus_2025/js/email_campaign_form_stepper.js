@@ -68,10 +68,10 @@ class EmailCampaignStepper {
         }
       },
       messages: {
-        name: "Campaign name is required (minimum 2 characters).",
-        templateId: "Please select a template.",
-        startTime: "Start date and time are required.",
-        endTime: "End date and time are required."
+        name: window.i18n?.validation?.campaign_name_required || "Campaign name is required (minimum 2 characters).",
+        templateId: window.i18n?.validation?.template_required || "Please select a template.",
+        startTime: window.i18n?.validation?.start_time_required || "Start date and time are required.",
+        endTime: window.i18n?.validation?.end_time_required || "End date and time are required."
       },
       errorClass: "text-red-500 text-sm mt-1 block",
       errorElement: "span",
@@ -267,9 +267,17 @@ class EmailCampaignStepper {
 
     const fieldFromData = container.dataset?.field?.trim() || null;
     const fieldFromSelectName = select?.name?.replace(/\[\]$/, '').trim() || null;
-    const labelText = container.querySelector('label')?.textContent?.toLowerCase() || '';
-    const inferredField = labelText.includes('department') ? 'department' : 
-                         (labelText.includes('group') ? 'group' : 'field');
+    const labelText = container.querySelector('label')?.textContent?.trim() || '';
+    console.log('Tag selector label text:', labelText);
+    
+    let inferredField = 'field'; // default
+    if (labelText.toLowerCase().includes('department') || labelText.includes('قسم') || labelText.includes('القسم')) {
+      inferredField = 'department';
+    } else if (labelText.toLowerCase().includes('group') || labelText.includes('مجموعة') || labelText.includes('المجموعة')) {
+      inferredField = 'group';
+    }
+    
+    console.log('Inferred field type:', inferredField);
 
     const logicalField = fieldFromData || fieldFromSelectName || inferredField;
     let hiddenContainer = container.querySelector('.hidden-inputs');
@@ -403,9 +411,9 @@ class EmailCampaignStepper {
     this.backBtn.addEventListener('click', () => this.handleBack());
   }
 
-  handleNext() {
+  async handleNext() {
     // Validate form before advancing
-    if (this.form && !this.validateForm()) {
+    if (this.form && !(await this.validateForm())) {
       console.warn('Form validation failed on step:', this.currentStep);
       return;
     }
@@ -492,7 +500,7 @@ class EmailCampaignStepper {
   }
 
   // ===== FORM VALIDATION & SUBMISSION =====
-  validateForm() {
+  async validateForm() {
     if (!this.form) return true;
 
     // Step 1: Validate campaign name
@@ -522,6 +530,14 @@ class EmailCampaignStepper {
 
       console.log('Validation - Department IDs found:', departmentIds.length);
       console.log('Validation - Group IDs found:', groupIds.length);
+      
+      // Debug: Log actual hidden inputs
+      departmentIds.forEach((input, index) => {
+        console.log(`Department ${index + 1}: ID=${input.value}, Name=${input.nextElementSibling?.value || 'N/A'}`);
+      });
+      groupIds.forEach((input, index) => {
+        console.log(`Group ${index + 1}: ID=${input.value}, Name=${input.nextElementSibling?.value || 'N/A'}`);
+      });
 
       const hasDepartments = departmentIds.length > 0;
       const hasGroups = groupIds.length > 0;
@@ -534,11 +550,16 @@ class EmailCampaignStepper {
       tagSelectors.forEach(selector => {
         const label = selector.querySelector('label');
         if (label) {
-          const labelText = label.textContent.toLowerCase();
-          if (labelText.includes('department')) {
+          const labelText = label.textContent.trim();
+          // Check for department (English and Arabic)
+          if (labelText.toLowerCase().includes('department') || labelText.includes('قسم') || labelText.includes('القسم')) {
             departmentSelect = selector.querySelector('.groupSelect');
-          } else if (labelText.includes('group')) {
+            console.log('Found department selector with label:', labelText);
+          } 
+          // Check for group (English and Arabic)
+          else if (labelText.toLowerCase().includes('group') || labelText.includes('مجموعة') || labelText.includes('المجموعة')) {
             groupSelect = selector.querySelector('.groupSelect');
+            console.log('Found group selector with label:', labelText);
           }
         }
       });
@@ -551,16 +572,17 @@ class EmailCampaignStepper {
       console.log('Group options available:', hasGroupOptions);
 
       if (!hasDepartmentOptions && !hasGroupOptions) {
-        this.showValidationError('No departments or groups available. Please add users to departments or groups before creating a campaign.');
+        this.showValidationError(window.i18n?.validation_messages?.no_departments_groups || window.i18n?.sms?.validation_messages?.no_departments_groups || 'No departments or groups available. Please add users to departments or groups before creating a campaign.');
         return false;
       }
 
       if (!hasDepartments && !hasGroups) {
-        this.showValidationError('Please select at least one department or group to target.');
+        this.showValidationError(window.i18n?.validation_messages?.select_department_group || window.i18n?.sms?.validation_messages?.select_department_group || 'Please select at least one department or group to target.');
         return false;
       }
 
-      console.log('Step 2 validation passed!');
+      // Validate member count for selected departments and groups
+      return this.validateMemberCount(departmentIds, groupIds);
     }
 
     // HTML5 validation check
@@ -586,6 +608,155 @@ class EmailCampaignStepper {
     return true;
   }
 
+  async validateMemberCount(departmentIds, groupIds) {
+    console.log('=== MEMBER VALIDATION STARTED ===');
+    console.log('Department IDs to check:', Array.from(departmentIds).map(input => input.value));
+    console.log('Group IDs to check:', Array.from(groupIds).map(input => input.value));
+    
+    try {
+      let hasMembers = false;
+      const emptySelections = [];
+      
+      // Check departments
+      for (const input of departmentIds) {
+        const departmentId = input.value;
+        // Get department name from the adjacent input or from the original option text
+        const departmentNameInput = input.nextElementSibling;
+        let departmentName = departmentId;
+        
+        if (departmentNameInput && departmentNameInput.name && departmentNameInput.name.includes('departmentNames')) {
+          departmentName = departmentNameInput.value;
+        } else {
+          // Try to get name from the select option in the department selector
+          const departmentSelectors = document.querySelectorAll('.tag-selector');
+          for (const selector of departmentSelectors) {
+            const label = selector.querySelector('label');
+            if (label) {
+              const labelText = label.textContent.trim();
+              if (labelText.toLowerCase().includes('department') || labelText.includes('قسم') || labelText.includes('القسم')) {
+                const select = selector.querySelector('.groupSelect');
+                if (select) {
+                  const option = [...select.options].find(opt => opt.value === departmentId);
+                  if (option) {
+                    departmentName = option.textContent.trim();
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        try {
+          console.log(`Checking department ${departmentId} (${departmentName})`);
+          const response = await fetch(`/department/getUsersByDepartment/${departmentId}`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          const data = await response.json();
+          console.log(`Department ${departmentId} response:`, data);
+          
+          if (data.success && data.assignedUsers && data.assignedUsers.length > 0) {
+            console.log(`Department ${departmentId} has ${data.assignedUsers.length} members`);
+            hasMembers = true;
+          } else {
+            console.log(`Department ${departmentId} has no members`);
+            emptySelections.push(`Department: ${departmentName}`);
+          }
+        } catch (error) {
+          console.error(`Error checking department ${departmentId}:`, error);
+          emptySelections.push(`Department: ${departmentName} (validation failed)`);
+        }
+      }
+      
+      // Check groups
+      for (const input of groupIds) {
+        const groupId = input.value;
+        // Get group name from the adjacent input or from the original option text
+        const groupNameInput = input.nextElementSibling;
+        let groupName = groupId;
+        
+        if (groupNameInput && groupNameInput.name && groupNameInput.name.includes('groupNames')) {
+          groupName = groupNameInput.value;
+        } else {
+          // Try to get name from the select option in the group selector
+          const groupSelectors = document.querySelectorAll('.tag-selector');
+          for (const selector of groupSelectors) {
+            const label = selector.querySelector('label');
+            if (label) {
+              const labelText = label.textContent.trim();
+              if (labelText.toLowerCase().includes('group') || labelText.includes('مجموعة') || labelText.includes('المجموعة')) {
+                const select = selector.querySelector('.groupSelect');
+                if (select) {
+                  const option = [...select.options].find(opt => opt.value === groupId);
+                  if (option) {
+                    groupName = option.textContent.trim();
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        try {
+          console.log(`Checking group ${groupId} (${groupName})`);
+          const response = await fetch(`/group/getUsersByGroup/${groupId}`, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          const data = await response.json();
+          console.log(`Group ${groupId} response:`, data);
+          
+          if (data.success && data.assignedUsers && data.assignedUsers.length > 0) {
+            console.log(`Group ${groupId} has ${data.assignedUsers.length} members`);
+            hasMembers = true;
+          } else {
+            console.log(`Group ${groupId} has no members`);
+            emptySelections.push(`Group: ${groupName}`);
+          }
+        } catch (error) {
+          console.error(`Error checking group ${groupId}:`, error);
+          emptySelections.push(`Group: ${groupName} (validation failed)`);
+        }
+      }
+      
+      console.log('Member validation summary:');
+      console.log('- hasMembers:', hasMembers);
+      console.log('- emptySelections:', emptySelections);
+      
+      // If no members found in any selected department or group
+      if (!hasMembers && emptySelections.length > 0) {
+        const message = window.i18n?.validation_messages?.no_members_in_selection || window.i18n?.sms?.validation_messages?.no_members_in_selection || 
+          `The selected departments/groups have no members. Please select departments or groups with members, or add members to the selected ones: ${emptySelections.join(', ')}`;
+        console.log('Showing error for empty selections:', message);
+        this.showValidationError(message);
+        return false;
+      }
+      
+      // If there are some empty selections but at least one has members, show warning but allow continuation
+      if (emptySelections.length > 0 && hasMembers) {
+        const warningMessage = window.i18n?.validation_messages?.some_empty_selections || window.i18n?.sms?.validation_messages?.some_empty_selections || 
+          `Warning: Some selections have no members: ${emptySelections.join(', ')}. The campaign will only target departments/groups with members.`;
+        console.warn(warningMessage);
+      }
+      
+      console.log('Step 2 member validation passed!');
+      return true;
+      
+    } catch (error) {
+      console.error('Error during member validation:', error);
+      this.showValidationError(window.i18n?.validation_messages?.validation_failed || window.i18n?.sms?.validation_messages?.validation_failed || 'Validation failed. Please try again.');
+      return false;
+    }
+  }
+
   showValidationError(message) {
     // Create or get error message container
     let errorContainer = document.getElementById('step-validation-error');
@@ -607,7 +778,7 @@ class EmailCampaignStepper {
       <div class="flex items-start">
         <span class="flex-shrink-0 mr-2">⚠️</span>
         <div class="flex-1">
-          <strong class="font-medium">Validation Error:</strong>
+          <strong class="font-medium">${window.i18n?.validation_messages?.validation_error || window.i18n?.sms?.validation_messages?.validation_error || 'Validation Error:'}</strong>
           <span class="block mt-1">${message}</span>
         </div>
         <button type="button" class="ml-4 text-red-700 hover:text-red-900" onclick="this.parentElement.parentElement.remove()">
