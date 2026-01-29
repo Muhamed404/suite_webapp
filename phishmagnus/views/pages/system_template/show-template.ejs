@@ -53,12 +53,12 @@
                     <label class="block text-lg font-medium mb-2">Select Language</label>
                     <div class="relative">
                         <select name="language" id="language"
-                            class="appearance-none w-full border border-gray-300 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                            class="appearance-none bg-none bg-transparent w-full border border-gray-300 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
                             <option value="en" <%= (template && String(template.language) === 'en') ? 'selected' : '' %>>English</option>
                             <option value="ar" <%= (template && String(template.language) === 'ar') ? 'selected' : '' %>>Arabic</option>
                         </select>
                         <!-- Custom Dropdown Icon -->
-                        <svg class="w-5 h-5 text-gray-500 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none"
+                        <svg class="w-5 h-5 text-gray-500 absolute right-4 top-1/2 -translate-y-1/3 pointer-events-none"
                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                         </svg>
