@@ -534,7 +534,13 @@
 			"invalidUrlFormat": "Invalid URL format.",
 			"fetchButtonText": "Fetch",
 			"fetchingButtonText": "Fetching...",
-			"labelDetails_level2_title": "system_template.create.labelDetails_level2_title"
+			"labelDetails_level2_title": "system_template.create.labelDetails_level2_title",
+			"whatsappShortMessageTitle": "Short Message",
+			"whatsappShortMessageDescription": "Send a simple SMS message.",
+			"whatsappAttachUrlTitle": "Attach URL",
+			"whatsappAttachUrlDescription": "Include a clickable link in SMS.",
+			"whatsappDownloadTemplateTitle": "Download Template",
+			"whatsappDownloadTemplateDescription": "Use a ready-made SMS template."
 		}
 	},
 	"campaign": {

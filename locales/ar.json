@@ -555,7 +555,13 @@
 			"sms_message": "نص الرسالة القصيرة",
 			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)",
 			"smsShortMessageTitle": "رسالة قصيرة (المستوى 1)",
-			"smsShortMessageDescription": "إرسال رسالة نصية قصيرة بسيطة."
+			"smsShortMessageDescription": "إرسال رسالة نصية قصيرة بسيطة.",
+			"whatsappShortMessageTitle": "رسالة قصيرة",
+			"whatsappShortMessageDescription": "إرسال رسالة نصية قصيرة بسيطة.",
+			"whatsappAttachUrlTitle": "إرفاق رابط",
+			"whatsappAttachUrlDescription": "تضمين رابط قابل للنقر في الرسالة القصيرة.",
+			"whatsappDownloadTemplateTitle": "تحميل القالب",
+			"whatsappDownloadTemplateDescription": "استخدام قالب رسائل قصيرة جاهز."
 		},
 		"stepper8": "محتوى قالب الرسائل النصية"
 	},
