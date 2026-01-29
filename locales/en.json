@@ -59,7 +59,8 @@
 		"dontHaveAccount": "Don't have an account?",
 		"signup": "Signup",
 		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today",
-		"entries": "generic_label.entries"
+		"entries": "entries",
+		"no_entries_found": "No entries found"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -956,7 +957,8 @@
 		"senderName": "Sender Name",
 		"companyName": "Company Name",
 		"companyDomain": "Company Domain",
-		"phishPage": "Phishing Page"
+		"phishPage": "Phishing Page",
+		"template_deleted_successfully": "Template deleted successfully"
 	},
 	"Audit": {
 		"CreationDate": "Creation Date",
@@ -1205,5 +1207,6 @@
 	"showing": "showing",
 	"to": "to",
 	"of": "of",
-	"entries": "entries"
+	"entries": "entries",
+	"no_entries_found": "No entries found"
 }

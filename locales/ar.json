@@ -71,7 +71,9 @@
 		"signup": "التسجيل",
 		"heroText": "تمكين المستقبل،<br /> <span class=\"text-[var(--teal)]\">تأمين</span> اليوم",
 		"welcomeToSecureMagnus": "مرحباً بك في SecureMagnus",
-		"entries": "generic_label.entries"
+		"entries": "الإدخالات",
+		"to": "إلى",
+		"no_entries_found": "لم يتم العثور على إدخالات"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -1106,7 +1108,8 @@
 		"enterWebsiteToImport": "Template.enterWebsiteToImport",
 		"createPhishingWebPage": "Template.createPhishingWebPage",
 		"createPhishingWebPageDescription": "Template.createPhishingWebPageDescription",
-		"emailMessage": "Template.emailMessage"
+		"emailMessage": "Template.emailMessage",
+		"template_deleted_successfully": "تم حذف القالب بنجاح"
 	},
 	"Audit": {
 		"CreationDate": "تاريخ الإنشاء",
@@ -1388,5 +1391,6 @@
 	"showing": "showing",
 	"to": "to",
 	"of": "of",
-	"entries": "entries"
+	"entries": "entries",
+	"no_entries_found": "لم يتم العثور على إدخالات"
 }
