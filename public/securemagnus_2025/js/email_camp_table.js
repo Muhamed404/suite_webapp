@@ -47,14 +47,15 @@ const rowsSelect  = document.getElementById("rowsPerPage");
 function renderTabs() {
   // Count how many items are in each status
   const counts = { All: data.length };
-  ["active", "inprogress", "completed"].forEach(st => {
+  ["draft", "scheduled", "inprogress", "completed"].forEach(st => {
     counts[st] = data.filter(d => d.status === st).length;
   });
 
   // Translation map
   const statusTranslations = {
     All: window.translations.filterAll,
-    active: window.translations.active,
+    draft: 'Draft',
+    scheduled: 'Scheduled',
     inprogress: window.translations.InProgress,
     completed: window.translations.filterCompleted
   };
@@ -144,8 +145,7 @@ function renderTable() {
   // Render campaign rows into table body
   tableBody.innerHTML = pageData.map(campaign => {
     let statusClass = "";
-    if (campaign.status === "active") statusClass = "px-4 py-1 text-sm text-blue-700 bg-blue-100 rounded-full";
-    if (campaign.status === "inprogress") statusClass = "px-4 py-1 text-sm text-yellow-700 bg-yellow-100 rounded-full";
+    if (campaign.status === "inprogress") statusClass = "px-4 py-1 text-sm text-blue-700 bg-blue-100 rounded-full";
     if (campaign.status === "completed") statusClass = "px-4 py-1 text-sm text-green-700 bg-green-100 rounded-full";
 
     // Action icons (view details, edit)

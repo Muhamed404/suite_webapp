@@ -47,6 +47,11 @@ function getStatusDisplayName(status) {
   const key = `filter${status.charAt(0).toUpperCase() + status.slice(1)}`;
   return translations[key] || status;
 }
+
+// ===============================
+// Render status tabs (with counts)
+// ===============================
+function renderTabs() {
   // Count how many items are in each status
   const counts = { All: data.length };
   ["active", "scheduled", "completed", "draft"].forEach(st => {
