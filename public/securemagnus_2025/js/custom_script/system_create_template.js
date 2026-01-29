@@ -250,6 +250,63 @@ let currentStep = 0;
     if (placeholderButtons) {
       placeholderButtons.style.display = showPlaceholders ? '' : 'none';
     }
+    updatePhishingPlaceholderVisibility();
+  }
+
+
+  function updatePhishingPlaceholderVisibility() {
+    // Email placeholders
+    const tagPhishingUrl = document.getElementById('tag_phishing_url');
+    const tagPhishingFile = document.getElementById('tag_phishing_file');
+    // SMS placeholders
+    const tagSmsPhishingUrl = document.getElementById('tag_sms_phishing_url');
+    const tagSmsPhishingFile = document.getElementById('tag_sms_phishing_file');
+    
+    // Get the selected tracking options from step 2 (stored in formData.step2.options)
+    const selectedOptions = (formData.step2 && formData.step2.options) ? formData.step2.options : [];
+    
+    // Level constants: Level 1 = '1', Level 2 = '2' (Download File), Level 3 = '3' (URL Click)
+    const hasLevel2 = selectedOptions.includes(difficulty_level_download_file);
+    const hasLevel3 = selectedOptions.includes(difficulty_level_url_click);
+    const hasLevel2Or3 = hasLevel2 || hasLevel3;
+    
+    // Handle EMAIL template placeholders
+    if (selectedPhishType === 'email') {
+      const hasOnlyEmailLevel1 = selectedOptions.length === 1 && selectedOptions.includes(difficulty_level_open_email);
+      
+      if (hasOnlyEmailLevel1 && !hasLevel2Or3) {
+        // Only Level 1 selected - hide both placeholders
+        if (tagPhishingUrl) tagPhishingUrl.style.display = 'none';
+        if (tagPhishingFile) tagPhishingFile.style.display = 'none';
+      } else {
+        // Show based on which levels are selected
+        if (tagPhishingUrl) {
+          tagPhishingUrl.style.display = hasLevel3 ? 'inline-block' : 'none';
+        }
+        if (tagPhishingFile) {
+          tagPhishingFile.style.display = hasLevel2 ? 'inline-block' : 'none';
+        }
+      }
+    }
+    
+    // Handle SMS template placeholders
+    if (selectedPhishType === 'sms') {
+      const hasOnlySmsLevel1 = selectedOptions.length === 1 && selectedOptions.includes(difficulty_level_sms_short_message);
+      
+      if (hasOnlySmsLevel1 && !hasLevel2Or3) {
+        // Only Level 1 selected - hide both placeholders
+        if (tagSmsPhishingUrl) tagSmsPhishingUrl.style.display = 'none';
+        if (tagSmsPhishingFile) tagSmsPhishingFile.style.display = 'none';
+      } else {
+        // Show based on which levels are selected
+        if (tagSmsPhishingUrl) {
+          tagSmsPhishingUrl.style.display = hasLevel3 ? 'inline-block' : 'none';
+        }
+        if (tagSmsPhishingFile) {
+          tagSmsPhishingFile.style.display = hasLevel2 ? 'inline-block' : 'none';
+        }
+      }
+    }
   }
 
   function saveDataForStep(idx) {
