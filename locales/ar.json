@@ -551,7 +551,25 @@
 			"labelFormSubmit": "إرسال النموذج",
 			"labelAttachmentOpened": "تم فتح المرفق",
 			"labelAction": "الإجراء",
+			"labelUniqueClicks": "النقرات الفريدة",
+			"labelRepeatedClicks": "النقرات المتكررة",
+			"labelNoClicks": "لا توجد نقرات",
+			"labelUnique": "فريد",
+			"labelRepeated": "متكرر",
+			"labelNoInteraction": "لا توجد تفاعلات",
+			"labelRepeatedScans": "عمليات المسح المتكررة",
+			"labelRepeatedInteractions": "التفاعلات المتكررة",
+			"labelRepeatedSubmitted": "المرسل المتكرر",
+			"labelRepeatedDownloads": "عمليات التحميل المتكررة",
+			"labelTotalScans": "إجمالي عمليات المسح",
+			"labelTotalInteractions": "إجمالي التفاعلات",
+			"labelTotalSubmitted": "إجمالي المرسل",
 			"labelPhishingWebContentEditor": "محتوى قالب صفحة التصيد الاحتيالي",
+			"labelEmailNotOpened": "لم يتم فتح البريد",
+			"labelSubmitData": "إرسال البيانات",
+			"labelEmailOpenedNotReported": "تم فتح البريد ولكن لم يتم الإبلاغ",
+			"labelEmailOpenedAndReported": "تم فتح البريد وتم الإبلاغ",
+			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ",
 			"labelLandingPageContentEditor": "محتوى قالب صفحة الوصول",
 			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)",
 			"sms_message": "نص الرسالة القصيرة",
@@ -1206,6 +1224,11 @@
 		"created": "تم الإنشاء",
 		"unsent": "غير مرسل"
 	},
+	"reports": {
+		"campaignReports": "تقارير الحملات",
+		"reportCenter": "مركز التقارير",
+		"reportCenterDescription": "عرض تقارير مفصلة لجميع حملات التصيد الخاصة بك."
+	},
 	"all_campaigns": {
 		"campaignCenter": "مركز الحملات",
 		"campaignCenterDescription": "تتبع كل نقطة اتصال تصيد من منظور واحد.",
@@ -1257,6 +1280,11 @@
 			"select_date_time": "اختر التاريخ والوقت",
 			"start_time": "وقت البدء *",
 			"end_time": "وقت الانتهاء"
+		},
+		"campaign_report": {
+			"title": "whatsapp.campaign_report.title",
+			"empty_description": "whatsapp.campaign_report.empty_description",
+			"create_campaign": "whatsapp.campaign_report.create_campaign"
 		}
 	},
 	"nfc_campaign": {
@@ -1266,5 +1294,15 @@
 		"title": "حملة NFC",
 		"success_message": "تم إنشاء حملة NFC بنجاح"
 	},
-	"nfcCampaign": "nfcCampaign"
+	"nfcCampaign": "nfcCampaign",
+	"start_date": "start_date",
+	"end_date": "end_date",
+	"status": "status",
+	"total_invitees": "total_invitees",
+	"unsent": "unsent",
+	"sent": "sent",
+	"filterAll": "filterAll",
+	"filterActive": "filterActive",
+	"InProgress": "InProgress",
+	"filterCompleted": "filterCompleted"
 }

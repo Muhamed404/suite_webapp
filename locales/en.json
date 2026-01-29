@@ -535,7 +535,26 @@
 			"labelInteractForm": "Interact Form",
 			"labelFormSubmit": "Form Submit",
 			"labelAttachmentOpened": "Attachment Opened",
-			"labelAction": "Action"
+			"labelAction": "Action",
+			"labelUniqueClicks": "Unique Clicks",
+			"labelRepeatedClicks": "Repeated Clicks",
+			"labelNoClicks": "No Clicks",
+			"labelUnique": "Unique",
+			"labelRepeated": "Repeated",
+			"labelNoInteraction": "No Interaction",
+			"labelRepeatedClicks": "Repeated Clicks",
+			"labelRepeatedScans": "Repeated Scans",
+			"labelRepeatedInteractions": "Repeated Interactions",
+			"labelRepeatedSubmitted": "Repeated Submitted",
+			"labelRepeatedDownloads": "Repeated Downloads",
+			"labelTotalScans": "Total Scans",
+			"labelTotalInteractions": "Total Interactions",
+			"labelTotalSubmitted": "Total Submitted",
+			"labelEmailNotOpened": "Email Not Opened",
+			"labelSubmitData": "Submit Data",
+			"labelEmailOpenedNotReported": "Email Opened Not Reported",
+			"labelEmailOpenedAndReported": "Email Opened & Reported",
+			"labelEmailNotOpenedAndReported": "Email Not Opened & Reported"
 		}
 	},
 	"usb_campaign": {
@@ -1104,6 +1123,11 @@
 		"created": "Created",
 		"unsent": "Unsent"
 	},
+	"reports": {
+		"campaignReports": "Campaign Reports",
+		"reportCenter": "Report Center",
+		"reportCenterDescription": "View detailed reports for all your phishing campaigns."
+	},
 	"all_campaigns": {
 		"campaignCenter": "Campaign Center",
 		"campaignCenterDescription": "Track every phishing touchpoint from a single view.",
@@ -1122,5 +1146,14 @@
 		"filterCompleted": "Completed",
 		"filterDraft": "Draft"
 	},
-	"nfcCampaign": "nfcCampaign"
+	"nfcCampaign": "nfcCampaign",
+	"start_date": "start_date",
+	"end_date": "end_date",
+	"total_invitees": "total_invitees",
+	"unsent": "unsent",
+	"sent": "sent",
+	"filterAll": "filterAll",
+	"filterActive": "filterActive",
+	"InProgress": "InProgress",
+	"filterCompleted": "filterCompleted"
 }

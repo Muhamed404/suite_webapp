@@ -51,11 +51,19 @@ function renderTabs() {
     counts[st] = data.filter(d => d.status === st).length;
   });
 
+  // Translation map
+  const statusTranslations = {
+    All: window.translations.filterAll,
+    active: window.translations.active,
+    inprogress: window.translations.InProgress,
+    completed: window.translations.filterCompleted
+  };
+
   // Generate buttons dynamically
   statusTabs.innerHTML = Object.entries(counts)
     .map(([status, count]) => {
       const isActive = currentTab === status;
-      const displayName = status.charAt(0).toUpperCase() + status.slice(1);
+      const displayName = statusTranslations[status] || status;
 
       // If active
       if (isActive) {
