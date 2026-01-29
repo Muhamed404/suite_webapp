@@ -31,6 +31,7 @@
 		"sort_by": "رتّب حسب",
 		"loading": "جارٍ التحميل...",
 		"error": "خطأ",
+		"error_creating_nfc_campaign": "خطأ في إنشاء حملة NFC",
 		"success": "نجاح",
 		"warning": "تحذير",
 		"info": "معلومات",
@@ -45,6 +46,7 @@
 		"of": "من",
 		"campaignName": "اسم الحملة",
 		"enter_campaign_name": "أدخل اسم الحملة",
+		"type_your_message_here": "اكتب رسالتك هنا...",
 		"templateName": "اسم القالب",
 		"save": "حفظ",
 		"close": "اغلاق",
@@ -68,9 +70,11 @@
 		"dontHaveAccount": "ليس لديك حساب؟",
 		"signup": "التسجيل",
 		"heroText": "تمكين المستقبل،<br /> <span class=\"text-[var(--teal)]\">تأمين</span> اليوم",
-		"welcomeToSecureMagnus": "مرحباً بك في SecureMagnus"
+		"welcomeToSecureMagnus": "مرحباً بك في SecureMagnus",
+		"entries": "generic_label.entries"
 	},
 	"validation_messages": {
+		"field_required": "validation_messages.field_required",
 		"campaign_name_required": "اسم الحملة مطلوب (حد أدنى حرفين).",
 		"template_type_required": "يرجى اختيار نوع القالب.",
 		"template_required": "يرجى اختيار قالب.",
@@ -81,7 +85,42 @@
 		"validation_error": "خطأ في التحقق:",
 		"no_members_in_selection": "الأقسام/المجموعات المختارة لا تحتوي على أعضاء. يرجى اختيار أقسام أو مجموعات تحتوي على أعضاء، أو إضافة أعضاء إلى المختارة.",
 		"some_empty_selections": "تحذير: بعض الاختيارات لا تحتوي على أعضاء. ستستهدف الحملة فقط الأقسام/المجموعات التي تحتوي على أعضاء.",
-		"validation_failed": "فشل في التحقق. يرجى المحاولة مرة أخرى."
+		"validation_failed": "فشل في التحقق. يرجى المحاولة مرة أخرى.",
+		"invalid_invitees_selected": "المدعوون المحددون غير صالحين",
+		"invalid_template_selected": "القالب المحدد غير صالح",
+		"template_name_required": "اسم القالب مطلوب.",
+		"phishing_type_required": "يرجى اختيار نوع التصيد.",
+		"invalid_template_id": "معرف القالب غير صالح",
+		"invalid_qr_template_selected": "تم تحديد قالب QR غير صالح",
+		"error_submitting_sms_campaign": "حدث خطأ أثناء إرسال طلب إنشاء حملة الرسائل القصيرة",
+		"error_processing_request": "حدث خطأ أثناء معالجة الطلب في إنشاء حملة الرسائل القصيرة",
+		"organization_not_found": "المؤسسة غير موجودة",
+		"usb_campaign_name_required": "اسم الحملة مطلوب.",
+		"usb_no_of_usb_required": "عدد أجهزة USB مطلوب ويجب أن يكون رقماً موجباً.",
+		"usb_env_variable_required": "متغير البيئة مطلوب.",
+		"usb_filename_required": "اسم الملف مطلوب.",
+		"usb_campaign_creation_error": "مشكلة في إنشاء حملة USB",
+		"qr_quantity_required": "يرجى إدخال كمية صالحة لرموز QR (الحد الأدنى 1).",
+		"qr_image_required": "يرجى تحميل ملف صورة صالح (jpg، jpeg، png، gif).",
+		"nfc_quantity_required": "يرجى إدخال كمية علامات صالحة (الحد الأدنى 1).",
+		"min_value_validation": "يرجى إدخال قيمة أكبر من أو تساوي {0}.",
+		"sender_email_required": "البريد الإلكتروني للمرسل مطلوب.",
+		"email_subject_required": "موضوع البريد الإلكتروني مطلوب.",
+		"company_name_required": "اسم الشركة مطلوب.",
+		"sender_name_required": "اسم المرسل مطلوب.",
+		"company_domain_required": "نطاق الشركة مطلوب.",
+		"email_content_required": "محتوى البريد الإلكتروني مطلوب.",
+		"valid_email_required": "يرجى إدخال عنوان بريد إلكتروني صالح.",
+		"file_name_required": "اسم الملف مطلوب.",
+		"phishing_page_content_required": "محتوى صفحة التصيد مطلوب.",
+		"sms_content_required": "نص الرسالة القصيرة مطلوب.",
+		"template_name_minlength": "يجب أن يكون اسم القالب على الأقل 3 أحرف.",
+		"file_name_minlength": "يجب أن يكون اسم الملف على الأقل حرفين.",
+		"subject_minlength": "يجب أن يكون الموضوع على الأقل 3 أحرف.",
+		"sender_name_minlength": "يجب أن يكون اسم المرسل على الأقل حرفين.",
+		"company_name_minlength": "يجب أن يكون اسم الشركة على الأقل حرفين.",
+		"company_domain_minlength": "يجب أن يكون نطاق الشركة على الأقل 3 أحرف.",
+		"sms_content_maxlength": "يجب ألا يتجاوز نص الرسالة القصيرة 160 حرفًا."
 	},
 	"topnavbar": {
 		"welcome": "مرحباً"
@@ -460,6 +499,7 @@
 			"btnDeleteTemplate": "system_template.homescreen.btnDeleteTemplate"
 		},
 		"create": {
+			"title": "إنشاء قالب",
 			"labelDetails": "تفاصيل القالب",
 			"labelDescription": "يمكنك إنشاء قالب تصيد جديد من خلال تعبئة التفاصيل أدناه.",
 			"labelName": "اسم القالب",
@@ -471,6 +511,11 @@
 			"labelTrackingEmailDetails_level1": "فتح البريد (المستوى 1)\n قالب تصيد بسيط لمراقبة فتح البريد من قبل المستخدمين.",
 			"labelTrackingEmailDetails_level2": "التنزيل عبر الملف (المستوى 2)\n قالب تصيد يحتوي على ملف مرفق لمراقبة تنزيل الملفات.",
 			"labelTrackingEmailDetails_level3": "النقر على الرابط (المستوى 3)\n قالب بريد مع رابط مخصص لاختبار زيارات المستخدمين لصفحة التصيد.",
+			"simplePhishingDescription": "قالب تصيد بسيط لمراقبة فتح البريد من قبل المستخدمين.",
+			"downloadFileBasedTitle": "التنزيل عبر الملف (المستوى 2)",
+			"downloadFileBasedDescription": "قالب تصيد يحتوي على ملف مرفق لمراقبة تنزيل الملفات.",
+			"urlClickBasedTitle": "النقر على الرابط (المستوى 3)",
+			"urlClickBasedDescription": "قالب بريد مع رابط مخصص لاختبار زيارات المستخدمين لصفحة التصيد.",
 			"labelDetails_level1_title": "تفاصيل رسالة التصيد",
 			"labelDetails_level1_Subject": "موضوع البريد",
 			"labelDetails_level1_SenderEmail": "بريد المرسل",
@@ -493,8 +538,32 @@
 			"labelLandingPage_Title": "إعدادات صفحة الهبوط",
 			"labelLandingPage_radioOption1": "أرغب في إعادة توجيه المستخدم إلى رابط",
 			"labelLandingPage_radioOption2": "أرغب في إعادة توجيه المستخدم إلى صفحة هبوط مخصصة",
-			"labelLanguage": "اللغة"
-		}
+			"labelLanguage": "اللغة",
+			"labelPhishingWebContentEditor": "محتوى قالب صفحة التصيد الاحتيالي",
+			"successMessage": "تم الإنشاء بنجاح",
+			"errorMessage": "تعذر حفظ القالب",
+			"validationSelectLandingPage": "يرجى اختيار خيار صفحة الهبوط.",
+			"validationEnterValidUrl": "يرجى إدخال رابط صحيح.",
+			"urlRequired": "الرابط مطلوب.",
+			"urlInvalid": "يرجى إدخال رابط صحيح.",
+			"invalidUrlFormat": "تنسيق الرابط غير صحيح.",
+			"fetchButtonText": "جلب",
+			"fetchingButtonText": "جاري الجلب...",
+			"labelImportHtmlUrl": "استيراد صفحة الوصول من رابط خارجي",
+			"labelLandingPageContentEditor": "محتوى قالب صفحة الوصول",
+			"sms_content": "محتوى قالب الرسائل النصية",
+			"sms_message": "نص الرسالة القصيرة",
+			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)",
+			"smsShortMessageTitle": "رسالة قصيرة (المستوى 1)",
+			"smsShortMessageDescription": "إرسال رسالة نصية قصيرة بسيطة.",
+			"whatsappShortMessageTitle": "رسالة قصيرة",
+			"whatsappShortMessageDescription": "إرسال رسالة نصية قصيرة بسيطة.",
+			"whatsappAttachUrlTitle": "إرفاق رابط",
+			"whatsappAttachUrlDescription": "تضمين رابط قابل للنقر في الرسالة القصيرة.",
+			"whatsappDownloadTemplateTitle": "تحميل القالب",
+			"whatsappDownloadTemplateDescription": "استخدام قالب رسائل قصيرة جاهز."
+		},
+		"stepper8": "محتوى قالب الرسائل النصية"
 	},
 	"campaign": {
 		"email_campaign_detail": {
@@ -532,12 +601,24 @@
 			"labelFormSubmit": "إرسال النموذج",
 			"labelAttachmentOpened": "تم فتح المرفق",
 			"labelAction": "الإجراء",
-			"labelPhishingWebContentEditor": "محتوى قالب صفحة التصيد الاحتيالي",
-			"labelLandingPageContentEditor": "محتوى قالب صفحة الوصول",
-			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)",
-			"sms_message": "نص الرسالة القصيرة",
-			"sms_content": "محتوى قالب الرسائل النصية",
-			"labelImportHtmlUrl": "استيراد صفحة الوصول من رابط خارجي"
+			"labelUniqueClicks": "النقرات الفريدة",
+			"labelRepeatedClicks": "النقرات المتكررة",
+			"labelNoClicks": "لا توجد نقرات",
+			"labelUnique": "فريد",
+			"labelRepeated": "متكرر",
+			"labelNoInteraction": "لا توجد تفاعلات",
+			"labelRepeatedScans": "عمليات المسح المتكررة",
+			"labelRepeatedInteractions": "التفاعلات المتكررة",
+			"labelRepeatedSubmitted": "المرسل المتكرر",
+			"labelRepeatedDownloads": "عمليات التحميل المتكررة",
+			"labelTotalScans": "إجمالي عمليات المسح",
+			"labelTotalInteractions": "إجمالي التفاعلات",
+			"labelTotalSubmitted": "إجمالي المرسل",
+			"labelEmailNotOpened": "لم يتم فتح البريد",
+			"labelSubmitData": "إرسال البيانات",
+			"labelEmailOpenedNotReported": "تم فتح البريد ولكن لم يتم الإبلاغ",
+			"labelEmailOpenedAndReported": "تم فتح البريد وتم الإبلاغ",
+			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ"
 		}
 	},
 	"sms": {
@@ -733,12 +814,6 @@
 			"downloadQRCode": "تنزيل رمز QR",
 			"tagScan": "تم مسح الوسم",
 			"notScanTag": "لم يتم مسح الوسم"
-		},
-		"nfc_campaign": {
-			"name": "اسم الحملة",
-			"templateName": "اسم القالب",
-			"totalTags": "إجمالي الوسوم",
-			"select_tag_quantity": "اختر كمية الوسوم"
 		},
 		"department": {
 			"labelTitleDepartmentManagement": "إدارة الأقسام",
@@ -1000,7 +1075,38 @@
 		"senderName": "اسم المرسل",
 		"companyName": "اسم الشركة",
 		"companyDomain": "نطاق الشركة",
-		"phishPage": "صفحة التصيد الاحتيالي"
+		"phishPage": "صفحة التصيد الاحتيالي",
+		"templateName": "Template.templateName",
+		"purposeReason": "Template.purposeReason",
+		"selectLanguage": "Template.selectLanguage",
+		"english": "Template.english",
+		"arabic": "Template.arabic",
+		"phishingType": "Template.phishingType",
+		"email": "Template.email",
+		"nfc": "Template.nfc",
+		"qr": "Template.qr",
+		"sms": "Template.sms",
+		"whatsapp": "Template.whatsapp",
+		"trackingDetails": "Template.trackingDetails",
+		"setupFileAttachment": "Template.setupFileAttachment",
+		"fileAttachmentDescription": "Template.fileAttachmentDescription",
+		"setupFileExtension": "Template.setupFileExtension",
+		"pdf": "Template.pdf",
+		"docx": "Template.docx",
+		"xlsx": "Template.xlsx",
+		"exe": "Template.exe",
+		"fileName": "Template.fileName",
+		"phishingMessageDetails": "Template.phishingMessageDetails",
+		"emailSubject": "Template.emailSubject",
+		"urlPhishPageSetting": "Template.urlPhishPageSetting",
+		"urlPhishPageDescription": "Template.urlPhishPageDescription",
+		"simplePhishingPage": "Template.simplePhishingPage",
+		"dataEntryPhishingPage": "Template.dataEntryPhishingPage",
+		"customUrlPhishingPage": "Template.customUrlPhishingPage",
+		"enterWebsiteToImport": "Template.enterWebsiteToImport",
+		"createPhishingWebPage": "Template.createPhishingWebPage",
+		"createPhishingWebPageDescription": "Template.createPhishingWebPageDescription",
+		"emailMessage": "Template.emailMessage"
 	},
 	"Audit": {
 		"CreationDate": "تاريخ الإنشاء",
@@ -1119,7 +1225,10 @@
 	" generic_label": {
 		"create": " إنشاء",
 		"search_here": " ابحث هنا",
-		"campaignName": " generic_label.campaignName"
+		"campaignName": " generic_label.campaignName",
+		"enter_campaign_name": " generic_label.enter_campaign_name",
+		"description": " generic_label.description",
+		"preview": " generic_label.preview"
 	},
 	"template": {
 		"sms_content": "محتوى قالب الرسائل النصية",
@@ -1129,7 +1238,8 @@
 	"common": {
 		"search_here": "ابحث هنا",
 		"sort_by": "رتّب حسب",
-		"back": "رجوع"
+		"back": "رجوع",
+		"goBack": "رجوع"
 	},
 	"Search": "بحث",
 	"entries per page": "عدد السجلات في الصفحة",
@@ -1190,6 +1300,11 @@
 		"created": "تم الإنشاء",
 		"unsent": "غير مرسل"
 	},
+	"reports": {
+		"campaignReports": "تقارير الحملات",
+		"reportCenter": "مركز التقارير",
+		"reportCenterDescription": "عرض تقارير مفصلة لجميع حملات التصيد الخاصة بك."
+	},
 	"all_campaigns": {
 		"campaignCenter": "مركز الحملات",
 		"campaignCenterDescription": "تتبع كل نقطة اتصال تصيد من منظور واحد.",
@@ -1206,19 +1321,72 @@
 		"filterActive": "نشط",
 		"filterScheduled": "مجدول",
 		"filterCompleted": "مكتمل",
-		"filterDraft": "مسودة"
+		"filterDraft": "مسودة",
+		"viewDetails": "عرض التفاصيل"
 	},
 	" sms": {
 		"create_campaign": {
-			"description": " sms.create_campaign.description"
+			"description": " sms.create_campaign.description",
+			"campaign_name": " sms.create_campaign.campaign_name"
 		}
 	},
 	"qr_campaign": {
-		"imageSetup": "qr_campaign.imageSetup",
-		"name": "qr_campaign.name",
-		"description": "qr_campaign.description",
-		"labelCreationNFCTag": "qr_campaign.labelCreationNFCTag",
-		"tagQuantity": "qr_campaign.tagQuantity",
-		"uploadBrandLogo": "qr_campaign.uploadBrandLogo"
-	}
+		"title": "حملة QR",
+		"imageSetup": "إعداد صورة QR",
+		"name": "اسم الحملة",
+		"description": "الوصف",
+		"select_template": "اختر القالب",
+		"labelCreationNFCTag": "إنشاء علامات NFC",
+		"tagQuantity": "كمية العلامات",
+		"uploadBrandLogo": "تحميل شعار العلامة التجارية",
+		"choose_file": "qr_campaign.choose_file"
+	},
+	"whatsapp": {
+		"create": {
+			"step1": "الخطوة 1",
+			"step2": "الخطوة 2",
+			"step3": "الخطوة 3",
+			"campaign_name": "اسم الحملة",
+			"description": "الوصف",
+			"myTemplate": "قوالبي",
+			"systemTemplates": "القوالب النظامية",
+			"select_template": "اختر القالب",
+			"select_target_audience": "اختر الجمهور المستهدف",
+			"select_department": "اختر القسم",
+			"select_group": "اختر المجموعة",
+			"select_date_time": "اختر التاريخ والوقت",
+			"start_time": "وقت البدء *",
+			"end_time": "وقت الانتهاء"
+		},
+		"campaign_report": {
+			"title": "whatsapp.campaign_report.title",
+			"empty_description": "whatsapp.campaign_report.empty_description",
+			"create_campaign": "whatsapp.campaign_report.create_campaign"
+		}
+	},
+	"nfc_campaign": {
+		"select_tag_quantity": "اختر كمية العلامة",
+		"name": "اسم الحملة",
+		"totalTags": "إجمالي العلامات",
+		"title": "حملة NFC",
+		"success_message": "تم إنشاء حملة NFC بنجاح"
+	},
+	"nfcCampaign": "nfcCampaign",
+	"start_date": "start_date",
+	"end_date": "end_date",
+	"status": "status",
+	"total_invitees": "total_invitees",
+	"unsent": "unsent",
+	"sent": "sent",
+	"filterAll": "filterAll",
+	"filterActive": "filterActive",
+	"InProgress": "InProgress",
+	"filterCompleted": "filterCompleted",
+	"tooltp-Template-Duplicate": "tooltp-Template-Duplicate",
+	"search_here": "search_here",
+	"no_data": "no_data",
+	"showing": "showing",
+	"to": "to",
+	"of": "of",
+	"entries": "entries"
 }

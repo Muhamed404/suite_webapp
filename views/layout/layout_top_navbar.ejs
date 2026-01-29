@@ -5,7 +5,7 @@
 </h1>
 
           <!-- Right Section for lg and up -->
-          <div class="hidden lg:flex items-center gap-4">
+          <div class="hidden lg:flex items-center gap-2 mr-4">
             <!-- Search Bar -->
             <div class="flex items-center w-48 bg-white rounded-full border border-gray-300 focus-within:ring-2 focus-within:ring-[var(--teal)]">
               <img src="/securemagnus_2025/images/img/search.svg" class="w-4 h-4 <%= locals.locale === 'ar' ? 'mr-3' : 'ml-3' %> text-gray-400" alt="">
@@ -43,7 +43,7 @@
                 <h4 class="text-base">
                   <%=username%>
                 </h4>
-                <p class="text-sm text-gray-500">
+                <p class="text-sm text-gray-500 truncate max-w-32">
                   <%=email%>
                 </p>
               </div>
@@ -92,7 +92,7 @@
               <h4 class="text-base">
                 <%=username%>
               </h4>
-              <p class="text-sm text-gray-500">
+              <p class="text-sm text-gray-500 truncate max-w-32">
                 <%=email%>
               </p>
             </div>

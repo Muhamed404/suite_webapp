@@ -31,6 +31,7 @@
 		"sort_by": "Sort by",
 		"loading": "Loading...",
 		"error": "Error",
+		"error_creating_nfc_campaign": "Error creating NFC campaign",
 		"success": "Success",
 		"warning": "Warning",
 		"info": "Information",
@@ -45,6 +46,7 @@
 		"of": "of",
 		"campaignName": "Campaign Name",
 		"enter_campaign_name": "Enter Campaign Name",
+		"type_your_message_here": "Type your message here...",
 		"templateName": "Template Name",
 		"login": "Login",
 		"welcomeToSecureMagnus": "Welcome to SecureMagnus",
@@ -56,9 +58,11 @@
 		"forgotPassword": "Forgot Password?",
 		"dontHaveAccount": "Don't have an account?",
 		"signup": "Signup",
-		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today"
+		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today",
+		"entries": "generic_label.entries"
 	},
 	"validation_messages": {
+		"field_required": "This field is required.",
 		"campaign_name_required": "Campaign name is required (minimum 2 characters).",
 		"template_type_required": "Please select a template type.",
 		"template_required": "Please select a template.",
@@ -69,7 +73,42 @@
 		"validation_error": "Validation Error:",
 		"no_members_in_selection": "The selected departments/groups have no members. Please select departments or groups with members, or add members to the selected ones.",
 		"some_empty_selections": "Warning: Some selections have no members. The campaign will only target departments/groups with members.",
-		"validation_failed": "Validation failed. Please try again."
+		"validation_failed": "Validation failed. Please try again.",
+		"invalid_invitees_selected": "Invalid Invitees Selected",
+		"invalid_template_selected": "Invalid Template Selected",
+		"invalid_template_id": "Invalid Template ID",
+		"invalid_qr_template_selected": "Invalid QR template selected.",
+		"error_submitting_sms_campaign": "Error submitting request in creating SMS campaign",
+		"error_processing_request": "Error processing request in creating SMS campaign",
+		"organization_not_found": "Organization not found",
+		"usb_campaign_name_required": "Campaign name is required.",
+		"usb_no_of_usb_required": "Number of USBs is required and must be a positive number.",
+		"usb_env_variable_required": "Environment variable is required.",
+		"usb_filename_required": "File name is required.",
+		"usb_campaign_creation_error": "Issue in Creating a USB Campaign",
+		"qr_quantity_required": "Please enter a valid QR code quantity (minimum 1).",
+		"qr_image_required": "Please upload a valid image file (jpg, jpeg, png, gif).",
+		"template_name_required": "Template name is required.",
+		"phishing_type_required": "Please select a phishing type.",
+		"nfc_quantity_required": "Please enter a valid tag quantity (minimum 1).",
+		"min_value_validation": "Please enter a value greater than or equal to {0}.",
+		"sender_email_required": "Sender email is required.",
+		"email_subject_required": "Email subject is required.",
+		"company_name_required": "Company name is required.",
+		"sender_name_required": "Sender name is required.",
+		"company_domain_required": "Company domain is required.",
+		"email_content_required": "Email content is required.",
+		"valid_email_required": "Please enter a valid email address.",
+		"file_name_required": "File name is required.",
+		"phishing_page_content_required": "Phishing page content is required.",
+		"sms_content_required": "SMS message is required.",
+		"template_name_minlength": "Template name must be at least 3 characters.",
+		"file_name_minlength": "File name must be at least 2 characters.",
+		"subject_minlength": "Subject must be at least 3 characters.",
+		"sender_name_minlength": "Sender name must be at least 2 characters.",
+		"company_name_minlength": "Company name must be at least 2 characters.",
+		"company_domain_minlength": "Company domain must be at least 3 characters.",
+		"sms_content_maxlength": "SMS message must not exceed 160 characters."
 	},
 	"topnavbar": {
 		"welcome": "Welcome"
@@ -439,6 +478,7 @@
 			"btnDeleteTemplate": "system_template.homescreen.btnDeleteTemplate"
 		},
 		"create": {
+			"title": "Create Template",
 			"labelDetails": "Template Details",
 			"labelDescription": "You can create a new phishing template by filling out the details below.",
 			"labelName": "Template Name",
@@ -450,6 +490,11 @@
 			"labelTrackingEmailDetails_level1": "Open Email (Level 1) \n Simple phishing email template to monitor email open by users.",
 			"labelTrackingEmailDetails_level2": "Download File Based (Level 2) \n Phishing email template with file attached in the message to monitor download by users.",
 			"labelTrackingEmailDetails_level3": "URL Click Based (Level 3) \n Email template with a dedicated URL for testing users visiting the phishing page.",
+			"simplePhishingDescription": "Simple phishing email template to monitor email open by users.",
+			"downloadFileBasedTitle": "Download File Based (Level 2)",
+			"downloadFileBasedDescription": "Phishing email template with file attached in the message to monitor download by users.",
+			"urlClickBasedTitle": "URL Click Based (Level 3)",
+			"urlClickBasedDescription": "Email template with a dedicated URL for testing users visiting the phishing page.",
 			"labelDetails_level1_title": "Phishing Message Details",
 			"labelDetails_level1_Subject": "Email Subject",
 			"labelDetails_level1_SenderEmail": "Email Sender",
@@ -462,7 +507,8 @@
 			"sms_placeholder": "Enter SMS message (max 160 characters)",
 			"sms_message": "SMS Message",
 			"sms_content": "SMS Template Content",
-			"labelDetails_level2_title": "Setup File Attachment",
+			"smsShortMessageTitle": "Short Message (Level 1)",
+			"smsShortMessageDescription": "Send a simple SMS message.",
 			"labelDetails_level2_Description": "You can enter file extension and name. We will provide you the new file automatically as an attachment in your phishing message to be downloaded.",
 			"labelDetails_level2_FileName": "File Name",
 			"labelDetails_level2_FileExtension": "File Extension",
@@ -478,7 +524,23 @@
 			"labelLandingPage_radioOption1": "Import Custom Landing Page",
 			"labelLandingPage_radioOption2": "I like to redirect the user to a custom landing page",
 			"labelLanguage": "Language",
-			"labelImportHtmlUrl": "Import Landing Page From An External URL"
+			"labelImportHtmlUrl": "Import Landing Page From An External URL",
+			"successMessage": "Created successfully",
+			"errorMessage": "Unable to save template",
+			"validationSelectLandingPage": "Please select a landing page option.",
+			"validationEnterValidUrl": "Please enter a valid URL.",
+			"urlRequired": "URL is required.",
+			"urlInvalid": "Please enter a valid URL.",
+			"invalidUrlFormat": "Invalid URL format.",
+			"fetchButtonText": "Fetch",
+			"fetchingButtonText": "Fetching...",
+			"labelDetails_level2_title": "system_template.create.labelDetails_level2_title",
+			"whatsappShortMessageTitle": "Short Message",
+			"whatsappShortMessageDescription": "Send a simple SMS message.",
+			"whatsappAttachUrlTitle": "Attach URL",
+			"whatsappAttachUrlDescription": "Include a clickable link in SMS.",
+			"whatsappDownloadTemplateTitle": "Download Template",
+			"whatsappDownloadTemplateDescription": "Use a ready-made SMS template."
 		}
 	},
 	"campaign": {
@@ -516,7 +578,25 @@
 			"labelInteractForm": "Interact Form",
 			"labelFormSubmit": "Form Submit",
 			"labelAttachmentOpened": "Attachment Opened",
-			"labelAction": "Action"
+			"labelAction": "Action",
+			"labelUniqueClicks": "Unique Clicks",
+			"labelRepeatedClicks": "Repeated Clicks",
+			"labelNoClicks": "No Clicks",
+			"labelUnique": "Unique",
+			"labelRepeated": "Repeated",
+			"labelNoInteraction": "No Interaction",
+			"labelRepeatedScans": "Repeated Scans",
+			"labelRepeatedInteractions": "Repeated Interactions",
+			"labelRepeatedSubmitted": "Repeated Submitted",
+			"labelRepeatedDownloads": "Repeated Downloads",
+			"labelTotalScans": "Total Scans",
+			"labelTotalInteractions": "Total Interactions",
+			"labelTotalSubmitted": "Total Submitted",
+			"labelEmailNotOpened": "Email Not Opened",
+			"labelSubmitData": "Submit Data",
+			"labelEmailOpenedNotReported": "Email Opened Not Reported",
+			"labelEmailOpenedAndReported": "Email Opened & Reported",
+			"labelEmailNotOpenedAndReported": "Email Not Opened & Reported"
 		}
 	},
 	"usb_campaign": {
@@ -679,9 +759,9 @@
 		},
 		"create": {
 			"title": "Create Whatsapp Campaign",
-			"step1": "Select Template",
-			"step2": "Select Group or Department",
-			"step3": "Schedule",
+			"step1": "Step 1",
+			"step2": "Step 2",
+			"step3": "Step 3",
 			"campaign_name": "Campaign Name",
 			"description": "Description",
 			"myTemplate": "My Templates",
@@ -759,8 +839,10 @@
 		}
 	},
 	"qr_campaign": {
+		"title": "QR Campaign",
 		"name": "Campaign Name",
 		"description": "Description",
+		"select_template": "Select Template",
 		"templateName": "Template Name",
 		"totalImages": "Total Images",
 		"imageSetup": "QR Image Setup",
@@ -809,10 +891,12 @@
 		"notScanTag": "Not Scan Tag"
 	},
 	"nfc_campaign": {
+		"title": "NFC Campaign",
 		"name": "Campaign Name",
 		"templateName": "Template Name",
 		"totalTags": "Total Tags",
-		"select_tag_quantity": "Select Tag Quantity"
+		"select_tag_quantity": "Select Tag Quantity",
+		"success_message": "NFC Campaign created successfully"
 	},
 	"Active": "Active",
 	"SubscriptionCancelled": "Subscription Cancelled",
@@ -1020,7 +1104,8 @@
 	"common": {
 		"search_here": "common.search_here",
 		"sort_by": "common.sort_by",
-		"back": "common.back"
+		"back": "common.back",
+		"goBack": "Go Back"
 	},
 	"Search": "Search",
 	"entries per page": "entries per page",
@@ -1081,6 +1166,11 @@
 		"created": "Created",
 		"unsent": "Unsent"
 	},
+	"reports": {
+		"campaignReports": "Campaign Reports",
+		"reportCenter": "Report Center",
+		"reportCenterDescription": "View detailed reports for all your phishing campaigns."
+	},
 	"all_campaigns": {
 		"campaignCenter": "Campaign Center",
 		"campaignCenterDescription": "Track every phishing touchpoint from a single view.",
@@ -1097,6 +1187,23 @@
 		"filterActive": "Active",
 		"filterScheduled": "Scheduled",
 		"filterCompleted": "Completed",
-		"filterDraft": "Draft"
-	}
+		"filterDraft": "Draft",
+		"viewDetails": "View Details"
+	},
+	"nfcCampaign": "nfcCampaign",
+	"start_date": "start_date",
+	"end_date": "end_date",
+	"total_invitees": "total_invitees",
+	"unsent": "unsent",
+	"sent": "sent",
+	"filterAll": "filterAll",
+	"filterActive": "filterActive",
+	"InProgress": "InProgress",
+	"filterCompleted": "filterCompleted",
+	"search_here": "search_here",
+	"no_data": "no_data",
+	"showing": "showing",
+	"to": "to",
+	"of": "of",
+	"entries": "entries"
 }

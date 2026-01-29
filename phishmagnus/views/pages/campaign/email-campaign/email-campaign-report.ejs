@@ -22,10 +22,12 @@
             <!-- Search + Filter -->
             <div class="flex items-center justify-between">
                 <div class="relative">
-                    <input id="searchInput" type="text" placeholder="Search here..."
+                    <input id="searchInput" type="text" placeholder="<%= translations.search_here %>"
                         class="pl-14 pr-10 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-                    <img src="/securemagnus_2025/images/img/search.svg"
-                        class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-7 top-1/2" alt="">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+                        <img src="/securemagnus_2025/images/img/search.svg"
+                            class="w-5 h-5 text-gray-400" alt="">
+                    </div>
                 </div>
 
                 <select id="filterType" class="hidden px-3 py-2 border rounded">
@@ -62,46 +64,46 @@
                             <span class="inline-flex items-center gap-2">
                                 <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg"
                                     alt="">
-                                Start Date
+                                <%= __("generic_label.start_date") %>
                             </span>
                         </th>
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
                             <span class="inline-flex items-center gap-2">
                                 <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg"
                                     alt="">
-                                End Date
+                                <%= __("generic_label.end_date") %>
                             </span>
                         </th>
 
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
                             <span class="inline-flex items-center gap-2">
 
-                                Status
+                                <%= __("generic_label.status") %>
                             </span>
                         </th>
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
                             <span class="inline-flex items-center gap-2">
 
-                                Total Invitee
+                                <%= translations.total_invitees %>
                             </span>
                         </th>
                                                 <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
                             <span class="inline-flex items-center gap-2">
 
-                                Pending
+                                <%= translations.unsent %>
                             </span>
                         </th>
                                                 <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
                             <span class="inline-flex items-center gap-2">
 
-                            Sent
+                            <%= translations.sent %>
                             </span>
                         </th>
 
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="action">
                             <span class="inline-flex items-center gap-2">
 
-                                Action
+                                <%= __("generic_label.action") %>
                             </span>
                         </th>
                     </tr>
@@ -117,7 +119,7 @@
 
         <!-- Pagination -->
         <div class="flex items-center justify-between mt-4">
-            <select id="rowsPerPage" class="px-2 py-1 border rounded">
+            <select id="rowsSelect" dir="<%= locale === 'ar' ? 'rtl' : 'ltr' %>" class="<%= locale === 'ar' ? 'pl-8 pr-4' : 'pl-4 pr-8' %> py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="5">5</option>
                 <option value="10" selected>10</option>
                 <option value="20">20</option>
@@ -140,6 +142,7 @@
         pagination: <%- JSON.stringify(pagination) %>,
         filters: <%- JSON.stringify(filters) %>
     };
+    window.translations = <%- JSON.stringify(translations) %>;
 </script>
 
 

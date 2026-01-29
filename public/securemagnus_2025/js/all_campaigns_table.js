@@ -47,6 +47,11 @@ function getStatusDisplayName(status) {
   const key = `filter${status.charAt(0).toUpperCase() + status.slice(1)}`;
   return translations[key] || status;
 }
+
+// ===============================
+// Render status tabs (with counts)
+// ===============================
+function renderTabs() {
   // Count how many items are in each status
   const counts = { All: data.length };
   ["active", "scheduled", "completed", "draft"].forEach(st => {
@@ -148,7 +153,7 @@ function renderTable() {
     const actionButton = `
       <a href="${campaign.detailPath}"
          class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300">
-        View Details
+        ${window.allCampaignsData.translations.viewDetails}
       </a>
     `;
 

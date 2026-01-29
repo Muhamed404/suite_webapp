@@ -305,8 +305,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedClicksColor = el.getAttribute('color2') || '#FF4B4B';
     const noClicksColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique', 'Repeated', 'No Interaction'];
-    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels);
+    const labels = [
+      window.translations?.campaign?.email_campaign_detail?.labelUnique || 'Unique',
+      window.translations?.campaign?.email_campaign_detail?.labelRepeated || 'Repeated', 
+      window.translations?.campaign?.email_campaign_detail?.labelNoInteraction || 'No Interaction'
+    ];
+    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks');
   });
 
 
@@ -317,8 +321,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedClicksColor = el.getAttribute('color2') || '#FF4B4B';
     const noClicksColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Clicks', 'Repeated Clicks', 'No Clicks'];
-    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels);
+    const labels = [
+      window.translations?.campaign?.email_campaign_detail?.labelUniqueClicks || 'Unique Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelNoClicks || 'No Clicks'
+    ];
+    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks');
   });
 
 
@@ -329,8 +337,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedClicksColor = el.getAttribute('color2') || '#FF4B4B';
     const noClicksColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Clicks', 'Repeated Clicks', 'No Clicks'];
-    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels);
+    const labels = [
+      window.translations?.campaign?.email_campaign_detail?.labelUniqueClicks || 'Unique Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelNoClicks || 'No Clicks'
+    ];
+    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks');
   });
 
 
@@ -341,8 +353,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedClicksColor = el.getAttribute('color2') || '#FF4B4B';
     const noClicksColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Clicks', 'Repeated Clicks', 'No Clicks'];
-    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels);
+    const labels = [
+      window.translations?.campaign?.email_campaign_detail?.labelUniqueClicks || 'Unique Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelNoClicks || 'No Clicks'
+    ];
+    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks');
   });
 
   // Below semi chart is for QR Campaign Details Page
@@ -354,7 +370,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
     const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, 'Repeated Scans');
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedScans || 'Repeated Scans');
   });
 
   document.querySelectorAll('.qrSemiChartInteract').forEach((el) => {
@@ -365,7 +381,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
     const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, 'Repeated Interactions');
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedInteractions || 'Repeated Interactions');
   });
 
   document.querySelectorAll('.qrSemiChartSubmitted').forEach((el) => {
@@ -376,7 +392,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
     const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, 'Repeated Submitted');
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedSubmitted || 'Repeated Submitted');
   });
 
 
@@ -388,7 +404,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
     const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, 'Repeated Downloads');
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedDownloads || 'Repeated Downloads');
   });
 
 
@@ -401,7 +417,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
     const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, 'Total Scans');
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelTotalScans || 'Total Scans');
   });
 
   document.querySelectorAll('.nfcSemiChartInteract').forEach((el) => {
@@ -412,7 +428,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const totalScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
     const labels = ['Unique Interactions', 'Repeated Interactions', 'No Interactions'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, totalInteractions, noScan, uniqueColor, totalScanColor, noScanColor, labels, 'Total Interactions');
+    createEmailCampaignSemiDonutChart(el, uniqueScan, totalInteractions, noScan, uniqueColor, totalScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelTotalInteractions || 'Total Interactions');
   });
 
   document.querySelectorAll('.nfcSemiChartSubmitted').forEach((el) => {
@@ -423,7 +439,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const totalSubmittedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
     const labels = ['Unique Submitted', 'Repeated Submitted', 'No Submitted'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, totalSubmitted, noScan, uniqueColor, totalSubmittedScanColor, noScanColor, labels, 'Total Submitted');
+    createEmailCampaignSemiDonutChart(el, uniqueScan, totalSubmitted, noScan, uniqueColor, totalSubmittedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelTotalSubmitted || 'Total Submitted');
   });
 
 
@@ -435,7 +451,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
     const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels);
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedDownloads || 'Repeated Downloads');
   });
 
   // document.querySelectorAll('.semichartFormSubmitted').forEach((el) => {

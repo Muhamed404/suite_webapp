@@ -5,7 +5,7 @@ $(document).ready(function () {
       // Step 1: Campaign Name & Template
       name: { required: true, minlength: 2 },
       templateOption: { required: true },
-      templateSelect: { required: true },
+      // templateSelect: { required: true }, // Checked in custom validation
 
       // Step 2: QR Image Setup
       noOfQRTags: { required: true, digits: true, min: 1 },
@@ -19,13 +19,13 @@ $(document).ready(function () {
       endTime: { required: true }
     },
     messages: {
-      name: "Campaign name is required (min 2 characters).",
-      templateOption: "Please select a template type.",
-      templateSelect: "Please select a template.",
-      noOfQRTags: "Please enter a valid QR code quantity (minimum 1).",
-      qrImage: "Please upload a valid image file (jpg, jpeg, png, gif).",
-      startTime: "Start date and time are required.",
-      endTime: "End date and time are required."
+      name: window.i18n.validation.campaign_name_required,
+      templateOption: window.i18n.validation.template_type_required,
+      templateSelect: window.i18n.validation.template_required,
+      noOfQRTags: window.i18n.validation.qr_quantity_required,
+      qrImage: window.i18n.validation.qr_image_required,
+      startTime: window.i18n.validation.start_time_required,
+      endTime: window.i18n.validation.end_time_required
     },
     errorClass: "text-red-500 text-sm mt-1",
     highlight: function (element) {
@@ -39,7 +39,7 @@ $(document).ready(function () {
   // Validate on change/blur for better UX
   $('#name').on('blur', function () { $(this).valid(); });
   $('input[name="templateOption"]').on('change', function () { $(this).valid(); });
-  $('#templateSelect').on('change', function () { $(this).valid(); });
+  // $('#templateSelect').on('change', function () { $(this).valid(); });
   $('#noOfQRTags').on('blur', function () { $(this).valid(); });
   $('#qrImage').on('change', function () { $(this).valid(); });
   $('#startTime, #endTime').on('change', function () { $(this).valid(); });
@@ -178,7 +178,7 @@ function initTemplateOptionToggle() {
     placeholder.value = '';
     placeholder.disabled = true;
     placeholder.selected = true;
-    placeholder.textContent = 'Select Template';
+    placeholder.textContent = window.i18n.labels.select_template || 'Select Template';
     selectEl.appendChild(placeholder);
 
     if (!items || !items.length) return;

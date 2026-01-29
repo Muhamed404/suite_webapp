@@ -99,7 +99,7 @@ exports.updateTemplateController = async (req, res) => {
       req.flash('alertType', 'success');
       return res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);
     } else {
-      req.flash('message', 'Unable to save template');
+      req.flash('message', req.__('system_template.create.errorMessage'));
       req.flash('alertType', 'error');
       return res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);
     }
@@ -108,7 +108,7 @@ exports.updateTemplateController = async (req, res) => {
   } catch (error) {
     logger.error('Controller - Update Template: Error:', error);
     logger.error(error.stack);
-    req.flash('message', 'Unable to save template');
+    req.flash('message', req.__('system_template.create.errorMessage'));
     req.flash('alertType', 'error');
     return res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);
 

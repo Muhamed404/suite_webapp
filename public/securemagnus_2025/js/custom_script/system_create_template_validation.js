@@ -106,54 +106,54 @@ $(document).ready(function () {
     messages: {
       // Step 1 Messages
       name: {
-        required: "Template name is required.",
-        minlength: "Template name must be at least 3 characters."
+        required: window.i18n?.validation_messages?.template_name_required || "Template name is required.",
+        minlength: window.i18n?.validation_messages?.template_name_minlength || "Template name must be at least 3 characters."
       },
-      phishType: "Please select a phishing type.",
+      phishType: window.i18n?.validation_messages?.phishing_type_required || "Please select a phishing type.",
       
       // Step 3 Messages
       file_extension: "Please select a file extension.",
       file_name: {
-        required: "File name is required.",
-        minlength: "File name must be at least 2 characters."
+        required: window.i18n?.validation_messages?.file_name_required || "File name is required.",
+        minlength: window.i18n?.validation_messages?.file_name_minlength || "File name must be at least 2 characters."
       },
       
       // Step 4 Messages
       subject: {
-        required: "Email subject is required.",
-        minlength: "Subject must be at least 3 characters."
+        required: window.i18n?.validation_messages?.email_subject_required || "Email subject is required.",
+        minlength: window.i18n?.validation_messages?.subject_minlength || "Subject must be at least 3 characters."
       },
       sender_email: {
-        required: "Sender email is required.",
-        email: "Please enter a valid email address."
+        required: window.i18n?.validation_messages?.sender_email_required || "Sender email is required.",
+        email: window.i18n?.validation_messages?.valid_email_required || "Please enter a valid email address."
       },
       sender_display_name: {
-        required: "Sender name is required.",
-        minlength: "Sender name must be at least 2 characters."
+        required: window.i18n?.validation_messages?.sender_name_required || "Sender name is required.",
+        minlength: window.i18n?.validation_messages?.sender_name_minlength || "Sender name must be at least 2 characters."
       },
       company_name: {
-        required: "Company name is required.",
-        minlength: "Company name must be at least 2 characters."
+        required: window.i18n?.validation_messages?.company_name_required || "Company name is required.",
+        minlength: window.i18n?.validation_messages?.company_name_minlength || "Company name must be at least 2 characters."
       },
       company_domain: {
-        required: "Company domain is required.",
-        minlength: "Company domain must be at least 3 characters."
+        required: window.i18n?.validation_messages?.company_domain_required || "Company domain is required.",
+        minlength: window.i18n?.validation_messages?.company_domain_minlength || "Company domain must be at least 3 characters."
       },
       sms_content: {
-        required: "SMS message is required.",
-        maxlength: "SMS message must not exceed 160 characters."
+        required: window.i18n?.validation_messages?.sms_content_required || "SMS message is required.",
+        maxlength: window.i18n?.validation_messages?.sms_content_maxlength || "SMS message must not exceed 160 characters."
       },
       
       // Step 5 Messages
       phish_url: {
-        required: "Phishing URL is required.",
-        url: "Please enter a valid URL."
+        required: window.i18n?.validation_messages?.urlRequired || "URL is required.",
+        url: window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL."
       },
       
       // Step 6 Messages
       webpage_url: {
-        required: "Webpage URL is required.",
-        url: "Please enter a valid URL."
+        required: window.i18n?.validation_messages?.urlRequired || "URL is required.",
+        url: window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL."
       }
     },
     errorClass: "text-red-500 text-sm mt-1",
@@ -210,7 +210,8 @@ $(document).ready(function () {
         // Add error message for phishType below the options
         const phishTypeContainer = $('input[name="phishType"]').closest('div').parent();
         phishTypeContainer.find('.validation-error').remove();
-        phishTypeContainer.append('<div class="validation-error text-red-500 text-sm mt-2">Please select a phishing type.</div>');
+        const errorMessage = window.i18n?.validation_messages?.phishing_type_required || 'Please select a phishing type.';
+        phishTypeContainer.append(`<div class="validation-error text-red-500 text-sm mt-2">${errorMessage}</div>`);
         isValid = false;
       } else {
         // Remove error if present
@@ -261,7 +262,7 @@ $(document).ready(function () {
         }
         
         // Validate CKEditor content
-        if (!validateCKEditor('phishing_content', 'Email content is required.')) {
+        if (!validateCKEditor('phishing_content', window.i18n?.validation_messages?.email_content_required || 'Email content is required.')) {
           isValid = false;
         }
       }
@@ -290,7 +291,7 @@ $(document).ready(function () {
     // Step 5 (phishing_webpage_screen): Phishing Webpage
     if (currentStep === 5) {
       // Validate phishing page content
-      if (!validateCKEditor('phishing_page_content', 'Phishing page content is required.')) {
+      if (!validateCKEditor('phishing_page_content', window.i18n?.validation_messages?.phishing_page_content_required || 'Phishing page content is required.')) {
         isValid = false;
       }
     }
@@ -302,7 +303,8 @@ $(document).ready(function () {
       landingOptionContainer.find('.validation-error').remove();
       
       if (!landingOption) {
-        landingOptionContainer.append('<div class="validation-error text-red-500 text-sm mt-2">Please select a landing page option.</div>');
+        const errorMessage = window.i18n ? window.i18n.__('system_template.create.validationSelectLandingPage') : 'Please select a landing page option.';
+        landingOptionContainer.append(`<div class="validation-error text-red-500 text-sm mt-2">${errorMessage}</div>`);
         isValid = false;
       }
       
