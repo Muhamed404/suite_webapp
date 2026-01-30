@@ -440,7 +440,21 @@
 		"labelRoleAssigned": "Role Assigned",
 		"labelUserStatus": "User Status",
 		"labelAction": "Action",
-		"btnAddUser": "Add User"
+		"btnAddUser": "Add User",
+		"btnBulkAssign": "Bulk Assign",
+		"btnImport": "Import",
+		"labelPhishMagnusLicenseStatus": "PhishMagnus License Status",
+		"labelAwarenessLicenseStatus": "Awareness License Status",
+		"statusLicensed": "Licensed",
+		"statusUnlicensed": "Unlicensed",
+		"btnSetAsLicensed": "Set as Licensed",
+		"btnSetAsUnlicensed": "Set as Unlicensed",
+		"modalConfirmLicenseAssignment": "Confirm License Assignment",
+		"modalConfirmSetAsLicensed": "Are you sure you want to set this user as Licensed?",
+		"statusActive": "Active",
+		"statusInactive": "Inactive",
+		"btnDelete": "Delete",
+		"btnEdit": "Edit"
 	},
 	"system_template": {
 		"stepper1": "Template Details",

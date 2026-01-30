@@ -464,7 +464,17 @@
 		"btnEdit": "تعديل",
 		"statusActive": "نشط",
 		"statusInactive": "غير نشط",
-		"labelSave": "حفظ"
+		"labelSave": "حفظ",
+		"btnBulkAssign": "تعيين مجمع",
+		"btnImport": "استيراد",
+		"labelPhishMagnusLicenseStatus": "حالة ترخيص PhishMagnus",
+		"labelAwarenessLicenseStatus": "حالة ترخيص Awareness",
+		"statusLicensed": "مرخص",
+		"statusUnlicensed": "غير مرخص",
+		"btnSetAsLicensed": "تعيين كمرخص",
+		"btnSetAsUnlicensed": "تعيين كغير مرخص",
+		"modalConfirmLicenseAssignment": "تأكيد تعيين الترخيص",
+		"modalConfirmSetAsLicensed": "هل أنت متأكد من أنك تريد تعيين هذا المستخدم كمرخص؟"
 	},
 	"system_template": {
 		"stepper1": "تفاصيل القالب",
