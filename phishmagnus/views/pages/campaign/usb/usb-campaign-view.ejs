@@ -175,7 +175,7 @@
                                         <%= device.description %>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-gray-800">
-                                        <%= new Date(device.createdAt).toLocaleString() %>
+                                        <%= device.creation_date ? new Date(device.creation_date).toLocaleString() : 'N/A' %>
                                     </td>
                                      
                                     <td>
