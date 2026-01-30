@@ -60,7 +60,8 @@
 		"signup": "Signup",
 		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today",
 		"entries": "entries",
-		"no_entries_found": "No entries found"
+		"no_entries_found": "No entries found",
+		"people": "People"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -1047,7 +1048,13 @@
 		"interactionReportByEachQRCode": "Interaction Report By Each QR Code",
 		"downloadQRCode": "Download QR Code",
 		"tagScan": "Tag Scan",
-		"notScanTag": "Not Scan Tag"
+		"notScanTag": "Not Scan Tag",
+		"uniqueScans": "Unique Scans",
+		"repeatedScans": "Repeated Scans",
+		"noScans": "No Scans",
+		"repeatedInteractions": "Repeated Interactions",
+		"repeatedSubmitted": "Repeated Submitted",
+		"repeatedDownloads": "Repeated Downloads"
 	},
 	"nfc_campaign": {
 		"title": "NFC Campaign",
