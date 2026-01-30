@@ -192,6 +192,36 @@
 		"smsCampaign": "إنشاء حملة رسائل قصيرة",
 		"whatsappCampaign": "إنشاء حملة واتساب"
 	},
+	"emailUserReport": {
+		"userReport": "تقرير المستخدم",
+		"emailSent": "تم إرسال البريد الإلكتروني",
+		"openEmail": "فتح البريد الإلكتروني",
+		"formInteractionSubmission": "تفاعل النموذج / الإرسال",
+		"linksClicked": "الروابط المضغوطة",
+		"reportedToAdmin": "تم الإبلاغ للمشرف",
+		"campaignMetrics": "مقاييس الحملة",
+		"phishingSuccess": "نجاح التصيد",
+		"emailView": "عرض البريد الإلكتروني",
+		"emailOpened": "تم فتح البريد الإلكتروني",
+		"totalActivity": "النشاط الإجمالي",
+		"phishingSegments": "شرائح التصيد",
+		"employeeResponse": "استجابة الموظف",
+		"employeeDetails": "تفاصيل الموظف",
+		"receiverAddress": "عنوان المستلم",
+		"department": "القسم",
+		"employeeId": "معرف الموظف",
+		"campaignDate": "تاريخ الحملة",
+		"interactionReport": "تقرير التفاعل",
+		"searchHere": "ابحث هنا...",
+		"sortBy": "ترتيب حسب",
+		"campaignName": "اسم الحملة",
+		"date": "التاريخ",
+		"riskScore": "درجة المخاطر",
+		"clickedLinked": "الروابط المضغوطة",
+		"interactForm": "تفاعل النموذج",
+		"formSubmit": "إرسال النموذج",
+		"attachmentOpened": "تم فتح المرفق"
+	},
 	"productsuite": {
 		"btn": {
 			"dashboard": "عرض لوحة التحكم",
@@ -1426,7 +1456,8 @@
 		"filterScheduled": "مجدول",
 		"filterCompleted": "مكتمل",
 		"filterDraft": "مسودة",
-		"viewDetails": "عرض التفاصيل"
+		"viewDetails": "عرض التفاصيل",
+		"showingResults": "عرض {start} إلى {end} من {total} نتائج"
 	},
 	" sms": {
 		"create_campaign": {

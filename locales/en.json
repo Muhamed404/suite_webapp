@@ -179,6 +179,36 @@
 		"smsCampaign": "Create SMS Campaign",
 		"whatsappCampaign": "Create WhatsApp Campaign"
 	},
+	"emailUserReport": {
+		"userReport": "User Report",
+		"emailSent": "Email Sent",
+		"openEmail": "Open Email",
+		"formInteractionSubmission": "Form Interaction / Submission",
+		"linksClicked": "Links Clicked",
+		"reportedToAdmin": "Reported to Admin",
+		"campaignMetrics": "Campaign Metrics",
+		"phishingSuccess": "Phishing Success",
+		"emailView": "Email View",
+		"emailOpened": "Email Opened",
+		"totalActivity": "Total Activity",
+		"phishingSegments": "Phishing Segments",
+		"employeeResponse": "Employee response",
+		"employeeDetails": "Employee Details",
+		"receiverAddress": "Receiver Address",
+		"department": "Department",
+		"employeeId": "Employee ID",
+		"campaignDate": "Campaign Date",
+		"interactionReport": "Interaction report",
+		"searchHere": "Search here...",
+		"sortBy": "Sort by",
+		"campaignName": "Campaign Name",
+		"date": "Date",
+		"riskScore": "Risk Score",
+		"clickedLinked": "Clicked Linked",
+		"interactForm": "Interact Form",
+		"formSubmit": "Form Submit",
+		"attachmentOpened": "Attachment Opened"
+	},
 	"productsuite": {
 		"btn": {
 			"dashboard": "View Dashboard",
@@ -1324,7 +1354,8 @@
 		"filterScheduled": "Scheduled",
 		"filterCompleted": "Completed",
 		"filterDraft": "Draft",
-		"viewDetails": "View Details"
+		"viewDetails": "View Details",
+		"showingResults": "Showing {start} to {end} of {total} results"
 	},
 	"nfcCampaign": "nfcCampaign",
 	"start_date": "start_date",
