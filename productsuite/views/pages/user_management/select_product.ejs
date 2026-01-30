@@ -1,18 +1,18 @@
 <div class="step fade-enter-active" id="step-1">
     <!--  Title -->
-    <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10"></h1>
+    <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10"><%= __("user.labelBulkUploadUsers") %></h1>
 
     <!-- Main Form -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="md:col-span-1">
             <label class="block text-gray-700 font-medium mb-3">
-                Choose the Product
+                <%= __("user.labelChooseTheProduct") %>
             </label>
 
                 <select id="application" name="application"
                     class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50"
                     tabindex="1">
-                    <option value="" disabled selected>Select Product</option>
+                    <option value="" disabled selected><%= __("user.labelSelectProduct") %></option>
                     <% Object.entries(Applications).forEach(([key, value]) => { %>
                         <option value="<%= value %>"><%= key %></option>
                     <% }) %>
@@ -22,9 +22,9 @@
 
         <div class="md:col-span-1">
             <label class="block text-gray-700 font-medium mb-3">
-                Available License Quantity
+                <%= __("user.labelAvailableLicenseQuantity") %>
             </label>
-            <input type="text" readonly placeholder="Available License Quantity"
+            <input type="text" readonly placeholder="<%= __("user.labelAvailableLicenseQuantity") %>"
             id="alertLicenseAvailability" name="alertLicenseAvailability"
             class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
             bg-gray-50"

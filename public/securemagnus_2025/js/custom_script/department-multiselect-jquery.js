@@ -42,7 +42,7 @@ $(document).ready(function () {
     $unenrolledBody.empty();
 
     if (enrolled.length === 0) {
-      $enrolledBody.append('<tr><td colspan="3" class="px-4 py-2 text-center text-sm text-gray-500">No enrolled users</td></tr>');
+      $enrolledBody.append(`<tr><td colspan="3" class="px-4 py-2 text-center text-sm text-gray-500">${window.departmentTranslations?.noEnrolledUsers || 'No enrolled users'}</td></tr>`);
     } else {
       enrolled.forEach(user => {
         const row = `<tr onclick="toggleRowCheckbox(this)" class="hover:bg-teal-50 cursor-pointer">
@@ -55,7 +55,7 @@ $(document).ready(function () {
     }
 
     if (unenrolled.length === 0) {
-      $unenrolledBody.append('<tr><td colspan="3" class="px-4 py-2 text-center text-sm text-gray-500">No unenrolled users</td></tr>');
+      $unenrolledBody.append(`<tr><td colspan="3" class="px-4 py-2 text-center text-sm text-gray-500">${window.departmentTranslations?.noUnenrolledUsers || 'No unenrolled users'}</td></tr>`);
     } else {
       unenrolled.forEach(user => {
         const row = `<tr onclick="toggleRowCheckbox(this)" class="hover:bg-teal-50 cursor-pointer">

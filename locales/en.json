@@ -527,7 +527,13 @@
 		"validationLastNameMinLength": "Last name must be at least 2 characters.",
 		"validationEmailRequired": "Please enter a valid email address with full domain (e.g., user@example.com).",
 		"validationPasswordRequired": "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
-		"labelCreateSecureMagnusUser": "user.labelCreateSecureMagnusUser"
+		"labelBulkUploadUsers": "Bulk Upload Users",
+		"stepChooseProduct": "Choose Product",
+		"stepChooseFile": "Choose File",
+		"labelChooseTheProduct": "Choose the Product",
+		"labelAvailableLicenseQuantity": "Available License Quantity",
+		"labelSelectProduct": "Select Product",
+		"labelSelectFileToUpload": "Select File to Upload"
 	},
 	"system_template": {
 		"stepper1": "Template Details",
@@ -734,7 +740,42 @@
 		"labelDescription": "Description",
 		"labelDepartmentManagement": "Department Management",
 		"labelUserEnroll": "Total User Enrolled",
-		"labelViewUser": "View Users"
+		"labelViewUser": "View Users",
+		"selectedUsers": "Selected Users",
+		"searchEnrolled": "Search Enrolled",
+		"enrolled": "Enrolled",
+		"firstName": "First Name",
+		"lastName": "Last Name",
+		"moveToUnenrolled": "Move to Unenrolled",
+		"searchUnenrolled": "Search Unenrolled",
+		"unenrolled": "Unenrolled",
+		"moveToEnrolled": "Move to Enrolled",
+		"done": "Done",
+		"noEnrolledUsers": "No enrolled users",
+		"noUnenrolledUsers": "No unenrolled users",
+		"enterDepartmentName": "Enter Department Name",
+		"enterDescription": "Enter Description",
+		"departmentNameRequired": "Department name is required.",
+		"descriptionRequired": "Description is required (min 5 characters)."
+	},
+	"group": {
+		"labelGroupManagement": "Group Management",
+		"labelGroupName": "Group Name",
+		"labelGroupDescription": "Group Description",
+		"labelViewUsers": "View Users",
+		"selectedServices": "Selected Services",
+		"searchEnrolled": "Search Enrolled",
+		"enrolled": "Enrolled",
+		"firstName": "First Name",
+		"lastName": "Last Name",
+		"moveToUnenrolled": "Move to Unenrolled",
+		"searchUnenrolled": "Search Unenrolled",
+		"unenrolled": "Unenrolled",
+		"moveToEnrolled": "Move to Enrolled",
+		"done": "Done",
+		"viewDetails": "View Details",
+		"noEnrolledUsers": "No enrolled users",
+		"noUnenrolledUsers": "No unenrolled users"
 	},
 	"sms": {
 		"settings": {
