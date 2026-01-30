@@ -19,7 +19,9 @@
     <!-- first section  -->
     <div class="flex flex-col p-8 gap-4 mt-3 rounded-3xl bg-white border border-gray-100 shadow-sm">
         <!-- Progress Bar -->
-        <div id="progress" class="flex items-center mb-6"></div>
+        <div class="overflow-x-auto mb-6">
+            <div id="progress" class="flex items-center min-w-max"></div>
+        </div>
         <form class="space-y-6" id="templateCreationForm" method="post" 
         action="<%=typeof postMethodUrl !== 'undefined' ? postMethodUrl: '/template/update/' + (template?.id) %>"
         data-difficulty='<%- template?.difficulty || [] %>'>
@@ -28,9 +30,7 @@
                 <!-- Page Heading -->
                 <h1 class="text-3xl font-bold mb-2">Template Details</h1>
                 <p class="text-gray-600 mb-8">
-                    Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore
-                    Et
-                    Dolore Magna Aliqua.
+                    You can edit the existing phishing template by modifying the details below.
                 </p>
 
                 <!-- Template Name -->
@@ -107,10 +107,7 @@
             </div>
             <div class="step hidden">
                 <h2 class="text-2xl font-bold mb-2" id="step-heading">Tracking Details</h2>
-                <p class="text-gray-500 mb-4  w-full lg:w-3/4" id="step-subheading">Lorem ipsum dolor sit amet,
-                    consectetur
-                    adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-                    veniam, quis nostrud exercitation ullamco laboris.</p>
+                <p class="text-gray-500 mb-4  w-full lg:w-3/4" id="step-subheading">Select the tracking methods you want to include in this phishing template.</p>
 
                 <div id="checkbox-options" class="space-y-4">
                     <!-- Dynamic options will be injected here -->
@@ -155,9 +152,7 @@
             </div>
             <div class="step hidden">
                 <h2 class="text-2xl font-bold mb-2">Phishing Message Details</h2>
-                <p class="text-gray-500 mb-8">
-                    Text
-                </p>
+
 
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-max">
