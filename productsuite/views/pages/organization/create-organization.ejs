@@ -45,18 +45,18 @@
             <div class="flex flex-col gap-6">
               <div>
                 <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgName") %> *</label>
-                <input placeholder="Enter organization name" type="text" value="" id="name" name="name"
+                <input placeholder="<%= __('organization.create.placeholderOrgName') %>" type="text" value="" id="name" name="name"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
               </div>
               <div>
                 <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgAddress") %> *</label>
-                <input placeholder="Enter organization address" type="text" value="" id="address" name="address"
+                <input placeholder="<%= __('organization.create.placeholderOrgAddress') %>" type="text" value="" id="address" name="address"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
               </div>
 
               <div>
                 <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgPostalCode") %> *</label>
-                <input placeholder="Enter Postal Code" type="text" value=""
+                <input placeholder="<%= __('organization.create.placeholderOrgPostalCode') %>" type="text" value=""
                   oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
                   min="1" id="postalCode" name="postalCode"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
@@ -64,7 +64,7 @@
 
               <div>
                 <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgContactNumber") %> *</label>
-                <input placeholder="Enter contact number"
+                <input placeholder="<%= __('organization.create.placeholderOrgContactNumber') %>"
                   oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
                   min="1" id="contact" name="contact" type="text" value=""
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
@@ -178,4 +178,27 @@
 
 </div>
 <script src="/securemagnus_2025/js/form_stepper.js"></script>
+<script>
+  window.i18n = {
+    labels: {
+      next: "<%= __('organization.create.btnNext') %>",
+      finish: "<%= __('organization.create.btnFinish') %>"
+    }
+  };
+  window.organizationValidationMessages = {
+    name: "<%= __('organization.create.validationOrgNameRequired') %>",
+    address: "<%= __('organization.create.validationOrgAddressRequired') %>",
+    postalCode: "<%= __('organization.create.validationOrgPostalCodeRequired') %>",
+    contact: "<%= __('organization.create.validationOrgContactRequired') %>",
+    country: "<%= __('organization.create.validationOrgCountryRequired') %>",
+    state: "<%= __('organization.create.validationOrgStateRequired') %>",
+    city: "<%= __('organization.create.validationOrgCityRequired') %>",
+    firstName: "<%= __('organization.create.validationAdminFirstNameRequired') %>",
+    lastName: "<%= __('organization.create.validationAdminLastNameRequired') %>",
+    email: "<%= __('organization.create.validationAdminEmailRequired') %>",
+    password: "<%= __('organization.create.validationAdminPasswordRequired') %>",
+    nameTaken: "<%= __('organization.create.validationOrgNameTaken') %>",
+    emailTaken: "<%= __('organization.create.validationEmailTaken') %>",
+  };
+</script>
 <script src="/securemagnus_2025/js/custom_script/create-organization-validation.js"></script>

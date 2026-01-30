@@ -99,6 +99,37 @@
 <script src="/securemagnus_2025/js/custom_script/smtp-validator.js"></script>
 
 <script>
+  // Localization data
+  window.i18n = {
+    validation_messages: {
+      fill_required_fields_before_testing: "<%- __('validation_messages.fill_required_fields_before_testing') %>",
+      fix_validation_errors_before_testing: "<%- __('validation_messages.fix_validation_errors_before_testing') %>",
+      smtp_test_connection_successful: "<%- __('validation_messages.smtp_test_connection_successful') %>",
+      smtp_test_connection_failed: "<%- __('validation_messages.smtp_test_connection_failed') %>",
+      smtp_test_connection_issue: "<%- __('validation_messages.smtp_test_connection_issue') %>",
+      enter_valid_format: "<%- __('validation_messages.enter_valid_format') %>",
+      ensure_correct_smtp_port: "<%- __('validation_messages.ensure_correct_smtp_port') %>",
+      organization_name_required: "<%- __('validation_messages.organization_name_required') %>",
+      organization_name_minlength: "<%- __('validation_messages.organization_name_minlength') %>",
+      organization_name_maxlength: "<%- __('validation_messages.organization_name_maxlength') %>",
+      smtp_host_required: "<%- __('validation_messages.smtp_host_required') %>",
+      host_minlength: "<%- __('validation_messages.host_minlength') %>",
+      host_maxlength: "<%- __('validation_messages.host_maxlength') %>",
+      valid_hostname_ip: "<%- __('validation_messages.valid_hostname_ip') %>",
+      port_required: "<%- __('validation_messages.port_required') %>",
+      valid_port_number: "<%- __('validation_messages.valid_port_number') %>",
+      port_min: "<%- __('validation_messages.port_min') %>",
+      port_max: "<%- __('validation_messages.port_max') %>",
+      service_account_required: "<%- __('validation_messages.service_account_required') %>",
+      service_account_minlength: "<%- __('validation_messages.service_account_minlength') %>",
+      service_account_maxlength: "<%- __('validation_messages.service_account_maxlength') %>",
+      valid_email: "<%- __('validation_messages.valid_email') %>",
+      password_required: "<%- __('validation_messages.password_required') %>",
+      password_minlength: "<%- __('validation_messages.password_minlength') %>",
+      password_maxlength: "<%- __('validation_messages.password_maxlength') %>"
+    }
+  };
+
   // Initialize SMTP form validator with configuration
   initSMTPFormValidator({
     orgId: '<%= org %>',

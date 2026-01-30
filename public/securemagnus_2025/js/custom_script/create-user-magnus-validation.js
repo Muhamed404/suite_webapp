@@ -3,13 +3,13 @@ $(document).ready(function () {
     $.validator.addMethod("strongPassword", function (value, element) {
         return this.optional(element) ||
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
-    }, "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.");
+    }, window.userValidationMessages.password);
 
     $.validator.addMethod("strictEmail", function (value, element) {
         // basic RFC compliant pattern w/ required TLD (.domain)
         return this.optional(element) ||
             /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value);
-    }, "Please enter a valid email address with full domain (e.g., user@example.com)");
+    }, window.userValidationMessages.email);
 
 
     $('#securemagnusUserForm').validate({
@@ -36,29 +36,7 @@ $(document).ready(function () {
             password: { required: true, strongPassword: true }
 
         },
-        messages: {
-            role: {
-                required: "Please select a user role."
-            },
-            contact: {
-                required: "Please enter a contact number.",
-                digits: "Contact number must be digits only.",
-                minlength: "Contact number must be at least 10 digits.",
-                maxlength: "Contact number must not exceed 15 digits."
-            },
-            first_name: {
-                required: "Please enter first name.",
-                minlength: "First name must be at least 2 characters."
-            },
-            last_name: {
-                required: "Please enter last name.",
-                minlength: "Last name must be at least 2 characters."
-            },
-            email: "Please enter a valid email address with full domain (e.g., user@example.com).",
-
-            password: "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
-
-        },
+        messages: window.userValidationMessages,
         errorClass: "text-red-500 text-sm mt-1",
         errorElement: "div",
         highlight: function (element) {

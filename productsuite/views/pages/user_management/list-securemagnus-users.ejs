@@ -34,7 +34,7 @@
     <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
 
 
-      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700">
+      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} to {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
         <thead class="bg-gray-50 text-gray-600  text-xs">
           <tr>
 
@@ -109,7 +109,7 @@
                 <% const isActive = u.User?.status ? true : false; %>
                 <span class="inline-flex items-center px-3 py-1 text-sm border rounded-full
                   <%= isActive ? 'text-green-500 border-green-500 bg-green-50' : 'text-red-500 border-red-500 bg-red-50' %>">
-                  <%= isActive ? 'Active' : 'Inactive' %>
+                  <%= isActive ? __("generic_label.active") : __("generic_label.inactive") %>
                 </span>
               </td>
 
@@ -129,14 +129,14 @@
                       <a href="/user/delete/<%= u.id || "" %>"
                         class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
                         <i class="ion-android-trash mr-2"></i>
-                        Delete
+                        <%= __("generic_label.delete") %>
                       </a>
                     </li>
                     <li>
                       <a href="/user/show/<%= u.id || "" %>"
-                        class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
-                        <i class="ion-android-trash mr-2"></i>
-                        Edit
+                        class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 rounded transition">
+                        <i class="ion-edit mr-2"></i>
+                        <%= __("generic_label.edit") %>
                       </a>
                     </li>
                   </ul>
@@ -155,6 +155,30 @@
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (!document.getElementById('filter-table') || typeof simpleDatatables === 'undefined' || typeof simpleDatatables.DataTable === 'undefined') {
+    console.warn('simple-datatables not found or table missing');
+    return;
+  }
+
+  const table = document.getElementById('filter-table');
+  const placeholder = table.dataset.placeholder || 'Search...';
+  const perPageLabel = table.dataset.perPage || 'entries per page';
+  const infoLabel = table.dataset.info || 'Showing {start} to {end} of {rows} entries';
+  const noRowsLabel = table.dataset.noRows || 'No entries found';
+
+  const dataTable = new simpleDatatables.DataTable('#filter-table', {
+    sortable: true,
+    perPageSelect: [10, 20, 25, 50, 100],
+    labels: {
+      placeholder: placeholder,
+      perPage: perPageLabel,
+      info: infoLabel,
+      noRows: noRowsLabel
+    }
+  });
+});
+
 function toggleDropdown(button) {
   const allDropdowns = document.querySelectorAll('.relative.inline-block.text-left ul');
   allDropdowns.forEach(dropdown => {
