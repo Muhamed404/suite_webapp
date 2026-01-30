@@ -98,6 +98,7 @@
 		"error_processing_request": "حدث خطأ أثناء معالجة الطلب في إنشاء حملة الرسائل القصيرة",
 		"organization_not_found": "المؤسسة غير موجودة",
 		"usb_campaign_name_required": "اسم الحملة مطلوب.",
+		"usb_description_required": "الوصف مطلوب.",
 		"usb_no_of_usb_required": "عدد أجهزة USB مطلوب ويجب أن يكون رقماً موجباً.",
 		"usb_env_variable_required": "متغير البيئة مطلوب.",
 		"usb_filename_required": "اسم الملف مطلوب.",

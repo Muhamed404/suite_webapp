@@ -83,6 +83,7 @@
 		"error_processing_request": "Error processing request in creating SMS campaign",
 		"organization_not_found": "Organization not found",
 		"usb_campaign_name_required": "Campaign name is required.",
+		"usb_description_required": "Description is required.",
 		"usb_no_of_usb_required": "Number of USBs is required and must be a positive number.",
 		"usb_env_variable_required": "Environment variable is required.",
 		"usb_filename_required": "File name is required.",
@@ -630,7 +631,7 @@
 			"descriptionLabel": "Description"
 		},
 		"schedule": {
-			"startTime": "Start Time *",
+			"startTime": "Start Time",
 			"endTime": "End Time"
 		},
 		"usb": {
