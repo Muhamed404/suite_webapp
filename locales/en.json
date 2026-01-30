@@ -59,7 +59,8 @@
 		"dontHaveAccount": "Don't have an account?",
 		"signup": "Signup",
 		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today",
-		"entries": "generic_label.entries"
+		"entries": "entries",
+		"no_entries_found": "No entries found"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -82,6 +83,7 @@
 		"error_processing_request": "Error processing request in creating SMS campaign",
 		"organization_not_found": "Organization not found",
 		"usb_campaign_name_required": "Campaign name is required.",
+		"usb_description_required": "Description is required.",
 		"usb_no_of_usb_required": "Number of USBs is required and must be a positive number.",
 		"usb_env_variable_required": "Environment variable is required.",
 		"usb_filename_required": "File name is required.",
@@ -439,7 +441,21 @@
 		"labelRoleAssigned": "Role Assigned",
 		"labelUserStatus": "User Status",
 		"labelAction": "Action",
-		"btnAddUser": "Add User"
+		"btnAddUser": "Add User",
+		"btnBulkAssign": "Bulk Assign",
+		"btnImport": "Import",
+		"labelPhishMagnusLicenseStatus": "PhishMagnus License Status",
+		"labelAwarenessLicenseStatus": "Awareness License Status",
+		"statusLicensed": "Licensed",
+		"statusUnlicensed": "Unlicensed",
+		"btnSetAsLicensed": "Set as Licensed",
+		"btnSetAsUnlicensed": "Set as Unlicensed",
+		"modalConfirmLicenseAssignment": "Confirm License Assignment",
+		"modalConfirmSetAsLicensed": "Are you sure you want to set this user as Licensed?",
+		"statusActive": "Active",
+		"statusInactive": "Inactive",
+		"btnDelete": "Delete",
+		"btnEdit": "Edit"
 	},
 	"system_template": {
 		"stepper1": "Template Details",
@@ -615,7 +631,7 @@
 			"descriptionLabel": "Description"
 		},
 		"schedule": {
-			"startTime": "Start Time *",
+			"startTime": "Start Time",
 			"endTime": "End Time"
 		},
 		"usb": {
@@ -956,7 +972,8 @@
 		"senderName": "Sender Name",
 		"companyName": "Company Name",
 		"companyDomain": "Company Domain",
-		"phishPage": "Phishing Page"
+		"phishPage": "Phishing Page",
+		"template_deleted_successfully": "Template deleted successfully"
 	},
 	"Audit": {
 		"CreationDate": "Creation Date",
@@ -1205,5 +1222,6 @@
 	"showing": "showing",
 	"to": "to",
 	"of": "of",
-	"entries": "entries"
+	"entries": "entries",
+	"no_entries_found": "No entries found"
 }

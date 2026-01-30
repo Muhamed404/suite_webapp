@@ -34,7 +34,7 @@ exports.disableTemplate = async (req, res) => {
       req.flash('alertType', 'error');
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.System_Template.LIST);
     }
-    req.flash('message', 'Template deleted successfully');
+    req.flash('message', req.__('Template.template_deleted_successfully'));
     req.flash('alertType', 'success');
     const redirectUrl = frontend_api_urls.PRODUCT_SUITE.System_Template.LIST;
     return res.redirect(redirectUrl)

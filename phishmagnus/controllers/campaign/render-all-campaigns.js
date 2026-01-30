@@ -9,9 +9,9 @@ const CAMPAIGN_TYPES = [
   { key: "email", label: "Email", fetcher: fetchEmailCampaigns },
   { key: "qr", label: "QR", fetcher: fetchQRCampaigns },
   { key: "nfc", label: "NFC", fetcher: fetchNFCCampaigns },
-  { key: "sms", label: "SMS", fetcher: null },
-  { key: "whatsapp", label: "Whatsapp", fetcher: null },
-  { key: "usb", label: "USB", fetcher: null },
+  { key: "sms", label: "SMS", fetcher: fetchSMSCampaigns },
+  { key: "whatsapp", label: "Whatsapp", fetcher: fetchWhatsappCampaigns },
+  { key: "usb", label: "USB", fetcher: fetchUSBCampaigns },
 ];
 
 exports.renderAllCampaigns = async (req, res) => {
@@ -142,14 +142,77 @@ async function fetchNFCCampaigns(req) {
   });
 }
 
+async function fetchSMSCampaigns(req) {
+  const queryParams = buildCampaignQuery(req, enums.phishingType.SMS);
+  const apiClient = getApiClient(req);
+  const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.SMS.RENDER_REPORT(queryParams);
+
+  const response = await apiClient.get(url, { headers: { Accept: "application/json" } });
+  const campaignsData = response?.data?.data || {};
+  const rawCampaigns = campaignsData.campaigns || [];
+
+  return rawCampaigns.map((item) => {
+    const campaign = item; // SMS response has campaign data directly in item
+    return normalizeCampaign(campaign, {
+      templateName: item.template?.name || "N/A",
+      totalTargets: item.smsStats?.totalInvitees ?? 0,
+      typeKey: "sms",
+      typeLabel: "SMS",
+      detailPath: campaign.id ? `/phm/campaign/sms/report/campaign/${campaign.id}` : "#",
+    });
+  });
+}
+
+async function fetchWhatsappCampaigns(req) {
+  const queryParams = buildCampaignQuery(req, enums.phishingType.Whatsapp);
+  const apiClient = getApiClient(req);
+  const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.Whatsapp.RENDER_REPORT(queryParams);
+
+  const response = await apiClient.get(url, { headers: { Accept: "application/json" } });
+  const campaignsData = response?.data?.data || {};
+  const rawCampaigns = campaignsData.campaigns || [];
+
+  return rawCampaigns.map((item) => {
+    const campaign = item; // WhatsApp response has campaign data directly in item
+    return normalizeCampaign(campaign, {
+      templateName: item.template?.name || "N/A",
+      totalTargets: item.smsStats?.totalInvitees ?? 0,
+      typeKey: "whatsapp",
+      typeLabel: "Whatsapp",
+      detailPath: (campaign.id || campaign.campaign_identifier) ? `/phm/campaign/whatsapp/report/campaign/${campaign.id || campaign.campaign_identifier}` : "#",
+    });
+  });
+}
+
+async function fetchUSBCampaigns(req) {
+  const queryParams = buildCampaignQuery(req, enums.phishingType.USB);
+  const apiClient = getApiClient(req);
+  const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.USB.RENDER_REPORT(queryParams);
+
+  const response = await apiClient.get(url, { headers: { Accept: "application/json" } });
+  const campaignsData = response?.data?.data || {};
+  const rawCampaigns = campaignsData.data || [];
+
+  return rawCampaigns.map((item) => {
+    const campaign = item; // USB response has campaign data directly in item
+    return normalizeCampaign(campaign, {
+      templateName: "N/A", // USB doesn't have template in response
+      totalTargets: item.total_usb_created ?? 0,
+      typeKey: "usb",
+      typeLabel: "USB",
+      detailPath: campaign.campaign_identifier ? `/phm/campaign/usb/report-view/${campaign.campaign_identifier}` : "#",
+    });
+  });
+}
+
 function normalizeCampaign(campaign = {}, extras = {}) {
-  const startDate = campaign.start_datetime || campaign.scheduled_date || null;
+  const startDate = campaign.start_datetime || campaign.scheduled_date || campaign.start_date || null;
   const endDate = campaign.end_datetime || startDate || null;
 
   return {
-    id: campaign.id || null,
+    id: campaign.id || campaign.campaign_id || null,
     campaignIdentifier: campaign.campaign_identifier || "",
-    name: campaign.name || "Untitled Campaign",
+    name: campaign.name || campaign.campaign_name || "Untitled Campaign",
     templateName: extras.templateName || "N/A",
     startDate,
     endDate,
@@ -163,8 +226,8 @@ function normalizeCampaign(campaign = {}, extras = {}) {
 
 function determineStatus(campaign = {}) {
   const now = new Date();
-  const startDate = new Date(campaign.start_datetime || campaign.scheduled_date || now);
-  const endDate = new Date(campaign.end_datetime || campaign.scheduled_date || now);
+  const startDate = new Date(campaign.start_datetime || campaign.scheduled_date || campaign.start_date || now);
+  const endDate = new Date(campaign.end_datetime || campaign.scheduled_date || campaign.start_date || now);
 
   if (!campaign.is_camp_uploaded && campaign.is_camp_uploaded !== undefined) {
     return "draft";

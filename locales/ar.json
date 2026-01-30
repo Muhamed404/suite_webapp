@@ -71,7 +71,9 @@
 		"signup": "التسجيل",
 		"heroText": "تمكين المستقبل،<br /> <span class=\"text-[var(--teal)]\">تأمين</span> اليوم",
 		"welcomeToSecureMagnus": "مرحباً بك في SecureMagnus",
-		"entries": "generic_label.entries"
+		"entries": "الإدخالات",
+		"to": "إلى",
+		"no_entries_found": "لم يتم العثور على إدخالات"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -96,6 +98,7 @@
 		"error_processing_request": "حدث خطأ أثناء معالجة الطلب في إنشاء حملة الرسائل القصيرة",
 		"organization_not_found": "المؤسسة غير موجودة",
 		"usb_campaign_name_required": "اسم الحملة مطلوب.",
+		"usb_description_required": "الوصف مطلوب.",
 		"usb_no_of_usb_required": "عدد أجهزة USB مطلوب ويجب أن يكون رقماً موجباً.",
 		"usb_env_variable_required": "متغير البيئة مطلوب.",
 		"usb_filename_required": "اسم الملف مطلوب.",
@@ -462,7 +465,17 @@
 		"btnEdit": "تعديل",
 		"statusActive": "نشط",
 		"statusInactive": "غير نشط",
-		"labelSave": "حفظ"
+		"labelSave": "حفظ",
+		"btnBulkAssign": "تعيين مجمع",
+		"btnImport": "استيراد",
+		"labelPhishMagnusLicenseStatus": "حالة ترخيص PhishMagnus",
+		"labelAwarenessLicenseStatus": "حالة ترخيص Awareness",
+		"statusLicensed": "مرخص",
+		"statusUnlicensed": "غير مرخص",
+		"btnSetAsLicensed": "تعيين كمرخص",
+		"btnSetAsUnlicensed": "تعيين كغير مرخص",
+		"modalConfirmLicenseAssignment": "تأكيد تعيين الترخيص",
+		"modalConfirmSetAsLicensed": "هل أنت متأكد من أنك تريد تعيين هذا المستخدم كمرخص؟"
 	},
 	"system_template": {
 		"stepper1": "تفاصيل القالب",
@@ -1106,7 +1119,8 @@
 		"enterWebsiteToImport": "Template.enterWebsiteToImport",
 		"createPhishingWebPage": "Template.createPhishingWebPage",
 		"createPhishingWebPageDescription": "Template.createPhishingWebPageDescription",
-		"emailMessage": "Template.emailMessage"
+		"emailMessage": "Template.emailMessage",
+		"template_deleted_successfully": "تم حذف القالب بنجاح"
 	},
 	"Audit": {
 		"CreationDate": "تاريخ الإنشاء",
@@ -1388,5 +1402,6 @@
 	"showing": "showing",
 	"to": "to",
 	"of": "of",
-	"entries": "entries"
+	"entries": "entries",
+	"no_entries_found": "لم يتم العثور على إدخالات"
 }
