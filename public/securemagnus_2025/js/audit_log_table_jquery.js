@@ -45,7 +45,13 @@ function renderTabs() {
   statusTabs.innerHTML = Object.entries(counts)
     .map(([status, count]) => {
       const isActive = currentTab === status;
-      const displayName = status.charAt(0).toUpperCase() + status.slice(1);
+      let displayName = status;
+      
+      // Localize tab names
+      if (status === 'All') displayName = window.i18n?.Audit?.tabAll || 'All';
+      else if (status === 'active') displayName = window.i18n?.Audit?.tabActive || 'Active';
+      else if (status === 'inprogress') displayName = window.i18n?.Audit?.tabInprogress || 'Inprogress';
+      else if (status === 'completed') displayName = window.i18n?.Audit?.tabCompleted || 'Completed';
 
       // If active
       if (isActive) {
