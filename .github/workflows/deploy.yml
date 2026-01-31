@@ -21,10 +21,6 @@ on:
       - '.github/workflows/deploy.yml'
       - '.github/scripts/deploy.sh'
       - '.github/scripts/register-suite-webapp-service.sh'
-    paths-ignore:
-      - 'awaremagnus/**'
-      - 'docs/**'
-      - '*.md'
 
 env:
   NODE_VERSION: '20.19.2'
