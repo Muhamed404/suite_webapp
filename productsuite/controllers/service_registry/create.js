@@ -34,20 +34,20 @@ exports.submitForm = async (req, res) => {
 
         if (response?.data?.status) {
             logger.info(`${logTxn} - Service registry created successfully`);
-            req.flash('message', 'Service registered successfully!');
+            req.flash('message', req.__('generic_label.service_registered_successfully'));
             req.flash('alertType', 'success');
             return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.LIST); // Redirect to a success page
 
         } else {
             logger.warn(`${logTxn} - Service registry creation failed: ${response.data.message}`);
-            throw new Error(response.data.message || 'Service registry creation failed');
+            throw new Error(response.data.message || req.__('generic_label.service_registry_creation_failed'));
         }
 
     } catch (error) {
         // console.error(error);
         logger.error(`${logTxn} - Error creating service registry: Unable to create service registry`);
         console.error(error);
-        req.flash('message', error.response.data.message || 'Unable to create service registry');
+        req.flash('message', error.response?.data?.message || req.__('generic_label.unable_to_create_service_registry'));
         req.flash('alertType', 'error');
         return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.CREATE); // Redirect to a success page
     }

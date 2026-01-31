@@ -7,8 +7,8 @@ window.confirmDeleteService = function(serviceId, registryId) {
   // Update modal text for delete
   const modal = document.getElementById('deleteConfirmModal');
   if (modal) {
-    modal.querySelector('h2').textContent = 'Confirm Service Deletion';
-    modal.querySelector('p').innerHTML = `Are you sure you want to delete service: <span class="font-bold text-red-600">${serviceId}</span>? This action cannot be undone.`;
+    modal.querySelector('h2').textContent = window.translations.modalConfirmServiceDeletion;
+    modal.querySelector('#deleteConfirmText').innerHTML = window.translations.modalConfirmDeleteService.replace('{serviceId}', `<span class="font-bold text-red-600">${serviceId}</span>`);
     modal.classList.remove('hidden');
   }
 }
@@ -85,7 +85,16 @@ function renderTabs() {
   statusTabs.innerHTML = Object.entries(counts)
     .map(([status, count]) => {
       const isActive = currentTab === status;
-      const displayName = status.charAt(0).toUpperCase() + status.slice(1);
+      let displayName;
+      if (status === "All") {
+        displayName = window.translations.all;
+      } else if (status === "Active") {
+        displayName = window.translations.active;
+      } else if (status === "Suspended") {
+        displayName = window.translations.suspended;
+      } else {
+        displayName = status;
+      }
       // If active
       if (isActive) {
         return `
@@ -169,6 +178,15 @@ function renderTable() {
     if (user.status === "active") statusClass = "px-4 py-1 text-sm text-blue-700 bg-blue-100 rounded-full";
     if (user.status === "suspended") statusClass = "px-4 py-1 text-sm text-yellow-700 bg-yellow-100 rounded-full";
 
+    let statusDisplay;
+    if (user.status === "active") {
+      statusDisplay = window.translations.active;
+    } else if (user.status === "suspended") {
+      statusDisplay = window.translations.suspended;
+    } else {
+      statusDisplay = user.status.charAt(0).toUpperCase() + user.status.slice(1);
+    }
+
     return `
     <tr class="transition-colors border-t hover:bg-blue-50">
       <td class="px-6 py-6 whitespace-nowrap">
@@ -188,7 +206,7 @@ function renderTable() {
               : 'text-green-500 border-green-500 bg-green-50 hover:bg-green-100'}
           "
           aria-haspopup="true" aria-expanded="false">
-          ${user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+          ${statusDisplay}
         </button>
       </td>
       <td class="px-6 py-6 whitespace-nowrap">
@@ -207,14 +225,14 @@ function renderTable() {
               <a href="/service-registry/update/${user.service_id}/r/${user.regId}"
                 class="flex items-center px-4 py-2 text-sm text-green-600 hover:bg-gray-100 rounded transition">
                 <i class="ion-android-create mr-2"></i>
-                Edit
+                ${window.translations.edit}
               </a>
             </li>
             <li>
               <button type="button" onclick="confirmDeleteService('${user.service_id}', '${user.regId}')"
                 class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition w-full text-left">
                 <i class="ion-android-trash mr-2"></i>
-                Delete
+                ${window.translations.delete}
               </button>
             </li>
           </ul>
@@ -353,8 +371,8 @@ if (data.length > 0) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-          <div class="text-lg font-medium mb-2">No data found</div>
-          <p>Create your first service registry entry to get started.</p>
+          <div class="text-lg font-medium mb-2">${window.translations.noDataFound}</div>
+          <p>${window.translations.createFirstEntry}</p>
         </td>
       </tr>
     `;
@@ -362,7 +380,7 @@ if (data.length > 0) {
   if (statusTabs) {
     statusTabs.innerHTML = `
       <button class="flex items-center gap-1 px-4 py-2 text-white bg-gray-900 rounded-full">
-        All <span class="bg-gray-700 text-white text-xs px-2 py-0.5 rounded-full">0</span>
+        ${window.translations.all} <span class="bg-gray-700 text-white text-xs px-2 py-0.5 rounded-full">0</span>
       </button>
     `;
   }
