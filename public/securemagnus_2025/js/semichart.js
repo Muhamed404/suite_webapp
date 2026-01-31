@@ -427,8 +427,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const totalScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Interactions', 'Repeated Interactions', 'No Interactions'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, totalInteractions, noScan, uniqueColor, totalScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelTotalInteractions || 'Total Interactions');
+    const labels = [window.localizedLabels?.uniqueInteractions || 'Unique Interactions', window.localizedLabels?.repeatedInteractions || 'Repeated Interactions', window.localizedLabels?.noInteractions || 'No Interactions'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, totalInteractions, noScan, uniqueColor, totalScanColor, noScanColor, labels, window.localizedLabels?.repeatedInteractions || 'Total Interactions');
   });
 
   document.querySelectorAll('.nfcSemiChartSubmitted').forEach((el) => {
@@ -438,8 +438,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const totalSubmittedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Submitted', 'Repeated Submitted', 'No Submitted'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, totalSubmitted, noScan, uniqueColor, totalSubmittedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelTotalSubmitted || 'Total Submitted');
+    const labels = [window.localizedLabels?.uniqueSubmitted || 'Unique Submitted', window.localizedLabels?.repeatedSubmitted || 'Repeated Submitted', window.localizedLabels?.noSubmitted || 'No Submitted'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, totalSubmitted, noScan, uniqueColor, totalSubmittedScanColor, noScanColor, labels, window.localizedLabels?.repeatedSubmitted || 'Total Submitted');
   });
 
 

@@ -37,12 +37,12 @@
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-paper-plane mr-1"></i>
-                        <%= inviteesCountStats?.totalSent || 0 %> Sent
+                        <%= inviteesCountStats?.totalSent || 0 %> <%= __("whatsapp.campaign_details.total_sms_sent") || "Sent" %>
                     </span>
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-clock mr-1"></i>
-                        <%= inviteesCountStats?.totalUnSent || 0 %> Unsent
+                        <%= inviteesCountStats?.totalUnSent || 0 %> <%= __("whatsapp.campaign_details.unsent") || "Unsent" %>
                     </span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -54,8 +54,8 @@
                                         style="width: <%= sentPercent %>%"></div>
                 </div>
                 <div class="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Sent</span>
-                    <span>Unsent</span>
+                    <span><%= __("whatsapp.campaign_details.total_sms_sent") || "Sent" %></span>
+                    <span><%= __("whatsapp.campaign_details.unsent") || "Unsent" %></span>
                 </div>
             </div>
 
@@ -73,13 +73,13 @@
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-check mr-1"></i>
-                        <%= campaign?.whatsappStats?.totalDelivered || 0 %> Delivered
+                        <%= campaign?.whatsappStats?.totalDelivered || 0 %> <%= __("whatsapp.campaign_details.sms_delivered") || "Delivered" %>
                     </span>
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-times mr-1"></i>
                         <%= (campaign?.whatsappStats?.totalSMSSent || 0) - (campaign?.whatsappStats?.totalDelivered ||
-                            0) %> Not Delivered
+                            0) %> <%= __("whatsapp.campaign_details.not_delivered") || "Not Delivered" %>
                     </span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -90,8 +90,8 @@
                                     style="width: <%= deliveredPercent %>%"></div>
                 </div>
                 <div class="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Delivered</span>
-                    <span>Not Delivered</span>
+                    <span><%= __("whatsapp.campaign_details.sms_delivered") || "Delivered" %></span>
+                    <span><%= __("whatsapp.campaign_details.not_delivered") || "Not Delivered" %></span>
                 </div>
             </div>
 
@@ -109,13 +109,13 @@
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-mouse-pointer mr-1"></i>
-                        <%= campaign?.whatsappStats?.is_link_clicked || 0 %> Clicked
+                        <%= campaign?.whatsappStats?.is_link_clicked || 0 %> <%= __("whatsapp.campaign_details.clicked") || "Clicked" %>
                     </span>
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-times mr-1"></i>
                         <%= (campaign?.whatsappStats?.totalSMSSent || 0) - (campaign?.whatsappStats?.is_link_clicked ||
-                            0) %> Not Clicked
+                            0) %> <%= __("whatsapp.campaign_details.not_clicked") || "Not Clicked" %>
                     </span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -127,8 +127,8 @@
                                     style="width: <%= clickedPercent %>%"></div>
                 </div>
                 <div class="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Clicked</span>
-                    <span>Not Clicked</span>
+                    <span><%= __("whatsapp.campaign_details.clicked") || "Clicked" %></span>
+                    <span><%= __("whatsapp.campaign_details.not_clicked") || "Not Clicked" %></span>
                 </div>
             </div>
 
@@ -146,13 +146,13 @@
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-orange-100 text-orange-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-eye mr-1"></i>
-                        <%= campaign?.whatsappStats?.is_page_visited || 0 %> Visited
+                        <%= campaign?.whatsappStats?.is_page_visited || 0 %> <%= __("whatsapp.campaign_details.visited") || "Visited" %>
                     </span>
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-times mr-1"></i>
                         <%= (campaign?.whatsappStats?.totalSMSSent || 0) - (campaign?.whatsappStats?.is_page_visited ||
-                            0) %> Not Visited
+                            0) %> <%= __("whatsapp.campaign_details.not_visited") || "Not Visited" %>
                     </span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -164,8 +164,8 @@
                                     style="width: <%= visitedPercent %>%"></div>
                 </div>
                 <div class="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Visited</span>
-                    <span>Not Visited</span>
+                    <span><%= __("whatsapp.campaign_details.visited") || "Visited" %></span>
+                    <span><%= __("whatsapp.campaign_details.not_visited") || "Not Visited" %></span>
                 </div>
             </div>
 
@@ -183,13 +183,13 @@
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-teal-100 text-teal-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-check-double mr-1"></i>
-                        <%= campaign?.whatsappStats?.is_form_submitted || 0 %> Submitted
+                        <%= campaign?.whatsappStats?.is_form_submitted || 0 %> <%= __("whatsapp.campaign_details.submitted") || "Submitted" %>
                     </span>
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-times mr-1"></i>
                         <%= (campaign?.whatsappStats?.totalSMSSent || 0) - (campaign?.whatsappStats?.is_form_submitted
-                            || 0) %> Not Submitted
+                            || 0) %> <%= __("whatsapp.campaign_details.not_submitted") || "Not Submitted" %>
                     </span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -201,8 +201,8 @@
                                     style="width: <%= submittedPercent %>%"></div>
                 </div>
                 <div class="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Submitted</span>
-                    <span>Not Submitted</span>
+                    <span><%= __("whatsapp.campaign_details.submitted") || "Submitted" %></span>
+                    <span><%= __("whatsapp.campaign_details.not_submitted") || "Not Submitted" %></span>
                 </div>
             </div>
 
@@ -220,13 +220,13 @@
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-file-download mr-1"></i>
-                        <%= campaign?.whatsappStats?.is_file_downloaded || 0 %> Downloaded
+                        <%= campaign?.whatsappStats?.is_file_downloaded || 0 %> <%= __("whatsapp.campaign_details.downloaded") || "Downloaded" %>
                     </span>
                     <span
                         class="inline-flex items-center px-3 py-1 rounded-full bg-gray-200 text-gray-700 text-xs font-semibold whitespace-nowrap">
                         <i class="fas fa-times mr-1"></i>
                         <%= (campaign?.whatsappStats?.totalSMSSent || 0) - (campaign?.whatsappStats?.is_file_downloaded
-                            || 0) %> Not Downloaded
+                            || 0) %> <%= __("whatsapp.campaign_details.not_downloaded") || "Not Downloaded" %>
                     </span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
@@ -238,8 +238,8 @@
                                     style="width: <%= downloadedPercent %>%"></div>
                 </div>
                 <div class="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Downloaded</span>
-                    <span>Not Downloaded</span>
+                    <span><%= __("whatsapp.campaign_details.downloaded") || "Downloaded" %></span>
+                    <span><%= __("whatsapp.campaign_details.not_downloaded") || "Not Downloaded" %></span>
                 </div>
             </div>
         </div>
@@ -435,11 +435,10 @@
                     <%= __("whatsapp.campaign_details.invitee_responses") || "Invitee Responses" %>
                 </h2>
                 <div class="relative flex-1 max-w-xs">
-                    <input type="text" id="responseSearchInput" placeholder="<%= __(" generic_label.search_here")
-                        || 'Search...' %>"
+                    <input type="text" id="responseSearchInput" placeholder="<%= __("generic_label.search_here") || 'Search here...' %>"
                     class="w-full pl-10 pr-4 py-2 rounded-full bg-gray-50 text-sm border border-gray-300
                     focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-[49%] text-gray-400"></i>
                 </div>
             </div>
 
@@ -486,14 +485,14 @@
                 <div class="flex flex-wrap gap-1 justify-center">
                     <button id="prevBtn"
                         class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm whitespace-nowrap">
-                        <i class="fas fa-chevron-left mr-1"></i>
+                        <i class="fas <%= locals.locale === 'ar' ? 'fa-chevron-right' : 'fa-chevron-left' %> mr-1"></i>
                         <%= __("generic_label.previous") || "Previous" %>
                     </button>
                     <div id="pageNumbers" class="flex flex-wrap gap-1 justify-center"></div>
                     <button id="nextBtn"
                         class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm whitespace-nowrap">
                         <%= __("generic_label.next") || "Next" %>
-                            <i class="fas fa-chevron-right ml-1"></i>
+                            <i class="fas <%= locals.locale === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' %> ml-1"></i>
                     </button>
                 </div>
             </div>
@@ -539,7 +538,8 @@
         fileDownloaded: '<%= __("whatsapp.campaign_details.file_downloaded") || "File Downloaded" %>',
         noInteraction: '<%= __("whatsapp.campaign_details.no_interaction") || "No Interaction" %>',
         interacted: '<%= __("whatsapp.campaign_details.interacted") || "Interacted" %>',
-        
+        showing: '<%= __("generic_label.showing") || "Showing" %>',
+        of: '<%= __("generic_label.of") || "of" %>'
     };
 </script>
 <script src="/securemagnus_2025/js/custom_script/whatsapp-campaign-detail-report.js"></script>
@@ -583,7 +583,7 @@
                     const startIdx = (page - 1) * ITEMS_PER_PAGE + 1;
                     const endIdx = Math.min(page * ITEMS_PER_PAGE, result.pagination.total);
                     document.getElementById('paginationInfo').textContent =
-                        `Showing ${startIdx}-${endIdx} of ${result.pagination.total}`;
+                        `${window.I18N.showing} ${startIdx}-${endIdx} ${window.I18N.of} ${result.pagination.total}`;
 
                     renderPaginationControls();
                 } else {
@@ -605,7 +605,7 @@
             tbody.innerHTML = `
                 <tr>
                     <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                        No invitee responses yet
+                        <%= __("whatsapp.campaign_details.no_invitees") || "No invitee responses yet" %>
                     </td>
                 </tr>
             `;

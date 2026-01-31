@@ -11,30 +11,30 @@
       <div id="steps">
         <div class="step fade-enter-active">
           <!-- Section Title -->
-          <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10">Edit Service Registry</h1>
+          <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10"><%= __("generic_label.edit_service_registry") %></h1>
           <!-- Main Form -->
-          <form class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start"
+          <form id="editServiceForm" class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start"
             action="/service-registry/update/<%= service.service_id %>/r/<%=service.id%>" method="post">
             <!-- Left Side: App/License/Duration -->
             <div class="flex flex-col gap-6">
               <div>
-                <label class="block text-gray-700 font-medium mb-3">Service ID</label>
-                <input placeholder="Enter service ID" type="text" id="serviceId" name="serviceId"
+                <label class="block text-gray-700 font-medium mb-3"><%= __("generic_label.service_id") %></label>
+                <input placeholder="<%= __("generic_label.enter_service_id") %>" type="text" id="serviceId" name="serviceId"
                   value="<%= service?.service_id || '' %>"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-gray-100 cursor-not-allowed"
                   readonly />
-                <p class="text-xs text-gray-500 mt-1">Service ID cannot be changed</p>
+                <p class="text-xs text-gray-500 mt-1"><%= __("generic_label.service_id_cannot_be_changed") %></p>
               </div>
               </div>
 
 
               <div>
-                <label class="block text-gray-700 font-medium mb-3">Service Type</label>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("settings.serviceRegistry.create.labelServiceType") %></label>
                 <select name="serviceType" class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] 
                   bg-transparent">
-                  <option value="BACKEND" <%=service.service_type==='BACKEND' ? 'selected' : '' %>>BACKEND</option>
-                  <option value="INTERNAL" <%=service.service_type==='INTERNAL' ? 'selected' : '' %>>INTERNAL</option>
-                  <option value="EXTERNAL" <%=service.service_type==='EXTERNAL' ? 'selected' : '' %>>EXTERNAL</option>
+                  <option value="BACKEND" <%=service.service_type==='BACKEND' ? 'selected' : '' %>><%= __("settings.serviceRegistry.create.optionSelectBackend") %></option>
+                  <option value="INTERNAL" <%=service.service_type==='INTERNAL' ? 'selected' : '' %>><%= __("settings.serviceRegistry.create.optionSelectInternal") %></option>
+                  <option value="EXTERNAL" <%=service.service_type==='EXTERNAL' ? 'selected' : '' %>><%= __("settings.serviceRegistry.create.optionSelectExternal") %></option>
 
                 </select>
               </div>
@@ -43,44 +43,45 @@
 
 
               <div>
-                <label class="block text-gray-700 font-medium mb-3">Public Key</label>
-                <textarea placeholder="Enter public key" id="public_key" name="public_key" rows="10"
+                <label class="block text-gray-700 font-medium mb-3"><%= __("settings.serviceRegistry.create.labelPublicKey") %></label>
+                <textarea placeholder="<%= __("generic_label.enter_public_key") %>" id="public_key" name="public_key" rows="10"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent">
                   <%= service?.public_key.trim() || '' %>
                   </textarea>
-              </div>
-              <!-- Buttons -->
-              <div>
-                <a href="/service-registry/"
-                  class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition">Cancel</a>
-                <button type="submit"
-                  class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition">Save</button>
               </div>
             </div>
 
             <!-- Right Side: Package/Start Date -->
             <div class="flex flex-col gap-6">
               <div>
-                <label class="block text-gray-700 font-medium mb-3">Service Name</label>
-                <input placeholder="Enter service name" type="text" id="serviceName" name="serviceName"
+                <label class="block text-gray-700 font-medium mb-3"><%= __("generic_label.service_name") %></label>
+                <input placeholder="<%= __("generic_label.enter_service_name") %>" type="text" id="serviceName" name="serviceName"
                   value="<%= service?.service_name || '' %>"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-gray-100 cursor-not-allowed"
                   readonly />
-                <p class="text-xs text-gray-500 mt-1">Service Name cannot be changed</p>
+                <p class="text-xs text-gray-500 mt-1"><%= __("generic_label.service_name_cannot_be_changed") %></p>
               </div>
               </div>
 
 
               <div>
-                <label class="block text-gray-700 font-medium mb-3">Status</label>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("generic_label.status") %></label>
                 <select name="status" class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] 
                   bg-transparent">
-                  <option value="Active" <%=service.status ? 'selected' : '' %>>Active</option>
-                  <option value="Suspended" <%=!service.status ? 'selected' : '' %>>Suspended</option>
+                  <option value="Active" <%=service.status ? 'selected' : '' %>><%= __("generic_label.active") %></option>
+                  <option value="Suspended" <%=!service.status ? 'selected' : '' %>><%= __("generic_label.suspended") %></option>
                 </select>
               </div>
             </div>
-            <!-- </form> -->
+          </form>
+          
+          <!-- Buttons -->
+          <div class="flex justify-end gap-4 mt-10">
+            <a href="/service-registry/"
+              class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition"><%= __("generic_label.cancel") %></a>
+            <button type="submit" form="editServiceForm"
+              class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition"><%= __("generic_label.save") %></button>
+          </div>
         </div>
       </div>
 

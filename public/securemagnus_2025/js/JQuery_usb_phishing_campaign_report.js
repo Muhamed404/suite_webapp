@@ -24,9 +24,9 @@ var barOptions = {
   },
   xaxis: {
     categories: [
-      'Total Devices',
-      'Total Plugged',
-      'Total Unplugged',
+      window.i18n?.usb_campaign?.report?.total_devices || 'Total Devices',
+      window.i18n?.usb_campaign?.report?.total_plugged || 'Total Plugged',
+      window.i18n?.usb_campaign?.report?.total_unplugged || 'Total Unplugged',
     ],
     labels: {
       style: {

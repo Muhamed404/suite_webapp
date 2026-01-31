@@ -95,7 +95,7 @@ exports.updateTemplateController = async (req, res) => {
     const response = await apiClient.post(url, payload);
     logger.info(`Controller - Update Template: Backend response: ${JSON.stringify(response.data)}`);
     if (response.data.success) {
-      req.flash('message', 'Template saved successfully');
+      req.flash('message', req.__('system_template.save_success'));
       req.flash('alertType', 'success');
       return res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);
     } else {

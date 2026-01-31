@@ -39,7 +39,7 @@ exports.generateNFCDeviceReport = async (req, res) => {
     const nfcReportProfile = response?.data?.message.nfcReportProfile || {};
     logger.info(`[NFC Device Report Controller]: NFC Report Profile: ${JSON.stringify(nfcReportProfile, null, 2)}`);
     // Transform interaction stats into timeline format
-    const interactionTimeline = transformInteractionStatsTimeline(nfcReportProfile);
+    const interactionTimeline = transformInteractionStatsTimeline(nfcReportProfile, req);
     logger.info(`[NFC Device Report Controller]: Interaction Timeline: ${JSON.stringify(interactionTimeline, null, 2)}`);
 
     return res.render(render_ejs_urls.PhishMagnus.Campaign.NFC.RENDER_TAG_REPORT, {
@@ -61,14 +61,14 @@ exports.generateNFCDeviceReport = async (req, res) => {
 };
 
 // Add this function to your emailUserReport.js controller
-function transformInteractionStatsTimeline(nfcReportProfile) {
+function transformInteractionStatsTimeline(nfcReportProfile, req) {
   const interactions = [];
   const nfcReport = nfcReportProfile?.QRReport?.[0];
 
   // QR Created
   if (nfcReport?.createdAt) {
     interactions.push({
-      name: "NFC Created",
+      name: req.__('qr_report.nfc_created'),
       time: nfcReport.createdAt
     });
   }
@@ -76,7 +76,7 @@ function transformInteractionStatsTimeline(nfcReportProfile) {
   // NFC Scanned
   if (nfcReport?.is_opened > 0 && nfcReport?.msg_link_opened_date) {
     interactions.push({
-      name: "Scanned",
+      name: req.__('qr_report.scanned'),
       time: nfcReport.msg_link_opened_date
     });
   }
@@ -84,7 +84,7 @@ function transformInteractionStatsTimeline(nfcReportProfile) {
   // Interact Form
   if (nfcReport?.is_interacted > 0 && nfcReport?.form_interaction_date) {
     interactions.push({
-      name: "Interact Form",
+      name: req.__('qr_report.interact_form'),
       time: nfcReport.form_interaction_date
     });
   }
@@ -92,7 +92,7 @@ function transformInteractionStatsTimeline(nfcReportProfile) {
   // Form Submit
   if (nfcReport?.is_submitted > 0 && nfcReport?.form_submitted_date) {
     interactions.push({
-      name: "Form Submit",
+      name: req.__('qr_report.form_submit'),
       time: nfcReport.form_submitted_date
     });
   }
@@ -100,7 +100,7 @@ function transformInteractionStatsTimeline(nfcReportProfile) {
   // Attachment Open
   if (nfcReport?.is_downloaded > 0 && nfcReport?.file_download_date) {
     interactions.push({
-      name: "Attachment Open",
+      name: req.__('qr_report.attachment_open'),
       time: nfcReport.file_download_date
     });
   }

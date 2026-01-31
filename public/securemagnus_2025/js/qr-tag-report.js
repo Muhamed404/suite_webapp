@@ -99,8 +99,8 @@ if (events.length > 0) {
   document.querySelector("#chart").innerHTML = `
     <div class="flex items-center justify-center h-96 text-gray-500">
       <div class="text-center">
-        <h3 class="text-lg font-medium mb-2">No Timeline Data</h3>
-        <p>No user interactions recorded for this campaign yet.</p>
+        <h3 class="text-lg font-medium mb-2">${window.i18n?.qr_report?.no_timeline_data || 'No Timeline Data'}</h3>
+        <p>${window.i18n?.qr_report?.no_user_interactions || 'No user interactions recorded for this campaign yet.'}</p>
       </div>
     </div>
   `;
@@ -123,9 +123,10 @@ const targetCompromised = qrScanned + formInteracted + formSubmitted + attachmen
 const total = qrScanned + formInteracted + targetCompromised;
 
 // Update DOM elements with real data
-document.getElementById('qrScanned').innerText = `${qrScanned} Times`;
-document.getElementById('formInteract').innerText = `${formInteracted} Times`;
-document.getElementById('targetCompromisedText').innerText = `${targetCompromised} Times`;
+const timesText = window.i18n?.qr_report?.times || 'Times';
+document.getElementById('qrScanned').innerText = `${qrScanned} ${timesText}`;
+document.getElementById('formInteract').innerText = `${formInteracted} ${timesText}`;
+document.getElementById('targetCompromisedText').innerText = `${targetCompromised} ${timesText}`;
 
 // Success Chart with real data
 var successOptions = {
@@ -134,7 +135,11 @@ var successOptions = {
     type: 'donut',
     height: '100%'
   },
-  labels: ['QR Scanned', 'Links Clicked', 'Target Compromised'],
+  labels: [
+    window.i18n?.qr_report?.qr_scanned || 'QR Scanned',
+    window.i18n?.qr_report?.links_clicked || 'Links Clicked', 
+    window.i18n?.qr_report?.target_compromised || 'Target Compromised'
+  ],
   colors: ['#38bdf8', '#f87171', '#34d399'],
   dataLabels: { enabled: false },
   plotOptions: {
@@ -153,7 +158,7 @@ var successOptions = {
           },
           total: {
             show: true,
-            label: 'Total Actions',
+            label: window.i18n?.qr_report?.total_actions || 'Total Actions',
             fontSize: '14px',
             color: '#6b7280',
             fontWeight: 'normal',
@@ -169,7 +174,7 @@ var successOptions = {
     enabled: true,
     y: {
       formatter: function (val) {
-        return val + ' Times';
+        return val + ' ' + (window.i18n?.qr_report?.times || 'Times');
       }
     }
   }
@@ -191,11 +196,11 @@ var segmentsOptions = {
     height: 300
   },
   labels: [
-    'QR Scanned',
-    'QR Not Scanned',
-    'Interact Form',
-    'Submit Data',
-    'Attachment Opened'
+    window.i18n?.qr_report?.qr_scanned || 'QR Scanned',
+    window.i18n?.qr_report?.qr_not_scanned || 'QR Not Scanned',
+    window.i18n?.qr_report?.interact_form || 'Interact Form',
+    window.i18n?.qr_report?.submit_data || 'Submit Data',
+    window.i18n?.qr_report?.attachment_opened || 'Attachment Opened'
   ],
   colors: ['#60a5fa', '#e5e7eb', '#fbbf24', '#a78bfa', '#4ade80'],
   legend: {
@@ -211,7 +216,7 @@ var segmentsOptions = {
     enabled: true,
     y: {
       formatter: function (val) {
-        return val + " Times";
+        return val + " " + (window.i18n?.qr_report?.times || 'Times');
       }
     }
   },
@@ -242,7 +247,7 @@ var reportOptions = {
     enabled: true,
     y: {
       formatter: function (val) {
-        return val + ' Times';
+        return val + ' ' + (window.i18n?.qr_report?.times || 'Times');
       }
     }
   }

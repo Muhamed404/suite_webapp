@@ -208,7 +208,7 @@ exports.editUser = async (req, res) => {
     }
 
     // Success - redirect based on user organization
-    req.flash("message", userResponse.data.message || "User updated successfully.");
+    req.flash("message", req.__('user_management.edit_user.user_updated_successfully'));
     req.flash("alertType", "success");
 
     const redirectUrl = getSuccessRedirectUrl(req.user);

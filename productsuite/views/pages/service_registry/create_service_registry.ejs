@@ -59,5 +59,19 @@
 </div>
 
 <!-- expose server-side arrays for client JS -->    
+<script>
+    window.validationTranslations = {
+        service_type_required: "<%= __("generic_label.service_type_required") %>",
+        service_name_required: "<%= __("generic_label.service_name_required") %>",
+        service_id_required: "<%= __("generic_label.service_id_required") %>",
+        public_key_required: "<%= __("generic_label.public_key_required") %>"
+    };
+    window.i18n = {
+        labels: {
+            finish: "<%= __("generic_label.finish") %>",
+            next: "<%= __("settings.serviceRegistry.create.btnNext") %>"
+        }
+    };
+</script>
 <script src="/securemagnus_2025/js/form_stepper.js"></script>
 <script src="/securemagnus_2025/js/custom_script/service-registry-validation.js"></script>

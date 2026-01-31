@@ -15,18 +15,18 @@ exports.createSMSSettings = async (req, res) => {
         const response = await apiClientInstance.post(url, req.body);
         if (response.data.success) {
             logger.info(`Controller - SMS Settings: Successfully created SMS for organization ID ${organizationId}`);
-            req.flash("message", "SMS Configuration created successfully.");
+            req.flash("message", req.__("sms.settings.create_success"));
             req.flash("alertType", "success");
             return res.redirect(`/organization/profile/${organizationId}`);
 
         }
 
         logger.error(`Create SMS Controller: Failed to create SMS for organization ID ${organizationId} - ${response.message}`);
-        req.flash("message", "SMS creation failed.");
+        req.flash("message", req.__("sms.settings.create_failed"));
         req.flash("alertType", "error");
         return res.redirect(`/sms/settings/${organizationId}`);
     } catch (err) {
-        req.flash("message", "SMS creation failed.");
+        req.flash("message", req.__("sms.settings.create_failed"));
         req.flash("alertType", "error");
         logger.error(`Create SMS Controller: Error creating SMS for organization ID ${organizationId} - ${err.message}`);
         logger.error(err.stack);

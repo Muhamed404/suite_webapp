@@ -1,20 +1,26 @@
+<style>
+.english-select {
+    padding-right: 40px;
+}
+</style>
+
 <!-- Modal -->
 <div id="popup" class="fixed inset-0 hidden bg-black bg-opacity-50 flex items-center justify-center z-50">
   <div class="bg-white rounded-2xl  w-[950px] max-h-[90vh] flex flex-col">
 
     <!-- Header -->
     <div class="flex justify-between items-center p-5 border-b bg-gradient-to-r rounded-t-2xl">
-      <h2 class="text-xl font-bold">Selected Users</h2>
+      <h2 class="text-xl font-bold"><%= __("user.modalSelectedUsers") %></h2>
       <button onclick="closeModal()" class=" text-2xl hover:text-red-400">&times;</button>
     </div>
     <!-- Select Dropdown -->
     <div class="flex items-center gap-4 px-5 py-3 bg-gray-50 border-b">
-      <label for="userActionSelect" class="text-gray-700 font-medium">Select Product:</label>
-      <select id="userActionSelect" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-400 bg-white text-gray-700">
-        <option value="">Choose a product</option>
-        <option value="awm">AwareMagnus</option>
-        <option value="phm">PhishMagnus</option>
-        <option value="grc">GRC</option>
+      <label for="userActionSelect" class="text-gray-700 font-medium"><%= __("user.labelSelectProductModal") %></label>
+      <select id="userActionSelect" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-teal-400 bg-white text-gray-700 <%= typeof locale !== 'undefined' && locale === 'en' ? 'english-select' : '' %>">
+        <option value=""><%= __("user.optionChooseProduct") %></option>
+        <option value="awm"><%= __("user.productAwareMagnus") %></option>
+        <option value="phm"><%= __("user.productPhishMagnus") %></option>
+        <option value="grc"><%= __("user.productGRC") %></option>
       </select>
     </div>
 
@@ -24,9 +30,9 @@
       <!-- Enrolled -->
       <div class="flex-1 border rounded-xl p-4   bg-white flex flex-col">
         <input type="text" id="enrolledSearch" onkeyup="filterTable('enrolledSearch','enrolledTable')"
-          placeholder="Search Enrolled"
+          placeholder="<%= __("user.placeholderSearchEnrolled") %>"
           class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-400 mb-4 text-sm">
-        <h3 class="text-lg font-semibold text-gray-800 mb-3">Enrolled</h3>
+        <h3 class="text-lg font-semibold text-gray-800 mb-3"><%= __("user.labelEnrolled") %></h3>
 
         <!-- Modern Table -->
         <div class="overflow-hidden rounded-lg flex-1 flex flex-col border">
@@ -37,8 +43,8 @@
                   <th class="px-4 py-2 border text-center w-12">
                     <input type="checkbox" onclick="toggleAll(this,'enrolledCheckbox')">
                   </th>
-                  <th class="px-4 py-2 border">First Name</th>
-                  <th class="px-4 py-2 border">Last Name</th>
+                  <th class="px-4 py-2 border"><%= __("user.labelFirstName") %></th>
+                  <th class="px-4 py-2 border"><%= __("user.labelLastName") %></th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200">
@@ -50,16 +56,16 @@
 
         <button onclick="moveToUnenrolled()"
           class="mt-4 px-4 py-2 bg-red-100 text-red-700 border border-red-300 rounded-lg hover:bg-red-200 transition">
-          Move to Unenrolled
+          <%= __("user.btnMoveToUnenrolled") %>
         </button>
       </div>
 
       <!-- Unenrolled -->
       <div class="flex-1 border rounded-xl p-4   bg-white flex flex-col">
         <input type="text" id="unenrolledSearch" onkeyup="filterTable('unenrolledSearch','unenrolledTable')"
-          placeholder=" Search Unenrolled"
+          placeholder="<%= __("user.placeholderSearchUnenrolled") %>"
           class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-teal-400 mb-4 text-sm">
-        <h3 class="text-lg font-semibold text-gray-800 mb-3">Unenrolled</h3>
+        <h3 class="text-lg font-semibold text-gray-800 mb-3"><%= __("user.labelUnenrolled") %></h3>
 
         <!-- Modern Table -->
         <div class="overflow-hidden rounded-lg   flex-1 flex flex-col border">
@@ -70,8 +76,8 @@
                   <th class="px-4 py-2 border text-center w-12">
                     <input type="checkbox" onclick="toggleAll(this,'unenrolledCheckbox')">
                   </th>
-                  <th class="px-4 py-2 border">First Name</th>
-                  <th class="px-4 py-2 border">Last Name</th>
+                  <th class="px-4 py-2 border"><%= __("user.labelFirstName") %></th>
+                  <th class="px-4 py-2 border"><%= __("user.labelLastName") %></th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200">
@@ -83,7 +89,7 @@
 
         <button onclick="moveToEnrolled()"
           class="mt-4 px-4 py-2 bg-green-100 text-green-700 border border-green-300 rounded-lg hover:bg-green-200 transition">
-          Move to Enrolled
+          <%= __("user.btnMoveToEnrolled") %>
         </button>
       </div>
     </div>
@@ -92,7 +98,7 @@
     <div class="p-5 border-t bg-gray-50 flex justify-center">
       <button onclick="closeModal()"
         class="px-8 py-3 bg-teal-500  text-white font-semibold rounded-full   hover:opacity-90 transition">
-        Done
+        <%= __("user.btnDone") %>
       </button>
     </div>
   </div>

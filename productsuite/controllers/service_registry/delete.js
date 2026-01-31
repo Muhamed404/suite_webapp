@@ -11,7 +11,7 @@ exports.deleteService = async (req, res) => {
     try {
         if (!registry_id || !service_id) {
             logger.warn(`${logTxn} - Missing registry_id or service_id in request parameters`);
-            req.flash('message', 'Invalid request parameters');
+            req.flash('message', req.__('generic_label.invalid_request_parameters'));
             req.flash('alertType', 'error');
             return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.LIST);
         }
@@ -20,16 +20,16 @@ exports.deleteService = async (req, res) => {
         const response = await apiClient.delete(backendUrl);
         if (response?.data?.success) {
             logger.info(`${logTxn} - Service registry deleted successfully`);
-            req.flash('message', 'Service deleted successfully!');
+            req.flash('message', req.__('generic_label.service_deleted_successfully'));
             req.flash('alertType', 'success');
         } else {
             logger.warn(`${logTxn} - Service registry deletion failed: ${response.data.message}`);
-            req.flash('message', response.data.message || 'Service registry deletion failed');
+            req.flash('message', response.data.message || req.__('generic_label.service_registry_deletion_failed'));
             req.flash('alertType', 'error');
         }
     } catch (error) {
         logger.error(`${logTxn} - Error deleting service registry: ${error.message}`);
-        req.flash('message', error.response?.data?.message || 'Unable to delete service registry');
+        req.flash('message', error.response?.data?.message || req.__('generic_label.unable_to_delete_service_registry'));
         req.flash('alertType', 'error');
     }
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.LIST);

@@ -102,7 +102,7 @@ exports.renderWhatsappCampaignReport = async (req, res) => {
             message: req.flash('message')[0] || null,
             alertType: req.flash('alertType')[0] || null,
             hasMessages: campaigns.length === 0,
-            emptyMessage: 'No SMS campaigns found. Create a new campaign to get started.'
+            emptyMessage: req.__('whatsapp.campaign_report.empty_message')
         };
 
         logger.info(`[SMS Campaign Report] Rendering template with ${campaigns.length} campaigns`);

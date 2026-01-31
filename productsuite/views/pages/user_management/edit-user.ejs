@@ -11,29 +11,29 @@
       <div id="steps">
         <div class="step fade-enter-active">
           <!-- Section Title -->
-          <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10">Edit User Details</h1>
+          <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10"><%= __('user_management.edit_user.edit_user_details') %></h1>
           <!-- Main Form -->
           <form class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start" action="/user/update/<%= user.id %>" method="post" autocomplete="off">
             <!-- Left Side: App/License/Duration -->
             <div class="flex flex-col gap-6">
               <div>
-                <label class="block text-gray-700 font-medium mb-3">First Name</label>
-                <input placeholder="Enter first name" type="text" id="firstName" name="firstName"
+                <label class="block text-gray-700 font-medium mb-3"><%= __('user_management.edit_user.first_name') %></label>
+                <input placeholder="<%= __('user_management.edit_user.enter_first_name') %>" type="text" id="firstName" name="firstName"
                   value="<%= user.UserProfile?.first_name || '' %>"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
                   tabindex="-1" readonly />
               </div>
               <div>
-                <label class="block text-gray-700 font-medium mb-3">Email</label>
-                <input placeholder="Enter email" type="text" value="<%= user.UserProfile?.email || '' %>" id="email"
+                <label class="block text-gray-700 font-medium mb-3"><%= __('user_management.edit_user.email') %></label>
+                <input placeholder="<%= __('user_management.edit_user.enter_email') %>" type="text" value="<%= user.UserProfile?.email || '' %>" id="email"
                   name="email"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
                   tabindex="-1" readonly />
               </div>
 
               <div>
-                <label class="block text-gray-700 font-medium mb-3">New Password</label>
-                <input placeholder="Enter new password" type="password" id="newPassword" name="newPassword" value=""
+                <label class="block text-gray-700 font-medium mb-3"><%= __('user_management.edit_user.new_password') %></label>
+                <input placeholder="<%= __('user_management.edit_user.enter_new_password') %>" type="password" id="newPassword" name="newPassword" value=""
                   autocomplete="off"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)]
                   bg-transparent"
@@ -41,45 +41,45 @@
               </div>
 
               <div>
-                <label class="block text-gray-700 font-medium mb-3">Status</label>
+                <label class="block text-gray-700 font-medium mb-3"><%= __('user_management.edit_user.status') %></label>
                 <select name="status"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)]
                   bg-transparent"
                   tabindex="3">
-                  <option value="true" <%=user.status ? 'selected' : '' %>>Active</option>
-                  <option value="false" <%=!user.status ? 'selected' : '' %>>Inactive</option>
+                  <option value="true" <%=user.status ? 'selected' : '' %>><%= __('generic_label.active') %></option>
+                  <option value="false" <%=!user.status ? 'selected' : '' %>><%= __('generic_label.inactive') %></option>
                 </select>
               </div>
               <!-- Buttons -->
               <div>
                 <a href="/user/suite-users"
                   class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition"
-                  tabindex="4">Cancel</a>
+                  tabindex="4"><%= __('generic_label.cancel') %></a>
                 <button type="submit"
                   class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition"
-                  tabindex="5">Save</button>
+                  tabindex="5"><%= __('user_management.edit_user.save') %></button>
               </div>
             </div>
 
             <!-- Right Side: Package/Start Date -->
             <div class="flex flex-col gap-6">
               <div>
-                <label class="block text-gray-700 font-medium mb-3">Last Name</label>
-                <input placeholder="Enter last name" type="text" id="lastName" name="lastName"
+                <label class="block text-gray-700 font-medium mb-3"><%= __('user_management.edit_user.last_name') %></label>
+                <input placeholder="<%= __('user_management.edit_user.enter_last_name') %>" type="text" id="lastName" name="lastName"
                   value="<%= user.UserProfile?.last_name || '' %>"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
                   tabindex="-1" readonly />
               </div>
               <div>
-                <label class="block text-gray-700 font-medium mb-3">Role Assigned</label>
-                <input placeholder="Enter role assigned" type="text" value="<%= user.UserRole?.role_name || '' %>"
+                <label class="block text-gray-700 font-medium mb-3"><%= __('user_management.edit_user.role_assigned') %></label>
+                <input placeholder="<%= __('user_management.edit_user.enter_role_assigned') %>" type="text" value="<%= user.UserRole?.role_name || '' %>"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
                   tabindex="-1" readonly />
               </div>
 
               <div>
-                <label class="block text-gray-700 font-medium mb-3">Confirm Password</label>
-                <input placeholder="Enter confirm password" type="password" id="confirmPassword" name="confirmPassword"
+                <label class="block text-gray-700 font-medium mb-3"><%= __('user_management.edit_user.confirm_password') %></label>
+                <input placeholder="<%= __('user_management.edit_user.enter_confirm_password') %>" type="password" id="confirmPassword" name="confirmPassword"
                   autocomplete="off"
                   value=""
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
@@ -98,4 +98,119 @@
 </div>
 
 <!-- jQuery Validation -->
-<script src="/securemagnus_2025/js/custom_script/validate_edit_user.js"></script>
+<script>
+  // Localized validation messages
+  window.validationMessages = {
+    passwordComplexity: '<%= __('user_management.edit_user.password_complexity_error') %>',
+    confirmPasswordRequired: '<%= __('user_management.edit_user.confirm_password_required') %>',
+    newPasswordRequired: '<%= __('user_management.edit_user.new_password_required') %>',
+    passwordsMustMatch: '<%= __('user_management.edit_user.passwords_must_match') %>'
+  };
+</script>
+<script>
+$(document).ready(function() {
+    // Check if jQuery Validate plugin is available
+    if (typeof $.fn.validate === 'undefined') {
+        console.warn('jQuery Validate plugin not found. Loading fallback validation.');
+        initFallbackValidation();
+        return;
+    }
+
+    // Add custom validation method: password required only if confirmPassword is filled
+    $.validator.addMethod('requiredIfConfirmFilled', function(value, element) {
+        var confirmPassword = $('#confirmPassword').val();
+        // If confirm password has value, new password is required
+        if (confirmPassword && confirmPassword.trim() !== '') {
+            return value && value.trim() !== '';
+        }
+        return true; // Not required if confirm is empty
+    }, window.validationMessages.newPasswordRequired);
+
+    // Add custom validation method: confirmPassword required only if newPassword is filled
+    $.validator.addMethod('requiredIfNewFilled', function(value, element) {
+        var newPassword = $('#newPassword').val();
+        // If new password has value, confirm password is required
+        if (newPassword && newPassword.trim() !== '') {
+            return value && value.trim() !== '';
+        }
+        return true; // Not required if new password is empty
+    }, window.validationMessages.confirmPasswordRequired);
+
+    // Add custom validation method: passwords must match if both are filled
+    $.validator.addMethod('passwordMatch', function(value, element) {
+        var newPassword = $('#newPassword').val();
+        var confirmPassword = $('#confirmPassword').val();
+
+        // Only validate if both fields have values
+        if ((newPassword && newPassword.trim() !== '') || (confirmPassword && confirmPassword.trim() !== '')) {
+            return newPassword === confirmPassword;
+        }
+        return true; // Valid if both are empty
+    }, window.validationMessages.passwordsMustMatch);
+
+    // Add custom validation method: password complexity (only when password is provided)
+    $.validator.addMethod('strongPassword', function(value, element) {
+        // If password is provided, check complexity
+        if (value && value.trim() !== '') {
+            // At least 8 characters, one uppercase, one lowercase, one number, one special character
+            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
+        }
+        return true; // Valid if empty
+    }, window.validationMessages.passwordComplexity);
+
+    // Initialize jQuery Validation Plugin
+    var validator = $('form').validate({
+        // Validate on blur/change for better UX
+        onfocusout: function(element) {
+            $(element).valid();
+        },
+        onkeyup: function(element) {
+            // Re-validate both password fields when either changes
+            if ($(element).attr('id') === 'newPassword' || $(element).attr('id') === 'confirmPassword') {
+                $('#newPassword').valid();
+                $('#confirmPassword').valid();
+            } else {
+                $(element).valid();
+            }
+        },
+
+        // Custom error placement for better UI
+        errorElement: 'span',
+        errorClass: 'error-message',
+        errorPlacement: function(error, element) {
+            error.addClass('text-red-500 text-sm mt-1 block');
+            error.insertAfter(element);
+        },
+
+        // Highlight invalid fields
+        highlight: function(element) {
+            $(element).addClass('border-red-500 focus:ring-red-200 focus:border-red-500');
+            $(element).removeClass('border-gray-300 focus:border-teal-400 focus:ring-teal-200');
+        },
+
+        // Remove highlight when valid
+        unhighlight: function(element) {
+            $(element).removeClass('border-red-500 focus:ring-red-200 focus:border-red-500');
+            $(element).addClass('focus:border-teal-400 focus:ring-teal-200');
+        },
+
+        // Validation rules for all fields
+        rules: {
+            newPassword: {
+                requiredIfConfirmFilled: true,
+                strongPassword: true,
+                passwordMatch: true
+            },
+            confirmPassword: {
+                requiredIfNewFilled: true,
+                passwordMatch: true
+            },
+        },
+
+        // Custom messages (if needed)
+        messages: {
+            // Add any additional custom messages here if needed
+        }
+    });
+});
+</script>

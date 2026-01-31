@@ -5,10 +5,10 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   const table = document.getElementById('filter-table');
-  const placeholder = table.dataset.placeholder || 'Search...';
-  const perPageLabel = table.dataset.perPage || 'entries per page';
-  const infoLabel = table.dataset.info || 'Showing {start} to {end} of {rows} entries';
-  const noRowsLabel = table.dataset.noRows || 'No entries found';
+  const placeholder = table.dataset.placeholder || (window.translations && window.translations.search) || 'Search...';
+  const perPageLabel = table.dataset.perPage || (window.translations && window.translations.entriesPerPage) || 'entries per page';
+  const infoLabel = table.dataset.info || (window.translations && window.translations.datatableInfo) || 'Showing {start} to {end} of {rows} entries';
+  const noRowsLabel = table.dataset.noRows || (window.translations && window.translations.no_entries_found) || 'No entries found';
 
   const dataTable = new simpleDatatables.DataTable('#filter-table', {
     perPageSelect: [10, 20, 25, 50, 100],
