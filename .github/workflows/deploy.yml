@@ -1,4 +1,4 @@
-name: Deploy Suite Webapp (Express) to OCI Server
+name: Deploy Suite Webapp ( Express ) to OCI Server
 
 on:
   push:
