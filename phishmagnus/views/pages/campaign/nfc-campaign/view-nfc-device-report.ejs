@@ -10,14 +10,14 @@
 
 
     <!-- Title -->
-    <h1 class="my-2 text-2xl font-semibold">Tag Report : <%=nfcReportProfile.nfc_code%>
+    <h1 class="my-2 text-2xl font-semibold"><%= __('nfc_campaign.tagReport') %> : <%=nfcReportProfile.nfc_code%>
     </h1>
 
         <!-- Top Metrics -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div class="bg-white p-4 flex flex-col rounded-xl">
                 <div class="flex items-center justify-between gap-2 mb-8">
-                    <p class="text-gray-500 text-sm">Total Not Scans</p>
+                    <p class="text-gray-500 text-sm"><%= __('nfc_campaign.totalNotScans') %></p>
                     <img src="/securemagnus_2025/images/Icons_Campaign_Report/Report_Admin.svg" alt="">
                 </div>
                 <p class="text-4xl">
@@ -27,7 +27,7 @@
             </div>
             <div class="bg-white p-4 flex flex-col rounded-xl">
                 <div class="flex items-center justify-between gap-2 mb-8">
-                    <p class="text-gray-500 text-sm">Open</p>
+                    <p class="text-gray-500 text-sm"><%= __('nfc_campaign.opened') %></p>
                     <img src="/securemagnus_2025/images/Icons_Campaign_Report/Opened_by_people.svg" alt="">
                 </div>
                 <p class="text-4xl">
@@ -36,7 +36,7 @@
             </div>
             <div class="bg-white p-4 flex flex-col rounded-xl">
                 <div class="flex items-center justify-between gap-2 mb-8">
-                    <p class="text-gray-500 text-sm">Download</p>
+                    <p class="text-gray-500 text-sm"><%= __('nfc_campaign.download') %></p>
                     <img src="/securemagnus_2025/images/Icons_Campaign_Report/not_opened.svg" alt="">
                 </div>
                 <p class="text-4xl">
@@ -46,7 +46,7 @@
             </div>
             <div class="bg-white p-4 flex flex-col rounded-xl">
                 <div class="flex items-center justify-between gap-2 mb-8">
-                    <p class="text-gray-500 text-sm">Total Submitted</p>
+                    <p class="text-gray-500 text-sm"><%= __('nfc_campaign.totalSubmitted') %></p>
                     <img src="/securemagnus_2025/images/Icons_Campaign_Report/link_Clicked.svg" alt="">
                 </div>
                 <p class="text-4xl">
@@ -56,7 +56,7 @@
             </div>
             <div class="bg-white p-4 flex flex-col rounded-xl">
                 <div class="flex items-center justify-between gap-2 mb-8">
-                    <p class="text-gray-500 text-sm">Total Interact</p>
+                    <p class="text-gray-500 text-sm"><%= __('nfc_campaign.totalInteract') %></p>
                     <img src="/securemagnus_2025/images/Icons_Campaign_Report/Report_Admin.svg" alt="">
                 </div>
                 <p class="text-4xl">
@@ -70,13 +70,13 @@
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <!-- Bar Chart -->
       <div class="col-span-2 p-6 bg-white rounded-xl">
-        <h2 class="mb-4 text-lg font-semibold">Campaign Metrics</h2>
+        <h2 class="mb-4 text-lg font-semibold"><%= __('nfc_campaign.campaignMetrics') %></h2>
         <div id="chart"></div>
       </div>
 
       <!-- Phishing Success -->
       <div class="flex flex-col items-start justify-start p-6 bg-white rounded-xl gap-11">
-        <h2 class="mb-4 text-lg font-semibold">Phishing Success</h2>
+        <h2 class="mb-4 text-lg font-semibold"><%= __('nfc_campaign.phishingSuccess') %></h2>
 
         <div class="flex items-center justify-between w-full gap-10">
           <!-- Left Side Labels -->
@@ -84,7 +84,7 @@
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-full bg-[#38bdf8]"></span>
               <div>
-                <p class="text-sm text-gray-500">QR View</p>
+                <p class="text-sm text-gray-500"><%= __('nfc_campaign.qrView') %></p>
                 <p class="text-lg font-bold text-gray-900" id="qrScanned">
                     
                 </p>
@@ -93,7 +93,7 @@
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-full bg-[#f87171]"></span>
               <div>
-                <p class="text-sm text-gray-500">Form Interacted</p>
+                <p class="text-sm text-gray-500"><%= __('nfc_campaign.formInteracted') %></p>
                 <p class="text-lg font-bold text-gray-900" id="formInteract">
                    
                 </p>
@@ -102,7 +102,7 @@
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-full bg-[#34d399]"></span>
               <div>
-                <p class="text-sm text-gray-500">Total Activity </p>
+                <p class="text-sm text-gray-500"><%= __('nfc_campaign.totalActivity') %></p>
                 <p class="text-lg font-bold text-gray-900" id="targetCompromisedText">
                   
                 </p>
@@ -121,36 +121,36 @@
       <!-- Employees Phishing Segments -->
       <div class="p-6 bg-white rounded-xl ">
         <h2 class="mb-4 text-lg font-semibold">
-          Phishing Segments
+          <%= __('nfc_campaign.phishingSegments') %>
         </h2>
         <div id="userPhishingSegmentsChart"></div>
       </div>
 
       <!-- Reported To Admin -->
       <div class="p-6 bg-white rounded-xl ">
-        <h2 class="mb-4 text-lg font-semibold">Employee response</h2>
+        <h2 class="mb-4 text-lg font-semibold"><%= __('nfc_campaign.employeeResponse') %></h2>
         <div id="reportChart"></div>
       </div>
 
       <!-- Employee Details -->
       <div class="p-6 bg-white rounded-xl ">
-        <h2 class="mb-6 text-lg font-semibold text-gray-800">NFC & Campaign Details</h2>
+        <h2 class="mb-6 text-lg font-semibold text-gray-800"><%= __('nfc_campaign.nfcCampaignDetails') %></h2>
         <div class="space-y-4">
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">NFC Device Code</span>
+            <span class="text-gray-500"><%= __('nfc_campaign.nfcDeviceCode') %></span>
             <span class="font-medium text-gray-800">
               <%=nfcReportProfile.nfc_code%>
             </span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Campaign Name</span>
+            <span class="text-gray-500"><%= __('nfc_campaign.campaignName') %></span>
             <span class="font-medium text-gray-800">
               <%=campaignDetails.name%>
             </span>
           </div>
  
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Campaign Date</span>
+            <span class="text-gray-500"><%= __('nfc_campaign.campaignDate') %></span>
             <span class="font-medium text-gray-800">              <%=campaignDetails.start_datetime%>
 </span>
           </div>
