@@ -165,7 +165,26 @@
 
 <script>
  
- 
+// Client-side i18n setup for NFC report
+window.i18n = {
+  qr_report: {
+    times: "<%= __('qr_report.times') %>",
+    no_timeline_data: "<%= __('qr_report.no_timeline_data') %>",
+    no_user_interactions: "<%= __('qr_report.no_user_interactions') %>",
+    qr_scanned: "<%= __('qr_report.qr_scanned') %>",
+    links_clicked: "<%= __('qr_report.links_clicked') %>",
+    target_compromised: "<%= __('qr_report.target_compromised') %>",
+    qr_not_scanned: "<%= __('qr_report.qr_not_scanned') %>",
+    interact_form: "<%= __('qr_report.interact_form') %>",
+    submit_data: "<%= __('qr_report.submit_data') %>",
+    attachment_opened: "<%= __('qr_report.attachment_opened') %>",
+    total_actions: "<%= __('qr_report.total_actions') %>",
+    nfc_created: "<%= __('qr_report.nfc_created') %>",
+    scanned: "<%= __('qr_report.scanned') %>",
+    attachment_open: "<%= __('qr_report.attachment_open') %>",
+    qr_created: "<%= __('qr_report.qr_created') %>"
+  }
+};
 </script>
 <script>
 

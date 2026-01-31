@@ -818,6 +818,18 @@
 		},
 		"report": {
 			"title": "USB Campaign Report",
+			"view_report_title": "USB Campaign View Report",
+			"total_usb_initiated": "Total USB Initiated",
+			"usb_plugged": "USB Plugged",
+			"usb_unplugged": "USB Unplugged",
+			"usb_campaign_metrics": "USB Campaign Metrics",
+			"download_usb_package": "Download USB Package",
+			"campaign_name": "Campaign Name",
+			"launch_date": "Launch Date",
+			"download": "Download",
+			"total_devices": "Total Devices",
+			"total_plugged": "Total Plugged",
+			"total_unplugged": "Total Unplugged",
 			"header": {
 				"campaign_name": "Campaign Name",
 				"total_usb": "Total USB's",
@@ -1556,7 +1568,11 @@
 		"target_compromised": "Target Compromised",
 		"qr_not_scanned": "QR Not Scanned",
 		"submit_data": "Submit Data",
-		"total_actions": "Total Actions"
+		"total_actions": "Total Actions",
+		"nfc_created": "NFC Created",
+		"scanned": "Scanned",
+		"attachment_open": "Attachment Open",
+		"qr_created": "QR Created"
 	},
 	"phishingCampaignResponseMetrics": "Phishing Campaign Response Metrics"
 }

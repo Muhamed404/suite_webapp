@@ -945,6 +945,18 @@
 		},
 		"report": {
 			"title": "تقرير حملة USB",
+			"view_report_title": "تقرير عرض حملة USB",
+			"total_usb_initiated": "إجمالي أجهزة USB المبادرة",
+			"usb_plugged": "USB متصل",
+			"usb_unplugged": "USB غير متصل",
+			"usb_campaign_metrics": "مقاييس حملة USB",
+			"download_usb_package": "تنزيل حزمة USB",
+			"campaign_name": "اسم الحملة",
+			"launch_date": "تاريخ الإطلاق",
+			"download": "تنزيل",
+			"total_devices": "إجمالي الأجهزة",
+			"total_plugged": "إجمالي المتصلة",
+			"total_unplugged": "إجمالي غير المتصلة",
 			"header": {
 				"campaign_name": "اسم الحملة",
 				"total_usb": "إجمالي أجهزة USB",
@@ -1825,7 +1837,11 @@
 		"target_compromised": "تم اختراق الهدف",
 		"qr_not_scanned": "لم يتم مسح QR",
 		"submit_data": "إرسال البيانات",
-		"total_actions": "إجمالي الإجراءات"
+		"total_actions": "إجمالي الإجراءات",
+		"nfc_created": "تم إنشاء NFC",
+		"scanned": "تم المسح",
+		"attachment_open": "فتح المرفق",
+		"qr_created": "تم إنشاء QR"
 	},
 	"phishingCampaignResponseMetrics": "phishingCampaignResponseMetrics",
 	"people": "people",
