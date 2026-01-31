@@ -1948,6 +1948,29 @@
 			"allocated": "مخصص",
 			"active": "نشط",
 			"inactive": "غير نشط"
+		},
+		"edit_user": {
+			"edit_user_details": "تعديل تفاصيل المستخدم",
+			"first_name": "الاسم الأول",
+			"email": "البريد الإلكتروني",
+			"new_password": "كلمة المرور الجديدة",
+			"status": "الحالة",
+			"cancel": "إلغاء",
+			"save": "حفظ",
+			"last_name": "اسم العائلة",
+			"role_assigned": "الدور المخصص",
+			"confirm_password": "تأكيد كلمة المرور",
+			"enter_first_name": "أدخل الاسم الأول",
+			"enter_email": "أدخل البريد الإلكتروني",
+			"enter_new_password": "أدخل كلمة المرور الجديدة",
+			"enter_last_name": "أدخل اسم العائلة",
+			"enter_role_assigned": "أدخل الدور المخصص",
+			"enter_confirm_password": "أدخل تأكيد كلمة المرور",
+			"user_updated_successfully": "تم تحديث المستخدم بنجاح",
+			"password_complexity_error": "يجب أن تكون كلمة المرور 8 أحرف على الأقل وتشمل حرف كبير وحرف صغير ورقم ورمز خاص (@$!%*?&).",
+			"confirm_password_required": "تأكيد كلمة المرور مطلوب عند توفير كلمة مرور جديدة",
+			"new_password_required": "كلمة المرور الجديدة مطلوبة عند توفير تأكيد كلمة المرور",
+			"passwords_must_match": "يجب أن تتطابق كلمات المرور"
 		}
 	}
 }

@@ -1619,6 +1619,29 @@
 			"allocated": "Allocated",
 			"active": "Active",
 			"inactive": "Inactive"
+		},
+		"edit_user": {
+			"edit_user_details": "Edit User Details",
+			"first_name": "First Name",
+			"email": "Email",
+			"new_password": "New Password",
+			"status": "Status",
+			"cancel": "Cancel",
+			"save": "Save",
+			"last_name": "Last Name",
+			"role_assigned": "Role Assigned",
+			"confirm_password": "Confirm Password",
+			"enter_first_name": "Enter first name",
+			"enter_email": "Enter email",
+			"enter_new_password": "Enter new password",
+			"enter_last_name": "Enter last name",
+			"enter_role_assigned": "Enter role assigned",
+			"enter_confirm_password": "Enter confirm password",
+			"user_updated_successfully": "User updated successfully",
+			"password_complexity_error": "Password must be at least 8 characters and include uppercase, lowercase, number, and special character (@$!%*?&).",
+			"confirm_password_required": "Confirm password is required when new password is provided",
+			"new_password_required": "New password is required when confirm password is provided",
+			"passwords_must_match": "Passwords must match"
 		}
 	},
 	"labelTrackingEmailDetails_level1": "Open Email (Level 1)"
