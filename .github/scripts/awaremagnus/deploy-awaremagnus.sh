@@ -69,7 +69,7 @@ sudo chmod -R 755 "$DEPLOY_DIR"
 # Install production dependencies only (since .next is already built)
 echo "Installing Node.js production dependencies..."
 cd "$DEPLOY_DIR"
-npm ci --only=production
+npm install --only=production
 
 # Create .env.local file from environment variables
 if [ -f "/tmp/create-awaremagnus-env.sh" ]; then
