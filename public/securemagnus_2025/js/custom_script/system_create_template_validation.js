@@ -275,7 +275,8 @@ $(document).ready(function () {
       phishOptionContainer.find('.validation-error').remove();
       
       if (!phishOption) {
-        phishOptionContainer.append('<div class="validation-error text-red-500 text-sm mt-2">Please select a phishing option.</div>');
+        const errorMessage = window.i18n?.validation_messages?.validationSelectPhishingOption || 'Please select a phishing option.';
+        phishOptionContainer.append(`<div class="validation-error text-red-500 text-sm mt-2">${errorMessage}</div>`);
         isValid = false;
       }
       
