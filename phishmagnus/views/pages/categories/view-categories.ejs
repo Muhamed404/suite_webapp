@@ -123,6 +123,14 @@
   </div>
 </div>
 
-
+<script>
+    // Pass translations to JavaScript for DataTables
+    window.translations = {
+        search: "<%= __("search") %>",
+        entriesPerPage: "<%= __("entriesPerPage") %>",
+        datatableInfo: "<%= __("datatableInfo") %>",
+        no_entries_found: "<%= __("no_entries_found") %>"
+    };
+</script>
 
 <%- include('../categories/upload-library-posters.ejs') %>

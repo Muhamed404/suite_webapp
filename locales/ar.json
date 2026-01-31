@@ -51,6 +51,20 @@
 		"paste_public_key_hint": "الصق مفتاحك العام في سطر واحد.",
 		"example": "مثال:",
 		"finish": "إنهاء",
+		"edit_service_registry": "تعديل سجل الخدمة",
+		"service_id": "معرّف الخدمة",
+		"service_name": "اسم الخدمة",
+		"public_key": "المفتاح العام",
+		"enter_public_key": "أدخل المفتاح العام",
+		"service_id_cannot_be_changed": "لا يمكن تغيير معرّف الخدمة",
+		"service_name_cannot_be_changed": "لا يمكن تغيير اسم الخدمة",
+		"invalid_service_id_passed": "تم تمرير معرّف خدمة غير صحيح. يرجى الاتصال بالمسؤول.",
+		"service_not_found": "الخدمة غير موجودة.",
+		"error_in_retrieving_service": "خطأ في استرجاع الخدمة.",
+		"invalid_service_id": "تم تمرير معرّف خدمة غير صحيح.",
+		"incomplete_data_submitted": "تم إرسال بيانات غير مكتملة. يرجى ملء جميع الحقول المطلوبة.",
+		"error_in_saving_service": "خطأ في حفظ الخدمة.",
+		"service_updated_successfully": "تم تحديث الخدمة بنجاح!",
 		"warning": "تحذير",
 		"info": "معلومات",
 		"confirm": "تأكيد",
@@ -1626,6 +1640,9 @@
 	"of": "من",
 	"entries": "الإدخالات",
 	"no_entries_found": "لم يتم العثور على إدخالات",
+	"datatableInfo": "عرض {start} إلى {end} من {rows} إدخال",
+	"entriesPerPage": "إدخال لكل صفحة",
+	"search": "بحث...",
 	"department": {
 		"labelDepartmentManagement": "إدارة الأقسام",
 		"labelDepartmentName": "اسم القسم",
@@ -1711,5 +1728,8 @@
 			},
 			"Action": "الإجراء"
 		}
-	}
+	},
+	"minimum_3_characters": "الحد الأدنى 3 أحرف",
+	"example_abc": "مثال: ABC",
+	"must_be_exactly_3_characters": "يجب أن يكون بالضبط 3 أحرف"
 }
