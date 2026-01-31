@@ -17,7 +17,7 @@ const editors = ['phishing_content', 'phishing_page_content', 'landing_page_cont
 // ✅ Conditions for step 2 options
 const conditions = {
   email: [
-    { id: 'open', title: 'Open Email (Level 1)', value: 'simple', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.simplePhishingDescription') : 'Simple phishing email template to monitor email open by users.' },
+    { id: 'open', title: window.i18n ? window.i18n.__('system_template.create.simplePhishingTitle') : 'Open Email (Level 1)', value: 'simple', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.simplePhishingDescription') : 'Simple phishing email template to monitor email open by users.' },
     { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing email template with file attached in the message to monitor download by users.' },
     { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'Email template with a dedicated URL for testing users visiting the phishing page.' }
   ],

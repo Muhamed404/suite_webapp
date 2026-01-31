@@ -78,8 +78,8 @@
               <td class="px-6 py-3 whitespace-nowrap">
                 <%= tpl.PhishingCategory ? tpl.PhishingCategory.name : __('Unknown') %>
               </td>
-              <td class="px-6 py-3 whitespace-nowrap">
-                <div class="flex items-center gap-2">
+              <td class="px-6 py-3 whitespace-nowrap text-left">
+                <div class="flex items-center gap-2" dir="ltr">
                   <!-- Edit -->
                   <%if(!disableOption.disableEdit) {%>
                     <a href="<%= typeof organization === 'undefined' ? '/template/view/' + tpl.id : '/phm/template/view/' + tpl.id %>"

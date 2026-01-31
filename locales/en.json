@@ -94,7 +94,10 @@
 		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today",
 		"entries": "entries",
 		"no_entries_found": "No entries found",
-		"people": "People"
+		"people": "People",
+		"to": "generic_label.to",
+		"search": "generic_label.search",
+		"show": "generic_label.show"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -683,6 +686,7 @@
 			"labelTrackingEmailDetails_level2": "Download File Based (Level 2) \n Phishing email template with file attached in the message to monitor download by users.",
 			"labelTrackingEmailDetails_level3": "URL Click Based (Level 3) \n Email template with a dedicated URL for testing users visiting the phishing page.",
 			"simplePhishingDescription": "Simple phishing email template to monitor email open by users.",
+			"simplePhishingTitle": "Open Email (Level 1)",
 			"downloadFileBasedTitle": "Download File Based (Level 2)",
 			"downloadFileBasedDescription": "Phishing email template with file attached in the message to monitor download by users.",
 			"urlClickBasedTitle": "URL Click Based (Level 3)",
@@ -727,7 +731,7 @@
 			"invalidUrlFormat": "Invalid URL format.",
 			"fetchButtonText": "Fetch",
 			"fetchingButtonText": "Fetching...",
-			"labelDetails_level2_title": "system_template.create.labelDetails_level2_title",
+			"labelDetails_level2_title": "Setup File Attachment",
 			"whatsappShortMessageTitle": "Short Message",
 			"whatsappShortMessageDescription": "Send a simple SMS message.",
 			"whatsappAttachUrlTitle": "Attach URL",
@@ -1055,18 +1059,37 @@
 			"edit": "Edit",
 			"back": "Back",
 			"total_sms_sent": "Sent",
+			"unsent": "Unsent",
 			"sms_delivered": "Delivered",
+			"not_delivered": "Not Delivered",
 			"link_clicked": "Link Clicked",
+			"clicked": "Clicked",
+			"not_clicked": "Not Clicked",
 			"page_visited": "Page Visited",
+			"visited": "Visited",
+			"not_visited": "Not Visited",
 			"form_submitted": "Form Submitted",
+			"submitted": "Submitted",
+			"not_submitted": "Not Submitted",
 			"file_downloaded": "File Downloaded",
+			"downloaded": "Downloaded",
+			"not_downloaded": "Not Downloaded",
 			"interaction_metrics": "Interaction Metrics",
 			"interaction_summary": "Interaction Summary",
 			"count": "Count",
 			"sms_reply_stats": "Reply Stats",
 			"sms_replied": "Replied",
+			"replied": "Replied",
+			"not_replied": "Not Replied",
 			"call_made": "Call Made",
+			"made_call": "Made Call",
+			"not_made_call": "Not Made Call",
 			"otp_shared": "OTP Shared",
+			"shared_otp": "Shared OTP",
+			"not_shared_otp": "Not Shared OTP",
+			"whatsapp_interacted": "WhatsApp Interacted",
+			"interacted": "Interacted",
+			"not_interacted": "Not Interacted",
 			"campaign_details": "Campaign Details",
 			"campaign_name": "Campaign Name",
 			"template_name": "Template",
@@ -1084,8 +1107,8 @@
 			"form_interacted": "Form Interacted",
 			"opened": "Opened",
 			"no_interaction": "No Interaction",
-			"interacted": "Interacted",
-			"no_invitees": "No invitee responses yet"
+			"no_invitees": "No invitee responses yet",
+			"invalid_id": "Invalid campaign ID"
 		}
 	},
 	"qr_campaign": {
@@ -1205,7 +1228,13 @@
 		"uniqueInteractions": "Unique Interactions",
 		"noInteractions": "No Interactions",
 		"uniqueSubmitted": "Unique Submitted",
-		"noSubmitted": "No Submitted"
+		"noSubmitted": "No Submitted",
+		"startDate": "Start Date",
+		"endDate": "End Date",
+		"status": "Status",
+		"totalNFCDevices": "Total NFC Devices",
+		"action": "Action",
+		"results": "results"
 	},
 	"Active": "Active",
 	"SubscriptionCancelled": "Subscription Cancelled",
@@ -1516,7 +1545,7 @@
 	"filterAll": "filterAll",
 	"filterActive": "filterActive",
 	"InProgress": "InProgress",
-	"filterCompleted": "filterCompleted",
+	"filterCompleted": "Completed",
 	"search_here": "search_here",
 	"no_data": "no_data",
 	"showing": "showing",
@@ -1574,5 +1603,20 @@
 		"attachment_open": "Attachment Open",
 		"qr_created": "QR Created"
 	},
-	"phishingCampaignResponseMetrics": "Phishing Campaign Response Metrics"
+	"phishingCampaignResponseMetrics": "Phishing Campaign Response Metrics",
+	"tabCompleted": "tabCompleted",
+	"tabInprogress": "tabInprogress",
+	"user_management": {
+		"licensed_users": {
+			"first_name": "First Name",
+			"last_name": "Last Name",
+			"email": "Email",
+			"role": "Role",
+			"license_status": "License Status",
+			"allocated": "Allocated",
+			"active": "Active",
+			"inactive": "Inactive"
+		}
+	},
+	"labelTrackingEmailDetails_level1": "Open Email (Level 1)"
 }

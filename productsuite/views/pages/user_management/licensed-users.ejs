@@ -15,7 +15,7 @@
   <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
     <!-- Search & Filter -->
     <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
-      <table id="filter-table" class="min-w-full border-none text-sm text-left text-gray-700">
+      <table id="filter-table" class="min-w-full border-none text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} <%= __('generic_label.to') %> {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
         <thead class="bg-gray-50 text-gray-600 text-xs">
           <tr>
             <th class="px-4 py-5 text-sm font-normal">
@@ -26,36 +26,36 @@
             <th class="px-4 py-5 text-sm font-normal">
               <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
                 class="size-3.5 ml-3 inline">
-              First Name
+              <%= __("user_management.licensed_users.first_name") || "First Name" %>
             </th>
             <th class="px-4 py-5 text-sm font-normal">
               <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
                 class="size-3.5 ml-3 inline">
-              Last Name
+              <%= __("user_management.licensed_users.last_name") || "Last Name" %>
             </th>
             <th class="px-4 py-5 text-sm font-normal">
               <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
                 class="size-3.5 ml-3 inline">
-              Email
+              <%= __("user_management.licensed_users.email") || "Email" %>
             </th>
             <th class="px-4 py-5 text-sm font-normal">
               <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
                 class="size-3.5 ml-3 inline">
-              Role
+              <%= __("user_management.licensed_users.role") || "Role" %>
             </th>
             <th class="px-4 py-5 text-sm font-normal">
               <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
                 class="size-3.5 ml-3 inline">
-              License Status
+              <%= __("user_management.licensed_users.license_status") || "License Status" %>
             </th>
             <th class="px-4 py-5 text-sm font-normal">
               <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
                 class="size-3.5 ml-3 inline">
-              Allocated
+              <%= __("user_management.licensed_users.allocated") || "Allocated" %>
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="users-table-body">
           <% users.forEach((item, idx)=> { %>
             <tr class="bg-white border-b hover:bg-gray-50">
               <td class="px-6 py-6 whitespace-nowrap"><%= idx + 1 %></td>
@@ -66,7 +66,7 @@
               <td class="px-6 py-6 whitespace-nowrap">
                 <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
                   <%= item.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
-                  <%= item.status %>
+                  <%= item.status === 'Active' ? __("user_management.licensed_users.active") : __("user_management.licensed_users.inactive") %>
                 </span>
               </td>
               <td class="px-6 py-6 whitespace-nowrap"><%= item.licenses_allocation_date_formatted %></td>
@@ -98,6 +98,11 @@
 
 
 <script>
+  // Localized strings
+  const localizedStrings = {
+    active: '<%= __("user_management.licensed_users.active") || "Active" %>',
+    inactive: '<%= __("user_management.licensed_users.inactive") || "Inactive" %>'
+  };
   // pageSize and productId should be set in your EJS context or globally
   const pageSize = <%= typeof pageSize !== 'undefined' ? pageSize : 10 %>;
   // const productId = <%= typeof productId !== 'undefined' ? productId : '' %>;
@@ -114,6 +119,7 @@ function fetchLicensedUsers(page) {
         const statusClass = item.status === 'Active'
           ? 'bg-green-100 text-green-700'
           : 'bg-red-100 text-red-700';
+        const statusText = item.status === 'Active' ? localizedStrings.active : localizedStrings.inactive;
         const tr = document.createElement('tr');
         tr.className = 'bg-white border-b hover:bg-gray-50';
         tr.innerHTML = `
@@ -124,7 +130,7 @@ function fetchLicensedUsers(page) {
           <td class="px-6 py-6 whitespace-nowrap">${item.UserProfile.User.UserRole.role_name}</td>
           <td class="px-6 py-6 whitespace-nowrap">
             <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">
-              ${item.status || 'Inactive'}
+              ${statusText}
             </span>
           </td>
           <td class="px-6 py-6 whitespace-nowrap">${item.licenses_allocation_date_formatted || ''}</td>

@@ -199,11 +199,11 @@
                     <% if (pagination.hasPreviousPage) { %>
                         <a href="?page=1&pageSize=<%= pagination.pageSize %>"
                             class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] transition-all duration-300">
-                            <i class="fas fa-chevron-left text-xs"></i>
+                            <i class="fas <%= locals.locale === 'ar' ? 'fa-chevron-right' : 'fa-chevron-left' %> text-xs"></i>
                         </a>
                     <% } else { %>
                         <button disabled class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-300 cursor-not-allowed">
-                            <i class="fas fa-chevron-left text-xs"></i>
+                            <i class="fas <%= locals.locale === 'ar' ? 'fa-chevron-right' : 'fa-chevron-left' %> text-xs"></i>
                         </button>
                     <% } %>
 
@@ -229,11 +229,11 @@
                     <% if (pagination.hasNextPage) { %>
                         <a href="?page=<%= pagination.totalPages %>&pageSize=<%= pagination.pageSize %>"
                             class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] transition-all duration-300">
-                            <i class="fas fa-chevron-right text-xs"></i>
+                            <i class="fas <%= locals.locale === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' %> text-xs"></i>
                         </a>
                     <% } else { %>
                         <button disabled class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-300 cursor-not-allowed">
-                            <i class="fas fa-chevron-right text-xs"></i>
+                            <i class="fas <%= locals.locale === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' %> text-xs"></i>
                         </button>
                     <% } %>
                 </div>
