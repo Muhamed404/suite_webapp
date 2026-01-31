@@ -7,10 +7,21 @@ $(document).ready(function () {
       status: { required: true }
     },
     messages: {
-      provider_name: "SMS provider name is required.",
-      api_key: "API Key is required and must be a POST URL.",
-      sender_id: "Sender Name is required.",
-      status: "Status is required."
+      provider_name: {
+        required: window.smsValidationMessages.provider_required,
+        minlength: window.smsValidationMessages.provider_minlength
+      },
+      api_key: {
+        required: window.smsValidationMessages.api_key_required,
+        minlength: window.smsValidationMessages.api_key_minlength
+      },
+      sender_id: {
+        required: window.smsValidationMessages.sender_id_required,
+        minlength: window.smsValidationMessages.sender_id_minlength
+      },
+      status: {
+        required: window.smsValidationMessages.status_required
+      }
     },
     errorClass: "text-red-500 text-sm mt-1",
     highlight: function (element) {

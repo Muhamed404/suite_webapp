@@ -13,7 +13,7 @@
             class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white font-bold text-xs">
             1</div>
           <span class="font-medium step-label text-teal-700 text-sm">
-            SMS Provider Details
+            <%= __("sms.settings.provider_details") %>
           </span>
         </div>
         <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
@@ -32,7 +32,7 @@
                 <%= __("sms.settings.provider") %> <span class="text-red-500">*</span>
               </label>
 
-              <input type="text" value="<%= sms?.provider_name %>" name="provider_name" id="provider_name" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
+              <input type="text" value="<%= sms?.provider_name %>" name="provider_name" id="provider_name" required data-msg-required="<%= __('sms.settings.provider_required') %>" data-msg-minlength="<%= __('sms.settings.provider_minlength') %>" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
             bg-gray-50" />
             </div>
 
@@ -41,7 +41,7 @@
                 <%= __("sms.settings.sender_id") %> <span class="text-red-500">*</span>
 
               </label>
-              <input type="text" value="<%= sms?.sender_id %>" name="sender_id" id="sender_id" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
+              <input type="text" value="<%= sms?.sender_id %>" name="sender_id" id="sender_id" required data-msg-required="<%= __('sms.settings.sender_id_required') %>" data-msg-minlength="<%= __('sms.settings.sender_id_minlength') %>" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
             bg-gray-50" />
             </div>
 
@@ -51,9 +51,9 @@
                   <span class="text-red-500">*</span>
 
               </label>
-              <select name="status" id="status" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50">
-                <option value="active" <%= sms?.is_active === "active" ? "selected" : "" %>>Active</option>
-                <option value="inactive" <%= !sms?.is_active || sms?.is_active === "inactive" ? "selected" : "" %>>Inactive</option>
+              <select name="status" id="status" required data-msg-required="<%= __('sms.settings.status_required') %>" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50">
+                <option value="active" <%= sms?.is_active === "active" ? "selected" : "" %>><%= __("sms.settings.active") %></option>
+                <option value="inactive" <%= !sms?.is_active || sms?.is_active === "inactive" ? "selected" : "" %>><%= __("sms.settings.inactive") %></option>
               </select>
             </div>
 
@@ -61,7 +61,7 @@
               <label class="block text-gray-700 font-medium mb-3">
                 <%= __("sms.settings.api_key") %> <span class="text-red-500">*</span>
               </label>
-              <textarea name="api_key" id="api_key" required class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
+              <textarea name="api_key" id="api_key" required data-msg-required="<%= __('sms.settings.api_key_required') %>" data-msg-minlength="<%= __('sms.settings.api_key_minlength') %>" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
             bg-gray-50"><%= sms?.api_key %></textarea>
             </div>
           </div>
@@ -88,4 +88,17 @@
   </div>
 
 </div>
+
+<script>
+window.smsValidationMessages = {
+  provider_required: "<%= __('sms.settings.provider_required') %>",
+  provider_minlength: "<%= __('sms.settings.provider_minlength') %>",
+  sender_id_required: "<%= __('sms.settings.sender_id_required') %>",
+  sender_id_minlength: "<%= __('sms.settings.sender_id_minlength') %>",
+  api_key_required: "<%= __('sms.settings.api_key_required') %>",
+  api_key_minlength: "<%= __('sms.settings.api_key_minlength') %>",
+  status_required: "<%= __('sms.settings.status_required') %>"
+};
+</script>
+
 <script src="/securemagnus_2025/js/custom_script/create-sms-validation.js"></script>
