@@ -33,6 +33,7 @@
 		"sort_by": "رتّب حسب",
 		"loading": "جارٍ التحميل...",
 		"error": "خطأ",
+		"form_validation_error": "خطأ في التحقق من النموذج",
 		"error_creating_nfc_campaign": "خطأ في إنشاء حملة NFC",
 		"success": "نجاح",
 		"service_deleted_successfully": "تم حذف الخدمة بنجاح!",
@@ -1847,6 +1848,8 @@
 		"labelGroupManagement": "إدارة المجموعات",
 		"labelGroupName": "اسم المجموعة",
 		"labelGroupDescription": "وصف المجموعة",
+		"enterGroupName": "أدخل اسم المجموعة",
+		"enterGroupDescription": "أدخل وصف المجموعة",
 		"labelViewUsers": "عرض المستخدمين",
 		"selectedServices": "الخدمات المختارة",
 		"searchEnrolled": "البحث في المسجلين",
@@ -1972,5 +1975,6 @@
 			"new_password_required": "كلمة المرور الجديدة مطلوبة عند توفير تأكيد كلمة المرور",
 			"passwords_must_match": "يجب أن تتطابق كلمات المرور"
 		}
-	}
+	},
+	"Submit": "Submit"
 }
