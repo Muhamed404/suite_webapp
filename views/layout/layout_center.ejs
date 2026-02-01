@@ -18,10 +18,25 @@
 <% if (toastMessage) { %>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Use EJS escaping for message and alertType to prevent XSS
+      let message = '<%- toastMessage.replace(/'/g, "&#39;").replace(/\"/g, "&quot;") %>';
+      <% if (locale === 'ar') { %>
+        const translations = {
+          'Package deleted successfully': 'تم حذف الباقة بنجاح',
+          'User deleted successfully': 'تم حذف المستخدم بنجاح',
+          'User created successfully': 'تم إنشاء المستخدم بنجاح',
+          'Success': 'نجاح',
+          'Success!': 'نجاح!',
+          '!Success': '!نجاح',
+          'Delete Successfully': 'تم الحذف بنجاح',
+          'Successfully': 'بنجاح'
+        };
+        for (const [en, ar] of Object.entries(translations)) {
+          message = message.replace(en, ar);
+        }
+      <% } %>
       showCustomToast(
         '<%- toastAlertType.replace(/'/g, "&#39;") %>',
-        '<%- toastMessage.replace(/'/g, "&#39;").replace(/\"/g, "&quot;") %>'
+        message
       );
     });
   </script>
