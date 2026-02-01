@@ -1125,7 +1125,7 @@
 		"templateName": "Template Name",
 		"totalImages": "Total Images",
 		"imageSetup": "QR Image Setup",
-		"labelCreationNFCTag": "Creation of NFC Tags",
+		"labelCreationQRTag": "Creation of QR Tags",
 		"tagQuantity": "Tag Quantity",
 		"uploadBrandLogo": "Upload Brand Logo",
 		"phishingCampaignResponseMetrics": "Phishing Campaign Response Metrics",

@@ -54,8 +54,8 @@ function renderTabs() {
   // Translation map
   const statusTranslations = {
     All: window.translations.filterAll,
-    draft: 'Draft',
-    scheduled: 'Scheduled',
+    draft: window.translations.filterDraft,
+    scheduled: window.translations.filterScheduled,
     inprogress: window.translations.InProgress,
     completed: window.translations.filterCompleted
   };
