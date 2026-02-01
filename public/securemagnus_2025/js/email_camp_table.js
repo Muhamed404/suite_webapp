@@ -222,9 +222,10 @@ function renderPagination(total) {
     <div class="flex items-center justify-between w-full">
       <div>
         <p class="text-sm text-gray-700">
-          Showing ${((currentPageNum - 1) * pageSize) + 1}
-          to ${Math.min(currentPageNum * pageSize, totalCount)}
-          of ${totalCount} results
+          ${window.translations.showingResults
+            .replace('{start}', ((currentPageNum - 1) * pageSize) + 1)
+            .replace('{end}', Math.min(currentPageNum * pageSize, totalCount))
+            .replace('{total}', totalCount)}
         </p>
       </div>
       <div class="flex space-x-2">

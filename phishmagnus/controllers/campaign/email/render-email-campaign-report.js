@@ -107,6 +107,7 @@ exports.renderCampaignReport = async (req, res) => {
                     filterCompleted: req.__("all_campaigns.filterCompleted"),
                     filterScheduled: req.__("all_campaigns.filterScheduled"),
                     filterDraft: req.__("all_campaigns.filterDraft"),
+                    showingResults: req.__("all_campaigns.showingResults"),
                     search_here: req.__("generic_label.search_here"),
                     total_invitees: req.getLocale() === 'ar' ? 'إجمالي المدعوين' : 'Total Invitee',
                     unsent: req.getLocale() === 'ar' ? 'في الانتظار' : 'Pending',
