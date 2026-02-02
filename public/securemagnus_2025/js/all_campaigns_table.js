@@ -203,10 +203,11 @@ function renderPagination(total) {
   let paginationHTML = `
     <div class="flex items-center justify-between w-full">
       <div>
-        <p class="text-sm text-gray-700">
-          Showing ${((currentPage - 1) * rowsPerPage) + 1}
-          to ${Math.min(currentPage * rowsPerPage, total)}
-          of ${total} results
+        <p class="text-sm text-gray-700 mr-2 ${document.dir === 'rtl' ? 'ml-2' : ''}">
+          ${translations.showingResults
+            .replace('{start}', ((currentPage - 1) * rowsPerPage) + 1)
+            .replace('{end}', Math.min(currentPage * rowsPerPage, total))
+            .replace('{total}', total)}
         </p>
       </div>
       <div class="flex space-x-2">

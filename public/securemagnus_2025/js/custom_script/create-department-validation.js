@@ -5,8 +5,8 @@ $(document).ready(function () {
       description: { required: true, minlength: 5 }
     },
     messages: {
-      name: "Department name is required.",
-      description: "Description is required (min 5 characters)."
+      name: departmentValidationMessages.name,
+      description: departmentValidationMessages.description
     },
     errorClass: "text-red-500 text-sm mt-1",
     highlight: function (element) {

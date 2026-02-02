@@ -1,7 +1,7 @@
 <div class="step hidden" id="step-2">
 
     <!--  Title -->
-    <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10"> </h1>
+    <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10"><%= __("user.labelBulkUploadUsers") %></h1>
 
     <!-- Main Form -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -10,7 +10,7 @@
 
         <div class="md:col-span-1">
             <label class="block text-gray-700 font-medium mb-3">
-                Select File to Upload
+                <%= __("user.labelSelectFileToUpload") %>
             </label>
 
             <input
@@ -18,7 +18,6 @@
   name="csvFile"
   type="file"
   accept=".csv"
-  required
   class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50"
 />
         </div>

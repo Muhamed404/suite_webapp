@@ -31,11 +31,9 @@ function initSingleTagSelector(container) {
 
   const fieldFromData = container.dataset?.field?.trim() || null;
   const fieldFromSelectName = select?.name?.replace(/\[\]$/, '').trim() || null;
-  const labelText = container.querySelector('label')?.textContent?.toLowerCase() || '';
-  const inferredField = labelText.includes('department') ? 'department' : 
-                       (labelText.includes('group') ? 'group' : 'field');
-
-  const logicalField = fieldFromData || fieldFromSelectName || inferredField;
+  
+  // Use data-field attribute as the primary source for field identification
+  const logicalField = fieldFromData || fieldFromSelectName || 'field';
   let hiddenContainer = container.querySelector('.hidden-inputs');
 
   if (!hiddenContainer) {

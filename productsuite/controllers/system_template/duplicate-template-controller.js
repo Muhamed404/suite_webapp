@@ -102,10 +102,10 @@ exports.duplicateTemplate = async (req, res) => {
     logger.info(`[Duplicate System Template] Backend response: ${JSON.stringify(response.data)}`);
 
     if (response.data.success) {
-      req.flash('message', 'Template duplicated successfully');
+      req.flash('message', req.__('system_template.duplicate_success'));
       req.flash('alertType', 'success');
     } else {
-      req.flash('message', 'Failed to duplicate template');
+      req.flash('message', req.__('system_template.duplicate_error'));
       req.flash('alertType', 'error');
     }
     if (req.user.organization_id) {
@@ -118,7 +118,7 @@ exports.duplicateTemplate = async (req, res) => {
   } catch (error) {
     logger.error('Error - Duplicate Template', error);
     logger.error(error.stack);
-    req.flash('message', 'Failed to duplicate template');
+    req.flash('message', req.__('system_template.duplicate_error'));
     req.flash('alertType', 'error');
     if (req.user.organization_id) {
       return res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);

@@ -30,7 +30,7 @@
             required
             minlength="3"
           />
-          <p class="text-xs text-gray-500 mt-1">Minimum 3 characters</p>
+          <p class="text-xs text-gray-500 mt-1"><%= __("minimum_3_characters") %></p>
         </div>
         <div>
           <label for="code" class="block text-sm font-medium mb-1">
@@ -45,9 +45,9 @@
             required
             minlength="3"
             maxlength="3"
-            placeholder="e.g., ABC"
+            placeholder="<%= __("example_abc") %>"
           />
-          <p class="text-xs text-gray-500 mt-1">Must be exactly 3 characters</p>
+          <p class="text-xs text-gray-500 mt-1"><%= __("must_be_exactly_3_characters") %></p>
         </div>
         <div>
           <label for="description" class="block text-sm font-medium mb-1">

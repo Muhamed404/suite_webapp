@@ -19,30 +19,29 @@
     <!-- first section  -->
     <div class="flex flex-col p-8 gap-4 mt-3 rounded-3xl bg-white border border-gray-100 shadow-sm">
         <!-- Progress Bar -->
-        <div id="progress" class="flex items-center mb-6"></div>
+        <div class="overflow-x-auto mb-6">
+            <div id="progress" class="flex items-center min-w-max"></div>
+        </div>
         <form class="space-y-6" id="templateCreationForm" method="post" 
         action="<%=typeof postMethodUrl !== 'undefined' ? postMethodUrl: '/template/update/' + (template?.id) %>"
         data-difficulty='<%- template?.difficulty || [] %>'>
             <!-- Steps -->
             <div class="step hidden w-full lg:w-3/4">
-                <!-- Page Heading -->
-                <h1 class="text-3xl font-bold mb-2">Template Details</h1>
+                <h1 class="text-3xl font-bold mb-2"><%= __("system_template.stepper1") %></h1>
                 <p class="text-gray-600 mb-8">
-                    Lorem Ipsum Dolor Sit Amet, Consectetur Adipiscing Elit, Sed Do Eiusmod Tempor Incididunt Ut Labore
-                    Et
-                    Dolore Magna Aliqua.
+                    <%= __("system_template.create.labelDescription") %>
                 </p>
 
                 <!-- Template Name -->
                 <div class="mb-6">
-                    <label class="block text-lg font-medium mb-2">Template Name</label>
+                    <label class="block text-lg font-medium mb-2"><%= __("system_template.create.labelName") %></label>
                     <input type="text"   id="name" name="name" value="<%= template?.name || '-' %>"
                         class="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
                 </div>
 
                 <!-- Purpose -->
                 <div class="mb-6">
-                    <label class="block text-lg font-medium mb-2">Purpose / Reason (Optional)</label>
+                    <label class="block text-lg font-medium mb-2"><%= __("system_template.create.labelPurpose") %></label>
                     <input type="text"   name="description_purpose" id="description_purpose"
 					value="<%= template?.description_purpose || '-' %>"
                         class="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
@@ -50,7 +49,7 @@
 
                 <!-- Language Dropdown -->
                 <div class="mb-6 relative">
-                    <label class="block text-lg font-medium mb-2">Select Language</label>
+                    <label class="block text-lg font-medium mb-2"><%= __("system_template.create.optionSelectLanguage") %></label>
                     <div class="relative">
                         <select name="language" id="language"
                             class="appearance-none bg-none bg-transparent w-full border border-gray-300 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
@@ -67,7 +66,7 @@
                 <!-- Phishing Type -->
                 <div class="mb-6">
 				
-                    <label class="block text-lg font-medium mb-4">Phishing Type</label>
+                    <label class="block text-lg font-medium mb-4"><%= __("system_template.create.labelPhishType") %></label>
                     <div class="flex flex-wrap gap-4">
                         <label class="cursor-pointer">
                             <input type="radio" name="phishType" value="email" <%= template.selPhish === 'email' ? 'checked' : '' %> disabled class="hidden peer">
@@ -106,27 +105,22 @@
                 </div>
             </div>
             <div class="step hidden">
-                <h2 class="text-2xl font-bold mb-2" id="step-heading">Tracking Details</h2>
-                <p class="text-gray-500 mb-4  w-full lg:w-3/4" id="step-subheading">Lorem ipsum dolor sit amet,
-                    consectetur
-                    adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-                    veniam, quis nostrud exercitation ullamco laboris.</p>
+                <h2 class="text-2xl font-bold mb-2" id="step-heading"><%= __("system_template.stepper2") %></h2>
+                <p class="text-gray-500 mb-4  w-full lg:w-3/4" id="step-subheading"><%= __("system_template.create.labelTrackingDescription") %></p>
 
                 <div id="checkbox-options" class="space-y-4">
                     <!-- Dynamic options will be injected here -->
                 </div>
             </div>
             <div class="step hidden">
-                <h2 class="text-2xl font-bold mb-2" id="step-heading">Setup File Attachment</h2>
+                <h2 class="text-2xl font-bold mb-2" id="step-heading"><%= __("system_template.stepper3") %></h2>
                 <p class="text-gray-500 mb-6">
-                    You can enter file extension and name. We will provide you the new file automatically as an
-                    attachment
-                    in your phishing message to be downloaded.
+                    <%= __("system_template.create.labelDetails_level2_Description") %>
                 </p>
 
                 <!-- Dropdown -->
                 <div class="mb-6 relative  w-full lg:w-3/4">
-                    <label class="block text-lg font-medium mb-2">Setup File Extension</label>
+                    <label class="block text-lg font-medium mb-2"><%= __("system_template.create.labelDetails_level2_FileExtension") %></label>
                     <div class="relative">
                         <select name="file_extension" id="file_extension"
                             class="appearance-none w-full border border-gray-300 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
@@ -148,22 +142,20 @@
 
                 <!-- Input -->
                 <div>
-                    <label class="block text-base font-semibold mb-2">File Name</label>
+                    <label class="block text-base font-semibold mb-2"><%= __("system_template.create.labelDetails_level2_FileName") %></label>
                     <input type="text"   name="file_name" value="<%=template?.file_name%>"
                         class="w-full lg:w-3/4 px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
                 </div>
             </div>
             <div class="step hidden">
-                <h2 class="text-2xl font-bold mb-2">Phishing Message Details</h2>
-                <p class="text-gray-500 mb-8">
-                    Text
-                </p>
+                <h2 class="text-2xl font-bold mb-2"><%= __("system_template.create.labelDetails_level1_title") %></h2>
+
 
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-max">
                     <!-- Email Subject -->
                     <div id="email-content">
-                        <label class="block text-base font-semibold mb-2">Email Subject</label>
+                        <label class="block text-base font-semibold mb-2"><%= __("system_template.create.labelDetails_level1_Subject") %></label>
                         <input type="text"   name="subject" value="<%= template?.subject || '' %>"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
                     </div>
@@ -223,9 +215,9 @@
             <!--URL Phish Page Setting (Optional)-->
             <div class="step hidden">
                 <!-- Heading -->
-                <h2 class="text-2xl font-bold mb-2">URL Phish Page Setting</h2>
+                <h2 class="text-2xl font-bold mb-2"><%= __("system_template.stepper5") %></h2>
                 <p class="text-gray-500 mb-6">
-                    You can create an HTML page that will be opened after user click dedicated phishing URL Link
+                    <%= __("system_template.create.labelDetails_level3_Description") %>
                 </p>
 
                 <!-- Options -->
@@ -239,7 +231,7 @@
                     <%= selectedPhishOption && selectedPhishOption !== 'simple' ? 'disabled' : '' %> >
                     <span class="radio-circle"></span>
                     <span class="text-lg font-medium">
-                    Simple Phishing Web Page To Track User Click
+                    <%= __("system_template.create.labelDetails_level3_radioOption1") %>
                     </span>
                 </label>
 
@@ -250,7 +242,7 @@
                     <%= selectedPhishOption && selectedPhishOption !== 'data_entry' ? 'disabled' : '' %> >
                     <span class="radio-circle"></span>
                     <span class="text-lg font-medium">
-                    Data Entry Based Phishing Web Page To Track User Click And Data Submission
+                    <%= __("system_template.create.labelDetails_level3_radioOption2") %>
                     </span>
                 </label>
 
@@ -261,26 +253,25 @@
                     <%= selectedPhishOption && selectedPhishOption !== 'custom_url' ? 'disabled' : '' %> >
                     <span class="radio-circle"></span>
                     <span class="text-lg font-medium">
-                    Import Webpage From An External URL (Custom) To Track User Click Or Data Submission
+                    <%= __("system_template.create.labelDetails_level3_radioOption3") %>
                     </span>
                 </label>
                 </div>
 
                 <!-- Conditional Input -->
                 <div id="custom-url-input" class="mt-6 hidden">
-                    <label for="website" class="block text-sm text-gray-700 mb-2">Enter website to import</label>
+                    <label for="website" class="block text-sm text-gray-700 mb-2"><%= __("system_template.create.labelDetails_level3_CustomPhishPageURL") %></label>
                     <input type="text" id="website"  
                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400">
                 </div>
             </div>
             <div class="step hidden">
                 <!-- Heading -->
-                <h1 class="text-2xl font-semibold mb-1">Create Phishing Web Page</h1>
-                <p class="text-gray-500 mb-6">You Can Create An HTML Page That Will Be Opened After User Click Dedicated
-                    Phishing URL Link</p>
+                <h1 class="text-2xl font-semibold mb-1"><%= __("system_template.create.labelDetails_level3_radioOption1_Content") %></h1>
+                <p class="text-gray-500 mb-6"><%= __("system_template.create.labelDetails_level3_Description") %></p>
 
                 <!-- Email Message Label -->
-                <label for="editor" class="block text-gray-700 font-medium mb-2">Email Message</label>
+                <label for="editor" class="block text-gray-700 font-medium mb-2"><%= __("system_template.create.labelDetails_level1_Content") %></label>
 
                 <!-- CKEditor container -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
@@ -291,30 +282,28 @@
             </div>
             <div class="step hidden">
                 <!-- Heading -->
-                <h1 class="text-2xl font-semibold mb-1">Landing Page Settings</h1>
-                <p class="text-gray-500 mb-6">You Can Create An HTML Page That Will Be Opened After User Click Dedicated
-                    Phishing URL Link</p>
+                <h1 class="text-2xl font-semibold mb-1"><%= __("system_template.create.labelLandingPage_Title") %></h1>
+                <p class="text-gray-500 mb-6"><%= __("system_template.create.labelDetails_level3_Description") %></p>
 
                 <!-- Radio Buttons -->
                 <div class="space-y-4 mb-6">
                     <label class="flex items-center custom-radio cursor-pointer">
                         <input type="radio" name="landing_option" value="link">
                         <span class="radio-circle"></span>
-                        <span class="text-gray-700">Import Custom Landing Page</span>
+                        <span class="text-gray-700"><%= __("system_template.create.labelLandingPage_radioOption1") %></span>
                     </label>
 
                     <label class="flex items-center custom-radio cursor-pointer">
                         <input type="radio" name="landing_option" value="custom" <%=template?.landing_page_content ? 'checked' : '' %>  >
                         <span class="radio-circle"></span>
-                        <span class="text-gray-700">I like to redirect the user to a custom landing page</span>
+                        <span class="text-gray-700"><%= __("system_template.create.labelLandingPage_radioOption2") %></span>
                     </label>
                 </div>
 
 
                 <!-- Custom Page Setting (hidden initially) -->
                 <div id="editor-container">
-                    <label for="editor" style="display: none;" class="block text-gray-700 font-medium mb-2">Custom Page
-                        Setting</label>
+                    <label for="editor" style="display: none;" class="block text-gray-700 font-medium mb-2"><%= __("system_template.create.labelLandingPageContentEditor") %></label>
                     <div class="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
                 
                     <textarea name="landing_page_content" id="landing_page_content" rows="10" cols="80"><%- template?.landing_page_content || '' %></textarea>
@@ -364,7 +353,7 @@
                             </label>
                             <div class="flex gap-2">
                                 <input type="url" id="import-html-url" name="import_html_url" placeholder="https://example.com/template.html" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400">
-                                <button type="button" id="fetch-html-template" class="bg-teal-400 text-white px-4 py-2 rounded-lg hover:bg-teal-500 transition">Fetch</button>
+                                <button type="button" id="fetch-html-template" class="bg-teal-400 text-white px-4 py-2 rounded-lg hover:bg-teal-500 transition"><%= __("system_template.create.fetchButtonText") %></button>
                             </div>
                             <div id="import-html-url-error" class="text-red-500 text-sm mt-2" style="display:none;"></div>
                         </div>
@@ -419,11 +408,11 @@
                 <button id="prev" type="button"
                     class="border border-teal-400 text-teal-500 font-medium px-6 py-2 rounded-full hover:bg-teal-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled>
-                    Back
+                    <%= __("generic_label.back") %>
                 </button>
                 <button id="next" type="button"
                     class="bg-teal-400 text-white font-medium px-6 py-2 rounded-full hover:bg-teal-500 transition">
-                    Next
+                    <%= __("generic_label.next") %>
                 </button>
             </div>
          </form>
@@ -447,6 +436,7 @@
         ],
         __: function(key) {
             const translations = {
+                "system_template.create.simplePhishingTitle": "<%= __('system_template.create.simplePhishingTitle') %>",
                 "system_template.create.simplePhishingDescription": "<%= __('system_template.create.simplePhishingDescription') %>",
                 "system_template.create.downloadFileBasedTitle": "<%= __('system_template.create.downloadFileBasedTitle') %>",
                 "system_template.create.downloadFileBasedDescription": "<%= __('system_template.create.downloadFileBasedDescription') %>",
@@ -454,7 +444,16 @@
                 "system_template.create.urlClickBasedDescription": "<%= __('system_template.create.urlClickBasedDescription') %>",
                 "system_template.create.validationEnterValidUrl": "<%= __('system_template.create.validationEnterValidUrl') %>",
                 "system_template.create.smsShortMessageTitle": "<%= __('system_template.create.smsShortMessageTitle') %>",
-                "system_template.create.smsShortMessageDescription": "<%= __('system_template.create.smsShortMessageDescription') %>"
+                "system_template.create.smsShortMessageDescription": "<%= __('system_template.create.smsShortMessageDescription') %>",
+                "system_template.create.whatsappShortMessageTitle": "<%= __('system_template.create.whatsappShortMessageTitle') %>",
+                "system_template.create.whatsappShortMessageDescription": "<%= __('system_template.create.whatsappShortMessageDescription') %>",
+                "system_template.create.whatsappAttachUrlTitle": "<%= __('system_template.create.whatsappAttachUrlTitle') %>",
+                "system_template.create.whatsappAttachUrlDescription": "<%= __('system_template.create.whatsappAttachUrlDescription') %>",
+                "system_template.create.whatsappDownloadTemplateTitle": "<%= __('system_template.create.whatsappDownloadTemplateTitle') %>",
+                "system_template.create.whatsappDownloadTemplateDescription": "<%= __('system_template.create.whatsappDownloadTemplateDescription') %>",
+                "generic_label.next": "<%= __('generic_label.next') %>",
+                "generic_label.back": "<%= __('generic_label.back') %>",
+                "generic_label.Finish": "<%= __('generic_label.Finish') %>"
             };
             return translations[key] || key;
         }
@@ -501,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             try {
                 fetchBtn.disabled = true;
-                fetchBtn.textContent = 'Fetching...';
+                fetchBtn.textContent = '<%= __("system_template.create.fetchingButtonText") %>';
                 const response = await fetch('/template/api/fetch-html', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -514,12 +513,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (window.CKEDITOR && CKEDITOR.instances['landing_page_content']) {
                     CKEDITOR.instances['landing_page_content'].setData(html);
                 }
-                fetchBtn.textContent = 'Fetch';
+                fetchBtn.textContent = '<%= __("system_template.create.fetchButtonText") %>';
                 fetchBtn.disabled = false;
             } catch (err) {
                 errorDiv.textContent = 'Error: ' + err.message;
                 errorDiv.style.display = '';
-                fetchBtn.textContent = 'Fetch';
+                fetchBtn.textContent = '<%= __("system_template.create.fetchButtonText") %>';
                 fetchBtn.disabled = false;
             }
         });

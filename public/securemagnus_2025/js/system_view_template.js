@@ -14,7 +14,7 @@ const disableSaveEdit = window.disableSaveEdit || false;
 // ✅ Conditions for step 2 options
 const conditions = {
   email: [
-    { id: 'open', title: 'Open Email (Level 1)', value: 'simple', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.simplePhishingDescription') : 'Simple phishing email template to monitor email open by users.' },
+    { id: 'open', title: window.i18n ? window.i18n.__('system_template.create.simplePhishingTitle') : 'Open Email (Level 1)', value: 'simple', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.simplePhishingDescription') : 'Simple phishing email template to monitor email open by users.' },
     { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing email template with file attached in the message to monitor download by users.' },
     { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'Email template with a dedicated URL for testing users visiting the phishing page.' }
   ],
@@ -28,14 +28,14 @@ const conditions = {
   ],
 
   sms: [
-    { id: 'short', title: 'Short Message (Level 1)', difficulty_level: 1, desc: 'Send a simple SMS message.' },
+    { id: 'short', title: window.i18n ? window.i18n.__('system_template.create.smsShortMessageTitle') : 'Short Message (Level 1)', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.smsShortMessageDescription') : 'Send a simple SMS message.' },
     { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing SMS template with file attached in the message to monitor download by users.' },
     { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'SMS template with a dedicated URL for testing users visiting the phishing page.' }
   ],
   whatsapp: [
-    { id: 'short', title: 'Short Message', difficulty_level: 1, desc: 'Send a simple SMS message.' },
-    { id: 'attach', title: 'Attach URL', difficulty_level: 2, desc: 'Include a clickable link in SMS.' },
-    { id: 'template', title: 'Download Template', difficulty_level: 3, desc: 'Use a ready-made SMS template.' }
+    { id: 'short', title: window.i18n ? window.i18n.__('system_template.create.whatsappShortMessageTitle') : 'Short Message', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.whatsappShortMessageDescription') : 'Send a simple SMS message.' },
+    { id: 'attach', title: window.i18n ? window.i18n.__('system_template.create.whatsappAttachUrlTitle') : 'Attach URL', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.whatsappAttachUrlDescription') : 'Include a clickable link in SMS.' },
+    { id: 'template', title: window.i18n ? window.i18n.__('system_template.create.whatsappDownloadTemplateTitle') : 'Download Template', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.whatsappDownloadTemplateDescription') : 'Use a ready-made SMS template.' }
   ],
 };
 
@@ -162,14 +162,15 @@ let currentStep = 0;
   const formData = {};
   let selectedPhishType = null;
 
-  const stepTitles = [
+  const stepTitles = window.i18n && window.i18n.stepTitles ? window.i18n.stepTitles : [
     'Template Details',
     'Tracking Details',
     'File Attachment Setting (Optional)',
     'Phishing Content',
     'URL Phish Page Setting (Optional)',
     'Create Phishing Webpage (Optional)',
-    'Landing Page (Optional)'
+    'Landing Page (Optional)',
+    'SMS Template Content'
   ];
 
   function renderProgressBar() {
@@ -180,19 +181,22 @@ let currentStep = 0;
       const isActive = i === currentIndexInFlow;
       const isCompleted = i < currentIndexInFlow;
       const circle = document.createElement('div');
-      circle.className = 'flex flex-col items-center text-center mx-2';
+      circle.className = 'flex flex-col items-start text-center flex-shrink-0';
+      circle.style.width = '125px';
       circle.innerHTML = `
-        <div class="w-8 h-8 flex items-center justify-center rounded-full border-2
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border-2 mx-auto
           ${isActive ? 'bg-teal-400 text-white border-teal-400' : isCompleted ? 'bg-teal-500 text-white border-teal-500' : 'bg-white text-gray-600 border-gray-300'}">
           ${i + 1}
         </div>
-        <div class="text-xs mt-1">${stepTitles[stepIndex] || ''}</div>
+        <div class="text-xs mt-1 px-1 leading-tight w-full font-semibold" style="min-height: 32px; word-wrap: break-word;">${stepTitles[stepIndex] || ''}</div>
       `;
       progressWrap.appendChild(circle);
       if (i < activeFlow.length - 1) {
         const isLineActive = i < currentIndexInFlow;
         const line = document.createElement('div');
-        line.className = `flex-1 h-1 ${isLineActive ? 'bg-teal-400' : 'bg-gray-200'}`;
+        line.className = `h-1 flex-shrink-0 ${isLineActive ? 'bg-teal-400' : 'bg-gray-200'}`;
+        line.style.width = '60px';
+        line.style.marginTop = '16px';
         progressWrap.appendChild(line);
       }
     });
@@ -208,7 +212,7 @@ let currentStep = 0;
 
     if (nextBtn) {
       // ✅ Update button text
-      nextBtn.textContent = isLastStep ? 'Finish' : 'Next';
+      nextBtn.textContent = isLastStep ? (window.i18n ? window.i18n.__('generic_label.Finish') : 'Finish') : (window.i18n ? window.i18n.__('generic_label.next') : 'Next');
 
       // ✅ Disable Finish button if disableSaveEdit is true
       if (isLastStep && disableSaveEdit) {

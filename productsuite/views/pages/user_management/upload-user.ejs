@@ -5,7 +5,13 @@
   <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
 
     <form action="/user/create/bulk" method="post" name="uploadBulkUser" id="uploadBulkUser" 
-    enctype="multipart/form-data" class="bg-white  w-full mt-3 p-8">
+    enctype="multipart/form-data" class="bg-white  w-full mt-3 p-8" novalidate
+    data-csv-file-required="<%= __('user.csvFileRequired') %>"
+    data-csv-header-ensure="<%= __('user.csvHeaderEnsure') %>"
+    data-csv-fields-separated="<%= __('user.csvFieldsSeparated') %>"
+    data-csv-header-must-be="<%= __('user.csvHeaderMustBe') %>"
+    data-csv-upload-valid="<%= __('user.csvUploadValid') %>"
+    data-select-valid-product="<%= __('user.selectValidProduct') %>">
       <!-- Stepper Navigation -->
       <div id="stepper" class="flex items-center justify-between mb-10">
         <div class="flex items-center gap-2">
@@ -13,7 +19,7 @@
             class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white font-bold text-xs">
             1</div>
           <span class="font-medium step-label text-teal-700 text-sm">
-            Choose Product
+            <%= __("user.stepChooseProduct") %>
           </span>
         </div>
         <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
@@ -22,7 +28,7 @@
             class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-white border-2 border-teal-300 text-teal-400 font-bold text-xs">
             2</div>
           <span class="font-medium step-label text-gray-400 text-sm">
-            Choose File
+            <%= __("user.stepChooseFile") %>
           </span>
         </div>
 
@@ -57,3 +63,9 @@
 
 <script src="/securemagnus_2025/js/form_stepper.js"></script>
 <script src="/securemagnus_2025/js/custom_script/import-bulk-user-validation.js"></script>
+<script>
+window.i18n = window.i18n || {};
+window.i18n.labels = window.i18n.labels || {};
+window.i18n.labels.finish = '<%= __("generic_label.Finish") %>';
+window.i18n.labels.next = '<%= __("generic_label.next") %>';
+</script>

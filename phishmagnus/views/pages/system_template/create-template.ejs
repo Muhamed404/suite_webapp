@@ -603,6 +603,7 @@
             valid_email_required: "<%= __('validation_messages.valid_email_required') %>",
             file_name_required: "<%= __('validation_messages.file_name_required') %>",
             phishing_page_content_required: "<%= __('validation_messages.phishing_page_content_required') %>",
+            validationSelectPhishingOption: "<%= __('system_template.create.validationSelectPhishingOption') %>",
             validationEnterValidUrl: "<%= __('system_template.create.validationEnterValidUrl') %>",
             urlRequired: "<%= __('system_template.create.urlRequired') %>",
             urlInvalid: "<%= __('system_template.create.urlInvalid') %>",
@@ -619,6 +620,7 @@
         },
         __: function (key) {
             const translations = {
+                "system_template.create.simplePhishingTitle": "<%= __('system_template.create.simplePhishingTitle') %>",
                 "system_template.create.simplePhishingDescription": "<%= __('system_template.create.simplePhishingDescription') %>",
                 "system_template.create.downloadFileBasedTitle": "<%= __('system_template.create.downloadFileBasedTitle') %>",
                 "system_template.create.downloadFileBasedDescription": "<%= __('system_template.create.downloadFileBasedDescription') %>",
@@ -631,7 +633,8 @@
                 "system_template.create.whatsappAttachUrlTitle": "<%= __('system_template.create.whatsappAttachUrlTitle') %>",
                 "system_template.create.whatsappAttachUrlDescription": "<%= __('system_template.create.whatsappAttachUrlDescription') %>",
                 "system_template.create.whatsappDownloadTemplateTitle": "<%= __('system_template.create.whatsappDownloadTemplateTitle') %>",
-                "system_template.create.whatsappDownloadTemplateDescription": "<%= __('system_template.create.whatsappDownloadTemplateDescription') %>"
+                "system_template.create.whatsappDownloadTemplateDescription": "<%= __('system_template.create.whatsappDownloadTemplateDescription') %>",
+                "system_template.create.validationSelectLandingPage": "<%= __('system_template.create.validationSelectLandingPage') %>"
             };
             return translations[key] || key;
         }

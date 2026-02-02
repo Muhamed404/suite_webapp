@@ -34,7 +34,7 @@
 <div class="flex flex-col p-6 pt-0">
   <div class="flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm">
     <div class="p-6">
-      <table id="filter-table" class="min-w-full border-none text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} to {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>">
+      <table id="filter-table" class="min-w-full border-none text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} to {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
         <thead class="bg-gray-50 text-gray-600 text-xs">
           <tr>
             <th class="px-4 py-3 text-sm font-normal">
@@ -50,15 +50,12 @@
               <%= __("system_template.homescreen.labelSubject") %>
             </th>
             <th class="px-4 py-3 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
               <%= __("system_template.homescreen.labelLanguage") %>
             </th>
             <th class="px-4 py-3 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
               <%= __("system_template.homescreen.labelCategory") %>
             </th>
             <th class="px-4 py-3 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
               <%= __("system_template.homescreen.labelAction") %>
             </th>
           </tr>
@@ -81,8 +78,8 @@
               <td class="px-6 py-3 whitespace-nowrap">
                 <%= tpl.PhishingCategory ? tpl.PhishingCategory.name : __('Unknown') %>
               </td>
-              <td class="px-6 py-3 whitespace-nowrap">
-                <div class="flex items-center gap-2">
+              <td class="px-6 py-3 whitespace-nowrap text-left">
+                <div class="flex items-center gap-2" dir="ltr">
                   <!-- Edit -->
                   <%if(!disableOption.disableEdit) {%>
                     <a href="<%= typeof organization === 'undefined' ? '/template/view/' + tpl.id : '/phm/template/view/' + tpl.id %>"

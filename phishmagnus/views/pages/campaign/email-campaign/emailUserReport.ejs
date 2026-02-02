@@ -10,14 +10,14 @@
 
 
     <!-- Title -->
-    <h1 class="my-2 text-2xl font-semibold">User Report: <%= userProfile.first_name %>
+    <h1 class="my-2 text-2xl font-semibold"><%= __("emailUserReport.userReport") %>: <%= userProfile.first_name %>
     </h1>
 
     <!-- Top Metrics -->
     <div class="grid grid-cols-2 gap-4 md:grid-cols-5">
       <div class="flex flex-col p-4 bg-white rounded-xl">
         <div class="flex items-center justify-between gap-2 mb-8">
-          <p class="text-sm text-gray-500">Email Sent</p>
+          <p class="text-sm text-gray-500"><%= __("emailUserReport.emailSent") %></p>
           <img src="/securemagnus_2025/images/Icons_Campaign_Report/Email_Sent.svg" alt="">
         </div>
         <p class="text-4xl">
@@ -26,7 +26,7 @@
       </div>
       <div class="flex flex-col p-4 bg-white rounded-xl">
         <div class="flex items-center justify-between gap-2 mb-8">
-          <p class="text-sm text-gray-500">Open Email</p>
+          <p class="text-sm text-gray-500"><%= __("emailUserReport.openEmail") %></p>
           <img src="/securemagnus_2025/images/Icons_Campaign_Report/Opened_by_people.svg" alt="">
         </div>
         <p class="text-4xl">
@@ -35,7 +35,7 @@
       </div>
       <div class="flex flex-col p-4 bg-white rounded-xl">
         <div class="flex items-center justify-between gap-2 mb-8">
-          <p class="text-sm text-gray-500">Form Interaction / Submission</p>
+          <p class="text-sm text-gray-500"><%= __("emailUserReport.formInteractionSubmission") %></p>
           <img src="/securemagnus_2025/images/Icons_Campaign_Report/not_opened.svg" alt="">
         </div>
         <p class="text-4xl">
@@ -45,7 +45,7 @@
       </div>
       <div class="flex flex-col p-4 bg-white rounded-xl">
         <div class="flex items-center justify-between gap-2 mb-8">
-          <p class="text-sm text-gray-500">Links Clicked</p>
+          <p class="text-sm text-gray-500"><%= __("emailUserReport.linksClicked") %></p>
           <img src="/securemagnus_2025/images/Icons_Campaign_Report/link_Clicked.svg" alt="">
         </div>
         <p class="text-4xl">
@@ -54,7 +54,7 @@
       </div>
       <div class="flex flex-col p-4 bg-white rounded-xl">
         <div class="flex items-center justify-between gap-2 mb-8">
-          <p class="text-sm text-gray-500">Reported to Admin</p>
+          <p class="text-sm text-gray-500"><%= __("emailUserReport.reportedToAdmin") %></p>
           <img src="/securemagnus_2025/images/Icons_Campaign_Report/Report_Admin.svg" alt="">
         </div>
         <p class="text-4xl">
@@ -67,13 +67,13 @@
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <!-- Bar Chart -->
       <div class="col-span-2 p-6 bg-white rounded-xl">
-        <h2 class="mb-4 text-lg font-semibold">Campaign Metrics</h2>
+        <h2 class="mb-4 text-lg font-semibold"><%= __("emailUserReport.campaignMetrics") %></h2>
         <div id="chart"></div>
       </div>
 
       <!-- Phishing Success -->
       <div class="flex flex-col items-start justify-start p-6 bg-white rounded-xl gap-11">
-        <h2 class="mb-4 text-lg font-semibold">Phishing Success</h2>
+        <h2 class="mb-4 text-lg font-semibold"><%= __("emailUserReport.phishingSuccess") %></h2>
 
         <div class="flex items-center justify-between w-full gap-10">
           <!-- Left Side Labels -->
@@ -81,7 +81,7 @@
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-full bg-[#38bdf8]"></span>
               <div>
-                <p class="text-sm text-gray-500">Email View</p>
+                <p class="text-sm text-gray-500"><%= __("emailUserReport.emailView") %></p>
                 <p class="text-lg font-bold text-gray-900" id="emailViewedText">
                     
                 </p>
@@ -90,7 +90,7 @@
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-full bg-[#f87171]"></span>
               <div>
-                <p class="text-sm text-gray-500">Email Opened</p>
+                <p class="text-sm text-gray-500"><%= __("emailUserReport.emailOpened") %></p>
                 <p class="text-lg font-bold text-gray-900" id="linksClickedText">
                    
                 </p>
@@ -99,7 +99,7 @@
             <div class="flex items-center gap-2">
               <span class="w-3 h-3 rounded-full bg-[#34d399]"></span>
               <div>
-                <p class="text-sm text-gray-500">Total Activity </p>
+                <p class="text-sm text-gray-500"><%= __("emailUserReport.totalActivity") %></p>
                 <p class="text-lg font-bold text-gray-900" id="targetCompromisedText">
                   
                 </p>
@@ -118,37 +118,37 @@
       <!-- Employees Phishing Segments -->
       <div class="p-6 bg-white rounded-xl ">
         <h2 class="mb-4 text-lg font-semibold">
-          <%= userProfile.first_name %> Phishing Segments
+          <%= userProfile.first_name %> <%= __("emailUserReport.phishingSegments") %>
         </h2>
         <div id="userPhishingSegmentsChart"></div>
       </div>
 
       <!-- Reported To Admin -->
       <div class="p-6 bg-white rounded-xl ">
-        <h2 class="mb-4 text-lg font-semibold">Employee response</h2>
+        <h2 class="mb-4 text-lg font-semibold"><%= __("emailUserReport.employeeResponse") %></h2>
         <div id="reportChart"></div>
       </div>
 
       <!-- Employee Details -->
       <div class="p-6 bg-white rounded-xl ">
-        <h2 class="mb-6 text-lg font-semibold text-gray-800">Employee Details</h2>
+        <h2 class="mb-6 text-lg font-semibold text-gray-800"><%= __("emailUserReport.employeeDetails") %></h2>
         <div class="space-y-4">
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Receiver Address</span>
+            <span class="text-gray-500"><%= __("emailUserReport.receiverAddress") %></span>
             <span class="font-medium text-gray-800">
               <%= userProfile.email %>
             </span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Department</span>
+            <span class="text-gray-500"><%= __("emailUserReport.department") %></span>
             <span class="font-medium text-gray-800">IT</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Employee ID</span>
+            <span class="text-gray-500"><%= __("emailUserReport.employeeId") %></span>
             <span class="font-medium text-gray-800">3333</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-500">Campaign Date</span>
+            <span class="text-gray-500"><%= __("emailUserReport.campaignDate") %></span>
             <span class="font-medium text-gray-800">2025-08-12</span>
           </div>
         </div>
@@ -161,7 +161,7 @@
       <div class="flex items-center justify-between gap-3 px-5 pt-5">
 
         <div class="relative">
-          <h2 class="mb-4 text-2xl">Interaction report</h2>
+          <h2 class="mb-4 text-2xl"><%= __("emailUserReport.interactionReport") %></h2>
 
         </div>
 
@@ -173,10 +173,10 @@
 
           <button class="hidden lg:block ms-auto">
             <div class="relative">
-              <input type="text" placeholder="Search here..."
-                class="pl-14 pr-10 py-3 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+              <input type="text" placeholder="<%= __("emailUserReport.searchHere") %>"
+                class="pl-14 pr-10 py-3 h-12 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
               <img src="/securemagnus_2025/images/img/search.svg"
-                class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-7 top-1/2" alt="">
+                class="w-5 h-5 text-gray-400 absolute left-4 top-3.5" alt="">
             </div>
 
           </button>
@@ -184,7 +184,7 @@
             <a href=""
               class=" flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
 
-              Sort by
+              <%= __("emailUserReport.sortBy") %>
               <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
             </a>
 
@@ -200,37 +200,37 @@
         <table class="min-w-full text-sm text-left">
           <thead class="bg-[#FAFBFC]">
             <tr>
-              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">Campaign Name</th>
-              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">Date</th>
-              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">Risk Score</th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap"><%= __("emailUserReport.campaignName") %></th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap"><%= __("emailUserReport.date") %></th>
+              <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap"><%= __("emailUserReport.riskScore") %></th>
               <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <img src="/securemagnus_2025/images/email-opned.svg" class="w-5 h-5" alt="">
-                  Open Email
+                  <%= __("emailUserReport.openEmail") %>
                 </div>
               </th>
               <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <img src="/securemagnus_2025/images/Links-Interaction.svg" class="w-5 h-5" alt="">
-                  Clicked Linked
+                  <%= __("emailUserReport.clickedLinked") %>
                 </div>
               </th>
               <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <img src="/securemagnus_2025/images/eye.svg" class="w-5 h-5" alt="">
-                  Interact Form
+                  <%= __("emailUserReport.interactForm") %>
                 </div>
               </th>
               <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <img src="/securemagnus_2025/images/form-submit.svg" class="w-5 h-5" alt="">
-                  Form Submit
+                  <%= __("emailUserReport.formSubmit") %>
                 </div>
               </th>
               <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <img src="/securemagnus_2025/images/attachmentopened.svg" class="w-5 h-5" alt="">
-                  Attachment Opened
+                  <%= __("emailUserReport.attachmentOpened") %>
                 </div>
               </th>
               
@@ -238,7 +238,7 @@
               <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
                 <div class="flex items-center gap-2">
                   <img src="/securemagnus_2025/images/email-letter-mail-document.svg" class="w-5 h-5" alt="">
-                  Reported to Admin
+                  <%= __("emailUserReport.reportedToAdmin") %>
                 </div>
               </th>
             </tr>
@@ -283,36 +283,6 @@
 
           </tbody>
         </table>
-      </div>
-
-      <div class="flex items-center justify-between px-6 mt-16">
-
-        <p class="text-[#656972]">
-          Showing 1-8 out of 32 Entries
-        </p>
-
-
-        <div class="flex flex-wrap items-center justify-center gap-2 py-7 pb-9">
-          <button
-            class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] duration-300">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
-            </svg>
-          </button>
-          <button
-            class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">1</button>
-          <button class="w-8 h-8 rounded-full bg-teal-50 text-[var(--teal)] border border-[var(--teal)]">2</button>
-          <button
-            class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">3</button>
-          <button
-            class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">4</button>
-          <button
-            class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] duration-300">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </button>
-        </div>
       </div>
 
     </div>

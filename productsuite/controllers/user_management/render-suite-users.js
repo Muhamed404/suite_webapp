@@ -54,7 +54,8 @@ exports.renderSuiteUsers = async (req, res) => {
       enableSuiteManagementLeftMenu: true,
       users: combinedUsers,
       hasCreatePermission,
-      isReadOnly
+      isReadOnly,
+      locale: req.getLocale()
     });
 
   } catch (error) {

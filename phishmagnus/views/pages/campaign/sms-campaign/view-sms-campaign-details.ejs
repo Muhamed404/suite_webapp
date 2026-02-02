@@ -311,8 +311,7 @@
                     <%= __("sms.campaign_details.invitee_responses") || "Invitee Responses" %>
                 </h2>
                 <div class="relative flex-1 max-w-xs">
-                    <input type="text" id="responseSearchInput" placeholder="<%= __("generic_label.search_here")
-                        || 'Search here...' %>"
+                    <input type="text" id="responseSearchInput" placeholder="<%= __("generic_label.search_here") || 'Search here...' %>"
                     class="w-full pl-10 pr-4 py-2 rounded-full bg-gray-50 text-sm border border-gray-300
                     focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
                     <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-[49%] text-gray-400"></i>
@@ -362,14 +361,14 @@
                 <div class="flex flex-wrap gap-1 justify-center">
                     <button id="prevBtn"
                         class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm whitespace-nowrap">
-                        <i class="fas fa-chevron-left mr-1"></i>
+                        <i class="fas <%= locals.locale === 'ar' ? 'fa-chevron-right' : 'fa-chevron-left' %> mr-1"></i>
                         <%= __("generic_label.previous") || "Previous" %>
                     </button>
                     <div id="pageNumbers" class="flex flex-wrap gap-1 justify-center"></div>
                     <button id="nextBtn"
                         class="px-3 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm whitespace-nowrap">
                         <%= __("generic_label.next") || "Next" %>
-                            <i class="fas fa-chevron-right ml-1"></i>
+                            <i class="fas <%= locals.locale === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' %> ml-1"></i>
                     </button>
                 </div>
             </div>
@@ -395,6 +394,20 @@
                                         otp_shared: <%= campaign?.smsStats?.is_otp_shared || 0 %>,
                                             sms_interacted: <%= campaign?.smsStats?.is_sms_interacted || 0 %>,
                                                 totalSMSSent: <%= campaign?.smsStats?.totalSMSSent || 0 %>
+    };
+
+    window.I18N = {
+        count: '<%= __("sms.campaign_details.count") || "Count" %>',
+        linkClicked: '<%= __("sms.campaign_details.link_clicked") || "Link Clicked" %>',
+        pageVisited: '<%= __("sms.campaign_details.page_visited") || "Page Visited" %>',
+        formInteracted: '<%= __("sms.campaign_details.form_interacted") || "Form Interacted" %>',
+        formSubmitted: '<%= __("sms.campaign_details.form_submitted") || "Form Submitted" %>',
+        fileDownloaded: '<%= __("sms.campaign_details.file_downloaded") || "File Downloaded" %>',
+        noInteraction: '<%= __("sms.campaign_details.no_interaction") || "No Interaction" %>',
+        interacted: '<%= __("sms.campaign_details.interacted") || "Interacted" %>',
+        showing: '<%= __("generic_label.showing") || "Showing" %>',
+        of: '<%= __("generic_label.of") || "of" %>',
+        no_invitees: '<%= __("sms.campaign_details.no_invitees") || "No invitee responses yet" %>'
     };
 
     // Initialize Charts
@@ -587,7 +600,7 @@
                     const startIdx = (page - 1) * ITEMS_PER_PAGE + 1;
                     const endIdx = Math.min(page * ITEMS_PER_PAGE, result.pagination.total);
                     document.getElementById('paginationInfo').textContent =
-                        `Showing ${startIdx}-${endIdx} of ${result.pagination.total}`;
+                        `${window.I18N.showing} ${startIdx}-${endIdx} ${window.I18N.of} ${result.pagination.total}`;
 
                     renderPaginationControls();
                 } else {
@@ -609,7 +622,7 @@
             tbody.innerHTML = `
                 <tr>
                     <td colspan="7" class="px-6 py-8 text-center text-gray-500">
-                        No invitee responses yet
+                        ${window.I18N.no_invitees}
                     </td>
                 </tr>
             `;

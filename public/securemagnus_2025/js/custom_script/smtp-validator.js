@@ -16,7 +16,7 @@ function initSMTPFormValidator(config) {
         pattern = new RegExp(pattern);
       }
       return pattern.test(value);
-    }, "Please enter a valid format");
+    }, window.i18n?.validation_messages?.enter_valid_format || "Please enter a valid format");
 
     // Custom validation method to warn about common SMTP ports
     $.validator.addMethod("commonPort", function(value, element) {
@@ -24,7 +24,7 @@ function initSMTPFormValidator(config) {
       var commonPorts = [25, 465, 587, 2525];
       // This is just a warning method, always return true for validation
       return true;
-    }, "Ensure this is the correct SMTP port");
+    }, window.i18n?.validation_messages?.ensure_correct_smtp_port || "Ensure this is the correct SMTP port");
 
     // Initialize form validation
     $('#smtpSettingsForm').validate({
@@ -62,32 +62,32 @@ function initSMTPFormValidator(config) {
       },
       messages: {
         org: {
-          required: "Organization name is required",
-          minlength: "Organization name must be at least 2 characters",
-          maxlength: "Organization name cannot exceed 100 characters"
+          required: window.i18n?.validation_messages?.organization_name_required || "Organization name is required",
+          minlength: window.i18n?.validation_messages?.organization_name_minlength || "Organization name must be at least 2 characters",
+          maxlength: window.i18n?.validation_messages?.organization_name_maxlength || "Organization name cannot exceed 100 characters"
         },
         host: {
-          required: "SMTP host name is required",
-          minlength: "Host name must be at least 3 characters",
-          maxlength: "Host name cannot exceed 255 characters",
-          pattern: "Please enter a valid hostname or IP address"
+          required: window.i18n?.validation_messages?.smtp_host_required || "SMTP host name is required",
+          minlength: window.i18n?.validation_messages?.host_minlength || "Host name must be at least 3 characters",
+          maxlength: window.i18n?.validation_messages?.host_maxlength || "Host name cannot exceed 255 characters",
+          pattern: window.i18n?.validation_messages?.valid_hostname_ip || "Please enter a valid hostname or IP address"
         },
         port: {
-          required: "Port number is required",
-          number: "Please enter a valid port number",
-          min: "Port must be between 1 and 65535",
-          max: "Port must be between 1 and 65535"
+          required: window.i18n?.validation_messages?.port_required || "Port number is required",
+          number: window.i18n?.validation_messages?.valid_port_number || "Please enter a valid port number",
+          min: window.i18n?.validation_messages?.port_min || "Port must be between 1 and 65535",
+          max: window.i18n?.validation_messages?.port_max || "Port must be between 1 and 65535"
         },
         smtp_account: {
-          required: "Service account email is required",
-          minlength: "Service account must be at least 3 characters",
-          maxlength: "Service account cannot exceed 255 characters",
-          email: "Please enter a valid email address"
+          required: window.i18n?.validation_messages?.service_account_required || "Service account email is required",
+          minlength: window.i18n?.validation_messages?.service_account_minlength || "Service account must be at least 3 characters",
+          maxlength: window.i18n?.validation_messages?.service_account_maxlength || "Service account cannot exceed 255 characters",
+          email: window.i18n?.validation_messages?.valid_email || "Please enter a valid email address"
         },
         smtp_password: {
-          required: "Password is required",
-          minlength: "Password must be at least 6 characters",
-          maxlength: "Password cannot exceed 255 characters"
+          required: window.i18n?.validation_messages?.password_required || "Password is required",
+          minlength: window.i18n?.validation_messages?.password_minlength || "Password must be at least 6 characters",
+          maxlength: window.i18n?.validation_messages?.password_maxlength || "Password cannot exceed 255 characters"
         }
       },
       errorElement: 'span',
@@ -170,13 +170,13 @@ function initSMTPFormValidator(config) {
     $('#testConnection').on('click', function () {
       // Check if form is valid before testing
       if (!checkFormValidity()) {
-        showCustomToast('error', 'Please fill in all required fields before testing connection.');
+        showCustomToast('error', window.i18n?.validation_messages?.fill_required_fields_before_testing || 'Please fill in all required fields before testing connection.');
         return;
       }
 
       // Validate form using jQuery validator
       if (!$('#smtpSettingsForm').valid()) {
-        showCustomToast('error', 'Please fix all validation errors before testing connection.');
+        showCustomToast('error', window.i18n?.validation_messages?.fix_validation_errors_before_testing || 'Please fix all validation errors before testing connection.');
         return;
       }
 
@@ -193,15 +193,15 @@ function initSMTPFormValidator(config) {
         success: function (response) {
           // Check different response structures
           if (response.message && response.message.message && response.message.message.Code == 200) {
-            showCustomToast('success', "SMTP TEST: CONNECTION SUCCESSFUL.");
+            showCustomToast('success', window.i18n?.validation_messages?.smtp_test_connection_successful || "SMTP TEST: CONNECTION SUCCESSFUL.");
           } else if (response.message && response.message.alertType === 'success') {
-            showCustomToast('success', "SMTP TEST: CONNECTION SUCCESSFUL.");
+            showCustomToast('success', window.i18n?.validation_messages?.smtp_test_connection_successful || "SMTP TEST: CONNECTION SUCCESSFUL.");
           } else {
-            showCustomToast('error', "SMTP TEST: CONNECTION FAILED.");
+            showCustomToast('error', window.i18n?.validation_messages?.smtp_test_connection_failed || "SMTP TEST: CONNECTION FAILED.");
           }
         },
         error: function (jqXHR, textStatus, errorThrown) {
-          showCustomToast('error', "SMTP TEST: ISSUE IN CONNECTION FAILURE.");
+          showCustomToast('error', window.i18n?.validation_messages?.smtp_test_connection_issue || "SMTP TEST: ISSUE IN CONNECTION FAILURE.");
         },
         complete: function() {
           // Re-enable test button

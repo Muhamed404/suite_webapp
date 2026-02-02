@@ -4,12 +4,12 @@
       <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
         <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
         <span class="text-gray-400">›</span>
-        <a href="/user/securemagnus-users" class="hover:text-gray-700 transition">SecureMagnus Users</a>
+        <a href="/user/securemagnus-users" class="hover:text-gray-700 transition"><%= __("user.labelSecureMagnusUsers") %></a>
         <span class="text-gray-400">›</span>
-        <span class="font-semibold text-gray-900">Create User</span>
+        <span class="font-semibold text-gray-900"><%= __("user.labelCreateUser") %></span>
       </nav>
       <h3 class="text-3xl font-medium">
-        Create SecureMagnus User
+        <%= __("user.labelCreateSecureMagnusUser") %>
       </h3>
     </div>
   </div>
@@ -21,7 +21,7 @@
 
   <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
 
-    <form action="/user/create" method="post" name="addUserForm" id="addUserForm" class="bg-white  w-full mt-3 p-8">
+    <form action="/user/create" method="post" name="addUserForm" id="addUserForm" class="bg-white  w-full mt-3 p-8" data-select-role-error="<%= __('user.validationSelectRoleProceed') %>">
       <!-- Stepper Navigation -->
       <div id="stepper" class="flex items-center justify-between mb-10">
         <div class="flex items-center gap-2">
@@ -29,7 +29,7 @@
             class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white font-bold text-xs">
             1</div>
           <span class="font-medium step-label text-teal-700 text-sm">
-            Choose Product
+            <%= __("user.stepChooseProduct") %>
           </span>
         </div>
         <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
@@ -38,7 +38,7 @@
             class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-white border-2 border-teal-300 text-teal-400 font-bold text-xs">
             2</div>
           <span class="font-medium step-label text-gray-400 text-sm">
-            Enter User Details
+            <%= __("user.labelEnterUserDetails") %>
           </span>
         </div>
 
@@ -74,4 +74,10 @@
 
 <script src="/securemagnus_2025/js/form_stepper.js"></script>
 <script src="/securemagnus_2025/js/custom_script/create-user-validation.js"></script>
+<script>
+window.i18n = window.i18n || {};
+window.i18n.labels = window.i18n.labels || {};
+window.i18n.labels.finish = '<%= __("generic_label.Finish") %>';
+window.i18n.labels.next = '<%= __("generic_label.next") %>';
+</script>
 

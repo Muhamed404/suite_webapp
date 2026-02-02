@@ -154,10 +154,7 @@ exports.generateWhatsappCampaignDetails = async (req, res) => {
     const templateData = {
       campaign: campaign,
       inviteesCountStats,
-      user: req.user,
-      message: req.flash('message')[0] || null,
-      alertType: req.flash('alertType')[0] || null,
-
+      user: req.user
     };
 
     logger.info(`[Whatsapp Campaign Details] Rendering campaign details template`);

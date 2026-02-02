@@ -1,9 +1,26 @@
-name: Deploy to OCI Server
+name: Deploy Suite Webapp ( Express ) to OCI Server
 
 on:
   push:
     branches:
       - development
+    paths:
+      - 'phishmagnus/**'
+      - 'productsuite/**'
+      - 'commons/**'
+      - 'config/**'
+      - 'logger/**'
+      - 'locales/**'
+      - 'middleware/**'
+      - 'routes/**'
+      - 'views/**'
+      - 'public/**'
+      - 'utility/**'
+      - 'server.js'
+      - 'package.json'
+      - '.github/workflows/deploy.yml'
+      - '.github/scripts/deploy.sh'
+      - '.github/scripts/register-suite-webapp-service.sh'
 
 env:
   NODE_VERSION: '20.19.2'

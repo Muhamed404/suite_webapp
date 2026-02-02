@@ -58,13 +58,15 @@ $(document).ready(function () {
             // data: { product: selectedProduct },
             success: function (response) {
                 // Assuming response.availableLicenses contains the number
-                $('#alertLicenseAvailability').val('Available Users License: ' + response.filteredLicense.availableLicenses);
+                var licenseText = $('#alertLicenseAvailability').data('license-text') || 'Available Users License';
+                $('#alertLicenseAvailability').val(licenseText + ': ' + response.filteredLicense.availableLicenses);
                 $('#nextBtn').prop('disabled', false); // enable the button
                 $('#nextBtn').removeClass('opacity-50 cursor-not-allowed'); // remove visual feedback
             },
             error: function () {
                 // alert('Failed to fetch license availability');
-                $('#alertLicenseAvailability').val('Available Users License: ' + 0);
+                var licenseText = $('#alertLicenseAvailability').data('license-text') || 'Available Users License';
+                $('#alertLicenseAvailability').val(licenseText + ': ' + 0);
 
                 $('#nextBtn').prop('disabled', true); // disables the button
                 $('#nextBtn').addClass('opacity-50 cursor-not-allowed'); // optional: visual feedback
@@ -163,7 +165,8 @@ $(document).ready(function () {
             $('#role').next('.role-error').remove();
             
             // Add error message below the role field
-            $('#role').after('<div class="role-error text-red-500 text-sm mt-1">Please select a user role before proceeding.</div>');
+            var errorMsg = $('#addUserForm').data('select-role-error') || 'Please select a user role before proceeding.';
+            $('#role').after('<div class="role-error text-red-500 text-sm mt-1">' + errorMsg + '</div>');
             $('#role').focus();
             return false;
         }

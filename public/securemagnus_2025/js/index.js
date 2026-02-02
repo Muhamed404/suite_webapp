@@ -73,6 +73,40 @@ function showCustomToast(alertType, alertMessage = null) {
     return;
   }
 
+  const lang = document.documentElement.lang;
+  let title = alertType === 'error' ? 'Error' : 'Success!';
+  let message = alertMessage;
+
+  if (lang === 'ar') {
+    if (alertType === 'error') {
+      title = 'خطأ';
+    } else {
+      title = 'نجاح!';
+    }
+    const translations = {
+      'Package deleted successfully': 'تم حذف الباقة بنجاح',
+      'User deleted successfully': 'تم حذف المستخدم بنجاح',
+      'User created successfully': 'تم إنشاء المستخدم بنجاح',
+      'Campaign launch has been initiated': 'تم بدء إطلاق الحملة',
+      'Campaign Launch has been initiated': 'تم بدء إطلاق الحملة',
+      'Campaign has been initiated': 'تم بدء الحملة',
+      'campaign has been initiated': 'تم بدء الحملة',
+      'Campaign has been initated': 'تم بدء الحملة',
+      'Campaign has been initiated.': 'تم بدء الحملة.',
+      'QR Campaign created successfully': 'تم إنشاء حملة QR بنجاح',
+      'Success': 'نجاح',
+      'Success!': 'نجاح!',
+      '!Success': '!نجاح',
+      '! Success': '! نجاح',
+      'Success !': 'نجاح !',
+      'Delete Successfully': 'تم الحذف بنجاح',
+      'Successfully': 'بنجاح'
+    };
+    for (const [en, ar] of Object.entries(translations)) {
+      message = message.replaceAll(en, ar);
+    }
+  }
+
   const toast = document.createElement('div');
   toast.className =
     'flex items-start p-6 rounded-2xl shadow-xl max-w-md w-full ' +
@@ -83,12 +117,10 @@ function showCustomToast(alertType, alertMessage = null) {
     <span class="mt-1" aria-hidden="true">${alertType === 'error' ? errorIcon : successIcon}</span>
     <div>
       <div class="text-[18px] font-bold">
-        ${alertType === 'error' ? 'Error' : 'Success!'}
+        ${title}
       </div>
       <div class="text-[12px] font-normal mt-1">
-        ${alertType === 'error'
-          ? alertMessage
-          : alertMessage}
+        ${message}
       </div>
     </div>
   `;

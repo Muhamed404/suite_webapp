@@ -94,7 +94,7 @@ const validate = (method) => {
           .notEmpty()
 
           .isString()
-          .withMessage("Name of Group is require"),
+          .withMessage("Name of Group is required"),
       ];
     }
     case "validateInvoiceReport": {
@@ -237,7 +237,7 @@ const handleValidationResult = (req, res, next) => {
       )}`
     );
     req.flash("alertType", "error");
-    req.flash("message", `Form validation Error`);
+    req.flash("message", req.__("generic_label.form_validation_error"));
 
  
     return res.redirect(

@@ -39,7 +39,7 @@ exports.generateQRTagReport = async (req, res) => {
     const qrReportProfile = response?.data?.message.qrReportProfile || {};
     logger.info(`[QR Tag Report]: QR Report Profile: ${JSON.stringify(qrReportProfile, null, 2)}`);
     // Transform interaction stats into timeline format
-    const interactionTimeline = transformInteractionStatsTimeline(qrReportProfile);
+    const interactionTimeline = transformInteractionStatsTimeline(qrReportProfile, req);
     logger.info(`[QR Tag Report]: Interaction Timeline: ${JSON.stringify(interactionTimeline, null, 2)}`);
 
     return res.render(render_ejs_urls.PhishMagnus.Campaign.QR.RENDER_TAG_REPORT, {
@@ -61,14 +61,14 @@ exports.generateQRTagReport = async (req, res) => {
 };
 
 // Add this function to your emailUserReport.js controller
-function transformInteractionStatsTimeline(qrReportProfile) {
+function transformInteractionStatsTimeline(qrReportProfile, req) {
   const interactions = [];
   const qr = qrReportProfile?.QRReport?.[0];
 
   // QR Created
   if (qrReportProfile?.createdAt) {
     interactions.push({
-      name: "QR Created",
+      name: req.__('qr_report.qr_created'),
       time: qrReportProfile.createdAt
     });
   }
@@ -76,7 +76,7 @@ function transformInteractionStatsTimeline(qrReportProfile) {
   // QR Scanned
   if (qr?.is_opened > 0 && qr?.msg_link_opened_date) {
     interactions.push({
-      name: "QR Scanned",
+      name: req.__('qr_report.qr_scanned'),
       time: qr.msg_link_opened_date
     });
   }
@@ -84,7 +84,7 @@ function transformInteractionStatsTimeline(qrReportProfile) {
   // Interact Form
   if (qr?.is_interacted > 0 && qr?.form_interaction_date) {
     interactions.push({
-      name: "Interact Form",
+      name: req.__('qr_report.interact_form'),
       time: qr.form_interaction_date
     });
   }
@@ -92,7 +92,7 @@ function transformInteractionStatsTimeline(qrReportProfile) {
   // Form Submit
   if (qr?.is_submitted > 0 && qr?.form_submitted_date) {
     interactions.push({
-      name: "Form Submit",
+      name: req.__('qr_report.form_submit'),
       time: qr.form_submitted_date
     });
   }
@@ -100,7 +100,7 @@ function transformInteractionStatsTimeline(qrReportProfile) {
   // Attachment Open
   if (qr?.is_downloaded > 0 && qr?.file_download_date) {
     interactions.push({
-      name: "Attachment Open",
+      name: req.__('qr_report.attachment_open'),
       time: qr.file_download_date
     });
   }

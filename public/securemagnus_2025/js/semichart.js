@@ -369,8 +369,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedScans || 'Repeated Scans');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedScans || 'Repeated Scans');
   });
 
   document.querySelectorAll('.qrSemiChartInteract').forEach((el) => {
@@ -380,8 +380,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedInteractions || 'Repeated Interactions');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedInteractions || 'Repeated Interactions');
   });
 
   document.querySelectorAll('.qrSemiChartSubmitted').forEach((el) => {
@@ -391,8 +391,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedSubmitted || 'Repeated Submitted');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedSubmitted || 'Repeated Submitted');
   });
 
 
@@ -403,8 +403,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedDownloads || 'Repeated Downloads');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedDownloads || 'Repeated Downloads');
   });
 
 
@@ -416,8 +416,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelTotalScans || 'Total Scans');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedScans || 'Total Scans');
   });
 
   document.querySelectorAll('.nfcSemiChartInteract').forEach((el) => {
@@ -427,8 +427,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const totalScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Interactions', 'Repeated Interactions', 'No Interactions'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, totalInteractions, noScan, uniqueColor, totalScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelTotalInteractions || 'Total Interactions');
+    const labels = [window.localizedLabels?.uniqueInteractions || 'Unique Interactions', window.localizedLabels?.repeatedInteractions || 'Repeated Interactions', window.localizedLabels?.noInteractions || 'No Interactions'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, totalInteractions, noScan, uniqueColor, totalScanColor, noScanColor, labels, window.localizedLabels?.repeatedInteractions || 'Total Interactions');
   });
 
   document.querySelectorAll('.nfcSemiChartSubmitted').forEach((el) => {
@@ -438,8 +438,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const totalSubmittedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Submitted', 'Repeated Submitted', 'No Submitted'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, totalSubmitted, noScan, uniqueColor, totalSubmittedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelTotalSubmitted || 'Total Submitted');
+    const labels = [window.localizedLabels?.uniqueSubmitted || 'Unique Submitted', window.localizedLabels?.repeatedSubmitted || 'Repeated Submitted', window.localizedLabels?.noSubmitted || 'No Submitted'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, totalSubmitted, noScan, uniqueColor, totalSubmittedScanColor, noScanColor, labels, window.localizedLabels?.repeatedSubmitted || 'Total Submitted');
   });
 
 
@@ -450,8 +450,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedDownloads || 'Repeated Downloads');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedDownloads || 'Repeated Downloads');
   });
 
   // document.querySelectorAll('.semichartFormSubmitted').forEach((el) => {

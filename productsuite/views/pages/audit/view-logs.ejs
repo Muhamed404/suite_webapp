@@ -9,7 +9,7 @@
       <span class="text-gray-400">›</span>
       <span class="font-semibold text-gray-900"><%= __("breadcrumbs.audit") %></span>
     </nav>
-    <h3 class="text-3xl font-medium">Audit Log</h3>
+    <h3 class="text-3xl font-medium"><%= __("breadcrumbs.audit") %></h3>
   </div>
 </div>
 
@@ -19,15 +19,21 @@
     <div class="flex flex-row justify-between w-full gap-6 mb-6">
       <!-- Tabs with counts -->
       <div id="statusTabs"
-        class="flex items-center justify-start gap-4 p-1 text-sm font-medium bg-white rounded-full w-fit">
+        class="flex items-center justify-start gap-4 p-1 text-sm font-medium bg-white rounded-full w-fit"
+        data-tab-all="<%- __('Audit.tabAll') %>"
+        data-tab-active="<%- __('Audit.tabActive') %>"
+        data-tab-inprogress="<%- __('Audit.tabInprogress') %>"
+        data-tab-completed="<%- __('Audit.tabCompleted') %>">
       </div>
       <!-- Search + Filter -->
       <div class="flex items-center justify-between">
         <div class="relative">
-          <input id="searchInput" type="text" placeholder="Search here..."
-            class="pl-14 pr-10 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-          <img src="/securemagnus_2025/images/img/search.svg"
-            class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-7 top-1/2" alt="">
+          <input id="searchInput" type="text" placeholder="<%= __('Audit.searchPlaceholder') %>"
+            class="pl-10 pr-10 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+            <img src="/securemagnus_2025/images/img/search.svg"
+              class="w-5 h-5 text-gray-400" alt="">
+          </div>
         </div>
       </div>
 
@@ -103,7 +109,7 @@
 
     <!-- Pagination -->
     <div class="flex items-center justify-between mt-4">
-      <select id="rowsPerPage" class="px-2 py-1 border rounded">
+      <select id="rowsPerPage" class="px-4 py-2 border rounded text-sm" style="padding-right: 2.5rem; background-position: right 0.75rem center;">
         <option value="5">5</option>
         <option value="10" selected>10</option>
         <option value="20">20</option>
@@ -126,8 +132,73 @@
     pagination: <%- JSON.stringify(pagination) %>,
  
     };
+  // Localization data
+  window.i18n = {
+    Audit: {
+      tabAll: "<%- __('Audit.tabAll') %>",
+      tabActive: "<%- __('Audit.tabActive') %>",
+      tabInprogress: "<%- __('Audit.tabInprogress') %>",
+      tabCompleted: "<%- __('Audit.tabCompleted') %>"
+    }
+  };
 </script>
 
 
 
 <script src="/securemagnus_2025/js/audit_log_table_jquery.js"></script>
+
+<script>
+// Override the renderTabs function to use localized tab names
+const originalRenderTabs = window.renderTabs || function() {};
+
+function renderTabs() {
+  // Count how many items are in each status
+  const counts = { All: window.auditData?.report?.report?.length || 0 };
+  ["active", "inprogress", "completed"].forEach(st => {
+    counts[st] = (window.auditData?.report?.report || []).filter(d => d.status === st).length;
+  });
+
+  // Generate buttons dynamically
+  const statusTabs = document.getElementById('statusTabs');
+  if (!statusTabs) return;
+
+  statusTabs.innerHTML = Object.entries(counts)
+    .map(([status, count]) => {
+      const isActive = (window.currentTab || 'All') === status;
+      let displayName = status;
+      
+      // Localize tab names from data attributes
+      if (status === 'All') displayName = statusTabs.dataset.tabAll || 'All';
+      else if (status === 'active') displayName = statusTabs.dataset.tabActive || 'Active';
+      else if (status === 'inprogress') displayName = statusTabs.dataset.tabInprogress || 'Inprogress';
+      else if (status === 'completed') displayName = statusTabs.dataset.tabCompleted || 'Completed';
+
+      // If active
+      if (isActive) {
+        return `
+          <button class="flex items-center gap-1 px-4 py-2 text-white transition-all duration-300 bg-gray-900 rounded-full filter-btn"
+                  onclick="setTab('${status}')">
+            ${displayName}
+            <span class="number bg-gray-700 text-white text-xs px-2 py-0.5 rounded-full transition-all duration-300">
+              ${count}
+            </span>
+          </button>`;
+      }
+
+      // If not active
+      return `
+        <button class="flex items-center gap-1 px-4 py-2 text-gray-600 transition-all duration-300 rounded-full filter-btn hover:text-black"
+                onclick="setTab('${status}')">
+          ${displayName}
+          <span class="number text-green-500 bg-green-500/15 text-xs px-2 py-0.5 rounded-full transition-all duration-300">
+            ${count}
+          </span>
+        </button>`;
+    }).join("");
+}
+
+// Call renderTabs when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  renderTabs();
+});
+</script>

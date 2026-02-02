@@ -26,12 +26,12 @@ var barOptions = {
   },
   xaxis: {
     categories: [
-      'QR Codes',
-      'Total Scans',
-      'Opened Link',
-      'Interact Form',
-      'Submit Form',
-      'Attachment Downloaded'
+      localizedLabels.qrCodes,
+      localizedLabels.totalScans,
+      localizedLabels.openedLink,
+      localizedLabels.interactForm,
+      localizedLabels.submitForm,
+      localizedLabels.attachmentDownloaded
     ],
     labels: {
       style: {
@@ -74,11 +74,11 @@ const reportedToAdmin = campMetricsData?.reportedToAdmin || 0
 
 
 // Update left labels dynamically
-document.getElementById('scanText').innerText = `${campMetricsData.openedLink} People`;
-document.getElementById('notScanText').innerText = `${campMetricsData.totalNotScans} People`;
-document.getElementById('formInteractionText').innerText = `${campMetricsData.interactForm} People`;
-document.getElementById('targetCompromisedText').innerText = `${targetCompromised} People`;
-document.getElementById('attachmentDownloadedText').innerText = `${campMetricsData.attachmentDownloaded} People`;
+document.getElementById('scanText').innerText = `${campMetricsData.openedLink} ${localizedLabels.people}`;
+document.getElementById('notScanText').innerText = `${campMetricsData.totalNotScans} ${localizedLabels.people}`;
+document.getElementById('formInteractionText').innerText = `${campMetricsData.interactForm} ${localizedLabels.people}`;
+document.getElementById('targetCompromisedText').innerText = `${targetCompromised} ${localizedLabels.people}`;
+document.getElementById('attachmentDownloadedText').innerText = `${campMetricsData.attachmentDownloaded} ${localizedLabels.people}`;
 
 // ApexCharts Configuration
 var successOptions = {
@@ -87,7 +87,7 @@ var successOptions = {
     type: 'donut',
     height: '100%'
   },
-  labels: ['Scanned',  'Interaction', 'File Downloaded', 'Target Compromised', 'Not Scanned'],
+  labels: [localizedLabels.scanned, localizedLabels.interaction, localizedLabels.fileDownloaded, localizedLabels.targetCompromised, localizedLabels.notScanned],
   colors: ['#3b82f6', '#fb923c', '#34d399', '#ef4444', '#9ca3af'],
 
   dataLabels: { enabled: false },
@@ -123,7 +123,7 @@ var successOptions = {
     enabled: true,
     y: {
       formatter: function (val) {
-        return val + ' People';
+        return val + ' ' + localizedLabels.people;
       }
     }
   }
@@ -143,11 +143,11 @@ var segmentsOptions = {
     height: 300
   },
   labels: [
-    'QR Codes Sent',
-    'QR Codes Not Scanned',
-    'QR Code Scanned',
-    'QR Code Submit Data',
-    'QR Code Attachment Opened'
+    localizedLabels.qrCodesSent,
+    localizedLabels.qrCodesNotScanned,
+    localizedLabels.qrCodeScanned,
+    localizedLabels.qrCodeSubmitData,
+    localizedLabels.qrCodeAttachmentOpened
   ],
   colors: ['#60a5fa', '#e5e7eb', '#fbbf24', '#a78bfa', '#4ade80'],
   legend: {
@@ -165,7 +165,7 @@ var segmentsOptions = {
     enabled: true,
     y: {
       formatter: function (val) {
-        return val + " People";
+        return val + " " + localizedLabels.people;
       }
     }
   },
