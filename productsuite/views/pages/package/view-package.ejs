@@ -37,7 +37,7 @@
         <!-- Dropdown outside -->
         <div style="margin-bottom: 1rem;">
           <select id="filter">
-            <option value="">All</option>
+            <option value=""><%= __("generic_label.all") %></option>
             <option value="On Cloud">On Cloud</option>
             <option value="On Premise">On Premise</option>
           </select>
@@ -45,7 +45,7 @@
       </div>
 
 
-      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700">
+      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} <%= __('generic_label.to') %> {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
         <thead class="bg-gray-50 text-gray-600  text-xs">
           <tr>
 
@@ -182,6 +182,32 @@
     </div>
   </div>
 </div>
+
+<style>
+.datatable-search {
+  flex: 1;
+}
+.datatable-input {
+  width: 100%;
+}
+.datatable-length select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+</style>
+
+<script>
+if (!document.getElementById('filter-table') || typeof simpleDatatables === 'undefined' || typeof simpleDatatables.DataTable === 'undefined') {
+  console.warn('simple-datatables not found or table missing');
+} else {
+  const dataTable = new simpleDatatables.DataTable('#filter-table', {
+    searchable: true,
+    fixedHeight: true,
+  });
+}
+</script>
 
 <script>
 function toggleDropdown(button) {

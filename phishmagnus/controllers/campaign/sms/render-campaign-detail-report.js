@@ -132,8 +132,6 @@ exports.getSMSCampaignDetails = async (req, res) => {
     const templateData = {
       campaign: campaign,
       user: req.user,
-      message: req.flash('message')[0] || null,
-      alertType: req.flash('alertType')[0] || null,
       isMockData: USE_MOCK_DATA
     };
 

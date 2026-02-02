@@ -75,14 +75,11 @@ function validateDepartmentGroupSelection() {
   let groupSelect = null;
 
   tagSelectors.forEach(selector => {
-    const label = selector.querySelector('label');
-    if (label) {
-      const labelText = label.textContent.toLowerCase();
-      if (labelText.includes('department')) {
-        departmentSelect = selector.querySelector('.groupSelect');
-      } else if (labelText.includes('group')) {
-        groupSelect = selector.querySelector('.groupSelect');
-      }
+    const fieldType = selector.dataset?.field?.trim();
+    if (fieldType === 'department') {
+      departmentSelect = selector.querySelector('.groupSelect');
+    } else if (fieldType === 'group') {
+      groupSelect = selector.querySelector('.groupSelect');
     }
   });
 
