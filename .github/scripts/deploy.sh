@@ -72,7 +72,33 @@ sudo chmod -R 755 "$DEPLOY_DIR"
 # Install dependencies
 echo "Installing Node.js dependencies..."
 cd "$DEPLOY_DIR"
-npm install --only=production --no-package-lock
+
+# Clean node_modules if exists to prevent corrupted state
+if [ -d "node_modules" ]; then
+    echo "Removing existing node_modules for clean install..."
+    rm -rf node_modules
+fi
+
+# Install with retry logic for transient failures
+MAX_RETRIES=3
+RETRY_COUNT=0
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    if npm install --only=production --no-package-lock; then
+        echo "Dependencies installed successfully"
+        break
+    else
+        RETRY_COUNT=$((RETRY_COUNT + 1))
+        if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+            echo "npm install failed, cleaning up and retrying ($RETRY_COUNT/$MAX_RETRIES)..."
+            rm -rf node_modules
+            npm cache clean --force
+            sleep 5
+        else
+            echo "ERROR: npm install failed after $MAX_RETRIES attempts"
+            exit 1
+        fi
+    fi
+done
 
 # Create .env file from environment variables
 echo "Creating environment configuration..."
