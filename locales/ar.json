@@ -462,7 +462,9 @@
 		"btnEdit": "تعديل",
 		"statusActive": "نشط",
 		"statusInactive": "غير نشط",
-		"labelSave": "حفظ"
+		"labelSave": "حفظ",
+		"modalConfirmLicenseAssignment": "هل أنت متأكد من أنك تريد تعيين هذا الترخيص؟",
+		"modalConfirmSetAsLicensed": "هل أنت متأكد من أنك تريد تعيين هذا المستخدم كمرخص؟"
 	},
 	"system_template": {
 		"stepper1": "تفاصيل القالب",

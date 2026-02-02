@@ -308,8 +308,9 @@
   <div id="licenseConfirmModal"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm ml-20 -mt-10">
-      <h2 class="text-lg font-semibold mb-4">Confirm License Assignment</h2>
-      <p class="mb-6">Are you sure you want to set this user as <span class="font-bold text-green-600">Licensed</span>?
+      <h2 class="text-lg font-semibold mb-4"><%= __("user.modalConfirmLicenseAssignment") %></h2>
+      <p class="mb-6"><%= __("user.modalConfirmSetAsLicensed") %>
+        <span class="font-bold" id="licenseActionText">Licensed</span>
       </p>
       <div class="flex justify-end gap-3">
         <button id="cancelLicenseConfirm" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">Cancel</button>
@@ -360,34 +361,42 @@ if (!document.getElementById('filter-table') || typeof simpleDatatables === 'und
 
     document.addEventListener('click', function (e) {
       // Handle action dropdown toggle
-      if (e.target.closest('.relative.inline-block.text-left button')) {
+      const actionBtn = e.target.closest('div.relative.inline-block.text-left button');
+      if (actionBtn && !actionBtn.classList.contains('licenseStatusBtn') && !actionBtn.classList.contains('AwareMagnuslicenseStatusBtn')) {
         e.preventDefault();
-        const btn = e.target.closest('.relative.inline-block.text-left button');
-        const menu = btn.parentElement.querySelector('.actionDropdownMenu');
-        if (menu) {
-          // Close other action menus
-          document.querySelectorAll('.actionDropdownMenu').forEach(other => {
-            if (other !== menu) other.classList.add('hidden');
-          });
-          menu.classList.toggle('hidden');
+        e.stopPropagation();
+        
+        const parentDiv = actionBtn.closest('div.relative.inline-block.text-left');
+        if (parentDiv) {
+          const menu = parentDiv.querySelector('.actionDropdownMenu');
+          if (menu) {
+            document.querySelectorAll('.actionDropdownMenu').forEach(other => {
+              if (other !== menu) other.classList.add('hidden');
+            });
+            menu.classList.toggle('hidden');
+          }
         }
         return;
       }
 
-      // Handle dropdown toggle
-      if (e.target.closest('.licenseStatusBtn') || e.target.closest('.AwareMagnuslicenseStatusBtn')) {
+      const licenseBtn = e.target.closest('button.licenseStatusBtn') || e.target.closest('button.AwareMagnuslicenseStatusBtn');
+      if (licenseBtn) {
         e.preventDefault();
-        const PhishMagnusBtn = e.target.closest('.licenseStatusBtn');
-        const AwareMagnusBtn = e.target.closest('.AwareMagnuslicenseStatusBtn');
-        actionProduct = PhishMagnusBtn ? 'phm' : 'awm';
-        const btn = PhishMagnusBtn || AwareMagnusBtn;
-        const menu = btn.parentElement.querySelector('.licenseDropdownMenu');
-        if (menu) {
-          menu.classList.toggle('hidden');
-          // Close other dropdowns
-          document.querySelectorAll('.licenseDropdownMenu').forEach(other => {
-            if (other !== menu) other.classList.add('hidden');
-          });
+        e.stopPropagation();
+        
+        const isPhishMagnus = licenseBtn.classList.contains('licenseStatusBtn');
+        actionProduct = isPhishMagnus ? 'phm' : 'awm';
+        
+        // Find the parent div with relative positioning
+        const parentDiv = licenseBtn.closest('div.relative.inline-block.text-left');
+        if (parentDiv) {
+          const menu = parentDiv.querySelector('.licenseDropdownMenu');
+          if (menu) {
+            document.querySelectorAll('.licenseDropdownMenu').forEach(other => {
+              if (other !== menu) other.classList.add('hidden');
+            });
+            menu.classList.toggle('hidden');
+          }
         }
         return; // Prevent further handling for dropdown button clicks
       }
@@ -403,15 +412,31 @@ if (!document.getElementById('filter-table') || typeof simpleDatatables === 'und
           pendingLicenseStatus = newStatus;
           // Update modal text
           let actionText = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
-          document.querySelector('#licenseConfirmModal span.font-bold').textContent = actionText;
+          const actionTextSpan = document.getElementById('licenseActionText');
+          if (actionTextSpan) {
+            actionTextSpan.textContent = actionText;
+          }
           document.getElementById('licenseConfirmModal').classList.remove('hidden');
         }
         return;
       }
 
       // Close dropdowns when clicking outside
-      document.querySelectorAll('.licenseDropdownMenu, .actionDropdownMenu').forEach(menu => {
-        if (!menu.parentElement.contains(e.target)) menu.classList.add('hidden');
+      const licenseDropdowns = document.querySelectorAll('.licenseDropdownMenu');
+      const actionDropdowns = document.querySelectorAll('.actionDropdownMenu');
+      
+      licenseDropdowns.forEach(menu => {
+        const parentDiv = menu.closest('div.relative.inline-block.text-left');
+        if (parentDiv && !parentDiv.contains(e.target)) {
+          menu.classList.add('hidden');
+        }
+      });
+      
+      actionDropdowns.forEach(menu => {
+        const parentDiv = menu.closest('div.relative.inline-block.text-left');
+        if (parentDiv && !parentDiv.contains(e.target)) {
+          menu.classList.add('hidden');
+        }
       });
     });
 

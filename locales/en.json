@@ -439,7 +439,9 @@
 		"labelRoleAssigned": "Role Assigned",
 		"labelUserStatus": "User Status",
 		"labelAction": "Action",
-		"btnAddUser": "Add User"
+		"btnAddUser": "Add User",
+		"modalConfirmLicenseAssignment": "Are you sure you want to assign this license?",
+		"modalConfirmSetAsLicensed": "Are you sure you want to set this user as licensed?"
 	},
 	"system_template": {
 		"stepper1": "Template Details",
