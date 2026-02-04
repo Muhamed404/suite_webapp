@@ -211,6 +211,7 @@
 		"serviceRegistry": "سجل الخدمات",
 		"audit": "سجل التدقيق",
 		"subscriptionHistory": "سجل الاشتراكات",
+		"userManagement": "إدارة المستخدمين",
 		"campaigns": "الحملات",
 		"allCampaigns": "جميع الحملات",
 		"createEmailCampaign": "إنشاء حملة بريد إلكتروني",
