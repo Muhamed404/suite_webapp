@@ -59,11 +59,14 @@ exports.editOrganization = async (req, res) => {
       address: req.body.address,
       firstName: req.body.firstName,
       lastName: req.body.lastName,
-      password: req.body.password,
       email: req.body.email,
       postalCode: parseInt(req.body.postalCode),
       contact: req.body.contact
     };
+
+    if (req.body.password) {
+      payload.password = req.body.password;
+    }
     logger.info(`EDIT ORGANIZATION: FINAL PAYLOAD:${JSON.stringify(payload)}`);
 
     try {
