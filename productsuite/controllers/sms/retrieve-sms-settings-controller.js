@@ -18,7 +18,7 @@ exports.retrieveSMSSettings = async (req, res) => {
         logger.info(`Retrieve SMS Controller: Successfully retrieved SMS with ID ${organizationId}`);
         const smsData = response.data.object || null;
         logger.info(`Retrieve SMS Controller: SMS Data: ${JSON.stringify(smsData, null, 2)}`);
-        return res.render("pages/sms/create-sms", { sms: smsData, organization: req.params.organizationId });
+        return res.render("pages/sms/create-sms", { sms: smsData, organization: req.params.organizationId, enableSuiteManagementLeftMenu: true });
 
 
     } catch (err) {
