@@ -799,6 +799,9 @@
 			"labelEmailOpenedNotReported": "Email Opened Not Reported",
 			"labelEmailOpenedAndReported": "Email Opened & Reported",
 			"labelEmailNotOpenedAndReported": "Email Not Opened & Reported"
+		},
+		"email_create_campaign": {
+			"title": "Create Email Campaign"
 		}
 	},
 	"usb_campaign": {
@@ -1648,5 +1651,10 @@
 			"passwords_must_match": "Passwords must match"
 		}
 	},
-	"labelTrackingEmailDetails_level1": "Open Email (Level 1)"
+	"labelTrackingEmailDetails_level1": "Open Email (Level 1)",
+	"email": {
+		"create_campaign": {
+			"title": "email.create_campaign.title"
+		}
+	}
 }

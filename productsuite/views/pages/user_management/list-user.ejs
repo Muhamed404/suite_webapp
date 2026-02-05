@@ -277,6 +277,7 @@
                     </svg>
                   </button>
                   <ul class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 hidden actionDropdownMenu">
+                    <% if(u.user.status === true || u.user.status === "true"){ %>
                     <li>
                       <a href="/user/delete/<%= u.userProfileId || "" %>"
                         class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
@@ -284,6 +285,7 @@
                         <%= __("user.btnDelete") %>
                       </a>
                     </li>
+                    <% } %>
                     <li>
                       <a href="/user/show/<%= u.userProfileId || "" %>"
                         class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 rounded transition">

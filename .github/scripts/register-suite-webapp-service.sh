@@ -76,9 +76,8 @@ WorkingDirectory=$DEPLOY_DIR
 ExecStart=$NPM_PATH run start
 Restart=on-failure
 RestartSec=10
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=$SERVICE_NAME
+StandardOutput=append:/opt/secure-magnus/logs/suite_webapp_sysout.log
+StandardError=append:/opt/secure-magnus/logs/suite_webapp_syerr.log
 Environment=NODE_ENV=production
 Environment=PATH=/usr/local/bin:/usr/bin:/bin
 
@@ -117,4 +116,4 @@ echo "  Start:   sudo systemctl start $SERVICE_NAME"
 echo "  Stop:    sudo systemctl stop $SERVICE_NAME"
 echo "  Restart: sudo systemctl restart $SERVICE_NAME"
 echo "  Status:  sudo systemctl status $SERVICE_NAME"
-echo "  Logs:    sudo journalctl -u $SERVICE_NAME -f"
+echo "  Logs:    tail -f /opt/secure-magnus/logs/suite_webapp.log"

@@ -811,6 +811,14 @@
 			"labelEmailOpenedNotReported": "تم فتح البريد ولكن لم يتم الإبلاغ",
 			"labelEmailOpenedAndReported": "تم فتح البريد وتم الإبلاغ",
 			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ"
+		},
+		"email_create_campaign": {
+			"title": "إنشاء حملة بريد إلكتروني"
+		}
+	},
+	"email": {
+		"create_campaign": {
+			"title": "إنشاء حملة بريد إلكتروني"
 		}
 	},
 	"sms": {
