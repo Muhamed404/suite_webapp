@@ -233,7 +233,11 @@ nextBtn.addEventListener("click", (e) => {
   }
 
   if (currentStep < steps.length - 1) {
-    updateStep(currentStep + 1);
+    const newStep = currentStep + 1;
+    updateStep(newStep);
+    if (window.onStepChange && typeof window.onStepChange === 'function') {
+      window.onStepChange(newStep);
+    }
   } else {
     // On last step, validate entire form before submit
     if (mainForm && window.jQuery && typeof jQuery === "function" && typeof jQuery(mainForm).valid === "function") {
