@@ -1,5 +1,17 @@
 <div class="flex flex-col  p-6 pt-0">
 
+  <!-- Header Section -->
+  <div class="flex flex-col gap-2 mb-3 border-b border-gray-100 pb-3">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mt-6" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+      <span class="text-gray-400">›</span>
+      <a href="/organization/profile/<%=organization%>" class="hover:text-gray-700 transition"><%= __("breadcrumbs.organizationProfile") %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900"><%= __("sms.settings.title") %></span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900"><%= __("sms.settings.title") %></h3>
+  </div>
+
   <!-- first section  -->
 
   <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
@@ -22,9 +34,6 @@
       <div id="steps">
         <!-- Step 1: SMS Server Details -->
         <div class="step fade-enter-active" id="step-1">
-          <!--  Title -->
-          <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10"></h1>
-
           <!-- Main Form -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="md:col-span-1">
@@ -52,8 +61,8 @@
 
               </label>
               <select name="status" id="status" required data-msg-required="<%= __('sms.settings.status_required') %>" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50">
-                <option value="active" <%= sms?.is_active === "active" ? "selected" : "" %>><%= __("sms.settings.active") %></option>
-                <option value="inactive" <%= !sms?.is_active || sms?.is_active === "inactive" ? "selected" : "" %>><%= __("sms.settings.inactive") %></option>
+                <option value="active" <%= sms?.is_active === "active" ? "selected" : "" %>><%= __("generic_label.active") %></option>
+                <option value="inactive" <%= !sms?.is_active || sms?.is_active === "inactive" ? "selected" : "" %>><%= __("generic_label.inactive") %></option>
               </select>
             </div>
 
@@ -71,11 +80,10 @@
 
       <!-- Buttons -->
       <div class="flex justify-end gap-4 mt-10">
-        <button type="reset"
-          class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition">
+        <a href="/organization/profile/<%=organization%>"
+          class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition inline-block text-center">
           <%= __("generic_label.cancel") %>
-
-        </button>
+        </a>
         <button type="submit"
           class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition">
           <%= __("generic_label.submit") %>

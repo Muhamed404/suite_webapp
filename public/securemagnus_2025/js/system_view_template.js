@@ -237,6 +237,25 @@ let currentStep = 0;
     if (placeholderButtons) {
       placeholderButtons.style.display = allowedScreens.includes(index) ? '' : 'none';
     }
+
+    if (allowedScreens.includes(index)) {
+      const form = document.getElementById('templateCreationForm');
+      const difficulty = form ? form.getAttribute('data-difficulty') : '[]';
+      let diffArray = [];
+      try {
+        diffArray = JSON.parse(difficulty);
+      } catch (e) {
+        diffArray = [];
+      }
+      const tagPhishingUrl = document.getElementById('tag_phishing_url');
+      const tagPhishingFile = document.getElementById('tag_phishing_file');
+      if (tagPhishingUrl) {
+        tagPhishingUrl.style.display = diffArray.includes(3) || diffArray.includes('3') ? 'inline-block' : 'none';
+      }
+      if (tagPhishingFile) {
+        tagPhishingFile.style.display = diffArray.includes(2) || diffArray.includes('2') ? 'inline-block' : 'none';
+      }
+    }
   }
 
   function saveDataForStep(idx) {

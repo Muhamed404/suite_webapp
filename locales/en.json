@@ -198,6 +198,7 @@
 		"serviceRegistry": "Service Registry",
 		"audit": "Audit Log",
 		"subscriptionHistory": "Subscription History",
+		"userManagement": "User Management",
 		"campaigns": "Campaigns",
 		"allCampaigns": "All Campaigns",
 		"createEmailCampaign": "Create Email Campaign",
