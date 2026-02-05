@@ -1,11 +1,55 @@
 
-// let currentStep = 0;
 $(document).ready(function () {
 
   // Custom validator: at least one service must be selected
   $.validator.addMethod('requireOneService', function(value, element) {
     return $('input[name="services[]"]:checked').length > 0;
   }, 'Please select at least one service.');
+
+  // Custom validator: validate user licenses against package range
+  $.validator.addMethod('withinPackageUserRange', function(value, element) {
+    const selectedPackageId = $('#selectedPackage').val();
+    if (!selectedPackageId || selectedPackageId === "0") return true;
+    
+    const packageData = $('#selectedPackage').data('package-info');
+    if (!packageData) return true;
+    
+    const userLicenses = parseInt(value);
+    const rangeFrom = parseInt(packageData.license_range_from);
+    const rangeTo = parseInt(packageData.license_range_to);
+    
+    const isValid = userLicenses >= rangeFrom && userLicenses <= rangeTo;
+    
+    return isValid;
+  }, function(value, element) {
+    const packageData = $('#selectedPackage').data('package-info');
+    if (packageData) {
+      return `User licenses must be between ${packageData.license_range_from} and ${packageData.license_range_to} for the selected package.`;
+    }
+    return 'User licenses must be within the selected package range.';
+  });
+
+  // Custom validator: validate duration against package duration
+  $.validator.addMethod('withinPackageDuration', function(value, element) {
+    const selectedPackageId = $('#selectedPackage').val();
+    if (!selectedPackageId || selectedPackageId === "0") return true;
+    
+    const packageData = $('#selectedPackage').data('package-info');
+    if (!packageData) return true;
+    
+    const durationDays = parseInt(value);
+    const maxDuration = parseInt(packageData.duration_days);
+    
+    const isValid = durationDays > 0 && durationDays <= maxDuration;
+    
+    return isValid;
+  }, function(value, element) {
+    const packageData = $('#selectedPackage').data('package-info');
+    if (packageData) {
+      return `License duration must be between 1 and ${packageData.duration_days} days for the selected package.`;
+    }
+    return 'License duration must be within the selected package limit.';
+  });
 
   // Disable past dates for licenseStartDate input
   var $licenseStartDate = $("#licenseStartDate, [name='licenseStartDate']");
@@ -27,7 +71,6 @@ $(document).ready(function () {
     return inputDate >= today;
   }, 'Date must be today or in the future.');
 
-  // jQuery Validate for createSubscription form
   $('#createSubscription').validate({
     ignore: [],
     errorClass: 'input-error',
@@ -39,8 +82,7 @@ $(document).ready(function () {
       $(element).removeClass('border-red-500');
     },
     errorPlacement: function(error, element) {
-      error.addClass('text-red-500 text-xs mt-1');
-      // Special handling for service checkboxes
+      error.addClass('text-red-500 text-xs mt-1 block');
       if (element.attr('name') === 'services[]') {
         $('#services-error-container').html(error);
       } else if (element.parent('.input-group').length) {
@@ -59,7 +101,8 @@ $(document).ready(function () {
       totaluserlicense: {
         required: true,
         digits: true,
-        min: 1
+        min: 1,
+        withinPackageUserRange: true
       },
       licenseStartDate: {
         required: true,
@@ -69,6 +112,14 @@ $(document).ready(function () {
       selectedPackage: {
         required: true,
         min: 1
+      },
+      durationDays: {
+        required: function() {
+          return $('#selectedPackage').val() !== "0";
+        },
+        digits: true,
+        min: 1,
+        withinPackageDuration: true
       },
       billAddress: {
         required: true
@@ -139,6 +190,11 @@ $(document).ready(function () {
       selectedPackage: {
         required: 'Please select a package.',
         min: 'Please select a valid package.'
+      },
+      durationDays: {
+        required: 'Please enter license duration in days.',
+        digits: 'Only digits allowed.',
+        min: 'Duration must be at least 1 day.'
       },
       billAddress: {
         required: 'Billing address is required.'
@@ -220,38 +276,89 @@ $(document).ready(function () {
 
     }
   });
-  $('#nextBtn').on('click', function (e) {
-
-    // alert('Next button clicked');
-    if (currentStep === 0) {
-      // alert('Loading services for application...');
-      const selectedAppId = $('#selectedApplication').val();
-      loadServices(selectedAppId)
-    } else if (currentStep === 1) {
-      // alert('Loading package and service costs...');
+  window.onStepChange = function(newStep) {
+    if (newStep === 1) {
+      // Step 1: Load services after moving to step 2
+      loadServices($('#selectedApplication').val());
+    } else if (newStep === 2) {
+      // Step 2: Retrieve costs after moving to step 3
       retrievePackageCost();
       retrieveServiceCost();
-    } else if (currentStep === 2) {
-      // alert('Calculating payable amount...');
+    } else if (newStep === 3) {
+      // Step 3: Calculate payable amount
       calculatePayableAmount();
     }
-  });
+  };
 
   $('#selectedPackage').on('change', function () {
 
     const selectedVal = $(this).val();
-    // alert(selectedVal)
+    const packageId = selectedVal;
+    
     if (selectedVal === "0" || !selectedVal) {
       $('#durationDays').val(0);
-      $('#divDurationDays').show(); // hide div
+      $('#divDurationDays').show();
+      $('#selectedPackage').removeData('package-info');
+      $('#totaluserlicense').removeData('package-info');
+      $('#durationDays').removeData('package-info');
+      $('#nextBtn').prop('disabled', false); // Re-enable next button
     } else {
-      $('#durationDays').val(0);
-      $('#divDurationDays').hide(); // show div
-
-
+      $('#nextBtn').prop('disabled', true);
+      $('#nextBtn').text('Loading...');
+      
+      // Fetch package details to get range and duration
+      $.ajax({
+        url: `/package/retrieve-package-cost/${packageId}`,
+        type: 'GET',
+        success: function(response) {
+          
+          let packageData = null;
+          if (response.object && response.object.cost && response.object.cost.package) {
+            packageData = response.object.cost.package;
+          } else if (response.cost && response.cost.package) {
+            packageData = response.cost.package;
+          } else if (response.package) {
+            packageData = response.package;
+          } else {
+            console.error('Package data not found in response:', response);
+            return;
+          }
+                    
+          const packageInfo = {
+            license_range_from: packageData.license_range_from,
+            license_range_to: packageData.license_range_to,
+            duration_days: packageData.duration_days
+          };
+                    
+          $('#selectedPackage').data('package-info', packageInfo);
+          
+          $('#totaluserlicense').data('package-info', packageInfo);
+          $('#durationDays').data('package-info', packageInfo);
+          
+          // Show duration input when package is selected
+          $('#durationDays').val(0);
+          $('#divDurationDays').show();
+          
+          // Revalidate fields if they have values
+          if ($('#totaluserlicense').val()) {
+            $('#totaluserlicense').valid();
+          }
+          if ($('#durationDays').val()) {
+            $('#durationDays').valid();
+          }
+          
+          // Re-enable next button
+          $('#nextBtn').prop('disabled', false);
+          $('#nextBtn').text('Next');
+        },
+        error: function(xhr, status, error) {
+          console.error('Error fetching package details:', error);
+          // Re-enable next button on error
+          $('#nextBtn').prop('disabled', false);
+          $('#nextBtn').text('Next');
+        }
+      });
     }
-
-
   });
   $('#discount').on('change', function () {
     calculatePayableAmount();
@@ -383,9 +490,34 @@ function retrievePackageCost() {
       url: '/package/retrieve-package-cost/' + packageId,  // Adjust to your actual route
       type: 'GET',
       success: function (response) {
-        // alert('Cost from backend:' + response.cost);
-
-        $('#packageCost').val(response.cost.toFixed(2));
+        // Handle APIResponse format where data is in response.object.cost
+        let responseData = null;
+        if (response.object && response.object.cost) {
+          responseData = response.object.cost;
+        } else if (response.cost) {
+          responseData = response.cost;
+        } else {
+          responseData = response;
+        }
+        
+        // Handle both old format (response.cost) and new format (response.cost with response.package)
+        let cost = responseData.cost;
+        if (typeof cost === 'object' && cost.cost) {
+          cost = cost.cost;
+        }
+        $('#packageCost').val(parseFloat(cost).toFixed(2));
+        
+        // Also store package info for validators if available
+        if (responseData.package) {
+          const packageInfo = {
+            license_range_from: responseData.package.license_range_from,
+            license_range_to: responseData.package.license_range_to,
+            duration_days: responseData.package.duration_days
+          };
+          $('#selectedPackage').data('package-info', packageInfo);
+          $('#totaluserlicense').data('package-info', packageInfo);
+          $('#durationDays').data('package-info', packageInfo);
+        }
       },
       error: function (xhr, status, error) {
         console.error('Error fetching total price:', error);
