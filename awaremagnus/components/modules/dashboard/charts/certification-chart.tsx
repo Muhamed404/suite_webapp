@@ -11,7 +11,11 @@ interface CertificationChartProps {
   color2: string;
 }
 
-export const CertificationChart = ({ value = 50, color = "#3ACE89", color2 = "#FB5050" }: CertificationChartProps) => {
+export const CertificationChart = ({
+  value = 50,
+  color = "#3ACE89",
+  color2 = "#FB5050",
+}: CertificationChartProps) => {
   const chartOptions = useMemo(
     () => ({
       chart: {
@@ -62,11 +66,17 @@ export const CertificationChart = ({ value = 50, color = "#3ACE89", color2 = "#F
       },
       labels: [""],
     }),
-    [color, color2]
+    [color, color2],
   );
 
   const series = [value];
 
-  return <Chart options={chartOptions} series={series} type="radialBar" height={240} />;
+  return (
+    <Chart
+      height={240}
+      options={chartOptions}
+      series={series}
+      type="radialBar"
+    />
+  );
 };
-

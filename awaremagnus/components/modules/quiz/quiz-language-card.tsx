@@ -1,14 +1,17 @@
 "use client";
 
+import type { QuizAnswer } from "./quiz-answer-row";
+
 import Image from "next/image";
 import { Textarea } from "@heroui/input";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
 
+import { QuizAnswerRow } from "./quiz-answer-row";
+
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
-import type { QuizAnswer } from "./quiz-answer-row";
-import { QuizAnswerRow } from "./quiz-answer-row";
+import { getLanguageName, getLanguageFlag } from "@/utils/supportedLanguages";
 
 export type QuizLocale = "en" | "ar";
 
@@ -24,7 +27,9 @@ export interface QuizQuestion {
 }
 
 export interface QuizLanguageForm {
-  lang: QuizLocale;
+  lang?: QuizLocale;
+  /** When set, display uses getLanguageName(langId) and getLanguageFlag(langId) from supportedLanguages */
+  langId?: number;
   questions: QuizQuestion[];
 }
 
@@ -37,6 +42,8 @@ interface QuizLanguageCardProps {
   onAddAnswer: (questionIndex: number) => void;
   onAddQuestion: () => void;
   onRemoveQuestion: (questionIndex: number) => void;
+  /** When false, hides the "Add New Question" button (e.g. on quiz creation). Default true. */
+  allowAddQuestion?: boolean;
 }
 
 function generateId() {
@@ -56,42 +63,45 @@ export function QuizLanguageCard({
   onAddAnswer,
   onAddQuestion,
   onRemoveQuestion,
+  allowAddQuestion = true,
 }: QuizLanguageCardProps) {
   const t = useTranslations("quiz");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
-  const meta = LANG_META[form.lang];
+  const meta = form.langId != null ? null : LANG_META[form.lang ?? "en"];
+  const langLabel = form.langId != null ? getLanguageName(form.langId) : (meta ? t(meta.labelKey) : "");
+  const langFlag = form.langId != null ? getLanguageFlag(form.langId) : (meta?.flag ?? "");
   const singleCorrect = quizType === "single" || quizType === "truefalse";
 
   return (
     <div
       className={clsx(
         "bg-white border border-gray-200 rounded-xl p-5 relative language-card",
-        isRtl && "text-right"
+        isRtl && "text-right",
       )}
     >
       <Button
-        type="button"
         isIconOnly
-        variant="light"
-        size="sm"
-        onPress={onRemove}
+        aria-label="Remove language"
         className={clsx(
           "absolute w-6 h-6 min-w-6 min-h-6 flex items-center justify-center rounded-full",
           "border border-red-300 text-red-400 hover:text-red-600 hover:border-red-500 hover:bg-red-50 transition",
-          isRtl ? "left-3 top-3" : "right-3 top-3"
+          isRtl ? "left-3 top-3" : "right-3 top-3",
         )}
-        aria-label="Remove language"
+        size="sm"
+        type="button"
+        variant="light"
+        onPress={onRemove}
       >
         <svg
-          xmlns="http://www.w3.org/2000/svg"
           className="w-3 h-3 stroke-current"
-          viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
         >
           <path d="M18 6 6 18" />
           <path d="M6 6l12 12" />
@@ -102,18 +112,22 @@ export function QuizLanguageCard({
       <div
         className={clsx(
           "flex items-center gap-2 mb-4 p-2 rounded-xl bg-[#F7FAFF] border border-gray-100 w-fit",
-          isRtl && "flex-row-reverse"
+          isRtl && "flex-row-reverse",
         )}
       >
-        <Image
-          src={meta.flag}
-          alt=""
-          width={24}
-          height={24}
-          className="w-6 h-6 rounded-full object-cover ring-2 ring-white shadow-sm"
-        />
+        {form.langId != null ? (
+          <span className="text-xl leading-none" aria-hidden>{getLanguageFlag(form.langId)}</span>
+        ) : (
+          <Image
+            alt=""
+            className="w-6 h-6 rounded-full object-cover ring-2 ring-white shadow-sm"
+            height={24}
+            src={langFlag}
+            width={24}
+          />
+        )}
         <span className="text-sm font-semibold text-gray-900">
-          {t(meta.labelKey)}
+          {form.langId != null ? getLanguageName(form.langId) : (meta ? t(meta.labelKey) : "")}
         </span>
       </div>
 
@@ -124,8 +138,9 @@ export function QuizLanguageCard({
 
           const handleTextChange = (id: string) => (text: string) => {
             const next = q.answers.map((a) =>
-              a.id === id ? { ...a, text } : a
+              a.id === id ? { ...a, text } : a,
             );
+
             onAnswersChange(qIndex, next);
           };
 
@@ -133,13 +148,16 @@ export function QuizLanguageCard({
             const next = q.answers.map((a) => {
               if (a.id === id) return { ...a, correct };
               if (singleCorrect && correct) return { ...a, correct: false };
+
               return a;
             });
+
             onAnswersChange(qIndex, next);
           };
 
           const handleRemoveAnswer = (id: string) => () => {
             const next = q.answers.filter((a) => a.id !== id);
+
             onAnswersChange(qIndex, next);
           };
 
@@ -150,27 +168,27 @@ export function QuizLanguageCard({
             >
               {canRemoveQuestion && (
                 <Button
-                  type="button"
                   isIconOnly
-                  variant="light"
-                  size="sm"
-                  onPress={() => onRemoveQuestion(qIndex)}
+                  aria-label="Remove question"
                   className={clsx(
                     "absolute w-5 h-5 min-w-5 min-h-5 flex items-center justify-center rounded-full",
                     "border border-red-200 text-red-400 hover:text-red-600 hover:border-red-400 hover:bg-red-50 transition",
-                    isRtl ? "left-2 top-2" : "right-2 top-2"
+                    isRtl ? "left-2 top-2" : "right-2 top-2",
                   )}
-                  aria-label="Remove question"
+                  size="sm"
+                  type="button"
+                  variant="light"
+                  onPress={() => onRemoveQuestion(qIndex)}
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
                     className="w-2.5 h-2.5 stroke-current"
-                    viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
-                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
                     <path d="M18 6 6 18" />
                     <path d="M6 6l12 12" />
@@ -184,16 +202,16 @@ export function QuizLanguageCard({
                   : t("question")}
               </p>
               <Textarea
-                value={q.question}
-                onValueChange={(v) => onQuestionChange(qIndex, v)}
-                placeholder={t("questionPlaceholder")}
-                minRows={2}
                 classNames={{
                   base: "mb-2",
                   input: "text-sm",
                   inputWrapper:
                     "rounded-lg border border-gray-300 bg-white focus-within:border-[#3FBDFF] px-3 py-2 min-h-0",
                 }}
+                minRows={2}
+                placeholder={t("questionPlaceholder")}
+                value={q.question}
+                onValueChange={(v) => onQuestionChange(qIndex, v)}
               />
 
               <p className="text-sm font-medium text-gray-900 mt-2 mb-1">
@@ -204,35 +222,35 @@ export function QuizLanguageCard({
                   <QuizAnswerRow
                     key={a.id}
                     answer={a}
-                    onTextChange={handleTextChange(a.id)}
-                    onCorrectChange={handleCorrectChange(a.id)}
-                    onRemove={handleRemoveAnswer(a.id)}
                     correctDisabled={
                       singleCorrect &&
                       !!correctAnswerId &&
                       a.id !== correctAnswerId
                     }
+                    onCorrectChange={handleCorrectChange(a.id)}
+                    onRemove={handleRemoveAnswer(a.id)}
+                    onTextChange={handleTextChange(a.id)}
                   />
                 ))}
               </div>
 
               <Button
+                className="add-answer text-[#3FBDFF] text-sm font-medium flex items-center gap-2 py-1.5 rounded-full h-auto min-h-0 hover:bg-[#EAF8FF]"
+                size="sm"
                 type="button"
                 variant="light"
-                size="sm"
                 onPress={() => onAddAnswer(qIndex)}
-                className="add-answer text-[#3FBDFF] text-sm font-medium flex items-center gap-2 py-1.5 rounded-full h-auto min-h-0 hover:bg-[#EAF8FF]"
               >
                 <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={14}
-                  height={14}
-                  viewBox="0 0 24 24"
                   fill="none"
+                  height={14}
                   stroke="currentColor"
-                  strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width={14}
+                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <path d="M5 12h14" />
                   <path d="M12 5v14" />
@@ -244,29 +262,31 @@ export function QuizLanguageCard({
         })}
       </div>
 
-      <Button
-        type="button"
-        variant="bordered"
-        size="sm"
-        onPress={onAddQuestion}
-        className="add-question mt-4 w-full flex items-center justify-center gap-2 border-dashed border-[#3FBDFF] text-[#3FBDFF] text-sm font-medium py-2.5 rounded-xl hover:bg-[#EAF8FF] hover:border-[#3FBDFF]"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={16}
-          height={16}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      {allowAddQuestion && (
+        <Button
+          className="add-question mt-4 w-full flex items-center justify-center gap-2 border-dashed border-[#3FBDFF] text-[#3FBDFF] text-sm font-medium py-2.5 rounded-xl hover:bg-[#EAF8FF] hover:border-[#3FBDFF]"
+          size="sm"
+          type="button"
+          variant="bordered"
+          onPress={onAddQuestion}
         >
-          <path d="M5 12h14" />
-          <path d="M12 5v14" />
-        </svg>
-        {t("addNewQuestion")}
-      </Button>
+          <svg
+            fill="none"
+            height={16}
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+            width={16}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M5 12h14" />
+            <path d="M12 5v14" />
+          </svg>
+          {t("addNewQuestion")}
+        </Button>
+      )}
     </div>
   );
 }

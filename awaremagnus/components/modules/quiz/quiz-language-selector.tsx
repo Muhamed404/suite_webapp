@@ -28,48 +28,53 @@ export function QuizLanguageSelector({
 
   return (
     <div className={className}>
-      <p className="text-sm font-medium text-gray-900 mb-2">{t("selectLanguage")}</p>
+      <p className="text-sm font-medium text-gray-900 mb-2">
+        {t("selectLanguage")}
+      </p>
       <RadioGroup
-        value={value}
-        onValueChange={(v) => onChange(v as QuizLocale)}
-        orientation="horizontal"
         classNames={{
           base: "gap-2",
           wrapper: "flex flex-wrap gap-2",
         }}
+        orientation="horizontal"
+        value={value}
+        onValueChange={(v) => onChange(v as QuizLocale)}
       >
         {LANGUAGES.map(({ value: v, key, flag }) => {
           const selected = value === v;
+
           return (
             <Radio
               key={v}
-              value={v}
               classNames={{
                 base: clsx(
                   "flex items-center gap-2 px-4 py-2 bg-white rounded-full border cursor-pointer transition m-0 max-w-fit",
                   selected
                     ? "border-[#3FBDFF] bg-[#EAF8FF]"
-                    : "border-gray-300 hover:bg-[#f4fbff]"
+                    : "border-gray-300 hover:bg-[#f4fbff]",
                 ),
                 wrapper: "!hidden",
                 control: "!hidden",
                 labelWrapper: "ml-0",
                 label: "text-sm cursor-pointer flex items-center gap-2",
               }}
+              value={v}
             >
               <span
+                aria-hidden
                 className={clsx(
                   "w-4 h-4 rounded-full border flex-shrink-0",
-                  selected ? "border-[#3FBDFF] bg-[#3FBDFF]" : "border-gray-300"
+                  selected
+                    ? "border-[#3FBDFF] bg-[#3FBDFF]"
+                    : "border-gray-300",
                 )}
-                aria-hidden
               />
               <Image
-                src={flag}
                 alt=""
-                width={16}
-                height={16}
                 className="w-4 h-4 rounded-full object-cover"
+                height={16}
+                src={flag}
+                width={16}
               />
               {t(key)}
             </Radio>

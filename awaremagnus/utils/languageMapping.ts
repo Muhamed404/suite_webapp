@@ -24,7 +24,8 @@ export function getLanguageId(locale: ModuleLocale): number {
  */
 export function getLanguageCode(languageId: number): ModuleLocale {
   const entry = Object.entries(LANGUAGE_ID_MAP).find(
-    ([, id]) => id === languageId
+    ([, id]) => id === languageId,
   );
+
   return (entry?.[0] as ModuleLocale) ?? "en";
 }

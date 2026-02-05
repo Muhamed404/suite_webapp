@@ -25,7 +25,11 @@ interface PrimaryMenuProps {
   isCollapsed?: boolean;
 }
 
-export const PrimaryMenu = ({ menuItems, onToggle, isCollapsed = false }: PrimaryMenuProps) => {
+export const PrimaryMenu = ({
+  menuItems,
+  onToggle,
+  isCollapsed = false,
+}: PrimaryMenuProps) => {
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
@@ -41,29 +45,29 @@ export const PrimaryMenu = ({ menuItems, onToggle, isCollapsed = false }: Primar
     <div
       className={cn(
         "flex h-screen bg-black text-white transition-all duration-300",
-        isCollapsed ? "w-20" : "w-[200px]"
+        isCollapsed ? "w-20" : "w-[200px]",
       )}
     >
       {/* Logo */}
       <Link
-        href="#"
         className="absolute flex items-center gap-3 px-3 py-3 transition mt-5 group"
+        href="#"
       >
         <Image
-          src="/images/menu-logo.svg"
           alt="Menu Logo"
-          width={20}
-          height={20}
           className="size-5"
+          height={20}
+          src="/images/menu-logo.svg"
+          width={20}
         />
         {!isCollapsed && (
           <span className="menu-text">
             <Image
-              src="/images/menu-logo-name.svg"
               alt="Menu Logo Name"
-              width={80}
-              height={16}
               className="h-4"
+              height={16}
+              src="/images/menu-logo-name.svg"
+              width={80}
             />
           </span>
         )}
@@ -72,15 +76,20 @@ export const PrimaryMenu = ({ menuItems, onToggle, isCollapsed = false }: Primar
       {/* Toggle Button */}
       <div className="relative">
         <Button
-          onPress={onToggle}
+          isIconOnly
           className={cn(
             "absolute top-7 py-1.5 h-10 px-1.5 bg-[#00CCC440] z-20",
-            isRtl ? "left-0 rounded-r-2xl" : "right-0 rounded-l-2xl"
+            isRtl ? "left-0 rounded-r-2xl" : "right-0 rounded-l-2xl",
           )}
           variant="flat"
-          isIconOnly
+          onPress={onToggle}
         >
-          <span className={cn("text-xl font-light inline-block transition-transform", isCollapsed && "scale-x-[-1]")}>
+          <span
+            className={cn(
+              "text-xl font-light inline-block transition-transform",
+              isCollapsed && "scale-x-[-1]",
+            )}
+          >
             ›
           </span>
         </Button>
@@ -95,8 +104,9 @@ export const PrimaryMenu = ({ menuItems, onToggle, isCollapsed = false }: Primar
               {menuItems.map((item, index) => (
                 <MenuItemComponent
                   key={index}
-                  item={item}
                   isCollapsed={isCollapsed}
+                  isRtl={isRtl}
+                  item={item}
                   openMenus={openMenus}
                   onToggleMenu={toggleMenu}
                 />
@@ -112,29 +122,46 @@ export const PrimaryMenu = ({ menuItems, onToggle, isCollapsed = false }: Primar
 interface MenuItemComponentProps {
   item: MenuItem;
   isCollapsed: boolean;
+  isRtl: boolean;
   openMenus: Record<string, boolean>;
   onToggleMenu: (menuId: string) => void;
 }
 
-const MenuItemComponent = ({ item, isCollapsed, openMenus, onToggleMenu }: MenuItemComponentProps) => {
+const MenuItemComponent = ({
+  item,
+  isCollapsed,
+  isRtl,
+  openMenus,
+  onToggleMenu,
+}: MenuItemComponentProps) => {
   const menuId = item.label.toLowerCase().replace(/\s+/g, "");
 
   if (item.children && item.children.length > 0) {
     return (
       <div>
         <button
-          onClick={() => onToggleMenu(menuId)}
           className="w-full flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-white/10 rounded whitespace-nowrap group"
+          onClick={() => onToggleMenu(menuId)}
         >
           <div className="flex items-center gap-3">
-            <Image src={item.icon} alt="" width={20} height={20} className="size-5" />
-            {!isCollapsed && <span className="text-sm font-normal menu-text">{item.label}</span>}
+            <Image
+              alt=""
+              className="size-5"
+              height={20}
+              src={item.icon}
+              width={20}
+            />
+            {!isCollapsed && (
+              <span className="text-sm font-normal menu-text">
+                {item.label}
+              </span>
+            )}
           </div>
           {!isCollapsed && (
             <span
               className={cn(
                 "transition-transform duration-300 text-xl menu-text",
-                openMenus[menuId] && "rotate-90"
+                openMenus[menuId] && "rotate-90",
               )}
             >
               ›
@@ -143,12 +170,15 @@ const MenuItemComponent = ({ item, isCollapsed, openMenus, onToggleMenu }: MenuI
         </button>
 
         {!isCollapsed && openMenus[menuId] && (
-          <div className={cn("mt-2 flex-col space-y-2", isRtl ? "pr-6" : "pl-6")}>
+          <div
+            className={cn("mt-2 flex-col space-y-2", isRtl ? "pr-6" : "pl-6")}
+          >
             {item.children.map((child, childIndex) => (
               <MenuItemComponent
                 key={childIndex}
-                item={child}
                 isCollapsed={isCollapsed}
+                isRtl={isRtl}
+                item={child}
                 openMenus={openMenus}
                 onToggleMenu={onToggleMenu}
               />
@@ -161,13 +191,13 @@ const MenuItemComponent = ({ item, isCollapsed, openMenus, onToggleMenu }: MenuI
 
   return (
     <Link
-      href={item.href || "#"}
       className="relative flex items-center gap-3 px-3 py-3 transition hover:bg-white/10 group whitespace-nowrap"
+      href={item.href || "#"}
     >
-      <Image src={item.icon} alt="" width={20} height={20} className="size-5" />
-      {!isCollapsed && <span className="text-sm font-normal menu-text">{item.label}</span>}
+      <Image alt="" className="size-5" height={20} src={item.icon} width={20} />
+      {!isCollapsed && (
+        <span className="text-sm font-normal menu-text">{item.label}</span>
+      )}
     </Link>
   );
 };
-
-

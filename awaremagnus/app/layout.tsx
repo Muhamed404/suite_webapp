@@ -2,12 +2,12 @@ import "@/styles/globals.css";
 import { Metadata, Viewport } from "next";
 import clsx from "clsx";
 
+import { Providers } from "./providers";
+
 import { I18nProvider } from "@/i18n/I18nProvider";
 import { getLocaleDir } from "@/i18n/config";
 import { getServerLocale } from "@/i18n/locale-cookie";
 import { loadMessages } from "@/i18n/messages";
-import { Providers } from "./providers";
-
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { LayoutWrapper } from "@/components/layout-wrapper";
@@ -35,12 +35,12 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const locale = getServerLocale();
+  const locale = await getServerLocale();
   const dir = getLocaleDir(locale);
   const messages = await loadMessages(locale);
 
   return (
-    <html suppressHydrationWarning lang={locale} dir={dir}>
+    <html suppressHydrationWarning dir={dir} lang={locale}>
       <head />
       <body
         className={clsx(

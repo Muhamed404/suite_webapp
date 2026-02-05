@@ -84,12 +84,15 @@
     "subscriptionHistory": "Subscription History",
     "products": "Products",
     "dashboard": "Dashboard",
-    "quizzes": "Quizzes",
-    "modules": "Modules",
-    "content": "Content",
     "licenseUser": "License User",
     "survey": "Survey",
-    "trainingLibrary": "Training Library"
+    "trainingLibrary": "Training Library",
+    "systemLibrary": "System Library",
+    "myLibrary": "My Library",
+    "systemBranding": "System Branding",
+    "launchAwareness": "Launch Awareness",
+    "systemSettings": "System Settings",
+    "myAwareness": "My Awareness"
   }
 }
 

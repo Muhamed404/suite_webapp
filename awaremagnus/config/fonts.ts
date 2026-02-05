@@ -1,4 +1,8 @@
-import { Fira_Code as FontMono, Nunito_Sans, Fondamento } from "next/font/google";
+import {
+  Fira_Code as FontMono,
+  Nunito_Sans,
+  Fondamento,
+} from "next/font/google";
 
 export const fontSans = Nunito_Sans({
   subsets: ["latin"],

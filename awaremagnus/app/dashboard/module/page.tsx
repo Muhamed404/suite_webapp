@@ -1,5 +1,7 @@
 "use client";
 
+import type { Module } from "@/types/quiz";
+
 import Link from "next/link";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
@@ -16,24 +18,19 @@ import { useState } from "react";
 import clsx from "clsx";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
+import { ModuleListPageSkeleton } from "@/components/ui/skeletons";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
-import {
-  useModules,
-  useDeleteModule,
-} from "@/hooks/useQuiz";
+import { useModules, useDeleteModule } from "@/hooks/useQuiz";
 import { getApiErrorMessage } from "@/utils/apiError";
-import type { Module } from "@/types/quiz";
 
 function moduleName(m: Module): string {
-  const t = m.translations?.[0];
-  return t?.name ?? m.code ?? `Module ${m.id}`;
+  return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
 function moduleDescription(m: Module): string {
-  const t = m.translations?.[0];
-  return t?.description ?? "";
+  return m.description ?? m.translations?.[0]?.description ?? "";
 }
 
 const DIFFICULTY_LABELS: Record<number, string> = {
@@ -57,7 +54,7 @@ export default function ModuleListPage() {
     status: 1,
     category_id: categoryFilter ? Number(categoryFilter) : undefined,
   });
-  const modules = modulesRes?.success ? modulesRes.data ?? [] : [];
+  const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
 
   const deleteModule = useDeleteModule();
 
@@ -65,7 +62,8 @@ export default function ModuleListPage() {
     const v =
       keys === "all" || !keys
         ? ""
-        : (Array.from(keys as Iterable<string>)[0] as string) ?? "";
+        : ((Array.from(keys as Iterable<string>)[0] as string) ?? "");
+
     setCategoryFilter(v);
   };
 
@@ -79,7 +77,7 @@ export default function ModuleListPage() {
       setListError(
         getApiErrorMessage(err, tCommon, {
           defaultValue: t("deleteError"),
-        })
+        }),
       );
     }
   };
@@ -89,8 +87,8 @@ export default function ModuleListPage() {
     new Map(
       modules
         .filter((m) => m.category)
-        .map((m) => [m.category!.id, m.category!])
-    ).values()
+        .map((m) => [m.category!.id, m.category!]),
+    ).values(),
   );
 
   return (
@@ -109,8 +107,8 @@ export default function ModuleListPage() {
               </div>
               <Button
                 as={Link}
-                href="/dashboard/module/create"
                 className="px-6 py-2 rounded-full bg-[#3FBDFF] text-white text-sm font-medium hover:bg-[#29AAE8]"
+                href="/dashboard/module/create"
               >
                 {t("createNew")}
               </Button>
@@ -121,21 +119,21 @@ export default function ModuleListPage() {
                 <div
                   className={clsx(
                     "flex flex-wrap items-center gap-3",
-                    isRtl && "flex-row-reverse"
+                    isRtl && "flex-row-reverse",
                   )}
                 >
                   <span className="text-sm font-medium text-gray-700">
                     {t("filterByCategory")}
                   </span>
                   <Select
-                    placeholder={t("categoryPlaceholder")}
-                    selectedKeys={categoryFilter ? [categoryFilter] : []}
-                    onSelectionChange={handleCategoryChange}
                     className="w-48"
                     classNames={{
                       trigger:
                         "h-10 min-h-10 rounded-lg border border-gray-300 text-sm",
                     }}
+                    placeholder={t("categoryPlaceholder")}
+                    selectedKeys={categoryFilter ? [categoryFilter] : []}
+                    onSelectionChange={handleCategoryChange}
                   >
                     {categories.map((cat) => (
                       <SelectItem key={String(cat.id)} textValue={cat.name}>
@@ -152,7 +150,7 @@ export default function ModuleListPage() {
                 )}
 
                 {isLoading ? (
-                  <p className="text-sm text-gray-500 py-8">{t("loading")}</p>
+                  <ModuleListPageSkeleton />
                 ) : modules.length === 0 ? (
                   <div className="py-12 text-center">
                     <p className="text-base font-medium text-gray-700">
@@ -163,15 +161,15 @@ export default function ModuleListPage() {
                     </p>
                     <Button
                       as={Link}
-                      href="/dashboard/module/create"
                       className="mt-4 px-6 py-2 rounded-full bg-[#3FBDFF] text-white text-sm font-medium hover:bg-[#29AAE8]"
+                      href="/dashboard/module/create"
                     >
                       {t("createNew")}
                     </Button>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <Table aria-label="Modules" removeWrapper>
+                    <Table removeWrapper aria-label="Modules">
                       <TableHeader>
                         <TableColumn key="code" className="text-sm">
                           Code
@@ -223,15 +221,15 @@ export default function ModuleListPage() {
                             </TableCell>
                             <TableCell>
                               <Button
-                                size="sm"
-                                variant="light"
+                                className="text-sm"
                                 color="danger"
-                                onPress={() => handleDelete(item.id)}
                                 isLoading={
                                   deleteModule.isPending &&
                                   deleteModule.variables === item.id
                                 }
-                                className="text-sm"
+                                size="sm"
+                                variant="light"
+                                onPress={() => handleDelete(item.id)}
                               >
                                 {t("delete")}
                               </Button>

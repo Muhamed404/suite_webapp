@@ -16,10 +16,17 @@ export interface Module {
   id: number;
   category_id: number;
   code: string;
-  difficulty: number;
-  status: number;
+  difficulty?: number;
+  status?: number;
+  status_id?: number;
   org_id: number;
   creation_date?: string;
+  created_at?: string;
+  updated_at?: string;
+  is_global?: boolean;
+  /** From API list/detail (single language or default) */
+  title?: string;
+  description?: string;
   category?: { id: number; name: string };
   translations?: ModuleTranslation[];
 }
@@ -34,14 +41,24 @@ export interface ContentTranslation {
 
 export interface ModuleContent {
   id: number;
-  mod_id: number;
+  mod_id?: number;
+  module_id?: number;
   content_type_id: number;
   order: number;
   duration?: number;
-  status: number;
-  org_id: number;
+  status?: number;
+  org_id?: number;
   logo_path?: string;
+  logo_url?: string;
   source_path?: string;
+  source_url?: string;
+  content_data?: string;
+  description?: string;
+  is_mandatory?: boolean;
+  /** From API (single language or default) */
+  title?: string;
+  /** Language from API (e.g. { id, name }) */
+  language?: { id: number; name?: string };
   translations?: ContentTranslation[];
 }
 
@@ -55,14 +72,19 @@ export interface QuizAnswer {
 
 export interface Quiz {
   id: number;
-  mod_content_id: number;
+  mod_content_id?: number;
+  content_id?: number;
   quiz_type_id: number;
   question: string;
   explanation?: string;
   difficulty?: number;
   time_limit?: number;
-  status: number;
-  org_id: number;
+  status?: number;
+  org_id?: number;
+  is_mandatory?: boolean;
+  order?: number;
+  /** From API (e.g. { id, name }) for display */
+  quizType?: { id: number; name?: string };
   answers?: QuizAnswer[];
 }
 
@@ -95,8 +117,14 @@ export interface CreateModulePayload {
   module: {
     category_id: number;
     code: string;
+    /** Template name / display name of the module */
+    name?: string;
     difficulty: number;
     org_id?: number;
+    /** API: status_id (default 1) */
+    status_id?: number;
+    /** API: is_global (default false) */
+    is_global?: boolean;
   };
   translations: Array<{
     language_id: number;
@@ -109,17 +137,26 @@ export interface UpdateModulePayload {
   category_id?: number;
   code?: string;
   difficulty?: number;
+  status_id?: number;
+  is_global?: boolean;
 }
 
 export interface AddModuleTranslationPayload {
   language_id: number;
-  name: string;
+  title: string;
   description?: string;
+  /** Legacy: some backends use name */
+  name?: string;
 }
 
 export interface CreateContentPayload {
   mod_id: number;
+  /** Sent as contype_id in form */
   content_type_id: number;
+  /** Primary language id; sent as lang_id in form */
+  lang_id: number;
+  /** Primary content name; sent as name in form */
+  name: string;
   order: number;
   duration?: number;
   org_id?: number;

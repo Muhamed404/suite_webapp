@@ -19,4 +19,3 @@ export const LayoutWrapper = ({ children }: LayoutWrapperProps) => {
   // Default layout for other pages
   return <>{children}</>;
 };
-

@@ -8,17 +8,16 @@ interface LogoProps {
 export const Logo = ({ className = "h-10" }: LogoProps) => {
   return (
     <Link href="/">
-      <div className={`relative ${className}`} aria-label="AwareMagnus Logo">
+      <div aria-label="AwareMagnus Logo" className={`relative ${className}`}>
         <Image
-          src="/logo.svg"
-          alt="AwareMagnus Logo"
-          width={120}
-          height={40}
-          className="h-full w-auto object-contain"
           priority
+          alt="AwareMagnus Logo"
+          className="h-full w-auto object-contain"
+          height={40}
+          src="/logo.svg"
+          width={120}
         />
       </div>
     </Link>
   );
 };
-

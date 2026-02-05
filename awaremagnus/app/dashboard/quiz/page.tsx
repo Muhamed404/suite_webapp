@@ -1,5 +1,7 @@
 "use client";
 
+import type { Module, ModuleContent, Quiz } from "@/types/quiz";
+
 import Link from "next/link";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
@@ -16,6 +18,7 @@ import { useState } from "react";
 import clsx from "clsx";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
+import { QuizPageSkeleton } from "@/components/ui/skeletons";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -25,24 +28,16 @@ import {
   useModules,
   useContentsByModule,
   useDeleteQuiz,
+  useQuizTypes,
 } from "@/hooks/useQuiz";
 import { getApiErrorMessage } from "@/utils/apiError";
-import type { Module, ModuleContent, Quiz } from "@/types/quiz";
-
-const QUIZ_TYPE_LABELS: Record<number, string> = {
-  1: "Single Choice",
-  2: "Multiple Choice",
-  3: "True/False",
-};
 
 function moduleName(m: Module): string {
-  const t = m.translations?.[0];
-  return t?.name ?? m.code ?? `Module ${m.id}`;
+  return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
 function contentTitle(c: ModuleContent): string {
-  const t = c.translations?.[0];
-  return t?.title ?? `Content ${c.id}`;
+  return c.title ?? c.translations?.[0]?.title ?? `Content ${c.id}`;
 }
 
 export default function QuizListPage() {
@@ -56,20 +51,22 @@ export default function QuizListPage() {
   const [listError, setListError] = useState<string | null>(null);
 
   const { data: modulesRes } = useModules({ status: 1 });
-  const modules = modulesRes?.success ? modulesRes.data ?? [] : [];
+  const { data: quizTypesRes } = useQuizTypes();
+  const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
+  const quizTypes = quizTypesRes?.success ? (quizTypesRes.data ?? []) : [];
 
   const { data: contentsRes } = useContentsByModule(
     moduleId ? Number(moduleId) : 0,
-    !!moduleId
+    !!moduleId,
   );
-  const contents = contentsRes?.success ? contentsRes.data ?? [] : [];
+  const contents = contentsRes?.success ? (contentsRes.data ?? []) : [];
 
   const allQuizzes = useQuizzes(
-    contentFilter ? { contentId: Number(contentFilter) } : undefined
+    contentFilter ? { contentId: Number(contentFilter) } : undefined,
   );
   const byContent = useQuizzesByContent(
     contentFilter ? Number(contentFilter) : 0,
-    !!contentFilter
+    !!contentFilter,
   );
 
   const quizzesQuery = contentFilter ? byContent : allQuizzes;
@@ -84,7 +81,8 @@ export default function QuizListPage() {
     const v =
       keys === "all" || !keys
         ? ""
-        : (Array.from(keys as Iterable<string>)[0] as string) ?? "";
+        : ((Array.from(keys as Iterable<string>)[0] as string) ?? "");
+
     setModuleId(v);
     setContentFilter("");
   };
@@ -93,7 +91,8 @@ export default function QuizListPage() {
     const v =
       keys === "all" || !keys
         ? ""
-        : (Array.from(keys as Iterable<string>)[0] as string) ?? "";
+        : ((Array.from(keys as Iterable<string>)[0] as string) ?? "");
+
     setContentFilter(v);
   };
 
@@ -107,7 +106,7 @@ export default function QuizListPage() {
       setListError(
         getApiErrorMessage(err, tCommon, {
           defaultValue: t("deleteError"),
-        })
+        }),
       );
     }
   };
@@ -128,8 +127,8 @@ export default function QuizListPage() {
               </div>
               <Button
                 as={Link}
-                href="/dashboard/quiz/create"
                 className="px-6 py-2 rounded-full bg-[#3FBDFF] text-white text-sm font-medium hover:bg-[#29AAE8]"
+                href="/dashboard/quiz/create"
               >
                 {t("createNew")}
               </Button>
@@ -140,21 +139,21 @@ export default function QuizListPage() {
                 <div
                   className={clsx(
                     "flex flex-wrap items-center gap-3",
-                    isRtl && "flex-row-reverse"
+                    isRtl && "flex-row-reverse",
                   )}
                 >
                   <span className="text-sm font-medium text-gray-700">
                     {t("filterByContent")}
                   </span>
                   <Select
-                    placeholder={t("modulePlaceholder")}
-                    selectedKeys={moduleId ? [moduleId] : []}
-                    onSelectionChange={handleModuleChange}
                     className="w-48"
                     classNames={{
                       trigger:
                         "h-10 min-h-10 rounded-lg border border-gray-300 text-sm",
                     }}
+                    placeholder={t("modulePlaceholder")}
+                    selectedKeys={moduleId ? [moduleId] : []}
+                    onSelectionChange={handleModuleChange}
                   >
                     {modules.map((m) => (
                       <SelectItem key={String(m.id)} textValue={moduleName(m)}>
@@ -163,18 +162,21 @@ export default function QuizListPage() {
                     ))}
                   </Select>
                   <Select
-                    placeholder={t("contentPlaceholder")}
-                    selectedKeys={contentFilter ? [contentFilter] : []}
-                    onSelectionChange={handleContentChange}
-                    isDisabled={!moduleId}
                     className="w-56"
                     classNames={{
                       trigger:
                         "h-10 min-h-10 rounded-lg border border-gray-300 text-sm",
                     }}
+                    isDisabled={!moduleId}
+                    placeholder={t("contentPlaceholder")}
+                    selectedKeys={contentFilter ? [contentFilter] : []}
+                    onSelectionChange={handleContentChange}
                   >
                     {contents.map((c) => (
-                      <SelectItem key={String(c.id)} textValue={contentTitle(c)}>
+                      <SelectItem
+                        key={String(c.id)}
+                        textValue={contentTitle(c)}
+                      >
                         {contentTitle(c)}
                       </SelectItem>
                     ))}
@@ -188,7 +190,7 @@ export default function QuizListPage() {
                 )}
 
                 {quizzesQuery.isLoading ? (
-                  <p className="text-sm text-gray-500 py-8">{t("loading")}</p>
+                  <QuizPageSkeleton />
                 ) : quizzes.length === 0 ? (
                   <div className="py-12 text-center">
                     <p className="text-base font-medium text-gray-700">
@@ -199,15 +201,15 @@ export default function QuizListPage() {
                     </p>
                     <Button
                       as={Link}
-                      href="/dashboard/quiz/create"
                       className="mt-4 px-6 py-2 rounded-full bg-[#3FBDFF] text-white text-sm font-medium hover:bg-[#29AAE8]"
+                      href="/dashboard/quiz/create"
                     >
                       {t("createNew")}
                     </Button>
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <Table aria-label="Quizzes" removeWrapper>
+                    <Table removeWrapper aria-label="Quizzes">
                       <TableHeader>
                         <TableColumn key="question" className="text-sm">
                           Question
@@ -232,8 +234,13 @@ export default function QuizListPage() {
                             </TableCell>
                             <TableCell>
                               <span className="text-sm text-gray-600">
-                                {QUIZ_TYPE_LABELS[item.quiz_type_id] ??
-                                  `Type ${item.quiz_type_id}`}
+                                {item.quizType?.name ??
+                                  quizTypes.find(
+                                    (qt) =>
+                                      qt.id ===
+                                      (item.quiz_type_id ?? (item as { qtype_id?: number }).qtype_id),
+                                  )?.name ??
+                                  "—"}
                               </span>
                             </TableCell>
                             <TableCell>
@@ -243,15 +250,15 @@ export default function QuizListPage() {
                             </TableCell>
                             <TableCell>
                               <Button
-                                size="sm"
-                                variant="light"
+                                className="text-sm"
                                 color="danger"
-                                onPress={() => handleDelete(item.id)}
                                 isLoading={
                                   deleteQuiz.isPending &&
                                   deleteQuiz.variables === item.id
                                 }
-                                className="text-sm"
+                                size="sm"
+                                variant="light"
+                                onPress={() => handleDelete(item.id)}
                               >
                                 {t("delete")}
                               </Button>

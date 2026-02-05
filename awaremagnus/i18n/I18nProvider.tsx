@@ -1,11 +1,12 @@
 "use client";
 
+import type { Locale } from "./config";
+import type { AppMessages } from "./messages";
+
 import IntlMessageFormat from "intl-messageformat";
 import * as React from "react";
 
-import type { Locale } from "./config";
 import { getLocaleDir } from "./config";
-import type { AppMessages } from "./messages";
 
 type Namespace = keyof AppMessages;
 
@@ -13,7 +14,11 @@ export interface I18nContextValue {
   locale: Locale;
   dir: "ltr" | "rtl";
   messages: AppMessages;
-  t: (namespace: Namespace, key: string, values?: Record<string, unknown>) => string;
+  t: (
+    namespace: Namespace,
+    key: string,
+    values?: Record<string, unknown>,
+  ) => string;
 }
 
 const I18nContext = React.createContext<I18nContextValue | null>(null);
@@ -23,6 +28,7 @@ function getValueAtPath(obj: unknown, path: string): unknown {
 
   return path.split(".").reduce<unknown>((acc, segment) => {
     if (!acc || typeof acc !== "object") return undefined;
+
     return (acc as Record<string, unknown>)[segment];
   }, obj);
 }
@@ -47,7 +53,9 @@ export function I18nProvider({
         return key;
       }
 
-      const template = isString ? (msg as string) : (values?.defaultValue as string);
+      const template = isString
+        ? (msg as string)
+        : (values?.defaultValue as string);
 
       if (!values) return template;
 
@@ -57,12 +65,12 @@ export function I18nProvider({
         return template;
       }
     },
-    [locale, messages]
+    [locale, messages],
   );
 
   const value = React.useMemo<I18nContextValue>(
     () => ({ locale, dir, messages, t }),
-    [dir, locale, messages, t]
+    [dir, locale, messages, t],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
@@ -70,10 +78,10 @@ export function I18nProvider({
 
 export function useI18n() {
   const ctx = React.useContext(I18nContext);
+
   if (!ctx) {
     throw new Error("useI18n must be used within I18nProvider");
   }
+
   return ctx;
 }
-
-

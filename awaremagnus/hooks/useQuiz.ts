@@ -1,9 +1,3 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
-import { quizService } from "@/services/quizService";
 import type {
   CreateQuizPayload,
   UpdateQuizPayload,
@@ -14,10 +8,15 @@ import type {
   UpdateContentPayload,
 } from "@/types/quiz";
 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { quizService } from "@/services/quizService";
+
 export const QUIZ_KEYS = {
   modules: ["quiz", "modules"] as const,
   module: (id: number) => ["quiz", "module", id] as const,
-  contents: (modId?: number) => ["quiz", "contents", { modId }] as const,
+  contents: (modId?: number, langId?: number) =>
+    ["quiz", "contents", { modId, langId }] as const,
   content: (id: number) => ["quiz", "content", id] as const,
   quizTypes: ["quiz", "quizTypes"] as const,
   quizzes: (params?: { contentId?: number }) =>
@@ -28,6 +27,7 @@ export const QUIZ_KEYS = {
 
 export function useModules(params?: {
   category_id?: number;
+  lang_id?: number;
   status?: number;
   org_id?: number;
 }) {
@@ -48,19 +48,30 @@ export function useModule(id: number, enabled = true) {
 export function useContents(params?: {
   mod_id?: number;
   content_type_id?: number;
+  lang_id?: number;
   status?: number;
 }) {
   return useQuery({
-    queryKey: QUIZ_KEYS.contents(params?.mod_id),
+    queryKey: QUIZ_KEYS.contents(params?.mod_id, params?.lang_id),
     queryFn: () => quizService.getContents(params),
     enabled: params?.mod_id != null,
   });
 }
 
-export function useContentsByModule(moduleId: number, enabled = true) {
+export function useContentsByModule(
+  moduleId: number,
+  enabledOrOptions?: boolean | { enabled?: boolean; lang_id?: number },
+) {
+  const options =
+    typeof enabledOrOptions === "boolean"
+      ? { enabled: enabledOrOptions }
+      : enabledOrOptions ?? { enabled: true };
+  const enabled = options.enabled ?? true;
+  const lang_id = options.lang_id;
   return useQuery({
-    queryKey: QUIZ_KEYS.contents(moduleId),
-    queryFn: () => quizService.getContentsByModule(moduleId),
+    queryKey: QUIZ_KEYS.contents(moduleId, lang_id),
+    queryFn: () =>
+      quizService.getContentsByModule(moduleId, lang_id != null ? { lang_id } : undefined),
     enabled: enabled && !!moduleId,
   });
 }
@@ -104,6 +115,31 @@ export function useQuizzesByContent(contentId: number, enabled = true) {
   });
 }
 
+/** Fetches all quizzes for a module by first getting contents then quizzes per content */
+export function useQuizzesByModule(moduleId: number, enabled = true) {
+  return useQuery({
+    queryKey: [...QUIZ_KEYS.contents(moduleId), "quizzes"],
+    queryFn: async () => {
+      const contentsRes = await quizService.getContentsByModule(moduleId);
+      const contents =
+        contentsRes?.success && Array.isArray(contentsRes.data)
+          ? contentsRes.data
+          : [];
+      const contentIds = contents.map((c: { id: number }) => c.id);
+      const results = await Promise.all(
+        contentIds.map((id: number) =>
+          quizService.getQuizzesByContent(id),
+        ),
+      );
+      const all = results.flatMap((r) =>
+        r?.success && Array.isArray(r?.data) ? r.data : [],
+      );
+      return { success: true, data: all };
+    },
+    enabled: enabled && !!moduleId,
+  });
+}
+
 export function useQuiz(id: number, enabled = true) {
   return useQuery({
     queryKey: QUIZ_KEYS.quiz(id),
@@ -112,8 +148,17 @@ export function useQuiz(id: number, enabled = true) {
   });
 }
 
+export function useQuizAnswers(quizId: number, enabled = true) {
+  return useQuery({
+    queryKey: QUIZ_KEYS.quizAnswers(quizId),
+    queryFn: () => quizService.getQuizAnswers(quizId),
+    enabled: enabled && !!quizId,
+  });
+}
+
 export function useCreateQuiz() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: (payload: CreateQuizPayload) => quizService.createQuiz(payload),
     onSuccess: () => {
@@ -124,11 +169,9 @@ export function useCreateQuiz() {
 
 export function useUpdateQuiz() {
   const qc = useQueryClient();
+
   return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: { id: number; payload: UpdateQuizPayload }) =>
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateQuizPayload }) =>
       quizService.updateQuiz(id, payload),
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.quiz(id) });
@@ -139,6 +182,7 @@ export function useUpdateQuiz() {
 
 export function useDeleteQuiz() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: (id: number) => quizService.deleteQuiz(id),
     onSuccess: () => {
@@ -150,8 +194,10 @@ export function useDeleteQuiz() {
 /** Module Mutations */
 export function useCreateModule() {
   const qc = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: CreateModulePayload) => quizService.createModule(payload),
+    mutationFn: (payload: CreateModulePayload) =>
+      quizService.createModule(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.modules });
     },
@@ -160,12 +206,15 @@ export function useCreateModule() {
 
 export function useUpdateModule() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       id,
       payload,
-    }: { id: number; payload: UpdateModulePayload }) =>
-      quizService.updateModule(id, payload),
+    }: {
+      id: number;
+      payload: UpdateModulePayload;
+    }) => quizService.updateModule(id, payload),
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.module(id) });
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.modules });
@@ -175,6 +224,7 @@ export function useUpdateModule() {
 
 export function useDeleteModule() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: (id: number) => quizService.deleteModule(id),
     onSuccess: () => {
@@ -185,12 +235,15 @@ export function useDeleteModule() {
 
 export function useAddModuleTranslation() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       moduleId,
       payload,
-    }: { moduleId: number; payload: AddModuleTranslationPayload }) =>
-      quizService.addModuleTranslation(moduleId, payload),
+    }: {
+      moduleId: number;
+      payload: AddModuleTranslationPayload;
+    }) => quizService.addModuleTranslation(moduleId, payload),
     onSuccess: (_, { moduleId }) => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.module(moduleId) });
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.modules });
@@ -201,8 +254,10 @@ export function useAddModuleTranslation() {
 /** Content Mutations */
 export function useCreateContent() {
   const qc = useQueryClient();
+
   return useMutation({
-    mutationFn: (payload: CreateContentPayload) => quizService.createContent(payload),
+    mutationFn: (payload: CreateContentPayload) =>
+      quizService.createContent(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.contents() });
     },
@@ -211,12 +266,15 @@ export function useCreateContent() {
 
 export function useUpdateContent() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: ({
       id,
       payload,
-    }: { id: number; payload: UpdateContentPayload }) =>
-      quizService.updateContent(id, payload),
+    }: {
+      id: number;
+      payload: UpdateContentPayload;
+    }) => quizService.updateContent(id, payload),
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.content(id) });
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.contents() });
@@ -226,6 +284,7 @@ export function useUpdateContent() {
 
 export function useDeleteContent() {
   const qc = useQueryClient();
+
   return useMutation({
     mutationFn: (id: number) => quizService.deleteContent(id),
     onSuccess: () => {

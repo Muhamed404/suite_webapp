@@ -5,15 +5,14 @@ export const LoginHero = () => {
     <div className="w-full h-full flex justify-center items-center rounded-3xl bg-[#E7F4FF] overflow-hidden">
       <div className="w-full h-full flex items-center justify-center p-8">
         <Image
-          src="/images/login-vector.png"
-          alt="Login Illustration"
-          width={600}
-          height={600}
-          className="w-1/2 h-auto object-contain"
           priority
+          alt="Login Illustration"
+          className="w-1/2 h-auto object-contain"
+          height={600}
+          src="/images/login-vector.png"
+          width={600}
         />
       </div>
     </div>
   );
 };
-

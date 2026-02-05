@@ -1,5 +1,6 @@
-import { awmClient, suiteClient } from "./httpClient";
 import type { AuthUser } from "@/hooks/useAuthStore";
+
+import { awmClient, API_BASE, suiteClient } from "./httpClient";
 
 export interface LoginPayload {
   email: string;
@@ -39,6 +40,7 @@ interface DecodedJwt {
 const decodeJwt = (token: string): DecodedJwt | null => {
   try {
     const parts = token.split(".");
+
     if (parts.length !== 3) return null;
 
     const base64Url = parts[1];
@@ -97,11 +99,33 @@ export const authService = {
   async getCurrentUser(): Promise<AuthUser | null> {
     // This assumes an endpoint that returns the currently authenticated user
     // aligned with the validateSessionMiddleware described in the docs.
-    const response = await awmClient.get<{ user: AuthUser | null }>("/api/awm/auth/me");
+    const response = await awmClient.get<{ user: AuthUser | null }>(
+      `${API_BASE}/auth/me`,
+    );
+
     return response.data.user ?? null;
   },
+
+  /**
+   * Generate JWT token for development/testing (AWM API: POST /auth/generate-token).
+   * Role IDs: 1=Super Magnus, 2=Sub Magnus, 3=Super Org User, 4=Sub Org User, 5=Org User.
+   */
+  async generateTestToken(payload: {
+    user_id: number;
+    org_id: number;
+    email: string;
+    role_id: number;
+  }): Promise<{ token: string; expiresIn: string; payload: Record<string, unknown> }> {
+    const response = await awmClient.post<{
+      message?: string;
+      statusCode?: number;
+      alertType?: string;
+      object?: { token: string; expiresIn: string; payload: Record<string, unknown> };
+    }>(`${API_BASE}/auth/generate-token`, payload);
+    const obj = response.data.object;
+    if (!obj?.token) {
+      throw new Error(response.data.message ?? "Failed to generate token");
+    }
+    return { token: obj.token, expiresIn: obj.expiresIn ?? "24h", payload: obj.payload ?? {} };
+  },
 };
-
-
-
-
