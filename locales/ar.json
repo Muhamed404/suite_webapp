@@ -211,6 +211,7 @@
 		"serviceRegistry": "سجل الخدمات",
 		"audit": "سجل التدقيق",
 		"subscriptionHistory": "سجل الاشتراكات",
+		"createSubscription": "إنشاء اشتراك",
 		"userManagement": "إدارة المستخدمين",
 		"campaigns": "الحملات",
 		"allCampaigns": "جميع الحملات",
@@ -1186,6 +1187,7 @@
 		"tooltp-Template-View": "عرض القالب",
 		"Organization": {
 			"SubscriptionHistory": "سجل الاشتراك",
+			"CreateSubscription": "إنشاء اشتراك",
 			"Edit": "تعديل المؤسسة",
 			"Address": "العنوان",
 			"PostalCode": "الرمز البريدي",
@@ -1875,7 +1877,8 @@
 		"noUnenrolledUsers": "لا يوجد مستخدمون غير مسجلين"
 	},
 	"Organization": {
-		"SubscriptionHistory": "سجل الاشتراكات"
+		"SubscriptionHistory": "سجل الاشتراكات",
+		"CreateSubscription": "إنشاء اشتراك"
 	},
 	"SubscriptionHistory": {
 		"TotalSubscription": "إجمالي الاشتراكات",

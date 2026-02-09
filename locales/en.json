@@ -198,6 +198,7 @@
 		"serviceRegistry": "Service Registry",
 		"audit": "Audit Log",
 		"subscriptionHistory": "Subscription History",
+		"createSubscription": "Create Subscription",
 		"userManagement": "User Management",
 		"campaigns": "Campaigns",
 		"allCampaigns": "All Campaigns",
@@ -1384,6 +1385,7 @@
 	"tooltp-Template-View": "tooltp-Template-View",
 	"Organization": {
 		"SubscriptionHistory": "Subscription History",
+		"CreateSubscription": "Create Subscription",
 		"Edit": "Organization.Edit",
 		"Address": "Organization.Address",
 		"PostalCode": "Organization.PostalCode",
