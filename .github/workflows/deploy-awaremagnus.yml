@@ -169,6 +169,8 @@ jobs:
       env:
         AWAREMAGNUS_API_URL: ${{ secrets.AWAREMAGNUS_API_URL }}
         AWAREMAGNUS_PORT: ${{ secrets.AWAREMAGNUS_PORT }}
+        NEXT_PUBLIC_SERVICE_AWM_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_AWM_URL }}
+        NEXT_PUBLIC_SERVICE_SUITE_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_SUITE_URL }}
       run: |
         # Transfer deployment package to server
         scp awaremagnus_deployment.tar.gz ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/awaremagnus_deployment.tar.gz || { echo "Failed to copy deployment package"; exit 1; }
@@ -183,6 +185,8 @@ jobs:
         ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "chmod +x /tmp/deploy-awaremagnus.sh && chmod +x /tmp/register-awaremagnus-service.sh && chmod +x /tmp/create-awaremagnus-env.sh && \
           AWAREMAGNUS_API_URL='${AWAREMAGNUS_API_URL:-http://127.0.0.1:3001}' \
           AWAREMAGNUS_PORT='${AWAREMAGNUS_PORT:-8001}' \
+          NEXT_PUBLIC_SERVICE_AWM_URL='${NEXT_PUBLIC_SERVICE_AWM_URL:-http://localhost:3002}' \
+          NEXT_PUBLIC_SERVICE_SUITE_URL='${NEXT_PUBLIC_SERVICE_SUITE_URL:-http://localhost:3001}' \
           /tmp/deploy-awaremagnus.sh"
 
     - name: Notify deployment status

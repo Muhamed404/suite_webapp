@@ -6,10 +6,10 @@ set -e
 
 SERVICE_NAME="awaremagnus"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
-DEPLOY_DIR="/opt/secure-magnus/awaremagnus"
+DEPLOY_DIR="/opt/secure-magnus/suite_webapp/awaremagnus"
 LOGS_DIR="/opt/secure-magnus/logs"
 SERVICE_USER="ubuntu"
-NPM_PATH=$(which npm)
+NODE_PATH=$(which node)
 AWAREMAGNUS_PORT=${AWAREMAGNUS_PORT:-8001}
 
 echo "Registering AwareMagnus as a systemd service..."
@@ -20,9 +20,9 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Check if npm is installed
-if [ -z "$NPM_PATH" ]; then
-    echo "npm not found. Please install Node.js first."
+# Check if node is installed
+if [ -z "$NODE_PATH" ]; then
+    echo "Node.js not found. Please install Node.js first."
     exit 1
 fi
 
@@ -43,10 +43,10 @@ chown -R $SERVICE_USER:$SERVICE_USER "$DEPLOY_DIR"
 chmod -R 755 "$DEPLOY_DIR"
 chmod -R 755 "$LOGS_DIR"
 
-# Secure .env.local file if exists
-if [ -f "$DEPLOY_DIR/.env.local" ]; then
-    chmod 600 "$DEPLOY_DIR/.env.local"
-    chown $SERVICE_USER:$SERVICE_USER "$DEPLOY_DIR/.env.local"
+# Secure .env file if exists
+if [ -f "$DEPLOY_DIR/.env" ]; then
+    chmod 600 "$DEPLOY_DIR/.env"
+    chown $SERVICE_USER:$SERVICE_USER "$DEPLOY_DIR/.env"
 fi
 
 # Stop existing service if running
@@ -68,11 +68,11 @@ Type=simple
 User=$SERVICE_USER
 Group=$SERVICE_USER
 WorkingDirectory=$DEPLOY_DIR
-ExecStart=$NPM_PATH run start
+ExecStart=$NODE_PATH $DEPLOY_DIR/node_modules/.bin/next start -p $AWAREMAGNUS_PORT
 Restart=on-failure
 RestartSec=10
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=append:/opt/secure-magnus/logs/suite_webapp_awm_sysout.log
+StandardError=append:/opt/secure-magnus/logs/suite_webapp_awm_syerr.log
 SyslogIdentifier=$SERVICE_NAME
 Environment=NODE_ENV=production
 Environment=PORT=$AWAREMAGNUS_PORT
