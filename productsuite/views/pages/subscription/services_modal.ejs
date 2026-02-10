@@ -6,7 +6,7 @@
       &times;
     </button>
 
-    <h2 class="text-xl font-semibold mb-4 p-6  border-b border-black/10">Selected Services</h2>
+    <h2 class="text-xl font-semibold mb-4 p-6  border-b border-black/10"><%= __("subscription.create.selectedServices") %></h2>
 
 
 
@@ -16,23 +16,40 @@
 
         <!-- Annual Service -->
         <div class="border p-8 rounded-3xl" id="annualServiceContainer">
-
-
+          <div class="flex items-center gap-2.5 mb-8">
+            <img src="/securemagnus_2025/images/calendar-schedule-checkmark.svg" alt="">
+            <h3 class="font-medium text-xl"><%= __("subscription.create.labelAnnualServices") %></h3>
+          </div>
+          <div id="annualServicesList"></div>
         </div>
 
         <!-- Fixed Service -->
         <div class="border p-8 rounded-3xl" id="fixedServiceContainer">
-
-
+          <div class="flex items-center gap-2.5 mb-8">
+            <img src="/securemagnus_2025/images/browser-web-checkmark.svg" alt="">
+            <h3 class="font-medium text-xl"><%= __("subscription.create.labelFixedServices") %></h3>
+          </div>
+          <div id="fixedServicesList"></div>
         </div>
       </div>
 
       <!-- Done Button -->
       <div class="mt-6">
         <button id="closeDoneModal"
-          class="w-full py-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition">Done</button>
+          class="w-full py-2 rounded-full bg-teal-500 text-white hover:bg-teal-600 transition"><%= __("subscription.create.done") %></button>
       </div>
     </div>
 
   </div>
 </div>
+
+<script>
+window.i18n = window.i18n || {};
+window.i18n.__ = function(key) {
+  var translations = {
+    'subscription.create.noAnnualServicesFound': '<%= __("subscription.create.noAnnualServicesFound") %>',
+    'subscription.create.noFixedServicesFound': '<%= __("subscription.create.noFixedServicesFound") %>'
+  };
+  return translations[key] || key;
+};
+</script>
