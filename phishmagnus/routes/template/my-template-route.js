@@ -4,6 +4,7 @@ const { renderCreateTemplate, createTemplate } = require('../../controllers/temp
 const { retrieveAllTemplates } = require('../../controllers/template/list-templates-controller.js')
 const { disableTemplate } = require('../../controllers/template/disable-template.js')
 const { viewTemplate } = require('../../controllers/template/view-template.js')
+const { viewTemplateApi } = require('../../controllers/template/view-template-api.js')
 
 // const { updateSystemTemplate } = require('../../controllers/system_template/updateSystemTemplateController')
 
@@ -26,6 +27,9 @@ router.get("/create", checkPermission(enums.ModuleNames.My_Template, [enums.Acce
 
 router.post("/create", checkPermission(enums.ModuleNames.My_Template, [enums.Access_Types.RWD_O]),
     createTemplate);
+
+// API endpoint to get template details as JSON (for preview functionality)
+router.get("/api/view/:templateId", checkPermission(enums.ModuleNames.Campaign_Management, [enums.Access_Types.RWD_O, enums.Access_Types.R_O]), viewTemplateApi);
 
 router.get("/view/:templateId", checkPermission(enums.ModuleNames.My_Template, [enums.Access_Types.RWD_O, enums.Access_Types.R_O]), viewTemplate);
 

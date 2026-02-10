@@ -25,9 +25,10 @@
 		"select_template": "اختر القالب",
 		"description": "الوصف",
 		"preview": "معاينة",
-		"formInteraction": "تفاعل النموذج",
-		"formSubmitted": "تم إرسال النموذج",
-		"attachmentOpened": "تم فتح المرفق",
+		"formInteraction": "تتبع تفاعل المستخدم مع نموذج التصيد الاحتيالي",
+		"formSubmitted": "تتبع البيانات المرسلة من خلال نموذج التصيد الاحتيالي",
+		"attachmentOpened": "تتبع تحميل ملف التصيد الاحتيالي (من البريد الإلكتروني أو صفحة الهبوط)",
+		"linkClicked": "تتبع النقر على رابط التصيد الاحتيالي",
 		"targetCompromised": "تم اختراق الهدف",
 		"search_here": "ابحث هنا...",
 		"sort_by": "رتّب حسب",
@@ -111,7 +112,10 @@
 		"InProgress": "قيد التقدم",
 		"completed": "مكتمل",
 		"search": "بحث",
-		"show": "عرض"
+		"show": "عرض",
+		"select_template_to_preview": "اختر قالبًا للمعاينة",
+		"emailOpened": "تتبع فتح البريد الإلكتروني",
+		"fileDownloaded": "generic_label.fileDownloaded"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -244,7 +248,7 @@
 		"campaignMetrics": "مقاييس الحملة",
 		"phishingSuccess": "نجاح التصيد",
 		"emailView": "عرض البريد الإلكتروني",
-		"emailOpened": "تم فتح البريد الإلكتروني",
+		"emailOpened": "تتبع فتح البريد الإلكتروني",
 		"totalActivity": "النشاط الإجمالي",
 		"phishingSegments": "شرائح التصيد",
 		"employeeResponse": "استجابة الموظف",
@@ -819,7 +823,19 @@
 			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ"
 		},
 		"email_create_campaign": {
-			"title": "إنشاء حملة بريد إلكتروني"
+			"title": "إنشاء حملة بريد إلكتروني",
+			"email_content": "محتوى البريد الإلكتروني",
+			"landing_page": "صفحة الهبوط",
+			"redirect_page": "صفحة إعادة التوجيه",
+			"attachment": "المرفق",
+			"template_tracking_description": "system_template.create.labelTrackingDescription",
+			"tracking_items": {
+				"email_opened": "campaign.email_campaign_detail.labelEmailOpen",
+				"phishing_link_clicked": "campaign.email_campaign_detail.labelClickedLink",
+				"phishing_file_downloaded": "campaign.email_campaign_detail.labelAttachmentOpened",
+				"form_data_submitted": "campaign.email_campaign_detail.labelFormSubmitted",
+				"form_user_interaction": "campaign.email_campaign_detail.labelInteractForm"
+			}
 		}
 	},
 	"email": {
@@ -1473,7 +1489,8 @@
 	"template": {
 		"sms_content": "محتوى قالب الرسائل النصية",
 		"sms_message": "نص الرسالة القصيرة",
-		"sms_placeholder": "نص الرسالة"
+		"sms_placeholder": "نص الرسالة",
+		"tracking_header": "هذا القالب سيسمح لك بتتبع العناصر التالية:"
 	},
 	"common": {
 		"search_here": "ابحث هنا",

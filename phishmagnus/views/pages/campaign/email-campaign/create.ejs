@@ -81,11 +81,23 @@
   // templates & systemTemplate come from controller
   window._userTemplates = <%- JSON.stringify(templates || []) %>;
   window._systemTemplates = <%- JSON.stringify(systemTemplate || []) %>;
+  window.backendUrl = '<%= backendUrl %>';
+  window.backendTVBSUrl = '<%= backendTVBSUrl %>';
   window.i18n = {
     labels: {
       next: "<%= __('generic_label.next') %>",
       finish: "<%= __('generic_label.Finish') %>",
       selectTemplate: "<%= __('generic_label.select_template') %>"
+    },
+    generic_label: {
+      emailOpened: "<%= __('generic_label.emailOpened') %>",
+      linkClicked: "<%= __('generic_label.linkClicked') %>",
+      attachmentOpened: "<%= __('generic_label.attachmentOpened') %>",
+      formInteraction: "<%= __('generic_label.formInteraction') %>",
+      formSubmitted: "<%= __('generic_label.formSubmitted') %>"
+    },
+    template: {
+      tracking_header: "<%= __('template.tracking_header') %>"
     },
     validation: {
       campaign_name_required: "<%= __('sms.validation_messages.campaign_name_required') %>",
