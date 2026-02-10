@@ -111,7 +111,9 @@ exports.renderCampaignReport = async (req, res) => {
                     search_here: req.__("generic_label.search_here"),
                     total_invitees: req.getLocale() === 'ar' ? 'إجمالي المدعوين' : 'Total Invitee',
                     unsent: req.getLocale() === 'ar' ? 'في الانتظار' : 'Pending',
-                    sent: req.getLocale() === 'ar' ? 'مرسل' : 'Sent'
+                    sent: req.getLocale() === 'ar' ? 'مرسل' : 'Sent',
+                    noCampaignsFound: req.__("all_campaigns.noCampaignsFound"),
+                    createFirstCampaign: req.__("all_campaigns.createFirstCampaign")
                 },
                 user: req.user,
                 title: 'Email Campaign Reports',

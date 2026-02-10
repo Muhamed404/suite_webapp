@@ -16,7 +16,7 @@ const baseOptions = {
             fontSize: '14px',
             offsetY: -10,
             formatter: function () {
-              return 'Total Campaigns';
+              return translations.totalCampaigns || 'Total Campaigns';
             }
           },
           value: {
@@ -113,6 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     };
   } else {
+    const total = campaignChartData.reduce((a, b) => a + b, 0);
     chartOptions = {
       ...baseOptions,
       series: campaignChartData,
@@ -124,7 +125,38 @@ document.addEventListener("DOMContentLoaded", function () {
         translations.qr || 'QR',
         translations.whatsapp || 'WhatsApp'
       ],
-      colors: ['#57ABE6', '#FAA139', '#A3B5C3', '#45D8DD', '#AE62E9', '#47E7C5']
+      colors: ['#57ABE6', '#FAA139', '#A3B5C3', '#45D8DD', '#AE62E9', '#47E7C5'],
+      plotOptions: {
+        ...baseOptions.plotOptions,
+        pie: {
+          ...baseOptions.plotOptions.pie,
+          donut: {
+            ...baseOptions.plotOptions.pie.donut,
+            labels: {
+              ...baseOptions.plotOptions.pie.donut.labels,
+              name: {
+                show: true,
+                fontSize: '14px',
+                offsetY: -10,
+                formatter: function () {
+                  return translations.totalCampaigns || 'Total Campaigns';
+                }
+              },
+              value: {
+                show: true,
+                fontSize: '20px',
+                offsetY: 10,
+                formatter: function () {
+                  return total.toString();
+                }
+              },
+              total: {
+                show: true
+              }
+            }
+          }
+        }
+      }
     };
   }
 

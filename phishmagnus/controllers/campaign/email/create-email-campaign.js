@@ -66,6 +66,8 @@ exports.createEmailCampaign = async (req, res) => {
           group: grpResponse.data.message,
           templates: templateResponse.data.message,
           systemTemplate: systemTemplates,
+          backendUrl: config.BACKEND_EP,
+          backendTVBSUrl: config.BACKEND_TVBS_URL,
         });
       } catch (err) {
         logger.error(`[Create Email Campaign] error in processing request ${err.message}`);

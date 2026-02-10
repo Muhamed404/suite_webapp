@@ -1,4 +1,13 @@
 <div class="container mx-auto px-4 py-8">
+  <!-- Breadcrumb -->
+  <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-4" aria-label="Breadcrumb">
+    <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+    <span class="text-gray-400">›</span>
+    <a href="/phm/campaign/reports" class="hover:text-gray-700 transition"><%= __("breadcrumbs.reports") %></a>
+    <span class="text-gray-400">›</span>
+    <span class="font-semibold text-gray-900"><%= __("breadcrumbs.usbCampaignReport") %></span>
+  </nav>
+
   <h1 class="text-2xl font-bold text-teal-700 mb-6"><%= __("usb_campaign.report.title") %></h1>
   <div class="overflow-x-auto bg-white rounded-xl shadow">
     <table class="min-w-full divide-y divide-gray-200">

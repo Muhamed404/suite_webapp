@@ -98,6 +98,10 @@ exports.renderCampaignReport = async (req, res) => {
                 filters: {
                     organizationId: req.user.organization_id
                 },
+                translations: {
+                    noCampaignsFound: req.__("all_campaigns.noCampaignsFound"),
+                    createFirstCampaign: req.__("all_campaigns.createFirstCampaign")
+                },
                 user: req.user,
                 title: 'NFC Campaign Reports',
                 message: res.locals.message || [],

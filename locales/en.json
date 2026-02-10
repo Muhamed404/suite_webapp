@@ -25,9 +25,10 @@
 		"select_template": "Select Template",
 		"description": "Description",
 		"preview": "Preview",
-		"formInteraction": "Form Interaction",
-		"formSubmitted": "Form Submitted",
-		"attachmentOpened": "Attachment Opened",
+		"formInteraction": "Track user interaction with the phishing simulation form",
+		"formSubmitted": "Track data submitted through the phishing simulation form",
+		"attachmentOpened": "Track phishing simulation file downloaded (from email or landing page)",
+		"linkClicked": "Track phishing simulation link clicked",
 		"targetCompromised": "Target Compromised",
 		"search_here": "Search here...",
 		"sort_by": "Sort by",
@@ -96,9 +97,12 @@
 		"entries": "entries",
 		"no_entries_found": "No entries found",
 		"people": "People",
-		"to": "generic_label.to",
-		"search": "generic_label.search",
-		"show": "generic_label.show"
+		"to": "to",
+		"search": "Search",
+		"show": "Show",
+		"select_template_to_preview": "Select a template to preview",
+		"emailOpened": "Track email opened",
+		"fileDownloaded": "generic_label.fileDownloaded"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -198,6 +202,7 @@
 		"serviceRegistry": "Service Registry",
 		"audit": "Audit Log",
 		"subscriptionHistory": "Subscription History",
+		"createSubscription": "Create Subscription",
 		"userManagement": "User Management",
 		"campaigns": "Campaigns",
 		"allCampaigns": "All Campaigns",
@@ -214,6 +219,7 @@
 		"nfcCampaignReport": "NFC Campaign Report",
 		"usbCampaignReport": "USB Campaign Report",
 		"smsCampaignReport": "SMS Campaign Report",
+		"whatsappCampaignReport": "WhatsApp Campaign Report",
 		"systemTemplate": "System Template",
 		"myTemplate": "My Template",
 		"smsCampaign": "Create SMS Campaign",
@@ -229,7 +235,7 @@
 		"campaignMetrics": "Campaign Metrics",
 		"phishingSuccess": "Phishing Success",
 		"emailView": "Email View",
-		"emailOpened": "Email Opened",
+		"emailOpened": "Track email opened",
 		"totalActivity": "Total Activity",
 		"phishingSegments": "Phishing Segments",
 		"employeeResponse": "Employee response",
@@ -529,8 +535,12 @@
 			"optionSelectPackage": "Select Package",
 			"labelLicenseDuration": "License Duration (in Days)",
 			"labelSelectServices": "Select Services",
+			"selectedServices": "Selected Services",
 			"labelFixedServices": "Fixed Services",
 			"labelAnnualServices": "Annual Services",
+			"noAnnualServicesFound": "No annual services found.",
+			"noFixedServicesFound": "No fixed services found.",
+			"done": "Done",
 			"labelBillingAddress": "Billing Address",
 			"optionSelectCountry": "Country",
 			"optionSelectState": "State",
@@ -798,10 +808,31 @@
 			"labelSubmitData": "Submit Data",
 			"labelEmailOpenedNotReported": "Email Opened Not Reported",
 			"labelEmailOpenedAndReported": "Email Opened & Reported",
-			"labelEmailNotOpenedAndReported": "Email Not Opened & Reported"
+			"labelEmailNotOpenedAndReported": "Email Not Opened & Reported",
+			"labelCampaignPreview": "campaign.email_campaign_detail.labelCampaignPreview",
+			"labelEmailContent": "campaign.email_campaign_detail.labelEmailContent",
+			"labelViewRenderedEmail": "campaign.email_campaign_detail.labelViewRenderedEmail",
+			"labelLandingPage": "campaign.email_campaign_detail.labelLandingPage",
+			"labelViewLandingPage": "campaign.email_campaign_detail.labelViewLandingPage",
+			"labelRedirectionPage": "campaign.email_campaign_detail.labelRedirectionPage",
+			"labelViewRedirectPage": "campaign.email_campaign_detail.labelViewRedirectPage",
+			"labelAttachedFile": "campaign.email_campaign_detail.labelAttachedFile",
+			"labelDownloadAttachment": "campaign.email_campaign_detail.labelDownloadAttachment"
 		},
 		"email_create_campaign": {
-			"title": "Create Email Campaign"
+			"title": "Create Email Campaign",
+			"email_content": "Email Content",
+			"landing_page": "Landing Page",
+			"redirect_page": "Redirect Page",
+			"attachment": "Attachment",
+			"template_tracking_description": "system_template.create.labelTrackingDescription",
+			"tracking_items": {
+				"email_opened": "campaign.email_campaign_detail.labelEmailOpen",
+				"phishing_link_clicked": "campaign.email_campaign_detail.labelClickedLink",
+				"phishing_file_downloaded": "campaign.email_campaign_detail.labelAttachmentOpened",
+				"form_data_submitted": "campaign.email_campaign_detail.labelFormSubmitted",
+				"form_user_interaction": "campaign.email_campaign_detail.labelInteractForm"
+			}
 		}
 	},
 	"usb_campaign": {
@@ -1384,6 +1415,7 @@
 	"tooltp-Template-View": "tooltp-Template-View",
 	"Organization": {
 		"SubscriptionHistory": "Subscription History",
+		"CreateSubscription": "Create Subscription",
 		"Edit": "Organization.Edit",
 		"Address": "Organization.Address",
 		"PostalCode": "Organization.PostalCode",
@@ -1447,14 +1479,11 @@
 	"CS-Add": "Add Category",
 	"btn-CS-Save": "Save",
 	"btn-CS-Cancel": "Cancel",
-	" generic_label": {
-		"create": " generic_label.create",
-		"search_here": " generic_label.search_here"
-	},
 	"template": {
 		"sms_content": "template.sms_content",
 		"sms_message": "template.sms_message",
-		"sms_placeholder": "template.sms_placeholder"
+		"sms_placeholder": "template.sms_placeholder",
+		"tracking_header": "This template will allow you to track the following items:"
 	},
 	"common": {
 		"search_here": "common.search_here",
@@ -1519,7 +1548,8 @@
 		"totalScanned": "Total Scanned",
 		"totalQRImages": "Total QR Images",
 		"created": "Created",
-		"unsent": "Unsent"
+		"unsent": "Unsent",
+		"totalCampaigns": "Total Campaigns"
 	},
 	"reports": {
 		"campaignReports": "Campaign Reports",

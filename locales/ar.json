@@ -25,9 +25,10 @@
 		"select_template": "اختر القالب",
 		"description": "الوصف",
 		"preview": "معاينة",
-		"formInteraction": "تفاعل النموذج",
-		"formSubmitted": "تم إرسال النموذج",
-		"attachmentOpened": "تم فتح المرفق",
+		"formInteraction": "تتبع تفاعل المستخدم مع نموذج التصيد الاحتيالي",
+		"formSubmitted": "تتبع البيانات المرسلة من خلال نموذج التصيد الاحتيالي",
+		"attachmentOpened": "تتبع تحميل ملف التصيد الاحتيالي (من البريد الإلكتروني أو صفحة الهبوط)",
+		"linkClicked": "تتبع النقر على رابط التصيد الاحتيالي",
 		"targetCompromised": "تم اختراق الهدف",
 		"search_here": "ابحث هنا...",
 		"sort_by": "رتّب حسب",
@@ -108,10 +109,13 @@
 		"to": "إلى",
 		"no_entries_found": "لم يتم العثور على إدخالات",
 		"people": "الأشخاص",
-		"InProgress": "generic_label.InProgress",
-		"completed": "generic_label.completed",
-		"search": "generic_label.search",
-		"show": "generic_label.show"
+		"InProgress": "قيد التقدم",
+		"completed": "مكتمل",
+		"search": "بحث",
+		"show": "عرض",
+		"select_template_to_preview": "اختر قالبًا للمعاينة",
+		"emailOpened": "تتبع فتح البريد الإلكتروني",
+		"fileDownloaded": "generic_label.fileDownloaded"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -211,6 +215,7 @@
 		"serviceRegistry": "سجل الخدمات",
 		"audit": "سجل التدقيق",
 		"subscriptionHistory": "سجل الاشتراكات",
+		"createSubscription": "إنشاء اشتراك",
 		"userManagement": "إدارة المستخدمين",
 		"campaigns": "الحملات",
 		"allCampaigns": "جميع الحملات",
@@ -227,6 +232,7 @@
 		"nfcCampaignReport": "تقرير حملة NFC",
 		"usbCampaignReport": "تقرير حملة USB",
 		"smsCampaignReport": "تقرير حملة SMS",
+		"whatsappCampaignReport": "تقرير حملة واتساب",
 		"systemTemplate": "قالب النظام",
 		"myTemplate": "قالباتي",
 		"smsCampaign": "إنشاء حملة رسائل قصيرة",
@@ -242,7 +248,7 @@
 		"campaignMetrics": "مقاييس الحملة",
 		"phishingSuccess": "نجاح التصيد",
 		"emailView": "عرض البريد الإلكتروني",
-		"emailOpened": "تم فتح البريد الإلكتروني",
+		"emailOpened": "تتبع فتح البريد الإلكتروني",
 		"totalActivity": "النشاط الإجمالي",
 		"phishingSegments": "شرائح التصيد",
 		"employeeResponse": "استجابة الموظف",
@@ -542,8 +548,12 @@
 			"optionSelectPackage": "اختر الباقة",
 			"labelLicenseDuration": "مدة الترخيص (بالأيام)",
 			"labelSelectServices": "اختر الخدمات",
+			"selectedServices": "الخدمات المحددة",
 			"labelFixedServices": "الخدمات الثابتة",
 			"labelAnnualServices": "الخدمات السنوية",
+			"noAnnualServicesFound": "لم يتم العثور على خدمات سنوية.",
+			"noFixedServicesFound": "لم يتم العثور على خدمات ثابتة.",
+			"done": "تم",
 			"labelBillingAddress": "عنوان الفوترة",
 			"optionSelectCountry": "البلد",
 			"optionSelectState": "الولاية / المنطقة",
@@ -813,7 +823,19 @@
 			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ"
 		},
 		"email_create_campaign": {
-			"title": "إنشاء حملة بريد إلكتروني"
+			"title": "إنشاء حملة بريد إلكتروني",
+			"email_content": "محتوى البريد الإلكتروني",
+			"landing_page": "صفحة الهبوط",
+			"redirect_page": "صفحة إعادة التوجيه",
+			"attachment": "المرفق",
+			"template_tracking_description": "system_template.create.labelTrackingDescription",
+			"tracking_items": {
+				"email_opened": "campaign.email_campaign_detail.labelEmailOpen",
+				"phishing_link_clicked": "campaign.email_campaign_detail.labelClickedLink",
+				"phishing_file_downloaded": "campaign.email_campaign_detail.labelAttachmentOpened",
+				"form_data_submitted": "campaign.email_campaign_detail.labelFormSubmitted",
+				"form_user_interaction": "campaign.email_campaign_detail.labelInteractForm"
+			}
 		}
 	},
 	"email": {
@@ -1186,6 +1208,7 @@
 		"tooltp-Template-View": "عرض القالب",
 		"Organization": {
 			"SubscriptionHistory": "سجل الاشتراك",
+			"CreateSubscription": "إنشاء اشتراك",
 			"Edit": "تعديل المؤسسة",
 			"Address": "العنوان",
 			"PostalCode": "الرمز البريدي",
@@ -1463,18 +1486,11 @@
 	"CS-Add": "إضافة فئة",
 	"btn-CS-Save": "حفظ",
 	"btn-CS-Cancel": "إلغاء",
-	" generic_label": {
-		"create": " إنشاء",
-		"search_here": " ابحث هنا",
-		"campaignName": " generic_label.campaignName",
-		"enter_campaign_name": " generic_label.enter_campaign_name",
-		"description": " generic_label.description",
-		"preview": " generic_label.preview"
-	},
 	"template": {
 		"sms_content": "محتوى قالب الرسائل النصية",
 		"sms_message": "نص الرسالة القصيرة",
-		"sms_placeholder": "نص الرسالة"
+		"sms_placeholder": "نص الرسالة",
+		"tracking_header": "هذا القالب سيسمح لك بتتبع العناصر التالية:"
 	},
 	"common": {
 		"search_here": "ابحث هنا",
@@ -1539,7 +1555,8 @@
 		"totalScanned": "إجمالي الممسوح",
 		"totalQRImages": "إجمالي صور QR",
 		"created": "تم الإنشاء",
-		"unsent": "غير مرسل"
+		"unsent": "غير مرسل",
+		"totalCampaigns": "إجمالي الحملات"
 	},
 	"reports": {
 		"campaignReports": "تقارير الحملات",
@@ -1875,7 +1892,8 @@
 		"noUnenrolledUsers": "لا يوجد مستخدمون غير مسجلين"
 	},
 	"Organization": {
-		"SubscriptionHistory": "سجل الاشتراكات"
+		"SubscriptionHistory": "سجل الاشتراكات",
+		"CreateSubscription": "إنشاء اشتراك"
 	},
 	"SubscriptionHistory": {
 		"TotalSubscription": "إجمالي الاشتراكات",

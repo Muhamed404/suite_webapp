@@ -203,12 +203,15 @@ class EmailCampaignStepper {
       const opt = selectEl.options[selectEl.selectedIndex];
       if (!opt || !opt.value) {
         this.syncHiddenTemplate(null);
+        this.clearTemplatePreview();
         return;
       }
       this.syncHiddenTemplate({ 
         id: opt.value, 
         name: opt.textContent || opt.label || opt.value 
       });
+      // Load template preview
+      this.loadTemplatePreview(opt.value);
     });
 
     radios.forEach(r => r.addEventListener('change', handleTemplateChange));
@@ -788,6 +791,547 @@ class EmailCampaignStepper {
     `;
 
     errorContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ===== TEMPLATE PREVIEW FUNCTIONALITY =====
+  clearTemplatePreview() {
+    const previewEmpty = document.getElementById('preview-empty');
+    const previewContent = document.getElementById('preview-content');
+    const previewLoading = document.getElementById('preview-loading');
+
+    if (previewEmpty) previewEmpty.classList.remove('hidden');
+    if (previewContent) previewContent.classList.add('hidden');
+    if (previewLoading) previewLoading.classList.add('hidden');
+
+    // Reset all preview buttons
+    const buttons = document.querySelectorAll('.preview-nav-btn');
+    buttons.forEach(btn => {
+      btn.disabled = true;
+      btn.classList.add('hidden');
+    });
+
+    // Clear tracking information
+    const container = document.getElementById('templateSelection');
+    if (container) {
+      const existingInfo = container.querySelector('.tracking-info');
+      if (existingInfo) {
+        existingInfo.remove();
+      }
+    }
+
+    this.currentTemplateData = null;
+    this.currentPreviewTab = 'email';
+  }
+
+  updateTrackingInfo() {
+    const container = document.getElementById('templateSelection');
+    if (!container || !this.currentTemplateData) return;
+
+    // Remove existing tracking info
+    const existingInfo = container.querySelector('.tracking-info');
+    if (existingInfo) {
+      existingInfo.remove();
+    }
+
+    const trackingDiv = document.createElement('div');
+    trackingDiv.className = 'tracking-info mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg';
+
+    // Determine available tracking features based on template data
+    const hasEmailContent = !!(this.currentTemplateData.phishing_content ||
+                              this.currentTemplateData.email_content || 
+                              this.currentTemplateData.email_body || 
+                              this.currentTemplateData.content || 
+                              this.currentTemplateData.html_content);
+
+    const hasLandingPage = !!(this.currentTemplateData.landing_page_content || 
+                             this.currentTemplateData.landing_page || 
+                             this.currentTemplateData.landing_page_html);
+
+    const hasRedirectPage = !!(this.currentTemplateData.phishing_page_content || 
+                              this.currentTemplateData.redirect_page || 
+                              this.currentTemplateData.redirection_page || 
+                              this.currentTemplateData.redirect_page_html);
+
+    const hasAttachment = !!(this.currentTemplateData.file_attachment_path || 
+                            this.currentTemplateData.attachment || 
+                            this.currentTemplateData.attachment_url || 
+                            this.currentTemplateData.file || 
+                            this.currentTemplateData.file_url || 
+                            this.currentTemplateData.file_attachment) &&
+                          !!(this.currentTemplateData.inv && this.currentTemplateData.cid);
+
+    const trackingItems = [
+      {
+        text: window.i18n?.generic_label?.emailOpened || 'Track email opened',
+        available: hasEmailContent,
+        icon: hasEmailContent ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
+        color: hasEmailContent ? 'green' : 'blue'
+      },
+      {
+        text: window.i18n?.generic_label?.linkClicked || 'Track phishing simulation link clicked',
+        available: hasLandingPage || hasRedirectPage,
+        icon: (hasLandingPage || hasRedirectPage) ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
+        color: (hasLandingPage || hasRedirectPage) ? 'green' : 'blue'
+      },
+      {
+        text: window.i18n?.generic_label?.attachmentOpened || 'Track phishing simulation file downloaded (from email or landing page)',
+        available: hasAttachment,
+        icon: hasAttachment ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
+        color: hasAttachment ? 'green' : 'blue'
+      },
+      {
+        text: window.i18n?.generic_label?.formSubmitted || 'Track data submitted through the phishing simulation form',
+        available: hasLandingPage,
+        icon: hasLandingPage ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
+        color: hasLandingPage ? 'green' : 'blue'
+      },
+      {
+        text: window.i18n?.generic_label?.formInteraction || 'Track user interaction with the phishing simulation form',
+        available: hasLandingPage,
+        icon: hasLandingPage ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
+        color: hasLandingPage ? 'green' : 'blue'
+      },
+      {
+        text: window.i18n?.generic_label?.formSubmitted || 'Track data submitted through the phishing simulation form',
+        available: hasLandingPage,
+        icon: hasLandingPage ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
+        color: hasLandingPage ? 'green' : 'blue'
+      }
+    ];
+
+    trackingDiv.innerHTML = `
+      <h4 class="text-sm font-semibold text-blue-800 mb-2">${window.i18n?.template?.tracking_header || 'This template will allow you to track the following items:'}</h4>
+      <ul class="text-sm text-black space-y-1">
+        ${trackingItems.map(item => `
+          <li class="flex items-center">
+            <span class="mr-2 flex-shrink-0">${item.icon}</span>
+            ${item.text}
+          </li>
+        `).join('')}
+      </ul>
+    `;
+
+    container.appendChild(trackingDiv);
+  }
+
+  async loadTemplatePreview(templateId) {
+    if (!templateId) {
+      console.log('No templateId provided, clearing preview');
+      this.clearTemplatePreview();
+      return;
+    }
+
+    console.log('Loading template preview for ID:', templateId);
+    const previewEmpty = document.getElementById('preview-empty');
+    const previewContent = document.getElementById('preview-content');
+    const previewLoading = document.getElementById('preview-loading');
+    const previewError = document.getElementById('preview-error');
+
+    console.log('Preview elements:', {
+      empty: !!previewEmpty,
+      content: !!previewContent,
+      loading: !!previewLoading,
+      error: !!previewError
+    });
+
+    // Show loading state
+    if (previewEmpty) previewEmpty.classList.add('hidden');
+    if (previewContent) previewContent.classList.add('hidden');
+    if (previewError) previewError.classList.add('hidden');
+    if (previewLoading) previewLoading.classList.remove('hidden');
+
+    try {
+      const url = `/phm/template/api/view/${templateId}`;
+      console.log('Fetching template from:', url);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      console.log('Response status:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
+        throw new Error(`Failed to fetch template details: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Raw API response:', data);
+      
+      this.currentTemplateData = data.message || data.data || data;
+      this.currentPreviewTab = 'email';
+
+      console.log('Template Preview Loaded:', this.currentTemplateData);
+
+      // Hide loading, show content
+      if (previewLoading) previewLoading.classList.add('hidden');
+      if (previewContent) previewContent.classList.remove('hidden');
+
+      // Setup navigation buttons
+      this.setupPreviewNavigation();
+      
+      // Update tracking information based on template
+      this.updateTrackingInfo();
+      
+      // Show first available content
+      this.showPreviewTab('email');
+
+    } catch (error) {
+      console.error('Error loading template preview:', error);
+      console.error('Error stack:', error.stack);
+      
+      if (previewLoading) previewLoading.classList.add('hidden');
+      if (previewError) {
+        previewError.classList.remove('hidden');
+        const errorText = previewError.querySelector('p');
+        if (errorText) {
+          errorText.textContent = 'Failed to load template preview. Please try again.';
+        }
+      }
+    }
+  }
+
+  setupPreviewNavigation() {
+    if (!this.currentTemplateData) {
+      console.warn('setupPreviewNavigation: No template data available');
+      return;
+    }
+
+    console.log('Setting up preview navigation with data:', this.currentTemplateData);
+    const buttons = document.querySelectorAll('.preview-nav-btn');
+    console.log('Found preview navigation buttons:', buttons.length);
+    
+    buttons.forEach(btn => {
+      const tab = btn.getAttribute('data-preview-tab');
+      let hasContent = false;
+
+      switch(tab) {
+        case 'email':
+          hasContent = !!(this.currentTemplateData.phishing_content ||
+                         this.currentTemplateData.email_content || 
+                         this.currentTemplateData.email_body || 
+                         this.currentTemplateData.content || 
+                         this.currentTemplateData.html_content);
+          console.log(`Email content available: ${hasContent}`, {
+            phishing_content: !!this.currentTemplateData.phishing_content,
+            email_content: !!this.currentTemplateData.email_content
+          });
+          break;
+        case 'landing':
+          hasContent = !!(this.currentTemplateData.landing_page_content || 
+                         this.currentTemplateData.landing_page || 
+                         this.currentTemplateData.landing_page_html);
+          console.log(`Landing page content available: ${hasContent}`);
+          break;
+        case 'redirect':
+          hasContent = !!(this.currentTemplateData.phishing_page_content || 
+                         this.currentTemplateData.redirect_page || 
+                         this.currentTemplateData.redirection_page || 
+                         this.currentTemplateData.redirect_page_html);
+          console.log(`Redirect page content available: ${hasContent}`);
+          break;
+        case 'attachment':
+          hasContent = !!(this.currentTemplateData.file_attachment_path || 
+                         this.currentTemplateData.attachment || 
+                         this.currentTemplateData.attachment_url || 
+                         this.currentTemplateData.file || 
+                         this.currentTemplateData.file_url || 
+                         this.currentTemplateData.file_attachment) &&
+                       !!(this.currentTemplateData.inv && this.currentTemplateData.cid);
+          console.log(`Attachment available: ${hasContent}`);
+          break;
+      }
+
+      // Always show email button, hide others if no content
+      const shouldShow = tab === 'email' ? true : hasContent;
+      btn.disabled = !hasContent;
+      btn.classList.toggle('hidden', !shouldShow);
+      
+      if (hasContent) {
+        // Remove any existing listeners by cloning
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        newBtn.onclick = (e) => {
+          e.preventDefault();
+          console.log(`Button clicked for tab: ${tab}`);
+          this.showPreviewTab(tab);
+        };
+        console.log(`Added click handler for ${tab} tab`);
+      }
+    });
+  }
+
+  showPreviewTab(tab) {
+    if (!this.currentTemplateData) {
+      console.warn('No template data available');
+      return;
+    }
+
+    this.currentPreviewTab = tab;
+    console.log('Switching to preview tab:', tab);
+    
+    // Update active button
+    const buttons = document.querySelectorAll('.preview-nav-btn');
+    buttons.forEach(btn => {
+      if (btn.getAttribute('data-preview-tab') === tab) {
+        btn.classList.remove('border-gray-300', 'text-gray-700', 'hover:border-teal-400', 'hover:text-teal-600');
+        btn.classList.add('bg-teal-500', 'text-white', 'border-teal-500');
+      } else {
+        btn.classList.remove('bg-teal-500', 'text-white', 'border-teal-500');
+        btn.classList.add('border-gray-300', 'text-gray-700', 'hover:border-teal-400', 'hover:text-teal-600');
+      }
+    });
+
+    // Update preview title and content
+    const previewTitle = document.getElementById('preview-title');
+    const previewIframe = document.getElementById('preview-iframe');
+    const previewAttachmentInfo = document.getElementById('preview-attachment-info');
+    const previewNoContent = document.getElementById('preview-no-content');
+
+    console.log('Preview elements found:', {
+      title: !!previewTitle,
+      iframe: !!previewIframe,
+      attachmentInfo: !!previewAttachmentInfo,
+      noContent: !!previewNoContent
+    });
+
+    // Hide all content areas first
+    if (previewIframe) previewIframe.classList.add('hidden');
+    if (previewAttachmentInfo) previewAttachmentInfo.classList.add('hidden');
+    if (previewNoContent) previewNoContent.classList.add('hidden');
+
+    let content = '';
+    let title = '';
+
+    switch(tab) {
+      case 'email':
+        title = 'Email Content';
+        content = this.getEmailContent();
+        console.log('Email content length:', content?.length || 0);
+        if (content && !content.includes('No email content')) {
+          if (previewIframe) {
+            previewIframe.classList.remove('hidden');
+            previewIframe.srcdoc = content;
+            console.log('Email content loaded into iframe');
+          }
+        } else {
+          if (previewNoContent) previewNoContent.classList.remove('hidden');
+          console.log('No email content available');
+        }
+        break;
+
+      case 'landing':
+        title = 'Landing Page';
+        content = this.getLandingPageContent();
+        console.log('Landing page content length:', content?.length || 0);
+        if (content && !content.includes('No landing page')) {
+          if (previewIframe) {
+            previewIframe.classList.remove('hidden');
+            previewIframe.srcdoc = content;
+            console.log('Landing page loaded into iframe');
+          }
+        } else {
+          if (previewNoContent) previewNoContent.classList.remove('hidden');
+          console.log('No landing page content available');
+        }
+        break;
+
+      case 'redirect':
+        title = 'Redirection Page';
+        content = this.getRedirectPageContent();
+        console.log('Redirect page content length:', content?.length || 0);
+        if (content && !content.includes('No redirection page')) {
+          if (previewIframe) {
+            previewIframe.classList.remove('hidden');
+            previewIframe.srcdoc = content;
+            console.log('Redirect page loaded into iframe');
+          }
+        } else {
+          if (previewNoContent) previewNoContent.classList.remove('hidden');
+          console.log('No redirect page content available');
+        }
+        break;
+
+      case 'attachment':
+        title = 'Attachment';
+        const attachmentUrl = this.getAttachmentUrl();
+        console.log('Attachment URL:', attachmentUrl);
+        if (attachmentUrl) {
+          if (previewAttachmentInfo) {
+            previewAttachmentInfo.classList.remove('hidden');
+            const attachmentName = document.getElementById('attachment-name');
+            if (attachmentName) {
+              const displayName = this.currentTemplateData?.attachment_filename || 
+                                 this.currentTemplateData?.file_name || 
+                                 attachmentUrl.split('/').pop() || 
+                                 'File Attachment';
+              attachmentName.textContent = displayName;
+              console.log('Attachment name set to:', displayName);
+            }
+            const downloadBtn = document.getElementById('btn-download-attachment-inline');
+            console.log('Download button element found:', !!downloadBtn);
+            if (downloadBtn) {
+              // Remove any existing click handlers
+              const newBtn = downloadBtn.cloneNode(true);
+              downloadBtn.parentNode.replaceChild(newBtn, downloadBtn);
+              
+              newBtn.onclick = (e) => {
+                e.preventDefault();
+                console.log('Download button clicked!');
+                this.downloadAttachment();
+              };
+              console.log('Download button click handler attached');
+            }
+            console.log('Attachment info displayed');
+          }
+        } else {
+          if (previewNoContent) previewNoContent.classList.remove('hidden');
+          console.log('No attachment available');
+        }
+        break;
+    }
+
+    if (previewTitle) {
+      previewTitle.textContent = title;
+      console.log('Preview title set to:', title);
+    }
+  }
+
+  getEmailContent() {
+    const content = this.currentTemplateData?.phishing_content || 
+                   this.currentTemplateData?.email_content || 
+                   this.currentTemplateData?.email_body || 
+                   this.currentTemplateData?.content || 
+                   this.currentTemplateData?.html_content;
+    
+    console.log('getEmailContent - phishing_content:', this.currentTemplateData?.phishing_content?.substring(0, 100));
+    return content || '<p class="text-gray-500 p-4">No email content available.</p>';
+  }
+
+  getLandingPageContent() {
+    const content = this.currentTemplateData?.landing_page_content || 
+                   this.currentTemplateData?.landing_page || 
+                   this.currentTemplateData?.landing_page_html;
+    
+    console.log('getLandingPageContent - landing_page_content:', this.currentTemplateData?.landing_page_content?.substring(0, 100));
+    return content || '<p class="text-gray-500 p-4">No landing page available.</p>';
+  }
+
+  getRedirectPageContent() {
+    const content = this.currentTemplateData?.phishing_page_content || 
+                   this.currentTemplateData?.redirect_page || 
+                   this.currentTemplateData?.redirection_page || 
+                   this.currentTemplateData?.redirect_page_html;
+    
+    console.log('getRedirectPageContent - phishing_page_content:', this.currentTemplateData?.phishing_page_content?.substring(0, 100));
+    return content || '<p class="text-gray-500 p-4">No redirection page available.</p>';
+  }
+
+  getAttachmentUrl() {
+    const url = this.currentTemplateData?.file_attachment_path || 
+                this.currentTemplateData?.file_attachment || 
+                this.currentTemplateData?.attachment_url || 
+                this.currentTemplateData?.attachment || 
+                this.currentTemplateData?.file_url || 
+                this.currentTemplateData?.file;
+    
+    console.log('getAttachmentUrl - checking fields:', {
+      file_attachment_path: this.currentTemplateData?.file_attachment_path,
+      file_attachment: this.currentTemplateData?.file_attachment,
+      attachment_url: this.currentTemplateData?.attachment_url,
+      attachment: this.currentTemplateData?.attachment,
+      file_url: this.currentTemplateData?.file_url,
+      file: this.currentTemplateData?.file,
+      resolved: url
+    });
+    
+    return url;
+  }
+
+  downloadAttachment() {
+    const attachmentUrl = this.getAttachmentUrl();
+    
+    console.log('Download attachment clicked');
+    console.log('Attachment URL:', attachmentUrl);
+    console.log('Attachment filename:', this.currentTemplateData?.attachment_filename);
+    
+    if (attachmentUrl) {
+      // Extract inv and cid from template data first
+      let inv = this.currentTemplateData?.inv;
+      let cid = this.currentTemplateData?.cid;
+      
+      // If not found in template data, try to extract from email content
+      if (!inv || !cid) {
+        const emailContent = this.getEmailContent();
+        const extracted = this.extractInvCidFromContent(emailContent);
+        inv = inv || extracted.inv;
+        cid = cid || extracted.cid;
+      }
+      
+      // Fallback to undefined if still not found
+      inv = inv || 'undefined';
+      cid = cid || 'undefined';
+      
+      // Use the backend TVBS URL for download with dynamic inv and cid
+      const backendUrl = `${window.backendTVBSUrl}/em/dfurl?inv=${inv}&cid=${cid}`;
+      
+      console.log('Backend URL for download:', backendUrl);
+      console.log('Using inv:', inv, 'cid:', cid);
+      
+      // Create a link and trigger download
+      const link = document.createElement('a');
+      link.href = backendUrl;
+      link.download = this.currentTemplateData?.attachment_filename || 'attachment';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('Download triggered');
+    } else {
+      console.warn('No attachment URL found');
+      alert('No attachment available for download.');
+    }
+  }
+
+  extractInvCidFromContent(content) {
+    if (!content) return { inv: null, cid: null };
+    
+    // Look for URLs containing /em/dfurl?inv=...&cid=...
+    const urlRegex = /\/em\/dfurl\?inv=([^&]+)&cid=([^&\s"']+)/g;
+    const match = urlRegex.exec(content);
+    
+    if (match) {
+      return {
+        inv: match[1],
+        cid: match[2]
+      };
+    }
+    
+    // Alternative: look for inv and cid separately in the content
+    const invMatch = content.match(/inv=([^&]+)/);
+    const cidMatch = content.match(/cid=([^&]+)/);
+    
+    return {
+      inv: invMatch ? invMatch[1] : null,
+      cid: cidMatch ? cidMatch[1] : null
+    };
+  }
+
+  updatePreviewButtons() {
+    // This method is no longer needed but keeping for backward compatibility
+    this.setupPreviewNavigation();
+  }
+
+  showPreviewModal(title, htmlContent) {
+    // Modal functionality replaced by inline preview
+  }
+
+  closePreviewModal() {
+    // Modal functionality replaced by inline preview
   }
 
   submitForm() {
