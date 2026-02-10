@@ -66,18 +66,7 @@ sudo mv deployment/awaremagnus "$DEPLOY_DIR"
 sudo chown -R $SERVICE_USER:$SERVICE_USER "$DEPLOY_DIR"
 sudo chmod -R 755 "$DEPLOY_DIR"
 
-# Clean .next cache (standalone build already includes node_modules)
-echo "Removing .next cache..."
-rm -rf "$DEPLOY_DIR/.next/cache"
-
-# Verify standalone server exists
-if [ ! -f "$DEPLOY_DIR/server.js" ]; then
-    echo "ERROR: server.js not found - standalone build may be incomplete"
-    exit 1
-fi
-echo "Standalone build verified"
-
-# Create .env file from environment variables
+# Create .env file before npm install (build needs env vars)
 if [ -f "/tmp/create-awaremagnus-env.sh" ]; then
     echo "Running create-awaremagnus-env.sh..."
     sudo /tmp/create-awaremagnus-env.sh
@@ -85,6 +74,35 @@ else
     echo "ERROR: create-awaremagnus-env.sh not found at /tmp/create-awaremagnus-env.sh"
     exit 1
 fi
+
+# Remove old node_modules and npm cache if they exist
+echo "Cleaning old node_modules and npm cache..."
+rm -rf "$DEPLOY_DIR/node_modules"
+rm -rf "$DEPLOY_DIR/.next"
+npm cache clean --force
+
+# Install dependencies and build (postinstall triggers next build)
+echo "Running npm install (this will also build the application)..."
+cd "$DEPLOY_DIR"
+npm install
+
+# Verify standalone build was created
+if [ ! -f "$DEPLOY_DIR/server.js" ] && [ ! -d "$DEPLOY_DIR/.next/standalone" ]; then
+    echo "ERROR: Build failed - .next/standalone not found after npm install"
+    ls -la "$DEPLOY_DIR/.next/" 2>/dev/null || echo ".next directory does not exist"
+    exit 1
+fi
+
+# If standalone output exists, set up the server structure
+if [ -d "$DEPLOY_DIR/.next/standalone" ]; then
+    echo "Setting up standalone server..."
+    # Copy standalone output to deploy dir root
+    cp -r "$DEPLOY_DIR/.next/standalone/"* "$DEPLOY_DIR/"
+    # Copy static assets into standalone .next
+    mkdir -p "$DEPLOY_DIR/.next/static"
+fi
+
+echo "Build verified successfully"
 
 # Register and restart the application using systemd
 echo "Registering and restarting application service..."

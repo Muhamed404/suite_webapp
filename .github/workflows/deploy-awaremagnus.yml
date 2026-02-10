@@ -38,79 +38,17 @@ jobs:
 
         echo "Development branch verified - deploying commit ${{ github.sha }}"
 
-  # Build and Test AwareMagnus
-  awaremagnus-build-test:
-    name: AwareMagnus Build & Test
-    runs-on: ubuntu-latest
-    needs: [verify-development-branch]
-    defaults:
-      run:
-        working-directory: ./awaremagnus
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ github.sha }}
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Run linting
-      run: npm run lint
-      continue-on-error: true
-
-    - name: Build Next.js application
-      env:
-        NEXT_PUBLIC_API_URL: ${{ secrets.AWAREMAGNUS_API_URL }}
-        NEXT_PUBLIC_SERVICE_AWM_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_AWM_URL }}
-        NEXT_PUBLIC_SERVICE_SUITE_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_SUITE_URL }}
-      run: npm run build
-
-    - name: Verify build output
-      run: |
-        if [ ! -d ".next/standalone" ]; then
-          echo "ERROR: .next/standalone directory not found. Build may have failed."
-          ls -la .next/ 2>/dev/null || echo ".next directory does not exist"
-          exit 1
-        fi
-        echo "Build output verified - standalone directory exists"
-
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: awaremagnus-build
-        path: |
-          awaremagnus/.next/standalone
-          awaremagnus/.next/static
-          awaremagnus/public
-          awaremagnus/package.json
-          awaremagnus/package-lock.json
-          awaremagnus/next.config.js
-        retention-days: 1
-
   # Deploy to OCI Server
   deploy-awaremagnus:
     name: Deploy AwareMagnus to OCI
     runs-on: ubuntu-latest
-    needs: [awaremagnus-build-test]
+    needs: [verify-development-branch]
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         ref: ${{ github.sha }}
-
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: awaremagnus-build
-        path: .
 
     - name: Log deployment info
       run: |
@@ -120,31 +58,12 @@ jobs:
         echo "Commit message: ${{ github.event.head_commit.message }}"
         echo "=========================================="
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-
-    - name: Verify downloaded artifacts
-      run: |
-        echo "Listing downloaded artifact structure..."
-        ls -la awaremagnus/.next/standalone/ || { echo "ERROR: standalone build not found in artifacts"; exit 1; }
-        ls -la awaremagnus/.next/static/ || { echo "ERROR: static assets not found in artifacts"; exit 1; }
-
     - name: Create deployment package
       run: |
-        mkdir -p deployment/awaremagnus
         mkdir -p deployment/scripts
 
-        # Copy the standalone server (includes node_modules and server code)
-        cp -r awaremagnus/.next/standalone/awaremagnus/* deployment/awaremagnus/
-
-        # Copy static assets into the standalone .next directory
-        mkdir -p deployment/awaremagnus/.next/static
-        cp -r awaremagnus/.next/static/* deployment/awaremagnus/.next/static/
-
-        # Copy public assets
-        cp -r awaremagnus/public deployment/awaremagnus/
+        # Copy awaremagnus source files
+        cp -r awaremagnus deployment/awaremagnus
 
         # Copy deployment scripts
         cp .github/scripts/awaremagnus/deploy-awaremagnus.sh deployment/scripts/
@@ -155,13 +74,13 @@ jobs:
       run: |
         tar -czf awaremagnus_deployment.tar.gz \
           --exclude 'node_modules' \
+          --exclude '.next' \
           --exclude '.git' \
           --exclude '.github' \
           --exclude '.claude' \
           --exclude '.env' \
           --exclude '*.md' \
           --exclude '*.txt' \
-          --exclude 'deployment' \
           --exclude 'package-lock.json' \
           --exclude 'docs' \
           deployment/
