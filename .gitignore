@@ -28,7 +28,9 @@ Thumbs.db
 # Build files
 dist/
 build/
-**/.next/
+.next/
+awaremagnus/.next/
+awaremagnus/tsconfig.tsbuildinfo
 node_modules/
 
 # Temporary files
