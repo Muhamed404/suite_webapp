@@ -312,8 +312,8 @@ if (data.length > 0) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-          <div class="text-lg font-medium mb-2">No campaigns found</div>
-          <p>Create your first email campaign to get started.</p>
+          <div class="text-lg font-medium mb-2">${translations.noCampaignsFound || 'No campaigns found'}</div>
+          <p>${translations.createFirstCampaign || 'Create your first campaign to get started.'}</p>
         </td>
       </tr>
     `;

@@ -215,6 +215,7 @@
 		"nfcCampaignReport": "NFC Campaign Report",
 		"usbCampaignReport": "USB Campaign Report",
 		"smsCampaignReport": "SMS Campaign Report",
+		"whatsappCampaignReport": "WhatsApp Campaign Report",
 		"systemTemplate": "System Template",
 		"myTemplate": "My Template",
 		"smsCampaign": "Create SMS Campaign",
