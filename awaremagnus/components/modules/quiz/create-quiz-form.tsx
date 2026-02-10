@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import type { QuizAnswer } from "./quiz-answer-row";
+import type { Module, ModuleContent } from "@/types/quiz";
+
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Select, SelectItem } from "@heroui/select";
 import clsx from "clsx";
 
-import { useTranslations } from "@/i18n/useTranslations";
-import { useI18n } from "@/i18n/I18nProvider";
-import { QuizTypeSelector, type QuizType } from "./quiz-type-selector";
-import { QuizLanguageSelector, type QuizLocale } from "./quiz-language-selector";
+import { QuizTypeSelectorPills, QuizCardType } from "./quiz-type-selector-pills";
+import { QuizLanguageSelectorFlags } from "./quiz-language-selector-flags";
 import {
   QuizLanguageCard,
   generateId,
@@ -17,20 +18,11 @@ import {
   type QuizLanguageForm,
   type QuizQuestion,
 } from "./quiz-language-card";
-import type { QuizAnswer } from "./quiz-answer-row";
-import {
-  useModules,
-  useContentsByModule,
-  useCreateQuiz,
-} from "@/hooks/useQuiz";
-import { getApiErrorMessage } from "@/utils/apiError";
-import type { Module, ModuleContent } from "@/types/quiz";
 
-const QUIZ_TYPE_TO_ID: Record<QuizType, number> = {
-  single: 1,
-  multiple: 2,
-  truefalse: 3,
-};
+import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
+import { useModules, useContentsByModule, useCreateQuiz, useQuizTypes } from "@/hooks/useQuiz";
+import { getApiErrorMessage } from "@/utils/apiError";
 
 function createEmptyAnswer(): QuizAnswer {
   return { id: generateId(), text: "", correct: false };
@@ -44,85 +36,116 @@ function createEmptyQuestion(): QuizQuestion {
   };
 }
 
-function createLanguageForm(lang: QuizLocale): QuizLanguageForm {
+function createLanguageFormByLangId(langId: number): QuizLanguageForm {
   return {
-    lang,
+    langId,
     questions: [createEmptyQuestion()],
   };
 }
 
 function moduleName(m: Module): string {
-  const t = m.translations?.[0];
-  return t?.name ?? m.code ?? `Module ${m.id}`;
+  return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
 function contentTitle(c: ModuleContent): string {
-  const t = c.translations?.[0];
-  return t?.title ?? `Content ${c.id}`;
+  return c.title ?? c.translations?.[0]?.title ?? `Content ${c.id}`;
 }
 
-export function CreateQuizForm() {
+export interface CreateQuizFormProps {
+  /** Pre-fill module when opened from module context (e.g. Training Library > Module > Quizzes > Create) */
+  initialModuleId?: string;
+  /** Link for "Back to Quizzes" when in module context */
+  returnHref?: string;
+}
+
+export function CreateQuizForm({
+  initialModuleId = "",
+  returnHref = "/dashboard/quiz",
+}: CreateQuizFormProps = {}) {
   const t = useTranslations("quiz");
   const tCommon = useTranslations("common");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
-  const [moduleId, setModuleId] = useState<string>("");
+  const [moduleId, setModuleId] = useState<string>(initialModuleId);
   const [contentId, setContentId] = useState<string>("");
-  const [quizType, setQuizType] = useState<QuizType>("single");
-  const [language, setLanguage] = useState<QuizLocale>("en");
+
+  useEffect(() => {
+    if (initialModuleId) setModuleId(initialModuleId);
+  }, [initialModuleId]);
+
+  // Quiz Type State
+  const [selectedQuizType, setSelectedQuizType] = useState<QuizCardType>("single");
+
+  // Map internal type string to API ID
+  const { data: quizTypesRes } = useQuizTypes();
+  const apiQuizTypes = quizTypesRes?.success ? (quizTypesRes.data ?? []) : [];
+
+  // Helper to get ID from internal type string
+  const getTypeIdFromCardType = (type: QuizCardType): number => {
+    // This mapping depends on how the DB seeds types.
+    // Usually: 1=Single Choice, 2=Multiple Choice, 3=True/False (or similar)
+    // For safety, we try to match by name or fallback to index.
+    // Assuming standard order or naming convention in API response.
+    // If API types have specific codes/names, map them here.
+    // Fallback logic based on common naming:
+    const found = apiQuizTypes.find((t) => {
+      const name = (t.name ?? "").toLowerCase();
+
+      if (type === "single") return name.includes("single") || name.includes("one");
+      if (type === "multiple") return name.includes("multiple") || name.includes("many");
+      if (type === "truefalse") return name.includes("true") || name.includes("boolean");
+
+      return false;
+    });
+
+    return found ? found.id : (apiQuizTypes[0]?.id ?? 1);
+  };
+
+  // Helper to reverse map if needed, but we drive state by UI selection now.
+
+  const [selectedLanguageIds, setSelectedLanguageIds] = useState<number[]>([]);
   const [generated, setGenerated] = useState(false);
   const [languageForms, setLanguageForms] = useState<QuizLanguageForm[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
   const { data: modulesRes } = useModules({ status: 1 });
-  const modules = modulesRes?.success ? modulesRes.data ?? [] : [];
+  const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
 
-  const { data: contentsRes } = useContentsByModule(
-    moduleId ? Number(moduleId) : 0,
-    !!moduleId
-  );
-  const contents = contentsRes?.success ? contentsRes.data ?? [] : [];
+  const { data: contentsRes } = useContentsByModule(moduleId ? Number(moduleId) : 0, !!moduleId);
+  const contents = contentsRes?.success ? (contentsRes.data ?? []) : [];
 
   const createQuiz = useCreateQuiz();
-
-  const handleModuleChange = (keys: unknown) => {
-    const v =
-      keys === "all" || !keys
-        ? ""
-        : (Array.from(keys as Iterable<string>)[0] as string) ?? "";
-    setModuleId(v);
-    setContentId("");
-  };
-
-  const handleContentChange = (keys: unknown) => {
-    const v =
-      keys === "all" || !keys
-        ? ""
-        : (Array.from(keys as Iterable<string>)[0] as string) ?? "";
-    setContentId(v);
-  };
 
   const handleGenerateForm = useCallback(() => {
     setFormError(null);
     setFormSuccess(null);
-    const forms = [createLanguageForm(language)];
+
+    if (selectedLanguageIds.length === 0) {
+      setFormError(t("selectLanguageError") || "Please select at least one language");
+
+      return;
+    }
+
+    const forms = selectedLanguageIds.map(createLanguageFormByLangId);
+
     setLanguageForms(forms);
     setGenerated(true);
-  }, [language]);
+  }, [selectedLanguageIds, t]);
 
   const updateForm = useCallback(
     (index: number, updater: (prev: QuizLanguageForm) => QuizLanguageForm) => {
-      setLanguageForms((prev) =>
-        prev.map((f, i) => (i === index ? updater(f) : f))
-      );
+      setLanguageForms((prev) => prev.map((f, i) => (i === index ? updater(f) : f)));
     },
     []
   );
 
   const removeForm = useCallback((index: number) => {
     setLanguageForms((prev) => prev.filter((_, i) => i !== index));
+    // Also uncheck the language? Optional, but keeps UI sync
+    // For now we keep the selection in pills separate or sync them?
+    // Design suggests they might be separate steps.
   }, []);
 
   const addAnswer = useCallback(
@@ -130,9 +153,7 @@ export function CreateQuizForm() {
       updateForm(formIndex, (f) => ({
         ...f,
         questions: f.questions.map((q, i) =>
-          i === questionIndex
-            ? { ...q, answers: [...q.answers, createEmptyAnswer()] }
-            : q
+          i === questionIndex ? { ...q, answers: [...q.answers, createEmptyAnswer()] } : q
         ),
       }));
     },
@@ -165,50 +186,71 @@ export function CreateQuizForm() {
     setFormSuccess(null);
     if (!generated || languageForms.length === 0) return;
     const modContentId = contentId ? Number(contentId) : 0;
+
     if (!modContentId) {
       setFormError(t("selectContent") + " " + (t("contentPlaceholder") ?? ""));
+
       return;
     }
 
-    const quizTypeId = QUIZ_TYPE_TO_ID[quizType];
-    const form = languageForms[0]!;
-    const questions = form.questions;
+    let hasValid = false;
 
-    const validQuestions = questions.filter((q) => {
-      const answers = q.answers.filter((a) => a.text.trim() !== "");
-      return answers.length > 0 && answers.some((a) => a.correct);
-    });
-    if (validQuestions.length === 0) {
+    for (const form of languageForms) {
+      const validQuestions = form.questions.filter((q) => {
+        const answers = q.answers.filter((a) => a.text.trim() !== "");
+
+        return answers.length > 0 && answers.some((a) => a.correct);
+      });
+
+      if (validQuestions.length > 0) hasValid = true;
+    }
+
+    if (!hasValid) {
       setFormError(t("validationQuestionAnswers"));
+
       return;
     }
+
+    const selectedQuizTypeId = getTypeIdFromCardType(selectedQuizType);
 
     try {
-      for (const q of validQuestions) {
-        const answers = q.answers
-          .filter((a) => a.text.trim() !== "")
-          .map((a, i) => ({
-            answer_text: a.text.trim(),
-            is_correct: a.correct,
-            order: i + 1,
-          }));
-        await createQuiz.mutateAsync({
-          quiz: {
-            mod_content_id: modContentId,
-            quiz_type_id: quizTypeId,
-            question: q.question.trim() || "Untitled question",
-            difficulty: 1,
-            time_limit: 60,
-          },
-          answers,
+      for (const form of languageForms) {
+        const validQuestions = form.questions.filter((q) => {
+          const answers = q.answers.filter((a) => a.text.trim() !== "");
+
+          return answers.length > 0 && answers.some((a) => a.correct);
         });
+
+        for (const q of validQuestions) {
+          const answers = q.answers
+            .filter((a) => a.text.trim() !== "")
+            .map((a, i) => ({
+              answer_text: a.text.trim(),
+              is_correct: a.correct,
+              order: i + 1,
+            }));
+
+          await createQuiz.mutateAsync({
+            quiz: {
+              mod_content_id: modContentId,
+              quiz_type_id: selectedQuizTypeId,
+              question: q.question.trim() || "Untitled question",
+              difficulty: 1,
+              time_limit: 60,
+              lang_id: form.langId, // Ensure lang_id is passed if API supports it
+            },
+            answers,
+          });
+        }
       }
       setFormSuccess(t("createSuccess"));
+      // Optional: Clear form or redirect
     } catch (err) {
       const msg = getApiErrorMessage(err, tCommon, {
         defaultKey: "errors.unknown",
         defaultValue: t("createError"),
       });
+
       setFormError(msg);
     }
   };
@@ -220,75 +262,98 @@ export function CreateQuizForm() {
     setFormSuccess(null);
   };
 
-  const canGenerate = !!contentId;
   const isSubmitting = createQuiz.isPending;
 
   return (
     <div className={clsx("p-6", isRtl && "text-right")}>
       <Link
-        href="/dashboard/quiz"
-        className="text-sm text-[#3FBDFF] hover:underline mb-3 inline-block"
+        className="text-xs text-[var(--blue)] hover:underline mb-3 inline-block font-medium"
+        href={returnHref}
       >
         {t("backToQuizzes")}
       </Link>
-      <div className="text-sm text-gray-500 mb-2">
+      <div className="text-xs text-[var(--darkgray)] mb-2">
         {t("breadcrumbPrefix")}
-        <span className="text-gray-900 font-semibold">{t("breadcrumbCurrent")}</span>
+        <span className="text-[var(--mainblue)] font-semibold px-1">/</span>
+        <span className="text-[var(--mainblue)] font-semibold">{t("breadcrumbCurrent")}</span>
       </div>
-      <h2 className="text-2xl font-semibold text-[var(--mainblue)]">{t("title")}</h2>
-      <p className="text-sm text-gray-500 mb-4">{t("subtitle")}</p>
+      <h2 className="text-xl font-bold text-[var(--mainblue)]">{t("title")}</h2>
+      <p className="text-xs text-[var(--darkgray)] mb-5 mt-1">{t("subtitle")}</p>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-5 mb-4">
-        <p className="text-sm font-medium text-gray-900 mb-2">{t("selectModule")}</p>
-        <Select
-          placeholder={t("modulePlaceholder")}
-          selectedKeys={moduleId ? [moduleId] : []}
-          onSelectionChange={handleModuleChange}
-          classNames={{
-            trigger: "h-10 min-h-10 rounded-lg border border-gray-300",
-          }}
-        >
-          {modules.map((m) => (
-            <SelectItem key={String(m.id)} textValue={moduleName(m)}>
-              {moduleName(m)}
-            </SelectItem>
-          ))}
-        </Select>
+      <div className="bg-white border border-[var(--strokeGray)] rounded-2xl p-6 mb-5 shadow-none">
+        {/* Module and Content Selectors */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <p className="text-[10px] font-medium text-gray-900 mb-1">{t("selectModule")}</p>
+            <Select
+              className="w-full"
+              classNames={{
+                trigger:
+                  "h-10 min-h-10 rounded-lg bg-white border border-gray-200 data-[hover=true]:bg-white data-[focus=true]:border-[#3FBDFF] transition-colors text-xs px-3 shadow-none",
+                value: "text-xs group-data-[has-value=true]:text-gray-900",
+              }}
+              placeholder={t("modulePlaceholder")}
+              selectedKeys={moduleId ? [moduleId] : []}
+              onSelectionChange={(keys) => {
+                const v = Array.from(keys)[0] as string;
 
-        <p className="text-sm font-medium text-gray-900 mt-4 mb-2">
-          {t("selectContent")}
-        </p>
-        <Select
-          placeholder={t("contentPlaceholder")}
-          selectedKeys={contentId ? [contentId] : []}
-          onSelectionChange={handleContentChange}
-          isDisabled={!moduleId}
-          classNames={{
-            trigger: "h-10 min-h-10 rounded-lg border border-gray-300",
-          }}
-        >
-          {contents.map((c) => (
-            <SelectItem key={String(c.id)} textValue={contentTitle(c)}>
-              {contentTitle(c)}
-            </SelectItem>
-          ))}
-        </Select>
+                setModuleId(v || "");
+              }}
+            >
+              {modules.map((m) => (
+                <SelectItem key={m.id} textValue={moduleName(m)}>
+                  {moduleName(m)}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
 
-        <QuizTypeSelector
-          value={quizType}
-          onChange={setQuizType}
+          <div>
+            <p className="text-[10px] font-medium text-gray-900 mb-1">{t("selectContent")}</p>
+            <Select
+              className="w-full"
+              classNames={{
+                trigger:
+                  "h-10 min-h-10 rounded-lg bg-white border border-gray-200 data-[hover=true]:bg-white data-[focus=true]:border-[#3FBDFF] transition-colors text-xs px-3 shadow-none",
+                value: "text-xs group-data-[has-value=true]:text-gray-900",
+              }}
+              isDisabled={!moduleId}
+              placeholder={t("contentPlaceholder")}
+              selectedKeys={contentId ? [contentId] : []}
+              onSelectionChange={(keys) => {
+                const v = Array.from(keys)[0] as string;
+
+                setContentId(v || "");
+              }}
+            >
+              {contents.map((c) => (
+                <SelectItem key={c.id} textValue={contentTitle(c)}>
+                  {contentTitle(c)}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+        </div>
+
+        <QuizTypeSelectorPills
           className="mt-4"
+          value={selectedQuizType}
+          onChange={setSelectedQuizType}
         />
-        <QuizLanguageSelector
-          value={language}
-          onChange={setLanguage}
-          className="mt-4"
+
+        <QuizLanguageSelectorFlags
+          className="mt-2"
+          value={selectedLanguageIds}
+          onChange={setSelectedLanguageIds}
         />
-        <div className="mt-4 flex justify-end">
+
+        <div className="mt-6 flex justify-end pb-2 border-b border-gray-100">
           <Button
+            className="rounded-full bg-[#3FBDFF] text-white font-medium hover:opacity-90 disabled:opacity-50 text-xs px-6"
+            isDisabled={!moduleId || !contentId || selectedLanguageIds.length === 0}
+            radius="full"
+            size="sm"
             onPress={handleGenerateForm}
-            isDisabled={!canGenerate}
-            className="px-6 py-2 rounded-full bg-[#3FBDFF] text-white text-sm font-medium hover:bg-[#29AAE8] disabled:opacity-50"
           >
             {t("generateForm")}
           </Button>
@@ -306,59 +371,56 @@ export function CreateQuizForm() {
             {formSuccess}
           </p>
         )}
-        <div id="languageForms" className="space-y-3">
+
+        <div className="space-y-4" id="languageForms">
           {generated &&
             languageForms.map((form, formIndex) => (
               <QuizLanguageCard
-                key={form.lang}
+                key={String(form.langId ?? form.lang ?? formIndex)}
+                allowAddQuestion={true}
+                contentId={contentId ? Number(contentId) : undefined}
                 form={form}
-                quizType={quizType}
-                onQuestionChange={(qIndex, question) =>
-                  updateForm(formIndex, (f) => ({
-                    ...f,
-                    questions: f.questions.map((q, i) =>
-                      i === qIndex ? { ...q, question } : q
-                    ),
-                  }))
-                }
+                quizType={selectedQuizType as any}
+                quizTypeId={getTypeIdFromCardType(selectedQuizType)}
+                onAddAnswer={(qIndex) => addAnswer(formIndex, qIndex)}
+                onAddQuestion={() => addQuestion(formIndex)}
                 onAnswersChange={(qIndex, answers) =>
                   updateForm(formIndex, (f) => ({
                     ...f,
-                    questions: f.questions.map((q, i) =>
-                      i === qIndex ? { ...q, answers } : q
-                    ),
+                    questions: f.questions.map((q, i) => (i === qIndex ? { ...q, answers } : q)),
+                  }))
+                }
+                onQuestionChange={(qIndex, question) =>
+                  updateForm(formIndex, (f) => ({
+                    ...f,
+                    questions: f.questions.map((q, i) => (i === qIndex ? { ...q, question } : q)),
                   }))
                 }
                 onRemove={() => removeForm(formIndex)}
-                onAddAnswer={(qIndex) => addAnswer(formIndex, qIndex)}
-                onAddQuestion={() => addQuestion(formIndex)}
-                onRemoveQuestion={(qIndex) =>
-                  removeQuestion(formIndex, qIndex)
-                }
+                onRemoveQuestion={(qIndex) => removeQuestion(formIndex, qIndex)}
               />
             ))}
         </div>
 
         {generated && languageForms.length > 0 && (
-          <div
-            className={clsx(
-              "flex justify-end gap-3 mt-4",
-              isRtl && "flex-row-reverse"
-            )}
-          >
+          <div className={clsx("flex justify-end gap-3 mt-6", isRtl && "flex-row-reverse")}>
             <Button
+              className="rounded-full border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 text-xs px-6"
+              isDisabled={isSubmitting}
+              radius="full"
+              size="sm"
               type="button"
               variant="bordered"
               onPress={handleCancel}
-              isDisabled={isSubmitting}
-              className="px-6 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-600 hover:bg-gray-50"
             >
               {t("cancel")}
             </Button>
             <Button
-              type="submit"
+              className="rounded-full bg-[#3FBDFF] text-white font-medium hover:opacity-90 text-xs px-8"
               isLoading={isSubmitting}
-              className="px-6 py-2 rounded-full bg-[#3FBDFF] text-white text-sm font-medium hover:bg-[#29AAE8]"
+              radius="full"
+              size="sm"
+              type="submit"
             >
               {isSubmitting ? t("saving") : t("saveChanges")}
             </Button>

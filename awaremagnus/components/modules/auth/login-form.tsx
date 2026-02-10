@@ -61,12 +61,13 @@ export const LoginForm = () => {
           defaultValue: "Invalid email or password.",
         }),
       });
+
       setFormError(message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-stretch w-full">
+    <form className="flex flex-col items-stretch w-full" onSubmit={handleSubmit(onSubmit)}>
       <h3 className="text-center text-3xl font-semibold">
         {t("form.title", { appName: tCommon("appName") })}
       </h3>
@@ -75,32 +76,34 @@ export const LoginForm = () => {
         <div>
           <Input
             id="email"
-            type="email"
             placeholder={t("form.emailPlaceholder")}
+            type="email"
             {...register("email")}
+            isRequired
             classNames={{
               base: "w-full",
-              inputWrapper: "px-5 py-3.5 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300",
+              inputWrapper:
+                "px-5 py-3.5 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300",
               input: "bg-transparent text-[14px]",
             }}
-            isRequired
-            isInvalid={!!errors.email}
             errorMessage={errors.email?.message}
+            isInvalid={!!errors.email}
           />
         </div>
 
         <div className="mt-3">
           <Input
             id="password"
-            type="password"
             placeholder={t("form.passwordPlaceholder")}
+            type="password"
             {...register("password")}
+            isRequired
             classNames={{
               base: "w-full",
-              inputWrapper: "px-5 py-3.5 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300",
+              inputWrapper:
+                "px-5 py-3.5 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300",
               input: "bg-transparent text-[14px]",
             }}
-            isRequired
           />
         </div>
 
@@ -117,25 +120,21 @@ export const LoginForm = () => {
 
           <Link
             as={NextLink}
-            href="/forgot-password"
             className="text-[var(--blue)] text-xs hover:underline"
+            href="/forgot-password"
             size="sm"
           >
             {t("form.forgotPassword")}
           </Link>
         </div>
 
-        {formError && (
-          <p className="mt-4 text-sm text-red-500 text-center">
-            {formError}
-          </p>
-        )}
+        {formError && <p className="mt-4 text-sm text-red-500 text-center">{formError}</p>}
 
         <Button
-          type="submit"
-          isLoading={isSubmitting || loginMutation.isPending}
           className="w-full mt-8 px-6 py-3 rounded-full bg-[var(--blue)] text-white border border-transparent transition-all duration-300 hover:bg-transparent hover:border-[var(--blue)] hover:text-[var(--blue)]"
+          isLoading={isSubmitting || loginMutation.isPending}
           radius="full"
+          type="submit"
         >
           {t("form.loginButton")}
         </Button>
@@ -144,8 +143,8 @@ export const LoginForm = () => {
           {t("form.noAccount")}
           <Link
             as={NextLink}
-            href="/signup"
             className="text-[var(--blue)] ms-1 hover:underline"
+            href="/signup"
             size="sm"
           >
             {t("form.signup")}
@@ -155,4 +154,3 @@ export const LoginForm = () => {
     </form>
   );
 };
-

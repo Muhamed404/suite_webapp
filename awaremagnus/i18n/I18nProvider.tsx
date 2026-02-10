@@ -1,11 +1,12 @@
 "use client";
 
+import type { Locale } from "./config";
+import type { AppMessages } from "./messages";
+
 import IntlMessageFormat from "intl-messageformat";
 import * as React from "react";
 
-import type { Locale } from "./config";
 import { getLocaleDir } from "./config";
-import type { AppMessages } from "./messages";
 
 type Namespace = keyof AppMessages;
 
@@ -23,6 +24,7 @@ function getValueAtPath(obj: unknown, path: string): unknown {
 
   return path.split(".").reduce<unknown>((acc, segment) => {
     if (!acc || typeof acc !== "object") return undefined;
+
     return (acc as Record<string, unknown>)[segment];
   }, obj);
 }
@@ -70,10 +72,10 @@ export function I18nProvider({
 
 export function useI18n() {
   const ctx = React.useContext(I18nContext);
+
   if (!ctx) {
     throw new Error("useI18n must be used within I18nProvider");
   }
+
   return ctx;
 }
-
-

@@ -1,35 +1,39 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import clsx from "clsx";
 
+import { ModuleLanguageSelector } from "./module-language-selector";
+import { ModuleTranslationCard, type ModuleTranslation } from "./module-translation-card";
+
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
-import {
-  ModuleLanguageSelector,
-  type ModuleLocale,
-} from "./module-language-selector";
-import {
-  ModuleTranslationCard,
-  type ModuleTranslation,
-} from "./module-translation-card";
 import { useCreateModule } from "@/hooks/useQuiz";
-import { getLanguageId } from "@/utils/languageMapping";
+import { useCategories } from "@/hooks/useSuiteAwm";
 import { getApiErrorMessage } from "@/utils/apiError";
 
-function createEmptyTranslation(lang: ModuleLocale): ModuleTranslation {
+function createEmptyTranslation(languageId: number): ModuleTranslation {
   return {
-    lang,
+    language_id: languageId,
     name: "",
     description: "",
   };
 }
 
+/** Input wrapper classes matching HTML input-field, input-label, input-group */
+const inputGroupClass = "mb-4";
+const inputLabelClass = "block text-gray-700 mb-1 font-medium text-xs";
+const inputFieldClass =
+  "w-full px-[0.59rem] py-[0.59rem] border border-[#e5e7eb] rounded-lg text-xs outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20";
+
 export function CreateModuleForm() {
+  const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations("module");
   const tCommon = useTranslations("common");
   const { dir } = useI18n();
@@ -40,46 +44,38 @@ export function CreateModuleForm() {
   const [creationDay, setCreationDay] = useState("");
   const [category, setCategory] = useState<string>("");
   const [difficulty, setDifficulty] = useState<string>("1");
-  const [selectedLanguages, setSelectedLanguages] = useState<ModuleLocale[]>([]);
+  const [selectedLanguageIds, setSelectedLanguageIds] = useState<number[]>([]);
   const [translations, setTranslations] = useState<ModuleTranslation[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
   const createModule = useCreateModule();
-
-  // TODO: Fetch categories from API when endpoint is available
-  const categories = [
-    { id: "1", name: "Application Security" },
-    { id: "2", name: "Network Security" },
-    { id: "3", name: "Data Protection" },
-    { id: "4", name: "Physical Security" },
-    { id: "5", name: "Social Engineering" },
-  ];
+  const { data: categoriesList, isLoading: categoriesLoading } = useCategories();
+  const categories = Array.isArray(categoriesList) ? categoriesList : [];
 
   const handleAddTranslation = useCallback(() => {
-    if (selectedLanguages.length === 0) {
+    if (selectedLanguageIds.length === 0) {
       setFormError(t("selectLanguageFirst"));
+
       return;
     }
 
-    // Find first language that doesn't have a translation yet
-    const existingLangs = new Set(translations.map((t) => t.lang));
-    const availableLang = selectedLanguages.find((lang) => !existingLangs.has(lang));
+    const existingIds = new Set(translations.map((tr) => tr.language_id));
+    const toAdd = selectedLanguageIds.filter((id) => !existingIds.has(id));
 
-    if (!availableLang) {
+    if (toAdd.length === 0) {
       setFormError(t("allLanguagesAdded"));
+
       return;
     }
 
-    setTranslations((prev) => [...prev, createEmptyTranslation(availableLang)]);
+    setTranslations((prev) => [...prev, ...toAdd.map((id) => createEmptyTranslation(id))]);
     setFormError(null);
-  }, [selectedLanguages, translations, t]);
+  }, [selectedLanguageIds, translations, t]);
 
   const updateTranslation = useCallback(
     (index: number, updater: (prev: ModuleTranslation) => ModuleTranslation) => {
-      setTranslations((prev) =>
-        prev.map((t, i) => (i === index ? updater(t) : t))
-      );
+      setTranslations((prev) => prev.map((t, i) => (i === index ? updater(t) : t)));
     },
     []
   );
@@ -95,30 +91,30 @@ export function CreateModuleForm() {
 
     if (!category) {
       setFormError(t("validationCategory"));
+
       return;
     }
 
     if (translations.length === 0) {
       setFormError(t("validationTranslations"));
+
       return;
     }
 
-    // Validate translations - name is required, description is optional
-    const invalidTranslations = translations.filter(
-      (t) => !t.name.trim()
-    );
+    const invalidTranslations = translations.filter((t) => !t.name.trim());
+
     if (invalidTranslations.length > 0) {
       setFormError(t("validationTranslationFields"));
+
       return;
     }
 
-    // Validate module code format (alphanumeric with underscores and hyphens)
     if (moduleCode.trim() && !/^[A-Za-z0-9_-]+$/.test(moduleCode.trim())) {
       setFormError(t("validationModuleCodeFormat"));
+
       return;
     }
 
-    // Generate module code if not provided
     const code = moduleCode.trim() || `MOD-${Date.now()}`;
 
     try {
@@ -126,32 +122,41 @@ export function CreateModuleForm() {
         module: {
           category_id: Number(category),
           code,
+          name: moduleName.trim() || undefined,
           difficulty: Number(difficulty),
-          org_id: 0, // Will be set by backend from JWT token
+          org_id: 0,
         },
-        translations: translations.map((t) => ({
-          language_id: getLanguageId(t.lang),
-          name: t.name.trim(),
-          description: t.description.trim() || undefined,
+        translations: translations.map((tr) => ({
+          language_id: tr.language_id,
+          name: tr.name.trim(),
+          description: tr.description.trim() || undefined,
         })),
       };
 
       await createModule.mutateAsync(payload);
 
       setFormSuccess(t("createSuccess"));
-      // Reset form
       setModuleName("");
       setModuleCode("");
       setCreationDay("");
       setCategory("");
       setDifficulty("1");
-      setSelectedLanguages([]);
+      setSelectedLanguageIds([]);
       setTranslations([]);
+
+      if (pathname?.includes("/training-library/my/")) {
+        router.push("/dashboard/training-library/my");
+      } else if (pathname?.includes("/training-library/system/")) {
+        router.push("/dashboard/training-library/system");
+      } else {
+        router.push("/dashboard/module");
+      }
     } catch (err) {
       const msg = getApiErrorMessage(err, tCommon, {
         defaultKey: "errors.unknown",
         defaultValue: t("createError"),
       });
+
       setFormError(msg);
     }
   };
@@ -162,7 +167,7 @@ export function CreateModuleForm() {
     setCreationDay("");
     setCategory("");
     setDifficulty("1");
-    setSelectedLanguages([]);
+    setSelectedLanguageIds([]);
     setTranslations([]);
     setFormError(null);
     setFormSuccess(null);
@@ -171,225 +176,223 @@ export function CreateModuleForm() {
   const isSubmitting = createModule.isPending;
 
   return (
-    <div className={clsx("flex flex-col p-2", isRtl && "text-right")}>
-      <div className="bg-[#F3F7FA] min-h-screen">
-        {/* Breadcrumb */}
-        <div className="text-[10px] text-gray-500 mb-2">
-          {t("breadcrumbPrefix")}
-          <span className="font-medium text-gray-700">{t("breadcrumbCurrent")}</span>
-        </div>
+    <form className={clsx("flex flex-col", isRtl && "text-right")} onSubmit={handleSubmit}>
+      {/* CREATE MODULE CARD - matches HTML */}
+      <div className="bg-white rounded-xl p-4 mb-4">
+        <h2 className="text-xl font-semibold mb-1 text-gray-900">{t("title")}</h2>
+        <p className="text-gray-500 mb-10 text-xs">{t("subtitle")}</p>
 
-        <form onSubmit={handleSubmit}>
-          {/* CREATE MODULE CARD */}
-          <div className="bg-white rounded-xl p-4 mb-4">
-          <h2 className="text-lg font-semibold mb-1">{t("title")}</h2>
-          <p className="text-gray-500 mb-2 text-xs">{t("subtitle")}</p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* LEFT FORM - matches HTML col-span-2 */}
+          <div className="col-span-2 space-y-4">
+            {/* Module Code */}
+            <div className={inputGroupClass}>
+              <label className={inputLabelClass} htmlFor="moduleCode">
+                {t("moduleCode")}
+              </label>
+              <Input
+                classNames={{
+                  base: "w-full",
+                  input: "text-xs",
+                  inputWrapper:
+                    "h-10 min-h-10 rounded-lg bg-white border border-[#e5e7eb] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 px-4",
+                }}
+                id="moduleCode"
+                placeholder={t("moduleCodePlaceholder")}
+                value={moduleCode}
+                onValueChange={setModuleCode}
+              />
+              <p className="text-xs text-gray-500 mt-1">{t("moduleCodeHint")}</p>
+            </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* LEFT FORM */}
-            <div className="col-span-2 space-y-4">
-              {/* Module Code */}
-              <div>
-                <label className="block text-gray-700 mb-1 font-medium text-xs">
-                  {t("moduleCode")}
-                </label>
-                <Input
-                  value={moduleCode}
-                  onValueChange={setModuleCode}
-                  placeholder={t("moduleCodePlaceholder")}
-                  classNames={{
-                    base: "w-full",
-                    input: "text-xs",
-                    inputWrapper:
-                      "h-10 min-h-10 rounded-lg border border-gray-200 bg-white focus-within:border-[#3FBDFF] px-3 py-2",
-                  }}
+            {/* Name */}
+            <div className={inputGroupClass}>
+              <label className={inputLabelClass} htmlFor="moduleName">
+                {t("name")}
+              </label>
+              <Input
+                classNames={{
+                  base: "w-full",
+                  input: "text-xs",
+                  inputWrapper:
+                    "h-10 min-h-10 rounded-lg bg-white border border-[#e5e7eb] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 px-4",
+                }}
+                id="moduleName"
+                placeholder={t("namePlaceholder")}
+                value={moduleName}
+                onValueChange={setModuleName}
+              />
+            </div>
+
+            {/* Creation Day */}
+            <div className={inputGroupClass}>
+              <label className={inputLabelClass} htmlFor="creationDay">
+                {t("creationDay")}
+              </label>
+              <div className="relative">
+                <input
+                  className={`${inputFieldClass} h-10 pl-4 pr-10`}
+                  id="creationDay"
+                  type="date"
+                  value={creationDay}
+                  onChange={(e) => setCreationDay(e.target.value)}
                 />
-                <p className="text-[10px] text-gray-500 mt-1">
-                  {t("moduleCodeHint")}
-                </p>
-              </div>
-
-              {/* Name */}
-              <div>
-                <label className="block text-gray-700 mb-1 font-medium text-xs">
-                  {t("name")}
-                </label>
-                <Input
-                  value={moduleName}
-                  onValueChange={setModuleName}
-                  placeholder={t("namePlaceholder")}
-                  classNames={{
-                    base: "w-full",
-                    input: "text-xs",
-                    inputWrapper:
-                      "h-10 min-h-10 rounded-lg border border-gray-200 bg-white focus-within:border-[#3FBDFF] px-3 py-2",
-                  }}
+                <Image
+                  alt=""
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none"
+                  height={16}
+                  src="/images/date.svg"
+                  width={16}
                 />
-              </div>
-
-              {/* Creation Day */}
-              <div>
-                <label className="block text-gray-700 mb-1 font-medium text-xs">
-                  {t("creationDay")}
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={creationDay}
-                    onChange={(e) => setCreationDay(e.target.value)}
-                    className="w-full p-2 border border-gray-200 rounded-lg focus:ring focus:ring-blue-100 text-xs h-10"
-                  />
-                  <Image
-                    src="/images/date.svg"
-                    width={12}
-                    height={12}
-                    className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none"
-                    alt=""
-                  />
-                </div>
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-gray-700 mb-1 font-medium text-xs">
-                  {t("moduleCategory")}
-                </label>
-                <Select
-                  selectedKeys={category ? [category] : []}
-                  onSelectionChange={(keys) => {
-                    const v =
-                      keys === "all" || !keys
-                        ? ""
-                        : (Array.from(keys as Iterable<string>)[0] as string) ?? "";
-                    setCategory(v);
-                  }}
-                  placeholder={t("categoryPlaceholder")}
-                  classNames={{
-                    trigger: "h-10 min-h-10 rounded-lg border border-gray-200 text-xs",
-                  }}
-                >
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} textValue={cat.name}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </Select>
-              </div>
-
-              {/* Difficulty */}
-              <div>
-                <label className="block text-gray-700 mb-1 font-medium text-xs">
-                  {t("difficulty")}
-                </label>
-                <Select
-                  selectedKeys={difficulty ? [difficulty] : []}
-                  onSelectionChange={(keys) => {
-                    const v =
-                      keys === "all" || !keys
-                        ? "1"
-                        : (Array.from(keys as Iterable<string>)[0] as string) ?? "1";
-                    setDifficulty(v);
-                  }}
-                  classNames={{
-                    trigger: "h-10 min-h-10 rounded-lg border border-gray-200 text-xs",
-                  }}
-                >
-                  <SelectItem key="1" textValue="1">
-                    {t("difficultyLevels.1")}
-                  </SelectItem>
-                  <SelectItem key="2" textValue="2">
-                    {t("difficultyLevels.2")}
-                  </SelectItem>
-                  <SelectItem key="3" textValue="3">
-                    {t("difficultyLevels.3")}
-                  </SelectItem>
-                  <SelectItem key="4" textValue="4">
-                    {t("difficultyLevels.4")}
-                  </SelectItem>
-                  <SelectItem key="5" textValue="5">
-                    {t("difficultyLevels.5")}
-                  </SelectItem>
-                </Select>
               </div>
             </div>
 
-            {/* LANGUAGE SELECTOR */}
-            <ModuleLanguageSelector
-              selectedLanguages={selectedLanguages}
-              onChange={setSelectedLanguages}
-              onAddTranslation={handleAddTranslation}
-            />
-          </div>
-        </div>
+            {/* Category */}
+            <div className={inputGroupClass}>
+              <label className={inputLabelClass} htmlFor="category">
+                {t("moduleCategory")}
+              </label>
+              <Select
+                classNames={{
+                  trigger:
+                    "h-10 min-h-10 rounded-lg bg-white border border-[#e5e7eb] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 text-xs px-4",
+                }}
+                id="category"
+                placeholder={
+                  categoriesLoading ? (t("loading") ?? "Loading...") : t("categoryPlaceholder")
+                }
+                selectedKeys={category ? [category] : []}
+                onSelectionChange={(keys) => {
+                  const v =
+                    keys === "all" || !keys
+                      ? ""
+                      : ((Array.from(keys as Iterable<string>)[0] as string) ?? "");
 
-        {/* MODULE TRANSLATION SECTION */}
-        {translations.length > 0 && (
-          <div className="bg-white rounded-xl p-4 mb-4">
-            <h2 className="text-lg font-semibold mb-1">{t("moduleTranslation")}</h2>
-            <p className="text-gray-500 mb-2 text-xs">
-              {t("moduleTranslationSubtitle")}
-            </p>
+                  setCategory(v);
+                }}
+              >
+                {categories.map((cat) => (
+                  <SelectItem key={String(cat.id)} textValue={cat.name}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
 
-            <div className="space-y-4">
-              {translations.map((translation, index) => (
-                <ModuleTranslationCard
-                  key={`${translation.lang}-${index}`}
-                  translation={translation}
-                  onNameChange={(name) =>
-                    updateTranslation(index, (prev) => ({ ...prev, name }))
-                  }
-                  onDescriptionChange={(description) =>
-                    updateTranslation(index, (prev) => ({ ...prev, description }))
-                  }
-                  onRemove={() => removeTranslation(index)}
-                />
-              ))}
+            {/* Difficulty */}
+            <div className={inputGroupClass}>
+              <label className={inputLabelClass} htmlFor="difficulty">
+                {t("difficulty")}
+              </label>
+              <Select
+                classNames={{
+                  trigger:
+                    "h-10 min-h-10 rounded-lg bg-white border border-[#e5e7eb] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 text-xs px-4",
+                }}
+                id="difficulty"
+                selectedKeys={difficulty ? [difficulty] : []}
+                onSelectionChange={(keys) => {
+                  const v =
+                    keys === "all" || !keys
+                      ? "1"
+                      : ((Array.from(keys as Iterable<string>)[0] as string) ?? "1");
+
+                  setDifficulty(v);
+                }}
+              >
+                <SelectItem key="1" textValue={t("difficultyLevels.1")}>
+                  {t("difficultyLevels.1")}
+                </SelectItem>
+                <SelectItem key="2" textValue={t("difficultyLevels.2")}>
+                  {t("difficultyLevels.2")}
+                </SelectItem>
+                <SelectItem key="3" textValue={t("difficultyLevels.3")}>
+                  {t("difficultyLevels.3")}
+                </SelectItem>
+                <SelectItem key="4" textValue={t("difficultyLevels.4")}>
+                  {t("difficultyLevels.4")}
+                </SelectItem>
+                <SelectItem key="5" textValue={t("difficultyLevels.5")}>
+                  {t("difficultyLevels.5")}
+                </SelectItem>
+              </Select>
             </div>
           </div>
-        )}
 
-        {/* Error/Success Messages */}
-        {formError && (
-          <div className="bg-white rounded-xl p-4 mb-4">
-            <p className="text-sm text-red-500" role="alert">
-              {formError}
-            </p>
-          </div>
-        )}
-        {formSuccess && (
-          <div className="bg-white rounded-xl p-4 mb-4">
-            <p className="text-sm text-green-600" role="status">
-              {formSuccess}
-            </p>
-          </div>
-        )}
-
-        {/* FOOTER */}
-        <div
-          className={clsx(
-            "flex justify-end gap-2 py-4",
-            isRtl && "flex-row-reverse"
-          )}
-        >
-          <Button
-            type="button"
-            variant="bordered"
-            onPress={handleCancel}
-            isDisabled={isSubmitting}
-            className="px-6 py-2 bg-white border border-gray-200 rounded-full text-gray-600 hover:bg-gray-100 text-xs"
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            type="submit"
-            isLoading={isSubmitting}
-            className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 text-xs"
-          >
-            {isSubmitting ? t("saving") : t("submit")}
-          </Button>
+          {/* LANGUAGE SELECTOR - right column, matches HTML */}
+          <ModuleLanguageSelector
+            selectedLanguageIds={selectedLanguageIds}
+            onAddTranslation={handleAddTranslation}
+            onChange={setSelectedLanguageIds}
+          />
         </div>
-        </form>
       </div>
-    </div>
+
+      {/* MODULE TRANSLATION SECTION - matches HTML */}
+      {translations.length > 0 && (
+        <div className="bg-white rounded-xl p-4 mb-4">
+          <h2 className="text-lg font-semibold mb-1 text-gray-900">{t("moduleTranslation")}</h2>
+          <p className="text-gray-500 mb-6 text-xs">{t("moduleTranslationSubtitle")}</p>
+          <div className="space-y-4" id="translationContainer">
+            {translations.map((translation, index) => (
+              <ModuleTranslationCard
+                key={`${translation.language_id}-${index}`}
+                translation={translation}
+                onDescriptionChange={(description) =>
+                  updateTranslation(index, (prev) => ({
+                    ...prev,
+                    description,
+                  }))
+                }
+                onIconChange={(file, preview) =>
+                  updateTranslation(index, (prev) => ({
+                    ...prev,
+                    iconFile: file ?? undefined,
+                    iconPreview: preview ?? undefined,
+                  }))
+                }
+                onNameChange={(name) => updateTranslation(index, (prev) => ({ ...prev, name }))}
+                onRemove={() => removeTranslation(index)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {formError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 mb-4" role="alert">
+          <p className="text-sm text-red-600">{formError}</p>
+        </div>
+      )}
+      {formSuccess && (
+        <div className="rounded-xl border border-green-200 bg-green-50 p-4 mb-4" role="status">
+          <p className="text-sm text-green-700">{formSuccess}</p>
+        </div>
+      )}
+
+      {/* FOOTER - matches HTML */}
+      <div className={clsx("flex justify-end gap-2 py-4", isRtl && "flex-row-reverse")}>
+        <Button
+          className="px-6 py-2 bg-white rounded-full text-gray-600 hover:bg-gray-100 text-xs font-medium"
+          isDisabled={isSubmitting}
+          radius="full"
+          size="sm"
+          type="button"
+          variant="flat"
+          onPress={handleCancel}
+        >
+          {t("cancel")}
+        </Button>
+        <Button
+          className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 text-xs font-medium"
+          isLoading={isSubmitting}
+          radius="full"
+          size="sm"
+          type="submit"
+        >
+          {isSubmitting ? t("saving") : t("submit")}
+        </Button>
+      </div>
+    </form>
   );
 }

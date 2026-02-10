@@ -10,7 +10,10 @@ interface AreaChartProps {
   labels?: string[];
 }
 
-export const AreaChart = ({ data = [22, 18, 25, 20, 30, 26], labels = ["7 June", "8 June", "9 June", "10 June", "11 June", "12 June"] }: AreaChartProps) => {
+export const AreaChart = ({
+  data = [22, 18, 25, 20, 30, 26],
+  labels = ["7 June", "8 June", "9 June", "10 June", "11 June", "12 June"],
+}: AreaChartProps) => {
   const chartOptions = useMemo(
     () => ({
       chart: {
@@ -95,5 +98,5 @@ export const AreaChart = ({ data = [22, 18, 25, 20, 30, 26], labels = ["7 June",
     },
   ];
 
-  return <Chart options={chartOptions} series={series} type="area" height={300} />;
+  return <Chart height={300} options={chartOptions} series={series} type="area" />;
 };

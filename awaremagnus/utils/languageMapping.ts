@@ -23,8 +23,7 @@ export function getLanguageId(locale: ModuleLocale): number {
  * Gets the language code from a language ID
  */
 export function getLanguageCode(languageId: number): ModuleLocale {
-  const entry = Object.entries(LANGUAGE_ID_MAP).find(
-    ([, id]) => id === languageId
-  );
+  const entry = Object.entries(LANGUAGE_ID_MAP).find(([, id]) => id === languageId);
+
   return (entry?.[0] as ModuleLocale) ?? "en";
 }

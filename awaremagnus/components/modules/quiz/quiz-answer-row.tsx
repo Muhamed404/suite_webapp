@@ -1,8 +1,5 @@
 "use client";
 
-import { Input } from "@heroui/input";
-import { Checkbox } from "@heroui/checkbox";
-import { Button } from "@heroui/button";
 import clsx from "clsx";
 
 import { useTranslations } from "@/i18n/useTranslations";
@@ -19,6 +16,7 @@ interface QuizAnswerRowProps {
   onCorrectChange: (correct: boolean) => void;
   onRemove: () => void;
   correctDisabled?: boolean;
+  isMultiple?: boolean;
 }
 
 export function QuizAnswerRow({
@@ -27,87 +25,95 @@ export function QuizAnswerRow({
   onCorrectChange,
   onRemove,
   correctDisabled,
+  isMultiple,
 }: QuizAnswerRowProps) {
   const t = useTranslations("quiz");
 
   return (
-    <div className="answer flex items-center gap-3">
-      <Input
-        value={answer.text}
-        onValueChange={onTextChange}
+    <div className="answer flex items-center gap-2.5">
+      <input
+        className="ansText w-full px-3 py-2 text-xs border border-gray-200 rounded-lg outline-none focus:border-[#3FBDFF] focus:ring-1 focus:ring-[#3FBDFF]/10 focus:shadow-[0_0_0_3px_rgba(63,189,255,0.1)] transition-all duration-200 placeholder:text-gray-400"
         placeholder={t("answerPlaceholder")}
-        classNames={{
-          base: "flex-1 min-w-0",
-          input: "text-sm",
-          inputWrapper:
-            "px-3 py-2 min-h-10 h-10 rounded-lg border border-gray-300 bg-[#F7FAFF] focus-within:border-[#3FBDFF]",
-        }}
+        type="text"
+        value={answer.text}
+        onChange={(e) => onTextChange(e.target.value)}
       />
-      <Checkbox
-        isSelected={answer.correct}
-        onValueChange={(checked) => onCorrectChange(!!checked)}
-        isDisabled={correctDisabled}
-        classNames={{
-          base: clsx(
-            "answer-pill select-none flex items-center gap-2 px-3 py-2 border rounded-full text-sm cursor-pointer transition m-0 max-w-fit",
-            !correctDisabled && "hover:bg-[#f4fbff]",
-            answer.correct
-              ? "border-[#3FBDFF] bg-[#EAF8FF]"
-              : "border-gray-300",
-            correctDisabled && "opacity-60 cursor-not-allowed"
-          ),
-          wrapper: "!hidden",
-          icon: "!hidden",
-          label: "cursor-pointer flex items-center gap-2 ml-0",
-        }}
+
+      <label
+        className={clsx(
+          "answer-pill flex items-center gap-2 px-2 py-1 border rounded-lg cursor-pointer transition-all duration-200 select-none",
+          "hover:bg-[#3FBDFF]/5 hover:border-[#3FBDFF]",
+          answer.correct ? "bg-[#EAF6FF] border-[#3FBDFF]" : "bg-white border-gray-300",
+          correctDisabled && "opacity-50 cursor-not-allowed pointer-events-none"
+        )}
+        style={{ width: "fit-content" }}
       >
+        <input
+          checked={answer.correct}
+          className="correctCheck hidden"
+          disabled={correctDisabled}
+          type="checkbox"
+          onChange={(e) => onCorrectChange(e.target.checked)}
+        />
+
         <span
           className={clsx(
-            "tick flex items-center justify-center w-4 h-4 rounded-full border overflow-hidden flex-shrink-0",
-            answer.correct ? "border-[#3FBDFF] bg-[#3FBDFF]" : "border-gray-300 bg-white"
+            "radio-btn flex items-center justify-center w-4 h-4 border-2 flex-shrink-0 transition-all duration-200 bg-white",
+            isMultiple ? "rounded-sm" : "rounded-full",
+            answer.correct ? "border-[#3FBDFF]" : "border-gray-300"
           )}
-          aria-hidden
         >
-          {answer.correct && (
-            <svg
-              className="w-2.5 h-2.5 text-white"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="3"
-              viewBox="0 0 24 24"
+          {isMultiple ? (
+            // Checkbox style tick
+            <span
+              className={clsx(
+                "transform transition-all duration-150",
+                answer.correct ? "scale-100 opacity-100" : "scale-0 opacity-0"
+              )}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+              <svg
+                className="w-2.5 h-2.5 text-[#3FBDFF]"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="4"
+                viewBox="0 0 24 24"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </span>
+          ) : (
+            // Radio style dot
+            <span
+              className={clsx(
+                "radio-dot w-2 h-2 rounded-full bg-[#3FBDFF] transition-all duration-200",
+                answer.correct ? "opacity-100 scale-100" : "opacity-0 scale-0"
+              )}
+            />
           )}
         </span>
-        {t("correct")}
-      </Checkbox>
-      <Button
-        type="button"
-        isIconOnly
-        variant="light"
-        size="sm"
-        onPress={onRemove}
-        className="remove-ans w-8 h-10 min-w-8 min-h-10 flex items-center justify-center rounded-full border border-red-300 text-red-400 hover:bg-red-50 hover:border-red-400 transition"
+
+        <span className="text-[10px] text-gray-700 font-medium">{t("correct")}</span>
+      </label>
+
+      <button
         aria-label="Remove answer"
+        className="remove-ans w-5 h-5 flex items-center justify-center rounded-full border border-red-300 text-red-400 text-[9px] hover:bg-red-50 hover:text-red-500 hover:border-red-400 transition-colors duration-200"
+        type="button"
+        onClick={onRemove}
       >
         <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-3.5 h-3.5 stroke-current"
-          viewBox="0 0 24 24"
+          className="w-2.5 h-2.5 stroke-current"
           fill="none"
           stroke="currentColor"
-          strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
+          strokeWidth="2"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
         >
           <path d="M5 12h14" />
         </svg>
-      </Button>
+      </button>
     </div>
   );
 }

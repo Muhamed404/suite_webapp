@@ -54,6 +54,5 @@ export const CircularProgressChart = ({ value, color, size = 128 }: CircularProg
 
   const series = [value];
 
-  return <Chart options={chartOptions} series={series} type="radialBar" height={size} />;
+  return <Chart height={size} options={chartOptions} series={series} type="radialBar" />;
 };
-

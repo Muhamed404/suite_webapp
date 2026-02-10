@@ -5,6 +5,15 @@ import { persist } from "zustand/middleware";
 
 import { RoleId } from "@/utils/roles";
 
+/** Tracks when persisted auth state has been rehydrated from storage (avoids redirect-to-login on reload). */
+export const useAuthRehydratedStore = create<{
+  hasRehydrated: boolean;
+  setRehydrated: (v: boolean) => void;
+}>((set) => ({
+  hasRehydrated: false,
+  setRehydrated: (v) => set({ hasRehydrated: v }),
+}));
+
 export type AuthRoleId = RoleId;
 
 export interface AuthUser {
@@ -68,10 +77,9 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
-    },
-  ),
+      onRehydrateStorage: () => () => {
+        useAuthRehydratedStore.getState().setRehydrated(true);
+      },
+    }
+  )
 );
-
-
-
-

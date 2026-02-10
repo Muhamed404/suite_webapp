@@ -5,11 +5,6 @@ export const metadata: Metadata = {
   description: "Sign in to your AwareMagnus account",
 };
 
-export default function LoginLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function LoginLayout({ children }: { children: React.ReactNode }) {
   return children;
 }
-

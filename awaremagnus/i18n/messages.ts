@@ -21,7 +21,12 @@ export async function loadMessages(locale: Locale): Promise<AppMessages> {
     import(`@/messages/${locale}/content.json`).then((m) => m.default),
   ]);
 
-  return { common, login: hintLogin, dashboard: hintDashboard, quiz, module, content };
+  return {
+    common,
+    login: hintLogin,
+    dashboard: hintDashboard,
+    quiz,
+    module,
+    content,
+  };
 }
-
-

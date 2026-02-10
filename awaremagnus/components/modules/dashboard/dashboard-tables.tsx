@@ -5,13 +5,11 @@ import { Select, SelectItem } from "@heroui/select";
 import { Button } from "@heroui/button";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { useState } from "react";
+
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useSystemLeaderboard, useOrganizationLeaderboard } from "@/hooks/useDashboard";
 import { useTranslations } from "@/i18n/useTranslations";
-import {
-  isPlatformAdmin as getIsPlatformAdmin,
-  isUser as getIsUser
-} from "@/utils/roles";
+import { isPlatformAdmin as getIsPlatformAdmin, isUser as getIsUser } from "@/utils/roles";
 
 export const DashboardTables = () => {
   const t = useTranslations("dashboard");
@@ -21,13 +19,13 @@ export const DashboardTables = () => {
   const itemsPerPage = 5;
 
   const isPlatformAdmin = getIsPlatformAdmin(user?.role_id);
-  const isOrgUser = getIsUser(user?.role_id);
+  const _isOrgUser = getIsUser(user?.role_id);
   // Org Admin (3, 4) and Org User (5) use Organization Leaderboard.
   // Platform Admin (1, 2) uses System Leaderboard.
 
   // Actually, Org User (5) can see leaderboard too (Access ✅).
 
-  const { data: systemLeaderboard } = useSystemLeaderboard(20, 'compliance_score');
+  const { data: systemLeaderboard } = useSystemLeaderboard(20, "compliance_score");
   const { data: orgLeaderboard } = useOrganizationLeaderboard({ count: 20 });
 
   let highRiskData: any[] = [];
@@ -59,24 +57,25 @@ export const DashboardTables = () => {
     // API: user_id/org_id, modules_completed, risk_level, compliance_score, etc.
     // Columns: Employee Name, Start Date, Due Date, Badge, Exp
 
-    const name = item.user_name || item.org_name || (item.user_id ? `User #${item.user_id}` : `Org #${item.org_id}`);
-    const uniqueId = item.user_id || item.org_id; // For key
+    const name =
+      item.user_name ||
+      item.org_name ||
+      (item.user_id ? `User #${item.user_id}` : `Org #${item.org_id}`);
+    const _uniqueId = item.user_id || item.org_id; // For key
 
     switch (columnKey) {
       case "name":
-        return <div className="text-xs font-medium">{name}</div>;
+        return <div className="text-sm font-medium">{name}</div>;
       case "startDate":
-        // No start date in API? Use placeholder or omit
-        return <div className="text-xs text-gray-500">-</div>;
+        return <div className="text-sm text-gray-500">-</div>;
       case "dueDate":
-        return <div className="text-xs text-gray-500">-</div>;
+        return <div className="text-sm text-gray-500">-</div>;
       case "badge":
-        // Based on achievement count?
-        return <div className="text-xs">{item.achievement_count > 0 ? "🏆" : ""}</div>;
+        return <div className="text-sm">{item.achievement_count > 0 ? "🏆" : ""}</div>;
       case "exp":
-        return <div className="text-xs">{item.total_xp_tokens} XP</div>;
+        return <div className="text-sm">{item.total_xp_tokens} XP</div>;
       default:
-        return <div className="text-xs">{(item as any)[columnKey as string]}</div>;
+        return <div className="text-sm">{(item as any)[columnKey as string]}</div>;
     }
   };
 
@@ -86,15 +85,16 @@ export const DashboardTables = () => {
       <Card className="rounded-2xl shadow-none">
         <CardBody className="p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold whitespace-nowrap">
+            <h2 className="text-base font-semibold text-[var(--mainblue)] whitespace-nowrap">
               {isPlatformAdmin ? "Top High Risk Organizations" : t("tables.topHighRisk")}
             </h2>
             <Select
-              placeholder={t("tables.sortBy")}
+              aria-label={t("tables.sortBy")}
               className="w-36"
               classNames={{
-                trigger: "h-10 min-h-10 px-4 pr-10 rounded-full border border-gray-300 text-xs",
+                trigger: "h-10 min-h-10 px-4 pr-10 rounded-full border border-gray-300 text-sm",
               }}
+              placeholder={t("tables.sortBy")}
             >
               <SelectItem key="default">{t("tables.sortBy")}</SelectItem>
               <SelectItem key="risk">{t("cards.inRisk")}</SelectItem>
@@ -103,9 +103,11 @@ export const DashboardTables = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <Table aria-label="High risk table" removeWrapper>
+            <Table removeWrapper aria-label="High risk table">
               <TableHeader>
-                <TableColumn key="name">{isPlatformAdmin ? "Organization" : t("tables.employeeName")}</TableColumn>
+                <TableColumn key="name">
+                  {isPlatformAdmin ? "Organization" : t("tables.employeeName")}
+                </TableColumn>
                 <TableColumn key="startDate">{t("tables.startDate")}</TableColumn>
                 <TableColumn key="dueDate">{t("tables.dueDate")}</TableColumn>
                 <TableColumn key="badge">{t("tables.badge")}</TableColumn>
@@ -122,28 +124,31 @@ export const DashboardTables = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <p className="text-gray-500 text-xs whitespace-nowrap">
-              {t("tables.showingOf", { shown: highRiskPaginated.length, total: highRiskData.length })}
+            <p className="text-gray-500 text-sm whitespace-nowrap">
+              {t("tables.showingOf", {
+                shown: highRiskPaginated.length,
+                total: highRiskData.length,
+              })}
             </p>
             <div className="flex items-center gap-2">
               <Button
                 isIconOnly
+                className="w-8 h-8 min-w-8"
+                isDisabled={highRiskPage === 1}
                 size="sm"
                 variant="bordered"
                 onPress={() => setHighRiskPage((p) => Math.max(1, p - 1))}
-                isDisabled={highRiskPage === 1}
-                className="w-8 h-8 min-w-8"
               >
                 ‹
               </Button>
-              <span className="text-xs">{highRiskPage}</span>
+              <span className="text-sm">{highRiskPage}</span>
               <Button
                 isIconOnly
+                className="w-8 h-8 min-w-8"
+                isDisabled={highRiskPage * itemsPerPage >= highRiskData.length}
                 size="sm"
                 variant="bordered"
                 onPress={() => setHighRiskPage((p) => p + 1)}
-                isDisabled={highRiskPage * itemsPerPage >= highRiskData.length}
-                className="w-8 h-8 min-w-8"
               >
                 ›
               </Button>
@@ -156,15 +161,16 @@ export const DashboardTables = () => {
       <Card className="rounded-2xl shadow-none">
         <CardBody className="p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold whitespace-nowrap">
+            <h2 className="text-base font-semibold text-[var(--mainblue)] whitespace-nowrap">
               {isPlatformAdmin ? "Top Low Risk Organizations" : t("tables.topLowRisk")}
             </h2>
             <Select
-              placeholder={t("tables.sortBy")}
+              aria-label={t("tables.sortBy")}
               className="w-36"
               classNames={{
-                trigger: "h-10 min-h-10 px-4 pr-10 rounded-full border border-gray-300 text-xs",
+                trigger: "h-10 min-h-10 px-4 pr-10 rounded-full border border-gray-300 text-sm",
               }}
+              placeholder={t("tables.sortBy")}
             >
               <SelectItem key="default">{t("tables.sortBy")}</SelectItem>
               <SelectItem key="risk">{t("cards.inRisk")}</SelectItem>
@@ -173,9 +179,11 @@ export const DashboardTables = () => {
           </div>
 
           <div className="overflow-x-auto">
-            <Table aria-label="Low risk table" removeWrapper>
+            <Table removeWrapper aria-label="Low risk table">
               <TableHeader>
-                <TableColumn key="name">{isPlatformAdmin ? "Organization" : t("tables.employeeName")}</TableColumn>
+                <TableColumn key="name">
+                  {isPlatformAdmin ? "Organization" : t("tables.employeeName")}
+                </TableColumn>
                 <TableColumn key="startDate">{t("tables.startDate")}</TableColumn>
                 <TableColumn key="dueDate">{t("tables.dueDate")}</TableColumn>
                 <TableColumn key="badge">{t("tables.badge")}</TableColumn>
@@ -192,28 +200,31 @@ export const DashboardTables = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <p className="text-gray-500 text-xs whitespace-nowrap">
-              {t("tables.showingOf", { shown: lowRiskPaginated.length, total: lowRiskData.length })}
+            <p className="text-gray-500 text-sm whitespace-nowrap">
+              {t("tables.showingOf", {
+                shown: lowRiskPaginated.length,
+                total: lowRiskData.length,
+              })}
             </p>
             <div className="flex items-center gap-2">
               <Button
                 isIconOnly
+                className="w-8 h-8 min-w-8"
+                isDisabled={lowRiskPage === 1}
                 size="sm"
                 variant="bordered"
                 onPress={() => setLowRiskPage((p) => Math.max(1, p - 1))}
-                isDisabled={lowRiskPage === 1}
-                className="w-8 h-8 min-w-8"
               >
                 ‹
               </Button>
-              <span className="text-xs">{lowRiskPage}</span>
+              <span className="text-sm">{lowRiskPage}</span>
               <Button
                 isIconOnly
+                className="w-8 h-8 min-w-8"
+                isDisabled={lowRiskPage * itemsPerPage >= lowRiskData.length}
                 size="sm"
                 variant="bordered"
                 onPress={() => setLowRiskPage((p) => p + 1)}
-                isDisabled={lowRiskPage * itemsPerPage >= lowRiskData.length}
-                className="w-8 h-8 min-w-8"
               >
                 ›
               </Button>

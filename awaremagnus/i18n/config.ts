@@ -11,5 +11,3 @@ export function isLocale(value: string | undefined | null): value is Locale {
 export function getLocaleDir(locale: Locale): "ltr" | "rtl" {
   return locale === "ar" ? "rtl" : "ltr";
 }
-
-

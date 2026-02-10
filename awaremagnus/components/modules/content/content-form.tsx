@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import type { ContentType } from "./content-type-selector";
+import type { ModuleLocale } from "../module/module-language-selector";
+
+import { useCallback } from "react";
 import { Input } from "@heroui/input";
 import { Textarea } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import clsx from "clsx";
+
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
-import type { ContentType } from "./content-type-selector";
-import type { ModuleLocale } from "../module/module-language-selector";
-import { getLanguageId } from "@/utils/languageMapping";
 
 export interface ContentTranslation {
   lang: ModuleLocale;
@@ -24,10 +25,10 @@ interface ContentFormProps {
   translation: ContentTranslation;
   onTranslationChange: (translation: ContentTranslation) => void;
   onLanguageChange: (lang: ModuleLocale) => void;
-  duration?: number;
-  onDurationChange: (duration: number) => void;
-  sourceUrl?: string;
-  onSourceUrlChange: (url: string) => void;
+  /** When false, only language and title are shown (e.g. for Quiz). */
+  showDescription?: boolean;
+  /** When true, do not render the language selector (e.g. when language is shown above the form). */
+  hideLanguage?: boolean;
   className?: string;
 }
 
@@ -45,15 +46,13 @@ export function ContentForm({
   translation,
   onTranslationChange,
   onLanguageChange,
-  duration,
-  onDurationChange,
-  sourceUrl,
-  onSourceUrlChange,
+  showDescription = true,
+  hideLanguage = false,
   className,
 }: ContentFormProps) {
   const t = useTranslations("content");
   const { dir } = useI18n();
-  const isRtl = dir === "rtl";
+  const _isRtl = dir === "rtl";
 
   const updateTranslation = useCallback(
     (updater: (prev: ContentTranslation) => ContentTranslation) => {
@@ -64,128 +63,76 @@ export function ContentForm({
 
   if (!contentType) {
     return (
-      <div className={clsx("space-y-3 text-xs", className)}>
-        <p className="text-gray-400">{t("selectContentType")}</p>
+      <div className={clsx("space-y-4", className)}>
+        <p className="text-sm text-[var(--darkgray)]">{t("selectContentType")}</p>
       </div>
     );
   }
 
-  const requiresFile = ["iSpring", "PDF", "Video", "Brochure", "Screen Saver", "Poster", "Game"].includes(contentType);
-  const requiresUrl = contentType === "Misc" || contentType === "Video";
+  /* Match reference: input-field (border #e5e7eb, rounded-lg, text-xs), input-label (text-xs text-gray-600) */
+  const inputWrapper =
+    "w-full min-h-9 h-9 rounded-lg bg-white border border-gray-200 focus-within:border-[#32B8FF] focus-within:ring-0 focus-within:shadow-[0_0_0_3px_rgba(50,184,255,0.1)] transition-colors duration-200 px-3";
+  const inputClass = "text-xs text-gray-900 placeholder:text-gray-400";
+  const textareaWrapper =
+    "w-full rounded-lg bg-white border border-gray-200 focus-within:border-[#32B8FF] focus-within:shadow-[0_0_0_3px_rgba(50,184,255,0.1)] transition-colors duration-200 px-3 py-2.5 min-h-0";
+  const selectTrigger =
+    "min-h-9 h-9 rounded-lg bg-white border border-gray-200 focus-within:border-[#32B8FF] text-xs px-3";
+  const labelClass = "block text-xs text-gray-600 font-medium mb-1.5";
 
   return (
-    <div className={clsx("space-y-3 text-xs", className)}>
-      {/* Language Selector */}
-      <div>
-        <label className="block text-xs text-gray-600 mb-1.5">{t("selectLanguage")}</label>
-        <Select
-          selectedKeys={[language]}
-          onSelectionChange={(keys) => {
-            const v =
-              keys === "all" || !keys
-                ? "en"
-                : (Array.from(keys as Iterable<string>)[0] as ModuleLocale) ?? "en";
-            onLanguageChange(v);
-          }}
-          classNames={{
-            trigger: "h-10 min-h-10 rounded-lg border border-gray-200 bg-white text-xs",
-          }}
-        >
-          {LANGUAGES.map(({ value, key }) => (
-            <SelectItem key={value} textValue={t(key)}>
-              {t(key)}
-            </SelectItem>
-          ))}
-        </Select>
-      </div>
+    <div className={clsx("space-y-4", className)}>
+      {!hideLanguage && (
+        <div>
+          <label className={labelClass}>{t("selectLanguage")}</label>
+          <Select
+            classNames={{ trigger: selectTrigger }}
+            selectedKeys={[language]}
+            onSelectionChange={(keys) => {
+              const v =
+                keys === "all" || !keys
+                  ? "en"
+                  : ((Array.from(keys as Iterable<string>)[0] as ModuleLocale) ?? "en");
+
+              onLanguageChange(v);
+            }}
+          >
+            {LANGUAGES.map(({ value, key }) => (
+              <SelectItem key={value} textValue={t(key)}>
+                {t(key)}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
+      )}
 
       {/* Title */}
       <div>
-        <label className="block text-xs text-gray-600 mb-1.5">{t("contentTitle")}</label>
+        <label className={labelClass}>{t("contentTitle")}</label>
         <Input
-          value={translation.title}
-          onValueChange={(value) =>
-            updateTranslation((prev) => ({ ...prev, title: value }))
-          }
+          classNames={{
+            base: "w-full",
+            input: inputClass,
+            inputWrapper,
+          }}
           placeholder={t("titlePlaceholder")}
-          classNames={{
-            base: "w-full",
-            input: "text-xs",
-            inputWrapper:
-              "h-10 min-h-10 rounded-lg border border-gray-200 bg-white focus-within:border-[#3FBDFF] px-3 py-2",
-          }}
+          value={translation.title}
+          onValueChange={(value) => updateTranslation((prev) => ({ ...prev, title: value }))}
         />
       </div>
 
-      {/* Summary */}
-      <div>
-        <label className="block text-xs text-gray-600 mb-1.5">{t("summary")}</label>
-        <Textarea
-          value={translation.summary || ""}
-          onValueChange={(value) =>
-            updateTranslation((prev) => ({ ...prev, summary: value }))
-          }
-          placeholder={t("summaryPlaceholder")}
-          minRows={2}
-          classNames={{
-            base: "w-full",
-            input: "text-xs",
-            inputWrapper:
-              "rounded-lg border border-gray-200 bg-white focus-within:border-[#3FBDFF] px-3 py-2 min-h-0",
-          }}
-        />
-      </div>
-
-      {/* Content/Description */}
-      <div>
-        <label className="block text-xs text-gray-600 mb-1.5">{t("content")}</label>
-        <Textarea
-          value={translation.content || ""}
-          onValueChange={(value) =>
-            updateTranslation((prev) => ({ ...prev, content: value }))
-          }
-          placeholder={t("contentPlaceholder")}
-          minRows={4}
-          classNames={{
-            base: "w-full",
-            input: "text-xs",
-            inputWrapper:
-              "rounded-lg border border-gray-200 bg-white focus-within:border-[#3FBDFF] px-3 py-2 min-h-0",
-          }}
-        />
-      </div>
-
-      {/* Duration */}
-      <div>
-        <label className="block text-xs text-gray-600 mb-1.5">{t("duration")} (minutes)</label>
-        <Input
-          type="number"
-          value={duration ? String(duration) : ""}
-          onValueChange={(value) => onDurationChange(value ? Number(value) : 0)}
-          placeholder={t("durationPlaceholder")}
-          classNames={{
-            base: "w-full",
-            input: "text-xs",
-            inputWrapper:
-              "h-10 min-h-10 rounded-lg border border-gray-200 bg-white focus-within:border-[#3FBDFF] px-3 py-2",
-          }}
-        />
-      </div>
-
-      {/* Source URL (for Misc and optional for Video) */}
-      {requiresUrl && (
+      {showDescription && (
         <div>
-          <label className="block text-xs text-gray-600 mb-1.5">{t("sourceUrl")}</label>
-          <Input
-            value={sourceUrl || ""}
-            onValueChange={onSourceUrlChange}
-            placeholder={t("sourceUrlPlaceholder")}
+          <label className={labelClass}>{t("description")}</label>
+          <Textarea
             classNames={{
               base: "w-full",
-              input: "text-xs",
-              inputWrapper:
-                "h-10 min-h-10 rounded-lg border border-gray-200 bg-white focus-within:border-[#3FBDFF] px-3 py-2",
+              input: inputClass,
+              inputWrapper: textareaWrapper,
             }}
+            minRows={3}
+            placeholder={t("descriptionPlaceholder")}
+            value={translation.content ?? ""}
+            onValueChange={(value) => updateTranslation((prev) => ({ ...prev, content: value }))}
           />
         </div>
       )}

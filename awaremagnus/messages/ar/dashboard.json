@@ -84,13 +84,14 @@
     "subscriptionHistory": "سجل الاشتراك",
     "products": "المنتجات",
     "dashboard": "لوحة التحكم",
-    "quizzes": "الاختبارات",
-    "modules": "الوحدات",
-    "content": "المحتوى",
     "licenseUser": "مستخدمو الترخيص",
     "survey": "استبيان",
-    "trainingLibrary": "مكتبة التدريب"
+    "trainingLibrary": "مكتبة التدريب",
+    "systemLibrary": "المكتبة النظامية",
+    "myLibrary": "مكتبتي",
+    "systemBranding": "هوية النظام",
+    "launchAwareness": "إطلاق التوعية",
+    "systemSettings": "إعدادات النظام",
+    "myAwareness": "توعيتي"
   }
 }
-
-

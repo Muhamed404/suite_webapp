@@ -52,4 +52,9 @@ module.exports = {
   // INSTANT_CAMPAIGN_LAUNCH: process.env.INSTANT_CAMPAIGN_LAUNCH,
 
   BACKEND_TVBS_URL: process.env.BACKEND_TVBS_URL,
+
+  /** Base URL of the Aware Magnus dashboard app (e.g. https://awm.example.com). Used for "View Dashboard" redirect with token. */
+  AWAREMAGNUS_DASHBOARD_URL: process.env.AWAREMAGNUS_DASHBOARD_URL
+    ? process.env.AWAREMAGNUS_DASHBOARD_URL.replace(/\/$/, '')
+    : '',
 };

@@ -39,23 +39,28 @@ To empower organizations with data-driven insights and engaging learning experie
 ## 🌟 Key Features
 
 ### 1. Role-Based Dashboards
+
 The application provides a tailors experience for three main roles:
+
 - **Platform Admin (Super Admin)**: System-wide overview of all organizations, aggregated risk metrics, and global leaderboards.
 - **Organization Admin**: Detailed analytics for their specific organization, employee risk states, and training completion rates.
 - **Organization User**: Personalized dashboard showing individual progress, certifications, and personal scores.
 
 ### 2. Gamification Engine
+
 - **Achievements**: Unlockable badges for completing modules and maintaining streaks.
 - **Avatar System**: 14 levels of avatar evolution from "Vulnerable Newbie" to "Master" based on security scores.
 - **Leaderboards**: Competitive ranking for organizations and employees to encourage participation.
 
 ### 3. Comprehensive Analytics
+
 - **Security Posture Bar**: Visual representation of organization-wide compliance.
 - **Struggling Modules**: Identification of topics where employees need more attention.
 - **Course Completion Rate**: Monthly tracking of training velocity.
 - **Risk Distribution**: Semi-circle charts showing low, medium, and high-risk segments.
 
 ### 4. Advanced Architecture
+
 - **API Interceptors**: Seamless JWT token handling and 401/403 auto-logout logic.
 - **Type-Safe API Calls**: Full TypeScript coverage for all dashboard and gamification endpoints.
 - **Reactive State**: Unified state management using Zustand for auth and configuration.

@@ -1,12 +1,12 @@
 "use client";
 
+import clsx from "clsx";
+
 import { Logo } from "@/components/ui/logo";
 import { LanguageToggle } from "@/components/ui/language-toggle";
 import { LoginForm } from "@/components/modules/auth/login-form";
 import { LoginHero } from "@/components/modules/auth/login-hero";
 import { useTranslations } from "@/i18n/useTranslations";
-import clsx from "clsx";
-
 import { useI18n } from "@/i18n/I18nProvider";
 
 export default function LoginPage() {
@@ -19,7 +19,12 @@ export default function LoginPage() {
       {/* Login Section (Always Visible) */}
       <div className="flex flex-col justify-between col-span-12 sm:col-span-6 h-screen lg:p-10 p-4">
         {/* Header */}
-        <div className={clsx("flex items-center justify-between w-full max-w-xl mx-auto", isRtl && "flex-row-reverse")}>
+        <div
+          className={clsx(
+            "flex items-center justify-between w-full max-w-xl mx-auto",
+            isRtl && "flex-row-reverse"
+          )}
+        >
           <Logo />
           <LanguageToggle />
         </div>
@@ -44,4 +49,3 @@ export default function LoginPage() {
     </div>
   );
 }
-

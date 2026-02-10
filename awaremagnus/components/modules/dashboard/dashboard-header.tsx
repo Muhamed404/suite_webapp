@@ -8,105 +8,109 @@ import clsx from "clsx";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 
-export const DashboardHeader = () => {
+interface DashboardHeaderProps {
+  onMenuClick?: () => void;
+}
+
+export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
 
   const searchIcon = (
     <Image
-      src="/images/img/search.svg"
       alt=""
-      width={20}
-      height={20}
-      className="size-5 text-gray-400"
+      className="size-4 text-gray-400"
+      height={16}
+      src="/images/img/search.svg"
+      width={16}
     />
   );
 
   return (
     <header
       className={clsx(
-        "bg-[#FAFBFC] px-6 py-3 flex items-center justify-between sticky top-0 z-30",
+        "flex items-center justify-between gap-3 sm:gap-4 px-4 sm:px-6 py-3 sm:py-3.5",
+        "bg-white border-b border-[var(--strokeGray)] sticky top-0 z-30",
         isRtl && "flex-row-reverse"
       )}
     >
-      <h1 className="text-2xl font-semibold text-[var(--mainblue)]">
+      <h1 className="text-base font-semibold text-[var(--mainblue)] truncate min-w-0 flex-1">
         {t("header.welcome", { name: t("header.profileCompany") })}
       </h1>
 
-      {/* Right Section for lg and up */}
-      <div className="items-center hidden gap-5 lg:flex">
-        {/* Search Bar */}
-        <div className="relative">
+      {/* Right Section for lg and up - compact row like PhishMagnus */}
+      <div
+        className={clsx("hidden lg:flex items-center gap-3 shrink-0", isRtl && "flex-row-reverse")}
+      >
+        <div className="w-56 xl:w-64">
           <Input
-            type="text"
-            placeholder={t("header.searchPlaceholder")}
             classNames={{
-              base: "w-72",
-              input: clsx("py-2 text-base", isRtl ? "pr-14 pl-10" : "pl-14 pr-10"),
-              inputWrapper: "rounded-full bg-white border border-gray-300 h-11 min-h-11",
+              input: clsx("py-2 text-sm", isRtl ? "pr-10 pl-9" : "pl-10 pr-9"),
+              inputWrapper:
+                "rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] h-9 min-h-9",
             }}
-            startContent={isRtl ? undefined : searchIcon}
             endContent={isRtl ? searchIcon : undefined}
+            placeholder={t("header.searchPlaceholder")}
+            startContent={isRtl ? undefined : searchIcon}
+            type="text"
           />
         </div>
-
-        {/* Two Circle Buttons */}
         <Button
           isIconOnly
-          variant="light"
-          className="w-11 h-11 min-w-11 min-h-11 rounded-full border border-gray-200 hover:bg-gray-200"
           aria-label={t("header.mail")}
+          className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[var(--strokeGray)] bg-white hover:bg-[var(--gray)]"
+          variant="light"
         >
-          <Image src="/images/img/mail.svg" alt="" width={22} height={22} className="size-5.5" />
+          <Image alt="" className="size-4" height={16} src="/images/img/mail.svg" width={16} />
         </Button>
-
         <Button
           isIconOnly
-          variant="light"
-          className="w-11 h-11 min-w-11 min-h-11 rounded-full border border-gray-200 hover:bg-gray-200"
           aria-label={t("header.notifications")}
+          className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[var(--strokeGray)] bg-white hover:bg-[var(--gray)]"
+          variant="light"
         >
-          <Image src="/images/img/bell.svg" alt="" width={22} height={22} className="size-5.5" />
+          <Image alt="" className="size-4" height={16} src="/images/img/bell.svg" width={16} />
         </Button>
-
-        {/* User Profile */}
-        <div className="flex gap-4 items-center">
+        <div
+          className={clsx(
+            "flex items-center gap-3 pl-2 border-l border-[var(--strokeGray)]",
+            isRtl && "border-l-0 border-r pl-0 pr-2"
+          )}
+        >
           <Image
-            src="/images/img/profile.png"
             alt=""
-            width={44}
-            height={44}
-            className="w-11 h-11 rounded-full"
+            className="w-9 h-9 rounded-full shrink-0"
+            height={36}
+            src="/images/img/profile.png"
+            width={36}
           />
-          <div className="flex flex-col gap-1">
-            <h4 className="flex gap-1.5 text-lg font-medium">
+          <div className="flex flex-col gap-0.5 min-w-0">
+            <span className="text-sm font-medium text-[var(--mainblue)] truncate">
               {t("header.profileCompany")}
-              <Image src="/images/img/arrow.svg" alt="" width={20} height={20} className="size-5" />
-            </h4>
-            <p className="text-base text-gray-500">{t("header.profileEmail")}</p>
+            </span>
+            <p className="text-xs text-[var(--darkgray)] truncate">{t("header.profileEmail")}</p>
           </div>
         </div>
       </div>
 
-      {/* Hamburger Button for small screens */}
       <Button
         isIconOnly
-        variant="light"
-        className="block lg:hidden"
         aria-label="Menu"
+        className="shrink-0 lg:hidden w-9 h-9 min-w-9 min-h-9"
+        variant="light"
+        onPress={onMenuClick}
       >
         <svg
-          className="w-7 h-7 text-gray-800"
+          className="w-6 h-6 text-gray-800"
           fill="none"
           stroke="currentColor"
           strokeWidth="2"
           viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </Button>
     </header>
   );
 };
-

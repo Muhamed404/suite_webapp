@@ -15,6 +15,9 @@ SECURE_MAGNUS_WORKSPACE=c:\secure_magnus_workspace # Secure Magnus Workspace dir
 # Backend TVBS Configuration
 BACKEND_TVBS_URL=http://127.0.0.1:9000
 
+# Aware Magnus dashboard URL for "View Dashboard" redirect (JWT sent in URL hash only)
+# AWAREMAGNUS_DASHBOARD_URL=https://your-awm-domain.com
+
 # Logger
 LOGS_DIR=C:\SecureMagnus\application logs
 LOGS_FILENAME="frontend"
