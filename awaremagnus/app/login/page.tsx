@@ -22,7 +22,7 @@ export default function LoginPage() {
         <div
           className={clsx(
             "flex items-center justify-between w-full max-w-xl mx-auto",
-            isRtl && "flex-row-reverse",
+            isRtl && "flex-row-reverse"
           )}
         >
           <Logo />

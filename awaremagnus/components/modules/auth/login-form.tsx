@@ -67,10 +67,7 @@ export const LoginForm = () => {
   };
 
   return (
-    <form
-      className="flex flex-col items-stretch w-full"
-      onSubmit={handleSubmit(onSubmit)}
-    >
+    <form className="flex flex-col items-stretch w-full" onSubmit={handleSubmit(onSubmit)}>
       <h3 className="text-center text-3xl font-semibold">
         {t("form.title", { appName: tCommon("appName") })}
       </h3>
@@ -131,9 +128,7 @@ export const LoginForm = () => {
           </Link>
         </div>
 
-        {formError && (
-          <p className="mt-4 text-sm text-red-500 text-center">{formError}</p>
-        )}
+        {formError && <p className="mt-4 text-sm text-red-500 text-center">{formError}</p>}
 
         <Button
           className="w-full mt-8 px-6 py-3 rounded-full bg-[var(--blue)] text-white border border-transparent transition-all duration-300 hover:bg-transparent hover:border-[var(--blue)] hover:text-[var(--blue)]"

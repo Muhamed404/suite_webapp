@@ -66,17 +66,10 @@ export const CertificationChart = ({
       },
       labels: [""],
     }),
-    [color, color2],
+    [color, color2]
   );
 
   const series = [value];
 
-  return (
-    <Chart
-      height={240}
-      options={chartOptions}
-      series={series}
-      type="radialBar"
-    />
-  );
+  return <Chart height={240} options={chartOptions} series={series} type="radialBar" />;
 };

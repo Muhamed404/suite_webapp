@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+
 import { ModuleDetailsPage } from "@/components/modules/training-library/module-details-page";
 
 export default function MyLibraryModuleDetailsPage() {
@@ -11,7 +12,5 @@ export default function MyLibraryModuleDetailsPage() {
     return null;
   }
 
-  return (
-    <ModuleDetailsPage moduleId={moduleId} libraryType="my" />
-  );
+  return <ModuleDetailsPage libraryType="my" moduleId={moduleId} />;
 }

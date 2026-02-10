@@ -68,12 +68,10 @@ export const SemiCircleChart = ({
         },
       },
     }),
-    [sent, opened, admin, color1, color2, color3],
+    [sent, opened, admin, color1, color2, color3]
   );
 
   const series = [sentPercent, openedPercent, adminPercent];
 
-  return (
-    <Chart height={200} options={chartOptions} series={series} type="donut" />
-  );
+  return <Chart height={200} options={chartOptions} series={series} type="donut" />;
 };

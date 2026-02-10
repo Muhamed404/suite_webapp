@@ -11,11 +11,7 @@ interface CircularProgressChartProps {
   size?: number;
 }
 
-export const CircularProgressChart = ({
-  value,
-  color,
-  size = 128,
-}: CircularProgressChartProps) => {
+export const CircularProgressChart = ({ value, color, size = 128 }: CircularProgressChartProps) => {
   const chartOptions = useMemo(
     () => ({
       chart: {
@@ -53,17 +49,10 @@ export const CircularProgressChart = ({
       },
       labels: [""],
     }),
-    [color, size],
+    [color, size]
   );
 
   const series = [value];
 
-  return (
-    <Chart
-      height={size}
-      options={chartOptions}
-      series={series}
-      type="radialBar"
-    />
-  );
+  return <Chart height={size} options={chartOptions} series={series} type="radialBar" />;
 };

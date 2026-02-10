@@ -7,22 +7,13 @@ export const DashboardCharts = () => {
     <div className="grid grid-cols-12 gap-2">
       {/* Employee Risk States */}
       <div className="col-span-4 row-span-3 row-start-9 bg-white rounded-xl p-4 flex flex-col items-center justify-between">
-        <h3 className="text-xs font-semibold text-gray-800 mb-2">
-          Employee Risk States
-        </h3>
-        <div
-          className="semichart w-72 h-72"
-          data-admin="30"
-          data-opened="90"
-          data-sent="120"
-        />
+        <h3 className="text-xs font-semibold text-gray-800 mb-2">Employee Risk States</h3>
+        <div className="semichart w-72 h-72" data-admin="30" data-opened="90" data-sent="120" />
       </div>
 
       {/* Employee Certification */}
       <div className="col-span-4 col-start-5 row-start-9 bg-white rounded-xl p-4 flex flex-col items-center justify-between">
-        <h3 className="text-xs font-semibold text-gray-800 mb-2">
-          Employee Certification
-        </h3>
+        <h3 className="text-xs font-semibold text-gray-800 mb-2">Employee Certification</h3>
         <div
           className="leadchart w-60 h-60"
           data-text-size="28px"
@@ -61,9 +52,7 @@ export const DashboardCharts = () => {
                   width={40}
                 />
                 <div>
-                  <h3 className="text-xs font-semibold text-gray-800">
-                    Security Awareness Score
-                  </h3>
+                  <h3 className="text-xs font-semibold text-gray-800">Security Awareness Score</h3>
                   <div className="flex items-center gap-1">
                     <p className="text-lg text-gray-800">50</p>
                     <p className="text-gray-400 text-xs font-medium">/100</p>
@@ -84,9 +73,7 @@ export const DashboardCharts = () => {
         <Card>
           <CardBody className="p-4 flex flex-col">
             <div className="flex justify-between items-center mb-2">
-              <h3 className="text-xs font-semibold text-gray-800">
-                Top 3 Struggling Topics
-              </h3>
+              <h3 className="text-xs font-semibold text-gray-800">Top 3 Struggling Topics</h3>
               <Link className="text-blue-600 text-xs font-medium" href="#">
                 View All
               </Link>
@@ -121,17 +108,9 @@ export const DashboardCharts = () => {
                     <div
                       className={`w-6 h-6 rounded-full ${topic.color} flex items-center justify-center ${topic.iconColor}`}
                     >
-                      <Image
-                        alt=""
-                        className="w-3 h-3"
-                        height={12}
-                        src={topic.icon}
-                        width={12}
-                      />
+                      <Image alt="" className="w-3 h-3" height={12} src={topic.icon} width={12} />
                     </div>
-                    <span className="text-xs font-medium text-gray-800">
-                      {topic.label}
-                    </span>
+                    <span className="text-xs font-medium text-gray-800">{topic.label}</span>
                   </div>
                   <svg
                     className="w-3 h-3 text-gray-400"
@@ -140,11 +119,7 @@ export const DashboardCharts = () => {
                     strokeWidth="2"
                     viewBox="0 0 24 24"
                   >
-                    <path
-                      d="M9 5l7 7-7 7"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
+                    <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
               ))}
@@ -169,9 +144,7 @@ export const DashboardCharts = () => {
         <Card className="bg-[#10B981] text-white">
           <CardBody className="p-4 flex justify-between items-center h-full">
             <div>
-              <h3 className="text-xs font-medium opacity-90">
-                Active Learners This Month
-              </h3>
+              <h3 className="text-xs font-medium opacity-90">Active Learners This Month</h3>
               <p className="text-lg">12</p>
             </div>
             <div className="w-12 h-12">
@@ -192,9 +165,7 @@ export const DashboardCharts = () => {
         <Card className="bg-[#A78BFA] text-white">
           <CardBody className="p-4 flex justify-between items-center h-full">
             <div>
-              <h3 className="text-xs font-medium opacity-90">
-                Training Completion Rate
-              </h3>
+              <h3 className="text-xs font-medium opacity-90">Training Completion Rate</h3>
               <p className="text-lg">76%</p>
             </div>
 

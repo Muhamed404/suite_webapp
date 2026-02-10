@@ -3,10 +3,7 @@
 import { Checkbox } from "@heroui/checkbox";
 import clsx from "clsx";
 
-import {
-  SUPPORTED_LANGUAGES,
-  getLanguageFlag,
-} from "@/utils/supportedLanguages";
+import { SUPPORTED_LANGUAGES, getLanguageFlag } from "@/utils/supportedLanguages";
 
 interface QuizLanguageSelectorMultiProps {
   value: number[];
@@ -29,9 +26,7 @@ export function QuizLanguageSelectorMulti({
 
   return (
     <div className={className}>
-      <p className="text-sm font-medium text-gray-900 mb-2">
-        Select Language(s)
-      </p>
+      <p className="text-sm font-medium text-gray-900 mb-2">Select Language(s)</p>
       <div className="flex flex-wrap gap-2">
         {SUPPORTED_LANGUAGES.map((lang) => {
           const selected = value.includes(lang.id);
@@ -41,9 +36,7 @@ export function QuizLanguageSelectorMulti({
               key={lang.id}
               className={clsx(
                 "flex items-center gap-2 px-4 py-2 rounded-full border cursor-pointer transition m-0 max-w-fit",
-                selected
-                  ? "border-[#3FBDFF] bg-[#EAF8FF]"
-                  : "border-gray-300 hover:bg-[#f4fbff]",
+                selected ? "border-[#3FBDFF] bg-[#EAF8FF]" : "border-gray-300 hover:bg-[#f4fbff]"
               )}
             >
               <Checkbox
@@ -62,7 +55,7 @@ export function QuizLanguageSelectorMulti({
                     "w-4 h-4 rounded-full flex items-center justify-center transition-colors border flex-shrink-0",
                     selected
                       ? "border-[#3FBDFF] bg-[#3FBDFF] text-white"
-                      : "border-gray-300 bg-white",
+                      : "border-gray-300 bg-white"
                   )}
                 >
                   {selected && (
@@ -73,16 +66,12 @@ export function QuizLanguageSelectorMulti({
                       strokeWidth="3"
                       viewBox="0 0 24 24"
                     >
-                      <path
-                        d="M5 13l4 4L19 7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
                 </span>
               </Checkbox>
-              <span className="text-xl leading-none" aria-hidden>
+              <span aria-hidden className="text-xl leading-none">
                 {getLanguageFlag(lang.id)}
               </span>
               <span className="text-sm">{lang.name}</span>

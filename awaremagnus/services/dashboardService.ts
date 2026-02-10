@@ -21,7 +21,7 @@ export const dashboardService = {
   // --- System Dashboard ---
   getSystemOverview: async () => {
     const { data } = await awmClient.get<SystemDashboardOverview>(
-      `${API_BASE}/dashboard/system/overview`,
+      `${API_BASE}/dashboard/system/overview`
     );
 
     return data;
@@ -30,7 +30,7 @@ export const dashboardService = {
   getSystemMonthlyCompletion: async (params?: { orgId?: number }) => {
     const { data } = await awmClient.get<SystemMonthlyCompletion>(
       `${API_BASE}/dashboard/system/monthly-completion`,
-      { params },
+      { params }
     );
 
     return data;
@@ -38,19 +38,16 @@ export const dashboardService = {
 
   getSystemStrugglingModules: async () => {
     const { data } = await awmClient.get<SystemStrugglingModules>(
-      `${API_BASE}/dashboard/system/struggling-modules`,
+      `${API_BASE}/dashboard/system/struggling-modules`
     );
 
     return data;
   },
 
-  getSystemLeaderboard: async (params?: {
-    count?: number;
-    sortBy?: string;
-  }) => {
+  getSystemLeaderboard: async (params?: { count?: number; sortBy?: string }) => {
     const { data } = await awmClient.get<SystemLeaderboard>(
       `${API_BASE}/dashboard/system/leaderboard`,
-      { params },
+      { params }
     );
 
     return data;
@@ -64,18 +61,16 @@ export const dashboardService = {
   }) => {
     const { data } = await awmClient.get<OrganizationDashboardsResponse>(
       `${API_BASE}/dashboard/organizations`,
-      { params },
+      { params }
     );
 
     return data;
   },
 
-  getOrganizationMonthlyCompletion: async (params?: {
-    campaignId?: number;
-  }) => {
+  getOrganizationMonthlyCompletion: async (params?: { campaignId?: number }) => {
     const { data } = await awmClient.get<OrganizationMonthlyCompletion>(
       `${API_BASE}/dashboard/organizations/monthly-completion`,
-      { params },
+      { params }
     );
 
     return data;
@@ -84,7 +79,7 @@ export const dashboardService = {
   getOrganizationStrugglingModules: async (params?: { orgId?: number }) => {
     const { data } = await awmClient.get<OrganizationStrugglingModulesResponse>(
       `${API_BASE}/dashboard/organizations/struggling-modules`,
-      { params },
+      { params }
     );
 
     return data;
@@ -97,7 +92,7 @@ export const dashboardService = {
   }) => {
     const { data } = await awmClient.get<OrganizationLeaderboardResponse>(
       `${API_BASE}/dashboard/organizations/leaderboard`,
-      { params },
+      { params }
     );
 
     return data;
@@ -110,10 +105,9 @@ export const dashboardService = {
     limit?: number;
     offset?: number;
   }) => {
-    const { data } = await awmClient.get<UserDashboardsResponse>(
-      `${API_BASE}/dashboard/users`,
-      { params },
-    );
+    const { data } = await awmClient.get<UserDashboardsResponse>(`${API_BASE}/dashboard/users`, {
+      params,
+    });
 
     return data;
   },
@@ -122,7 +116,7 @@ export const dashboardService = {
   getAchievementStatistics: async (params?: { orgId?: number }) => {
     const { data } = await awmClient.get<AchievementStatisticsResponse>(
       `${API_BASE}/gamification/achievements/statistics`,
-      { params },
+      { params }
     );
 
     return data;
@@ -136,7 +130,7 @@ export const dashboardService = {
   }) => {
     const { data } = await awmClient.get<AchievementsResponse>(
       `${API_BASE}/gamification/achievements`,
-      { params },
+      { params }
     );
 
     return data;
@@ -145,23 +139,21 @@ export const dashboardService = {
   getAvatarStatistics: async (params?: { orgId?: number }) => {
     const { data } = await awmClient.get<AvatarStatisticsResponse>(
       `${API_BASE}/gamification/avatar/statistics`,
-      { params },
+      { params }
     );
 
     return data;
   },
 
   getScoreTypes: async () => {
-    const { data } = await awmClient.get<ScoreTypesResponse>(
-      `${API_BASE}/gamification/scoretypes`,
-    );
+    const { data } = await awmClient.get<ScoreTypesResponse>(`${API_BASE}/gamification/scoretypes`);
 
     return data;
   },
 
   getScoreLevels: async () => {
     const { data } = await awmClient.get<ScoreLevelsResponse>(
-      `${API_BASE}/gamification/scorelevels`,
+      `${API_BASE}/gamification/scorelevels`
     );
 
     return data;
@@ -169,7 +161,7 @@ export const dashboardService = {
 
   getScoreLevelsByType: async (scoreTypeId: number) => {
     const { data } = await awmClient.get<ScoreLevelsResponse>(
-      `${API_BASE}/gamification/scorelevels/type/${scoreTypeId}`,
+      `${API_BASE}/gamification/scorelevels/type/${scoreTypeId}`
     );
 
     return data;

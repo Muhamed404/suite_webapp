@@ -11,6 +11,8 @@ export interface SuiteCategory {
 export interface SuiteContentType {
   id: number;
   name: string;
+  /** When false, only URL input is allowed (no file upload). */
+  allowsFileUpload?: boolean;
 }
 
 export interface SuiteModule {

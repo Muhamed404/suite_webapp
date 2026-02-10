@@ -12,12 +12,7 @@ interface FilePreviewProps {
   className?: string;
 }
 
-export function FilePreview({
-  file,
-  previewUrl,
-  type,
-  className,
-}: FilePreviewProps) {
+export function FilePreview({ file, previewUrl, type, className }: FilePreviewProps) {
   const t = useTranslations("content");
 
   const isImage = file?.type.startsWith("image/");
@@ -42,11 +37,7 @@ export function FilePreview({
               />
             )}
             {isVideo && (
-              <video
-                controls
-                className="max-w-full max-h-[150px] rounded"
-                src={previewUrl}
-              >
+              <video controls className="max-w-full max-h-[150px] rounded" src={previewUrl}>
                 <track kind="captions" />
               </video>
             )}

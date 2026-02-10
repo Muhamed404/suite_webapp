@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+
 import { ContentListPage } from "@/components/modules/training-library/content-list-page";
 
 export default function MyLibraryModuleContentListPage() {
@@ -11,11 +12,5 @@ export default function MyLibraryModuleContentListPage() {
   if (!moduleId || Number.isNaN(moduleId)) return null;
   if (!contentTypeId || Number.isNaN(contentTypeId)) return null;
 
-  return (
-    <ContentListPage
-      moduleId={moduleId}
-      contentTypeId={contentTypeId}
-      libraryType="my"
-    />
-  );
+  return <ContentListPage contentTypeId={contentTypeId} libraryType="my" moduleId={moduleId} />;
 }

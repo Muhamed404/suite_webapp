@@ -61,24 +61,13 @@ export default function DashboardPage() {
     ) {
       return orgDataResponse.data.dashboardOrganizations[0];
     }
-    if (
-      isUser &&
-      userDataResponse?.success &&
-      userDataResponse.data.dashboardUsers.length > 0
-    ) {
+    if (isUser && userDataResponse?.success && userDataResponse.data.dashboardUsers.length > 0) {
       // Map User Data to generic structure where possible, or return specific
       return userDataResponse.data.dashboardUsers[0];
     }
 
     return null;
-  }, [
-    isPlatformAdmin,
-    isOrgAdmin,
-    isUser,
-    systemData,
-    orgDataResponse,
-    userDataResponse,
-  ]);
+  }, [isPlatformAdmin, isOrgAdmin, isUser, systemData, orgDataResponse, userDataResponse]);
 
   const strugglingModules = useMemo(() => {
     if (isPlatformAdmin && systemStrugglingRaw?.success) {
@@ -93,13 +82,7 @@ export default function DashboardPage() {
     }
 
     return [];
-  }, [
-    isPlatformAdmin,
-    isOrgAdmin,
-    systemStrugglingRaw,
-    orgStrugglingRaw,
-    dashboardData,
-  ]);
+  }, [isPlatformAdmin, isOrgAdmin, systemStrugglingRaw, orgStrugglingRaw, dashboardData]);
 
   // Extract values with fallbacks
   const totalLicenses = 100; // API doesn't seem to have "Total Licenses", only "Total User Licenses" in spec image but mapped to... total_employees?
@@ -225,7 +208,7 @@ export default function DashboardPage() {
               <div
                 className={clsx(
                   "bg-[linear-gradient(305deg,#4BABDC_0%,#5DB1FC_94.2%)] text-white rounded-xl p-4 flex gap-3 items-start h-full",
-                  isRtl && "flex-row-reverse",
+                  isRtl && "flex-row-reverse"
                 )}
               >
                 <Image
@@ -247,7 +230,7 @@ export default function DashboardPage() {
               <div
                 className={clsx(
                   "bg-white text-black rounded-xl p-4 flex gap-3 items-start h-full",
-                  isRtl && "flex-row-reverse",
+                  isRtl && "flex-row-reverse"
                 )}
               >
                 <Image
@@ -258,9 +241,7 @@ export default function DashboardPage() {
                   width={48}
                 />
                 <div className="flex flex-col">
-                  <h3 className="text-base">
-                    {t("cards.totalConsumedLicenses")}
-                  </h3>
+                  <h3 className="text-base">{t("cards.totalConsumedLicenses")}</h3>
                   <p className="text-2xl">{consumedLicenses}</p>
                 </div>
               </div>
@@ -272,17 +253,10 @@ export default function DashboardPage() {
                 <h2 className="text-xl font-semibold text-gray-900">
                   {isUser ? t("cards.myScore") : t("cards.organizationScore")}
                 </h2>
-                <h2 className="text-base text-gray-900">
-                  {t("cards.totalComplianceScore")}
-                </h2>
+                <h2 className="text-base text-gray-900">{t("cards.totalComplianceScore")}</h2>
 
                 <div className="flex w-full items-center">
-                  <div
-                    className={clsx(
-                      "text-6xl text-gray-900",
-                      isRtl ? "ml-4" : "mr-4",
-                    )}
-                  >
+                  <div className={clsx("text-6xl text-gray-900", isRtl ? "ml-4" : "mr-4")}>
                     {Math.round(compliancePercent / 10)}
                   </div>
                   <div className="mt-1 flex-1">
@@ -295,7 +269,7 @@ export default function DashboardPage() {
                     <div
                       className={clsx(
                         "text-base text-gray-500 font-medium mt-1.5",
-                        isRtl ? "text-left" : "text-right",
+                        isRtl ? "text-left" : "text-right"
                       )}
                     >
                       {compliancePercent}%
@@ -304,12 +278,7 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between gap-5">
-                  <div
-                    className={clsx(
-                      "flex items-center gap-3",
-                      isRtl && "flex-row-reverse",
-                    )}
-                  >
+                  <div className={clsx("flex items-center gap-3", isRtl && "flex-row-reverse")}>
                     <Image
                       alt=""
                       className="w-6 h-6"
@@ -318,21 +287,12 @@ export default function DashboardPage() {
                       width={24}
                     />
                     <div>
-                      <div className="text-2xl font-semibold text-gray-900">
-                        {globalProgress}%
-                      </div>
-                      <p className="text-gray-500 text-base">
-                        {t("cards.globalProgress")}
-                      </p>
+                      <div className="text-2xl font-semibold text-gray-900">{globalProgress}%</div>
+                      <p className="text-gray-500 text-base">{t("cards.globalProgress")}</p>
                     </div>
                   </div>
 
-                  <div
-                    className={clsx(
-                      "flex items-center gap-3",
-                      isRtl && "flex-row-reverse",
-                    )}
-                  >
+                  <div className={clsx("flex items-center gap-3", isRtl && "flex-row-reverse")}>
                     <Image
                       alt=""
                       className="w-6 h-6"
@@ -341,31 +301,20 @@ export default function DashboardPage() {
                       width={24}
                     />
                     <div>
-                      <div className="text-2xl font-semibold text-gray-900">
-                        {xpTokens}
-                      </div>
-                      <p className="text-gray-500 text-base">
-                        {t("cards.totalXpTokens")}
-                      </p>
+                      <div className="text-2xl font-semibold text-gray-900">{xpTokens}</div>
+                      <p className="text-gray-500 text-base">{t("cards.totalXpTokens")}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between mt-auto">
-                  <div
-                    className={clsx(
-                      "flex items-center gap-3",
-                      isRtl && "flex-row-reverse",
-                    )}
-                  >
+                  <div className={clsx("flex items-center gap-3", isRtl && "flex-row-reverse")}>
                     <div className="w-2 h-8 bg-orange-400 rounded-full" />
                     <p className="text-gray-600 text-base leading-tight">
                       {t("cards.totalAwarenessCampaigns")}
                     </p>
                   </div>
-                  <div className="text-2xl font-semibold text-gray-900">
-                    {totalCampaigns}
-                  </div>
+                  <div className="text-2xl font-semibold text-gray-900">{totalCampaigns}</div>
                 </div>
               </div>
             </div>
@@ -374,10 +323,7 @@ export default function DashboardPage() {
             <div className="col-span-1 md:col-span-8 row-start-4 md:row-start-2">
               <div className="bg-white rounded-xl p-4 flex items-center gap-5 w-full h-full">
                 <div
-                  className={clsx(
-                    "relative flex gap-3 items-center",
-                    isRtl && "flex-row-reverse",
-                  )}
+                  className={clsx("relative flex gap-3 items-center", isRtl && "flex-row-reverse")}
                 >
                   <Image
                     alt=""
@@ -386,9 +332,7 @@ export default function DashboardPage() {
                     src="/images/shield-check.svg"
                     width={16}
                   />
-                  <h3 className="text-base whitespace-nowrap">
-                    {t("cards.securityPosture")}
-                  </h3>
+                  <h3 className="text-base whitespace-nowrap">{t("cards.securityPosture")}</h3>
 
                   <Popover placement="bottom">
                     <PopoverTrigger>
@@ -411,11 +355,7 @@ export default function DashboardPage() {
                       <div className="p-5 text-sm bg-white border border-gray-300 rounded-xl w-80">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center">
-                            <svg
-                              className="w-5 h-5 me-2 shrink-0"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
+                            <svg className="w-5 h-5 me-2 shrink-0" fill="none" viewBox="0 0 24 24">
                               <path
                                 d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                                 stroke="currentColor"
@@ -424,9 +364,7 @@ export default function DashboardPage() {
                                 strokeWidth="2"
                               />
                             </svg>
-                            <h3 className="font-medium text-base">
-                              {t("cards.infoTitle")}
-                            </h3>
+                            <h3 className="font-medium text-base">{t("cards.infoTitle")}</h3>
                           </div>
                         </div>
                         <div className="mt-2 mb-4 leading-relaxed text-sm">
@@ -477,10 +415,7 @@ export default function DashboardPage() {
                   <h3 className="text-lg font-semibold text-gray-800">
                     {t("cards.securityAwarenessCampaign")}
                   </h3>
-                  <Link
-                    className="text-blue-600 text-base font-medium"
-                    href="#"
-                  >
+                  <Link className="text-blue-600 text-base font-medium" href="#">
                     {t("cards.viewAll")}
                   </Link>
                 </div>
@@ -497,25 +432,13 @@ export default function DashboardPage() {
             <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-6 md:row-start-3 md:row-span-2">
               <div className="grid grid-cols-1 sm:grid-cols-2 p-3 rounded-xl bg-white gap-3 h-full">
                 <div className="bg-[#F1F5F8] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <h3 className="text-base font-semibold mb-3">
-                    {t("cards.weeklyProgress")}
-                  </h3>
-                  <CircularProgressChart
-                    color="#00CCC4"
-                    size={120}
-                    value={weeklyProgress}
-                  />
+                  <h3 className="text-base font-semibold mb-3">{t("cards.weeklyProgress")}</h3>
+                  <CircularProgressChart color="#00CCC4" size={120} value={weeklyProgress} />
                 </div>
 
                 <div className="bg-[#F1F5F8] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <h3 className="text-base font-semibold mb-3">
-                    {t("cards.quizAccuracy")}
-                  </h3>
-                  <CircularProgressChart
-                    color="#7CC5FA"
-                    size={120}
-                    value={quizAccuracy}
-                  />
+                  <h3 className="text-base font-semibold mb-3">{t("cards.quizAccuracy")}</h3>
+                  <CircularProgressChart color="#7CC5FA" size={120} value={quizAccuracy} />
                 </div>
               </div>
             </div>
@@ -524,12 +447,7 @@ export default function DashboardPage() {
             <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-8 md:row-start-5">
               <div className="bg-white rounded-xl p-5 flex flex-col h-full justify-center">
                 <div className="flex justify-between items-center">
-                  <div
-                    className={clsx(
-                      "flex items-center gap-4",
-                      isRtl && "flex-row-reverse",
-                    )}
-                  >
+                  <div className={clsx("flex items-center gap-4", isRtl && "flex-row-reverse")}>
                     <Image
                       alt=""
                       className="w-12 h-12"
@@ -542,9 +460,7 @@ export default function DashboardPage() {
                         {t("cards.securityAwarenessScore")}
                       </h3>
                       <div className="flex items-center gap-1.5">
-                        <p className="text-2xl text-gray-800">
-                          {securityAwarenessScore}
-                        </p>
+                        <p className="text-2xl text-gray-800">{securityAwarenessScore}</p>
                         <p className="text-gray-400 text-base font-medium">
                           /{Number(securityAwarenessMax).toFixed(0)}
                         </p>
@@ -585,9 +501,7 @@ export default function DashboardPage() {
                   color="#3ACE89"
                   color2="#FB5050"
                   value={Math.round(
-                    (certStats.certified /
-                      (certStats.certified + certStats.uncertified || 1)) *
-                      100,
+                    (certStats.certified / (certStats.certified + certStats.uncertified || 1)) * 100
                   )}
                 />
 
@@ -613,10 +527,7 @@ export default function DashboardPage() {
                     <h3 className="text-sm font-semibold text-gray-800">
                       {t("cards.top3StrugglingTopics")}
                     </h3>
-                    <Link
-                      className="text-blue-600 text-xs font-medium"
-                      href="#"
-                    >
+                    <Link className="text-blue-600 text-xs font-medium" href="#">
                       {t("cards.viewAll")}
                     </Link>
                   </div>
@@ -650,9 +561,7 @@ export default function DashboardPage() {
                         </div>
                       ))
                     ) : (
-                      <div className="text-xs text-gray-400 italic">
-                        No struggling topics
-                      </div>
+                      <div className="text-xs text-gray-400 italic">No struggling topics</div>
                     )}
                   </div>
 

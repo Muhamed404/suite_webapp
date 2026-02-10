@@ -14,11 +14,7 @@ export interface I18nContextValue {
   locale: Locale;
   dir: "ltr" | "rtl";
   messages: AppMessages;
-  t: (
-    namespace: Namespace,
-    key: string,
-    values?: Record<string, unknown>,
-  ) => string;
+  t: (namespace: Namespace, key: string, values?: Record<string, unknown>) => string;
 }
 
 const I18nContext = React.createContext<I18nContextValue | null>(null);
@@ -53,9 +49,7 @@ export function I18nProvider({
         return key;
       }
 
-      const template = isString
-        ? (msg as string)
-        : (values?.defaultValue as string);
+      const template = isString ? (msg as string) : (values?.defaultValue as string);
 
       if (!values) return template;
 
@@ -65,12 +59,12 @@ export function I18nProvider({
         return template;
       }
     },
-    [locale, messages],
+    [locale, messages]
   );
 
   const value = React.useMemo<I18nContextValue>(
     () => ({ locale, dir, messages, t }),
-    [dir, locale, messages, t],
+    [dir, locale, messages, t]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

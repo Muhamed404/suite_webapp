@@ -6,10 +6,5 @@ import { useTranslations } from "@/i18n/useTranslations";
 export default function SystemLibraryPage() {
   const t = useTranslations("dashboard");
 
-  return (
-    <LibraryPage
-      libraryType="system"
-      title={t("menu.systemLibrary")}
-    />
-  );
+  return <LibraryPage libraryType="system" title={t("menu.systemLibrary")} />;
 }

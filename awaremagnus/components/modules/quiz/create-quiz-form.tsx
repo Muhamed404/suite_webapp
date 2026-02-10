@@ -9,11 +9,8 @@ import { Button } from "@heroui/button";
 import { Select, SelectItem } from "@heroui/select";
 import clsx from "clsx";
 
-import {
-  QuizTypeSelectorApi,
-  apiQuizTypeIdToCardType,
-} from "./quiz-type-selector-api";
-import { QuizLanguageSelectorMulti } from "./quiz-language-selector-multi";
+import { QuizTypeSelectorPills, QuizCardType } from "./quiz-type-selector-pills";
+import { QuizLanguageSelectorFlags } from "./quiz-language-selector-flags";
 import {
   QuizLanguageCard,
   generateId,
@@ -21,16 +18,10 @@ import {
   type QuizLanguageForm,
   type QuizQuestion,
 } from "./quiz-language-card";
-import { SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
 
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
-import {
-  useModules,
-  useContentsByModule,
-  useCreateQuiz,
-  useQuizTypes,
-} from "@/hooks/useQuiz";
+import { useModules, useContentsByModule, useCreateQuiz, useQuizTypes } from "@/hooks/useQuiz";
 import { getApiErrorMessage } from "@/utils/apiError";
 
 function createEmptyAnswer(): QuizAnswer {
@@ -82,76 +73,79 @@ export function CreateQuizForm({
   useEffect(() => {
     if (initialModuleId) setModuleId(initialModuleId);
   }, [initialModuleId]);
-  const [selectedQuizTypeId, setSelectedQuizTypeId] = useState<number>(0);
-  const [selectedLanguageIds, setSelectedLanguageIds] = useState<number[]>([
-    SUPPORTED_LANGUAGES[0]!.id,
-  ]);
+
+  // Quiz Type State
+  const [selectedQuizType, setSelectedQuizType] = useState<QuizCardType>("single");
+
+  // Map internal type string to API ID
+  const { data: quizTypesRes } = useQuizTypes();
+  const apiQuizTypes = quizTypesRes?.success ? (quizTypesRes.data ?? []) : [];
+
+  // Helper to get ID from internal type string
+  const getTypeIdFromCardType = (type: QuizCardType): number => {
+    // This mapping depends on how the DB seeds types.
+    // Usually: 1=Single Choice, 2=Multiple Choice, 3=True/False (or similar)
+    // For safety, we try to match by name or fallback to index.
+    // Assuming standard order or naming convention in API response.
+    // If API types have specific codes/names, map them here.
+    // Fallback logic based on common naming:
+    const found = apiQuizTypes.find((t) => {
+      const name = (t.name ?? "").toLowerCase();
+
+      if (type === "single") return name.includes("single") || name.includes("one");
+      if (type === "multiple") return name.includes("multiple") || name.includes("many");
+      if (type === "truefalse") return name.includes("true") || name.includes("boolean");
+
+      return false;
+    });
+
+    return found ? found.id : (apiQuizTypes[0]?.id ?? 1);
+  };
+
+  // Helper to reverse map if needed, but we drive state by UI selection now.
+
+  const [selectedLanguageIds, setSelectedLanguageIds] = useState<number[]>([]);
   const [generated, setGenerated] = useState(false);
   const [languageForms, setLanguageForms] = useState<QuizLanguageForm[]>([]);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
   const { data: modulesRes } = useModules({ status: 1 });
-  const { data: quizTypesRes } = useQuizTypes();
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
-  const apiQuizTypes = quizTypesRes?.success ? (quizTypesRes.data ?? []) : [];
 
-  useEffect(() => {
-    if (apiQuizTypes.length > 0 && selectedQuizTypeId === 0) {
-      setSelectedQuizTypeId(apiQuizTypes[0]!.id);
-    }
-  }, [apiQuizTypes, selectedQuizTypeId]);
-
-  const { data: contentsRes } = useContentsByModule(
-    moduleId ? Number(moduleId) : 0,
-    !!moduleId,
-  );
+  const { data: contentsRes } = useContentsByModule(moduleId ? Number(moduleId) : 0, !!moduleId);
   const contents = contentsRes?.success ? (contentsRes.data ?? []) : [];
 
   const createQuiz = useCreateQuiz();
 
-  const handleModuleChange = (keys: unknown) => {
-    const v =
-      keys === "all" || !keys
-        ? ""
-        : ((Array.from(keys as Iterable<string>)[0] as string) ?? "");
-
-    setModuleId(v);
-    setContentId("");
-  };
-
-  const handleContentChange = (keys: unknown) => {
-    const v =
-      keys === "all" || !keys
-        ? ""
-        : ((Array.from(keys as Iterable<string>)[0] as string) ?? "");
-
-    setContentId(v);
-  };
-
   const handleGenerateForm = useCallback(() => {
     setFormError(null);
     setFormSuccess(null);
-    const forms =
-      selectedLanguageIds.length > 0
-        ? selectedLanguageIds.map(createLanguageFormByLangId)
-        : [createLanguageFormByLangId(SUPPORTED_LANGUAGES[0]!.id)];
+
+    if (selectedLanguageIds.length === 0) {
+      setFormError(t("selectLanguageError") || "Please select at least one language");
+
+      return;
+    }
+
+    const forms = selectedLanguageIds.map(createLanguageFormByLangId);
 
     setLanguageForms(forms);
     setGenerated(true);
-  }, [selectedLanguageIds]);
+  }, [selectedLanguageIds, t]);
 
   const updateForm = useCallback(
     (index: number, updater: (prev: QuizLanguageForm) => QuizLanguageForm) => {
-      setLanguageForms((prev) =>
-        prev.map((f, i) => (i === index ? updater(f) : f)),
-      );
+      setLanguageForms((prev) => prev.map((f, i) => (i === index ? updater(f) : f)));
     },
-    [],
+    []
   );
 
   const removeForm = useCallback((index: number) => {
     setLanguageForms((prev) => prev.filter((_, i) => i !== index));
+    // Also uncheck the language? Optional, but keeps UI sync
+    // For now we keep the selection in pills separate or sync them?
+    // Design suggests they might be separate steps.
   }, []);
 
   const addAnswer = useCallback(
@@ -159,13 +153,11 @@ export function CreateQuizForm({
       updateForm(formIndex, (f) => ({
         ...f,
         questions: f.questions.map((q, i) =>
-          i === questionIndex
-            ? { ...q, answers: [...q.answers, createEmptyAnswer()] }
-            : q,
+          i === questionIndex ? { ...q, answers: [...q.answers, createEmptyAnswer()] } : q
         ),
       }));
     },
-    [updateForm],
+    [updateForm]
   );
 
   const addQuestion = useCallback(
@@ -175,7 +167,7 @@ export function CreateQuizForm({
         questions: [...f.questions, createEmptyQuestion()],
       }));
     },
-    [updateForm],
+    [updateForm]
   );
 
   const removeQuestion = useCallback(
@@ -185,7 +177,7 @@ export function CreateQuizForm({
         questions: f.questions.filter((_, i) => i !== questionIndex),
       }));
     },
-    [updateForm],
+    [updateForm]
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -202,12 +194,14 @@ export function CreateQuizForm({
     }
 
     let hasValid = false;
+
     for (const form of languageForms) {
       const validQuestions = form.questions.filter((q) => {
         const answers = q.answers.filter((a) => a.text.trim() !== "");
 
         return answers.length > 0 && answers.some((a) => a.correct);
       });
+
       if (validQuestions.length > 0) hasValid = true;
     }
 
@@ -216,6 +210,8 @@ export function CreateQuizForm({
 
       return;
     }
+
+    const selectedQuizTypeId = getTypeIdFromCardType(selectedQuizType);
 
     try {
       for (const form of languageForms) {
@@ -241,12 +237,14 @@ export function CreateQuizForm({
               question: q.question.trim() || "Untitled question",
               difficulty: 1,
               time_limit: 60,
+              lang_id: form.langId, // Ensure lang_id is passed if API supports it
             },
             answers,
           });
         }
       }
       setFormSuccess(t("createSuccess"));
+      // Optional: Clear form or redirect
     } catch (err) {
       const msg = getApiErrorMessage(err, tCommon, {
         defaultKey: "errors.unknown",
@@ -264,89 +262,97 @@ export function CreateQuizForm({
     setFormSuccess(null);
   };
 
-  const canGenerate =
-    !!contentId &&
-    selectedLanguageIds.length > 0 &&
-    selectedQuizTypeId > 0;
   const isSubmitting = createQuiz.isPending;
 
   return (
     <div className={clsx("p-6", isRtl && "text-right")}>
       <Link
-        className="text-sm text-[var(--blue)] hover:underline mb-3 inline-block font-medium"
+        className="text-xs text-[var(--blue)] hover:underline mb-3 inline-block font-medium"
         href={returnHref}
       >
         {t("backToQuizzes")}
       </Link>
-      <div className="text-sm text-[var(--darkgray)] mb-2">
+      <div className="text-xs text-[var(--darkgray)] mb-2">
         {t("breadcrumbPrefix")}
-        <span className="text-[var(--mainblue)] font-semibold">
-          {t("breadcrumbCurrent")}
-        </span>
+        <span className="text-[var(--mainblue)] font-semibold px-1">/</span>
+        <span className="text-[var(--mainblue)] font-semibold">{t("breadcrumbCurrent")}</span>
       </div>
-      <h2 className="text-2xl font-semibold text-[var(--mainblue)]">
-        {t("title")}
-      </h2>
-      <p className="text-sm text-[var(--darkgray)] mb-5 mt-1">{t("subtitle")}</p>
+      <h2 className="text-xl font-bold text-[var(--mainblue)]">{t("title")}</h2>
+      <p className="text-xs text-[var(--darkgray)] mb-5 mt-1">{t("subtitle")}</p>
 
-      <div className="bg-white border border-[var(--strokeGray)] rounded-2xl p-5 mb-5 shadow-none">
-        <p className="text-sm font-medium text-[var(--mainblue)] mb-2">
-          {t("selectModule")}
-        </p>
-        <Select
-          classNames={{
-            trigger:
-              "rounded-full bg-white border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300 h-11 min-h-11",
-            value: "text-sm",
-          }}
-          placeholder={t("modulePlaceholder")}
-          selectedKeys={moduleId ? [moduleId] : []}
-          onSelectionChange={handleModuleChange}
-        >
-          {modules.map((m) => (
-            <SelectItem key={String(m.id)} textValue={moduleName(m)}>
-              {moduleName(m)}
-            </SelectItem>
-          ))}
-        </Select>
+      <div className="bg-white border border-[var(--strokeGray)] rounded-2xl p-6 mb-5 shadow-none">
+        {/* Module and Content Selectors */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <p className="text-[10px] font-medium text-gray-900 mb-1">{t("selectModule")}</p>
+            <Select
+              className="w-full"
+              classNames={{
+                trigger:
+                  "h-10 min-h-10 rounded-lg bg-white border border-gray-200 data-[hover=true]:bg-white data-[focus=true]:border-[#3FBDFF] transition-colors text-xs px-3 shadow-none",
+                value: "text-xs group-data-[has-value=true]:text-gray-900",
+              }}
+              placeholder={t("modulePlaceholder")}
+              selectedKeys={moduleId ? [moduleId] : []}
+              onSelectionChange={(keys) => {
+                const v = Array.from(keys)[0] as string;
 
-        <p className="text-sm font-medium text-[var(--mainblue)] mt-4 mb-2">
-          {t("selectContent")}
-        </p>
-        <Select
-          classNames={{
-            trigger:
-              "rounded-full bg-white border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300 h-11 min-h-11",
-            value: "text-sm",
-          }}
-          isDisabled={!moduleId}
-          placeholder={t("contentPlaceholder")}
-          selectedKeys={contentId ? [contentId] : []}
-          onSelectionChange={handleContentChange}
-        >
-          {contents.map((c) => (
-            <SelectItem key={String(c.id)} textValue={contentTitle(c)}>
-              {contentTitle(c)}
-            </SelectItem>
-          ))}
-        </Select>
+                setModuleId(v || "");
+              }}
+            >
+              {modules.map((m) => (
+                <SelectItem key={m.id} textValue={moduleName(m)}>
+                  {moduleName(m)}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
 
-        <QuizTypeSelectorApi
+          <div>
+            <p className="text-[10px] font-medium text-gray-900 mb-1">{t("selectContent")}</p>
+            <Select
+              className="w-full"
+              classNames={{
+                trigger:
+                  "h-10 min-h-10 rounded-lg bg-white border border-gray-200 data-[hover=true]:bg-white data-[focus=true]:border-[#3FBDFF] transition-colors text-xs px-3 shadow-none",
+                value: "text-xs group-data-[has-value=true]:text-gray-900",
+              }}
+              isDisabled={!moduleId}
+              placeholder={t("contentPlaceholder")}
+              selectedKeys={contentId ? [contentId] : []}
+              onSelectionChange={(keys) => {
+                const v = Array.from(keys)[0] as string;
+
+                setContentId(v || "");
+              }}
+            >
+              {contents.map((c) => (
+                <SelectItem key={c.id} textValue={contentTitle(c)}>
+                  {contentTitle(c)}
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+        </div>
+
+        <QuizTypeSelectorPills
           className="mt-4"
-          value={selectedQuizTypeId}
-          onChange={setSelectedQuizTypeId}
+          value={selectedQuizType}
+          onChange={setSelectedQuizType}
         />
-        <QuizLanguageSelectorMulti
-          className="mt-4"
+
+        <QuizLanguageSelectorFlags
+          className="mt-2"
           value={selectedLanguageIds}
           onChange={setSelectedLanguageIds}
         />
-        <div className="mt-4 flex justify-end">
+
+        <div className="mt-6 flex justify-end pb-2 border-b border-gray-100">
           <Button
-            className="rounded-full bg-[var(--blue)] text-white font-medium hover:opacity-90 disabled:opacity-50"
-            isDisabled={!canGenerate}
+            className="rounded-full bg-[#3FBDFF] text-white font-medium hover:opacity-90 disabled:opacity-50 text-xs px-6"
+            isDisabled={!moduleId || !contentId || selectedLanguageIds.length === 0}
             radius="full"
-            size="md"
+            size="sm"
             onPress={handleGenerateForm}
           >
             {t("generateForm")}
@@ -365,30 +371,29 @@ export function CreateQuizForm({
             {formSuccess}
           </p>
         )}
-        <div className="space-y-3" id="languageForms">
+
+        <div className="space-y-4" id="languageForms">
           {generated &&
             languageForms.map((form, formIndex) => (
               <QuizLanguageCard
                 key={String(form.langId ?? form.lang ?? formIndex)}
+                allowAddQuestion={true}
+                contentId={contentId ? Number(contentId) : undefined}
                 form={form}
-                quizType={apiQuizTypeIdToCardType(selectedQuizTypeId)}
+                quizType={selectedQuizType as any}
+                quizTypeId={getTypeIdFromCardType(selectedQuizType)}
                 onAddAnswer={(qIndex) => addAnswer(formIndex, qIndex)}
                 onAddQuestion={() => addQuestion(formIndex)}
-                allowAddQuestion={false}
                 onAnswersChange={(qIndex, answers) =>
                   updateForm(formIndex, (f) => ({
                     ...f,
-                    questions: f.questions.map((q, i) =>
-                      i === qIndex ? { ...q, answers } : q,
-                    ),
+                    questions: f.questions.map((q, i) => (i === qIndex ? { ...q, answers } : q)),
                   }))
                 }
                 onQuestionChange={(qIndex, question) =>
                   updateForm(formIndex, (f) => ({
                     ...f,
-                    questions: f.questions.map((q, i) =>
-                      i === qIndex ? { ...q, question } : q,
-                    ),
+                    questions: f.questions.map((q, i) => (i === qIndex ? { ...q, question } : q)),
                   }))
                 }
                 onRemove={() => removeForm(formIndex)}
@@ -398,17 +403,12 @@ export function CreateQuizForm({
         </div>
 
         {generated && languageForms.length > 0 && (
-          <div
-            className={clsx(
-              "flex justify-end gap-3 mt-4",
-              isRtl && "flex-row-reverse",
-            )}
-          >
+          <div className={clsx("flex justify-end gap-3 mt-6", isRtl && "flex-row-reverse")}>
             <Button
-              className="rounded-full border border-[var(--strokeGray)] text-[var(--mainblue)] font-medium hover:bg-[var(--gray)]"
+              className="rounded-full border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 text-xs px-6"
               isDisabled={isSubmitting}
               radius="full"
-              size="md"
+              size="sm"
               type="button"
               variant="bordered"
               onPress={handleCancel}
@@ -416,10 +416,10 @@ export function CreateQuizForm({
               {t("cancel")}
             </Button>
             <Button
-              className="rounded-full bg-[var(--blue)] text-white font-medium hover:opacity-90"
+              className="rounded-full bg-[#3FBDFF] text-white font-medium hover:opacity-90 text-xs px-8"
               isLoading={isSubmitting}
               radius="full"
-              size="md"
+              size="sm"
               type="submit"
             >
               {isSubmitting ? t("saving") : t("saveChanges")}

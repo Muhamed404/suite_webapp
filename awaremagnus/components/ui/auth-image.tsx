@@ -20,6 +20,8 @@ interface AuthImageProps {
   unoptimized?: boolean;
   /** Optional: resolve path with getContentAssetUrl (default true for relative paths) */
   resolveUrl?: boolean;
+  /** Optional: content to render when image fails to load (e.g. fallback thumbnail) */
+  fallbackContent?: React.ReactNode;
 }
 
 /**
@@ -37,20 +39,21 @@ export function AuthImage({
   sizes,
   unoptimized = false,
   resolveUrl = true,
+  fallbackContent,
 }: AuthImageProps) {
   const token = useAuthStore((s) => s.token);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const objectUrlRef = useRef<string | null>(null);
 
-  const urlToFetch =
-    !src?.trim() ? "" : resolveUrl ? getContentAssetUrl(src) : src.trim();
+  const urlToFetch = !src?.trim() ? "" : resolveUrl ? getContentAssetUrl(src) : src.trim();
   const isAbsolute = urlToFetch.startsWith("http://") || urlToFetch.startsWith("https://");
 
   useEffect(() => {
     if (!urlToFetch || !isAbsolute) {
       setObjectUrl(null);
       setError(!!src?.trim() && !urlToFetch);
+
       return;
     }
     setError(false);
@@ -58,15 +61,18 @@ export function AuthImage({
     const headers: HeadersInit = {
       "ngrok-skip-browser-warning": "true",
     };
+
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     fetch(urlToFetch, { headers, signal: controller.signal })
       .then((res) => {
         if (!res.ok) throw new Error(`Image ${res.status}`);
+
         return res.blob();
       })
       .then((blob) => {
         const url = URL.createObjectURL(blob);
+
         if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
         objectUrlRef.current = url;
         setObjectUrl(url);
@@ -89,13 +95,15 @@ export function AuthImage({
   if (!src?.trim()) return null;
   if (!isAbsolute) return null;
   if (error || !objectUrl) {
+    if (fallbackContent) {
+      return <>{fallbackContent}</>;
+    }
+
     return (
       <div
         className={className}
         style={
-          fill
-            ? undefined
-            : { width: width ?? 48, height: height ?? 48, background: "var(--gray)" }
+          fill ? undefined : { width: width ?? 48, height: height ?? 48, background: "var(--gray)" }
         }
         title={alt}
       >
@@ -105,26 +113,17 @@ export function AuthImage({
   }
 
   if (fill) {
-    return (
-      <Image
-        alt={alt}
-        src={objectUrl}
-        fill
-        className={className}
-        sizes={sizes}
-        unoptimized
-      />
-    );
+    return <Image fill unoptimized={unoptimized} alt={alt} className={className} sizes={sizes} src={objectUrl} />;
   }
 
   return (
     <Image
+      unoptimized={unoptimized}
       alt={alt}
+      className={className}
+      height={height ?? 48}
       src={objectUrl}
       width={width ?? 48}
-      height={height ?? 48}
-      className={className}
-      unoptimized
     />
   );
 }

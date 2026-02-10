@@ -1,9 +1,6 @@
 export { CreateQuizForm } from "./create-quiz-form";
 export { QuizTypeSelector, type QuizType } from "./quiz-type-selector";
-export {
-  QuizLanguageSelector,
-  type QuizLocale,
-} from "./quiz-language-selector";
+export { QuizLanguageSelector, type QuizLocale } from "./quiz-language-selector";
 export {
   QuizLanguageCard,
   generateId,

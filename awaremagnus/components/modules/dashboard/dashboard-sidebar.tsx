@@ -11,9 +11,15 @@ interface DashboardSidebarProps {
   open?: boolean;
   /** Called when sidebar should close (e.g. backdrop click). Used on mobile. */
   onClose?: () => void;
+  /** When true, show icon-only (collapsed). When false, show full width. Matches PhishMagnus: sub collapsed when primary expanded. */
+  isCollapsed?: boolean;
 }
 
-export const DashboardSidebar = ({ open = false, onClose }: DashboardSidebarProps) => {
+export const DashboardSidebar = ({
+  open = false,
+  onClose,
+  isCollapsed = false,
+}: DashboardSidebarProps) => {
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
@@ -92,13 +98,18 @@ export const DashboardSidebar = ({ open = false, onClose }: DashboardSidebarProp
   return (
     <div
       className={clsx(
-        "flex h-screen shrink-0 w-52 z-50 transition-[transform] duration-300 ease-out",
+        "flex shrink-0 z-50 transition-[transform] duration-300 ease-out",
         "fixed top-0 bottom-0 lg:relative lg:translate-x-0 lg:transition-none",
+        "lg:mt-2 lg:h-[98vh]",
         isRtl ? "right-0" : "left-0",
-        open ? "translate-x-0" : isRtl ? "translate-x-full lg:translate-x-0" : "-translate-x-full lg:translate-x-0",
+        open
+          ? "translate-x-0"
+          : isRtl
+            ? "translate-x-full lg:translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
       )}
     >
-      <SubMenu isCollapsed={false} items={subMenuItems} />
+      <SubMenu isCollapsed={isCollapsed} items={subMenuItems} />
     </div>
   );
 };

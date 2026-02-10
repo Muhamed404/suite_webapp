@@ -32,7 +32,11 @@ export function normalizeAWMResponse<T>(raw: AWMResponseBody<unknown>): Normaliz
   const success = isSuccessStatus(raw.statusCode);
   const message = raw.message;
 
-  const obj = raw.object as Record<string, unknown> | T | undefined;
+  // AWM returns { message, statusCode, object } - object may be array or wrapper. Some proxies use data.
+  const rawPayload =
+    (raw as Record<string, unknown>).object ?? (raw as Record<string, unknown>).data;
+  const obj = rawPayload as Record<string, unknown> | T | undefined;
+
   if (obj == null) {
     return { success, data: undefined, message, statusCode: raw.statusCode };
   }
@@ -41,6 +45,7 @@ export function normalizeAWMResponse<T>(raw: AWMResponseBody<unknown>): Normaliz
   if (typeof obj === "object" && !Array.isArray(obj)) {
     const o = obj as Record<string, unknown>;
     const count = typeof o.count === "number" ? o.count : undefined;
+
     if (Array.isArray(o.modules)) {
       return { success, data: o.modules as T, message, statusCode: raw.statusCode, count };
     }
@@ -61,6 +66,9 @@ export function normalizeAWMResponse<T>(raw: AWMResponseBody<unknown>): Normaliz
     }
     if (Array.isArray(o.quizTypes)) {
       return { success, data: o.quizTypes as T, message, statusCode: raw.statusCode, count };
+    }
+    if (Array.isArray(o.contentTypes)) {
+      return { success, data: o.contentTypes as T, message, statusCode: raw.statusCode, count };
     }
     if (Array.isArray(o.object)) {
       return { success, data: o.object as T, message, statusCode: raw.statusCode, count };

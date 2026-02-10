@@ -27,6 +27,8 @@ interface ContentFormProps {
   onLanguageChange: (lang: ModuleLocale) => void;
   /** When false, only language and title are shown (e.g. for Quiz). */
   showDescription?: boolean;
+  /** When true, do not render the language selector (e.g. when language is shown above the form). */
+  hideLanguage?: boolean;
   className?: string;
 }
 
@@ -45,6 +47,7 @@ export function ContentForm({
   onTranslationChange,
   onLanguageChange,
   showDescription = true,
+  hideLanguage = false,
   className,
 }: ContentFormProps) {
   const t = useTranslations("content");
@@ -55,7 +58,7 @@ export function ContentForm({
     (updater: (prev: ContentTranslation) => ContentTranslation) => {
       onTranslationChange(updater(translation));
     },
-    [translation, onTranslationChange],
+    [translation, onTranslationChange]
   );
 
   if (!contentType) {
@@ -66,77 +69,70 @@ export function ContentForm({
     );
   }
 
+  /* Match reference: input-field (border #e5e7eb, rounded-lg, text-xs), input-label (text-xs text-gray-600) */
   const inputWrapper =
-    "h-11 min-h-11 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300 px-5";
+    "w-full min-h-9 h-9 rounded-lg bg-white border border-gray-200 focus-within:border-[#32B8FF] focus-within:ring-0 focus-within:shadow-[0_0_0_3px_rgba(50,184,255,0.1)] transition-colors duration-200 px-3";
+  const inputClass = "text-xs text-gray-900 placeholder:text-gray-400";
   const textareaWrapper =
-    "rounded-2xl bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300 px-5 py-3 min-h-0";
+    "w-full rounded-lg bg-white border border-gray-200 focus-within:border-[#32B8FF] focus-within:shadow-[0_0_0_3px_rgba(50,184,255,0.1)] transition-colors duration-200 px-3 py-2.5 min-h-0";
   const selectTrigger =
-    "h-11 min-h-11 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300 text-[14px] px-5";
+    "min-h-9 h-9 rounded-lg bg-white border border-gray-200 focus-within:border-[#32B8FF] text-xs px-3";
+  const labelClass = "block text-xs text-gray-600 font-medium mb-1.5";
 
   return (
     <div className={clsx("space-y-4", className)}>
-      {/* Language Selector */}
-      <div>
-        <label className="block text-[var(--mainblue)] mb-1.5 font-medium text-sm">
-          {t("selectLanguage")}
-        </label>
-        <Select
-          classNames={{ trigger: selectTrigger }}
-          selectedKeys={[language]}
-          onSelectionChange={(keys) => {
-            const v =
-              keys === "all" || !keys
-                ? "en"
-                : ((Array.from(keys as Iterable<string>)[0] as ModuleLocale) ??
-                  "en");
+      {!hideLanguage && (
+        <div>
+          <label className={labelClass}>{t("selectLanguage")}</label>
+          <Select
+            classNames={{ trigger: selectTrigger }}
+            selectedKeys={[language]}
+            onSelectionChange={(keys) => {
+              const v =
+                keys === "all" || !keys
+                  ? "en"
+                  : ((Array.from(keys as Iterable<string>)[0] as ModuleLocale) ?? "en");
 
-            onLanguageChange(v);
-          }}
-        >
-          {LANGUAGES.map(({ value, key }) => (
-            <SelectItem key={value} textValue={t(key)}>
-              {t(key)}
-            </SelectItem>
-          ))}
-        </Select>
-      </div>
+              onLanguageChange(v);
+            }}
+          >
+            {LANGUAGES.map(({ value, key }) => (
+              <SelectItem key={value} textValue={t(key)}>
+                {t(key)}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
+      )}
 
       {/* Title */}
       <div>
-        <label className="block text-[var(--mainblue)] mb-1.5 font-medium text-sm">
-          {t("contentTitle")}
-        </label>
+        <label className={labelClass}>{t("contentTitle")}</label>
         <Input
           classNames={{
             base: "w-full",
-            input: "text-[14px]",
+            input: inputClass,
             inputWrapper,
           }}
           placeholder={t("titlePlaceholder")}
           value={translation.title}
-          onValueChange={(value) =>
-            updateTranslation((prev) => ({ ...prev, title: value }))
-          }
+          onValueChange={(value) => updateTranslation((prev) => ({ ...prev, title: value }))}
         />
       </div>
 
       {showDescription && (
         <div>
-          <label className="block text-[var(--mainblue)] mb-1.5 font-medium text-sm">
-            {t("description")}
-          </label>
+          <label className={labelClass}>{t("description")}</label>
           <Textarea
             classNames={{
               base: "w-full",
-              input: "text-[14px]",
+              input: inputClass,
               inputWrapper: textareaWrapper,
             }}
             minRows={3}
             placeholder={t("descriptionPlaceholder")}
             value={translation.content ?? ""}
-            onValueChange={(value) =>
-              updateTranslation((prev) => ({ ...prev, content: value }))
-            }
+            onValueChange={(value) => updateTranslation((prev) => ({ ...prev, content: value }))}
           />
         </div>
       )}

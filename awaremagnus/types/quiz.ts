@@ -60,6 +60,8 @@ export interface ModuleContent {
   /** Language from API (e.g. { id, name }) */
   language?: { id: number; name?: string };
   translations?: ContentTranslation[];
+  /** Set from API creation_date / createdAt when normalizing list/detail */
+  created_at?: string;
 }
 
 export interface QuizAnswer {
@@ -97,6 +99,7 @@ export interface CreateQuizPayload {
     difficulty?: number;
     time_limit?: number;
     org_id?: number;
+    lang_id?: number;
   };
   answers: Array<{
     answer_text: string;

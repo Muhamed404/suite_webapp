@@ -5,12 +5,7 @@ import { dashboardService } from "@/services/dashboardService";
 export const DASHBOARD_KEYS = {
   system: {
     overview: ["dashboard", "system", "overview"],
-    monthlyCompletion: (orgId?: number) => [
-      "dashboard",
-      "system",
-      "monthlyCompletion",
-      { orgId },
-    ],
+    monthlyCompletion: (orgId?: number) => ["dashboard", "system", "monthlyCompletion", { orgId }],
     strugglingModules: ["dashboard", "system", "strugglingModules"],
     leaderboard: (count?: number, sortBy?: string) => [
       "dashboard",
@@ -38,39 +33,30 @@ export const DASHBOARD_KEYS = {
       "strugglingModules",
       { orgId },
     ],
-    leaderboard: (params?: {
-      count?: number;
-      campaignId?: number;
-      sortBy?: string;
-    }) => ["dashboard", "organization", "leaderboard", params],
+    leaderboard: (params?: { count?: number; campaignId?: number; sortBy?: string }) => [
+      "dashboard",
+      "organization",
+      "leaderboard",
+      params,
+    ],
   },
   user: {
-    list: (params?: {
-      orgId?: number;
-      userId?: number;
-      limit?: number;
-      offset?: number;
-    }) => ["dashboard", "user", "list", params],
+    list: (params?: { orgId?: number; userId?: number; limit?: number; offset?: number }) => [
+      "dashboard",
+      "user",
+      "list",
+      params,
+    ],
   },
   gamification: {
-    achievementStats: (orgId?: number) => [
-      "gamification",
-      "achievements",
-      "statistics",
-      { orgId },
-    ],
+    achievementStats: (orgId?: number) => ["gamification", "achievements", "statistics", { orgId }],
     achievements: (params?: {
       limit?: number;
       offset?: number;
       sortBy?: string;
       sortOrder?: string;
     }) => ["gamification", "achievements", "list", params],
-    avatarStats: (orgId?: number) => [
-      "gamification",
-      "avatar",
-      "statistics",
-      { orgId },
-    ],
+    avatarStats: (orgId?: number) => ["gamification", "avatar", "statistics", { orgId }],
     scoreTypes: ["gamification", "scoreTypes"],
     scoreLevels: ["gamification", "scoreLevels"],
     scoreLevelsByType: (scoreTypeId: number) => [
@@ -128,8 +114,7 @@ export const useOrganizationDashboards = (params?: {
 export const useOrganizationMonthlyCompletion = (campaignId?: number) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.organization.monthlyCompletion(campaignId),
-    queryFn: () =>
-      dashboardService.getOrganizationMonthlyCompletion({ campaignId }),
+    queryFn: () => dashboardService.getOrganizationMonthlyCompletion({ campaignId }),
   });
 };
 

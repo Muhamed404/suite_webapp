@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { CreateQuizForm } from "@/components/modules/quiz/create-quiz-form";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -14,10 +15,7 @@ export default function SystemLibraryModuleQuizCreatePage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <CreateQuizForm
-          initialModuleId={moduleId}
-          returnHref={returnHref}
-        />
+        <CreateQuizForm initialModuleId={moduleId} returnHref={returnHref} />
       </DashboardLayout>
     </ProtectedRoute>
   );

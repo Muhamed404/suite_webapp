@@ -30,10 +30,7 @@ export function TableSkeleton({
           </thead>
           <tbody>
             {Array.from({ length: rows }).map((_, rowIdx) => (
-              <tr
-                key={rowIdx}
-                className="border-b border-[var(--strokeGray)] last:border-0"
-              >
+              <tr key={rowIdx} className="border-b border-[var(--strokeGray)] last:border-0">
                 {Array.from({ length: cols }).map((_, colIdx) => (
                   <td key={colIdx} className="py-3 px-4">
                     <Skeleton
@@ -76,11 +73,12 @@ export function LibraryPageSkeleton({ viewMode = "grid" }: { viewMode?: "grid" |
     return (
       <Card className="rounded-2xl border border-[var(--strokeGray)] bg-white shadow-none">
         <CardBody className="p-0 overflow-x-auto">
-          <TableSkeleton rows={6} cols={8} />
+          <TableSkeleton cols={8} rows={6} />
         </CardBody>
       </Card>
     );
   }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       {Array.from({ length: 6 }).map((_, i) => (
@@ -92,11 +90,11 @@ export function LibraryPageSkeleton({ viewMode = "grid" }: { viewMode?: "grid" |
 
 /** Content list / Quiz list page: table only */
 export function ContentListSkeleton() {
-  return <TableSkeleton rows={5} cols={7} />;
+  return <TableSkeleton cols={7} rows={5} />;
 }
 
 export function QuizListSkeleton() {
-  return <TableSkeleton rows={5} cols={5} />;
+  return <TableSkeleton cols={5} rows={5} />;
 }
 
 /** Module details page: breadcrumb + title + select + content type cards */
@@ -149,7 +147,7 @@ export function ModuleListPageSkeleton() {
         <Skeleton className={`${skeletonBase} h-4 w-28`} />
         <Skeleton className={`${skeletonBase} h-10 w-48 rounded-lg`} />
       </div>
-      <TableSkeleton rows={6} cols={5} />
+      <TableSkeleton cols={5} rows={6} />
     </div>
   );
 }
@@ -164,7 +162,7 @@ export function QuizPageSkeleton() {
         <Skeleton className={`${skeletonBase} h-4 w-24`} />
         <Skeleton className={`${skeletonBase} h-10 w-40 rounded-lg`} />
       </div>
-      <TableSkeleton rows={6} cols={4} />
+      <TableSkeleton cols={4} rows={6} />
     </div>
   );
 }

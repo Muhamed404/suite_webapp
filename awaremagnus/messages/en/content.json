@@ -13,16 +13,24 @@
   "selectLanguage": "Select Language",
   "uploadTitle": "Upload",
   "contentTypes": {
-    "iSpring": "iSpring",
+    "iSpring": "Interactive Lessons",
     "Quiz": "Manual Quiz",
     "quiz": "Manual Quiz",
     "pdf": "PDF",
     "video": "Video",
     "brochure": "Brochure",
+    "brochures": "Brochures",
     "screenSaver": "Screen Saver",
+    "screenSavers": "Screen Savers",
     "poster": "Poster",
+    "posters": "Posters",
     "game": "Game",
-    "misc": "Misc"
+    "games": "Games",
+    "misc": "Misc",
+    "interactiveContents": "Interactive Contents",
+    "motionVideos": "Motion Videos",
+    "documents": "Documents",
+    "vrGames": "VR Games"
   },
   "languages": {
     "en": "English",

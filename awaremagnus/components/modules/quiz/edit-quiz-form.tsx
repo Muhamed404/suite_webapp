@@ -7,10 +7,7 @@ import Link from "next/link";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
 
-import {
-  QuizTypeSelectorApi,
-  apiQuizTypeIdToCardType,
-} from "./quiz-type-selector-api";
+import { QuizTypeSelectorApi, apiQuizTypeIdToCardType } from "./quiz-type-selector-api";
 import {
   QuizLanguageCard,
   generateId,
@@ -31,13 +28,14 @@ function mapApiAnswersToForm(
     is_correct?: boolean;
     answer?: string;
     validity?: boolean;
-  }>,
+  }>
 ): QuizAnswer[] {
   if (!answers?.length) return [{ id: generateId(), text: "", correct: false }];
+
   return answers.map((a, i) => ({
     id: String(a.id ?? i),
     text: (a.answer_text ?? (a as { answer?: string }).answer ?? "").trim(),
-    correct: (a as { is_correct?: boolean }).is_correct ?? !!((a as { validity?: boolean }).validity),
+    correct: (a as { is_correct?: boolean }).is_correct ?? !!(a as { validity?: boolean }).validity,
   }));
 }
 
@@ -73,17 +71,17 @@ export function EditQuizForm({
   useEffect(() => {
     if (!quiz || hasInitialized) return;
     // Wait for answers to load so we can pre-fill; if answers API is slow, fall back to quiz.answers from getQuizById
-    if (answersLoading && !(quiz.answers?.length)) return;
+    if (answersLoading && !quiz.answers?.length) return;
     setHasInitialized(true);
     setSelectedQuizTypeId(quiz.quiz_type_id ?? 2);
-    const answersSource =
-      apiAnswers.length > 0 ? apiAnswers : (quiz.answers ?? []);
+    const answersSource = apiAnswers.length > 0 ? apiAnswers : (quiz.answers ?? []);
     const answers = mapApiAnswersToForm(answersSource);
     const question: QuizQuestion = {
       id: generateQuestionId(),
       question: quiz.question ?? "",
       answers: answers.length > 0 ? answers : [{ id: generateId(), text: "", correct: false }],
     };
+
     setLanguageForms([
       {
         langId: 1,
@@ -96,7 +94,7 @@ export function EditQuizForm({
     (index: number, updater: (prev: QuizLanguageForm) => QuizLanguageForm) => {
       setLanguageForms((prev) => prev.map((f, i) => (i === index ? updater(f) : f)));
     },
-    [],
+    []
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -105,6 +103,7 @@ export function EditQuizForm({
     setFormSuccess(null);
     if (languageForms.length === 0) return;
     const form = languageForms[0];
+
     if (!form?.questions.length) return;
     const q = form.questions[0]!;
     const questionText = q.question.trim() || "Untitled question";
@@ -123,6 +122,7 @@ export function EditQuizForm({
         defaultKey: "errors.unknown",
         defaultValue: t("createError"),
       });
+
       setFormError(msg);
     }
   };
@@ -134,11 +134,11 @@ export function EditQuizForm({
         questions: f.questions.map((q, i) =>
           i === questionIndex
             ? { ...q, answers: [...q.answers, { id: generateId(), text: "", correct: false }] }
-            : q,
+            : q
         ),
       }));
     },
-    [updateForm],
+    [updateForm]
   );
 
   const addQuestion = useCallback(
@@ -155,7 +155,7 @@ export function EditQuizForm({
         ],
       }));
     },
-    [updateForm],
+    [updateForm]
   );
 
   const removeQuestion = useCallback(
@@ -165,15 +165,12 @@ export function EditQuizForm({
         questions: f.questions.filter((_, i) => i !== questionIndex),
       }));
     },
-    [updateForm],
+    [updateForm]
   );
 
-  const removeForm = useCallback(
-    (index: number) => {
-      setLanguageForms((prev) => prev.filter((_, i) => i !== index));
-    },
-    [],
-  );
+  const removeForm = useCallback((index: number) => {
+    setLanguageForms((prev) => prev.filter((_, i) => i !== index));
+  }, []);
 
   const isLoading = quizLoading || answersLoading;
   const isSubmitting = updateQuiz.isPending;
@@ -207,9 +204,7 @@ export function EditQuizForm({
       </Link>
       <div className="text-sm text-[var(--darkgray)] mb-2">
         {t("breadcrumbPrefix")}
-        <span className="text-[var(--mainblue)] font-semibold">
-          {t("editQuiz") ?? "Edit Quiz"}
-        </span>
+        <span className="text-[var(--mainblue)] font-semibold">{t("editQuiz") ?? "Edit Quiz"}</span>
       </div>
       <h2 className="text-2xl font-semibold text-[var(--mainblue)]">
         {t("editQuiz") ?? "Edit Quiz"}
@@ -249,17 +244,13 @@ export function EditQuizForm({
               onAnswersChange={(qIndex, answers) =>
                 updateForm(formIndex, (f) => ({
                   ...f,
-                  questions: f.questions.map((q, i) =>
-                    i === qIndex ? { ...q, answers } : q,
-                  ),
+                  questions: f.questions.map((q, i) => (i === qIndex ? { ...q, answers } : q)),
                 }))
               }
               onQuestionChange={(qIndex, question) =>
                 updateForm(formIndex, (f) => ({
                   ...f,
-                  questions: f.questions.map((q, i) =>
-                    i === qIndex ? { ...q, question } : q,
-                  ),
+                  questions: f.questions.map((q, i) => (i === qIndex ? { ...q, question } : q)),
                 }))
               }
               onRemove={languageForms.length > 1 ? () => removeForm(formIndex) : () => {}}
@@ -269,16 +260,11 @@ export function EditQuizForm({
         </div>
 
         {languageForms.length > 0 && (
-          <div
-            className={clsx(
-              "flex justify-end gap-3 mt-4",
-              isRtl && "flex-row-reverse",
-            )}
-          >
+          <div className={clsx("flex justify-end gap-3 mt-4", isRtl && "flex-row-reverse")}>
             <Button
               as={Link}
-              href={returnHref}
               className="rounded-full border border-[var(--strokeGray)] text-[var(--mainblue)] font-medium hover:bg-[var(--gray)]"
+              href={returnHref}
               isDisabled={isSubmitting}
               radius="full"
               size="md"

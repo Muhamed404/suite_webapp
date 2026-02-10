@@ -19,10 +19,7 @@ export const LanguageToggle = ({ onClick }: LanguageToggleProps) => {
   const t = useTranslations("common");
 
   const nextLocale: Locale = locale === "ar" ? "en" : "ar";
-  const label =
-    locale === "ar"
-      ? t("language.switchToEnglish")
-      : t("language.switchToArabic");
+  const label = locale === "ar" ? t("language.switchToEnglish") : t("language.switchToArabic");
 
   return (
     <Button

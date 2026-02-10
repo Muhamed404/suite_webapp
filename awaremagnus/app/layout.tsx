@@ -24,32 +24,27 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
+  themeColor: "white",
 };
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getServerLocale();
   const dir = getLocaleDir(locale);
   const messages = await loadMessages(locale);
 
   return (
-    <html suppressHydrationWarning dir={dir} lang={locale}>
+    <html suppressHydrationWarning className="light" dir={dir} lang={locale}>
       <head />
       <body
         className={clsx(
           "min-h-screen text-foreground bg-background font-sans antialiased",
-          fontSans.variable,
+          fontSans.variable
         )}
       >
         <I18nProvider locale={locale} messages={messages}>
-          <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+          <Providers
+            themeProps={{ attribute: "class", defaultTheme: "light", forcedTheme: "light" }}
+          >
             <LayoutWrapper>{children}</LayoutWrapper>
           </Providers>
         </I18nProvider>

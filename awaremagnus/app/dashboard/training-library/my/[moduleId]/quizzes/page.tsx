@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+
 import { QuizListPage } from "@/components/modules/training-library/quiz-list-page";
 
 export default function MyLibraryModuleQuizzesPage() {
@@ -9,7 +10,5 @@ export default function MyLibraryModuleQuizzesPage() {
 
   if (!moduleId || Number.isNaN(moduleId)) return null;
 
-  return (
-    <QuizListPage moduleId={moduleId} libraryType="my" />
-  );
+  return <QuizListPage libraryType="my" moduleId={moduleId} />;
 }

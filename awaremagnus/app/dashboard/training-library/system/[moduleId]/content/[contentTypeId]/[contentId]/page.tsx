@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+
 import { ContentDetailPage } from "@/components/modules/training-library/content-detail-page";
 
 export default function SystemLibraryModuleContentDetailPage() {
@@ -15,10 +16,10 @@ export default function SystemLibraryModuleContentDetailPage() {
 
   return (
     <ContentDetailPage
-      moduleId={moduleId}
-      contentTypeId={contentTypeId}
       contentId={contentId}
+      contentTypeId={contentTypeId}
       libraryType="system"
+      moduleId={moduleId}
     />
   );
 }

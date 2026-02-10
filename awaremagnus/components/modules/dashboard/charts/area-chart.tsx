@@ -88,7 +88,7 @@ export const AreaChart = ({
       },
       colors: ["#4BA6FF"],
     }),
-    [labels],
+    [labels]
   );
 
   const series = [
@@ -98,7 +98,5 @@ export const AreaChart = ({
     },
   ];
 
-  return (
-    <Chart height={300} options={chartOptions} series={series} type="area" />
-  );
+  return <Chart height={300} options={chartOptions} series={series} type="area" />;
 };

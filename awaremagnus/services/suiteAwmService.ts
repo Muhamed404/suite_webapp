@@ -1,86 +1,137 @@
-import type {
-  SuiteCategory,
-  SuiteContentType,
-  SuiteResponse,
-} from "@/types/suiteAwm";
-import { suiteClient } from "./httpClient";
+import type { SuiteCategory, SuiteContentType, SuiteResponse } from "@/types/suiteAwm";
+import type { AWMResponseBody } from "./awmResponse";
 
-const AWM = "/awm";
+import { normalizeAWMResponse } from "./awmResponse";
+import { awmClient, API_BASE, suiteClient } from "./httpClient";
+
+const SUITE_AWM = "/awm";
 
 /** Suite may return payload in `data` or in `message` (AWM-style). */
-type SuiteListResponse<T> = SuiteResponse<T> | {
-  message: T;
-  statusCode?: number;
-  alertType?: string;
-};
+type SuiteListResponse<T> =
+  | SuiteResponse<T>
+  | {
+      message: T;
+      statusCode?: number;
+      alertType?: string;
+    };
 
 function extractPayload<T>(raw: SuiteListResponse<T>): T {
   const r = raw as Record<string, unknown>;
+
   if (Array.isArray(r.message)) return r.message as T;
   if (r.message != null && typeof r.message === "object") return r.message as T;
   if (r.data != null) return r.data as T;
+
   return r as T;
 }
 
 async function get<T>(path: string): Promise<T> {
   const { data } = await suiteClient.get<SuiteListResponse<T>>(path);
+
   return extractPayload(data);
 }
 
 async function post<T>(path: string, body: unknown): Promise<SuiteResponse<T>["data"]> {
   const { data } = await suiteClient.post<SuiteResponse<T>>(path, body);
+
   return data.data;
 }
 
 async function put<T>(path: string, body: unknown): Promise<SuiteResponse<T>["data"]> {
   const { data } = await suiteClient.put<SuiteResponse<T>>(path, body);
+
   return data.data;
 }
 
 async function del<T>(path: string): Promise<SuiteResponse<T>["data"]> {
   const { data } = await suiteClient.delete<SuiteResponse<T>>(path);
+
   return data.data;
 }
 
+/** AWM backend content-type request helpers */
+async function awmGet<T>(path: string): Promise<T> {
+  const { data } = await awmClient.get<AWMResponseBody>(path);
+  const normalized = normalizeAWMResponse<T>(data);
+
+  if (!normalized.success || normalized.data == null) {
+    throw new Error(normalized.message ?? "Request failed");
+  }
+
+  return normalized.data;
+}
+
+async function awmPost<T>(path: string, body: unknown): Promise<T> {
+  const { data } = await awmClient.post<AWMResponseBody>(path, body);
+  const normalized = normalizeAWMResponse<T>(data);
+
+  if (!normalized.success || normalized.data == null) {
+    throw new Error(normalized.message ?? "Request failed");
+  }
+
+  return normalized.data;
+}
+
+async function awmPut<T>(path: string, body: unknown): Promise<T> {
+  const { data } = await awmClient.put<AWMResponseBody>(path, body);
+  const normalized = normalizeAWMResponse<T>(data);
+
+  if (!normalized.success) {
+    throw new Error(normalized.message ?? "Request failed");
+  }
+
+  return normalized.data as T;
+}
+
+async function awmDel<T>(path: string): Promise<T> {
+  const { data } = await awmClient.delete<AWMResponseBody>(path);
+  const normalized = normalizeAWMResponse<T>(data);
+
+  if (!normalized.success) {
+    throw new Error(normalized.message ?? "Request failed");
+  }
+
+  return normalized.data as T;
+}
+
 export const suiteAwmService = {
-  /** GET /awm/categories */
-  getCategories: () => get<SuiteCategory[]>(`${AWM}/categories`),
+  /** GET /awm/categories (Service Suite) */
+  getCategories: () => get<SuiteCategory[]>(`${SUITE_AWM}/categories`),
 
-  /** GET /awm/categories/:id */
-  getCategoryById: (id: number) => get<SuiteCategory>(`${AWM}/categories/${id}`),
+  /** GET /awm/categories/:id (Service Suite) */
+  getCategoryById: (id: number) => get<SuiteCategory>(`${SUITE_AWM}/categories/${id}`),
 
-  /** POST /awm/categories */
+  /** POST /awm/categories (Service Suite) */
   createCategory: (payload: {
     name: string;
     code: string;
     description?: string;
     status?: boolean;
-  }) => post<SuiteCategory>(`${AWM}/categories`, payload),
+  }) => post<SuiteCategory>(`${SUITE_AWM}/categories`, payload),
 
-  /** PUT /awm/categories/:id */
+  /** PUT /awm/categories/:id (Service Suite) */
   updateCategory: (
     id: number,
-    payload: { name?: string; code?: string; description?: string; status?: boolean },
-  ) => put<number>(`${AWM}/categories/${id}`, payload),
+    payload: { name?: string; code?: string; description?: string; status?: boolean }
+  ) => put<number>(`${SUITE_AWM}/categories/${id}`, payload),
 
-  /** DELETE /awm/categories/:id */
-  deleteCategory: (id: number) => del<number>(`${AWM}/categories/${id}`),
+  /** DELETE /awm/categories/:id (Service Suite) */
+  deleteCategory: (id: number) => del<number>(`${SUITE_AWM}/categories/${id}`),
 
-  /** GET /awm/content-types */
-  getContentTypes: () => get<SuiteContentType[]>(`${AWM}/content-types`),
+  /** GET /api/awm/content-types (AWM Backend) */
+  getContentTypes: () => awmGet<SuiteContentType[]>(`${API_BASE}/content-types`),
 
-  /** GET /awm/content-types/:id */
-  getContentTypeById: (id: number) =>
-    get<SuiteContentType>(`${AWM}/content-types/${id}`),
+  /** GET /api/awm/content-types/:id (AWM Backend) */
+  getContentTypeById: (id: number) => awmGet<SuiteContentType>(`${API_BASE}/content-types/${id}`),
 
-  /** POST /awm/content-types */
+  /** POST /api/awm/content-types (AWM Backend) */
   createContentType: (payload: { name: string }) =>
-    post<SuiteContentType>(`${AWM}/content-types`, payload),
+    awmPost<SuiteContentType>(`${API_BASE}/content-types`, payload),
 
-  /** PUT /awm/content-types/:id */
+  /** PUT /api/awm/content-types/:id (AWM Backend) */
   updateContentType: (id: number, payload: { name?: string }) =>
-    put<number>(`${AWM}/content-types/${id}`, payload),
+    awmPut<SuiteContentType>(`${API_BASE}/content-types/${id}`, payload),
 
-  /** DELETE /awm/content-types/:id */
-  deleteContentType: (id: number) => del<number>(`${AWM}/content-types/${id}`),
+  /** DELETE /api/awm/content-types/:id (AWM Backend) */
+  deleteContentType: (id: number) => awmDel<number>(`${API_BASE}/content-types/${id}`),
 };

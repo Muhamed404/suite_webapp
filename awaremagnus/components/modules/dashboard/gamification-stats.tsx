@@ -5,10 +5,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import { useTranslations } from "@/i18n/useTranslations";
-import {
-  useAchievementStatistics,
-  useAvatarStatistics,
-} from "@/hooks/useDashboard";
+import { useAchievementStatistics, useAvatarStatistics } from "@/hooks/useDashboard";
 import { useAuthStore } from "@/hooks/useAuthStore";
 
 export const GamificationStats = () => {
@@ -41,20 +38,17 @@ export const GamificationStats = () => {
   // I will pick the level with the highest employee count to display as "Main" or just the first one.
 
   const mainAvatar = useMemo(() => {
-    if (!avatars?.avatar_statistics || avatars.avatar_statistics.length === 0)
-      return null;
+    if (!avatars?.avatar_statistics || avatars.avatar_statistics.length === 0) return null;
 
     // Find highest count? Or just first "unlocked"?
     // Let's Sort by employee_count desc
-    return [...avatars.avatar_statistics].sort(
-      (a, b) => b.employee_count - a.employee_count,
-    )[0];
+    return [...avatars.avatar_statistics].sort((a, b) => b.employee_count - a.employee_count)[0];
   }, [avatars]);
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
-        <h3 className="text-xl font-medium">{t("gamification.title")}</h3>
+        <h3 className="text-lg font-semibold text-[var(--mainblue)]">{t("gamification.title")}</h3>
       </div>
 
       <div className="grid grid-cols-12 gap-3">
@@ -66,39 +60,24 @@ export const GamificationStats = () => {
         */}
         <div className="col-span-3 row-span-1 bg-white rounded-xl p-4 flex flex-col justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-            <Image
-              alt=""
-              className="text-lg"
-              height={28}
-              src="/images/gard_cap.svg"
-              width={28}
-            />
+            <Image alt="" className="text-lg" height={28} src="/images/gard_cap.svg" width={28} />
             <div>
               {t("gamification.courseCompleted")}
-              <div className="text-2xl text-gray-900">8/12</div>
+              <div className="text-base font-semibold text-gray-900">8/12</div>
             </div>
           </div>
           <div className="w-full h-1.5 bg-gray-200 rounded-full mt-5">
-            <div
-              className="h-1.5 bg-green-500 rounded-full"
-              style={{ width: "70%" }}
-            />
+            <div className="h-1.5 bg-green-500 rounded-full" style={{ width: "70%" }} />
           </div>
         </div>
 
         {/* Study Time */}
         <div className="col-span-3 col-start-4 row-span-1 bg-white rounded-xl p-4 flex flex-col justify-start">
           <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-            <Image
-              alt=""
-              className="text-lg"
-              height={28}
-              src="/images/clock_icon.svg"
-              width={28}
-            />
+            <Image alt="" className="text-lg" height={28} src="/images/clock_icon.svg" width={28} />
             <div>
               {t("gamification.studyTime")}
-              <div className="text-2xl text-gray-900">127h</div>
+              <div className="text-base font-semibold text-gray-900">127h</div>
             </div>
           </div>
         </div>
@@ -142,8 +121,7 @@ export const GamificationStats = () => {
                     src={`/images/achivement/${ach.image_small_url}`}
                     width={56}
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "/images/achivement/1.png";
+                      (e.target as HTMLImageElement).src = "/images/achivement/1.png";
                     }}
                   />
                 ) : (
@@ -165,8 +143,7 @@ export const GamificationStats = () => {
               </div>
             ))}
 
-            {(!stats?.achievement_statistics ||
-              stats.achievement_statistics.length === 0) && (
+            {(!stats?.achievement_statistics || stats.achievement_statistics.length === 0) && (
               <div className="col-span-8 text-center text-gray-400 text-sm">
                 No achievements found
               </div>
@@ -178,12 +155,10 @@ export const GamificationStats = () => {
             <div className="flex justify-between text-gray-500 text-sm font-medium mb-2">
               <span>{t("gamification.achievements")}</span>
               <div>
-                <span className="text-gray-700 text-xl">
+                <span className="text-gray-700 text-base font-semibold">
                   {unlockedAchievements}/
                 </span>
-                <span className="text-gray-700 text-base">
-                  {totalUniqueAchievements}
-                </span>
+                <span className="text-gray-700 text-base">{totalUniqueAchievements}</span>
               </div>
             </div>
             <div className="w-full h-2.5 bg-gray-200 rounded-full">
@@ -198,9 +173,7 @@ export const GamificationStats = () => {
         {/* Employee Avatar Level */}
         <div className="col-span-6 row-span-2 row-start-2 bg-white rounded-xl p-5">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">
-              {t("gamification.employeeAvatarLevel")}
-            </h2>
+            <h2 className="text-lg font-semibold">{t("gamification.employeeAvatarLevel")}</h2>
             <Link className="text-blue-600 text-sm font-medium" href="#">
               {t("cards.viewAll")}
             </Link>
@@ -218,17 +191,14 @@ export const GamificationStats = () => {
                     src={`/images/avatars/${mainAvatar.image_small_url}`}
                     width={96}
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "/images/avatars/1.png";
+                      (e.target as HTMLImageElement).src = "/images/avatars/1.png";
                     }}
                   />
                 </div>
                 <p className="mt-5 text-gray-700 text-sm text-center leading-tight whitespace-pre-line">
                   {mainAvatar.level_name}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {mainAvatar.employee_count} Users
-                </p>
+                <p className="text-xs text-gray-500 mt-1">{mainAvatar.employee_count} Users</p>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center w-24">
@@ -252,8 +222,7 @@ export const GamificationStats = () => {
                       src={`/images/avatars/${level.image_small_url}`}
                       width={40}
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src =
-                          "/images/avatars/1.png";
+                        (e.target as HTMLImageElement).src = "/images/avatars/1.png";
                       }}
                     />
                   </div>

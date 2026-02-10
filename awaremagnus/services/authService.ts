@@ -49,7 +49,7 @@ const decodeJwt = (token: string): DecodedJwt | null => {
       atob(base64)
         .split("")
         .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-        .join(""),
+        .join("")
     );
 
     return JSON.parse(jsonPayload) as DecodedJwt;
@@ -60,7 +60,7 @@ const decodeJwt = (token: string): DecodedJwt | null => {
 
 export const authService = {
   async login(
-    payload: LoginPayload,
+    payload: LoginPayload
   ): Promise<{ user: AuthUser; token: string | null; mfaRequired: boolean }> {
     const response = await suiteClient.post<LoginResponse>("/login", payload);
 
@@ -99,9 +99,7 @@ export const authService = {
   async getCurrentUser(): Promise<AuthUser | null> {
     // This assumes an endpoint that returns the currently authenticated user
     // aligned with the validateSessionMiddleware described in the docs.
-    const response = await awmClient.get<{ user: AuthUser | null }>(
-      `${API_BASE}/auth/me`,
-    );
+    const response = await awmClient.get<{ user: AuthUser | null }>(`${API_BASE}/auth/me`);
 
     return response.data.user ?? null;
   },
@@ -123,9 +121,35 @@ export const authService = {
       object?: { token: string; expiresIn: string; payload: Record<string, unknown> };
     }>(`${API_BASE}/auth/generate-token`, payload);
     const obj = response.data.object;
+
     if (!obj?.token) {
       throw new Error(response.data.message ?? "Failed to generate token");
     }
+
     return { token: obj.token, expiresIn: obj.expiresIn ?? "24h", payload: obj.payload ?? {} };
+  },
+
+  /**
+   * Parse a JWT token (e.g. from redirect hash) into auth state without a network call.
+   * Used when landing from suite "View Dashboard" redirect with #token=...
+   */
+  parseTokenForAuth(token: string): { user: AuthUser; token: string } | null {
+    if (!token?.trim()) return null;
+    const decoded = decodeJwt(token);
+    const jwtUser = decoded?.user;
+
+    if (!jwtUser) return null;
+
+    return {
+      user: {
+        id: jwtUser.userId,
+        email: jwtUser.email,
+        organization_id: jwtUser.organization_id ?? undefined,
+        org_id: jwtUser.org_id ?? undefined,
+        role_id: jwtUser.role?.id as AuthUser["role_id"],
+        permissions: jwtUser.permissions,
+      },
+      token,
+    };
   },
 };

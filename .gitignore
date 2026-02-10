@@ -7,6 +7,9 @@ package-lock.json
 .env.*
 !.env.example
 
+# Generated keys (keep private.pem secret)
+keys/
+
 # Logs
 logs/
 *.log
@@ -25,6 +28,8 @@ Thumbs.db
 # Build files
 dist/
 build/
+**/.next/
+node_modules/
 
 # Temporary files
 temp/

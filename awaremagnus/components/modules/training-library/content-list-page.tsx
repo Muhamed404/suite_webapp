@@ -1,22 +1,27 @@
 "use client";
 
 import type { Module, ModuleContent } from "@/types/quiz";
+import type { LibraryType } from "./library-page";
 
 import Link from "next/link";
 import Image from "next/image";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "@heroui/table";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Select, SelectItem } from "@heroui/select";
 import { useState } from "react";
 import clsx from "clsx";
+import { Input } from "@heroui/input";
+
+import {
+  inputClassNames,
+  selectClassNames,
+  primaryButtonClassName,
+  cardClassName,
+  pageTitleClassName,
+  pageSubtitleClassName,
+  breadcrumbLinkClassName,
+} from "./shared-styles";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -27,36 +32,30 @@ import { useContentTypes } from "@/hooks/useSuiteAwm";
 import { SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
 import { AuthImage } from "@/components/ui/auth-image";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
-import { getContentTypeIcon } from "@/utils/contentTypeIcons";
-import type { LibraryType } from "./library-page";
+import { getContentTypeIconFor } from "@/utils/contentTypeIcons";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ContentListSkeleton } from "@/components/ui/skeletons";
-import {
-  inputClassNames,
-  selectClassNames,
-  primaryButtonClassName,
-  cardClassName,
-  pageTitleClassName,
-  pageSubtitleClassName,
-  breadcrumbLinkClassName,
-} from "./shared-styles";
-import { Input } from "@heroui/input";
 
 function moduleName(m: Module): string {
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
 function contentTitle(c: ModuleContent): string {
-  return c.title ?? c.translations?.[0]?.title ?? (c as { name?: string }).name ?? `Content ${c.id}`;
+  return (
+    c.title ?? c.translations?.[0]?.title ?? (c as { name?: string }).name ?? `Content ${c.id}`
+  );
 }
 
 function languageName(c: ModuleContent): string {
   const lang = c.language;
+
   if (lang?.name) return lang.name;
   if (c.translations?.[0]) {
     const lid = c.translations[0].language_id;
+
     return SUPPORTED_LANGUAGES.find((l) => l.id === lid)?.name ?? `Lang ${lid}`;
   }
+
   return "—";
 }
 
@@ -64,7 +63,10 @@ function languageName(c: ModuleContent): string {
 function isYouTubeUrl(url: string): boolean {
   try {
     const u = new URL(url);
-    return u.hostname === "www.youtube.com" || u.hostname === "youtube.com" || u.hostname === "youtu.be";
+
+    return (
+      u.hostname === "www.youtube.com" || u.hostname === "youtube.com" || u.hostname === "youtu.be"
+    );
   } catch {
     return false;
   }
@@ -74,11 +76,14 @@ function isYouTubeUrl(url: string): boolean {
 function youtubeEmbedUrl(url: string): string | null {
   try {
     const u = new URL(url);
+
     if (u.hostname === "youtu.be") {
       const id = u.pathname.slice(1).split("?")[0];
+
       return id ? `https://www.youtube.com/embed/${id}` : null;
     }
     const v = u.searchParams.get("v");
+
     return v ? `https://www.youtube.com/embed/${v}` : null;
   } catch {
     return null;
@@ -93,19 +98,14 @@ interface ContentListPageProps {
   libraryType: LibraryType;
 }
 
-export function ContentListPage({
-  moduleId,
-  contentTypeId,
-  libraryType,
-}: ContentListPageProps) {
+export function ContentListPage({ moduleId, contentTypeId, libraryType }: ContentListPageProps) {
   const t = useTranslations("module");
   const tContent = useTranslations("content");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
   const basePath = `/dashboard/training-library/${libraryType}`;
-  const libraryLabel =
-    libraryType === "system" ? "System Library" : "My Library";
+  const libraryLabel = libraryType === "system" ? "System Library" : "My Library";
   const createPath = `${basePath}/${moduleId}/content/create?type=${contentTypeId}`;
 
   const [languageFilter, setLanguageFilter] = useState<string>("");
@@ -118,20 +118,18 @@ export function ContentListPage({
   });
   const { data: contentTypesList } = useContentTypes(!!moduleId);
 
-  const module = moduleRes?.success ? moduleRes.data : null;
+  const moduleData = moduleRes?.success ? moduleRes.data : null;
   const allContents = contentsRes?.success ? (contentsRes.data ?? []) : [];
-  const contents = allContents.filter(
-    (c: ModuleContent) => c.content_type_id === contentTypeId,
-  );
+  const contents = allContents.filter((c: ModuleContent) => c.content_type_id === contentTypeId);
   const contentTypes = Array.isArray(contentTypesList) ? contentTypesList : [];
   const typeLabel =
     contentTypes.find((ct) => ct.id === contentTypeId)?.name ?? `Type ${contentTypeId}`;
 
-  if (!module) {
+  if (!moduleData) {
     return null;
   }
 
-  const moduleTitle = moduleName(module);
+  const moduleTitle = moduleName(moduleData);
 
   return (
     <ProtectedRoute>
@@ -140,7 +138,7 @@ export function ContentListPage({
           <nav
             className={clsx(
               "flex flex-wrap items-center gap-1.5 text-sm mb-4 sm:mb-5 overflow-x-auto",
-              isRtl && "flex-row-reverse",
+              isRtl && "flex-row-reverse"
             )}
           >
             <Link className={breadcrumbLinkClassName} href={basePath}>
@@ -155,14 +153,12 @@ export function ContentListPage({
           </nav>
 
           <h1 className={pageTitleClassName}>{typeLabel}</h1>
-          <p className={clsx(pageSubtitleClassName, "mt-1 mb-5")}>
-            {t("library.description")}
-          </p>
+          <p className={clsx(pageSubtitleClassName, "mt-1 mb-5")}>{t("library.description")}</p>
 
           <div
             className={clsx(
               "flex flex-wrap items-center gap-3 sm:gap-4 mb-5",
-              isRtl && "flex-row-reverse",
+              isRtl && "flex-row-reverse"
             )}
           >
             <Input
@@ -171,13 +167,14 @@ export function ContentListPage({
               type="text"
             />
             <Select
+              aria-label={t("library.language")}
               className="w-full min-w-0 sm:max-w-44"
               classNames={selectClassNames}
-              aria-label={t("library.language")}
               placeholder={t("library.allLanguages")}
               selectedKeys={languageFilter ? [languageFilter] : []}
               onSelectionChange={(keys) => {
                 const v = Array.from(keys as Set<string>)[0] ?? "";
+
                 setLanguageFilter(v);
               }}
             >
@@ -189,27 +186,27 @@ export function ContentListPage({
             </Select>
             <div className="flex rounded-full border border-[var(--strokeGray)] p-0.5 bg-[var(--gray)]/30">
               <button
-                type="button"
                 aria-label={t("library.viewGrid")}
                 className={clsx(
                   "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
                   viewMode === "grid"
                     ? "bg-white text-[var(--mainblue)] shadow-sm"
-                    : "text-[var(--darkgray)] hover:text-[var(--mainblue)]",
+                    : "text-[var(--darkgray)] hover:text-[var(--mainblue)]"
                 )}
+                type="button"
                 onClick={() => setViewMode("grid")}
               >
                 {t("library.viewGrid")}
               </button>
               <button
-                type="button"
                 aria-label={t("library.viewList")}
                 className={clsx(
                   "rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
                   viewMode === "table"
                     ? "bg-white text-[var(--mainblue)] shadow-sm"
-                    : "text-[var(--darkgray)] hover:text-[var(--mainblue)]",
+                    : "text-[var(--darkgray)] hover:text-[var(--mainblue)]"
                 )}
+                type="button"
                 onClick={() => setViewMode("table")}
               >
                 {t("library.viewList")}
@@ -230,8 +227,6 @@ export function ContentListPage({
             <ContentListSkeleton />
           ) : contents.length === 0 ? (
             <EmptyState
-              title={t("library.emptyContentTitle")}
-              description={t("library.emptyContentDescription")}
               action={
                 <Button
                   as={Link}
@@ -243,18 +238,20 @@ export function ContentListPage({
                   {t("library.addNew")}
                 </Button>
               }
+              description={t("library.emptyContentDescription")}
+              title={t("library.emptyContentTitle")}
             />
           ) : viewMode === "grid" ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {(contents as ModuleContent[]).map((item) => (
                 <ContentCard
                   key={item.id}
-                  item={item}
                   basePath={basePath}
+                  item={item}
                   moduleId={moduleId}
-                  typeLabel={typeLabel}
                   t={t}
                   tContent={tContent}
+                  typeLabel={typeLabel}
                 />
               ))}
             </div>
@@ -265,7 +262,9 @@ export function ContentListPage({
                   <TableHeader>
                     <TableColumn key="#">#</TableColumn>
                     <TableColumn key="thumbnail">{t("library.thumbnail")}</TableColumn>
-                    <TableColumn key="name">{tContent("contentTitle") ?? "Content Name"}</TableColumn>
+                    <TableColumn key="name">
+                      {tContent("contentTitle") ?? "Content Name"}
+                    </TableColumn>
                     <TableColumn key="description">{t("library.description")}</TableColumn>
                     <TableColumn key="language">{t("library.language")}</TableColumn>
                     <TableColumn key="contents">{t("library.contents")}</TableColumn>
@@ -315,11 +314,11 @@ export function ContentListPage({
                             {t("library.edit")}
                           </Button>
                           <Button
+                            className={isRtl ? "mr-1" : "ml-1"}
                             color="danger"
                             radius="full"
                             size="sm"
                             variant="light"
-                            className={isRtl ? "mr-1" : "ml-1"}
                           >
                             {t("library.delete")}
                           </Button>
@@ -337,60 +336,45 @@ export function ContentListPage({
   );
 }
 
-function ContentThumbnail({
-  item,
-  typeLabel,
-}: {
-  item: ModuleContent;
-  typeLabel: string;
-}) {
+function ContentThumbnail({ item, typeLabel }: { item: ModuleContent; typeLabel: string }) {
   const logoUrl = item.logo_url ?? item.logo_path;
-  const fallbackIcon = getContentTypeIcon(typeLabel ?? "");
+  const fallbackIcon = getContentTypeIconFor(item.content_type_id, typeLabel ?? "");
 
   if (logoUrl) {
     return (
       <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-[var(--gray)]/30 shrink-0">
-        <AuthImage
-          alt=""
-          src={logoUrl}
-          fill
-          className="object-cover"
-          sizes="48px"
-        />
+        <AuthImage fill alt="" className="object-cover" sizes="48px" src={logoUrl} />
       </div>
     );
   }
+
   return (
     <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-[var(--gray)]/30 flex items-center justify-center shrink-0">
       <Image
         alt=""
+        className="object-contain opacity-70"
+        height={24}
         src={fallbackIcon}
         width={24}
-        height={24}
-        className="object-contain opacity-70"
       />
     </div>
   );
 }
 
-function SourceCell({
-  item,
-  t,
-}: {
-  item: ModuleContent;
-  t: (key: string) => string;
-}) {
+function SourceCell({ item, t }: { item: ModuleContent; t: (key: string) => string }) {
   const sourceUrl = item.source_url ?? (item as { source_path?: string }).source_path;
+
   if (!sourceUrl?.trim()) {
     return <span className="text-sm text-[var(--darkgray)]">—</span>;
   }
   const fullUrl = sourceUrl.startsWith("http") ? sourceUrl : getContentAssetUrl(sourceUrl);
+
   return (
     <a
-      href={fullUrl}
-      target="_blank"
-      rel="noopener noreferrer"
       className="text-sm text-[var(--blue)] hover:underline truncate max-w-[180px] block"
+      href={fullUrl}
+      rel="noopener noreferrer"
+      target="_blank"
       title={fullUrl}
     >
       {t("library.openLink")}
@@ -416,10 +400,15 @@ function ContentCard({
   const contentTypeId = item.content_type_id;
   const detailHref = `${basePath}/${moduleId}/content/${contentTypeId}/${item.id}`;
   const logoUrl = item.logo_url ?? item.logo_path;
-  const fallbackIcon = getContentTypeIcon(typeLabel ?? "");
+  const fallbackIcon = getContentTypeIconFor(contentTypeId, typeLabel ?? "");
   const sourceUrl = item.source_url ?? (item as { source_path?: string }).source_path;
-  const fullSourceUrl = sourceUrl?.trim() ? (sourceUrl.startsWith("http") ? sourceUrl : getContentAssetUrl(sourceUrl)) : null;
-  const embedUrl = fullSourceUrl && isYouTubeUrl(fullSourceUrl) ? youtubeEmbedUrl(fullSourceUrl) : null;
+  const fullSourceUrl = sourceUrl?.trim()
+    ? sourceUrl.startsWith("http")
+      ? sourceUrl
+      : getContentAssetUrl(sourceUrl)
+    : null;
+  const embedUrl =
+    fullSourceUrl && isYouTubeUrl(fullSourceUrl) ? youtubeEmbedUrl(fullSourceUrl) : null;
 
   return (
     <Card className={cardClassName + " h-full flex flex-col"}>
@@ -427,49 +416,39 @@ function ContentCard({
         <div className="flex gap-3">
           {logoUrl ? (
             <div className="relative w-14 h-14 rounded-xl overflow-hidden bg-[var(--gray)]/30 shrink-0">
-              <AuthImage
-                alt=""
-                src={logoUrl}
-                fill
-                className="object-cover"
-                sizes="56px"
-              />
+              <AuthImage fill alt="" className="object-cover" sizes="56px" src={logoUrl} />
             </div>
           ) : (
             <div className="w-14 h-14 rounded-xl bg-[var(--gray)]/30 flex items-center justify-center shrink-0">
               <Image
                 alt=""
+                className="object-contain opacity-70"
+                height={28}
                 src={fallbackIcon}
                 width={28}
-                height={28}
-                className="object-contain opacity-70"
               />
             </div>
           )}
           <div className="min-w-0 flex-1">
             <Link
-              href={detailHref}
               className="font-medium text-[var(--mainblue)] hover:text-[var(--blue)] hover:underline text-sm line-clamp-2"
+              href={detailHref}
             >
               {contentTitle(item)}
             </Link>
-            <p className="text-xs text-[var(--darkgray)] mt-0.5">
-              {languageName(item)}
-            </p>
+            <p className="text-xs text-[var(--darkgray)] mt-0.5">{languageName(item)}</p>
           </div>
         </div>
         {item.description && (
-          <p className="text-sm text-[var(--darkgray)] line-clamp-2">
-            {item.description}
-          </p>
+          <p className="text-sm text-[var(--darkgray)] line-clamp-2">{item.description}</p>
         )}
         {fullSourceUrl && (
           <div className="mt-auto space-y-2">
             <a
-              href={fullSourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
               className="text-sm text-[var(--blue)] hover:underline block truncate"
+              href={fullSourceUrl}
+              rel="noopener noreferrer"
+              target="_blank"
               title={fullSourceUrl}
             >
               {t("library.viewSource")} ↗
@@ -477,11 +456,11 @@ function ContentCard({
             {embedUrl && (
               <div className="rounded-xl overflow-hidden bg-black/5 aspect-video max-h-32">
                 <iframe
-                  title={contentTitle(item)}
-                  src={embedUrl}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  className="w-full h-full"
+                  src={embedUrl}
+                  title={contentTitle(item)}
                 />
               </div>
             )}
@@ -490,11 +469,11 @@ function ContentCard({
         <div className="flex gap-2 pt-1">
           <Button
             as={Link}
+            className="text-[var(--blue)] text-sm"
             href={detailHref}
             radius="full"
             size="sm"
             variant="flat"
-            className="text-[var(--blue)] text-sm"
           >
             {t("library.viewDetails")}
           </Button>

@@ -3,26 +3,13 @@
 import { Card, CardBody } from "@heroui/card";
 import { Select, SelectItem } from "@heroui/select";
 import { Button } from "@heroui/button";
-import {
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "@heroui/table";
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { useState } from "react";
 
 import { useAuthStore } from "@/hooks/useAuthStore";
-import {
-  useSystemLeaderboard,
-  useOrganizationLeaderboard,
-} from "@/hooks/useDashboard";
+import { useSystemLeaderboard, useOrganizationLeaderboard } from "@/hooks/useDashboard";
 import { useTranslations } from "@/i18n/useTranslations";
-import {
-  isPlatformAdmin as getIsPlatformAdmin,
-  isUser as getIsUser,
-} from "@/utils/roles";
+import { isPlatformAdmin as getIsPlatformAdmin, isUser as getIsUser } from "@/utils/roles";
 
 export const DashboardTables = () => {
   const t = useTranslations("dashboard");
@@ -38,10 +25,7 @@ export const DashboardTables = () => {
 
   // Actually, Org User (5) can see leaderboard too (Access ✅).
 
-  const { data: systemLeaderboard } = useSystemLeaderboard(
-    20,
-    "compliance_score",
-  );
+  const { data: systemLeaderboard } = useSystemLeaderboard(20, "compliance_score");
   const { data: orgLeaderboard } = useOrganizationLeaderboard({ count: 20 });
 
   let highRiskData: any[] = [];
@@ -61,11 +45,11 @@ export const DashboardTables = () => {
 
   const highRiskPaginated = highRiskData.slice(
     (highRiskPage - 1) * itemsPerPage,
-    highRiskPage * itemsPerPage,
+    highRiskPage * itemsPerPage
   );
   const lowRiskPaginated = lowRiskData.slice(
     (lowRiskPage - 1) * itemsPerPage,
-    lowRiskPage * itemsPerPage,
+    lowRiskPage * itemsPerPage
   );
 
   const renderCell = (item: any, columnKey: React.Key) => {
@@ -81,25 +65,17 @@ export const DashboardTables = () => {
 
     switch (columnKey) {
       case "name":
-        return <div className="text-xs font-medium">{name}</div>;
+        return <div className="text-sm font-medium">{name}</div>;
       case "startDate":
-        // No start date in API? Use placeholder or omit
-        return <div className="text-xs text-gray-500">-</div>;
+        return <div className="text-sm text-gray-500">-</div>;
       case "dueDate":
-        return <div className="text-xs text-gray-500">-</div>;
+        return <div className="text-sm text-gray-500">-</div>;
       case "badge":
-        // Based on achievement count?
-        return (
-          <div className="text-xs">
-            {item.achievement_count > 0 ? "🏆" : ""}
-          </div>
-        );
+        return <div className="text-sm">{item.achievement_count > 0 ? "🏆" : ""}</div>;
       case "exp":
-        return <div className="text-xs">{item.total_xp_tokens} XP</div>;
+        return <div className="text-sm">{item.total_xp_tokens} XP</div>;
       default:
-        return (
-          <div className="text-xs">{(item as any)[columnKey as string]}</div>
-        );
+        return <div className="text-sm">{(item as any)[columnKey as string]}</div>;
     }
   };
 
@@ -109,24 +85,20 @@ export const DashboardTables = () => {
       <Card className="rounded-2xl shadow-none">
         <CardBody className="p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold whitespace-nowrap">
-              {isPlatformAdmin
-                ? "Top High Risk Organizations"
-                : t("tables.topHighRisk")}
+            <h2 className="text-base font-semibold text-[var(--mainblue)] whitespace-nowrap">
+              {isPlatformAdmin ? "Top High Risk Organizations" : t("tables.topHighRisk")}
             </h2>
             <Select
+              aria-label={t("tables.sortBy")}
               className="w-36"
               classNames={{
-                trigger:
-                  "h-10 min-h-10 px-4 pr-10 rounded-full border border-gray-300 text-xs",
+                trigger: "h-10 min-h-10 px-4 pr-10 rounded-full border border-gray-300 text-sm",
               }}
               placeholder={t("tables.sortBy")}
             >
               <SelectItem key="default">{t("tables.sortBy")}</SelectItem>
               <SelectItem key="risk">{t("cards.inRisk")}</SelectItem>
-              <SelectItem key="compliance">
-                {t("cards.totalComplianceScore")}
-              </SelectItem>
+              <SelectItem key="compliance">{t("cards.totalComplianceScore")}</SelectItem>
             </Select>
           </div>
 
@@ -136,9 +108,7 @@ export const DashboardTables = () => {
                 <TableColumn key="name">
                   {isPlatformAdmin ? "Organization" : t("tables.employeeName")}
                 </TableColumn>
-                <TableColumn key="startDate">
-                  {t("tables.startDate")}
-                </TableColumn>
+                <TableColumn key="startDate">{t("tables.startDate")}</TableColumn>
                 <TableColumn key="dueDate">{t("tables.dueDate")}</TableColumn>
                 <TableColumn key="badge">{t("tables.badge")}</TableColumn>
                 <TableColumn key="exp">{t("tables.exp")}</TableColumn>
@@ -146,9 +116,7 @@ export const DashboardTables = () => {
               <TableBody items={highRiskPaginated}>
                 {(item: any) => (
                   <TableRow key={item.user_id || item.org_id || Math.random()}>
-                    {(columnKey) => (
-                      <TableCell>{renderCell(item, columnKey)}</TableCell>
-                    )}
+                    {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                   </TableRow>
                 )}
               </TableBody>
@@ -156,7 +124,7 @@ export const DashboardTables = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <p className="text-gray-500 text-xs whitespace-nowrap">
+            <p className="text-gray-500 text-sm whitespace-nowrap">
               {t("tables.showingOf", {
                 shown: highRiskPaginated.length,
                 total: highRiskData.length,
@@ -173,7 +141,7 @@ export const DashboardTables = () => {
               >
                 ‹
               </Button>
-              <span className="text-xs">{highRiskPage}</span>
+              <span className="text-sm">{highRiskPage}</span>
               <Button
                 isIconOnly
                 className="w-8 h-8 min-w-8"
@@ -193,24 +161,20 @@ export const DashboardTables = () => {
       <Card className="rounded-2xl shadow-none">
         <CardBody className="p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold whitespace-nowrap">
-              {isPlatformAdmin
-                ? "Top Low Risk Organizations"
-                : t("tables.topLowRisk")}
+            <h2 className="text-base font-semibold text-[var(--mainblue)] whitespace-nowrap">
+              {isPlatformAdmin ? "Top Low Risk Organizations" : t("tables.topLowRisk")}
             </h2>
             <Select
+              aria-label={t("tables.sortBy")}
               className="w-36"
               classNames={{
-                trigger:
-                  "h-10 min-h-10 px-4 pr-10 rounded-full border border-gray-300 text-xs",
+                trigger: "h-10 min-h-10 px-4 pr-10 rounded-full border border-gray-300 text-sm",
               }}
               placeholder={t("tables.sortBy")}
             >
               <SelectItem key="default">{t("tables.sortBy")}</SelectItem>
               <SelectItem key="risk">{t("cards.inRisk")}</SelectItem>
-              <SelectItem key="compliance">
-                {t("cards.totalComplianceScore")}
-              </SelectItem>
+              <SelectItem key="compliance">{t("cards.totalComplianceScore")}</SelectItem>
             </Select>
           </div>
 
@@ -220,9 +184,7 @@ export const DashboardTables = () => {
                 <TableColumn key="name">
                   {isPlatformAdmin ? "Organization" : t("tables.employeeName")}
                 </TableColumn>
-                <TableColumn key="startDate">
-                  {t("tables.startDate")}
-                </TableColumn>
+                <TableColumn key="startDate">{t("tables.startDate")}</TableColumn>
                 <TableColumn key="dueDate">{t("tables.dueDate")}</TableColumn>
                 <TableColumn key="badge">{t("tables.badge")}</TableColumn>
                 <TableColumn key="exp">{t("tables.exp")}</TableColumn>
@@ -230,9 +192,7 @@ export const DashboardTables = () => {
               <TableBody items={lowRiskPaginated}>
                 {(item: any) => (
                   <TableRow key={item.user_id || item.org_id || Math.random()}>
-                    {(columnKey) => (
-                      <TableCell>{renderCell(item, columnKey)}</TableCell>
-                    )}
+                    {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
                   </TableRow>
                 )}
               </TableBody>
@@ -240,7 +200,7 @@ export const DashboardTables = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <p className="text-gray-500 text-xs whitespace-nowrap">
+            <p className="text-gray-500 text-sm whitespace-nowrap">
               {t("tables.showingOf", {
                 shown: lowRiskPaginated.length,
                 total: lowRiskData.length,
@@ -257,7 +217,7 @@ export const DashboardTables = () => {
               >
                 ‹
               </Button>
-              <span className="text-xs">{lowRiskPage}</span>
+              <span className="text-sm">{lowRiskPage}</span>
               <Button
                 isIconOnly
                 className="w-8 h-8 min-w-8"

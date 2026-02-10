@@ -15,12 +15,10 @@ import { quizService } from "@/services/quizService";
 export const QUIZ_KEYS = {
   modules: ["quiz", "modules"] as const,
   module: (id: number) => ["quiz", "module", id] as const,
-  contents: (modId?: number, langId?: number) =>
-    ["quiz", "contents", { modId, langId }] as const,
+  contents: (modId?: number, langId?: number) => ["quiz", "contents", { modId, langId }] as const,
   content: (id: number) => ["quiz", "content", id] as const,
   quizTypes: ["quiz", "quizTypes"] as const,
-  quizzes: (params?: { contentId?: number }) =>
-    ["quiz", "quizzes", params] as const,
+  quizzes: (params?: { contentId?: number }) => ["quiz", "quizzes", params] as const,
   quiz: (id: number) => ["quiz", "quiz", id] as const,
   quizAnswers: (quizId: number) => ["quiz", "quiz", quizId, "answers"] as const,
 };
@@ -60,14 +58,15 @@ export function useContents(params?: {
 
 export function useContentsByModule(
   moduleId: number,
-  enabledOrOptions?: boolean | { enabled?: boolean; lang_id?: number },
+  enabledOrOptions?: boolean | { enabled?: boolean; lang_id?: number }
 ) {
   const options =
     typeof enabledOrOptions === "boolean"
       ? { enabled: enabledOrOptions }
-      : enabledOrOptions ?? { enabled: true };
+      : (enabledOrOptions ?? { enabled: true });
   const enabled = options.enabled ?? true;
   const lang_id = options.lang_id;
+
   return useQuery({
     queryKey: QUIZ_KEYS.contents(moduleId, lang_id),
     queryFn: () =>
@@ -91,11 +90,7 @@ export function useQuizTypes() {
   });
 }
 
-export function useQuizzes(params?: {
-  contentId?: number;
-  limit?: number;
-  offset?: number;
-}) {
+export function useQuizzes(params?: { contentId?: number; limit?: number; offset?: number }) {
   return useQuery({
     queryKey: QUIZ_KEYS.quizzes(params),
     queryFn: () =>
@@ -122,19 +117,20 @@ export function useQuizzesByModule(moduleId: number, enabled = true) {
     queryFn: async () => {
       const contentsRes = await quizService.getContentsByModule(moduleId);
       const contents =
-        contentsRes?.success && Array.isArray(contentsRes.data)
-          ? contentsRes.data
-          : [];
+        contentsRes?.success && Array.isArray(contentsRes.data) ? contentsRes.data : [];
       const contentIds = contents.map((c: { id: number }) => c.id);
       const results = await Promise.all(
-        contentIds.map((id: number) =>
-          quizService.getQuizzesByContent(id),
-        ),
+        contentIds.map((id: number) => quizService.getQuizzesByContent(id))
       );
-      const all = results.flatMap((r) =>
-        r?.success && Array.isArray(r?.data) ? r.data : [],
-      );
-      return { success: true, data: all };
+      const all = results.flatMap((r) => (r?.success && Array.isArray(r?.data) ? r.data : []));
+
+      // Create a map of content_id to content name for category display
+      const contentMap: Record<number, string> = {};
+      contents.forEach((c: { id: number; title?: string; name?: string }) => {
+        contentMap[c.id] = c.title || (c as { name?: string }).name || `Content ${c.id}`;
+      });
+
+      return { success: true, data: all, contentMap };
     },
     enabled: enabled && !!moduleId,
   });
@@ -196,8 +192,7 @@ export function useCreateModule() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: CreateModulePayload) =>
-      quizService.createModule(payload),
+    mutationFn: (payload: CreateModulePayload) => quizService.createModule(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.modules });
     },
@@ -208,13 +203,8 @@ export function useUpdateModule() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: UpdateModulePayload;
-    }) => quizService.updateModule(id, payload),
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateModulePayload }) =>
+      quizService.updateModule(id, payload),
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.module(id) });
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.modules });
@@ -256,8 +246,7 @@ export function useCreateContent() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: (payload: CreateContentPayload) =>
-      quizService.createContent(payload),
+    mutationFn: (payload: CreateContentPayload) => quizService.createContent(payload),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.contents() });
     },
@@ -268,13 +257,8 @@ export function useUpdateContent() {
   const qc = useQueryClient();
 
   return useMutation({
-    mutationFn: ({
-      id,
-      payload,
-    }: {
-      id: number;
-      payload: UpdateContentPayload;
-    }) => quizService.updateContent(id, payload),
+    mutationFn: ({ id, payload }: { id: number; payload: UpdateContentPayload }) =>
+      quizService.updateContent(id, payload),
     onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.content(id) });
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.contents() });

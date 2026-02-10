@@ -18,8 +18,8 @@ export const DashboardStats = () => {
               width={40}
             />
             <div className="flex flex-col">
-              <h3 className="text-xs">Total User Licenses</h3>
-              <p className="text-lg">100</p>
+              <h3 className="text-sm font-medium">Total User Licenses</h3>
+              <p className="text-base font-semibold">100</p>
             </div>
           </CardBody>
         </Card>
@@ -37,8 +37,8 @@ export const DashboardStats = () => {
               width={40}
             />
             <div className="flex flex-col">
-              <h3 className="text-xs">Total Consumed Licenses</h3>
-              <p className="text-lg">78</p>
+              <h3 className="text-sm font-medium">Total Consumed Licenses</h3>
+              <p className="text-base font-semibold">78</p>
             </div>
           </CardBody>
         </Card>
@@ -56,7 +56,7 @@ export const DashboardStats = () => {
                 src="/images/shield-check.svg"
                 width={12}
               />
-              <h3 className="text-xs whitespace-nowrap">Security Posture</h3>
+              <h3 className="text-sm font-medium whitespace-nowrap">Security Posture</h3>
 
               <Popover placement="bottom">
                 <PopoverTrigger>
@@ -81,8 +81,8 @@ export const DashboardStats = () => {
                       <h3 className="font-medium">This is an info alert</h3>
                     </div>
                     <div className="mb-4 leading-relaxed">
-                      More info about this info alert goes here. This example
-                      text is longer to show spacing inside content.
+                      More info about this info alert goes here. This example text is longer to show
+                      spacing inside content.
                     </div>
                   </div>
                 </PopoverContent>
@@ -90,18 +90,13 @@ export const DashboardStats = () => {
             </div>
 
             <div className="flex-1">
-              <div
-                className="flex overflow-hidden rounded-lg w-full"
-                data-level="7"
-                id="segBar"
-              >
+              <div className="flex overflow-hidden rounded-lg w-full" data-level="7" id="segBar">
                 {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                   <div
                     key={i}
                     className="h-3 w-full bg-[#9EC232] opacity-0 transition-all duration-300"
                     style={{
-                      backgroundColor:
-                        i === 7 ? "#D1132A" : i === 6 ? "#E4590F" : "#9EC232",
+                      backgroundColor: i === 7 ? "#D1132A" : i === 6 ? "#E4590F" : "#9EC232",
                       opacity: i === 7 ? 1 : 0,
                     }}
                   />
@@ -120,23 +115,16 @@ export const DashboardStats = () => {
       <div className="col-span-4 row-span-4 col-start-9 row-start-1">
         <Card>
           <CardBody className="p-4 space-y-2">
-            <h2 className="text-base font-semibold text-gray-900">
-              Organization Score
-            </h2>
+            <h2 className="text-base font-semibold text-gray-900">Organization Score</h2>
             <h2 className="text-xs text-gray-900">Total Compliance Score</h2>
 
             <div className="flex w-full items-center">
               <div className="text-5xl text-gray-900 mr-3">05</div>
               <div className="mt-1 flex-1">
                 <div className="w-full h-1.5 bg-gray-200 rounded-full">
-                  <div
-                    className="h-1.5 bg-green-500 rounded-full"
-                    style={{ width: "70%" }}
-                  />
+                  <div className="h-1.5 bg-green-500 rounded-full" style={{ width: "70%" }} />
                 </div>
-                <div className="text-right text-xs text-gray-500 font-medium mt-1">
-                  70%
-                </div>
+                <div className="text-right text-xs text-gray-500 font-medium mt-1">70%</div>
               </div>
             </div>
 
@@ -190,9 +178,7 @@ export const DashboardStats = () => {
         <Card>
           <CardBody className="p-4 flex flex-col">
             <div className="flex justify-between items-center mb-1">
-              <h3 className="text-sm font-semibold text-gray-800">
-                Security Awareness Campaign
-              </h3>
+              <h3 className="text-sm font-semibold text-gray-800">Security Awareness Campaign</h3>
               <button
                 className="text-blue-600 text-xs font-medium bg-transparent border-0 cursor-pointer p-0 underline hover:text-blue-800"
                 type="button"
@@ -200,9 +186,7 @@ export const DashboardStats = () => {
                 View All
               </button>
             </div>
-            <p className="text-[10px] text-gray-400 mb-2">
-              Last Campaign Date: 1/23/05
-            </p>
+            <p className="text-[10px] text-gray-400 mb-2">Last Campaign Date: 1/23/05</p>
             <div className="flex-1 min-h-[200px]" id="areaChart">
               {/* Chart placeholder - will be implemented with a chart library */}
             </div>
@@ -215,20 +199,12 @@ export const DashboardStats = () => {
         <div className="grid grid-cols-4 p-2 rounded-xl bg-white gap-2 h-full">
           <div className="bg-[#F1F5F8] rounded-xl p-3 flex flex-col items-center justify-between col-span-2 h-full">
             <h3 className="text-xs font-semibold mb-1">Weekly Progress</h3>
-            <div
-              className="leadchart h-32 w-32"
-              color="#00CCC4"
-              data-value="85"
-            />
+            <div className="leadchart h-32 w-32" color="#00CCC4" data-value="85" />
           </div>
 
           <div className="bg-[#F1F5F8] rounded-xl p-3 flex flex-col items-center justify-between col-span-2 h-full">
             <h3 className="text-xs font-semibold mb-1">Quiz Accuracy</h3>
-            <div
-              className="leadchart h-32 w-32"
-              color="#7CC5FA"
-              data-value="94"
-            />
+            <div className="leadchart h-32 w-32" color="#7CC5FA" data-value="94" />
           </div>
         </div>
       </div>

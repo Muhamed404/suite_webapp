@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useSearchParams } from "next/navigation";
+
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import {
   CreateContentForm,
