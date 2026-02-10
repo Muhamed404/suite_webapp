@@ -68,6 +68,8 @@ jobs:
     - name: Build Next.js application
       env:
         NEXT_PUBLIC_API_URL: ${{ secrets.AWAREMAGNUS_API_URL }}
+        NEXT_PUBLIC_SERVICE_AWM_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_AWM_URL }}
+        NEXT_PUBLIC_SERVICE_SUITE_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_SUITE_URL }}
       run: npm run build
 
     - name: Upload build artifacts
@@ -98,7 +100,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: awaremagnus-build
-        path: awaremagnus
+        path: .
 
     - name: Log deployment info
       run: |
