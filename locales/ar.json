@@ -108,10 +108,10 @@
 		"to": "إلى",
 		"no_entries_found": "لم يتم العثور على إدخالات",
 		"people": "الأشخاص",
-		"InProgress": "generic_label.InProgress",
-		"completed": "generic_label.completed",
-		"search": "generic_label.search",
-		"show": "generic_label.show"
+		"InProgress": "قيد التقدم",
+		"completed": "مكتمل",
+		"search": "بحث",
+		"show": "عرض"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -1470,14 +1470,6 @@
 	"CS-Add": "إضافة فئة",
 	"btn-CS-Save": "حفظ",
 	"btn-CS-Cancel": "إلغاء",
-	" generic_label": {
-		"create": " إنشاء",
-		"search_here": " ابحث هنا",
-		"campaignName": " generic_label.campaignName",
-		"enter_campaign_name": " generic_label.enter_campaign_name",
-		"description": " generic_label.description",
-		"preview": " generic_label.preview"
-	},
 	"template": {
 		"sms_content": "محتوى قالب الرسائل النصية",
 		"sms_message": "نص الرسالة القصيرة",
@@ -1546,7 +1538,8 @@
 		"totalScanned": "إجمالي الممسوح",
 		"totalQRImages": "إجمالي صور QR",
 		"created": "تم الإنشاء",
-		"unsent": "غير مرسل"
+		"unsent": "غير مرسل",
+		"totalCampaigns": "إجمالي الحملات"
 	},
 	"reports": {
 		"campaignReports": "تقارير الحملات",

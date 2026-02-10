@@ -96,9 +96,9 @@
 		"entries": "entries",
 		"no_entries_found": "No entries found",
 		"people": "People",
-		"to": "generic_label.to",
-		"search": "generic_label.search",
-		"show": "generic_label.show"
+		"to": "to",
+		"search": "Search",
+		"show": "Show"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -1454,10 +1454,6 @@
 	"CS-Add": "Add Category",
 	"btn-CS-Save": "Save",
 	"btn-CS-Cancel": "Cancel",
-	" generic_label": {
-		"create": " generic_label.create",
-		"search_here": " generic_label.search_here"
-	},
 	"template": {
 		"sms_content": "template.sms_content",
 		"sms_message": "template.sms_message",
@@ -1526,7 +1522,8 @@
 		"totalScanned": "Total Scanned",
 		"totalQRImages": "Total QR Images",
 		"created": "Created",
-		"unsent": "Unsent"
+		"unsent": "Unsent",
+		"totalCampaigns": "Total Campaigns"
 	},
 	"reports": {
 		"campaignReports": "Campaign Reports",
