@@ -62,12 +62,12 @@ async function updateInvoice(req, res) {
     let message = data.message;
     let alertType = data.alertType;
     logger.info(`Response in update invoice : ${message} ${alertType}`);
-    res.redirect(
-      `/organization/?message=${message}&alertType=${alertType}`
-    );
     // res.redirect(
-    //   `/organization/profile/${orgId}?message=${message}&alertType=${alertType}`
+    //   `/organization/?message=${message}&alertType=${alertType}`
     // );
+    res.redirect(
+      `/organization/profile/${orgId}?message=${message}&alertType=${alertType}`
+    );
   } catch (error) {
     logger.error(`Exception in updateInvoice \n` + error);
     const errMessage = "Error in Request, Contact Administrator";
