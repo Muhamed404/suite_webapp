@@ -66,15 +66,16 @@ sudo mv deployment/awaremagnus "$DEPLOY_DIR"
 sudo chown -R $SERVICE_USER:$SERVICE_USER "$DEPLOY_DIR"
 sudo chmod -R 755 "$DEPLOY_DIR"
 
-# Clean .next cache and node_modules for a fresh install
-echo "Removing .next cache and node_modules..."
+# Clean .next cache (standalone build already includes node_modules)
+echo "Removing .next cache..."
 rm -rf "$DEPLOY_DIR/.next/cache"
-rm -rf "$DEPLOY_DIR/node_modules"
 
-# Install production dependencies only (since .next is already built)
-echo "Installing Node.js production dependencies..."
-cd "$DEPLOY_DIR"
-npm install --only=production
+# Verify standalone server exists
+if [ ! -f "$DEPLOY_DIR/server.js" ]; then
+    echo "ERROR: server.js not found - standalone build may be incomplete"
+    exit 1
+fi
+echo "Standalone build verified"
 
 # Create .env file from environment variables
 if [ -f "/tmp/create-awaremagnus-env.sh" ]; then

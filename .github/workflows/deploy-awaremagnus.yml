@@ -72,12 +72,22 @@ jobs:
         NEXT_PUBLIC_SERVICE_SUITE_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_SUITE_URL }}
       run: npm run build
 
+    - name: Verify build output
+      run: |
+        if [ ! -d ".next/standalone" ]; then
+          echo "ERROR: .next/standalone directory not found. Build may have failed."
+          ls -la .next/ 2>/dev/null || echo ".next directory does not exist"
+          exit 1
+        fi
+        echo "Build output verified - standalone directory exists"
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: awaremagnus-build
         path: |
-          awaremagnus/.next
+          awaremagnus/.next/standalone
+          awaremagnus/.next/static
           awaremagnus/public
           awaremagnus/package.json
           awaremagnus/package-lock.json
@@ -115,17 +125,26 @@ jobs:
       with:
         node-version: ${{ env.NODE_VERSION }}
 
+    - name: Verify downloaded artifacts
+      run: |
+        echo "Listing downloaded artifact structure..."
+        ls -la awaremagnus/.next/standalone/ || { echo "ERROR: standalone build not found in artifacts"; exit 1; }
+        ls -la awaremagnus/.next/static/ || { echo "ERROR: static assets not found in artifacts"; exit 1; }
+
     - name: Create deployment package
       run: |
         mkdir -p deployment/awaremagnus
         mkdir -p deployment/scripts
 
-        # Copy built application files
-        cp -r awaremagnus/.next deployment/awaremagnus/
+        # Copy the standalone server (includes node_modules and server code)
+        cp -r awaremagnus/.next/standalone/awaremagnus/* deployment/awaremagnus/
+
+        # Copy static assets into the standalone .next directory
+        mkdir -p deployment/awaremagnus/.next/static
+        cp -r awaremagnus/.next/static/* deployment/awaremagnus/.next/static/
+
+        # Copy public assets
         cp -r awaremagnus/public deployment/awaremagnus/
-        cp awaremagnus/package.json deployment/awaremagnus/
-        cp awaremagnus/package-lock.json deployment/awaremagnus/ 2>/dev/null || true
-        cp awaremagnus/next.config.js deployment/awaremagnus/
 
         # Copy deployment scripts
         cp .github/scripts/awaremagnus/deploy-awaremagnus.sh deployment/scripts/
@@ -134,7 +153,18 @@ jobs:
 
     - name: Package deployment
       run: |
-        tar -czf awaremagnus_deployment.tar.gz deployment/
+        tar -czf awaremagnus_deployment.tar.gz \
+          --exclude 'node_modules' \
+          --exclude '.git' \
+          --exclude '.github' \
+          --exclude '.claude' \
+          --exclude '.env' \
+          --exclude '*.md' \
+          --exclude '*.txt' \
+          --exclude 'deployment' \
+          --exclude 'package-lock.json' \
+          --exclude 'docs' \
+          deployment/
 
     - name: Check required secrets
       run: |

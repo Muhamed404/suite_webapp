@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 8001",
     "lint": "eslint --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "postinstall": "next build"
   },
   "dependencies": {
     "@heroui/accordion": "2.2.26",
