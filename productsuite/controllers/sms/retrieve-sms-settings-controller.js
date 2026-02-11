@@ -17,14 +17,17 @@ exports.retrieveSMSSettings = async (req, res) => {
         const response = await apiClientInstance.get(`/sms/settings/${organizationId}`);
         logger.info(`Retrieve SMS Controller: Successfully retrieved SMS with ID ${organizationId}`);
         const smsData = response.data.object || null;
+        console.log(JSON.stringify(smsData, null, 2));
         logger.info(`Retrieve SMS Controller: SMS Data: ${JSON.stringify(smsData, null, 2)}`);
         return res.render("pages/sms/create-sms", { sms: smsData, organization: req.params.organizationId, enableSuiteManagementLeftMenu: true });
 
 
     } catch (err) {
         logger.error(`Retrieve SMS Controller: Error retrieving SMS with ID ${organizationId} - ${err.message}`);
-        req.flash("message", "Failed to retrieve SMS.");
-        req.flash("alertType", "error");
+        if (req.session) {
+            req.flash("message", "Failed to retrieve SMS.");
+            req.flash("alertType", "error");
+        }
         return res.redirect(`/organization/profile/${organizationId}`);
     }
 };

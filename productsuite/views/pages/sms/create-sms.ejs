@@ -1,82 +1,139 @@
-<div class="flex flex-col  p-6 pt-0">
+<% const isEditMode = sms && sms.id; %>
+
+<div class="flex flex-col p-6 pt-0">
 
   <!-- Header Section -->
   <div class="flex flex-col gap-2 mb-3 border-b border-gray-100 pb-3">
     <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mt-6" aria-label="Breadcrumb">
       <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
       <span class="text-gray-400">›</span>
-      <a href="/organization/profile/<%=organization%>" class="hover:text-gray-700 transition"><%= __("breadcrumbs.organizationProfile") %></a>
+      <a href="/organization/profile/" class="hover:text-gray-700 transition"><%= __("breadcrumbs.organizationProfile") %></a>
       <span class="text-gray-400">›</span>
       <span class="font-semibold text-gray-900"><%= __("sms.settings.title") %></span>
     </nav>
     <h3 class="text-3xl font-medium text-gray-900"><%= __("sms.settings.title") %></h3>
+    <p class="text-gray-500 text-sm"><%= isEditMode ? __("sms.settings.edit_description") : __("sms.settings.create_description") %></p>
   </div>
 
-  <!-- first section  -->
-
+  <!-- Main Card -->
   <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
 
-    <form action="/sms/settings/create/<%=organization%>" method="post" name="smsSettingsForm" id="smsSettingsForm"
-      class="bg-white  w-full mt-3 p-8">
-      <!-- Stepper Navigation -->
-      <div id="stepper" class="flex items-center justify-between mb-10">
-        <div class="flex items-center gap-2">
-          <div
-            class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white font-bold text-xs">
-            1</div>
-          <span class="font-medium step-label text-teal-700 text-sm">
-            <%= __("sms.settings.provider_details") %>
-          </span>
+    <form action="<%= isEditMode ? '/sms/settings/update/' + organization : '/sms/settings/create/' + organization %>" method="post" name="smsSettingsForm" id="smsSettingsForm"
+      class="bg-white w-full mt-3 p-8">
+
+      <!-- Provider & Status Row -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div>
+          <label for="provider" class="block text-gray-700 font-medium mb-3">
+            <%= __("sms.settings.provider") %> <span class="text-red-500">*</span>
+          </label>
+          <select name="provider_name" id="provider" required onchange="toggleFields()"
+            class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50">
+            <option value=""><%= __("generic_label.select") %></option>
+            <option value="infobip" <%= sms?.provider_name === "infobip" ? "selected" : "" %>>Infobip</option>
+            <option value="twilio" <%= sms?.provider_name === "twilio" ? "selected" : "" %>>Twilio</option>
+            <option value="unifonic" <%= sms?.provider_name === "unifonic" ? "selected" : "" %>>Unifonic</option>
+          </select>
         </div>
-        <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
+
+        <div>
+          <label for="status" class="block text-gray-700 font-medium mb-3">
+            <%= __("generic_label.status") %> <span class="text-red-500">*</span>
+          </label>
+          <select name="is_active" id="status" required
+            class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50">
+            <option value="true" <%= sms?.is_active === true || sms?.is_active === "true" ? "selected" : "" %>><%= __("generic_label.active") %></option>
+            <option value="false" <%= !sms?.is_active || sms?.is_active === false || sms?.is_active === "false" ? "selected" : "" %>><%= __("generic_label.inactive") %></option>
+          </select>
+        </div>
       </div>
 
-      <div id="steps">
-        <!-- Step 1: SMS Server Details -->
-        <div class="step fade-enter-active" id="step-1">
-          <!-- Main Form -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="md:col-span-1">
-              <label for="provider_name" class="block text-gray-700 font-medium mb-3">
-                <%= __("sms.settings.provider") %> <span class="text-red-500">*</span>
-              </label>
-
-              <input type="text" value="<%= sms?.provider_name %>" name="provider_name" id="provider_name" required data-msg-required="<%= __('sms.settings.provider_required') %>" data-msg-minlength="<%= __('sms.settings.provider_minlength') %>" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
-            bg-gray-50" />
-            </div>
-
-            <div class="md:col-span-1">
-              <label class="block text-gray-700 font-medium mb-3">
-                <%= __("sms.settings.sender_id") %> <span class="text-red-500">*</span>
-
-              </label>
-              <input type="text" value="<%= sms?.sender_id %>" name="sender_id" id="sender_id" required data-msg-required="<%= __('sms.settings.sender_id_required') %>" data-msg-minlength="<%= __('sms.settings.sender_id_minlength') %>" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
-            bg-gray-50" />
-            </div>
-
-            <div class="md:col-span-1">
-              <label class="block text-gray-700 font-medium mb-3">
-                <%= __("generic_label.status") %>
-                  <span class="text-red-500">*</span>
-
-              </label>
-              <select name="status" id="status" required data-msg-required="<%= __('sms.settings.status_required') %>" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50">
-                <option value="active" <%= sms?.is_active === "active" ? "selected" : "" %>><%= __("generic_label.active") %></option>
-                <option value="inactive" <%= !sms?.is_active || sms?.is_active === "inactive" ? "selected" : "" %>><%= __("generic_label.inactive") %></option>
-              </select>
-            </div>
-
-            <div class="md:col-span-1">
-              <label class="block text-gray-700 font-medium mb-3">
-                <%= __("sms.settings.api_key") %> <span class="text-red-500">*</span>
-              </label>
-              <textarea name="api_key" id="api_key" required data-msg-required="<%= __('sms.settings.api_key_required') %>" data-msg-minlength="<%= __('sms.settings.api_key_minlength') %>" class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900
-            bg-gray-50"><%= sms?.api_key %></textarea>
-            </div>
+      <!-- Infobip Fields -->
+      <div id="infobipFields" class="hidden">
+        <h4 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-100 pb-2">Infobip Configuration</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="infobip_base_url" class="block text-gray-700 font-medium mb-3">
+              Base URL <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="base_url" id="infobip_base_url" placeholder="https://xxxxx.api.infobip.com"
+              class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+          </div>
+          <div>
+            <label for="infobip_api_key" class="block text-gray-700 font-medium mb-3">
+              API Key <span class="text-red-500">*</span>
+            </label>
+            <input type="password" name="api_key" id="infobip_api_key" placeholder="Enter API Key"
+              class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+          </div>
+          <div>
+            <label for="infobip_sender_id" class="block text-gray-700 font-medium mb-3">
+              Sender ID <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="sender_id" id="infobip_sender_id" placeholder="e.g. InfoSMS"
+              class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
           </div>
         </div>
-
       </div>
+
+      <!-- Twilio Fields -->
+      <div id="twilioFields" class="hidden">
+        <h4 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-100 pb-2">Twilio Configuration</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="twilio_account_sid" class="block text-gray-700 font-medium mb-3">
+              Account SID <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="account_sid" id="twilio_account_sid" placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+              class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+          </div>
+          <div>
+            <label for="twilio_auth_token" class="block text-gray-700 font-medium mb-3">
+              Auth Token <span class="text-red-500">*</span>
+            </label>
+            <input type="password" name="auth_token" id="twilio_auth_token" placeholder="Enter Auth Token"
+              class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+          </div>
+          <div>
+            <label for="twilio_from_number" class="block text-gray-700 font-medium mb-3">
+              From Number <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="from_number" id="twilio_from_number" placeholder="+1234567890"
+              class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Unifonic Fields -->
+      <div id="unifonicFields" class="hidden">
+        <h4 class="text-lg font-semibold text-gray-800 mb-4 border-b border-gray-100 pb-2">Unifonic Configuration</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="unifonic_app_sid" class="block text-gray-700 font-medium mb-3">
+              App SID <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="app_sid" id="unifonic_app_sid" placeholder="Enter App SID"
+              class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+          </div>
+          <div>
+            <label for="unifonic_sender_id" class="block text-gray-700 font-medium mb-3">
+              Sender ID <span class="text-red-500">*</span>
+            </label>
+            <input type="text" name="sender_id" id="unifonic_sender_id" placeholder="e.g. MyApp"
+              class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+          </div>
+          <div>
+            <label for="unifonic_base_url" class="block text-gray-700 font-medium mb-3">
+              Base URL
+            </label>
+            <input type="text" name="base_url" id="unifonic_base_url" placeholder="https://el.cloud.unifonic.com"
+              class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Hidden field for serialized params JSON -->
+      <input type="hidden" name="params" id="paramsJson" />
 
       <!-- Buttons -->
       <div class="flex justify-end gap-4 mt-10">
@@ -86,27 +143,88 @@
         </a>
         <button type="submit"
           class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition">
-          <%= __("generic_label.submit") %>
+          <%= isEditMode ? __("generic_label.update") : __("generic_label.submit") %>
         </button>
       </div>
 
     </form>
-
 
   </div>
 
 </div>
 
 <script>
-window.smsValidationMessages = {
-  provider_required: "<%= __('sms.settings.provider_required') %>",
-  provider_minlength: "<%= __('sms.settings.provider_minlength') %>",
-  sender_id_required: "<%= __('sms.settings.sender_id_required') %>",
-  sender_id_minlength: "<%= __('sms.settings.sender_id_minlength') %>",
-  api_key_required: "<%= __('sms.settings.api_key_required') %>",
-  api_key_minlength: "<%= __('sms.settings.api_key_minlength') %>",
-  status_required: "<%= __('sms.settings.status_required') %>"
-};
-</script>
+  const providerFieldIds = ["infobipFields", "twilioFields", "unifonicFields"];
 
-<script src="/securemagnus_2025/js/custom_script/create-sms-validation.js"></script>
+  // Map of which input IDs belong to each provider
+  const providerInputs = {
+    infobip: ["infobip_base_url", "infobip_api_key", "infobip_sender_id"],
+    twilio: ["twilio_account_sid", "twilio_auth_token", "twilio_from_number"],
+    unifonic: ["unifonic_app_sid", "unifonic_sender_id", "unifonic_base_url"]
+  };
+
+  function toggleFields() {
+    const provider = document.getElementById("provider").value;
+
+    // Hide all provider sections
+    providerFieldIds.forEach(function (id) {
+      document.getElementById(id).classList.add("hidden");
+    });
+
+    // Disable all provider inputs so hidden ones don't submit
+    Object.values(providerInputs).flat().forEach(function (inputId) {
+      var el = document.getElementById(inputId);
+      if (el) el.disabled = true;
+    });
+
+    // Show and enable the selected provider's section
+    if (provider === "infobip") {
+      document.getElementById("infobipFields").classList.remove("hidden");
+      providerInputs.infobip.forEach(function (id) { document.getElementById(id).disabled = false; });
+    } else if (provider === "twilio") {
+      document.getElementById("twilioFields").classList.remove("hidden");
+      providerInputs.twilio.forEach(function (id) { document.getElementById(id).disabled = false; });
+    } else if (provider === "unifonic") {
+      document.getElementById("unifonicFields").classList.remove("hidden");
+      providerInputs.unifonic.forEach(function (id) { document.getElementById(id).disabled = false; });
+    }
+  }
+
+  // Serialize visible provider fields into params JSON before submit
+  document.getElementById("smsSettingsForm").addEventListener("submit", function () {
+    var provider = document.getElementById("provider").value;
+    var inputs = providerInputs[provider] || [];
+    var params = {};
+
+    inputs.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && !el.disabled) {
+        // Strip the provider prefix from the name to get the param key
+        params[el.name] = el.value;
+      }
+    });
+
+    document.getElementById("paramsJson").value = JSON.stringify(params);
+  });
+
+  // On page load: if editing existing data, select provider and populate fields
+(function () {
+  var existingProvider = "<%= sms?.provider_name || '' %>";
+  var existingParams = <%- JSON.stringify(sms?.params || {}) %>;
+
+  if (existingProvider) {
+    document.getElementById("provider").value = existingProvider;
+    toggleFields();
+
+    var inputs = providerInputs[existingProvider] || [];
+    inputs.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el && existingParams[el.name] !== undefined) {
+        el.value = existingParams[el.name];
+      }
+    });
+  }
+})();
+
+
+</script>

@@ -11,6 +11,9 @@ const { retrieveSMSSettings } = require("../../controllers/sms/retrieve-sms-sett
 // Create SMS Settings
 router.post("/settings/create/:organizationId", createSMSSettings);
 
+// Update SMS Settings
+router.post("/settings/update/:organizationId", updateSMSSettings);
+
 // Retrieve SMS Settings by ID
 router.get("/settings/:organizationId", retrieveSMSSettings);
 
