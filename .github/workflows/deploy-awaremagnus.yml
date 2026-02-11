@@ -9,9 +9,6 @@ on:
       - '.github/workflows/deploy-awaremagnus.yml'
       - '.github/scripts/awaremagnus/**'
 
-env:
-  NODE_VERSION: '20.19.2'
-
 jobs:
   # Development Branch Verification
   verify-development-branch:
@@ -32,11 +29,10 @@ jobs:
 
         if [ "${{ github.ref }}" != "refs/heads/development" ]; then
           echo "ERROR: Not triggered from development branch!"
-          echo "Actual ref: ${{ github.ref }}"
           exit 1
         fi
 
-        echo "Development branch verified - deploying commit ${{ github.sha }}"
+        echo "Development branch verified"
 
   # Deploy to OCI Server
   deploy-awaremagnus:
@@ -123,21 +119,19 @@ jobs:
         NEXT_PUBLIC_SERVICE_AWM_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_AWM_URL }}
         NEXT_PUBLIC_SERVICE_SUITE_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_SUITE_URL }}
       run: |
-        # Transfer deployment package to server
-        scp awaremagnus_deployment.tar.gz ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/awaremagnus_deployment.tar.gz || { echo "Failed to copy deployment package"; exit 1; }
-        scp deployment/scripts/deploy-awaremagnus.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/ || { echo "Failed to copy deploy-awaremagnus.sh"; exit 1; }
-        scp deployment/scripts/register-awaremagnus-service.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/ || { echo "Failed to copy register-awaremagnus-service.sh"; exit 1; }
-        scp deployment/scripts/create-awaremagnus-env.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/ || { echo "Failed to copy create-awaremagnus-env.sh"; exit 1; }
+        # Transfer deployment package and scripts to server
+        scp awaremagnus_deployment.tar.gz ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
+        scp deployment/scripts/deploy-awaremagnus.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
+        scp deployment/scripts/register-awaremagnus-service.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
+        scp deployment/scripts/create-awaremagnus-env.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
 
-        # Verify files exist on remote server
-        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "ls -la /tmp/deploy-awaremagnus.sh /tmp/register-awaremagnus-service.sh /tmp/create-awaremagnus-env.sh"
-
-        # Execute deployment with environment variables
-        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "chmod +x /tmp/deploy-awaremagnus.sh && chmod +x /tmp/register-awaremagnus-service.sh && chmod +x /tmp/create-awaremagnus-env.sh && \
-          AWAREMAGNUS_API_URL='${AWAREMAGNUS_API_URL:-http://127.0.0.1:3001}' \
+        # Execute deployment on server
+        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "\
+          chmod +x /tmp/deploy-awaremagnus.sh /tmp/register-awaremagnus-service.sh /tmp/create-awaremagnus-env.sh && \
+          AWAREMAGNUS_API_URL='${AWAREMAGNUS_API_URL}' \
           AWAREMAGNUS_PORT='${AWAREMAGNUS_PORT:-8001}' \
-          NEXT_PUBLIC_SERVICE_AWM_URL='${NEXT_PUBLIC_SERVICE_AWM_URL:-http://localhost:3002}' \
-          NEXT_PUBLIC_SERVICE_SUITE_URL='${NEXT_PUBLIC_SERVICE_SUITE_URL:-http://localhost:3001}' \
+          NEXT_PUBLIC_SERVICE_AWM_URL='${NEXT_PUBLIC_SERVICE_AWM_URL}' \
+          NEXT_PUBLIC_SERVICE_SUITE_URL='${NEXT_PUBLIC_SERVICE_SUITE_URL}' \
           /tmp/deploy-awaremagnus.sh"
 
     - name: Notify deployment status

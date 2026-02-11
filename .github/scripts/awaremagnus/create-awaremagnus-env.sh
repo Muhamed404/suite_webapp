@@ -20,7 +20,8 @@ NEXT_PUBLIC_SERVICE_AWM_URL=${NEXT_PUBLIC_SERVICE_AWM_URL:-http://localhost:3001
 NEXT_PUBLIC_SERVICE_SUITE_URL=${NEXT_PUBLIC_SERVICE_SUITE_URL:-http://localhost:3000}
 EOF
 
-# Set proper permissions for .env file (readable only by owner)
+# Set proper permissions and ownership for .env file
+chown ubuntu:ubuntu "$DEPLOY_DIR/.env"
 chmod 600 "$DEPLOY_DIR/.env"
 
 echo "Environment configuration created successfully at $DEPLOY_DIR/.env"

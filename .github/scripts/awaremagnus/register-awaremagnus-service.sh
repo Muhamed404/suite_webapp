@@ -1,6 +1,6 @@
 #!/bin/bash
 # SecureMagnus AwareMagnus Service Registration Script
-# This script registers awaremagnus (Next.js) as a systemd service
+# Registers awaremagnus as a systemd service using npm start
 
 set -e
 
@@ -9,7 +9,7 @@ SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 DEPLOY_DIR="/opt/secure-magnus/suite_webapp/awaremagnus"
 LOGS_DIR="/opt/secure-magnus/logs"
 SERVICE_USER="ubuntu"
-NODE_PATH=$(which node)
+NPM_PATH=$(which npm)
 AWAREMAGNUS_PORT=${AWAREMAGNUS_PORT:-8001}
 
 echo "Registering AwareMagnus as a systemd service..."
@@ -20,21 +20,25 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-# Check if node is installed
-if [ -z "$NODE_PATH" ]; then
-    echo "Node.js not found. Please install Node.js first."
+# Check if npm is installed
+if [ -z "$NPM_PATH" ]; then
+    echo "npm not found. Please install Node.js first."
     exit 1
 fi
 
 # Check if deployment directory exists
 if [ ! -d "$DEPLOY_DIR" ]; then
     echo "Deployment directory not found: $DEPLOY_DIR"
-    echo "Please run deploy-awaremagnus.sh first."
     exit 1
 fi
 
-# Create required directories if they don't exist
-echo "Ensuring required directories exist..."
+# Check if build output exists
+if [ ! -d "$DEPLOY_DIR/.next" ]; then
+    echo ".next directory not found - please run npm run build first"
+    exit 1
+fi
+
+# Create required directories
 mkdir -p "$LOGS_DIR"
 
 # Set proper ownership and permissions
@@ -68,11 +72,11 @@ Type=simple
 User=$SERVICE_USER
 Group=$SERVICE_USER
 WorkingDirectory=$DEPLOY_DIR
-ExecStart=$NODE_PATH $DEPLOY_DIR/server.js
+ExecStart=$NPM_PATH run start -- -p $AWAREMAGNUS_PORT
 Restart=on-failure
 RestartSec=10
-StandardOutput=append:/opt/secure-magnus/logs/suite_webapp_awm_sysout.log
-StandardError=append:/opt/secure-magnus/logs/suite_webapp_awm_syerr.log
+StandardOutput=append:$LOGS_DIR/suite_webapp_awm_sysout.log
+StandardError=append:$LOGS_DIR/suite_webapp_awm_syserr.log
 SyslogIdentifier=$SERVICE_NAME
 Environment=NODE_ENV=production
 Environment=PORT=$AWAREMAGNUS_PORT
@@ -83,7 +87,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=$DEPLOY_DIR /opt/secure-magnus/logs
+ReadWritePaths=$DEPLOY_DIR $LOGS_DIR
 
 [Install]
 WantedBy=multi-user.target
@@ -97,8 +101,8 @@ systemctl daemon-reload
 echo "Enabling service to start on boot..."
 systemctl enable "$SERVICE_NAME"
 
-# Restart the service (handles both new and existing service)
-echo "Restarting service..."
+# Start the service
+echo "Starting service..."
 systemctl restart "$SERVICE_NAME"
 
 # Check service status
