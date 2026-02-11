@@ -172,8 +172,24 @@ exports.createTemplate = async (req, res) => {
   } catch (error) {
     logger.error('[Create System Template] Error:', error);
     logger.error(error.stack);
-    req.flash('message', req.__('system_template.create.errorMessage'));
-    req.flash('alertType', 'error');
+    
+    if (error.response && error.response.status === 403) {
+      const errorMessage = error.response.data?.message || 'Access Denied';
+      logger.warn(`[Create System Template] Access denied: ${errorMessage}`);
+      
+      if (errorMessage.toLowerCase().includes('subscription')) {
+        if (req.session) {
+          req.flash('message', 'You do not have an active subscription to create templates.');
+          req.flash('alertType', 'error');
+        }
+        return res.redirect(`${frontend_api_urls.PHISHMAGNUS.Home.INDEX}`);
+      }
+    }
+    
+    if (req.session) {
+      req.flash('message', req.__('system_template.create.errorMessage'));
+      req.flash('alertType', 'error');
+    }
     return res.redirect(`${frontend_api_urls.PHISHMAGNUS.Template.LIST}`);
 
   }
