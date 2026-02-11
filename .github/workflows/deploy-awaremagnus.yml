@@ -107,12 +107,20 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.OCI_SSH_KEY }}
 
-    - name: Add OCI server to known hosts
+    - name: Configure SSH and add OCI server to known hosts
       run: |
         mkdir -p ~/.ssh
         ssh-keyscan -H "${{ secrets.OCI_HOST }}" >> ~/.ssh/known_hosts
+        cat >> ~/.ssh/config << EOF
+        Host *
+          ServerAliveInterval 30
+          ServerAliveCountMax 20
+          TCPKeepAlive yes
+          ConnectionAttempts 3
+        EOF
 
     - name: Deploy to OCI server
+      timeout-minutes: 30
       env:
         AWAREMAGNUS_API_URL: ${{ secrets.AWAREMAGNUS_API_URL }}
         AWAREMAGNUS_PORT: ${{ secrets.AWAREMAGNUS_PORT }}
@@ -125,8 +133,9 @@ jobs:
         scp deployment/scripts/register-awaremagnus-service.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
         scp deployment/scripts/create-awaremagnus-env.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
 
-        # Execute deployment on server
-        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "\
+        # Execute deployment on server (with keepalive to prevent timeout)
+        ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 \
+          ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "\
           chmod +x /tmp/deploy-awaremagnus.sh /tmp/register-awaremagnus-service.sh /tmp/create-awaremagnus-env.sh && \
           AWAREMAGNUS_API_URL='${AWAREMAGNUS_API_URL}' \
           AWAREMAGNUS_PORT='${AWAREMAGNUS_PORT:-8001}' \
