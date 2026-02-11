@@ -276,7 +276,7 @@
                       <circle cx="5" cy="12" r="1.5" />
                     </svg>
                   </button>
-                  <ul class="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10 hidden actionDropdownMenu">
+                  <ul class="fixed w-40 bg-white border border-gray-200 rounded shadow-lg z-[9999] hidden actionDropdownMenu">
                     <% if(u.user.status === true || u.user.status === "true"){ %>
                     <li>
                       <a href="/user/delete/<%= u.userProfileId || "" %>"
@@ -377,14 +377,27 @@ if (!document.getElementById('filter-table') || typeof simpleDatatables === 'und
         e.preventDefault();
         e.stopPropagation();
         
-        const parentDiv = actionBtn.closest('div.relative.inline-block.text-left');
-        if (parentDiv) {
-          const menu = parentDiv.querySelector('.actionDropdownMenu');
-          if (menu) {
-            document.querySelectorAll('.actionDropdownMenu').forEach(other => {
-              if (other !== menu) other.classList.add('hidden');
-            });
-            menu.classList.toggle('hidden');
+        const menu = actionBtn.closest('div.relative.inline-block.text-left')?.querySelector('.actionDropdownMenu');
+        if (menu) {
+          // Close other menus
+          document.querySelectorAll('.actionDropdownMenu').forEach(m => m !== menu && m.classList.add('hidden'));
+          
+          const wasHidden = menu.classList.contains('hidden');
+          menu.classList.toggle('hidden');
+          
+          if (wasHidden) {
+            const btnRect = actionBtn.getBoundingClientRect();
+            const menuWidth = 160, menuHeight = menu.scrollHeight || 100, gap = 8;
+            const vw = window.innerWidth, vh = window.innerHeight;
+            
+            const left = Math.max(gap, Math.min(btnRect.right - menuWidth, vw - menuWidth - gap));
+            
+            const top = btnRect.bottom + menuHeight + gap > vh 
+              ? Math.max(gap, btnRect.top - menuHeight - gap)
+              : btnRect.bottom + gap;
+            
+            menu.style.left = `${left}px`;
+            menu.style.top = `${top}px`;
           }
         }
         return;
