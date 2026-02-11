@@ -9,8 +9,7 @@
     "start": "next start -p 8001",
     "lint": "eslint --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "postinstall": "next build"
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@heroui/accordion": "2.2.26",

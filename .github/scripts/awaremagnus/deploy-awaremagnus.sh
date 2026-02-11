@@ -65,17 +65,16 @@ else
 fi
 
 # Clean old node_modules and build cache
-echo "Cleaning old node_modules and npm cache..."
+echo "Cleaning old node_modules and .next from awaremagnus..."
 rm -rf "$DEPLOY_DIR/node_modules"
 rm -rf "$DEPLOY_DIR/.next"
-npm cache clean --force 2>/dev/null || true
 
 # Step 1: npm install
 echo "=========================================="
-echo "Step 1: Running npm install..."
+echo "Step 1: Running npm install (production only)..."
 echo "=========================================="
 cd "$DEPLOY_DIR"
-npm install
+npm install --omit=dev
 
 # Step 2: npm run build
 echo "=========================================="
