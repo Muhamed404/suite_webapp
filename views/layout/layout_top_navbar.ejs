@@ -9,8 +9,17 @@
             <!-- Search Bar -->
             <div class="flex items-center w-48 bg-white rounded-full border border-gray-300 focus-within:ring-2 focus-within:ring-[var(--teal)]">
               <img src="/securemagnus_2025/images/img/search.svg" class="w-4 h-4 <%= locals.locale === 'ar' ? 'mr-3' : 'ml-3' %> text-gray-400" alt="">
-              <input type="text" placeholder="<%= __('generic_label.search_here') %>" class="flex-1 py-2 <%= locals.locale === 'ar' ? 'pr-2 pl-10' : 'pl-2 pr-10' %> bg-transparent text-sm focus:outline-none <%= locals.locale === 'ar' ? 'text-right' : '' %>" />
+              <input type="text" placeholder="<%= __('generic_label.search_here') %>" list="nav-options" onchange="redirectToPage(this.value)" class="flex-1 py-2 <%= locals.locale === 'ar' ? 'pr-2 pl-10' : 'pl-2 pr-10' %> bg-transparent text-sm focus:outline-none <%= locals.locale === 'ar' ? 'text-right' : '' %>" />
             </div>
+
+            <datalist id="nav-options">
+              <option value="Organization Settings">
+              <option value="Add User">
+              <option value="Import User">
+              <option value="Dashboard">
+              <option value="Campaigns">
+              <option value="Reports">
+            </datalist>
 
             <!-- Two Circle Buttons -->
             <!--
@@ -103,6 +112,21 @@
         </div>
 
         <script>
+          const navMap = {
+            "Organization Settings": "/organization/profile",
+            "Add User": "/user/create",
+            "Import User": "/user/create/bulk",
+            "Dashboard": "/phm/index",
+            "Campaigns": "/phm/campaign/all-campaigns",
+            "Reports": "/phm/campaign/reports"
+          };
+
+          function redirectToPage(value) {
+            if (navMap[value]) {
+              window.location.href = navMap[value];
+            }
+          }
+
           function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
