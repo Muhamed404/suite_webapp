@@ -74,7 +74,9 @@ echo "=========================================="
 echo "Step 1: Running npm install (production only)..."
 echo "=========================================="
 cd "$DEPLOY_DIR"
-npm install --omit=dev
+# npm install --omit=dev
+# enable full install for now to avoid build issues with missing dependencies
+npm install
 
 # Step 2: npm run build
 echo "=========================================="
