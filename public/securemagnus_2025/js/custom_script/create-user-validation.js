@@ -59,9 +59,17 @@ $(document).ready(function () {
             success: function (response) {
                 // Assuming response.availableLicenses contains the number
                 var licenseText = $('#alertLicenseAvailability').data('license-text') || 'Available Users License';
-                $('#alertLicenseAvailability').val(licenseText + ': ' + response.filteredLicense.availableLicenses);
-                $('#nextBtn').prop('disabled', false); // enable the button
-                $('#nextBtn').removeClass('opacity-50 cursor-not-allowed'); // remove visual feedback
+                var available = response.filteredLicense.availableLicenses;
+                $('#alertLicenseAvailability').val(licenseText + ': ' + available);
+                if (available > 1) {
+                    $('#nextBtn').prop('disabled', false); // enable the button
+                    $('#nextBtn').removeClass('opacity-50 cursor-not-allowed bg-[var(--teal)] hover:bg-teal-500');
+                    $('#nextBtn').addClass('bg-green-500 hover:bg-green-600'); // turn green
+                } else {
+                    $('#nextBtn').prop('disabled', true); // disable the button
+                    $('#nextBtn').addClass('opacity-50 cursor-not-allowed');
+                    $('#nextBtn').removeClass('bg-green-500 hover:bg-green-600 bg-[var(--teal)] hover:bg-teal-500');
+                }
             },
             error: function () {
                 // alert('Failed to fetch license availability');
