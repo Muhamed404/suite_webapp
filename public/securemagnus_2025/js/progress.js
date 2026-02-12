@@ -74,6 +74,9 @@ document.addEventListener("DOMContentLoaded", function () {
     circle.style.strokeDasharray = circumference;
     circle.style.strokeDashoffset = circumference;
 
+    const localeEl = document.getElementById("locale-data");
+    const locale = localeEl ? localeEl.dataset.locale : 'en';
+
     let start = null;
     function step(timestamp) {
       if (!start) start = timestamp;
@@ -81,7 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const current = Math.floor(progress * percent);
 
       circle.style.strokeDashoffset = circumference - (current / 100) * circumference;
-      textEl.textContent = current;
+      const formattedNum = locale === 'ar' ? current.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : current;
+      textEl.textContent = formattedNum;
 
       if (progress < 1) {
         requestAnimationFrame(step);
