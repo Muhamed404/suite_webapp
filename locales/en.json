@@ -1686,5 +1686,8 @@
 		"create_campaign": {
 			"title": "email.create_campaign.title"
 		}
+	},
+	" generic_label": {
+		"create": " generic_label.create"
 	}
 }

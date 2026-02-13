@@ -49,13 +49,14 @@ async function displayInvoice(req, res) {
 }
 
 async function updateInvoice(req, res) {
+  let orgId;
   try {
     //let organizationId = req.user.organization_id;
     logger.info('Request has received in update invoice')
     logger.info(JSON.stringify(req.body))
     let orderId = req.body.order;
     let subscriptionId = req.body.subscription;
-    let orgId = req.body.org;
+    orgId = req.body.org;
 
     if (
       subscriptionId === null ||
@@ -87,7 +88,7 @@ async function updateInvoice(req, res) {
   } catch (error) {
     logger.error(`Exception in updateInvoice \n` + error);
     const errMessage = "Error in Request, Contact Administrator";
-    res.redirect(`/phm/index?message=${errMessage}&alertType=error`);
+    res.redirect(`/organization/profile/${orgId}?message=${errMessage}&alertType=error`);
   }
 }
 

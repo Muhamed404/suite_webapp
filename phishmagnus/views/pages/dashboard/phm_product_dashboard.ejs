@@ -1,5 +1,7 @@
 <div class="flex flex-col p-6 gap">
 
+  <div id="locale-data" data-locale="<%= locals.locale || 'en' %>"></div>
+
   <div class="flex items-center justify-between">
     <h3 class="text-3xl font-medium"><%= __('dashboard.phishMagnusDashboard') %></h3>
     <div class="  p-0 text-sm ">
@@ -134,7 +136,7 @@
       <div class="flex flex-col items-start justify-between h-full">
         <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-15" alt="">
         <div class="flex flex-col gap-0">
-          <div class="text-5xl font-semibold mt-8">
+          <div class="text-5xl font-semibold mt-8 convert-number">
             <%= phmTotalPurchaseUserLicense %>
           </div>
           <div class="text-base"><%= __('dashboard.totalUserLicenses') %></div>
@@ -152,7 +154,7 @@
             <circle id="progressCircleRemainingBalance" cx="80" cy="80" r="70" stroke="var(--teal)" stroke-width="10"
               fill="none" stroke-linecap="round" />
           </svg>
-          <div class="absolute inset-0 flex items-center justify-center text-3xl font-semibold text-[var(--teal)]"
+          <div class="absolute inset-0 flex items-center justify-center text-3xl font-semibold text-[var(--teal)] convert-number"
             id="remaininglicenseBalance">
             <%=phmConsumedUserLicense%>
           </div>
@@ -172,7 +174,7 @@
       <div class="flex justify-between items-start gap-2">
         <div>
           <h2 class="font-semibold lg:text-2xl text-xl mb-2"><%= __('dashboard.phishingCampaigns') %></h2>
-          <p class="text-base text-gray-500"><%= __('dashboard.lastCampaignDate') %> : <%=lastCampaignDate%>
+          <p class="text-base text-gray-500"><%= __('dashboard.lastCampaignDate') %> : <span class="convert-number"><%=lastCampaignDate%></span>
           </p>
         </div>
         <%if(magnusAdmin===false) {%>
@@ -203,7 +205,7 @@
             <img src="/securemagnus_2025/images/links-clicked.svg" alt="Links Clicked" class="w-5 h-5" />
             <div class=" flex w-full justify-between ">
               <p><%= __('dashboard.linksClicked') %></p>
-              <p class="font-semibold">
+              <p class="font-semibold convert-number">
                 <%= totalUserPhishingTypeCategoryInteractions?.linkClicked || 0 %>
               </p>
             </div>
@@ -212,7 +214,7 @@
             <img src="/securemagnus_2025/images/qr-scans.svg" alt="QR Scans" class="w-5 h-5" />
             <div class=" flex w-full justify-between ">
               <p><%= __('dashboard.qrScans') %></p>
-              <p class="font-semibold">
+              <p class="font-semibold convert-number">
                 <%= totalUserPhishingTypeCategoryInteractions?.numberOfScans || 0 %>
               </p>
             </div>
@@ -221,7 +223,7 @@
             <img src="/securemagnus_2025/images/interact-form.svg" alt="Open Campaign" class="w-5 h-5" />
             <div class=" flex w-full justify-between ">
               <p><%= __('dashboard.openCampaign') %></p>
-              <p class="font-semibold">
+              <p class="font-semibold convert-number">
                 <%= totalUserPhishingTypeCategoryInteractions?.interactForm || 0 %>
               </p>
             </div>
@@ -230,7 +232,7 @@
             <img src="/securemagnus_2025/images/message-replied.svg" alt="Message Replied" class="w-5 h-5" />
             <div class=" flex w-full justify-between ">
               <p><%= __('dashboard.messageReplied') %></p>
-              <p class="font-semibold">
+              <p class="font-semibold convert-number">
                 <%= totalUserPhishingTypeCategoryInteractions?.textReplyCount || 0 %>
               </p>
             </div>
@@ -243,7 +245,7 @@
             <img src="/securemagnus_2025/images/form-submit.svg" alt="Form Submit" class="w-5 h-5" />
             <div class=" flex w-full justify-between ">
               <p><%= __('dashboard.formSubmit') %></p>
-              <p class="font-semibold">
+              <p class="font-semibold convert-number">
                 <%= totalUserPhishingTypeCategoryInteractions?.formSubmit || 0 %>
               </p>
             </div>
@@ -252,7 +254,7 @@
             <img src="/securemagnus_2025/images/reported-admin.svg" alt="Reported to Admin" class="w-5 h-5" />
             <div class=" flex w-full justify-between ">
               <p><%= __('dashboard.reportedToAdmin') %></p>
-              <p class="font-semibold">
+              <p class="font-semibold convert-number">
                 <%= totalUserPhishingTypeCategoryInteractions?.reportedToAdminCount || 0 %>
               </p>
             </div>
@@ -261,7 +263,7 @@
             <img src="/securemagnus_2025/images/attachment-open.svg" alt="Attachment Open" class="w-5 h-5" />
             <div class=" flex w-full justify-between ">
               <p><%= __('dashboard.attachmentOpen') %></p>
-              <p class="font-semibold">
+              <p class="font-semibold convert-number">
                 <%= totalUserPhishingTypeCategoryInteractions?.attachmentOpen || 0 %>
               </p>
             </div>
@@ -270,7 +272,7 @@
             <img src="/securemagnus_2025/images/interact-form.svg" alt="Open Email" class="w-5 h-5" />
             <div class=" flex w-full justify-between ">
               <p><%= __('dashboard.openEmail') %></p>
-              <p class="font-semibold">
+              <p class="font-semibold convert-number">
                 <%= totalUserPhishingTypeCategoryInteractions?.openedCount || 0 %>
               </p>
             </div>
@@ -326,11 +328,11 @@
                 var emailOpened = uniqueEmailInteractionsCount?.openEmail || 0;
                 var emailOpenPercent = emailSent > 0 ? ((emailOpened / emailSent) * 100).toFixed(1) : '0.0';
               %>
-              <td class="px-6"><%=inviteesEmailSentUnSentStats?.sentCount %></td>
-              <td class="px-6"><%=uniqueEmailInteractionsCount?.openEmail%></td>
+              <td class="px-6 convert-number"><%=inviteesEmailSentUnSentStats?.sentCount %></td>
+              <td class="px-6 convert-number"><%=uniqueEmailInteractionsCount?.openEmail%></td>
               <td class="px-6">
                 <span
-                  class="inline-block px-4 py-1 text-blue-500 border border-blue-200 rounded-full bg-blue-50 font-medium text-xs transition-colors group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-500">
+                  class="inline-block px-4 py-1 text-blue-500 border border-blue-200 rounded-full bg-blue-50 font-medium text-xs transition-colors group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-500 convert-number">
                   <%= emailOpenPercent %>%
                 </span>
               </td>
@@ -344,12 +346,12 @@
                 </span>
                 <%= __('dashboard.sms') %>
               </td>
-              <td class="px-6"><%=smsSentUnSentCount.sentCount %></td>
-              <td class="px-6"><%= uniqueSMSInteractionsCount?.linkClicked %></td>
+              <td class="px-6 convert-number"><%=smsSentUnSentCount.sentCount %></td>
+              <td class="px-6 convert-number"><%= uniqueSMSInteractionsCount?.linkClicked %></td>
              
               <td class="px-6">
                 <span
-                  class="inline-block px-4 py-1 text-yellow-500 border border-yellow-200 rounded-full bg-yellow-50 font-medium text-xs transition-colors group-hover:bg-yellow-500 group-hover:text-white group-hover:border-yellow-500">
+                  class="inline-block px-4 py-1 text-yellow-500 border border-yellow-200 rounded-full bg-yellow-50 font-medium text-xs transition-colors group-hover:bg-yellow-500 group-hover:text-white group-hover:border-yellow-500 convert-number">
                   <% 
                     var smsSent = smsSentUnSentCount.sentCount || 0;
                     var smsOpened = uniqueSMSInteractionsCount?.linkClicked || 0;
@@ -369,12 +371,12 @@
                 </span>
                 <%= __('dashboard.usb') %>
               </td>
-              <td class="px-6"><%=usbTotalCreated.createdCount %></td>
-              <td class="px-6"><%=usbTotalInteracted.is_plugged %></td>
+              <td class="px-6 convert-number"><%=usbTotalCreated.createdCount %></td>
+              <td class="px-6 convert-number"><%=usbTotalInteracted.is_plugged %></td>
            
               <td class="px-6">
                 <span
-                  class="inline-block px-4 py-1 text-purple-500 border border-purple-200 rounded-full bg-purple-50 font-medium text-xs transition-colors group-hover:bg-purple-500 group-hover:text-white group-hover:border-purple-500">
+                  class="inline-block px-4 py-1 text-purple-500 border border-purple-200 rounded-full bg-purple-50 font-medium text-xs transition-colors group-hover:bg-purple-500 group-hover:text-white group-hover:border-purple-500 convert-number">
                   <% 
                     var usbSent = usbTotalCreated.createdCount || 0;
                     var usbOpened = usbTotalInteracted.is_plugged || 0;
@@ -393,11 +395,11 @@
                 </span>
                 <%= __('dashboard.qr') %>
               </td>
-              <td class="px-6"><%=qrCreatedAndScannedStats.total_qrs_created%></td>
-              <td class="px-6"><%=uniqueQRInteractionsCount.scan%></td>
+              <td class="px-6 convert-number"><%=qrCreatedAndScannedStats.total_qrs_created%></td>
+              <td class="px-6 convert-number"><%=uniqueQRInteractionsCount.scan%></td>
               <td class="px-6">
                 <span
-                  class="inline-block px-4 py-1 text-blue-500 border border-blue-200 rounded-full bg-blue-50 font-medium text-xs transition-colors group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-500">
+                  class="inline-block px-4 py-1 text-blue-500 border border-blue-200 rounded-full bg-blue-50 font-medium text-xs transition-colors group-hover:bg-blue-500 group-hover:text-white group-hover:border-blue-500 convert-number">
                   <% 
                     var qrSent = qrCreatedAndScannedStats.total_qrs_created || 0;
                     var qrOpened = uniqueQRInteractionsCount.scan || 0;
@@ -416,11 +418,11 @@
                 </span>
                 <%= __('dashboard.nfc') %>
               </td>
-              <td class="px-6"><%=nfcCreatedAndScannedStats.total_nfc_created%></td>
-              <td class="px-6"><%=uniqueNFCInteractionsCount.scan%></td>
+              <td class="px-6 convert-number"><%=nfcCreatedAndScannedStats.total_nfc_created%></td>
+              <td class="px-6 convert-number"><%=uniqueNFCInteractionsCount.scan%></td>
               <td class="px-6">
                 <span
-                  class="inline-block px-4 py-1 text-purple-500 border border-purple-200 rounded-full bg-purple-50 font-medium text-xs transition-colors group-hover:bg-purple-500 group-hover:text-white group-hover:border-purple-500">
+                  class="inline-block px-4 py-1 text-purple-500 border border-purple-200 rounded-full bg-purple-50 font-medium text-xs transition-colors group-hover:bg-purple-500 group-hover:text-white group-hover:border-purple-500 convert-number">
                   <% 
                     var nfcSent = nfcCreatedAndScannedStats.total_nfc_created || 0;
                     var nfcOpened = uniqueNFCInteractionsCount.scan || 0;
@@ -439,11 +441,11 @@
                 </span>
                 <%= __('dashboard.whatsapp') %>
               </td>
-              <td class="px-6"><%=whatsappSentUnSentCount.sentCount%></td>
-              <td class="px-6"><%=uniqueWhatsappInteractionsCount.open%></td>
+              <td class="px-6 convert-number"><%=whatsappSentUnSentCount.sentCount%></td>
+              <td class="px-6 convert-number"><%=uniqueWhatsappInteractionsCount.open%></td>
               <td class="px-6">
                 <span
-                  class="inline-block px-4 py-1 text-green-500 border border-green-200 rounded-full bg-green-50 font-medium text-xs transition-colors group-hover:bg-green-500 group-hover:text-white group-hover:border-green-500">
+                  class="inline-block px-4 py-1 text-green-500 border border-green-200 rounded-full bg-green-50 font-medium text-xs transition-colors group-hover:bg-green-500 group-hover:text-white group-hover:border-green-500 convert-number">
                   <% 
                     var whatsappSent = whatsappSentUnSentCount?.sentCount || 0;
                     var whatsappOpened = uniqueWhatsappInteractionsCount?.open || 0;
@@ -547,6 +549,43 @@
     } else {
       console.warn("setProgress function is not defined.");
     }
+
+    function toArabicNum(num) {
+      return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+    }
+
+    const localeEl = document.getElementById("locale-data");
+    const locale = localeEl ? localeEl.dataset.locale : 'en';
+    const convertNum = (num) => {
+      return locale === 'ar' ? toArabicNum(num) : num.toString();
+    };
+
+    const originalSetProgress = window.setProgress;
+    window.setProgress = function(circleId, textId, ...args) {
+      let percent, textValue;
+      if (args.length === 1) {
+        percent = args[0];
+        textValue = percent;
+      } else if (args.length === 2) {
+        const consumed = args[0];
+        const purchased = args[1];
+        percent = purchased > 0 ? (consumed / purchased) * 100 : 0;
+        textValue = consumed;
+      }
+      const circle = document.getElementById(circleId);
+      const text = document.getElementById(textId);
+      if (!circle || !text) return;
+      const radius = 70;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (percent / 100) * circumference;
+      circle.style.strokeDasharray = circumference;
+      circle.style.strokeDashoffset = offset;
+      text.textContent = convertNum(textValue);
+    };
+
+    document.querySelectorAll('.convert-number').forEach(el => {
+      el.textContent = convertNum(el.textContent);
+    });
   });
 
 

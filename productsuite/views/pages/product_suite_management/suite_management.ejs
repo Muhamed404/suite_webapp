@@ -60,7 +60,7 @@
                                 class="rounded-3xl p-4 md:p-6 pb-6 md:pb-[32px] col-span-1 md:col-span-3 md:row-span-4 flex flex-col items-start justify-between bg-[linear-gradient(to_bottom_right,#0891b2_0%,#2dd4bf_100%)] text-white">
 
                                 <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-10 md:size-12 lg:size-15" alt="">
-                                <div class="text-2xl md:text-3xl lg:text-5xl font-semibold mt-4 md:mt-6 lg:mt-8 text-white">
+                                <div class="text-2xl md:text-3xl lg:text-5xl font-semibold mt-4 md:mt-6 lg:mt-8 text-white" id="phm-total-license">
                                     <%= phmPurchasedLicense %>
                                 </div>
                                 <div class="text-sm md:text-base text-white pt-2 leading-tight">
@@ -105,7 +105,7 @@
                                         <div class="flex flex-row gap-3 md:gap-4 items-center">
                                             <img src="/securemagnus_2025/images/calanderteal.svg" alt="Calendar" class="w-8 h-8 md:w-10 md:h-10" />
                                             <div class="flex flex-col">
-                                                <p class="text-base md:text-lg lg:text-2xl font-semibold">
+                                                <p class="text-base md:text-lg lg:text-2xl font-semibold" id="phm-expiry-date">
                                                     <%= phmLicenseExpiry %>
                                                 </p>
                                                 <p class="text-xs md:text-sm font-light">
@@ -191,7 +191,7 @@
                                 class="rounded-3xl p-4 md:p-6 pb-6 md:pb-[42px] col-span-1 md:col-span-3 md:row-span-4 flex flex-col items-start justify-between bg-[linear-gradient(to_bottom_right,#1C80FF,#66CAFE)]">
 
                                 <img src="/securemagnus_2025/images/img/profilesIcon.svg" class="size-10 md:size-12 lg:size-15" alt="">
-                                <div class="text-2xl md:text-3xl lg:text-5xl font-semibold mt-4 md:mt-6 lg:mt-8 text-white">
+                                <div class="text-2xl md:text-3xl lg:text-5xl font-semibold mt-4 md:mt-6 lg:mt-8 text-white" id="awm-total-license">
                                     <%=awmPurchasedLicense%>
                                 </div>
                                 <div class="text-sm md:text-base text-white pt-2 leading-tight">                <%= __("productsuite.labels.totalLicense") %>
@@ -231,7 +231,7 @@
                                     <div class="flex flex-row gap-3 md:gap-4 items-center">
                                         <img src="/securemagnus_2025/images/calanderblue.svg" alt="Calendar" class="w-8 h-8 md:w-10 md:h-10" />
                                         <div class="flex flex-col">
-                                            <p class="text-base md:text-lg lg:text-2xl font-semibold">
+                                            <p class="text-base md:text-lg lg:text-2xl font-semibold" id="awm-expiry-date">
                                                 <%= awmLicenseExpiry %>
                                             </p>
                                             <p class="text-xs md:text-sm font-light"><%= __("productsuite.labels.licenseExpiry") %></p>
@@ -296,19 +296,64 @@
   data-phm-purchased="<%= phmPurchasedLicense || 0 %>"
   data-phm-consumed="<%= phmConsumeLicense || 0 %>"
   data-awm-purchased="<%= awmPurchasedLicense || 0 %>"
-  data-awm-consumed="<%= awmConsumeLicense || 0 %>"></div>
+  data-awm-consumed="<%= awmConsumeLicense || 0 %>"
+  data-locale="<%= locals.locale || 'en' %>"></div>
 
 <script>
+  function toArabicNum(num) {
+    return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     const statsEl = document.getElementById("licenseStatsData");
     if (!statsEl || typeof setProgress !== "function") return;
+
+    const locale = statsEl.dataset.locale;
+    const convertNum = (num) => {
+      return locale === 'ar' ? toArabicNum(num) : num.toString();
+    };
 
     const phmPurchasedLicense = Number(statsEl.dataset.phmPurchased || 0);
     const phmConsumeLicense = Number(statsEl.dataset.phmConsumed || 0);
     const awmPurchasedLicense = Number(statsEl.dataset.awmPurchased || 0);
     const awmConsumeLicense = Number(statsEl.dataset.awmConsumed || 0);
 
+    const originalSetProgress = window.setProgress;
+    window.setProgress = function(circleId, textId, ...args) {
+      let percent, textValue;
+      if (args.length === 1) {
+        percent = args[0];
+        textValue = percent;
+      } else if (args.length === 2) {
+        const consumed = args[0];
+        const purchased = args[1];
+        percent = purchased > 0 ? (consumed / purchased) * 100 : 0;
+        textValue = consumed;
+      }
+      const circle = document.getElementById(circleId);
+      const text = document.getElementById(textId);
+      if (!circle || !text) return;
+      const radius = 70;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (percent / 100) * circumference;
+      circle.style.strokeDasharray = circumference;
+      circle.style.strokeDashoffset = offset;
+      text.textContent = convertNum(textValue);
+    };
+
     setProgress("progressCircle1", "progressText1", phmConsumeLicense, phmPurchasedLicense);
     setProgress("progressCircle2", "progressText2", awmConsumeLicense, awmPurchasedLicense);
+
+    const phmTotalEl = document.getElementById("phm-total-license");
+    if (phmTotalEl) phmTotalEl.textContent = convertNum(phmPurchasedLicense);
+
+    const awmTotalEl = document.getElementById("awm-total-license");
+    if (awmTotalEl) awmTotalEl.textContent = convertNum(awmPurchasedLicense);
+
+    const phmExpiryEl = document.getElementById("phm-expiry-date");
+    if (phmExpiryEl) phmExpiryEl.textContent = convertNum(phmExpiryEl.textContent);
+
+    const awmExpiryEl = document.getElementById("awm-expiry-date");
+    if (awmExpiryEl) awmExpiryEl.textContent = convertNum(awmExpiryEl.textContent);
   });
 </script>

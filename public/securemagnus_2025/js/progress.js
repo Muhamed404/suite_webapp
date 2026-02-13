@@ -1,4 +1,21 @@
-function setProgress(circleId, textId, percent) {
+function toArabicNum(num) {
+  return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+}
+
+function setProgress(circleId, textId, ...args) {
+  let percent, textValue;
+  if (args.length === 1) {
+    percent = args[0];
+    textValue = percent;
+  } else if (args.length === 2) {
+    const consumed = args[0];
+    const purchased = args[1];
+    percent = purchased > 0 ? (consumed / purchased) * 100 : 0;
+    textValue = consumed;
+  } else {
+    return; 
+  }
+
   const circle = document.getElementById(circleId);
   const text = document.getElementById(textId);
 
@@ -10,7 +27,7 @@ function setProgress(circleId, textId, percent) {
 
   circle.style.strokeDasharray = circumference;
   circle.style.strokeDashoffset = offset;
-  text.textContent = `${percent}`;
+  text.textContent = textValue.toString();
 }
 
 
@@ -57,6 +74,9 @@ document.addEventListener("DOMContentLoaded", function () {
     circle.style.strokeDasharray = circumference;
     circle.style.strokeDashoffset = circumference;
 
+    const localeEl = document.getElementById("locale-data");
+    const locale = localeEl ? localeEl.dataset.locale : 'en';
+
     let start = null;
     function step(timestamp) {
       if (!start) start = timestamp;
@@ -64,7 +84,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const current = Math.floor(progress * percent);
 
       circle.style.strokeDashoffset = circumference - (current / 100) * circumference;
-      textEl.textContent = current;
+      const formattedNum = locale === 'ar' ? current.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : current;
+      textEl.textContent = formattedNum;
 
       if (progress < 1) {
         requestAnimationFrame(step);
