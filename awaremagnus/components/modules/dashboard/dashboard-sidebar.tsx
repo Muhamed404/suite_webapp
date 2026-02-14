@@ -63,8 +63,8 @@ export const DashboardSidebar = ({
       icon: "/images/Icon_Template.svg",
       label: t("menu.systemBranding"),
       children: [
-        { href: "#", icon: "", label: "Certificate" },
-        { href: "#", icon: "", label: "Logo and Images" },
+        { href: "#", icon: "", label: t("menu.certificate") },
+        { href: "#", icon: "", label: t("menu.logoAndImages") },
       ],
     },
     {
@@ -72,8 +72,12 @@ export const DashboardSidebar = ({
       icon: "/images/Icon_Template.svg",
       label: t("menu.launchAwareness"),
       children: [
-        { href: "#", icon: "", label: "Campaigns" },
-        { href: "#", icon: "", label: "Reports" },
+        {
+          href: "/dashboard/launch-awareness/campaigns",
+          icon: "",
+          label: t("menu.campaigns"),
+        },
+        { href: "#", icon: "", label: t("menu.reports") },
       ],
     },
     {
@@ -86,11 +90,11 @@ export const DashboardSidebar = ({
       icon: "/images/Icon_Template.svg",
       label: t("menu.myAwareness"),
       children: [
-        { href: "#", icon: "", label: "Profile" },
-        { href: "#", icon: "", label: "Certificates" },
-        { href: "#", icon: "", label: "Achievements" },
-        { href: "#", icon: "", label: "Assignments" },
-        { href: "#", icon: "", label: "Report Card" },
+        { href: "#", icon: "", label: t("menu.profile") },
+        { href: "#", icon: "", label: t("menu.certificates") },
+        { href: "#", icon: "", label: t("menu.achievements") },
+        { href: "#", icon: "", label: t("menu.assignments") },
+        { href: "#", icon: "", label: t("menu.reportCard") },
       ],
     },
   ];
