@@ -33,7 +33,7 @@ router.get("/api/view/:templateId", checkPermission(enums.ModuleNames.Campaign_M
 
 router.get("/view/:templateId", checkPermission(enums.ModuleNames.My_Template, [enums.Access_Types.RWD_O, enums.Access_Types.R_O]), viewTemplate);
 
-router.get("/delete/:templateId", checkPermission(enums.ModuleNames.My_Template, [enums.Access_Types.RWD_O]),
+router.delete("/delete/:templateId", checkPermission(enums.ModuleNames.My_Template, [enums.Access_Types.RWD_O]),
     disableTemplate);
 
 

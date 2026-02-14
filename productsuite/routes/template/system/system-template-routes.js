@@ -19,7 +19,7 @@ router.get("/duplicate/:templateId", checkPermission(enums.ModuleNames.System_Te
 router.post("/duplicate/:templateId/:organizationId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_O]), duplicateTemplate);
 router.get("/view/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), viewTemplate);
 router.post("/edit/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), updateTemplate);
-router.get("/delete/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), disableTemplate);
+router.delete("/delete/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), disableTemplate);
 router.get("/create", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), renderCreateTemplate);
 router.post("/create", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), createTemplate);
 
