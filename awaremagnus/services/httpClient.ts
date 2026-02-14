@@ -90,12 +90,16 @@ const setupInterceptors = (instance: ReturnType<typeof axios.create>) => {
 };
 
 export const awmClient = axios.create({
-  baseURL: SERVICE_AWM_URL,
+  // When on client, we want usage like awmClient.get(API_BASE + "/...") to map to /awm/api/awm/...
+  // Since API_BASE is /api/awm, we just need the basepath /awm as the baseURL.
+  // But wait, if we set baseURL to "/awm", then get("/api/awm/...") becomes "/awm/api/awm/...". Correct.
+  baseURL: typeof window === "undefined" ? SERVICE_AWM_URL : "/awm",
   withCredentials: true,
 });
 
 export const suiteClient = axios.create({
-  baseURL: SERVICE_SUITE_URL,
+  // Suite calls are like post("/login"). We want them to go to /awm/api/suite/login.
+  baseURL: typeof window === "undefined" ? SERVICE_SUITE_URL : "/awm/api/suite",
   withCredentials: true,
 });
 

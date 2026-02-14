@@ -4,16 +4,18 @@
  * e.g. https://your-awm-host/contents/motion_videos/system_files/0-2-2-logo-....jpeg
  */
 function getContentAssetBase(): string {
-  if (typeof process === "undefined") return "";
-  const awmUrl =
-    process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? process.env.NEXT_PUBLIC_AWM_API_BASE ?? "";
-
-  if (!awmUrl) return "";
-
-  // Ensure we return the base URL without the /api/awm suffix if it's for assets,
-  // but the user said "AWM BACKEND URL". Usually assets are at /contents/ or similar.
-  // If awmUrl is http://localhost:3002, then return that.
-  return awmUrl.replace(/\/$/, "");
+  if (typeof window === "undefined") {
+    // Server side: return full URL
+    return (
+      process.env.NEXT_PUBLIC_SERVICE_AWM_URL ??
+      process.env.NEXT_PUBLIC_AWM_API_BASE ??
+      "http://localhost:3002"
+    ).replace(/\/$/, "");
+  }
+  // Client side: return proxy path. 
+  // Assets likely start with /contents/. We want /awm/contents/...
+  // So we return the base path /awm.
+  return "/awm";
 }
 
 /**
