@@ -64,6 +64,20 @@ else
     exit 1
 fi
 
+# Copying iSpring interactive module files to the Next.js public directory
+ISPRING_SOURCE="/opt/secure-magnus/secure_magnus_workspace/service_awm/contents/interactive_modules/system_files"
+ISPRING_DEST="$DEPLOY_DIR/public/interactive_modules/system_files"
+
+echo "Copying iSpring files to public directory..."
+if [ -d "$ISPRING_SOURCE" ]; then
+    sudo mkdir -p "$ISPRING_DEST"
+    sudo cp -r "$ISPRING_SOURCE"/* "$ISPRING_DEST/"
+    sudo chown -R $SERVICE_USER:$SERVICE_USER "$ISPRING_DEST"
+    echo "iSpring files copied successfully"
+else
+    echo "WARNING: iSpring source directory not found at $ISPRING_SOURCE"
+fi
+
 # Clean old node_modules and build cache
 echo "Cleaning old node_modules and .next from awaremagnus..."
 rm -rf "$DEPLOY_DIR/node_modules"
@@ -71,12 +85,14 @@ rm -rf "$DEPLOY_DIR/.next"
 
 # Step 1: npm install
 echo "=========================================="
-echo "Step 1: Running npm install (production only)..."
+echo "Step 1: Running npm install..."
 echo "=========================================="
 cd "$DEPLOY_DIR"
-# npm install --omit=dev
-# enable full install for now to avoid build issues with missing dependencies
+# Full install needed - devDependencies include build tools (TypeScript, Tailwind, etc.)
 npm install
+
+# After build, prune dev dependencies to reduce deployment size
+# This is handled after Step 2 below
 
 # Step 2: npm run build
 echo "=========================================="
@@ -90,6 +106,11 @@ if [ ! -d "$DEPLOY_DIR/.next" ]; then
     exit 1
 fi
 echo "Build completed successfully"
+
+# Prune devDependencies after build to reduce deployment size
+echo "Pruning devDependencies..."
+cd "$DEPLOY_DIR"
+npm prune --omit=dev
 
 # Step 3: Register systemd service (runs npm start on port)
 echo "=========================================="
