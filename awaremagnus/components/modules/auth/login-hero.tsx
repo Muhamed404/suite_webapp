@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 export const LoginHero = () => {
   return (
@@ -9,7 +10,7 @@ export const LoginHero = () => {
           alt="Login Illustration"
           className="w-1/2 h-auto object-contain"
           height={600}
-          src="/images/login-vector.png"
+          src={getContentAssetUrl("/images/login-vector.png")}
           width={600}
         />
       </div>

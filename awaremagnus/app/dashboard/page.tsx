@@ -30,6 +30,7 @@ import {
   useSystemStrugglingModules,
   useOrganizationStrugglingModules,
 } from "@/hooks/useDashboard";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 export default function DashboardPage() {
   const { dir } = useI18n();
@@ -215,7 +216,7 @@ export default function DashboardPage() {
                   alt=""
                   className="w-12 h-12"
                   height={48}
-                  src="/images/img/users-profile.svg"
+                  src={getContentAssetUrl("/images/img/users-profile.svg")}
                   width={48}
                 />
                 <div className="flex flex-col">
@@ -237,7 +238,7 @@ export default function DashboardPage() {
                   alt=""
                   className="w-12 h-12"
                   height={48}
-                  src="/images/img/users-licanse.svg"
+                  src={getContentAssetUrl("/images/img/users-licanse.svg")}
                   width={48}
                 />
                 <div className="flex flex-col">
@@ -283,7 +284,7 @@ export default function DashboardPage() {
                       alt=""
                       className="w-6 h-6"
                       height={24}
-                      src="/images/img/score.svg"
+                      src={getContentAssetUrl("/images/img/score.svg")}
                       width={24}
                     />
                     <div>
@@ -297,7 +298,7 @@ export default function DashboardPage() {
                       alt=""
                       className="w-6 h-6"
                       height={24}
-                      src="/images/img/score.svg"
+                      src={getContentAssetUrl("/images/img/score.svg")}
                       width={24}
                     />
                     <div>
@@ -329,7 +330,7 @@ export default function DashboardPage() {
                     alt=""
                     className="w-4 h-4"
                     height={16}
-                    src="/images/shield-check.svg"
+                    src={getContentAssetUrl("/images/shield-check.svg")}
                     width={16}
                   />
                   <h3 className="text-base whitespace-nowrap">{t("cards.securityPosture")}</h3>
@@ -346,7 +347,7 @@ export default function DashboardPage() {
                           alt=""
                           className="w-4 h-4 cursor-pointer"
                           height={16}
-                          src="/images/info-information.svg"
+                          src={getContentAssetUrl("/images/info-information.svg")}
                           width={16}
                         />
                       </Button>
@@ -452,7 +453,7 @@ export default function DashboardPage() {
                       alt=""
                       className="w-12 h-12"
                       height={48}
-                      src="/images/icons/shield.svg"
+                      src={getContentAssetUrl("/images/icons/shield.svg")}
                       width={48}
                     />
                     <div>
@@ -547,7 +548,7 @@ export default function DashboardPage() {
                                 alt=""
                                 className="w-3 h-3"
                                 height={12}
-                                src="/images/icons/alert.svg"
+                                src={getContentAssetUrl("/images/icons/alert.svg")}
                                 width={12}
                               />
                             </div>
@@ -570,7 +571,7 @@ export default function DashboardPage() {
                       alt=""
                       className="w-3 h-3"
                       height={12}
-                      src="/images/icons/alert.svg"
+                      src={getContentAssetUrl("/images/icons/alert.svg")}
                       width={12}
                     />
                     {t("cards.employeesNeedAttention")}
@@ -590,7 +591,7 @@ export default function DashboardPage() {
                       alt=""
                       className="w-10 h-10"
                       height={40}
-                      src="/images/check-fr.svg"
+                      src={getContentAssetUrl("/images/check-fr.svg")}
                       width={40}
                     />
                   </div>

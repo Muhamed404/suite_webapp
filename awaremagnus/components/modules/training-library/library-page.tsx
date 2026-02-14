@@ -21,6 +21,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useModules } from "@/hooks/useQuiz";
 import { SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
 import { LibraryPageSkeleton } from "@/components/ui/skeletons";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import {
   SearchIcon,
   PlusIcon,
@@ -91,11 +92,11 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
   const filteredModules = useMemo(() => {
     let list = searchQuery.trim()
       ? modules.filter(
-          (m) =>
-            moduleCode(m).toLowerCase().includes(searchQuery.toLowerCase()) ||
-            moduleName(m).toLowerCase().includes(searchQuery.toLowerCase()) ||
-            moduleDescription(m).toLowerCase().includes(searchQuery.toLowerCase())
-        )
+        (m) =>
+          moduleCode(m).toLowerCase().includes(searchQuery.toLowerCase()) ||
+          moduleName(m).toLowerCase().includes(searchQuery.toLowerCase()) ||
+          moduleDescription(m).toLowerCase().includes(searchQuery.toLowerCase())
+      )
       : modules;
 
     if (sortField) {
@@ -390,7 +391,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                           <img
                             alt=""
                             className="w-full h-full object-cover object-center"
-                            src="/images/Card.png"
+                            src={getContentAssetUrl("/images/Card.png")}
                             onError={(e) => {
                               const el = e.target as HTMLImageElement;
 
@@ -402,7 +403,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                             aria-hidden
                             alt=""
                             className="absolute inset-0 m-auto w-12 h-12 object-contain opacity-90 hidden"
-                            src="/images/Icon_Template.svg"
+                            src={getContentAssetUrl("/images/Icon_Template.svg")}
                           />
                         </div>
                         <h3 className="font-semibold text-[var(--mainblue)] text-sm truncate">
@@ -504,7 +505,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                             <img
                               alt=""
                               className="w-full h-full object-cover"
-                              src="/images/Card.png"
+                              src={getContentAssetUrl("/images/Card.png")}
                               onError={(e) => {
                                 const el = e.target as HTMLImageElement;
 
@@ -516,7 +517,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                               aria-hidden
                               alt=""
                               className="absolute inset-0 m-auto w-5 h-5 object-contain opacity-90 hidden"
-                              src="/images/Icon_Template.svg"
+                              src={getContentAssetUrl("/images/Icon_Template.svg")}
                             />
                           </div>
                         </TableCell>

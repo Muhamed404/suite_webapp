@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { SubMenu } from "@/components/ui/sidebar-sub-menu";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 interface DashboardSidebarProps {
   /** On mobile: controls drawer visibility. On lg: ignored (sidebar always visible). */
@@ -27,40 +28,40 @@ export const DashboardSidebar = ({
   const subMenuItems = [
     {
       href: "/dashboard",
-      icon: "/images/icons/second-menu-dashboard-active.svg",
-      activeIcon: "/images/icons/second-menu-dashboard-active.svg",
+      icon: getContentAssetUrl("/images/icons/second-menu-dashboard-active.svg"),
+      activeIcon: getContentAssetUrl("/images/icons/second-menu-dashboard-active.svg"),
       label: t("menu.dashboard"),
     },
     {
       href: "/dashboard/license-user",
-      icon: "/images/Icon_License.svg",
+      icon: getContentAssetUrl("/images/Icon_License.svg"),
       label: t("menu.licenseUser"),
     },
     {
       href: "/dashboard/survey",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.survey"),
     },
     {
       href: "/dashboard/training-library/system",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.trainingLibrary"),
       children: [
         {
           href: "/dashboard/training-library/system",
-          icon: "/images/Icon_Template.svg",
+          icon: getContentAssetUrl("/images/Icon_Template.svg"),
           label: t("menu.systemLibrary"),
         },
         {
           href: "/dashboard/training-library/my",
-          icon: "/images/Icon_Template.svg",
+          icon: getContentAssetUrl("/images/Icon_Template.svg"),
           label: t("menu.myLibrary"),
         },
       ],
     },
     {
       href: "/dashboard/system-branding",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.systemBranding"),
       children: [
         { href: "#", icon: "", label: "Certificate" },
@@ -69,7 +70,7 @@ export const DashboardSidebar = ({
     },
     {
       href: "/dashboard/launch-awareness",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.launchAwareness"),
       children: [
         { href: "#", icon: "", label: "Campaigns" },
@@ -78,12 +79,12 @@ export const DashboardSidebar = ({
     },
     {
       href: "/dashboard/settings",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.systemSettings"),
     },
     {
       href: "/dashboard/my-awareness",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.myAwareness"),
       children: [
         { href: "#", icon: "", label: "Profile" },
