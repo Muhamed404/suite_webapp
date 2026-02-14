@@ -70,9 +70,6 @@ export function normalizeAWMResponse<T>(raw: AWMResponseBody<unknown>): Normaliz
     if (Array.isArray(o.certificates)) {
       return { success, data: o.certificates as T, message, statusCode: raw.statusCode, count };
     }
-    if (Array.isArray(o.campaigns)) {
-      return { success, data: o.campaigns as T, message, statusCode: raw.statusCode, count };
-    }
     if (Array.isArray(o.items)) {
       return { success, data: o.items as T, message, statusCode: raw.statusCode, count };
     }

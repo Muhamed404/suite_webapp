@@ -63,14 +63,29 @@ export function CampaignFilters({
 
   return (
     <div className="flex flex-col md:flex-row justify-between gap-3 mb-4">
+      <style dangerouslySetInnerHTML={{
+        __html: `
+          .campaign-filters .tab-btn {
+            background: transparent !important;
+          }
+          .campaign-filters .tab-btn.active {
+            background: transparent !important;
+            color: white !important;
+          }
+          .campaign-filters .tab-btn:hover:not(.active) {
+            background: #f3f4f6 !important;
+          }
+        `
+      }} />
+
       {/* Tabs with Sliding Indicator */}
-      <div ref={tabsContainerRef} className="flex gap-0 bg-white p-1 rounded-full relative">
+      <div ref={tabsContainerRef} className="campaign-filters flex gap-0 bg-white p-0.5 rounded-full relative">
         {/* Sliding background indicator */}
         <div
-          className="absolute bg-[#051226] rounded-full transition-all duration-300 ease-in-out"
+          className="absolute bg-[#051226] rounded-full transition-all duration-300"
           style={{
-            top: "4px",
-            height: "calc(100% - 8px)",
+            top: "3px",
+            height: "calc(100% - 6px)",
             left: `${indicatorStyle.left}px`,
             width: `${indicatorStyle.width}px`,
           }}
@@ -84,9 +99,9 @@ export function CampaignFilters({
               key={tab.id}
               onClick={() => onStatusChange(tab.status)}
               className={clsx(
-                "tab-btn px-3 py-1 text-xs font-semibold rounded-full transition-colors duration-200",
+                `tab-btn ${isActive ? 'active' : ''} px-3 py-0.5 text-xs font-semibold rounded-full transition-colors duration-200`,
                 "inline-flex items-center gap-2 relative z-10 whitespace-nowrap",
-                isActive ? "text-white" : "text-gray-700 hover:bg-gray-100"
+                isActive ? "text-white" : "bg-transparent text-gray-700 hover:bg-gray-100"
               )}
               type="button"
             >
