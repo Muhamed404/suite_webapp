@@ -90,6 +90,16 @@ export function CampaignModulesPage({ campaignId }: CampaignModulesPageProps) {
               }
               description={t("emptyModulesDescription")}
               title={t("emptyModulesTitle")}
+              action={
+                <Button
+                  as={Link}
+                  className="bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-semibold px-5"
+                  href={`/dashboard/campaign-assignments/${campaignId}`}
+                  size="sm"
+                >
+                  Back to Assignments
+                </Button>
+              }
             />
           )}
 
