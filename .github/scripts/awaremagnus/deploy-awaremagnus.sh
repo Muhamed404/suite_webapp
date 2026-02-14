@@ -71,12 +71,14 @@ rm -rf "$DEPLOY_DIR/.next"
 
 # Step 1: npm install
 echo "=========================================="
-echo "Step 1: Running npm install (production only)..."
+echo "Step 1: Running npm install..."
 echo "=========================================="
 cd "$DEPLOY_DIR"
-# npm install --omit=dev
-# enable full install for now to avoid build issues with missing dependencies
+# Full install needed - devDependencies include build tools (TypeScript, Tailwind, etc.)
 npm install
+
+# After build, prune dev dependencies to reduce deployment size
+# This is handled after Step 2 below
 
 # Step 2: npm run build
 echo "=========================================="
@@ -90,6 +92,11 @@ if [ ! -d "$DEPLOY_DIR/.next" ]; then
     exit 1
 fi
 echo "Build completed successfully"
+
+# Prune devDependencies after build to reduce deployment size
+echo "Pruning devDependencies..."
+cd "$DEPLOY_DIR"
+npm prune --omit=dev
 
 # Step 3: Register systemd service (runs npm start on port)
 echo "=========================================="
