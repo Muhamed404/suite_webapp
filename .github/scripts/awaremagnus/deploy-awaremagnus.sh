@@ -64,6 +64,20 @@ else
     exit 1
 fi
 
+# Copying iSpring interactive module files to the Next.js public directory
+ISPRING_SOURCE="/opt/secure-magnus/secure_magnus_workspace/service_awm/contents/interactive_modules/system_files"
+ISPRING_DEST="$DEPLOY_DIR/public/interactive_modules/system_files"
+
+echo "Copying iSpring files to public directory..."
+if [ -d "$ISPRING_SOURCE" ]; then
+    sudo mkdir -p "$ISPRING_DEST"
+    sudo cp -r "$ISPRING_SOURCE"/* "$ISPRING_DEST/"
+    sudo chown -R $SERVICE_USER:$SERVICE_USER "$ISPRING_DEST"
+    echo "iSpring files copied successfully"
+else
+    echo "WARNING: iSpring source directory not found at $ISPRING_SOURCE"
+fi
+
 # Clean old node_modules and build cache
 echo "Cleaning old node_modules and .next from awaremagnus..."
 rm -rf "$DEPLOY_DIR/node_modules"

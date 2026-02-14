@@ -27,7 +27,7 @@ const PdfViewer = dynamic(
 );
 
 /** Demo fallback when brochure/document URL fails or is missing (file in public folder). */
-const BROCHURE_DOCUMENT_FALLBACK_PDF = "/brochure.pdf";
+const BROCHURE_DOCUMENT_FALLBACK_PDF = getContentAssetUrl("/brochure.pdf");
 
 function moduleName(m: Module): string {
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;

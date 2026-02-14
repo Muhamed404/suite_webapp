@@ -12,14 +12,15 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getLanguageName, getLanguageCountryCode } from "@/utils/supportedLanguages";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import ReactCountryFlag from "react-country-flag";
 import { Textarea } from "@heroui/input";
 
 export type QuizLocale = "en" | "ar";
 
 const LANG_META: Record<QuizLocale, { labelKey: string; flag: string }> = {
-  en: { labelKey: "languages.en", flag: "/images/eng.png" },
-  ar: { labelKey: "languages.ar", flag: "/images/ar.png" },
+  en: { labelKey: "languages.en", flag: getContentAssetUrl("/images/eng.png") },
+  ar: { labelKey: "languages.ar", flag: getContentAssetUrl("/images/ar.png") },
 };
 
 export interface QuizQuestion {

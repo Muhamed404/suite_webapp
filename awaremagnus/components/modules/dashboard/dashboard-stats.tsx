@@ -3,6 +3,8 @@ import { Card, CardBody } from "@heroui/card";
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 import { Button } from "@heroui/button";
 
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+
 export const DashboardStats = () => {
   return (
     <div className="grid grid-cols-12 grid-rows-20 gap-2">
@@ -14,7 +16,7 @@ export const DashboardStats = () => {
               alt=""
               className="w-10 h-10"
               height={40}
-              src="/images/img/users-profile.svg"
+              src={getContentAssetUrl("/images/img/users-profile.svg")}
               width={40}
             />
             <div className="flex flex-col">
@@ -33,7 +35,7 @@ export const DashboardStats = () => {
               alt=""
               className="w-10 h-10"
               height={40}
-              src="/images/img/users-licanse.svg"
+              src={getContentAssetUrl("/images/img/users-licanse.svg")}
               width={40}
             />
             <div className="flex flex-col">
@@ -53,7 +55,7 @@ export const DashboardStats = () => {
                 alt=""
                 className="w-3 h-3"
                 height={12}
-                src="/images/shield-check.svg"
+                src={getContentAssetUrl("/images/shield-check.svg")}
                 width={12}
               />
               <h3 className="text-sm font-medium whitespace-nowrap">Security Posture</h3>
@@ -70,7 +72,7 @@ export const DashboardStats = () => {
                       alt=""
                       className="w-3 h-3 cursor-pointer"
                       height={12}
-                      src="/images/info-information.svg"
+                      src={getContentAssetUrl("/images/info-information.svg")}
                       width={12}
                     />
                   </Button>
@@ -134,7 +136,7 @@ export const DashboardStats = () => {
                   alt=""
                   className="w-5 h-5"
                   height={20}
-                  src="/images/img/score.svg"
+                  src={getContentAssetUrl("/images/img/score.svg")}
                   width={20}
                 />
                 <div>
@@ -148,7 +150,7 @@ export const DashboardStats = () => {
                   alt=""
                   className="w-5 h-5"
                   height={20}
-                  src="/images/img/score.svg"
+                  src={getContentAssetUrl("/images/img/score.svg")}
                   width={20}
                 />
                 <div>

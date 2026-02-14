@@ -8,6 +8,8 @@ import { DashboardSidebar } from "./dashboard-sidebar";
 
 import { SidebarPrimaryMenu } from "@/components/ui/sidebar-primary-menu";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { isOrgUser } from "@/utils/roles";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -17,6 +19,9 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { dir } = useI18n();
   const pathname = usePathname();
   const isRtl = dir === "rtl";
+  const { user } = useAuthStore();
+  /** Org User (role 5) = end-user / learner: no primary sidebar, limited AWM sub-menu */
+  const isEndUser = isOrgUser(user?.role_id);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   /** Primary (suite) sidebar collapsed = icon-only. When true, sub (AWM) sidebar is expanded (PhishMagnus behavior). */
   const [primaryCollapsed, setPrimaryCollapsed] = useState(true);
@@ -46,15 +51,18 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
         onClick={handleBackdropClick}
       />
 
-      {/* Primary sidebar (suite links) - no radius, matches HTML modules page */}
-      <SidebarPrimaryMenu
-        isCollapsed={primaryCollapsed}
-        onToggle={() => setPrimaryCollapsed((v) => !v)}
-      />
+      {/* Primary sidebar (suite links) - hidden for Org User (end user) */}
+      {!isEndUser && (
+        <SidebarPrimaryMenu
+          isCollapsed={primaryCollapsed}
+          onToggle={() => setPrimaryCollapsed((v) => !v)}
+        />
+      )}
 
-      {/* Secondary sidebar (AWM) - curved left, mt-2 h-[98vh] */}
+      {/* Secondary sidebar (AWM) - curved left, mt-2 h-[98vh]. Always expanded for Org User (no primary). */}
       <DashboardSidebar
-        isCollapsed={!primaryCollapsed}
+        isCollapsed={isEndUser ? false : !primaryCollapsed}
+        isEndUser={isEndUser}
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />

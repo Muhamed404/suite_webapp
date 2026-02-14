@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { SubMenu } from "@/components/ui/sidebar-sub-menu";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 interface DashboardSidebarProps {
   /** On mobile: controls drawer visibility. On lg: ignored (sidebar always visible). */
@@ -13,54 +14,58 @@ interface DashboardSidebarProps {
   onClose?: () => void;
   /** When true, show icon-only (collapsed). When false, show full width. Matches PhishMagnus: sub collapsed when primary expanded. */
   isCollapsed?: boolean;
+  /** When true, user is Org User (end-user / learner): show limited menu (Campaign Assignments, Certificates). */
+  isEndUser?: boolean;
 }
 
 export const DashboardSidebar = ({
   open = false,
   onClose,
   isCollapsed = false,
+  isEndUser = false,
 }: DashboardSidebarProps) => {
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
 
-  const subMenuItems = [
+  /* ─── Admin / Org Admin menu items (existing) ─── */
+  const adminMenuItems = [
     {
       href: "/dashboard",
-      icon: "/images/icons/second-menu-dashboard-active.svg",
-      activeIcon: "/images/icons/second-menu-dashboard-active.svg",
+      icon: getContentAssetUrl("/images/icons/second-menu-dashboard-active.svg"),
+      activeIcon: getContentAssetUrl("/images/icons/second-menu-dashboard-active.svg"),
       label: t("menu.dashboard"),
     },
     {
       href: "/dashboard/license-user",
-      icon: "/images/Icon_License.svg",
+      icon: getContentAssetUrl("/images/Icon_License.svg"),
       label: t("menu.licenseUser"),
     },
     {
       href: "/dashboard/survey",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.survey"),
     },
     {
       href: "/dashboard/training-library/system",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.trainingLibrary"),
       children: [
         {
           href: "/dashboard/training-library/system",
-          icon: "/images/Icon_Template.svg",
+          icon: getContentAssetUrl("/images/Icon_Template.svg"),
           label: t("menu.systemLibrary"),
         },
         {
           href: "/dashboard/training-library/my",
-          icon: "/images/Icon_Template.svg",
+          icon: getContentAssetUrl("/images/Icon_Template.svg"),
           label: t("menu.myLibrary"),
         },
       ],
     },
     {
       href: "/dashboard/system-branding",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.systemBranding"),
       children: [
         { href: "#", icon: "", label: t("menu.certificate") },
@@ -69,7 +74,7 @@ export const DashboardSidebar = ({
     },
     {
       href: "/dashboard/launch-awareness",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.launchAwareness"),
       children: [
         {
@@ -82,12 +87,12 @@ export const DashboardSidebar = ({
     },
     {
       href: "/dashboard/settings",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.systemSettings"),
     },
     {
       href: "/dashboard/my-awareness",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/Icon_Template.svg"),
       label: t("menu.myAwareness"),
       children: [
         { href: "#", icon: "", label: t("menu.profile") },
@@ -98,6 +103,28 @@ export const DashboardSidebar = ({
       ],
     },
   ];
+
+  /* ─── Org User (end-user / learner) menu items ─── */
+  const endUserMenuItems = [
+    {
+      href: "/dashboard",
+      icon: "/images/icons/second-menu-dashboard-active.svg",
+      activeIcon: "/images/icons/second-menu-dashboard-active.svg",
+      label: t("menu.dashboard"),
+    },
+    {
+      href: "/dashboard/campaign-assignments",
+      icon: "/images/Icon_Template.svg",
+      label: t("menu.campaignAssignments"),
+    },
+    {
+      href: "/dashboard/certificates",
+      icon: "/images/Icon_License.svg",
+      label: t("menu.certificates"),
+    },
+  ];
+
+  const subMenuItems = isEndUser ? endUserMenuItems : adminMenuItems;
 
   return (
     <div

@@ -9,6 +9,7 @@ import { Tooltip } from "@heroui/tooltip";
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 
 import { useI18n } from "@/i18n/I18nProvider";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 const HOVER_OPEN_DELAY_MS = 120;
 const HOVER_CLOSE_DELAY_MS = 180;
@@ -125,7 +126,7 @@ export const SubMenu = ({ items, isCollapsed = false }: SubMenuProps) => {
                 alt=""
                 className="size-4 shrink-0"
                 height={16}
-                src="/images/img/aware-icon.svg"
+                src={getContentAssetUrl("/images/img/aware-icon.svg")}
                 width={16}
               />
             </span>
@@ -135,7 +136,7 @@ export const SubMenu = ({ items, isCollapsed = false }: SubMenuProps) => {
             alt=""
             className="size-4 shrink-0"
             height={16}
-            src="/images/img/aware-icon.svg"
+            src={getContentAssetUrl("/images/img/aware-icon.svg")}
             width={16}
           />
         )}
@@ -144,7 +145,7 @@ export const SubMenu = ({ items, isCollapsed = false }: SubMenuProps) => {
             alt="Aware Magnus"
             className="h-3 w-auto text-[var(--mainblue)]"
             height={12}
-            src="/images/img/aware-name.svg"
+            src={getContentAssetUrl("/images/img/aware-name.svg")}
             width={80}
           />
         )}

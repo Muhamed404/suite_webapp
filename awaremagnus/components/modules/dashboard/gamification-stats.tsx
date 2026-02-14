@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useAchievementStatistics, useAvatarStatistics } from "@/hooks/useDashboard";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 export const GamificationStats = () => {
   const t = useTranslations("dashboard");
@@ -60,7 +61,13 @@ export const GamificationStats = () => {
         */}
         <div className="col-span-3 row-span-1 bg-white rounded-xl p-4 flex flex-col justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-            <Image alt="" className="text-lg" height={28} src="/images/gard_cap.svg" width={28} />
+            <Image
+              alt=""
+              className="text-lg"
+              height={28}
+              src={getContentAssetUrl("/images/gard_cap.svg")}
+              width={28}
+            />
             <div>
               {t("gamification.courseCompleted")}
               <div className="text-base font-semibold text-gray-900">8/12</div>
@@ -74,7 +81,13 @@ export const GamificationStats = () => {
         {/* Study Time */}
         <div className="col-span-3 col-start-4 row-span-1 bg-white rounded-xl p-4 flex flex-col justify-start">
           <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-            <Image alt="" className="text-lg" height={28} src="/images/clock_icon.svg" width={28} />
+            <Image
+              alt=""
+              className="text-lg"
+              height={28}
+              src={getContentAssetUrl("/images/clock_icon.svg")}
+              width={28}
+            />
             <div>
               {t("gamification.studyTime")}
               <div className="text-base font-semibold text-gray-900">127h</div>
@@ -91,7 +104,7 @@ export const GamificationStats = () => {
                   alt=""
                   className="text-lg"
                   height={28}
-                  src="/images/img/Icon_Trophy.svg"
+                  src={getContentAssetUrl("/images/img/Icon_Trophy.svg")}
                   width={28}
                 />
                 {t("gamification.achievementGallery")}
@@ -118,10 +131,12 @@ export const GamificationStats = () => {
                     alt={ach.achievement_name}
                     className="w-14 h-14"
                     height={56}
-                    src={`/images/achivement/${ach.image_small_url}`}
+                    src={getContentAssetUrl(`/images/achivement/${ach.image_small_url}`)}
                     width={56}
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/images/achivement/1.png";
+                      (e.target as HTMLImageElement).src = getContentAssetUrl(
+                        "/images/achivement/1.png"
+                      );
                     }}
                   />
                 ) : (
@@ -129,7 +144,7 @@ export const GamificationStats = () => {
                     alt=""
                     className="w-14 h-14"
                     height={56}
-                    src={`/images/achivement/${(i % 5) + 1}.png`}
+                    src={getContentAssetUrl(`/images/achivement/${(i % 5) + 1}.png`)}
                     width={56}
                   />
                 )}
@@ -188,10 +203,12 @@ export const GamificationStats = () => {
                     alt=""
                     className="w-24 h-24 rounded-full"
                     height={96}
-                    src={`/images/avatars/${mainAvatar.image_small_url}`}
+                    src={getContentAssetUrl(`/images/avatars/${mainAvatar.image_small_url}`)}
                     width={96}
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/images/avatars/1.png";
+                      (e.target as HTMLImageElement).src = getContentAssetUrl(
+                        "/images/avatars/1.png"
+                      );
                     }}
                   />
                 </div>
@@ -219,10 +236,12 @@ export const GamificationStats = () => {
                       alt=""
                       className="w-10 h-10 rounded-full"
                       height={40}
-                      src={`/images/avatars/${level.image_small_url}`}
+                      src={getContentAssetUrl(`/images/avatars/${level.image_small_url}`)}
                       width={40}
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/images/avatars/1.png";
+                        (e.target as HTMLImageElement).src = getContentAssetUrl(
+                          "/images/avatars/1.png"
+                        );
                       }}
                     />
                   </div>

@@ -16,6 +16,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useCreateModule } from "@/hooks/useQuiz";
 import { useCategories } from "@/hooks/useSuiteAwm";
 import { getApiErrorMessage } from "@/utils/apiError";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 function createEmptyTranslation(languageId: number): ModuleTranslation {
   return {
@@ -241,7 +242,7 @@ export function CreateModuleForm() {
                   alt=""
                   className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none"
                   height={16}
-                  src="/images/date.svg"
+                  src={getContentAssetUrl("/images/date.svg")}
                   width={16}
                 />
               </div>

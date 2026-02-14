@@ -5,12 +5,13 @@ import { RadioGroup, Radio } from "@heroui/radio";
 import clsx from "clsx";
 
 import { useTranslations } from "@/i18n/useTranslations";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 export type QuizLocale = "en" | "ar";
 
 const LANGUAGES: { value: QuizLocale; key: string; flag: string }[] = [
-  { value: "en", key: "languages.en", flag: "/images/eng.png" },
-  { value: "ar", key: "languages.ar", flag: "/images/ar.png" },
+  { value: "en", key: "languages.en", flag: getContentAssetUrl("/images/eng.png") },
+  { value: "ar", key: "languages.ar", flag: getContentAssetUrl("/images/ar.png") },
 ];
 
 interface QuizLanguageSelectorProps {

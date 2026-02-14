@@ -24,6 +24,7 @@ import { useModules } from "@/hooks/useQuiz";
 import { useCreateContent } from "@/hooks/useQuiz";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { getLanguageId } from "@/utils/languageMapping";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 /** Minimal upload icon for dropzones */
 function UploadIcon({ className }: { className?: string }) {
@@ -142,9 +143,9 @@ export function CreateContentForm({
   const isQuizType =
     useApiContentTypes && selectedContentTypeId != null
       ? (apiContentTypes
-          .find((ct) => ct.id === selectedContentTypeId)
-          ?.name?.toLowerCase()
-          .includes("quiz") ?? false)
+        .find((ct) => ct.id === selectedContentTypeId)
+        ?.name?.toLowerCase()
+        .includes("quiz") ?? false)
       : contentType === "Quiz";
 
   const { data: modulesRes } = useModules({ status: 1 });
@@ -266,8 +267,8 @@ export function CreateContentForm({
     const requiresFileOrUrl = useApiContentTypes
       ? true
       : ["iSpring", "PDF", "Video", "Brochure", "Screen Saver", "Poster", "Game"].includes(
-          contentType!
-        );
+        contentType!
+      );
 
     if (!isQuizType && requiresFileOrUrl) {
       if (!allowsFileUpload) {
@@ -383,15 +384,15 @@ export function CreateContentForm({
       ? true
       : contentType
         ? [
-            "iSpring",
-            "PDF",
-            "Video",
-            "Brochure",
-            "Screen Saver",
-            "Poster",
-            "Game",
-            "Misc",
-          ].includes(contentType)
+          "iSpring",
+          "PDF",
+          "Video",
+          "Brochure",
+          "Screen Saver",
+          "Poster",
+          "Game",
+          "Misc",
+        ].includes(contentType)
         : false;
   const showUrlOnly = requiresFileOrUrlForDisplay && !allowsFileUpload;
   const showFileOrUrlChoice = requiresFileOrUrlForDisplay && allowsFileUpload;
@@ -507,7 +508,7 @@ export function CreateContentForm({
               radius="full"
               size="md"
             >
-              <Image alt="" height={12} src="/images/img/add.svg" width={12} />
+              <Image alt="" height={12} src={getContentAssetUrl("/images/img/add.svg")} width={12} />
               <span className="md:flex hidden text-xs">{t("addNew")}</span>
             </Button>
           </div>

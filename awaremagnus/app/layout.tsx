@@ -12,6 +12,8 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { LayoutWrapper } from "@/components/layout-wrapper";
 
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+
 export const metadata: Metadata = {
   title: {
     default: siteConfig.name,
@@ -19,7 +21,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   icons: {
-    icon: "/favicon.ico",
+    icon: getContentAssetUrl("/favicon.ico"),
   },
 };
 
