@@ -119,7 +119,7 @@ function getActionButton(status: "active" | "pending" | "completed", campaignId:
 }
 
 export function CampaignAssignmentsPage() {
-  const t = useTranslations("campaign");
+  const t = useTranslations("campaigns");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 

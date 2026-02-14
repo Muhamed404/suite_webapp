@@ -65,6 +65,15 @@ export interface CampaignTarget {
   status_id: number;
 }
 
+export interface CampaignAssignment {
+  id: number;
+  name?: string;
+  status?: string;
+  start_date?: string;
+  end_date?: string;
+  progress_percent?: number;
+}
+
 export interface CampaignSchedule {
   id: number;
   campaign_id: number;

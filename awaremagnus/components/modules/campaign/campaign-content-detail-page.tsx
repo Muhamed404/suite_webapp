@@ -37,7 +37,7 @@ export function CampaignContentDetailPage({
   contentId,
 }: CampaignContentDetailPageProps) {
   const { dir } = useI18n();
-  const t = useTranslations("campaign");
+  const t = useTranslations("campaigns");
   const isRtl = dir === "rtl";
 
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);

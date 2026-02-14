@@ -28,7 +28,7 @@ interface CampaignModulesPageProps {
 }
 
 export function CampaignModulesPage({ campaignId }: CampaignModulesPageProps) {
-  const t = useTranslations("campaign");
+  const t = useTranslations("campaigns");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
@@ -78,6 +78,16 @@ export function CampaignModulesPage({ campaignId }: CampaignModulesPageProps) {
           {/* Empty */}
           {!isLoading && modules.length === 0 && (
             <EmptyState
+              action={
+                <Button
+                  as={Link}
+                  className="bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-semibold px-5"
+                  href="/dashboard/campaigns"
+                  size="sm"
+                >
+                  {t("backToCampaigns")}
+                </Button>
+              }
               description={t("emptyModulesDescription")}
               title={t("emptyModulesTitle")}
             />
