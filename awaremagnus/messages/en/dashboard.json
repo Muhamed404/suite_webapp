@@ -91,7 +91,16 @@
     "myLibrary": "My Library",
     "systemBranding": "System Branding",
     "launchAwareness": "Launch Awareness",
+    "campaigns": "Campaigns",
+    "reports": "Reports",
     "systemSettings": "System Settings",
-    "myAwareness": "My Awareness"
+    "myAwareness": "My Awareness",
+    "profile": "Profile",
+    "certificates": "Certificates",
+    "achievements": "Achievements",
+    "assignments": "Assignments",
+    "reportCard": "Report Card",
+    "certificate": "Certificate",
+    "logoAndImages": "Logo and Images"
   }
 }
