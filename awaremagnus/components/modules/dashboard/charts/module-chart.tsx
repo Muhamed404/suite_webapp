@@ -5,6 +5,16 @@ import ApexCharts from "apexcharts";
 
 // ModuleDetailsChart Component (adapted from provided JS)
 class ModuleDetailsChart {
+  element: HTMLElement;
+  elementId: string;
+  modules: any[];
+  chartSize: string;
+  title: string;
+  dropdownOptions: string[];
+  defaultOption: string;
+  selectedOption: string;
+  chart: any;
+
   constructor(element: HTMLElement) {
     this.element = element;
     this.elementId = 'chart-' + Math.random().toString(36).substr(2, 9);
