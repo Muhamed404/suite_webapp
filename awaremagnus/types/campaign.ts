@@ -74,6 +74,18 @@ export interface CampaignAssignment {
   progress_percent?: number;
 }
 
+export interface Certificate {
+  id: number;
+  certificate_name?: string;
+  name?: string;
+  title?: string;
+  campaign_name?: string;
+  module_name?: string;
+  certificate_issue_date?: string;
+  created_at?: string;
+  status?: string;
+}
+
 export interface CampaignSchedule {
   id: number;
   campaign_id: number;
