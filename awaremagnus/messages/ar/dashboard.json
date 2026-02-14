@@ -92,9 +92,16 @@
     "myLibrary": "مكتبتي",
     "systemBranding": "هوية النظام",
     "launchAwareness": "إطلاق التوعية",
+    "campaigns": "الحملات",
+    "reports": "التقارير",
     "systemSettings": "إعدادات النظام",
     "myAwareness": "توعيتي",
-    "campaignAssignments": "مهام الحملات",
-    "certificates": "الشهادات"
+    "profile": "الملف الشخصي",
+    "certificates": "الشهادات",
+    "achievements": "الإنجازات",
+    "assignments": "المهام",
+    "reportCard": "كرت الدرجات",
+    "certificate": "الشهادة",
+    "logoAndImages": "الشعار والصور"
   }
 }

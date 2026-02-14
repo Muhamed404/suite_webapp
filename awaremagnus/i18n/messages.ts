@@ -9,18 +9,18 @@ export interface AppMessages {
   quiz: Messages;
   module: Messages;
   content: Messages;
-  campaign: Messages;
+  campaigns: Messages;
 }
 
 export async function loadMessages(locale: Locale): Promise<AppMessages> {
-  const [common, hintLogin, hintDashboard, quiz, module, content, campaign] = await Promise.all([
+  const [common, hintLogin, hintDashboard, quiz, module, content, campaigns] = await Promise.all([
     import(`@/messages/${locale}/common.json`).then((m) => m.default),
     import(`@/messages/${locale}/login.json`).then((m) => m.default),
     import(`@/messages/${locale}/dashboard.json`).then((m) => m.default),
     import(`@/messages/${locale}/quiz.json`).then((m) => m.default),
     import(`@/messages/${locale}/module.json`).then((m) => m.default),
     import(`@/messages/${locale}/content.json`).then((m) => m.default),
-    import(`@/messages/${locale}/campaign.json`).then((m) => m.default),
+    import(`@/messages/${locale}/campaigns.json`).then((m) => m.default),
   ]);
 
   return {
@@ -30,6 +30,6 @@ export async function loadMessages(locale: Locale): Promise<AppMessages> {
     quiz,
     module,
     content,
-    campaign,
+    campaigns,
   };
 }

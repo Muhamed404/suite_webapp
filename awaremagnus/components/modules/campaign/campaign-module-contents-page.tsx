@@ -61,7 +61,7 @@ export function CampaignModuleContentsPage({
   campaignId,
   moduleId,
 }: CampaignModuleContentsPageProps) {
-  const t = useTranslations("campaign");
+  const t = useTranslations("campaigns");
   const tModule = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";

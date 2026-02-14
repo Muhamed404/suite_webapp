@@ -40,7 +40,7 @@ function certificateName(c: Certificate): string {
 }
 
 export function CertificateListPage() {
-  const t = useTranslations("campaign");
+  const t = useTranslations("campaigns");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
   const { user } = useAuthStore();
