@@ -14,6 +14,7 @@
     "totalUserLicenses": "Total User Licenses",
     "totalConsumedLicenses": "Total Consumed Licenses",
     "organizationScore": "Organization Score",
+    "myScore": "My Score",
     "totalComplianceScore": "Total Compliance Score",
     "globalProgress": "Global Progress",
     "totalXpTokens": "Total XP Tokens",
@@ -92,6 +93,8 @@
     "systemBranding": "System Branding",
     "launchAwareness": "Launch Awareness",
     "systemSettings": "System Settings",
-    "myAwareness": "My Awareness"
+    "myAwareness": "My Awareness",
+    "campaignAssignments": "Campaign Assignments",
+    "certificates": "Certificates"
   }
 }

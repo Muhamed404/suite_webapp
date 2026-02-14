@@ -1,0 +1,31 @@
+{
+  "title": "مهام الحملات",
+  "description": "عرض حملات التوعية المخصصة لك وتتبع تقدمك.",
+  "emptyTitle": "لا توجد مهام حملات",
+  "emptyDescription": "ليس لديك أي مهام حملات حتى الآن.",
+  "modules": "وحدات",
+  "startDate": "البداية",
+  "dueDate": "الاستحقاق",
+  "progress": "التقدم",
+  "modulesTitle": "وحدات الحملة",
+  "modulesDescription": "أكمل الوحدات في هذه الحملة للحصول على شهادتك.",
+  "emptyModulesTitle": "لم يتم العثور على وحدات",
+  "emptyModulesDescription": "لا توجد وحدات مخصصة لهذه الحملة حتى الآن.",
+  "viewContents": "عرض المحتوى",
+  "contentsTitle": "محتويات الوحدة",
+  "emptyContentsTitle": "لا يوجد محتوى متاح",
+  "emptyContentsDescription": "لا يوجد محتوى في هذه الوحدة حتى الآن.",
+  "contentDetail": "المحتوى",
+  "certificatesTitle": "الشهادات",
+  "certificatesDescription": "عرض وتحميل الشهادات التي حصلت عليها.",
+  "emptyCertificatesTitle": "لا توجد شهادات بعد",
+  "emptyCertificatesDescription": "أكمل وحدات الحملة للحصول على الشهادات.",
+  "campaignLabel": "الحملة",
+  "moduleLabel": "الوحدة",
+  "issuedDate": "تاريخ الإصدار",
+  "expiryDate": "تاريخ الانتهاء",
+  "downloadCertificate": "تحميل الشهادة",
+  "breadcrumb": {
+    "dashboard": "لوحة التحكم"
+  }
+}

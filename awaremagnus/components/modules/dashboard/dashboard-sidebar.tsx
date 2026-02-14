@@ -13,18 +13,22 @@ interface DashboardSidebarProps {
   onClose?: () => void;
   /** When true, show icon-only (collapsed). When false, show full width. Matches PhishMagnus: sub collapsed when primary expanded. */
   isCollapsed?: boolean;
+  /** When true, user is Org User (end-user / learner): show limited menu (Campaign Assignments, Certificates). */
+  isEndUser?: boolean;
 }
 
 export const DashboardSidebar = ({
   open = false,
   onClose,
   isCollapsed = false,
+  isEndUser = false,
 }: DashboardSidebarProps) => {
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
 
-  const subMenuItems = [
+  /* ─── Admin / Org Admin menu items (existing) ─── */
+  const adminMenuItems = [
     {
       href: "/dashboard",
       icon: "/images/icons/second-menu-dashboard-active.svg",
@@ -94,6 +98,28 @@ export const DashboardSidebar = ({
       ],
     },
   ];
+
+  /* ─── Org User (end-user / learner) menu items ─── */
+  const endUserMenuItems = [
+    {
+      href: "/dashboard",
+      icon: "/images/icons/second-menu-dashboard-active.svg",
+      activeIcon: "/images/icons/second-menu-dashboard-active.svg",
+      label: t("menu.dashboard"),
+    },
+    {
+      href: "/dashboard/campaign-assignments",
+      icon: "/images/Icon_Template.svg",
+      label: t("menu.campaignAssignments"),
+    },
+    {
+      href: "/dashboard/certificates",
+      icon: "/images/Icon_License.svg",
+      label: t("menu.certificates"),
+    },
+  ];
+
+  const subMenuItems = isEndUser ? endUserMenuItems : adminMenuItems;
 
   return (
     <div
