@@ -72,7 +72,7 @@ export function PosterContentDetailScreen({
   const basePath = `/dashboard/training-library/${libraryType}`;
   const libraryLabel = libraryType === "system" ? "System Library" : "My Library";
   const listHref = `${basePath}/${moduleId}/content/${contentTypeId}`;
-  const POSTER_FALLBACK = "/posters.png";
+  const POSTER_FALLBACK = getContentAssetUrl("/posters.png");
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);

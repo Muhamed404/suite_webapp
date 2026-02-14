@@ -2,6 +2,8 @@ import Image from "next/image";
 import { Card, CardBody } from "@heroui/card";
 import Link from "next/link";
 
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+
 export const DashboardCharts = () => {
   return (
     <div className="grid grid-cols-12 gap-2">
@@ -48,7 +50,7 @@ export const DashboardCharts = () => {
                   alt=""
                   className="w-10 h-10"
                   height={40}
-                  src="/images/icons/shield.svg"
+                  src={getContentAssetUrl("/images/icons/shield.svg")}
                   width={40}
                 />
                 <div>
@@ -82,19 +84,19 @@ export const DashboardCharts = () => {
             <div className="space-y-1.5">
               {[
                 {
-                  icon: "/images/icons/wifi.svg",
+                  icon: getContentAssetUrl("/images/icons/wifi.svg"),
                   label: "WIFI Security",
                   color: "bg-[#C9F1E2]",
                   iconColor: "text-[#0D9488]",
                 },
                 {
-                  icon: "/images/icons/physical.svg",
+                  icon: getContentAssetUrl("/images/icons/physical.svg"),
                   label: "Physical Security",
                   color: "bg-[#DCE9FF]",
                   iconColor: "text-[#2563EB]",
                 },
                 {
-                  icon: "/images/icons/phishing.svg",
+                  icon: getContentAssetUrl("/images/icons/phishing.svg"),
                   label: "Phishing Security",
                   color: "bg-[#FEE2E2]",
                   iconColor: "text-[#DC2626]",
@@ -130,7 +132,7 @@ export const DashboardCharts = () => {
                 alt=""
                 className="w-3 h-3"
                 height={12}
-                src="/images/icons/alert.svg"
+                src={getContentAssetUrl("/images/icons/alert.svg")}
                 width={12}
               />
               Your employees need attention on these topics
@@ -152,7 +154,7 @@ export const DashboardCharts = () => {
                 alt=""
                 className="w-12 h-12"
                 height={48}
-                src="/images/check-fr.svg"
+                src={getContentAssetUrl("/images/check-fr.svg")}
                 width={48}
               />
             </div>

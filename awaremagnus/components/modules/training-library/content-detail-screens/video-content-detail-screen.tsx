@@ -19,7 +19,7 @@ import { AuthImage } from "@/components/ui/auth-image";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 /** Card asset used as fallback thumbnail when logo is invalid */
-const CARD_ASSET = "/images/Card.png";
+const CARD_ASSET = getContentAssetUrl("/images/Card.png");
 
 function moduleName(m: Module): string {
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;

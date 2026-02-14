@@ -10,6 +10,7 @@ import {
   type SuitePrimaryMenuItem,
 } from "@/config/suite-links";
 import { useI18n } from "@/i18n/I18nProvider";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 interface SidebarPrimaryMenuProps {
   /** When true, sidebar is collapsed (icon-only, w-16). */
@@ -47,7 +48,7 @@ export function SidebarPrimaryMenu({ isCollapsed, onToggle }: SidebarPrimaryMenu
           alt=""
           className="size-4 shrink-0"
           height={16}
-          src="/images/menu-logo.svg"
+          src={getContentAssetUrl("/images/menu-logo.svg")}
           width={16}
         />
         <span
@@ -60,7 +61,7 @@ export function SidebarPrimaryMenu({ isCollapsed, onToggle }: SidebarPrimaryMenu
             alt="Suite"
             className="h-3 w-auto"
             height={12}
-            src="/images/menu-logo-name.svg"
+            src={getContentAssetUrl("/images/menu-logo-name.svg")}
             width={60}
           />
         </span>
@@ -119,7 +120,7 @@ export function SidebarPrimaryMenu({ isCollapsed, onToggle }: SidebarPrimaryMenu
                   alt=""
                   className="size-4 shrink-0"
                   height={16}
-                  src="/images/icons/logout.svg"
+                  src={getContentAssetUrl("/images/icons/logout.svg")}
                   width={16}
                 />
                 <span className={clsx("text-sm font-normal", isCollapsed && "hidden")}>Logout</span>

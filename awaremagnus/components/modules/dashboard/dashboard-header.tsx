@@ -7,6 +7,7 @@ import clsx from "clsx";
 
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 interface DashboardHeaderProps {
   onMenuClick?: () => void;
@@ -22,7 +23,7 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
       alt=""
       className="size-4 text-gray-400"
       height={16}
-      src="/images/img/search.svg"
+      src={getContentAssetUrl("/images/img/search.svg")}
       width={16}
     />
   );
@@ -62,7 +63,7 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[var(--strokeGray)] bg-white hover:bg-[var(--gray)]"
           variant="light"
         >
-          <Image alt="" className="size-4" height={16} src="/images/img/mail.svg" width={16} />
+          <Image alt="" className="size-4" height={16} src={getContentAssetUrl("/images/img/mail.svg")} width={16} />
         </Button>
         <Button
           isIconOnly
@@ -70,7 +71,7 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[var(--strokeGray)] bg-white hover:bg-[var(--gray)]"
           variant="light"
         >
-          <Image alt="" className="size-4" height={16} src="/images/img/bell.svg" width={16} />
+          <Image alt="" className="size-4" height={16} src={getContentAssetUrl("/images/img/bell.svg")} width={16} />
         </Button>
         <div
           className={clsx(
@@ -82,7 +83,7 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
             alt=""
             className="w-9 h-9 rounded-full shrink-0"
             height={36}
-            src="/images/img/profile.png"
+            src={getContentAssetUrl("/images/img/profile.png")}
             width={36}
           />
           <div className="flex flex-col gap-0.5 min-w-0">
