@@ -84,7 +84,7 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
             <button
               onClick={handleLaunchCampaign}
               disabled={isLaunching || updateCampaign.isPending}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 w-32 text-xs font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               title={t("launch")}
             >
               <Play className="w-3.5 h-3.5" />
@@ -96,7 +96,7 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
           {campaign.status_id === 2 && (
             <Link
               href={`/dashboard/launch-awareness/campaigns/${campaign.id}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-gray-500 hover:bg-gray-600 rounded-full transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 w-32 text-xs font-medium text-white bg-gray-500 hover:bg-gray-600 rounded-full transition-colors"
               title={t("viewReport")}
             >
               <FileText className="w-3.5 h-3.5" />
@@ -108,7 +108,7 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
           {campaign.status_id === 5 && (
             <Link
               href={`/dashboard/launch-awareness/campaigns/${campaign.id}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-gray-500 hover:bg-gray-600 rounded-full transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 w-32 text-xs font-medium text-white bg-gray-500 hover:bg-gray-600 rounded-full transition-colors"
               title={t("viewReport")}
             >
               <FileText className="w-3.5 h-3.5" />
@@ -120,7 +120,7 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
           {campaign.status_id === 3 && (
             <Link
               href={`/dashboard/launch-awareness/campaigns/${campaign.id}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+              className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 w-32 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
               title={t("viewDetails")}
             >
               <FileText className="w-3.5 h-3.5" />
