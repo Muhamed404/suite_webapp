@@ -108,7 +108,7 @@ export function CampaignModulesPage({ campaignId }: CampaignModulesPageProps) {
                         alt=""
                         className="object-contain"
                         height={24}
-                        src="/images/Icon_Template.svg"
+                        src="/awm/images/Icon_Template.svg"
                         width={24}
                       />
                     </div>

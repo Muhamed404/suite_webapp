@@ -150,7 +150,7 @@ export default function CampaignLeaderboardPage() {
                 </p>
               </div>
               <div className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center">
-                <img src="/images/assing/assingment.svg" alt="" />
+                <img src="/awm/images/assing/assingment.svg" alt="" />
               </div>
             </div>
 
@@ -162,7 +162,7 @@ export default function CampaignLeaderboardPage() {
                 </p>
               </div>
               <div className="w-7 h-7 bg-green-100 rounded-full flex items-center justify-center">
-                <img src="/images/assing/assingment.svg" alt="" />
+                <img src="/awm/images/assing/assingment.svg" alt="" />
               </div>
             </div>
 
@@ -174,7 +174,7 @@ export default function CampaignLeaderboardPage() {
                 </p>
               </div>
               <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center">
-                <img src="/images/assing/pending.svg" alt="" />
+                <img src="/awm/images/assing/pending.svg" alt="" />
               </div>
             </div>
 
@@ -186,7 +186,7 @@ export default function CampaignLeaderboardPage() {
                 </p>
               </div>
               <div className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center">
-                <img src="/images/assing/res-rate.svg" alt="" />
+                <img src="/awm/images/assing/res-rate.svg" alt="" />
               </div>
             </div>
           </div>

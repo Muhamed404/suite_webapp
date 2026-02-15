@@ -15,25 +15,25 @@ export function CampaignStatsCards({ data }: CampaignStatsCardsProps) {
     {
       label: t("stats.totalCampaigns"),
       value: data?.total_campaigns || 0,
-      icon: "/images/assing/assingment.svg",
+      icon: "/awm/images/assing/assingment.svg",
       bgColor: "bg-red-100",
     },
     {
       label: t("stats.totalEnrolledUsers"),
       value: data?.total_enrolled_users_all || 0,
-      icon: "/images/assing/assingment.svg",
+      icon: "/awm/images/assing/assingment.svg",
       bgColor: "bg-green-100",
     },
     {
       label: t("stats.totalCertification"),
       value: data?.total_completed_certifications_all || 0,
-      icon: "/images/assing/pending.svg",
+      icon: "/awm/images/assing/pending.svg",
       bgColor: "bg-gray-200",
     },
     {
       label: t("stats.completionProgress"),
       value: `${data?.average_completion_percentage_all?.toFixed(0) || 0}%`,
-      icon: "/images/assing/res-rate.svg",
+      icon: "/awm/images/assing/res-rate.svg",
       bgColor: "bg-red-100",
     },
   ];

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
-import { ArrowLeft, Calendar, AlertCircle, Play, Trophy } from "lucide-react";
+import { ArrowLeft, AlertCircle, Play, Trophy } from "lucide-react";
 import clsx from "clsx";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
@@ -166,7 +166,9 @@ export default function CampaignDetailsPage() {
                 {/* Topics Schedule */}
                 <div>
                   <div className="flex items-center gap-1.5 mb-2">
-                    <Calendar className="w-4 h-4 text-gray-600" />
+                    <span className="w-4 h-4">
+                      <img src="/awm/images/img/calendar.svg" alt="" className="w-full h-full" />
+                    </span>
                     <h3 className="font-semibold text-gray-800 text-sm">Topics Schedule</h3>
                   </div>
 
@@ -206,7 +208,9 @@ export default function CampaignDetailsPage() {
               <div className="bg-white rounded-xl p-4 flex flex-col justify-between h-full">
                 <div className="flex justify-between items-start">
                   <p className="text-gray-600 text-xs">Remaining days</p>
-                  <Calendar className="w-6 h-6 text-gray-400" />
+                  <div className="w-6 h-6">
+                    <img src="/awm/images/img/calendar.svg" alt="" className="w-full h-full" />
+                  </div>
                 </div>
 
                 <div className="mt-2 flex items-center gap-1">
@@ -248,18 +252,19 @@ export default function CampaignDetailsPage() {
 
               <div className="space-y-1 flex-1">
                 {[
-                  { name: "Phishing Awareness", value: 65 },
-                  { name: "Password Security", value: 58 },
-                  { name: "Data Privacy", value: 52 },
+                  { name: "WIFI Security", value: 65, icon: "/awm/images/icons/wifi.svg", color: "#C9F1E2", textColor: "#0D9488" },
+                  { name: "Physical Security", value: 58, icon: "/awm/images/icons/physical.svg", color: "#DCE9FF", textColor: "#2563EB" },
+                  { name: "Phishing Security", value: 52, icon: "/awm/images/icons/phishing.svg", color: "#FEE2E2", textColor: "#DC2626" },
                 ].map((topic, idx) => (
                   <div
                     key={idx}
                     className="flex justify-between items-center bg-[#F0F7F9] rounded-md py-1 px-1.5"
                   >
                     <div className="flex items-center gap-1.5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                      <span className="text-[10px] text-gray-700">{topic.name}</span>
-                      <span className="text-[9px] text-gray-500">({topic.value}%)</span>
+                      <div className={`w-4 h-4 rounded-full flex items-center justify-center`} style={{ backgroundColor: topic.color }}>
+                        <img src={topic.icon} className="w-2 h-2" alt="" />
+                      </div>
+                      <span className="text-[10px] font-medium text-gray-800">{topic.name}</span>
                     </div>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -276,7 +281,7 @@ export default function CampaignDetailsPage() {
               </div>
 
               <p className="text-[8px] text-red-600 mt-2 flex items-center gap-1">
-                <AlertCircle className="w-2.5 h-2.5" />
+                <img src="/awm/images/icons/alert.svg" className="w-2.5 h-2.5" alt="" />
                 Your employees need attention on these topics
               </p>
             </div>
@@ -331,30 +336,23 @@ export default function CampaignDetailsPage() {
 
               {/* Info Cards */}
               <div className="bg-[#FFEEE7] p-2 rounded-xl flex items-center justify-between border border-orange-200">
-                <span className="text-gray-700 font-medium text-[10px]">
-                  Departments
-                </span>
-                <span className="text-gray-800 text-lg font-semibold">
-                  {campaign?.departments?.length || 0}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5">
+                    <img src="/awm/images/fire-red.svg" alt="" className="w-full h-full" />
+                  </div>
+                  <span className="text-gray-700 font-medium text-[10px]">Active Learner This Month</span>
+                </div>
+                <span className="text-gray-800 text-lg font-semibold">12</span>
               </div>
 
               <div className="bg-[#E6FFFA] p-2 rounded-xl flex items-center justify-between border border-teal-300">
-                <span className="text-gray-700 font-medium text-[10px]">
-                  Groups
-                </span>
-                <span className="text-gray-800 text-lg font-semibold">
-                  {campaign?.groups?.length || 0}
-                </span>
-              </div>
-
-              <div className="bg-[#FFF4E6] p-2 rounded-xl flex items-center justify-between border border-yellow-300">
-                <span className="text-gray-700 font-medium text-[10px]">
-                  Invitees
-                </span>
-                <span className="text-gray-800 text-lg font-semibold">
-                  {campaign?.invitees?.length || 0}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-5 h-5">
+                    <img src="/awm/images/fire-teal.svg" alt="" className="w-full h-full" />
+                  </div>
+                  <span className="text-gray-700 font-medium text-[10px]">Training Completion Rate</span>
+                </div>
+                <span className="text-gray-800 text-lg font-semibold">76%</span>
               </div>
             </div>
           </div>
@@ -367,19 +365,30 @@ export default function CampaignDetailsPage() {
 
             {/* Gamification Grid */}
             <div className="grid grid-cols-12 gap-2">
-              {/* Total Modules */}
-              <div className="col-span-3 bg-white rounded-xl p-3 flex flex-col justify-between">
+              {/* Course Completed */}
+              <div className="col-span-3 row-span-1 bg-white rounded-xl p-3 flex flex-col justify-between">
                 <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-                  <span className="text-2xl font-bold text-gray-800">{campaign?.modules?.length || 0}</span>
-                  <span className="ml-auto">Total Modules</span>
+                  <span className="text-lg"><img src="/awm/images/gard_cap.svg" alt="" className="w-5 h-5" /></span>
+                  <div>
+                    Course Completed
+                    <div className="text-xl text-gray-900">8/12</div>
+                  </div>
+                </div>
+                <div className="w-full h-1 bg-gray-200 rounded-full mt-4">
+                  <div className="h-1 bg-green-500 rounded-full" style={{ width: "70%" }}></div>
                 </div>
               </div>
 
-              {/* Total Targets */}
-              <div className="col-span-3 bg-white rounded-xl p-3 flex flex-col justify-start">
+              {/* Study Time */}
+              <div className="col-span-3 row-span-1 col-start-4 bg-white rounded-xl p-3 flex flex-col justify-start">
                 <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
-                  <span className="text-2xl font-bold text-gray-800">{(campaign?.departments?.length || 0) + (campaign?.groups?.length || 0) + (campaign?.invitees?.length || 0)}</span>
-                  <span className="ml-auto">Total Targets</span>
+                  <span className="text-lg">
+                    <img src="/awm/images/clock_icon.svg" alt="" className="w-5 h-5" />
+                  </span>
+                  <div>
+                    Study Time
+                    <div className="text-xl text-gray-900">127h</div>
+                  </div>
                 </div>
               </div>
 
@@ -446,15 +455,29 @@ export default function CampaignDetailsPage() {
 
               {/* Achievement Gallery - Takes up more space */}
               <div className="col-span-6 row-span-3 bg-gradient-to-br from-[#FFFEFC] to-[#FDECE0] rounded-xl p-4">
-                <h3 className="text-sm font-semibold mb-4">Achievement Gallery</h3>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h2 className="font-semibold text-gray-900 text-base flex items-center gap-1.5">
+                      <span className="text-lg"><img src="/awm/images/img/Icon_Trophy.svg" alt="" className="w-5 h-5" /></span>
+                      Achievement Gallery
+                    </h2>
+                    <p className="text-gray-500 text-xs mt-1">Organization locked and unlocked badges</p>
+                  </div>
+                  <a href="#" className="text-blue-600 text-xs font-medium">View All</a>
+                </div>
                 <div className="grid grid-cols-8 gap-2">
-                  {/* Badge placeholders */}
+                  {/* Achievement badges */}
                   {Array.from({ length: 16 }).map((_, idx) => (
                     <div
                       key={idx}
-                      className="w-10 h-10 rounded-lg bg-gray-200 flex items-center justify-center text-xl"
+                      className="w-10 h-10 rounded-lg flex items-center justify-center relative"
                     >
-                      🏆
+                      <img src={`/awm/images/achivement/${idx + 1}.png`} alt={`Achievement ${idx + 1}`} className="w-full h-full object-contain" />
+                      {idx < 7 && (
+                        <span className="absolute top-0 -right-1 w-4 h-4">
+                          <img src="/awm/images/achivement/achived.svg" alt="Achieved" className="w-full h-full" />
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -472,27 +495,45 @@ export default function CampaignDetailsPage() {
 
               {/* Employee Avatar Level */}
               <div className="col-span-6 row-span-2 row-start-2 bg-white rounded-xl p-4">
-                <h3 className="text-sm font-semibold mb-2">Employee Avatar Level</h3>
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {[
-                    "Novice Learner",
-                    "Informed Defender",
-                    "Vigilant Guardian",
-                    "Skilled Sentinel",
-                    "Resilient Protector",
-                    "Advanced Watchman",
-                    "Expert Enforcer",
-                  ].map((level, idx) => (
-                    <div
-                      key={idx}
-                      className="text-center px-2 py-2 hover:bg-[#EFFAFF] rounded-lg flex flex-col items-center min-w-[80px]"
-                    >
-                      <div className="w-8 h-8 bg-gray-200 rounded-full mb-1">
-                        <img src={`/images/avatars/${idx + 1}.png`} alt={level} className="w-full h-full rounded-full" />
-                      </div>
-                      <p className="text-[9px] leading-tight text-gray-700">{level}</p>
+                <div className="flex justify-between items-center">
+                  <h2 className="text-base font-semibold">Employee Avatar Level</h2>
+                  <a href="#" className="text-blue-600 text-xs font-medium">View All</a>
+                </div>
+
+                <div className="flex mt-4 gap-6">
+                  {/* Avatar */}
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="w-20 h-20 bg-gray-200 rounded-full">
+                      <img src="/awm/images/avatars/1.png" alt="" className="w-full h-full rounded-full" />
                     </div>
-                  ))}
+                    <p className="mt-4 text-gray-700 text-xs text-center leading-tight">
+                      Vulnerable<br />Newbie
+                    </p>
+                  </div>
+
+                  {/* Levels */}
+                  <div className="grid grid-cols-4 gap flex-1 pl-4 border-l border-[#E6E6E6]">
+                    {[
+                      { level: "Alert Apprentice", avatar: 2 },
+                      { level: "Cautious Learner", avatar: 3 },
+                      { level: "Informed Defender", avatar: 4 },
+                      { level: "Vigilant Guardian", avatar: 5 },
+                      { level: "Skilled Sentinel", avatar: 6 },
+                      { level: "Resilient Protector", avatar: 7 },
+                      { level: "Advanced Watchman", avatar: 8 },
+                      { level: "Expert Enforcer", avatar: 9 },
+                    ].map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="col-span-1 text-center px-0.5 py-2 hover:bg-[#EFFAFF] transform duration-300 rounded-lg flex flex-col items-center"
+                      >
+                        <div className="w-8 h-8 bg-gray-200 rounded-full mx-auto">
+                          <img src={`/awm/images/avatars/${item.avatar}.png`} alt="" className="w-full h-full rounded-full" />
+                        </div>
+                        <p className="text-[10px] leading-tight text-gray-700 mt-1.5 w-[90%]">{item.level}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
