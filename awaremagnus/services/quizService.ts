@@ -432,4 +432,35 @@ export const quizService = {
       awmClient.get<AWMResponseBody>(`${API_BASE}/quiz/${quizId}/answers`)
     );
   },
+
+  /** 
+   * GET /module/:id/contents-with-quizzes 
+   * Returns: { module_id, non_aggregated_contents: [...], aggregated_contents: {...} }
+   */
+  getContentsWithQuizzes: async (moduleId: number, lang_id?: number) => {
+    return request<any>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/module/${moduleId}/contents-with-quizzes`, {
+        params: lang_id ? { language_id: lang_id } : undefined,
+      })
+    );
+  },
+
+  /** 
+   * GET /module/:id/contents-with-progress 
+   * Requires campaign_id
+   */
+  getContentsWithProgress: async (
+    moduleId: number,
+    campaignId: number,
+    lang_id?: number
+  ) => {
+    return request<any>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/module/${moduleId}/contents-with-progress`, {
+        params: {
+          campaign_id: campaignId,
+          ...(lang_id ? { language_id: lang_id } : {}),
+        },
+      })
+    );
+  },
 };

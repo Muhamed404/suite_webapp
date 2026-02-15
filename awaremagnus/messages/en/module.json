@@ -62,7 +62,6 @@
   "loading": "Loading...",
   "filterByCategory": "Filter by category",
   "library": {
-    "description": "Contents some text and descriptions about the library, detail etc etc",
     "filterAll": "All",
     "filterModules": "Modules",
     "category": "Category",
@@ -143,6 +142,7 @@
     "breadcrumbTrainingLibrary": "Training Library",
     "breadcrumbMyLibrary": "My Library",
     "breadcrumbAwarenessCampaign": "Awareness Campaign",
-    "breadcrumbCampaign": "Campaign"
+    "breadcrumbCampaign": "Campaign",
+    "viewDetails": "View Details"
   }
 }

@@ -319,7 +319,7 @@ export default function DashboardPage() {
                     <a href="#" className="text-gray-700 text-[9px] font-medium flex items-center gap-0.5 hover:text-gray-900">
                       View All
                       <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                       </svg>
                     </a>
                   </div>
@@ -360,7 +360,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-0.5 bg-orange-100 px-1.5 py-0.5 rounded-full">
                       <div className="w-3 h-3 bg-orange-400 rounded flex items-center justify-center">
                         <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                          <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
                         </svg>
                       </div>
                       <span className="text-gray-900 text-[9px] font-medium">Performance</span>
@@ -370,7 +370,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-0.5 bg-blue-100 px-1.5 py-0.5 rounded-full">
                       <div className="w-3 h-3 bg-blue-400 rounded flex items-center justify-center">
                         <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clipRule="evenodd"/>
+                          <path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <span className="text-gray-900 text-[9px] font-medium">Milestone</span>
@@ -380,7 +380,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-0.5 bg-red-100 px-1.5 py-0.5 rounded-full">
                       <div className="w-3 h-3 bg-red-400 rounded flex items-center justify-center">
                         <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/>
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <span className="text-gray-900 text-[9px] font-medium">Behavior</span>
@@ -390,7 +390,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-0.5 bg-purple-100 px-1.5 py-0.5 rounded-full">
                       <div className="w-3 h-3 bg-purple-400 rounded flex items-center justify-center">
                         <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                         </svg>
                       </div>
                       <span className="text-gray-900 text-[9px] font-medium">Streak</span>
@@ -400,7 +400,7 @@ export default function DashboardPage() {
                     <div className="flex items-center gap-0.5 bg-teal-100 px-1.5 py-0.5 rounded-full">
                       <div className="w-3 h-3 bg-teal-400 rounded flex items-center justify-center">
                         <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
                       </div>
                       <span className="text-gray-900 text-[9px] font-medium">Completion</span>
@@ -433,10 +433,10 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-1.5">
                         <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" strokeWidth="2"/>
-                          <line x1="16" y1="2" x2="16" y2="6" strokeWidth="2" strokeLinecap="round"/>
-                          <line x1="8" y1="2" x2="8" y2="6" strokeWidth="2" strokeLinecap="round"/>
-                          <line x1="3" y1="10" x2="21" y2="10" strokeWidth="2"/>
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" strokeWidth="2" />
+                          <line x1="16" y1="2" x2="16" y2="6" strokeWidth="2" strokeLinecap="round" />
+                          <line x1="8" y1="2" x2="8" y2="6" strokeWidth="2" strokeLinecap="round" />
+                          <line x1="3" y1="10" x2="21" y2="10" strokeWidth="2" />
                         </svg>
                         <h2 className="text-gray-900 text-sm font-semibold">This Week</h2>
                       </div>
@@ -444,7 +444,7 @@ export default function DashboardPage() {
                         <button className="flex items-center gap-1 text-gray-700 text-xs font-medium hover:text-gray-900">
                           Weekly
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"/>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                           </svg>
                         </button>
                       </div>
@@ -469,7 +469,7 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 bg-red-200 rounded-full flex items-center justify-center flex-shrink-0">
                           <svg className="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M15 17h5l-5 5v-5zM15 7v5h5l-5-5zM5 17h5l-5 5v-5zM5 7v5H0l5-5z"/>
+                            <path d="M15 17h5l-5 5v-5zM15 7v5h5l-5-5zM5 17h5l-5 5v-5zM5 7v5H0l5-5z" />
                           </svg>
                         </div>
                         <div>
@@ -484,7 +484,7 @@ export default function DashboardPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 bg-purple-200 rounded-full flex items-center justify-center flex-shrink-0">
                           <svg className="w-3.5 h-3.5 text-purple-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z" />
                           </svg>
                         </div>
                         <div>
@@ -544,11 +544,11 @@ export default function DashboardPage() {
                   <div className="grid grid-cols-4 p-2 rounded-xl bg-white gap-2 h-full">
                     <div className="bg-[#F1F5F8] rounded-xl p-3 flex flex-col items-center justify-between col-span-2 h-full">
                       <h3 className="text-xs font-semibold mb-1">Weekly Progress</h3>
-                      <div className="leadchart h-32 w-32" style={ ({ color: "#00CCC4", value: weeklyProgress.toString() } as any) }></div>
+                      <div className="leadchart h-32 w-32" style={({ color: "#00CCC4", value: weeklyProgress.toString() } as any)}></div>
                     </div>
                     <div className="bg-[#F1F5F8] rounded-xl p-3 flex flex-col items-center justify-between col-span-2 h-full">
                       <h3 className="text-xs font-semibold mb-1">Quiz Accuracy</h3>
-                      <div className="leadchart h-32 w-32" style={ ({ color: "#7CC5FA", value: quizAccuracy.toString() } as any) }></div>
+                      <div className="leadchart h-32 w-32" style={({ color: "#7CC5FA", value: quizAccuracy.toString() } as any)}></div>
                     </div>
                   </div>
                 </div>
@@ -636,431 +636,431 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex flex-col p-4 sm:p-6 pt-0 gap-4 sm:gap-5 overflow-x-hidden">
-          {/* Main Grid Layout - 1 col mobile, 12 col desktop */}
-          <div
-            className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-2"
-            style={{ gridAutoRows: "minmax(80px, auto)" }}
-          >
-            {/* Row 1: Total User Licenses (cols 1-4) */}
-            <div className="col-span-1 md:col-span-4 row-start-1">
+              {/* Main Grid Layout - 1 col mobile, 12 col desktop */}
               <div
-                className={clsx(
-                  "bg-[linear-gradient(305deg,#4BABDC_0%,#5DB1FC_94.2%)] text-white rounded-xl p-4 flex gap-3 items-start h-full",
-                  isRtl && "flex-row-reverse"
-                )}
+                className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-2"
+                style={{ gridAutoRows: "minmax(80px, auto)" }}
               >
-                <Image
-                  alt=""
-                  className="w-12 h-12"
-                  height={48}
-                  src={getContentAssetUrl("/images/img/users-profile.svg")}
-                  width={48}
-                />
-                <div className="flex flex-col">
-                  <h3 className="text-base">{t("cards.totalUserLicenses")}</h3>
-                  <p className="text-2xl">{totalLicenses}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 1: Consumed Licenses (cols 5-8) */}
-            <div className="col-span-1 md:col-span-4 md:col-start-5 row-start-2 md:row-start-1">
-              <div
-                className={clsx(
-                  "bg-white text-black rounded-xl p-4 flex gap-3 items-start h-full",
-                  isRtl && "flex-row-reverse"
-                )}
-              >
-                <Image
-                  alt=""
-                  className="w-12 h-12"
-                  height={48}
-                  src={getContentAssetUrl("/images/img/users-licanse.svg")}
-                  width={48}
-                />
-                <div className="flex flex-col">
-                  <h3 className="text-base">{t("cards.totalConsumedLicenses")}</h3>
-                  <p className="text-2xl">{consumedLicenses}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 1-2: Organization Score (cols 9-12, spans 2 rows) */}
-            <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-3 md:row-start-1 md:row-span-2">
-              <div className="bg-white rounded-xl p-5 space-y-3 h-full flex flex-col">
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {isUser ? t("cards.myScore") : t("cards.organizationScore")}
-                </h2>
-                <h2 className="text-base text-gray-900">{t("cards.totalComplianceScore")}</h2>
-
-                <div className="flex w-full items-center">
-                  <div className={clsx("text-6xl text-gray-900", isRtl ? "ml-4" : "mr-4")}>
-                    {Math.round(compliancePercent / 10)}
-                  </div>
-                  <div className="mt-1 flex-1">
-                    <div className="w-full h-2 bg-gray-200 rounded-full">
-                      <div
-                        className="h-2 bg-green-500 rounded-full"
-                        style={{ width: `${compliancePercent}%` }}
-                      />
-                    </div>
-                    <div
-                      className={clsx(
-                        "text-base text-gray-500 font-medium mt-1.5",
-                        isRtl ? "text-left" : "text-right"
-                      )}
-                    >
-                      {compliancePercent}%
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between gap-5">
-                  <div className={clsx("flex items-center gap-3", isRtl && "flex-row-reverse")}>
-                    <Image
-                      alt=""
-                      className="w-6 h-6"
-                      height={24}
-                      src={getContentAssetUrl("/images/img/score.svg")}
-                      width={24}
-                    />
-                    <div>
-                      <div className="text-2xl font-semibold text-gray-900">{globalProgress}%</div>
-                      <p className="text-gray-500 text-base">{t("cards.globalProgress")}</p>
-                    </div>
-                  </div>
-
-                  <div className={clsx("flex items-center gap-3", isRtl && "flex-row-reverse")}>
-                    <Image
-                      alt=""
-                      className="w-6 h-6"
-                      height={24}
-                      src={getContentAssetUrl("/images/img/score.svg")}
-                      width={24}
-                    />
-                    <div>
-                      <div className="text-2xl font-semibold text-gray-900">{xpTokens}</div>
-                      <p className="text-gray-500 text-base">{t("cards.totalXpTokens")}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between mt-auto">
-                  <div className={clsx("flex items-center gap-3", isRtl && "flex-row-reverse")}>
-                    <div className="w-2 h-8 bg-orange-400 rounded-full" />
-                    <p className="text-gray-600 text-base leading-tight">
-                      {t("cards.totalAwarenessCampaigns")}
-                    </p>
-                  </div>
-                  <div className="text-2xl font-semibold text-gray-900">{totalCampaigns}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 2: Security Posture (cols 1-8) */}
-            <div className="col-span-1 md:col-span-8 row-start-4 md:row-start-2">
-              <div className="bg-white rounded-xl p-4 flex items-center gap-5 w-full h-full">
-                <div
-                  className={clsx("relative flex gap-3 items-center", isRtl && "flex-row-reverse")}
-                >
-                  <Image
-                    alt=""
-                    className="w-4 h-4"
-                    height={16}
-                    src={getContentAssetUrl("/images/shield-check.svg")}
-                    width={16}
-                  />
-                  <h3 className="text-base whitespace-nowrap">{t("cards.securityPosture")}</h3>
-
-                  <Popover placement="bottom">
-                    <PopoverTrigger>
-                      <Button
-                        isIconOnly
-                        aria-label="Info"
-                        className="min-w-4 w-4 h-4 p-0"
-                        variant="light"
-                      >
-                        <Image
-                          alt=""
-                          className="w-4 h-4 cursor-pointer"
-                          height={16}
-                          src={getContentAssetUrl("/images/info-information.svg")}
-                          width={16}
-                        />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent>
-                      <div className="p-5 text-sm bg-white border border-gray-300 rounded-xl w-80">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center">
-                            <svg className="w-5 h-5 me-2 shrink-0" fill="none" viewBox="0 0 24 24">
-                              <path
-                                d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                              />
-                            </svg>
-                            <h3 className="font-medium text-base">{t("cards.infoTitle")}</h3>
-                          </div>
-                        </div>
-                        <div className="mt-2 mb-4 leading-relaxed text-sm">
-                          {t("cards.infoBody")}
-                        </div>
-                        <Button className="text-white bg-blue-600 rounded-2xl text-sm px-3 py-1.5">
-                          {t("cards.viewMore")}
-                        </Button>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-
-                <div className="flex-1">
+                {/* Row 1: Total User Licenses (cols 1-4) */}
+                <div className="col-span-1 md:col-span-4 row-start-1">
                   <div
-                    className="flex overflow-hidden rounded-lg w-full h-4"
-                    data-level={Math.ceil(compliancePercent / 14.3)}
-                    id="segBar"
+                    className={clsx(
+                      "bg-[linear-gradient(305deg,#4BABDC_0%,#5DB1FC_94.2%)] text-white rounded-xl p-4 flex gap-3 items-start h-full",
+                      isRtl && "flex-row-reverse"
+                    )}
                   >
-                    {[
-                      "#9EC232",
-                      "#C1C625",
-                      "#EACB16",
-                      "#FFCD0F",
-                      "#EBA75C",
-                      "#E4590F",
-                      "#D1132A",
-                    ].map((color, i) => (
-                      <div
-                        key={i}
-                        className="h-4 w-full transition-all duration-300 opacity-0"
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <p className="bg-red-600 text-white px-3 py-1 rounded-full text-base whitespace-nowrap">
-                  {t("cards.inRisk")}
-                </p>
-              </div>
-            </div>
-
-            {/* Row 3-5: Security Awareness Campaign (cols 1-8, spans 3 rows) */}
-            <div className="col-span-1 md:col-span-8 row-start-5 md:row-start-3 md:row-span-3">
-              <div className="bg-white rounded-xl p-5 flex flex-col h-full">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {t("cards.securityAwarenessCampaign")}
-                  </h3>
-                  <Link className="text-blue-600 text-base font-medium" href="#">
-                    {t("cards.viewAll")}
-                  </Link>
-                </div>
-                <p className="text-sm text-gray-400 mb-3">
-                  {t("cards.lastCampaignDate", { date: "1/23/05" })}
-                </p>
-                <div className="flex-1 min-h-0">
-                  <AreaChart />
-                </div>
-              </div>
-            </div>
-
-            {/* Row 3-4: Weekly Progress & Quiz Accuracy (cols 9-12, spans 2 rows) */}
-            <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-6 md:row-start-3 md:row-span-2">
-              <div className="grid grid-cols-1 sm:grid-cols-2 p-3 rounded-xl bg-white gap-3 h-full">
-                <div className="bg-[#F1F5F8] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <h3 className="text-base font-semibold mb-3">{t("cards.weeklyProgress")}</h3>
-                  <CircularProgressChart color="#00CCC4" size={120} value={weeklyProgress} />
-                </div>
-
-                <div className="bg-[#F1F5F8] rounded-xl p-4 flex flex-col items-center justify-center">
-                  <h3 className="text-base font-semibold mb-3">{t("cards.quizAccuracy")}</h3>
-                  <CircularProgressChart color="#7CC5FA" size={120} value={quizAccuracy} />
-                </div>
-              </div>
-            </div>
-
-            {/* Row 5: Security Awareness Score (cols 9-12) */}
-            <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-8 md:row-start-5">
-              <div className="bg-white rounded-xl p-5 flex flex-col h-full justify-center">
-                <div className="flex justify-between items-center">
-                  <div className={clsx("flex items-center gap-4", isRtl && "flex-row-reverse")}>
                     <Image
                       alt=""
                       className="w-12 h-12"
                       height={48}
-                      src={getContentAssetUrl("/images/icons/shield.svg")}
+                      src={getContentAssetUrl("/images/img/users-profile.svg")}
                       width={48}
                     />
-                    <div>
-                      <h3 className="text-base font-semibold text-gray-800">
-                        {t("cards.securityAwarenessScore")}
-                      </h3>
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-2xl text-gray-800">{securityAwarenessScore}</p>
-                        <p className="text-gray-400 text-base font-medium">
-                          /{Number(securityAwarenessMax).toFixed(0)}
+                    <div className="flex flex-col">
+                      <h3 className="text-base">{t("cards.totalUserLicenses")}</h3>
+                      <p className="text-2xl">{totalLicenses}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 1: Consumed Licenses (cols 5-8) */}
+                <div className="col-span-1 md:col-span-4 md:col-start-5 row-start-2 md:row-start-1">
+                  <div
+                    className={clsx(
+                      "bg-white text-black rounded-xl p-4 flex gap-3 items-start h-full",
+                      isRtl && "flex-row-reverse"
+                    )}
+                  >
+                    <Image
+                      alt=""
+                      className="w-12 h-12"
+                      height={48}
+                      src={getContentAssetUrl("/images/img/users-licanse.svg")}
+                      width={48}
+                    />
+                    <div className="flex flex-col">
+                      <h3 className="text-base">{t("cards.totalConsumedLicenses")}</h3>
+                      <p className="text-2xl">{consumedLicenses}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 1-2: Organization Score (cols 9-12, spans 2 rows) */}
+                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-3 md:row-start-1 md:row-span-2">
+                  <div className="bg-white rounded-xl p-5 space-y-3 h-full flex flex-col">
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      {isUser ? t("cards.myScore") : t("cards.organizationScore")}
+                    </h2>
+                    <h2 className="text-base text-gray-900">{t("cards.totalComplianceScore")}</h2>
+
+                    <div className="flex w-full items-center">
+                      <div className={clsx("text-6xl text-gray-900", isRtl ? "ml-4" : "mr-4")}>
+                        {Math.round(compliancePercent / 10)}
+                      </div>
+                      <div className="mt-1 flex-1">
+                        <div className="w-full h-2 bg-gray-200 rounded-full">
+                          <div
+                            className="h-2 bg-green-500 rounded-full"
+                            style={{ width: `${compliancePercent}%` }}
+                          />
+                        </div>
+                        <div
+                          className={clsx(
+                            "text-base text-gray-500 font-medium mt-1.5",
+                            isRtl ? "text-left" : "text-right"
+                          )}
+                        >
+                          {compliancePercent}%
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 rounded-lg p-4 flex items-center justify-between gap-5">
+                      <div className={clsx("flex items-center gap-3", isRtl && "flex-row-reverse")}>
+                        <Image
+                          alt=""
+                          className="w-6 h-6"
+                          height={24}
+                          src={getContentAssetUrl("/images/img/score.svg")}
+                          width={24}
+                        />
+                        <div>
+                          <div className="text-2xl font-semibold text-gray-900">{globalProgress}%</div>
+                          <p className="text-gray-500 text-base">{t("cards.globalProgress")}</p>
+                        </div>
+                      </div>
+
+                      <div className={clsx("flex items-center gap-3", isRtl && "flex-row-reverse")}>
+                        <Image
+                          alt=""
+                          className="w-6 h-6"
+                          height={24}
+                          src={getContentAssetUrl("/images/img/score.svg")}
+                          width={24}
+                        />
+                        <div>
+                          <div className="text-2xl font-semibold text-gray-900">{xpTokens}</div>
+                          <p className="text-gray-500 text-base">{t("cards.totalXpTokens")}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between mt-auto">
+                      <div className={clsx("flex items-center gap-3", isRtl && "flex-row-reverse")}>
+                        <div className="w-2 h-8 bg-orange-400 rounded-full" />
+                        <p className="text-gray-600 text-base leading-tight">
+                          {t("cards.totalAwarenessCampaigns")}
                         </p>
+                      </div>
+                      <div className="text-2xl font-semibold text-gray-900">{totalCampaigns}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 2: Security Posture (cols 1-8) */}
+                <div className="col-span-1 md:col-span-8 row-start-4 md:row-start-2">
+                  <div className="bg-white rounded-xl p-4 flex items-center gap-5 w-full h-full">
+                    <div
+                      className={clsx("relative flex gap-3 items-center", isRtl && "flex-row-reverse")}
+                    >
+                      <Image
+                        alt=""
+                        className="w-4 h-4"
+                        height={16}
+                        src={getContentAssetUrl("/images/shield-check.svg")}
+                        width={16}
+                      />
+                      <h3 className="text-base whitespace-nowrap">{t("cards.securityPosture")}</h3>
+
+                      <Popover placement="bottom">
+                        <PopoverTrigger>
+                          <Button
+                            isIconOnly
+                            aria-label="Info"
+                            className="min-w-4 w-4 h-4 p-0"
+                            variant="light"
+                          >
+                            <Image
+                              alt=""
+                              className="w-4 h-4 cursor-pointer"
+                              height={16}
+                              src={getContentAssetUrl("/images/info-information.svg")}
+                              width={16}
+                            />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <div className="p-5 text-sm bg-white border border-gray-300 rounded-xl w-80">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center">
+                                <svg className="w-5 h-5 me-2 shrink-0" fill="none" viewBox="0 0 24 24">
+                                  <path
+                                    d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                    stroke="currentColor"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                  />
+                                </svg>
+                                <h3 className="font-medium text-base">{t("cards.infoTitle")}</h3>
+                              </div>
+                            </div>
+                            <div className="mt-2 mb-4 leading-relaxed text-sm">
+                              {t("cards.infoBody")}
+                            </div>
+                            <Button className="text-white bg-blue-600 rounded-2xl text-sm px-3 py-1.5">
+                              {t("cards.viewMore")}
+                            </Button>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+
+                    <div className="flex-1">
+                      <div
+                        className="flex overflow-hidden rounded-lg w-full h-4"
+                        data-level={Math.ceil(compliancePercent / 14.3)}
+                        id="segBar"
+                      >
+                        {[
+                          "#9EC232",
+                          "#C1C625",
+                          "#EACB16",
+                          "#FFCD0F",
+                          "#EBA75C",
+                          "#E4590F",
+                          "#D1132A",
+                        ].map((color, i) => (
+                          <div
+                            key={i}
+                            className="h-4 w-full transition-all duration-300 opacity-0"
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    <p className="bg-red-600 text-white px-3 py-1 rounded-full text-base whitespace-nowrap">
+                      {t("cards.inRisk")}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Row 3-5: Security Awareness Campaign (cols 1-8, spans 3 rows) */}
+                <div className="col-span-1 md:col-span-8 row-start-5 md:row-start-3 md:row-span-3">
+                  <div className="bg-white rounded-xl p-5 flex flex-col h-full">
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {t("cards.securityAwarenessCampaign")}
+                      </h3>
+                      <Link className="text-blue-600 text-base font-medium" href="#">
+                        {t("cards.viewAll")}
+                      </Link>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-3">
+                      {t("cards.lastCampaignDate", { date: "1/23/05" })}
+                    </p>
+                    <div className="flex-1 min-h-0">
+                      <AreaChart />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 3-4: Weekly Progress & Quiz Accuracy (cols 9-12, spans 2 rows) */}
+                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-6 md:row-start-3 md:row-span-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 p-3 rounded-xl bg-white gap-3 h-full">
+                    <div className="bg-[#F1F5F8] rounded-xl p-4 flex flex-col items-center justify-center">
+                      <h3 className="text-base font-semibold mb-3">{t("cards.weeklyProgress")}</h3>
+                      <CircularProgressChart color="#00CCC4" size={120} value={weeklyProgress} />
+                    </div>
+
+                    <div className="bg-[#F1F5F8] rounded-xl p-4 flex flex-col items-center justify-center">
+                      <h3 className="text-base font-semibold mb-3">{t("cards.quizAccuracy")}</h3>
+                      <CircularProgressChart color="#7CC5FA" size={120} value={quizAccuracy} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 5: Security Awareness Score (cols 9-12) */}
+                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-8 md:row-start-5">
+                  <div className="bg-white rounded-xl p-5 flex flex-col h-full justify-center">
+                    <div className="flex justify-between items-center">
+                      <div className={clsx("flex items-center gap-4", isRtl && "flex-row-reverse")}>
+                        <Image
+                          alt=""
+                          className="w-12 h-12"
+                          height={48}
+                          src={getContentAssetUrl("/images/icons/shield.svg")}
+                          width={48}
+                        />
+                        <div>
+                          <h3 className="text-base font-semibold text-gray-800">
+                            {t("cards.securityAwarenessScore")}
+                          </h3>
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-2xl text-gray-800">{securityAwarenessScore}</p>
+                            <p className="text-gray-400 text-base font-medium">
+                              /{Number(securityAwarenessMax).toFixed(0)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <span className="bg-[#00CCC4] text-white text-lg font-medium px-3 py-1 rounded-full">
+                        {t("cards.good")}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 6: Employee Risk States (cols 1-4) */}
+                <div className="col-span-1 md:col-span-4 row-start-9 md:row-start-6">
+                  <div className="bg-white rounded-xl p-5 flex flex-col items-center justify-between h-full">
+                    <h3 className="text-base font-semibold text-gray-800 mb-3">
+                      {t("cards.employeeRiskStates")}
+                    </h3>
+                    <SemiCircleChart
+                      admin={riskStats.high}
+                      color1="#3ACE89"
+                      color2="#BEC3C7"
+                      color3="#FB5050"
+                      opened={riskStats.medium}
+                      sent={riskStats.low}
+                    />
+                  </div>
+                </div>
+
+                {/* Row 6: Employee Certification (cols 5-8) */}
+                <div className="col-span-1 md:col-span-4 md:col-start-5 row-start-10 md:row-start-6">
+                  <div className="bg-white rounded-xl p-5 flex flex-col items-center justify-between h-full">
+                    <h3 className="text-base font-semibold text-gray-800 mb-3">
+                      {t("cards.employeeCertification")}
+                    </h3>
+                    <CertificationChart
+                      color="#3ACE89"
+                      color2="#FB5050"
+                      value={Math.round(
+                        (certStats.certified / (certStats.certified + certStats.uncertified || 1)) * 100
+                      )}
+                    />
+
+                    <div className="flex justify-center gap-4 text-sm text-gray-600">
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 bg-green-400 rounded-full" />
+                        {t("cards.certified", { count: certStats.certified })}
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <span className="w-2 h-2 bg-red-400 rounded-full" />
+                        {t("cards.notCertified", { count: certStats.uncertified })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Row 6: Right Column - All three widgets stacked (cols 9-12) */}
+                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-11 md:row-start-6">
+                  <div className="flex flex-col gap-2 h-full">
+                    {/* Top 3 Struggling Topics - Very compact */}
+                    <div className="bg-white rounded-xl p-3 flex flex-col flex-1 min-h-0">
+                      <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-sm font-semibold text-gray-800">
+                          {t("cards.top3StrugglingTopics")}
+                        </h3>
+                        <Link className="text-blue-600 text-xs font-medium" href="#">
+                          {t("cards.viewAll")}
+                        </Link>
+                      </div>
+
+                      <div className="space-y-1">
+                        {strugglingModules.length > 0 ? (
+                          strugglingModules.map((topic: any, index: number) => (
+                            <div
+                              key={index}
+                              className="flex justify-between items-center bg-[#F0F7F9] rounded-lg py-1.5 px-2.5"
+                            >
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className={`w-5 h-5 rounded-full bg-[#FEE2E2] flex items-center justify-center text-[#DC2626]`}
+                                >
+                                  <Image
+                                    alt=""
+                                    className="w-3 h-3"
+                                    height={12}
+                                    src={getContentAssetUrl("/images/icons/alert.svg")}
+                                    width={12}
+                                  />
+                                </div>
+                                <span className="text-xs font-medium text-gray-800 truncate max-w-[150px]">
+                                  {topic.module_name}
+                                </span>
+                              </div>
+                              <span className="text-xs font-bold text-gray-600">
+                                {topic.failure_rate}% Fail
+                              </span>
+                            </div>
+                          ))
+                        ) : (
+                          <div className="text-xs text-gray-400 italic">No struggling topics</div>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-red-600 mt-2 flex items-center gap-1">
+                        <Image
+                          alt=""
+                          className="w-3 h-3"
+                          height={12}
+                          src={getContentAssetUrl("/images/icons/alert.svg")}
+                          width={12}
+                        />
+                        {t("cards.employeesNeedAttention")}
+                      </p>
+                    </div>
+
+                    {/* Active Learners - Compact */}
+                    <div className="bg-[#10B981] text-white rounded-xl p-3 flex justify-between items-center flex-shrink-0">
+                      <div>
+                        <h3 className="text-sm font-medium opacity-90">
+                          {t("cards.activeLearnersThisMonth")}
+                        </h3>
+                        <p className="text-xl">{activeLearners}</p>
+                      </div>
+                      <div className="w-10 h-10">
+                        <Image
+                          alt=""
+                          className="w-10 h-10"
+                          height={40}
+                          src={getContentAssetUrl("/images/check-fr.svg")}
+                          width={40}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Training Completion Rate - Compact */}
+                    <div className="bg-[#A78BFA] text-white rounded-xl p-3 flex justify-between items-center flex-shrink-0">
+                      <div>
+                        <h3 className="text-sm font-medium opacity-90">
+                          {t("cards.trainingCompletionRate")}
+                        </h3>
+                        <p className="text-xl">{trainingCompletionRate}%</p>
+                      </div>
+                      <div className="relative w-9 h-9">
+                        <div className="absolute inset-0 border-2 border-white/30 rounded-full" />
+                        <div className="absolute inset-0 border-2 border-white rounded-full border-t-transparent rotate-45" />
                       </div>
                     </div>
                   </div>
-                  <span className="bg-[#00CCC4] text-white text-lg font-medium px-3 py-1 rounded-full">
-                    {t("cards.good")}
-                  </span>
                 </div>
               </div>
-            </div>
 
-            {/* Row 6: Employee Risk States (cols 1-4) */}
-            <div className="col-span-1 md:col-span-4 row-start-9 md:row-start-6">
-              <div className="bg-white rounded-xl p-5 flex flex-col items-center justify-between h-full">
-                <h3 className="text-base font-semibold text-gray-800 mb-3">
-                  {t("cards.employeeRiskStates")}
-                </h3>
-                <SemiCircleChart
-                  admin={riskStats.high}
-                  color1="#3ACE89"
-                  color2="#BEC3C7"
-                  color3="#FB5050"
-                  opened={riskStats.medium}
-                  sent={riskStats.low}
-                />
+              {/* Second Section - Gamification */}
+              <div className="mt-4">
+                <GamificationStats />
+              </div>
+
+              {/* Third Section - Tables */}
+              <div className="mt-0">
+                <DashboardTables />
               </div>
             </div>
-
-            {/* Row 6: Employee Certification (cols 5-8) */}
-            <div className="col-span-1 md:col-span-4 md:col-start-5 row-start-10 md:row-start-6">
-              <div className="bg-white rounded-xl p-5 flex flex-col items-center justify-between h-full">
-                <h3 className="text-base font-semibold text-gray-800 mb-3">
-                  {t("cards.employeeCertification")}
-                </h3>
-                <CertificationChart
-                  color="#3ACE89"
-                  color2="#FB5050"
-                  value={Math.round(
-                    (certStats.certified / (certStats.certified + certStats.uncertified || 1)) * 100
-                  )}
-                />
-
-                <div className="flex justify-center gap-4 text-sm text-gray-600">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 bg-green-400 rounded-full" />
-                    {t("cards.certified", { count: certStats.certified })}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2 h-2 bg-red-400 rounded-full" />
-                    {t("cards.notCertified", { count: certStats.uncertified })}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Row 6: Right Column - All three widgets stacked (cols 9-12) */}
-            <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-11 md:row-start-6">
-              <div className="flex flex-col gap-2 h-full">
-                {/* Top 3 Struggling Topics - Very compact */}
-                <div className="bg-white rounded-xl p-3 flex flex-col flex-1 min-h-0">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-sm font-semibold text-gray-800">
-                      {t("cards.top3StrugglingTopics")}
-                    </h3>
-                    <Link className="text-blue-600 text-xs font-medium" href="#">
-                      {t("cards.viewAll")}
-                    </Link>
-                  </div>
-
-                  <div className="space-y-1">
-                    {strugglingModules.length > 0 ? (
-                      strugglingModules.map((topic: any, index: number) => (
-                        <div
-                          key={index}
-                          className="flex justify-between items-center bg-[#F0F7F9] rounded-lg py-1.5 px-2.5"
-                        >
-                          <div className="flex items-center gap-2">
-                            <div
-                              className={`w-5 h-5 rounded-full bg-[#FEE2E2] flex items-center justify-center text-[#DC2626]`}
-                            >
-                              <Image
-                                alt=""
-                                className="w-3 h-3"
-                                height={12}
-                                src={getContentAssetUrl("/images/icons/alert.svg")}
-                                width={12}
-                              />
-                            </div>
-                            <span className="text-xs font-medium text-gray-800 truncate max-w-[150px]">
-                              {topic.module_name}
-                            </span>
-                          </div>
-                          <span className="text-xs font-bold text-gray-600">
-                            {topic.failure_rate}% Fail
-                          </span>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-xs text-gray-400 italic">No struggling topics</div>
-                    )}
-                  </div>
-
-                  <p className="text-xs text-red-600 mt-2 flex items-center gap-1">
-                    <Image
-                      alt=""
-                      className="w-3 h-3"
-                      height={12}
-                      src={getContentAssetUrl("/images/icons/alert.svg")}
-                      width={12}
-                    />
-                    {t("cards.employeesNeedAttention")}
-                  </p>
-                </div>
-
-                {/* Active Learners - Compact */}
-                <div className="bg-[#10B981] text-white rounded-xl p-3 flex justify-between items-center flex-shrink-0">
-                  <div>
-                    <h3 className="text-sm font-medium opacity-90">
-                      {t("cards.activeLearnersThisMonth")}
-                    </h3>
-                    <p className="text-xl">{activeLearners}</p>
-                  </div>
-                  <div className="w-10 h-10">
-                    <Image
-                      alt=""
-                      className="w-10 h-10"
-                      height={40}
-                      src={getContentAssetUrl("/images/check-fr.svg")}
-                      width={40}
-                    />
-                  </div>
-                </div>
-
-                {/* Training Completion Rate - Compact */}
-                <div className="bg-[#A78BFA] text-white rounded-xl p-3 flex justify-between items-center flex-shrink-0">
-                  <div>
-                    <h3 className="text-sm font-medium opacity-90">
-                      {t("cards.trainingCompletionRate")}
-                    </h3>
-                    <p className="text-xl">{trainingCompletionRate}%</p>
-                  </div>
-                  <div className="relative w-9 h-9">
-                    <div className="absolute inset-0 border-2 border-white/30 rounded-full" />
-                    <div className="absolute inset-0 border-2 border-white rounded-full border-t-transparent rotate-45" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Second Section - Gamification */}
-          <div className="mt-4">
-            <GamificationStats />
-          </div>
-
-          {/* Third Section - Tables */}
-          <div className="mt-0">
-            <DashboardTables />
-          </div>
-        </div>
           </>
         )}
       </DashboardLayout>

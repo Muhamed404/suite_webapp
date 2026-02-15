@@ -17,6 +17,7 @@ import {
 } from "./content-type-selector";
 import { ContentForm, type ContentTranslation } from "./content-form";
 
+import { useRouter } from "next/navigation";
 import { useContentTypes } from "@/hooks/useSuiteAwm";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -80,6 +81,7 @@ export function CreateContentForm({
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
+  const router = useRouter();
   const { data: contentTypesList } = useContentTypes();
   const apiContentTypes = Array.isArray(contentTypesList) ? contentTypesList : [];
   const useApiContentTypes = apiContentTypes.length > 0;
@@ -151,6 +153,8 @@ export function CreateContentForm({
   const { data: modulesRes } = useModules({ status: 1 });
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
   const createContent = useCreateContent();
+
+  const backHref = returnHref ?? (moduleId ? `/dashboard/training-library/system/${moduleId}` : "/dashboard/module");
 
   const handleModuleChange = (keys: unknown) => {
     const v =
@@ -325,7 +329,13 @@ export function CreateContentForm({
 
       setFormSuccess(t("createSuccess"));
       setLastCreatedWasQuiz(isQuizType);
-      // Reset form
+
+      // Redirect to module details page after success
+      setTimeout(() => {
+        router.push(backHref);
+      }, 1500);
+
+      // Reset form (optional if redirecting)
       setModuleId("");
       setContentType(null);
       setSelectedContentTypeId(null);
@@ -397,7 +407,7 @@ export function CreateContentForm({
   const showUrlOnly = requiresFileOrUrlForDisplay && !allowsFileUpload;
   const showFileOrUrlChoice = requiresFileOrUrlForDisplay && allowsFileUpload;
 
-  const backHref = returnHref ?? "/dashboard/module";
+
   const quizFormHref =
     returnHref && moduleId
       ? `${returnHref.replace(/\/$/, "")}/quizzes/create`

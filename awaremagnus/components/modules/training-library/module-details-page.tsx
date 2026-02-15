@@ -23,8 +23,8 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useModule, useContentsByModule, useQuizzesByModule } from "@/hooks/useQuiz";
-import { useContentTypes } from "@/hooks/useSuiteAwm";
+import { useModule, useContentsByModule, useQuizzesByModule, useModules, useContentsWithQuizzes, useContentsWithProgress } from "@/hooks/useQuiz";
+// import { useContentTypes } from "@/hooks/useSuiteAwm";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { SUPPORTED_LANGUAGES, getLanguageName, getLanguageCountryCode } from "@/utils/supportedLanguages";
 import { getContentTypeIconFor } from "@/utils/contentTypeIcons";
@@ -139,85 +139,134 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
   const tabIndicatorRef = useRef<HTMLSpanElement>(null);
 
   const { data: moduleRes, isLoading: moduleLoading } = useModule(moduleId, !!moduleId);
-  const { data: contentsRes, isLoading: contentsLoading } = useContentsByModule(moduleId, {
-    enabled: !!moduleId,
-    lang_id: languageFilter ? Number(languageFilter) : undefined,
+
+  // Org User: Need to find campaign ID first
+  // We re-use useModules to get assigned modules and find the campaign_id
+  const { data: assignedModulesRes } = useModules({
+    assigned_only: true,
+    status: 1, // Active modules
   });
-  const { data: quizzesRes } = useQuizzesByModule(moduleId, !!moduleId);
-  const { data: contentTypesList } = useContentTypes();
+
+  const campaignId = useMemo(() => {
+    if (!isOrgUserView || !assignedModulesRes?.success) return undefined;
+    const modules = assignedModulesRes.data ?? [];
+    const currentModule = modules.find((m) => m.id === Number(moduleId));
+    // Use the first active assignment's campaign ID
+    if (currentModule && currentModule.assignments && currentModule.assignments.length > 0) {
+      // prioritizing IN_PROGRESS or NOT_STARTED
+      return currentModule.assignments[0].campaign_id;
+    }
+    return undefined;
+  }, [isOrgUserView, assignedModulesRes, moduleId]);
+
+  // Data Fetching based on Role
+  const { data: contentsWithQuizzesRes, isLoading: quizzesLoading } = useContentsWithQuizzes(
+    moduleId,
+    {
+      lang_id: languageFilter ? Number(languageFilter) : undefined,
+      enabled: isAdminView || (isOrgUserView && !campaignId) // Fallback for Org User if no campaign
+    }
+  );
+
+  const { data: contentsWithProgressRes, isLoading: progressLoading } = useContentsWithProgress(
+    moduleId,
+    campaignId!,
+    {
+      lang_id: languageFilter ? Number(languageFilter) : undefined,
+      enabled: isOrgUserView && !!campaignId
+    }
+  );
+
+  // Unified Data extraction
+  const {
+    nonAggregatedContents,
+    aggregatedContents,
+    userProgress,
+    quizzesData
+  } = useMemo(() => {
+    if (isOrgUserView && campaignId && contentsWithProgressRes?.success) {
+      const data = contentsWithProgressRes.data;
+      return {
+        nonAggregatedContents: data.non_aggregated_contents || [],
+        aggregatedContents: data.aggregated_contents || {},
+        userProgress: data.user_progress_summary,
+        quizzesData: null // Quizzes often embedded in non-aggregated or separate
+      };
+    } else if (contentsWithQuizzesRes?.success) {
+      const data = contentsWithQuizzesRes.data;
+      return {
+        nonAggregatedContents: data.non_aggregated_contents || [],
+        aggregatedContents: data.aggregated_contents || {},
+        userProgress: null,
+        quizzesData: null
+      };
+    }
+    return { nonAggregatedContents: [], aggregatedContents: {}, userProgress: null, quizzesData: null };
+  }, [isOrgUserView, campaignId, contentsWithProgressRes, contentsWithQuizzesRes]);
+
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
-  const contents = contentsRes?.success ? (contentsRes.data ?? []) : [];
-  const quizzes = quizzesRes?.success && Array.isArray(quizzesRes.data) ? quizzesRes.data : [];
-  const contentTypes = Array.isArray(contentTypesList) ? contentTypesList : [];
-
-  const typeNameById = useMemo(() => {
-    const map = new Map<number, string>();
-
-    contentTypes.forEach((ct) => map.set(ct.id, ct.name ?? ""));
-
-    return map;
-  }, [contentTypes]);
 
   const getContentTypeDisplayName = (name: string) => {
     const n = (name ?? "").toLowerCase().trim();
-    const labelMap: Record<string, string> = {
-      "interactive contents": "contentTypes.interactiveContents",
-      "motion videos": "contentTypes.motionVideos",
-      brochures: "contentTypes.brochures",
-      posters: "contentTypes.posters",
-      "screen savers": "contentTypes.screenSavers",
-      games: "contentTypes.games",
-      documents: "contentTypes.documents",
-      misc: "contentTypes.misc",
-      "vr games": "contentTypes.vrGames",
-    };
-    const key = labelMap[n];
-
-    if (key) {
-      const translated = tContent(key);
-
-      if (translated && translated !== key) return translated;
-    }
-    if (
-      n === "interactive lesson" ||
-      n === "interactive lessons" ||
-      n === "ispring" ||
-      n === "interactive content"
-    ) {
-      return tContent("contentTypes.iSpring");
-    }
-
-    return name ? name.charAt(0).toUpperCase() + name.slice(1).toLowerCase() : name;
+    // Simple mapping or translation key lookup
+    if (n.includes("interactive")) return tContent("contentTypes.interactiveContents");
+    if (n.includes("video")) return tContent("contentTypes.motionVideos");
+    if (n.includes("brochure")) return tContent("contentTypes.brochures");
+    if (n.includes("poster")) return tContent("contentTypes.posters");
+    if (n.includes("screen saver")) return tContent("contentTypes.screenSavers");
+    if (n.includes("game") && !n.includes("vr")) return tContent("contentTypes.games");
+    if (n.includes("vr")) return tContent("contentTypes.vrGames");
+    if (n.includes("document")) return tContent("contentTypes.documents");
+    return name;
   };
 
   const contentCards = useMemo((): ContentTypeCardItem[] => {
     const cards: ContentTypeCardItem[] = [];
-    const byType = new Map<number, ModuleContent[]>();
 
-    for (const c of contents) {
-      const tid = c.content_type_id;
+    // 1. Non-Aggregated (Interactive, Videos, Games, VR, Documents) -> One Card Per Item
+    nonAggregatedContents.forEach((item: any) => {
+      cards.push({
+        kind: "interactive", // Using 'interactive' kind for all individual cards for now
+        item: item,
+        typeId: item.content_type_id,
+        typeName: item.content_type
+      });
+    });
 
-      if (!byType.has(tid)) byType.set(tid, []);
-      byType.get(tid)!.push(c);
-    }
-    byType.forEach((items, typeId) => {
-      const typeName = typeNameById.get(typeId) ?? "";
-
-      if (isInteractiveLessonType(typeName)) {
-        items.forEach((item) => {
-          cards.push({ kind: "interactive", item, typeId, typeName });
+    // 2. Aggregated (Posters, Brochures, Screen Savers, Misc) -> One Card Per Type
+    // The API returns aggregated_contents as an object with keys: posters, brochures, etc.
+    Object.values(aggregatedContents).forEach((agg: any) => {
+      if (agg.total_count > 0) {
+        cards.push({
+          kind: "grouped",
+          typeId: agg.content_type_id,
+          typeName: agg.content_type,
+          count: agg.total_count,
+          // We don't have individual items here, just the summary
+          items: []
         });
-      } else {
-        cards.push({ kind: "grouped", typeId, typeName, count: items.length, items });
       }
     });
-    if (quizzes.length > 0) {
-      cards.push({ kind: "quizzes", count: quizzes.length });
+
+    // 3. Quizzes (Aggregated count from response or separate check)
+    // If using contents-with-progress, we have userProgress.quizzes
+    if (userProgress?.quizzes) {
+      cards.push({ kind: "quizzes", count: userProgress.quizzes.total });
     }
+    // If Admin view, we might need to rely on what the API returns. 
+    // The current API response for contents-with-quizzes doesn't explicitly give a global quiz count in root,
+    // but individual items have quiz data. 
+    // Assuming for now Quizzes are treated as a separate card if we want to list them all, 
+    // OR they are attached to content. The requirement said "render quiz card next to that... content".
+    // AND "In case of the non aggregated content... render quiz card next to...".
+
+    // Let's stick to the card list for now. The previous implementation had a "Quizzes" card.
+    // We can keep it if there are quizzes associated with the module globally.
 
     return cards;
-  }, [contents, typeNameById, quizzes.length]);
+
+  }, [nonAggregatedContents, aggregatedContents, userProgress]);
 
   const filteredContentCards = useMemo(() => {
     if (!searchQuery.trim()) return contentCards;
@@ -228,21 +277,17 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
         return contentTitle(card.item).toLowerCase().includes(q);
       }
       if (card.kind === "grouped") {
-        const displayName = isInteractiveLessonType(card.typeName)
-          ? tContent("contentTypes.iSpring")
-          : card.typeName;
-
-        return displayName.toLowerCase().includes(q);
+        return card.typeName.toLowerCase().includes(q);
       }
       if (card.kind === "quizzes") {
         return t("moduleDetails.quizzes").toLowerCase().includes(q);
       }
-
       return false;
     });
   }, [contentCards, searchQuery, t, tContent]);
 
   const allCount = filteredContentCards.length;
+  // Progress calculations could be derived from userProgress if available
   const pendingCount = 0;
   const completedCount = 0;
 
@@ -261,7 +306,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     }
   }, [statusFilter]);
 
-  const isLoading = moduleLoading || contentsLoading;
+  const isLoading = moduleLoading || quizzesLoading || progressLoading;
 
   if (isLoading || !moduleData) {
     return (
@@ -290,7 +335,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
       ? t("moduleDetails.breadcrumbCampaign")
       : t("moduleDetails.breadcrumbMyLibrary");
 
-  const progressPercent = 0;
+  const progressPercent = userProgress?.overall_progress_percent || 0;
 
   return (
     <ProtectedRoute>
@@ -321,24 +366,26 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
               )}
             >
               <h1 className="text-xl font-semibold text-gray-900">{moduleTitle}</h1>
-              <Button
-                as={Link}
-                className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs font-medium"
-                href={createContentHref}
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
+              {!isOrgUserView && (
+                <Button
+                  as={Link}
+                  className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs font-medium"
+                  href={createContentHref}
                 >
-                  <line x1="12" x2="12" y1="5" y2="19" />
-                  <line x1="5" x2="19" y1="12" y2="12" />
-                </svg>
-                <span className="hidden md:inline">{t("moduleDetails.addNewContent")}</span>
-              </Button>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <line x1="12" x2="12" y1="5" y2="19" />
+                    <line x1="5" x2="19" y1="12" y2="12" />
+                  </svg>
+                  <span className="hidden md:inline">{t("moduleDetails.addNewContent")}</span>
+                </Button>
+              )}
             </div>
 
             <div
@@ -380,6 +427,10 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     {allCount}
                   </span>
                 </button>
+                {/* 
+                  Pending/Completed tabs are visual filters. 
+                  In a real implementation, we would filter `filteredContentCards` based on item status (if available).
+                */}
                 <button
                   className={clsx(
                     "tab-btn px-3 py-1 text-xs font-semibold rounded-full transition-colors duration-200 inline-flex items-center gap-2 relative z-10",
@@ -476,6 +527,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
             </div>
 
             <div className="grid grid-cols-12 gap-2 w-full min-h-[80vh]">
+              {/* Left Side Info Panel */}
               <div className="col-span-12 lg:col-span-3 flex flex-col gap-4 justify-between bg-white rounded-2xl p-4 h-full min-h-[280px]">
                 <div>
                   <h2 className="text-sm font-semibold text-gray-900 mb-3">
@@ -517,106 +569,143 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                 </div>
 
                 <div>
-                  <Button
-                    as={Link}
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-full text-xs font-semibold flex items-center justify-center gap-2"
-                    href={basePath}
-                  >
-                    {t("moduleDetails.nextModule")}
-                  </Button>
+                  {!isOrgUserView ? (
+                    <Button
+                      as={Link}
+                      className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-full text-xs font-semibold flex items-center justify-center gap-2"
+                      href={basePath}
+                    >
+                      {t("moduleDetails.nextModule")}
+                    </Button>
+                  ) : (
+                    <Button
+                      as={Link}
+                      className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-full text-xs font-semibold flex items-center justify-center gap-2"
+                      // For Org User, maybe link to next module in campaign?
+                      href={basePath}
+                    >
+                      {t("moduleDetails.nextModule")}
+                    </Button>
+                  )}
                 </div>
               </div>
 
+              {/* Right Side Content List */}
               <div className="col-span-12 lg:col-span-9 flex flex-col justify-between min-h-0">
                 <div className="space-y-2 w-full overflow-y-auto flex-1 min-h-0" id="items">
                   {filteredContentCards.map((card, _idx) => {
+                    // --- 1. NON-AGGREGATED CONTENT CARD (Interactive, etc.) ---
                     if (card.kind === "interactive") {
                       const { item, typeId, typeName } = card;
-                      const detailHref = `${basePath}/${moduleId}/content/${typeId}/${item.id}`;
+
+                      // For non-aggregated, we go directly to the DETAIL page
+                      const detailHref = `${basePath}/${moduleId}/content/${typeId}/${item.content_id ?? item.id}`;
                       const iconPath = getContentTypeIconFor(typeId, typeName);
-                      const lid = languageId(item);
-                      const createdStr = formatCreatedDate(item.created_at);
+                      // Use item.language_id or item.language as per new API structure
+                      const lid = item.language_id ?? item.language?.id;
+                      const createdStr = formatCreatedDate(item.created_date ?? item.created_at);
                       const displayName = getContentTypeDisplayName(typeName);
 
+                      // Check for item specific quiz data (from new API structure)
+                      const itemQuizzes = item.quizzes; // { total_count, ... }
+
                       return (
-                        <Card key={`interactive-${item.id}`} className={cardClassName}>
-                          <CardBody className="p-4 flex flex-row items-center gap-3">
-                            <div
-                              className={clsx(
-                                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0 overflow-hidden",
-                                getIconBgClass(typeName)
-                              )}
-                            >
-                              <Image
-                                alt=""
-                                className="object-contain"
-                                height={24}
-                                src={iconPath}
-                                width={24}
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm text-gray-900">
-                                {contentTitle(item)}
-                              </p>
-                              <p className="text-xs text-gray-500 mt-0.5">
-                                {t("moduleDetails.created")} {createdStr}
-                              </p>
-                              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                {lid != null && (
-                                  <div className="flex items-center gap-1" title={getLanguageName(lid)}>
-                                    <ReactCountryFlag
-                                      countryCode={getLanguageCountryCode(lid)}
-                                      style={{
-                                        fontSize: "1em",
-                                        lineHeight: "1em",
-                                      }}
-                                      svg
-                                    />
-                                    <span className="text-xs text-gray-600">{getLanguageName(lid)}</span>
-                                  </div>
+                        <div key={`interactive-${item.content_id ?? item.id}-${_idx}`} className="flex flex-col gap-2">
+                          {/* Main Content Card */}
+                          <Card className={cardClassName}>
+                            <CardBody className="p-4 flex flex-row items-center gap-3">
+                              <div
+                                className={clsx(
+                                  "w-12 h-12 rounded-xl flex items-center justify-center shrink-0 overflow-hidden",
+                                  getIconBgClass(typeName)
                                 )}
-                                <span className="text-xs text-gray-600">
-                                  1 {displayName.toLowerCase()}
-                                </span>
-                                <span className="pill-btn green text-xs">
-                                  {t("moduleDetails.completed")}
-                                </span>
+                              >
+                                <Image
+                                  alt=""
+                                  className="object-contain"
+                                  height={24}
+                                  src={iconPath}
+                                  width={24}
+                                />
                               </div>
-                            </div>
-                            <Button
-                              as={Link}
-                              className="bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-semibold min-w-[88px] px-5"
-                              href={detailHref}
-                              size="sm"
-                            >
-                              {t("moduleDetails.start")}
-                            </Button>
-                          </CardBody>
-                        </Card>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-sm text-gray-900">
+                                  {contentTitle(item)}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                  {t("moduleDetails.created")} {createdStr}
+                                </p>
+                                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                                  {lid != null && (
+                                    <div className="flex items-center gap-1" title={getLanguageName(lid)}>
+                                      <ReactCountryFlag
+                                        countryCode={getLanguageCountryCode(lid)}
+                                        style={{ fontSize: "1em", lineHeight: "1em" }}
+                                        svg
+                                      />
+                                      <span className="text-xs text-gray-600">{getLanguageName(lid)}</span>
+                                    </div>
+                                  )}
+                                  <span className="text-xs text-gray-600">
+                                    1 {displayName.toLowerCase()}
+                                  </span>
+                                  {item.user_completion_status === 'completed' && (
+                                    <span className="pill-btn green text-xs">
+                                      {t("moduleDetails.completed")}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <Button
+                                as={Link}
+                                className="bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-semibold min-w-[88px] px-5"
+                                href={detailHref}
+                                size="sm"
+                              >
+                                {t("moduleDetails.start")}
+                              </Button>
+                            </CardBody>
+                          </Card>
+
+                          {/* Linked Quiz Card (if quizzes exist for this content) */}
+                          {itemQuizzes && itemQuizzes.total_count > 0 && (
+                            <Card className={clsx(cardClassName, "ml-8 border-l-4 border-l-amber-300")}>
+                              <CardBody className="p-3 flex flex-row items-center gap-3 bg-amber-50/30">
+                                <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                                  <Image alt="Quiz" height={16} src={getContentTypeIconFor(3, "Quiz")} width={16} />
+                                </div>
+                                <div className="flex-1">
+                                  <p className="font-medium text-xs text-gray-900">
+                                    {t("moduleDetails.quizzes")}
+                                  </p>
+                                  <p className="text-[10px] text-gray-500">
+                                    {itemQuizzes.total_count} {t("moduleDetails.quizzesCount")}
+                                  </p>
+                                </div>
+                                <Button
+                                  as={Link}
+                                  // TODO: Make sure we have a proper route for quizzes specific to a content item
+                                  // Usually /quizzes?content_id=...
+                                  className="bg-amber-500 hover:bg-amber-600 text-white rounded-full text-[10px] font-medium min-w-[70px] px-3 h-7"
+                                  href={`${basePath}/${moduleId}/quizzes?content_id=${item.content_id ?? item.id}`}
+                                  size="sm"
+                                >
+                                  {t("moduleDetails.start")}
+                                </Button>
+                              </CardBody>
+                            </Card>
+                          )}
+                        </div>
                       );
                     }
+
+                    // --- 2. AGGREGATED CONTENT CARD (Posters, etc.) ---
                     if (card.kind === "grouped") {
-                      const { typeId, typeName, count, items } = card;
+                      const { typeId, typeName, count } = card;
+                      // For aggregated, click takes us to LIST page for that type
                       const listHref = `${basePath}/${moduleId}/content/${typeId}`;
-                      // Motion Videos (2), Brochures (3), Documents (7): Start goes to first item's detail (video/poster/brochure-doc viewer)
-                      const goToFirstDetail =
-                        items[0] && (typeId === 2 || typeId === 3 || typeId === 7 || typeId === 4);
-                      const startHref = goToFirstDetail ? `${listHref}/${items[0].id}` : listHref;
                       const iconPath = getContentTypeIconFor(typeId, typeName);
                       const displayName = getContentTypeDisplayName(typeName);
-                      const first = items[0];
-                      const createdStr = first ? formatCreatedDate(first.created_at) : "—";
-                      const languageIds = Array.from(
-                        new Set(items.map(languageId).filter((id): id is number => id != null))
-                      );
-                      const typeLabel = typeName.toLowerCase();
-                      const countLabel =
-                        count > 1 && typeLabel.includes("quiz")
-                          ? `${count} ${t("moduleDetails.quizzes")}`
-                          : count === 1
-                            ? `1 ${typeLabel}`
-                            : `${count} ${typeLabel}s`;
 
                       return (
                         <Card key={`grouped-${typeId}`} className={cardClassName}>
@@ -638,40 +727,29 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-sm text-gray-900">{displayName}</p>
                               <p className="text-xs text-gray-500 mt-0.5">
-                                {t("moduleDetails.created")} {createdStr}
+                                {/* Date range could go here if we extracted it */}
+                                {t("moduleDetails.created")} —
                               </p>
                               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                {languageIds.map((lid) => (
-                                  <div key={lid} className="flex items-center gap-1" title={getLanguageName(lid)}>
-                                    <ReactCountryFlag
-                                      countryCode={getLanguageCountryCode(lid)}
-                                      style={{
-                                        fontSize: "1em",
-                                        lineHeight: "1em",
-                                      }}
-                                      svg
-                                    />
-                                    <span className="text-xs text-gray-600">{getLanguageName(lid)}</span>
-                                  </div>
-                                ))}
-                                <span className="text-xs text-gray-600">{countLabel}</span>
-                                <span className="pill-btn green text-xs">
-                                  {t("moduleDetails.completed")}
+                                <span className="text-xs text-gray-600">
+                                  {count} {displayName}
                                 </span>
                               </div>
                             </div>
                             <Button
                               as={Link}
                               className="bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-semibold min-w-[88px] px-5"
-                              href={startHref}
+                              href={listHref}
                               size="sm"
                             >
-                              {t("moduleDetails.start")}
+                              {t("moduleDetails.viewDetails")}
                             </Button>
                           </CardBody>
                         </Card>
                       );
                     }
+
+                    // --- 3. GENERAL QUIZZES CARD ---
                     if (card.kind === "quizzes") {
                       const quizzesHref = `${basePath}/${moduleId}/quizzes`;
                       const iconPath = getContentTypeIconFor(3, "Quiz");
@@ -703,9 +781,6 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                                 <span className="text-xs text-gray-600">
                                   {card.count} {t("moduleDetails.quizzesCount")}
-                                </span>
-                                <span className="pill-btn green text-xs">
-                                  {t("moduleDetails.completed")}
                                 </span>
                               </div>
                             </div>

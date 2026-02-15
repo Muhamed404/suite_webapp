@@ -62,7 +62,6 @@
   "loading": "جاري التحميل...",
   "filterByCategory": "تصفية حسب الفئة",
   "library": {
-    "description": "محتوى ونص ووصف حول المكتبة، التفاصيل، إلخ",
     "filterAll": "الكل",
     "filterModules": "الوحدات",
     "category": "الفئة",
@@ -143,6 +142,7 @@
     "breadcrumbTrainingLibrary": "مكتبة التدريب",
     "breadcrumbMyLibrary": "مكتبتي",
     "breadcrumbAwarenessCampaign": "حملة التوعية",
-    "breadcrumbCampaign": "الحملة"
+    "breadcrumbCampaign": "الحملة",
+    "viewDetails": "عرض التفاصيل"
   }
 }
