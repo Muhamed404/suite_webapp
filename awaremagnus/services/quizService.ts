@@ -44,14 +44,11 @@ export const quizService = {
     assigned_only?: boolean;
     campaign_id?: number;
     module_status?: string;
+    filter?: string;
     limit?: number;
     offset?: number;
   }) => {
     const p = { ...params };
-
-    if (p.status != null && p.status_id == null) {
-      p.status_id = p.status;
-    }
 
     return request<Module[]>(() =>
       awmClient.get<AWMResponseBody>(`${API_BASE}/module`, { params: p })

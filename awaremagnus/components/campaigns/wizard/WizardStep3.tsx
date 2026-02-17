@@ -19,8 +19,8 @@ interface WizardStep3Props {
 
 export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
   const t = useTranslations("campaigns");
-  const { data: modulesData, isLoading, error } = useModules({ status: 1 });
-  
+  const { data: modulesData, isLoading, error } = useModules();
+
   // Handle different possible data structures
   let modules: any[] = [];
   if (modulesData?.data && Array.isArray(modulesData.data)) {

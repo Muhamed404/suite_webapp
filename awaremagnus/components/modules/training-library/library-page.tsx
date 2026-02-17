@@ -4,6 +4,7 @@ import type { Module } from "@/types/quiz";
 
 import Link from "next/link";
 import { useState, useMemo } from "react";
+import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
@@ -82,10 +83,13 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
+  const pathname = usePathname();
+  const filter = pathname.includes("/training-library/my") ? "my_module" : "global_module";
+
   const { data: modulesRes, isLoading } = useModules({
-    status: 1,
     category_id: categoryFilter ? Number(categoryFilter) : undefined,
     lang_id: languageFilter ? Number(languageFilter) : undefined,
+    filter,
   });
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
 

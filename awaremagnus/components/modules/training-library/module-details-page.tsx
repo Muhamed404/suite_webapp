@@ -144,7 +144,6 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
   // We re-use useModules to get assigned modules and find the campaign_id
   const { data: assignedModulesRes } = useModules({
     assigned_only: true,
-    status: 1, // Active modules
   });
 
   const campaignId = useMemo(() => {

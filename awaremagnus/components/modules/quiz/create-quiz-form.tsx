@@ -110,7 +110,7 @@ export function CreateQuizForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
-  const { data: modulesRes } = useModules({ status: 1 });
+  const { data: modulesRes } = useModules();
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
 
   const { data: contentsRes } = useContentsByModule(moduleId ? Number(moduleId) : 0, !!moduleId);
