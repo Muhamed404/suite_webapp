@@ -8,11 +8,15 @@ const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 interface AreaChartProps {
   data?: number[];
   labels?: string[];
+  seriesName?: string;
+  yLabel?: string;
 }
 
 export const AreaChart = ({
   data = [22, 18, 25, 20, 30, 26],
   labels = ["7 June", "8 June", "9 June", "10 June", "11 June", "12 June"],
+  seriesName = "Campaign A",
+  yLabel = "Topics",
 }: AreaChartProps) => {
   const chartOptions = useMemo(
     () => ({
@@ -56,7 +60,7 @@ export const AreaChart = ({
       dataLabels: { enabled: false },
       series: [
         {
-          name: "Campaign A",
+          name: seriesName,
           data,
         },
       ],
@@ -83,17 +87,17 @@ export const AreaChart = ({
         theme: "light",
         style: { fontSize: "12px" },
         y: {
-          formatter: (val: number) => `${val} Topics`,
+          formatter: (val: number) => `${val} ${yLabel}`,
         },
       },
       colors: ["#4BA6FF"],
     }),
-    [labels]
+    [labels, seriesName, yLabel]
   );
 
   const series = [
     {
-      name: "Campaign A",
+      name: seriesName,
       data,
     },
   ];

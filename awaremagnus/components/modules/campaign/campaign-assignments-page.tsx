@@ -127,7 +127,7 @@ export function CampaignAssignmentsPage() {
   const campaigns = campaignsRes?.success ? (campaignsRes.data ?? []) : [];
 
   const { data: userDashboardsRes } = useUserDashboards();
-  const userMetrics = userDashboardsRes?.data?.dashboardUsers?.[0] || null;
+  const userMetrics = userDashboardsRes?.object?.dashboardUsers?.[0] || null;
 
   // Mock data for testing
   const mockCampaigns: CampaignAssignment[] = [

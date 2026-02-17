@@ -32,74 +32,58 @@ export const DashboardSidebar = ({
   const adminMenuItems = [
     {
       href: "/dashboard",
-      icon: getContentAssetUrl("/images/icons/second-menu-dashboard-active.svg"),
-      activeIcon: getContentAssetUrl("/images/icons/second-menu-dashboard-active.svg"),
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Dashboard_Solid.svg"),
+      activeIcon: getContentAssetUrl("/images/awaremagnus_sidebar/Dashboard_Solid.svg"),
       label: t("menu.dashboard"),
     },
     {
-      href: "/dashboard/license-user",
-      icon: getContentAssetUrl("/images/Icon_License.svg"),
-      label: t("menu.licenseUser"),
-    },
-    {
-      href: "/dashboard/survey",
-      icon: getContentAssetUrl("/images/Icon_Template.svg"),
-      label: t("menu.survey"),
-    },
-    {
       href: "/dashboard/training-library/system",
-      icon: getContentAssetUrl("/images/Icon_Template.svg"),
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Training_Library_Solid.svg"),
       label: t("menu.trainingLibrary"),
       children: [
         {
           href: "/dashboard/training-library/system",
-          icon: getContentAssetUrl("/images/Icon_Template.svg"),
+          icon: getContentAssetUrl("/images/awaremagnus_sidebar/Training_Library_Solid.svg"),
           label: t("menu.systemLibrary"),
         },
         {
           href: "/dashboard/training-library/my",
-          icon: getContentAssetUrl("/images/Icon_Template.svg"),
+          icon: getContentAssetUrl("/images/awaremagnus_sidebar/Training_Library_Solid.svg"),
           label: t("menu.myLibrary"),
         },
       ],
     },
     {
-      href: "/dashboard/system-branding",
-      icon: getContentAssetUrl("/images/Icon_Template.svg"),
-      label: t("menu.systemBranding"),
-      children: [
-        { href: "#", icon: "", label: t("menu.certificate") },
-        { href: "#", icon: "", label: t("menu.logoAndImages") },
-      ],
-    },
-    {
       href: "/dashboard/launch-awareness",
-      icon: getContentAssetUrl("/images/Icon_Template.svg"),
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Awareness_Solid.svg"),
       label: t("menu.launchAwareness"),
       children: [
+        {
+          href: "/dashboard/launch-awareness/campaigns/create",
+          icon: "",
+          label: t("menu.newCampaign"),
+        },
         {
           href: "/dashboard/launch-awareness/campaigns",
           icon: "",
           label: t("menu.campaigns"),
         },
-        { href: "#", icon: "", label: t("menu.reports") },
       ],
     },
     {
-      href: "/dashboard/settings",
-      icon: getContentAssetUrl("/images/Icon_Template.svg"),
-      label: t("menu.systemSettings"),
+      href: "/dashboard/system-branding",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Branding_Solid.svg"),
+      label: t("menu.systemBranding"),
+      children: [
+        { href: "#", icon: "", label: t("menu.certificate") },
+      ],
     },
     {
       href: "/dashboard/my-awareness",
-      icon: getContentAssetUrl("/images/Icon_Template.svg"),
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Report.svg"),
       label: t("menu.myAwareness"),
       children: [
-        { href: "#", icon: "", label: t("menu.profile") },
-        { href: "#", icon: "", label: t("menu.certificates") },
-        { href: "#", icon: "", label: t("menu.achievements") },
-        { href: "#", icon: "", label: t("menu.assignments") },
-        { href: "#", icon: "", label: t("menu.reportCard") },
+        { href: "/dashboard/certificates", icon: "", label: t("menu.certificates") },
       ],
     },
   ];
@@ -108,18 +92,18 @@ export const DashboardSidebar = ({
   const endUserMenuItems = [
     {
       href: "/dashboard",
-      icon: "/images/icons/second-menu-dashboard-active.svg",
-      activeIcon: "/images/icons/second-menu-dashboard-active.svg",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Dashboard_Solid.svg"),
+      activeIcon: getContentAssetUrl("/images/awaremagnus_sidebar/Dashboard_Solid.svg"),
       label: t("menu.dashboard"),
     },
     {
       href: "/dashboard/campaign-assignments",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Assessments_Solid.svg"),
       label: t("menu.campaignAssignments"),
     },
     {
       href: "/dashboard/certificates",
-      icon: "/images/Icon_License.svg",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Licensed_user_Solid.svg"),
       label: t("menu.certificates"),
     },
   ];

@@ -10,12 +10,14 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useCampaign, useUpdateCampaign } from "@/hooks/useCampaigns";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
 
 export default function CampaignDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const t = useTranslations("dashboard");
 
   const [isActive, setIsActive] = useState(true);
 
@@ -370,7 +372,7 @@ export default function CampaignDetailsPage() {
                 <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
                   <span className="text-lg"><img src="/awm/images/gard_cap.svg" alt="" className="w-5 h-5" /></span>
                   <div>
-                    Course Completed
+                    {t("gamification.courseCompleted")}
                     <div className="text-xl text-gray-900">8/12</div>
                   </div>
                 </div>

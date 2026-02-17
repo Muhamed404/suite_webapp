@@ -46,7 +46,7 @@ export const dashboardService = {
 
   getSystemLeaderboard: async (params?: { count?: number; sortBy?: string }) => {
     const { data } = await awmClient.get<SystemLeaderboard>(
-      `${API_BASE}/dashboard/system/leaderboard`,
+      `${API_BASE}/dashboard/organizations/leaderboard`,
       { params }
     );
 

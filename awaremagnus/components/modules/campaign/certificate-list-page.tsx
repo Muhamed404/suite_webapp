@@ -41,6 +41,7 @@ function certificateName(c: Certificate): string {
 
 export function CertificateListPage() {
   const t = useTranslations("campaigns");
+  const tMenu = useTranslations("dashboard");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
   const { user } = useAuthStore();
@@ -274,14 +275,14 @@ export function CertificateListPage() {
 
           {/* Breadcrumb */}
           <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5">
-            <a href="#" className="hover:text-gray-700 transition">System branding</a>
+            <a href="#" className="hover:text-gray-700 transition">{tMenu("menu.systemBranding")}</a>
             <span className="text-gray-400">›</span>
-            <span className="font-semibold text-gray-900">Certificate</span>
+            <span className="font-semibold text-gray-900">{tMenu("menu.certificate")}</span>
           </nav>
 
           {/* Header */}
           <div className="flex items-center mb-4">
-            <h1 className="text-xl font-semibold">Certificate List</h1>
+            <h1 className="text-xl font-semibold">{t("certificatesTitle")}</h1>
           </div>
 
           {/* Filters */}
@@ -411,7 +412,7 @@ export function CertificateListPage() {
                 <Search className="absolute text-gray-400 pointer-events-none z-10 w-4 h-4" style={{ left: '16px', top: '40%', transform: 'translateY(-50%)' }} />
                 <input 
                   type="text"
-                  placeholder="Search certificate..."
+                  placeholder={t("searchCertificates")}
                   value={currentSearch}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="datatable-input w-full pr-4 py-2 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-9 placeholder-gray-400" 
@@ -492,7 +493,7 @@ export function CertificateListPage() {
                   <tr>
                     <th className="px-4 py-3.5 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors" data-sort="name" onClick={() => handleSort('name')}>
                       <div className="flex items-center gap-2">
-                        <span>Certificate Name</span>
+                        <span>{t("certificateName")}</span>
                         <span className={`sort-icon ${sortColumn === 'name' ? 'text-blue-600' : 'text-gray-400'}`}>
                           {sortColumn === 'name' ? (
                             sortDirection === 'asc' ? (
@@ -605,7 +606,7 @@ export function CertificateListPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">No Certificates Found</h3>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">{t("emptyCertificatesTitle")}</h3>
                   <p className="text-sm text-gray-500">Try adjusting your filters or search query</p>
                 </div>
               </div>
@@ -614,7 +615,7 @@ export function CertificateListPage() {
                 <div className="absolute inset-0 flex items-center justify-center bg-white">
                   <div className="text-center py-12">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-sm text-gray-500">Loading certificates...</p>
+                    <p className="text-sm text-gray-500">{t("loadingCertificates")}</p>
                   </div>
                 </div>
               )}
