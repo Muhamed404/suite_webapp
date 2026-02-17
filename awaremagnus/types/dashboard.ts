@@ -91,7 +91,7 @@ export interface SystemLeaderboard {
   message: string;
   statusCode: number;
   alertType: string;
-  object: {
+  data: {
     top_low_risk_employees: EmployeeLeaderboard[];
     top_high_risk_employees: EmployeeLeaderboard[];
   };
@@ -172,7 +172,7 @@ export interface OrganizationLeaderboardResponse {
   message: string;
   statusCode: number;
   alertType: string;
-  object: {
+  data: {
     top_low_risk_employees: EmployeeLeaderboard[];
     top_high_risk_employees: EmployeeLeaderboard[];
   };
@@ -231,7 +231,7 @@ export interface AchievementStatisticsResponse {
   message: string;
   statusCode: number;
   alertType: string;
-  object: {
+  data: {
     total_achievements: number;
     total_unique_achievements_unlocked: number;
     total_unique_achievements_locked: number;
