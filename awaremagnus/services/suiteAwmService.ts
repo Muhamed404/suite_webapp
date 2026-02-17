@@ -178,4 +178,8 @@ export const suiteAwmService = {
   /** GET /api/awm/campaign/:id/leaderboard (AWM Backend) - Get campaign leaderboard */
   getCampaignLeaderboard: (id: number) =>
     awmGet<any>(`${API_BASE}/campaign/${id}/leaderboard`),
+
+  /** GET /api/awm/dashboard/organizations/campaign (AWM Backend) - Get campaign dashboard with all details and metrics */
+  getCampaignDashboard: (campaignId: number) =>
+    awmGet<any>(`${API_BASE}/dashboard/organizations/campaign?campaign_id=${campaignId}`),
 };
