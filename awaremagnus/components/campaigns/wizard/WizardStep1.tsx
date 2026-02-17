@@ -22,85 +22,94 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
-        <Info className="w-6 h-6 text-blue-500" />
-        <span>{t("wizard.step1")}</span>
-      </h2>
-
-      <div>
-        <label className="block text-sm font-medium mb-2">
-          {t("form.campaignName")} <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          value={formData.campaignName}
-          onChange={(e) => onChange("campaignName", e.target.value)}
-          className={clsx(
-            "w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-            errors.campaignName ? "border-red-500" : "border-gray-300"
-          )}
-          placeholder={t("form.campaignNamePlaceholder")}
-        />
-        {errors.campaignName && <p className="text-red-500 text-sm mt-1">{errors.campaignName}</p>}
+      <div className="flex items-center gap-1.5 mb-8">
+        <Info className="w-4 h-4 text-blue-400" />
+        <h2 className="text-base font-semibold text-[#051226]">{t("wizard.step1")}</h2>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium mb-2">{t("form.description")}</label>
-        <textarea
-          value={formData.description}
-          onChange={(e) => onChange("description", e.target.value)}
-          rows={4}
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder={t("form.descriptionPlaceholder")}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            {t("form.startDate")} <span className="text-red-500">*</span>
+      <div className="grid grid-cols-1 gap-3">
+        {/* Campaign Name */}
+        <div className="input-group">
+          <label className="input-label">
+            {t("form.campaignName")} <span className="text-red-500">*</span>
           </label>
           <input
-            type="date"
-            value={formData.startDate}
-            onChange={(e) => onChange("startDate", e.target.value)}
-            min={new Date().toISOString().split("T")[0]}
+            type="text"
+            value={formData.campaignName}
+            onChange={(e) => onChange("campaignName", e.target.value)}
             className={clsx(
-              "w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-              errors.startDate ? "border-red-500" : "border-gray-300"
+              "input-field",
+              errors.campaignName ? "border-red-500" : ""
             )}
+            placeholder={t("form.campaignNamePlaceholder")}
           />
-          {errors.startDate && <p className="text-red-500 text-sm mt-1">{errors.startDate}</p>}
+          {errors.campaignName && <p className="field-error">{errors.campaignName}</p>}
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            {t("form.endDate")} <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="date"
-            value={formData.endDate}
-            onChange={(e) => onChange("endDate", e.target.value)}
-            min={formData.startDate || new Date().toISOString().split("T")[0]}
-            className={clsx(
-              "w-full px-4 py-2.5 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500",
-              errors.endDate ? "border-red-500" : "border-gray-300"
-            )}
-          />
-          {errors.endDate && <p className="text-red-500 text-sm mt-1">{errors.endDate}</p>}
-        </div>
-      </div>
 
-      <div className="flex items-center gap-3">
-        <input
-          type="checkbox"
-          id="gamification"
-          checked={formData.gamified}
-          onChange={(e) => onChange("gamified", e.target.checked)}
-          className="w-4 h-4 text-blue-500 rounded focus:ring-2 focus:ring-blue-500"
-        />
-        <label htmlFor="gamification" className="text-sm font-medium cursor-pointer">
-          {t("form.gamification")}
-        </label>
+        {/* Description */}
+        <div className="input-group">
+          <label className="input-label">{t("form.description")}</label>
+          <textarea
+            value={formData.description}
+            onChange={(e) => onChange("description", e.target.value)}
+            rows={2}
+            className="input-field"
+            placeholder={t("form.descriptionPlaceholder")}
+          />
+        </div>
+
+        {/* Date Range */}
+        <div className="grid grid-cols-2 gap-2">
+          <div className="input-group">
+            <label className="input-label">
+              {t("form.startDate")} <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              value={formData.startDate}
+              onChange={(e) => onChange("startDate", e.target.value)}
+              min={new Date().toISOString().split("T")[0]}
+              className={clsx(
+                "input-field",
+                errors.startDate ? "border-red-500" : ""
+              )}
+            />
+            {errors.startDate && <p className="field-error">{errors.startDate}</p>}
+          </div>
+          <div className="input-group">
+            <label className="input-label">
+              {t("form.endDate")} <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              value={formData.endDate}
+              onChange={(e) => onChange("endDate", e.target.value)}
+              min={formData.startDate || new Date().toISOString().split("T")[0]}
+              className={clsx(
+                "input-field",
+                errors.endDate ? "border-red-500" : ""
+              )}
+            />
+            {errors.endDate && <p className="field-error">{errors.endDate}</p>}
+          </div>
+        </div>
+
+        {/* Gamification Toggle */}
+        <div className="flex items-center gap-2">
+          <label className="lang-item flex items-center gap-1.5 cursor-pointer group">
+            <input
+              type="checkbox"
+              id="gamified"
+              checked={formData.gamified}
+              onChange={(e) => onChange("gamified", e.target.checked)}
+              className="real-checkbox sr-only"
+            />
+            <span className="visual-tick w-4 h-4 border-2 border-gray-300 rounded flex items-center justify-center transition-all group-hover:border-blue-500">
+              <i data-lucide="check" className="w-2.5 h-2.5 text-white opacity-0"></i>
+            </span>
+            <span className="text-xs text-gray-700">Enable Gamification</span>
+          </label>
+        </div>
       </div>
     </div>
   );

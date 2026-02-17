@@ -128,6 +128,8 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
   const isOrgUserView = isOrgUser(roleId);
   /** Platform admin (1,2) or Org admin (3,4) = admin view: no progress, Training Library › Core Modules */
   const isAdminView = isPlatformAdmin(roleId) || isOrgAdmin(roleId);
+  const isPlatform = isPlatformAdmin(roleId);
+  const canEditContent = libraryType === "my" || (libraryType === "system" && isPlatform);
 
   const basePath = `/dashboard/training-library/${libraryType}`;
   const createContentHref = `${basePath}/${moduleId}/content/create`;
@@ -144,7 +146,6 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
   // We re-use useModules to get assigned modules and find the campaign_id
   const { data: assignedModulesRes } = useModules({
     assigned_only: true,
-    status: 1, // Active modules
   });
 
   const campaignId = useMemo(() => {
@@ -366,7 +367,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
               )}
             >
               <h1 className="text-xl font-semibold text-gray-900">{moduleTitle}</h1>
-              {!isOrgUserView && (
+              {!isOrgUserView && canEditContent && (
                 <Button
                   as={Link}
                   className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs font-medium"

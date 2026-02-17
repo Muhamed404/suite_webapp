@@ -105,7 +105,7 @@ export function QuizLanguageCard({
     setCsvStatus("uploading");
     const formData = new FormData();
 
-    formData.append("file", csvFile);
+    formData.append("csvFile", csvFile);
     formData.append("con_id", contentId.toString());
     formData.append("qtype_id", quizTypeId.toString());
 

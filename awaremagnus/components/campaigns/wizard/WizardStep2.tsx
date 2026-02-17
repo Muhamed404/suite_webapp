@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users } from "lucide-react";
+import { Users, ChevronDown, X } from "lucide-react";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
 
@@ -29,6 +29,8 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
   const [users, setUsers] = useState<Record<number, string>>({}); // Map of userId -> userName
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deptDropdownOpen, setDeptDropdownOpen] = useState(false);
+  const [groupDropdownOpen, setGroupDropdownOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,6 +81,10 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
     onChange("departments", newDepts);
   };
 
+  const removeDepartment = (id: number) => {
+    onChange("departments", formData.departments.filter((d) => d !== id));
+  };
+
   const toggleGroup = (id: number) => {
     const newGroups = formData.groups.includes(id)
       ? formData.groups.filter((g) => g !== id)
@@ -86,6 +92,21 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
 
     onChange("groups", newGroups);
   };
+
+  const removeGroup = (id: number) => {
+    onChange("groups", formData.groups.filter((g) => g !== id));
+  };
+
+  const getDepartmentName = (id: number) => {
+    return departments.find((d) => d.id === id)?.name || `Department ${id}`;
+  };
+
+  const getGroupName = (id: number) => {
+    return groups.find((g) => g.id === id)?.name || `Group ${id}`;
+  };
+
+  const activeDepartments = departments.filter((dept) => dept.is_Active !== false && dept.is_Deleted !== true);
+  const activeGroups = groups.filter((group) => group.is_Active !== false && group.is_Deleted !== true);
 
   return (
     <div className="space-y-6">
@@ -113,66 +134,118 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
           {/* Departments */}
           <div>
             <label className="block text-sm font-medium mb-3">{t("form.selectDepartments")}</label>
-            {departments.length === 0 ? (
-              <p className="text-sm text-gray-500 py-4">No departments available</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {departments
-                  .filter((dept) => dept.is_Active !== false && dept.is_Deleted !== true)
-                  .map((dept) => (
-                    <label
-                      key={dept.id}
-                      className={clsx(
-                        "flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all",
-                        formData.departments.includes(dept.id)
-                          ? "border-blue-500 bg-blue-50"
-                          : "border-gray-300 hover:border-blue-300"
-                      )}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.departments.includes(dept.id)}
-                        onChange={() => toggleDepartment(dept.id)}
-                        className="w-4 h-4 text-blue-500 rounded"
-                      />
-                      <span className="text-sm font-medium">{dept.name}</span>
-                    </label>
-                  ))}
-              </div>
-            )}
+            
+            <div className="relative">
+              <button
+                onClick={() => setDeptDropdownOpen(!deptDropdownOpen)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
+              >
+                <div className="flex flex-wrap gap-2 flex-1">
+                  {formData.departments.length === 0 ? (
+                    <span className="text-gray-500">{t("form.selectDepartments")}</span>
+                  ) : (
+                    formData.departments.map((deptId) => (
+                      <span
+                        key={deptId}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
+                      >
+                        {getDepartmentName(deptId)}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeDepartment(deptId);
+                          }}
+                          className="hover:text-blue-900 transition-colors flex-shrink-0"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))
+                  )}
+                </div>
+                <ChevronDown className={clsx("w-4 h-4 transition-transform flex-shrink-0", deptDropdownOpen && "rotate-180")} />
+              </button>
+
+              {deptDropdownOpen && activeDepartments.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
+                  <div className="max-h-48 overflow-y-auto">
+                    {activeDepartments.map((dept) => (
+                      <label
+                        key={dept.id}
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.departments.includes(dept.id)}
+                          onChange={() => toggleDepartment(dept.id)}
+                          className="w-4 h-4 text-blue-500 rounded"
+                        />
+                        <span className="text-sm">{dept.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <small className="text-gray-500 mt-2 block">{t("form.departmentsPlaceholder")}</small>
           </div>
 
           {/* Groups */}
           <div>
             <label className="block text-sm font-medium mb-3">{t("form.selectGroups")}</label>
-            {groups.length === 0 ? (
-              <p className="text-sm text-gray-500 py-4">No groups available</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {groups
-                  .filter((group) => group.is_Active !== false && group.is_Deleted !== true)
-                  .map((group) => (
-                    <label
-                      key={group.id}
-                      className={clsx(
-                        "flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all",
-                        formData.groups.includes(group.id)
-                          ? "border-blue-500 bg-blue-50"
-                          : "border-gray-300 hover:border-blue-300"
-                      )}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.groups.includes(group.id)}
-                        onChange={() => toggleGroup(group.id)}
-                        className="w-4 h-4 text-blue-500 rounded"
-                      />
-                      <span className="text-sm font-medium">{group.name}</span>
-                    </label>
-                  ))}
-              </div>
-            )}
+            
+            <div className="relative">
+              <button
+                onClick={() => setGroupDropdownOpen(!groupDropdownOpen)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
+              >
+                <div className="flex flex-wrap gap-2 flex-1">
+                  {formData.groups.length === 0 ? (
+                    <span className="text-gray-500">{t("form.selectGroups")}</span>
+                  ) : (
+                    formData.groups.map((groupId) => (
+                      <span
+                        key={groupId}
+                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
+                      >
+                        {getGroupName(groupId)}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeGroup(groupId);
+                          }}
+                          className="hover:text-blue-900 transition-colors flex-shrink-0"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))
+                  )}
+                </div>
+                <ChevronDown className={clsx("w-4 h-4 transition-transform flex-shrink-0", groupDropdownOpen && "rotate-180")} />
+              </button>
+
+              {groupDropdownOpen && activeGroups.length > 0 && (
+                <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
+                  <div className="max-h-48 overflow-y-auto">
+                    {activeGroups.map((group) => (
+                      <label
+                        key={group.id}
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.groups.includes(group.id)}
+                          onChange={() => toggleGroup(group.id)}
+                          className="w-4 h-4 text-blue-500 rounded"
+                        />
+                        <span className="text-sm">{group.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             <small className="text-gray-500 mt-2 block">{t("form.groupsPlaceholder")}</small>
           </div>
         </>

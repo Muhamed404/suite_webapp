@@ -149,7 +149,7 @@ export function CreateContentForm({
         .includes("quiz") ?? false)
       : contentType === "Quiz";
 
-  const { data: modulesRes } = useModules({ status: 1 });
+  const { data: modulesRes } = useModules();
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
   const createContent = useCreateContent();
 

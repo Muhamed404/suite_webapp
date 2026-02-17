@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
 import { ArrowLeft, Info, Users, BookOpen, Award, BarChart, Calendar, CheckCircle } from "lucide-react";
 import clsx from "clsx";
@@ -108,7 +107,7 @@ export default function CreateCampaignPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showUserModal, setShowUserModal] = useState(false);
 
-  const { data: modulesData } = useModules({ status: 1 });
+  const { data: modulesData } = useModules();
   const modules = modulesData?.success && Array.isArray(modulesData.data) ? modulesData.data : [];
 
   const createMutation = useMutation({
@@ -273,51 +272,49 @@ export default function CreateCampaignPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className={clsx("p-6", isRtl && "text-right")}>
-          <div className="flex items-center gap-4 mb-6">
-            <Button isIconOnly variant="light" onClick={() => router.back()}>
-              <ArrowLeft className="w-5 h-5" />
+        <div className={clsx("p-3", isRtl && "text-right")}>
+          <div className="flex items-center gap-2 mb-3">
+            <Button isIconOnly variant="light" size="sm" onClick={() => router.back()}>
+              <ArrowLeft className="w-4 h-4" />
             </Button>
-            <h1 className="text-2xl font-semibold text-gray-800">{t("createNew")}</h1>
+            <div className="text-xs text-gray-500">
+              {t("campaigns.label")} &gt; {t("campaigns.createNew")}
+            </div>
           </div>
 
-          <Card className="rounded-3xl shadow">
-            <CardBody className="p-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-hidden">
+            <div className="p-4">
               {/* Progress */}
-              <div className="flex justify-between mb-12 relative">
-                {steps.map((step, index) => (
-                  <div key={step.id} className="flex flex-col items-center flex-1 relative z-10">
-                    {index < steps.length - 1 && (
+              <div className="wizard-progress flex justify-between mb-5 relative">
+                {steps.map((step, index) => {
+                  const isActive = currentStep === step.id;
+                  const isDone = currentStep > step.id;
+                  
+                  return (
+                    <div
+                      key={step.id}
+                      className={clsx(
+                        "wizard-progress-step step flex-1 text-center relative",
+                        isActive && "active",
+                        isDone && "done"
+                      )}
+                    >
                       <div
                         className={clsx(
-                          "absolute top-4 left-1/2 h-1 -z-10 transition-all",
-                          currentStep > step.id ? "bg-blue-500" : "bg-gray-200"
-                        )}
-                        style={{ width: "100%" }}
-                      />
-                    )}
-                    <div
-                      className={clsx(
-                        "w-10 h-10 rounded-full flex items-center justify-center font-semibold mb-2 transition-all",
-                        currentStep > step.id
-                          ? "bg-green-500 text-white"
-                          : currentStep === step.id
+                          "circle w-6 h-6 rounded-full text-[10px] font-medium flex items-center justify-center mx-auto relative z-10 transition-all",
+                          isDone
                             ? "bg-blue-500 text-white"
-                            : "bg-gray-200 text-gray-600"
-                      )}
-                    >
-                      {currentStep > step.id ? "✓" : step.id}
+                            : isActive
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-200 text-gray-600"
+                        )}
+                      >
+                        {isDone ? "✓" : step.id}
+                      </div>
+                      <p className="text-[10px] text-gray-600 mt-1">{step.label}</p>
                     </div>
-                    <span
-                      className={clsx(
-                        "text-xs text-center max-w-[100px] transition-all",
-                        currentStep >= step.id ? "text-blue-500 font-medium" : "text-gray-500"
-                      )}
-                    >
-                      {step.label}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Step Content */}
@@ -345,29 +342,44 @@ export default function CreateCampaignPage() {
                 {currentStep === 7 && <WizardStep7 formData={formData} modulesList={modules} />}
               </div>
 
-              {/* Navigation */}
-              <div className="flex justify-between pt-6 border-t">
-                <Button onClick={handlePrevious} isDisabled={currentStep === 1} variant="bordered" className="px-6">
-                  {t("wizard.previous")}
-                </Button>
-                <Button
-                  onClick={handleNext}
-                  className="bg-blue-500 text-white px-8"
-                  isLoading={createMutation.isPending && currentStep === totalSteps}
+              {/* Navigation Buttons */}
+              <div className="mt-4 pt-3 border-t border-gray-100 flex gap-2 justify-end">
+                <button
+                  type="button"
+                  onClick={handlePrevious}
+                  disabled={currentStep === 1}
+                  className={clsx(
+                    "flex items-center gap-1.5 px-12 py-2 bg-gray-100 text-gray-700 rounded-full text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
+                  )}
                 >
-                  {currentStep === totalSteps ? t("wizard.finish") : t("wizard.next")}
-                </Button>
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={createMutation.isPending && currentStep === totalSteps}
+                  className="flex items-center gap-1.5 px-12 py-2 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {currentStep === totalSteps ? (
+                    <>
+                      {createMutation.isPending && <span className="animate-spin">⟳</span>}
+                      {t("wizard.finish")}
+                    </>
+                  ) : (
+                    "Next"
+                  )}
+                </button>
               </div>
-            </CardBody>
-          </Card>
-        </div>
+            </div>
+          </div>
 
-        <UserModal
-          isOpen={showUserModal}
-          onClose={() => setShowUserModal(false)}
-          onSave={(userIds) => handleChange("manualUsers", userIds)}
-          selectedUserIds={formData.manualUsers}
-        />
+          <UserModal
+            isOpen={showUserModal}
+            onClose={() => setShowUserModal(false)}
+            onSave={(userIds) => handleChange("manualUsers", userIds)}
+            selectedUserIds={formData.manualUsers}
+          />
+        </div>
       </DashboardLayout>
     </ProtectedRoute>
   );
