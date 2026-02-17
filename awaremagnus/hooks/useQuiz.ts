@@ -29,6 +29,7 @@ export function useModules(params?: {
   status?: number;
   org_id?: number;
   assigned_only?: boolean;
+  filter?: string;
 }) {
   return useQuery({
     queryKey: [...QUIZ_KEYS.modules, params],

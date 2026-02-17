@@ -107,7 +107,7 @@ export default function CreateCampaignPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showUserModal, setShowUserModal] = useState(false);
 
-  const { data: modulesData } = useModules({ status: 1 });
+  const { data: modulesData } = useModules();
   const modules = modulesData?.success && Array.isArray(modulesData.data) ? modulesData.data : [];
 
   const createMutation = useMutation({

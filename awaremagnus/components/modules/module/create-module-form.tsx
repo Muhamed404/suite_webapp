@@ -42,7 +42,7 @@ export function CreateModuleForm() {
 
   const [moduleName, setModuleName] = useState("");
   const [moduleCode, setModuleCode] = useState("");
-  const [creationDay, setCreationDay] = useState("");
+
   const [category, setCategory] = useState<string>("");
   const [difficulty, setDifficulty] = useState<string>("1");
   const [selectedLanguageIds, setSelectedLanguageIds] = useState<number[]>([]);
@@ -139,7 +139,7 @@ export function CreateModuleForm() {
       setFormSuccess(t("createSuccess"));
       setModuleName("");
       setModuleCode("");
-      setCreationDay("");
+
       setCategory("");
       setDifficulty("1");
       setSelectedLanguageIds([]);
@@ -165,7 +165,7 @@ export function CreateModuleForm() {
   const handleCancel = () => {
     setModuleName("");
     setModuleCode("");
-    setCreationDay("");
+
     setCategory("");
     setDifficulty("1");
     setSelectedLanguageIds([]);
@@ -225,28 +225,7 @@ export function CreateModuleForm() {
               />
             </div>
 
-            {/* Creation Day */}
-            <div className={inputGroupClass}>
-              <label className={inputLabelClass} htmlFor="creationDay">
-                {t("creationDay")}
-              </label>
-              <div className="relative">
-                <input
-                  className={`${inputFieldClass} h-10 pl-4 pr-10`}
-                  id="creationDay"
-                  type="date"
-                  value={creationDay}
-                  onChange={(e) => setCreationDay(e.target.value)}
-                />
-                <Image
-                  alt=""
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none"
-                  height={16}
-                  src={getContentAssetUrl("/images/date.svg")}
-                  width={16}
-                />
-              </div>
-            </div>
+
 
             {/* Category */}
             <div className={inputGroupClass}>

@@ -43,7 +43,7 @@ export default function QuizListPage() {
   const [moduleId, setModuleId] = useState<string>("");
   const [listError, setListError] = useState<string | null>(null);
 
-  const { data: modulesRes } = useModules({ status: 1 });
+  const { data: modulesRes } = useModules();
   const { data: quizTypesRes } = useQuizTypes();
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
   const quizTypes = quizTypesRes?.success ? (quizTypesRes.data ?? []) : [];
