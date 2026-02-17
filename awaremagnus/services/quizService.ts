@@ -382,7 +382,7 @@ export const quizService = {
     const q = payload.quiz;
     const contentId = q.mod_content_id ?? (q as { content_id?: number }).content_id ?? 0;
     const quizBody = {
-      content_id: contentId,
+      con_id: contentId,
       quiz_type_id: q.quiz_type_id,
       question: q.question,
       explanation: q.explanation,

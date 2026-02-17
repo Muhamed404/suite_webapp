@@ -47,5 +47,18 @@
   "deleteSuccess": "Quiz deleted",
   "deleteError": "Failed to delete quiz",
   "loading": "Loading…",
+  "uploadCsvHelper": "Upload CSV or Excel file to import quizzes in bulk.",
+  "uploadCsvExcel": "Upload CSV/Excel",
+  "clickToUpload": "Click to upload",
+  "csvExcelOnly": "CSV or Excel files only",
+  "uploading": "Uploading...",
+  "confirmUpload": "Confirm Upload",
+  "importStarted": "Import started successfully",
+  "importFailed": "Import failed",
+  "networkError": "Network error occurred",
+  "or": "OR",
+  "addOneMoreQuiz": "Add another question",
+  "removeQuestion": "Remove Question",
+  "importCsvHelper": "Download the template or use your own file following the required format.",
   "saving": "Saving…"
 }
