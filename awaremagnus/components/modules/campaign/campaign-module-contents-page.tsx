@@ -14,7 +14,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModule, useContentsByModule } from "@/hooks/useQuiz";
-import { useContentTypes } from "@/hooks/useSuiteAwm";
+import { CONTENT_TYPES } from "@/constants/content-types";
 import { getContentTypeIconFor } from "@/utils/contentTypeIcons";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ModuleDetailsSkeleton } from "@/components/ui/skeletons";
@@ -70,7 +70,7 @@ export function CampaignModuleContentsPage({
   const { data: contentsRes, isLoading: contentsLoading } = useContentsByModule(moduleId, {
     enabled: !!moduleId,
   });
-  const { data: contentTypesList } = useContentTypes();
+  const contentTypesList = CONTENT_TYPES;
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
   const contents = contentsRes?.success ? (contentsRes.data ?? []) : [];

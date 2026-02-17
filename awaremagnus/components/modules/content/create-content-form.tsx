@@ -18,7 +18,7 @@ import {
 import { ContentForm, type ContentTranslation } from "./content-form";
 
 import { useRouter } from "next/navigation";
-import { useContentTypes } from "@/hooks/useSuiteAwm";
+import { CONTENT_TYPES } from "@/constants/content-types";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModules } from "@/hooks/useQuiz";
@@ -82,9 +82,8 @@ export function CreateContentForm({
   const isRtl = dir === "rtl";
 
   const router = useRouter();
-  const { data: contentTypesList } = useContentTypes();
-  const apiContentTypes = Array.isArray(contentTypesList) ? contentTypesList : [];
-  const useApiContentTypes = apiContentTypes.length > 0;
+  const apiContentTypes = CONTENT_TYPES;
+  const useApiContentTypes = true;
 
   const [moduleId, setModuleId] = useState<string>(initialModuleId);
   const [contentType, setContentType] = useState<ContentType | null>(initialContentType);
