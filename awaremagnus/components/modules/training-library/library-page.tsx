@@ -20,6 +20,8 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModules } from "@/hooks/useQuiz";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { isPlatformAdmin } from "@/utils/roles";
 import { SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
 import { LibraryPageSkeleton } from "@/components/ui/skeletons";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
@@ -31,6 +33,7 @@ import {
   SearchXIcon,
   FilterIcon,
   EditIcon,
+  EyeIcon,
 } from "@/components/icons";
 
 export type LibraryType = "system" | "my";
@@ -70,6 +73,9 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
   const t = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const { user } = useAuthStore();
+  const isPlatform = isPlatformAdmin(user?.role_id);
+  const canManage = libraryType === "my" || (libraryType === "system" && isPlatform);
 
   const basePath = `/dashboard/training-library/${libraryType}`;
   const createModulePath = `${basePath}/module/create`;
@@ -173,15 +179,17 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                 <h3 className="text-xl font-semibold text-[var(--mainblue)]">{t("listTitle")}</h3>
                 <p className="text-xs text-gray-500 mt-1">{t("library.description")}</p>
               </div>
-              <Button
-                as={Link}
-                className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 min-h-0 h-9"
-                href={createModulePath}
-                radius="full"
-              >
-                <PlusIcon className="size-3 shrink-0" />
-                <span className="hidden md:inline">{t("library.addNew")}</span>
-              </Button>
+              {canManage && (
+                <Button
+                  as={Link}
+                  className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs font-medium transition-all duration-300 min-h-0 h-9"
+                  href={createModulePath}
+                  radius="full"
+                >
+                  <PlusIcon className="size-3 shrink-0" />
+                  <span className="hidden md:inline">{t("library.addNew")}</span>
+                </Button>
+              )}
             </div>
           </div>
 
@@ -374,15 +382,17 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                       {t("library.emptyTitle")}
                     </h3>
                     <p className="text-sm text-gray-500 mb-6">{t("library.emptyDescription")}</p>
-                    <Button
-                      as={Link}
-                      className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs font-medium mx-auto"
-                      href={createModulePath}
-                      radius="full"
-                    >
-                      <PlusIcon className="size-3" />
-                      {t("library.addNew")}
-                    </Button>
+                    {canManage && (
+                      <Button
+                        as={Link}
+                        className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs font-medium mx-auto"
+                        href={createModulePath}
+                        radius="full"
+                      >
+                        <PlusIcon className="size-3" />
+                        {t("library.addNew")}
+                      </Button>
+                    )}
                   </div>
                 </div>
               ) : viewMode === "grid" ? (
@@ -427,8 +437,17 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                             size="sm"
                             variant="bordered"
                           >
-                            <EditIcon className="size-3.5 shrink-0" />
-                            {t("library.edit")}
+                            {canManage ? (
+                              <>
+                                <EditIcon className="size-3.5 shrink-0" />
+                                {t("library.edit")}
+                              </>
+                            ) : (
+                              <>
+                                <EyeIcon className="size-3.5 shrink-0" />
+                                {t("library.view")}
+                              </>
+                            )}
                           </Button>
                         </div>
                       </CardBody>
@@ -550,8 +569,17 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                               size="sm"
                               variant="bordered"
                             >
-                              <EditIcon className="size-3.5 shrink-0" />
-                              {t("library.edit")}
+                              {canManage ? (
+                                <>
+                                  <EditIcon className="size-3.5 shrink-0" />
+                                  {t("library.edit")}
+                                </>
+                              ) : (
+                                <>
+                                  <EyeIcon className="size-3.5 shrink-0" />
+                                  {t("library.view")}
+                                </>
+                              )}
                             </Button>
                           </div>
                         </TableCell>
