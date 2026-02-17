@@ -91,3 +91,12 @@ export function useCampaignLeaderboard(campaignId: number, enabled = true) {
     enabled: enabled && !!campaignId,
   });
 }
+
+/** Get campaign dashboard with all details and metrics */
+export function useCampaignDashboard(campaignId: number, enabled = true) {
+  return useQuery({
+    queryKey: ["campaign", campaignId, "dashboard"],
+    queryFn: () => suiteAwmService.getCampaignDashboard(campaignId),
+    enabled: enabled && !!campaignId,
+  });
+}
