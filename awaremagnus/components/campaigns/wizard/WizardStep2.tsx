@@ -169,15 +169,23 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                         className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
                       >
                         {getDepartmentName(deptId)}
-                        <button
+                        <div
                           onClick={(e) => {
                             e.stopPropagation();
                             removeDepartment(deptId);
                           }}
-                          className="hover:text-blue-900 transition-colors flex-shrink-0"
+                          className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.stopPropagation();
+                              removeDepartment(deptId);
+                            }
+                          }}
                         >
                           <X className="w-3 h-3" />
-                        </button>
+                        </div>
                       </span>
                     ))
                   )}
@@ -228,15 +236,23 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                         className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
                       >
                         {getGroupName(groupId)}
-                        <button
+                        <div
                           onClick={(e) => {
                             e.stopPropagation();
                             removeGroup(groupId);
                           }}
-                          className="hover:text-blue-900 transition-colors flex-shrink-0"
+                          className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.stopPropagation();
+                              removeGroup(groupId);
+                            }
+                          }}
                         >
                           <X className="w-3 h-3" />
-                        </button>
+                        </div>
                       </span>
                     ))
                   )}
@@ -285,12 +301,19 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                   className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
                 >
                   {users[userId] || `User ${userId}`}
-                  <button
+                  <div
                     onClick={() => onChange("manualUsers", formData.manualUsers.filter((id) => id !== userId))}
-                    className="hover:text-blue-900"
+                    className="hover:text-blue-900 cursor-pointer transition-colors"
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        onChange("manualUsers", formData.manualUsers.filter((id) => id !== userId));
+                      }
+                    }}
                   >
                     ×
-                  </button>
+                  </div>
                 </span>
               ))}
             </div>

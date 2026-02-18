@@ -25,6 +25,8 @@ export default function CampaignLeaderboardPage() {
     direction: "asc" | "desc";
   } | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [dateFilter, setDateFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
@@ -34,20 +36,65 @@ export default function CampaignLeaderboardPage() {
     !!campaignId
   );
 
-  const leaderboardData = leaderboardRes?.leaderboard || [];
-  const campaignStats = leaderboardRes?.campaign_stats || {};
+  // The awmGet normalizer already extracts 'object' from the raw response
+  // So leaderboardRes directly contains { meta_statistics, users, pagination }
+  const rawUsers = leaderboardRes?.users || [];
+  const metaStats = leaderboardRes?.meta_statistics || {};
 
-  // Filter by search
+  // Transform API response to match table expectations
+  const leaderboardData = rawUsers.map((user: any) => {
+    const progress = user.global_progress || 0;
+    // Use status from API if available, otherwise default to "active"
+    const status = user.status || "active";
+
+    return {
+      user_id: user.user_id,
+      firstname: user.first_name || "-",
+      lastname: user.last_name || "-",
+      email: "-",
+      last_login: user.last_login_time || null,
+      risk_level: user.campaign_risk_level || 0,
+      compliance_score: user.compliance_score || 0,
+      completed_modules: user.modules_completed || 0,
+      progress_percentage: progress,
+      completed_certificates: user.certificates_completed || 0,
+      unlocked_achievements: user.total_achievements_unlocked || 0,
+      xp_tokens: user.xp_tokens_earned || 0,
+      status,
+      avatar_level: user.avatar_level || 1,
+      quizzes_accuracy: user.quizzes_accuracy_percent || 0,
+    };
+  });
+
+  const campaignStats = {
+    campaign_name: metaStats.campaign_name || "-",
+    total_modules: metaStats.total_campaign_modules || 0,
+    total_quizzes: metaStats.total_campaign_quizzes || 0,
+    avg_completion_percentage: metaStats.campaign_completion_percentage || 0,
+  };
+
+  // Filter by search and status
   const filteredData = useMemo(() => {
-    if (!searchQuery.trim()) return leaderboardData;
+    let filtered = leaderboardData;
+
+    // Filter by status
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((user: any) => {
+        const userStatus = user.status?.toLowerCase() || "active";
+        return userStatus === statusFilter.toLowerCase();
+      });
+    }
+
+    // Filter by search query
+    if (!searchQuery.trim()) return filtered;
 
     const query = searchQuery.toLowerCase();
-    return leaderboardData.filter((user: any) =>
+    return filtered.filter((user: any) =>
       user.firstname?.toLowerCase().includes(query) ||
       user.lastname?.toLowerCase().includes(query) ||
       user.email?.toLowerCase().includes(query)
     );
-  }, [leaderboardData, searchQuery]);
+  }, [leaderboardData, searchQuery, statusFilter]);
 
   // Sort data
   const sortedData = useMemo(() => {
@@ -88,13 +135,42 @@ export default function CampaignLeaderboardPage() {
     });
   };
 
-  const formatDate = (date?: string) => {
+  const formatDate = (date?: string | null) => {
     if (!date) return "-";
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
+    try {
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, '0');
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const year = d.getFullYear();
+      const hours = String(d.getHours()).padStart(2, '0');
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      return `${day}/${month}/${year} ${hours}:${minutes}`;
+    } catch {
+      return "-";
+    }
+  };
+
+  const getAvatarImage = (avatarLevel: number) => {
+    // Avatar levels 0-9 map to images 1-10
+    // Level 0 = image 1 (Vulnerable Newbie)
+    // Level 1 = image 2 (Alert Apprentice)
+    // ... Level 8 = image 9 (Expert Enforcer)
+    const imageNumber = Math.min(9, Math.max(1, (avatarLevel || 0) + 1));
+    return `/awm/images/avatars/${imageNumber}.png`;
+  };
+
+  const getRiskLevelColor = (riskLevel: number) => {
+    if (riskLevel <= 10) return "bg-green-100";
+    if (riskLevel <= 25) return "bg-yellow-100";
+    if (riskLevel <= 50) return "bg-orange-100";
+    return "bg-red-100";
+  };
+
+  const getRiskLevelTextColor = (riskLevel: number) => {
+    if (riskLevel <= 10) return "text-green-700";
+    if (riskLevel <= 25) return "text-yellow-700";
+    if (riskLevel <= 50) return "text-orange-700";
+    return "text-red-700";
   };
 
   const getRiskLevelProgressBar = (riskLevel?: string | number) => {
@@ -104,19 +180,21 @@ export default function CampaignLeaderboardPage() {
     const percentage = Math.min(100, Math.max(0, level));
 
     let bgColor = "bg-green-500";
-    if (level > 75) bgColor = "bg-red-500";
-    else if (level > 50) bgColor = "bg-orange-500";
+    if (level > 50) bgColor = "bg-orange-500";
     else if (level > 25) bgColor = "bg-yellow-500";
+    else if (level > 10) bgColor = "bg-blue-500";
 
     return (
       <div className="flex items-center gap-2">
-        <div className="w-16 bg-gray-200 rounded-full h-2">
+        <div className="w-20 h-2 bg-gray-200 rounded-full">
           <div
             className={`${bgColor} h-2 rounded-full transition-all duration-300`}
             style={{ width: `${percentage}%` }}
           />
         </div>
-        <span className="text-[10px] text-gray-600">{percentage}%</span>
+        <span className={`text-xs font-semibold ${getRiskLevelTextColor(level)}`}>
+          {percentage}%
+        </span>
       </div>
     );
   };
@@ -191,6 +269,38 @@ export default function CampaignLeaderboardPage() {
             </div>
           </div>
 
+          {/* Status Tabs */}
+          <div className="flex gap-2 mb-4 bg-white p-1.5 rounded-full w-fit">
+            {[
+              { value: "all", label: "All", count: leaderboardData.length },
+              { value: "active", label: "Active", count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "active").length },
+              { value: "pending", label: "Pending", count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "pending").length },
+              { value: "completed", label: "Completed", count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "completed").length },
+            ].map((tab) => (
+              <button
+                key={tab.value}
+                onClick={() => {
+                  setStatusFilter(tab.value);
+                  setCurrentPage(1);
+                }}
+                className={clsx(
+                  "px-4 py-2 text-xs font-medium rounded-full transition-all",
+                  statusFilter === tab.value
+                    ? "bg-[#051226] text-white"
+                    : "bg-transparent text-gray-700 hover:bg-gray-100"
+                )}
+              >
+                <span>{tab.label}</span>
+                <span className={clsx(
+                  "ml-1 inline-flex items-center justify-center min-w-5 h-5 rounded-full text-[10px]",
+                  statusFilter === tab.value ? "bg-white/30 text-white" : "bg-gray-100 text-gray-600"
+                )}>
+                  {tab.count}
+                </span>
+              </button>
+            ))}
+          </div>
+
           {/* Search & Filter */}
           <div className="flex flex-col md:flex-row justify-between gap-3 mb-4">
             <div className="relative w-64">
@@ -205,7 +315,7 @@ export default function CampaignLeaderboardPage() {
               />
               <input
                 type="text"
-                placeholder="Search user..."
+                placeholder="Search Campaign..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -214,6 +324,23 @@ export default function CampaignLeaderboardPage() {
                 className="w-full pl-10 pr-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
+
+            {/* Date Filter */}
+            <select
+              value={dateFilter}
+              onChange={(e) => {
+                setDateFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="px-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-40"
+            >
+              <option value="all">All Time</option>
+              <option value="7">Last 7 Days</option>
+              <option value="30">Last 30 Days</option>
+              <option value="90">Last 3 Months</option>
+              <option value="180">Last 6 Months</option>
+              <option value="365">This Year</option>
+            </select>
           </div>
 
           {/* Table */}
@@ -273,7 +400,7 @@ export default function CampaignLeaderboardPage() {
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>Completed Modules</span>
+                          <span>Completed Module</span>
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
@@ -283,12 +410,12 @@ export default function CampaignLeaderboardPage() {
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>Certificates</span>
+                          <span>Completed Certificates</span>
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>Achievements</span>
+                          <span>Unlocked Achievements</span>
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
@@ -303,6 +430,11 @@ export default function CampaignLeaderboardPage() {
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
+                          <span>Status</span>
+                        </div>
+                      </th>
+                      <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
+                        <div className="flex items-center gap-2">
                           <span>Action</span>
                         </div>
                       </th>
@@ -311,60 +443,80 @@ export default function CampaignLeaderboardPage() {
                   <tbody className="divide-y divide-gray-100">
                     {paginatedData.map((user: any, idx: number) => (
                       <tr key={user.user_id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3 text-gray-800">{user.firstname || "-"}</td>
-                        <td className="px-4 py-3 text-gray-800">{user.lastname || "-"}</td>
-                        <td className="px-4 py-3 text-gray-600">
-                          {formatDate(user.last_login)}
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          <span className="font-medium text-gray-700">{user.firstname || "-"}</span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3.5 text-gray-600 whitespace-nowrap">
+                          <span>{user.lastname || "-"}</span>
+                        </td>
+                        <td className="px-4 py-3.5 text-gray-600 whitespace-nowrap text-xs">
+                          <span>{formatDate(user.last_login)}</span>
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap">
                           {getRiskLevelProgressBar(user.risk_level)}
                         </td>
-                        <td className="px-4 py-3 text-gray-800 font-medium">
-                          {user.compliance_score || 0}%
+                        <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                          <span className="font-semibold text-gray-700">{user.compliance_score || 0}</span>
                         </td>
-                        <td className="px-4 py-3 text-gray-600">
-                          <span className="px-2 py-1 rounded bg-blue-100 text-blue-700 text-[10px] font-semibold">
-                            {user.completed_modules || 0}/{campaignStats.total_modules || 0}
-                          </span>
+                        <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                          <span className="text-gray-600">{user.completed_modules || 0}</span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3.5 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <div className="w-20 bg-gray-200 rounded-full h-1.5">
+                            <div className="w-20 h-2 rounded-full bg-gray-200">
                               <div
                                 className={clsx(
-                                  "h-1.5 rounded-full transition-all duration-300",
-                                  (user.progress_percentage || 0) >= 80 ? "bg-green-500" :
-                                  (user.progress_percentage || 0) >= 60 ? "bg-blue-500" :
-                                  (user.progress_percentage || 0) >= 40 ? "bg-yellow-500" :
-                                  (user.progress_percentage || 0) >= 20 ? "bg-orange-500" : "bg-red-500"
+                                  "h-2 rounded-full transition-all duration-300",
+                                  (user.progress_percentage || 0) >= 90 ? "bg-green-500" :
+                                  (user.progress_percentage || 0) >= 70 ? "bg-blue-500" :
+                                  (user.progress_percentage || 0) >= 50 ? "bg-yellow-500" :
+                                  "bg-orange-500"
                                 )}
                                 style={{
                                   width: `${user.progress_percentage || 0}%`,
                                 }}
                               />
                             </div>
-                            <span className="text-[10px] text-gray-600">
+                            <span className="text-xs font-semibold text-gray-700">
                               {user.progress_percentage?.toFixed(0) || 0}%
                             </span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-gray-800 font-medium">
-                          {user.completed_certificates || 0}
+                        <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                          <span className="font-semibold text-gray-700">{user.completed_certificates || 0}</span>
                         </td>
-                        <td className="px-4 py-3">
-                          <span className="px-2 py-1 rounded-full text-[10px] font-semibold bg-yellow-100 text-yellow-700">
+                        <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                          <span className={clsx(
+                            "inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold",
+                            `${getRiskLevelColor(user.risk_level || 0)} ${getRiskLevelTextColor(user.risk_level || 0)}`
+                          )}>
                             {user.unlocked_achievements || 0}
                           </span>
                         </td>
-                        <td className="px-4 py-3">
-                          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs text-gray-500">
-                            {user.firstname?.charAt(0)?.toUpperCase() || "U"}
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
+                            <img 
+                              src={getAvatarImage(user.avatar_level)} 
+                              alt={`Avatar Level ${user.avatar_level}`} 
+                              className="w-full h-full object-cover" 
+                            />
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-gray-800 font-medium">
-                          {user.xp_tokens || 0} tokens
+                        <td className="px-4 py-3.5 text-center whitespace-nowrap">
+                          <span className="text-xs font-semibold text-gray-700">{user.xp_tokens || 0} tokens</span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          <span className={clsx(
+                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold min-w-[100px] justify-center",
+                            user.status?.toLowerCase() === "active" ? "bg-green-100 text-green-700 border border-green-200" :
+                            user.status?.toLowerCase() === "pending" ? "bg-amber-100 text-amber-700 border border-amber-200" :
+                            user.status?.toLowerCase() === "completed" ? "bg-gray-100 text-gray-700" :
+                            "bg-green-100 text-green-700 border border-green-200"
+                          )}>
+                            <span>{user.status?.charAt(0).toUpperCase() + user.status?.slice(1) || "Active"}</span>
+                          </span>
+                        </td>
+                        <td className="px-4 py-3.5 whitespace-nowrap">
                           <button
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-full transition-colors"
                           >
