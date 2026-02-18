@@ -657,7 +657,7 @@ export default function CampaignDetailsPage() {
                 </Button>
               </div>
 
-              {leaderboardData?.data?.top_high_risk_employees && leaderboardData.data.top_high_risk_employees.length > 0 ? (
+              {(leaderboardData?.data?.top_high_risk_employees ?? []).length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead className="border-b border-gray-200">
@@ -669,7 +669,7 @@ export default function CampaignDetailsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {leaderboardData.data.top_high_risk_employees.slice(0, 10).map((employee: any, idx: number) => (
+                      {(leaderboardData?.data?.top_high_risk_employees ?? []).slice(0, 10).map((employee: any, idx: number) => (
                         <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
                           <td className="py-2 px-2 text-gray-700">User {employee.user_id}</td>
                           <td className="py-2 px-2">
@@ -707,7 +707,7 @@ export default function CampaignDetailsPage() {
                 </Button>
               </div>
 
-              {leaderboardData?.data?.top_low_risk_employees && leaderboardData.data.top_low_risk_employees.length > 0 ? (
+              {(leaderboardData?.data?.top_low_risk_employees ?? []).length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead className="border-b border-gray-200">
@@ -719,7 +719,7 @@ export default function CampaignDetailsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {leaderboardData.data.top_low_risk_employees.slice(0, 10).map((employee: any, idx: number) => (
+                      {(leaderboardData?.data?.top_low_risk_employees ?? []).slice(0, 10).map((employee: any, idx: number) => (
                         <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
                           <td className="py-2 px-2 text-gray-700">User {employee.user_id}</td>
                           <td className="py-2 px-2">

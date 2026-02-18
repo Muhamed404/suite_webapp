@@ -33,13 +33,13 @@ export const DashboardTables = () => {
 
   if (isPlatformAdmin) {
     if (systemLeaderboard?.statusCode === 200) {
-      highRiskData = systemLeaderboard.data.top_high_risk_employees || [];
-      lowRiskData = systemLeaderboard.data.top_low_risk_employees || [];
+      highRiskData = systemLeaderboard?.data?.top_high_risk_employees ?? [];
+      lowRiskData = systemLeaderboard?.data?.top_low_risk_employees ?? [];
     }
   } else {
     if (orgLeaderboard?.statusCode === 200) {
-      highRiskData = orgLeaderboard.data.top_high_risk_employees || [];
-      lowRiskData = orgLeaderboard.data.top_low_risk_employees || [];
+      highRiskData = orgLeaderboard?.data?.top_high_risk_employees ?? [];
+      lowRiskData = orgLeaderboard?.data?.top_low_risk_employees ?? [];
     }
   }
 
