@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@heroui/button";
 import { ArrowLeft, Info, Users, BookOpen, Award, BarChart, Calendar, CheckCircle } from "lucide-react";
 import clsx from "clsx";
@@ -62,12 +63,16 @@ interface FormData {
 export default function CreateCampaignPage() {
   const router = useRouter();
   const t = useTranslations("campaigns");
+  const tDashboard = useTranslations("dashboard");
+  const tc = useTranslations("common");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
   const queryClient = useQueryClient();
 
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 7;
+
+  const [formErrorMessage, setFormErrorMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<FormData>({
     campaignName: "",
@@ -178,13 +183,20 @@ export default function CreateCampaignPage() {
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
+      // clear any previous validation banner
+      setFormErrorMessage(null);
+
       if (currentStep === totalSteps) {
         handleSubmit();
       } else {
         setCurrentStep((s) => s + 1);
       }
     } else {
-      console.error(t("form.validationError"));
+      // show a visible validation banner instead of logging to console
+      const msg = t("form.validationError");
+      setFormErrorMessage(msg);
+      // auto-hide after 4s
+      window.setTimeout(() => setFormErrorMessage(null), 4000);
     }
   };
 
@@ -277,9 +289,17 @@ export default function CreateCampaignPage() {
             <Button isIconOnly variant="light" size="sm" onClick={() => router.back()}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <div className="text-xs text-gray-500">
-              {t("campaigns.label")} &gt; {t("campaigns.createNew")}
-            </div>
+            <nav aria-label="Breadcrumb" className="flex items-center text-xs text-gray-500 mb-6 gap-1.5">
+              <Link className="hover:text-gray-700 transition" href="/dashboard/launch-awareness">
+                {tDashboard("menu.launchAwareness")}
+              </Link>
+              <span className="text-gray-400">›</span>
+              <Link className="hover:text-gray-700 transition" href="/dashboard/launch-awareness/campaigns">
+                {t("title")}
+              </Link>
+              <span className="text-gray-400">›</span>
+              <span className="font-semibold text-gray-900">{t("createNew")}</span>
+            </nav>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-hidden">
@@ -318,6 +338,11 @@ export default function CreateCampaignPage() {
               </div>
 
               {/* Step Content */}
+              {formErrorMessage && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                  {formErrorMessage}
+                </div>
+              )}
               <div className="min-h-[500px] mb-8">
                 {currentStep === 1 && <WizardStep1 formData={formData} onChange={handleChange} errors={errors} />}
                 {currentStep === 2 && (

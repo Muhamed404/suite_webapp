@@ -96,17 +96,14 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
 
         {/* Gamification Toggle */}
         <div className="flex items-center gap-2">
-          <label className="lang-item flex items-center gap-1.5 cursor-pointer group">
+          <label className="flex items-center gap-1.5 cursor-pointer group">
             <input
               type="checkbox"
               id="gamified"
               checked={formData.gamified}
               onChange={(e) => onChange("gamified", e.target.checked)}
-              className="real-checkbox sr-only"
+              className="w-4 h-4 text-blue-500 rounded"
             />
-            <span className="visual-tick w-4 h-4 border-2 border-gray-300 rounded flex items-center justify-center transition-all group-hover:border-blue-500">
-              <i data-lucide="check" className="w-2.5 h-2.5 text-white opacity-0"></i>
-            </span>
             <span className="text-xs text-gray-700">Enable Gamification</span>
           </label>
         </div>

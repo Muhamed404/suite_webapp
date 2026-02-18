@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Users, ChevronDown, X } from "lucide-react";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
@@ -31,6 +31,25 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
   const [error, setError] = useState<string | null>(null);
   const [deptDropdownOpen, setDeptDropdownOpen] = useState(false);
   const [groupDropdownOpen, setGroupDropdownOpen] = useState(false);
+  const deptDropdownRef = useRef<HTMLDivElement>(null);
+  const groupDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (deptDropdownRef.current && !deptDropdownRef.current.contains(event.target as Node)) {
+        setDeptDropdownOpen(false);
+      }
+      if (groupDropdownRef.current && !groupDropdownRef.current.contains(event.target as Node)) {
+        setGroupDropdownOpen(false);
+      }
+    };
+
+    if (deptDropdownOpen || groupDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [deptDropdownOpen, groupDropdownOpen]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -135,7 +154,7 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
           <div>
             <label className="block text-sm font-medium mb-3">{t("form.selectDepartments")}</label>
             
-            <div className="relative">
+            <div className="relative" ref={deptDropdownRef}>
               <button
                 onClick={() => setDeptDropdownOpen(!deptDropdownOpen)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
@@ -194,7 +213,7 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
           <div>
             <label className="block text-sm font-medium mb-3">{t("form.selectGroups")}</label>
             
-            <div className="relative">
+            <div className="relative" ref={groupDropdownRef}>
               <button
                 onClick={() => setGroupDropdownOpen(!groupDropdownOpen)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
