@@ -438,9 +438,13 @@ export const quizService = {
    */
   getCategories: async () => {
     const { data } = await awmClient.get<{
-      success: boolean;
-      message: string;
-      data: {
+      success?: boolean;
+      message?: string;
+      object?: {
+        categories: Array<{ id: number; name: string; description: string | null }>;
+        count: number;
+      };
+      data?: {
         categories: Array<{ id: number; name: string; description: string | null }>;
         count: number;
       };

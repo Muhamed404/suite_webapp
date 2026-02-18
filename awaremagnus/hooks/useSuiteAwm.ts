@@ -18,7 +18,7 @@ export function useCategories(enabled = true) {
     queryKey: SUITE_AWM_KEYS.categories,
     queryFn: () => quizService.getCategories(),
     enabled,
-    select: (data) => data?.data?.categories ?? [],
+    select: (data) => data?.object?.categories ?? data?.data?.categories ?? [],
   });
 }
 
@@ -71,7 +71,7 @@ export function useAwmCategories(enabled = true) {
     queryFn: () => quizService.getCategories(),
     enabled,
     staleTime: 10 * 60 * 1000, // 10 minutes — categories rarely change
-    select: (data) => data?.data?.categories ?? [],
+    select: (data) => data?.object?.categories ?? data?.data?.categories ?? [],
   });
 }
 
