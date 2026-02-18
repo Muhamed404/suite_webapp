@@ -60,5 +60,6 @@
   "addOneMoreQuiz": "Add another question",
   "removeQuestion": "Remove Question",
   "importCsvHelper": "Download the template or use your own file following the required format.",
+  "downloadTemplate": "Download Template",
   "saving": "Saving…"
 }
