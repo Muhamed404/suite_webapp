@@ -32,6 +32,7 @@ import {
   useSystemStrugglingModules,
   useOrganizationStrugglingModules,
   useOrganizationMonthlyCompletion,
+  useUserAssignments,
 } from "@/hooks/useDashboard";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
@@ -49,6 +50,7 @@ export default function DashboardPage() {
   const { data: systemData } = useSystemOverview();
   const { data: orgDataResponse } = useOrganizationDashboards();
   const { data: userDataResponse } = useUserDashboards({ userId: user?.id });
+  const { data: assignmentsData } = useUserAssignments({ language_id: 1 });
 
   const { data: systemStrugglingRaw } = useSystemStrugglingModules();
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
@@ -121,8 +123,9 @@ export default function DashboardPage() {
         ? dashboardData.total_modules_enrolled
         : 0;
 
-  const _complianceScore = dashboardData?.total_compliance_score || 0;
-  const compliancePercent = dashboardData?.total_compliance_percent || 0;
+  // Ensure numeric types for score/percent (API may return strings)
+  const _complianceScore = Number(dashboardData?.total_compliance_score ?? 0);
+  const compliancePercent = parseFloat(String(dashboardData?.total_compliance_percent ?? "0"));
 
   const globalProgress =
     dashboardData && "global_org_progress_percent" in dashboardData
@@ -139,8 +142,18 @@ export default function DashboardPage() {
         : 0;
 
   const totalCampaigns = dashboardData?.total_campaigns || 0;
-  const weeklyProgress = dashboardData?.weekly_progress_percent || 0;
-  const quizAccuracy = dashboardData?.quizzes_accuracy_percent || 0;
+  // Ensure dashboard-level progress is numeric (API may return string)
+  const weeklyProgress = (() => {
+    const raw = dashboardData?.weekly_progress_percent ?? 0;
+    const num = typeof raw === "number" ? raw : parseFloat(String(raw));
+    return Number.isFinite(num) ? num : 0;
+  })();
+  // Ensure quiz accuracy is always numeric (API may return string)
+  const quizAccuracy = (() => {
+    const raw = dashboardData?.quizzes_accuracy_percent ?? 0;
+    const num = typeof raw === "number" ? raw : parseFloat(String(raw));
+    return Number.isFinite(num) ? num : 0;
+  })();
   const securityAwarenessScore =
     dashboardData && "total_compliance_score" in dashboardData
       ? dashboardData.total_compliance_score
@@ -192,13 +205,19 @@ export default function DashboardPage() {
   const totalCompletedModules = userDashboardData?.total_completed_modules || 0;
   const totalCertificatesAvailable = userDashboardData?.total_certificates_available || 0;
   const totalCompletedCertificates = userDashboardData?.total_completed_certificates || 0;
-  const totalStudyTimeHours = userDashboardData ? Math.floor(userDashboardData.total_study_time / 3600) : 0; // Convert seconds to hours
-  const levelNumber = userDashboardData?.level_number || 1;
-  const xpTotalTokens = userDashboardData?.xp_total_tokens || 0;
-  const streakDay = userDashboardData?.streak_day || 0;
-  const learningVelocity = userDashboardData?.learning_velocity || 0;
+  const totalStudyTimeHours = userDashboardData ? Math.floor(userDashboardData.total_study_time / 60) : 0; // Convert minutes to hours
+  const levelNumber = userDashboardData?.level_number ?? 1;
+  const xpTotalTokens = parseFloat(userDashboardData?.xp_total_tokens ?? "0");
+  const streakDay = userDashboardData?.streak_day ?? 0;
+  const learningVelocity = (() => {
+    const raw = userDashboardData?.learning_velocity ?? 0;
+    const num = typeof raw === "number" ? raw : parseFloat(String(raw));
+    return Number.isFinite(num) ? num : 0;
+  })();
   const bestModuleAttempted = userDashboardData?.best_module_attempted || "";
   const totalAchievementsCompleted = userDashboardData?.total_achievements_completed || 0;
+  const quizzesAccuracyPercent = parseFloat(userDashboardData?.quizzes_accuracy_percent ?? "0");
+  const weeklyProgressPercent = parseFloat(userDashboardData?.weekly_progress_percent ?? "0");
 
   // Risk Stats
   const riskStats = {
@@ -560,32 +579,39 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { name: "WIFI Security", assigned: "6 June", level: "1/16", days: 16, progress: 40 },
-                        { name: "Physical Security", assigned: "6 June", level: "1/16", days: 16, progress: 40 },
-                        { name: "WIFI Security", assigned: "6 June", level: "1/16", days: 16, progress: 40 },
-                        { name: "Physical Security", assigned: "6 June", level: "1/16", days: 16, progress: 40 },
-                      ].map((assignment, index) => (
-                        <div key={index} className="bg-gray-50 rounded-xl p-3 flex justify-between items-center">
-                          <div className="flex gap-3">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                              🎓
-                            </div>
-                            <div className="space-y-1">
-                              <h3 className="text-sm font-semibold text-gray-900">{assignment.name}</h3>
-                              <p className="text-[11px] text-gray-400">Assigned {assignment.assigned}</p>
-                              <div className="flex items-center gap-3 text-[11px] text-gray-500">
-                                <span>Level {assignment.level}</span>
-                                <span className="flex items-center gap-1">⏱ {assignment.days} Days</span>
+                      {(assignmentsData?.object?.assignments?.filter(a => a.status.name === "PENDING" || a.status.name === "IN_PROGRESS").slice(0, 4) || []).map((assignment, index) => {
+                        const startDate = new Date(assignment.start_date);
+                        const endDate = new Date(assignment.end_date);
+                        // use numeric timestamps so TypeScript accepts the arithmetic and guard invalid dates
+                        const startMs = startDate.getTime();
+                        const endMs = endDate.getTime();
+                        const days = Number.isFinite(startMs) && Number.isFinite(endMs)
+                          ? Math.ceil((endMs - startMs) / (1000 * 60 * 60 * 24))
+                          : 0;
+                        const assigned = startDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+                        const progress = assignment.status.name === "PENDING" ? 0 : assignment.status.name === "IN_PROGRESS" ? 50 : 100;
+                        return (
+                          <div key={index} className="bg-gray-50 rounded-xl p-3 flex justify-between items-center">
+                            <div className="flex gap-3">
+                              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                🎓
                               </div>
-                              <div className="w-36 h-1 bg-gray-200 rounded-full overflow-hidden">
-                                <div className="h-full bg-blue-400 rounded-full" style={{ width: `${assignment.progress}%` }}></div>
+                              <div className="space-y-1">
+                                <h3 className="text-sm font-semibold text-gray-900">{assignment.module_name}</h3>
+                                <p className="text-[11px] text-gray-400">Assigned {assigned}</p>
+                                <div className="flex items-center gap-3 text-[11px] text-gray-500">
+                                  <span>Level 1/1</span>
+                                  <span className="flex items-center gap-1">⏱ {days} Days</span>
+                                </div>
+                                <div className="w-36 h-1 bg-gray-200 rounded-full overflow-hidden">
+                                  <div className="h-full bg-blue-400 rounded-full" style={{ width: `${progress}%` }}></div>
+                                </div>
                               </div>
                             </div>
+                            <span className="text-blue-400 text-lg">›</span>
                           </div>
-                          <span className="text-blue-400 text-lg">›</span>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -595,11 +621,11 @@ export default function DashboardPage() {
                   <div className="grid grid-cols-4 p-2 rounded-xl bg-white gap-2 h-full">
                     <div className="bg-[#F1F5F8] rounded-xl p-3 flex flex-col items-center justify-between col-span-2 h-full">
                       <h3 className="text-xs font-semibold mb-1">Weekly Progress</h3>
-                      <div className="leadchart h-32 w-32" style={({ color: "#00CCC4", value: weeklyProgress.toString() } as any)}></div>
+                      <CircularProgressChart color="#00CCC4" size={128} value={weeklyProgressPercent} />
                     </div>
                     <div className="bg-[#F1F5F8] rounded-xl p-3 flex flex-col items-center justify-between col-span-2 h-full">
                       <h3 className="text-xs font-semibold mb-1">Quiz Accuracy</h3>
-                      <div className="leadchart h-32 w-32" style={({ color: "#7CC5FA", value: quizAccuracy.toString() } as any)}></div>
+                      <CircularProgressChart color="#7CC5FA" size={128} value={quizzesAccuracyPercent} />
                     </div>
                   </div>
                 </div>
@@ -627,33 +653,27 @@ export default function DashboardPage() {
                     <table className="min-w-full text-left text-[10px] whitespace-nowrap">
                       <thead className="sticky top-0 bg-gray-50 z-10">
                         <tr className="text-gray-500 font-semibold">
-                          <th className="px-4 py-2">Employee Name</th>
+                          <th className="px-4 py-2">Campaign Name</th>
+                          <th className="px-4 py-2">Module Name</th>
                           <th className="px-4 py-2">Start Date</th>
-                          <th className="px-4 py-2">Due Date</th>
                           <th className="px-4 py-2">🏆 Badge</th>
                           <th className="px-4 py-2">⭐ Exp</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {[
-                          { name: "Campaign 23-06", start: "23 July 2025", due: "23 July 2025", badge: "🔥", exp: "Experienced" },
-                          { name: "Campaign 23-07", start: "24 July 2025", due: "24 July 2025", badge: "🔥", exp: "Experienced" },
-                          { name: "Campaign 23-08", start: "25 July 2025", due: "25 July 2025", badge: "🔥", exp: "Experienced" },
-                          { name: "Campaign 23-09", start: "26 July 2025", due: "26 July 2025", badge: "🔥", exp: "Experienced" },
-                          { name: "Campaign 23-10", start: "27 July 2025", due: "27 July 2025", badge: "🔥", exp: "Experienced" },
-                        ].map((row, index) => (
+                        {(assignmentsData?.object?.assignments || []).map((assignment, index) => (
                           <tr key={index} className="hover:bg-gray-50">
-                            <td className="px-4 py-2">{row.name}</td>
-                            <td className="px-4 py-2">{row.start}</td>
-                            <td className="px-4 py-2">{row.due}</td>
+                            <td className="px-4 py-2">{assignment.campaign_name}</td>
+                            <td className="px-4 py-2">{assignment.module_name}</td>
+                            <td className="px-4 py-2">{new Date(assignment.start_date).toLocaleDateString()}</td>
                             <td className="px-4 py-2">
                               <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center">
-                                <span className="text-purple-500 text-sm">{row.badge}</span>
+                                <span className="text-purple-500 text-sm">🔥</span>
                               </div>
                             </td>
                             <td className="px-4 py-2">
                               <span className="px-3 py-1 rounded-full text-green-600 border border-green-400 bg-green-50">
-                                {row.exp}
+                                Experienced
                               </span>
                             </td>
                           </tr>
@@ -664,7 +684,9 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <p className="text-gray-500 text-[10px] whitespace-nowrap">Showing 1–5 out of 10 Entries</p>
+                  <p className="text-gray-500 text-[10px] whitespace-nowrap">
+                    Showing 1–{assignmentsData?.object?.assignments?.length || 0} out of {assignmentsData?.object?.count || 0} Entries
+                  </p>
                   <div className="flex items-center gap-1.5">
                     <button className="w-7 h-7 flex items-center justify-center rounded-full border border-gray-300 text-[10px] hover:bg-gray-100 opacity-40 cursor-not-allowed" disabled>‹</button>
                     <div className="flex items-center gap-1.5 text-[10px]">

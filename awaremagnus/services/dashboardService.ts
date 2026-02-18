@@ -13,6 +13,7 @@ import type {
   AvatarStatisticsResponse,
   ScoreTypesResponse,
   ScoreLevelsResponse,
+  UserAssignmentsResponse,
 } from "../types/dashboard";
 
 import { awmClient, API_BASE } from "./httpClient";
@@ -162,6 +163,16 @@ export const dashboardService = {
   getScoreLevelsByType: async (scoreTypeId: number) => {
     const { data } = await awmClient.get<ScoreLevelsResponse>(
       `${API_BASE}/gamification/scorelevels/type/${scoreTypeId}`
+    );
+
+    return data;
+  },
+
+  // --- User Assignments ---
+  getUserAssignments: async (params?: { language_id?: number }) => {
+    const { data } = await awmClient.get<UserAssignmentsResponse>(
+      `${API_BASE}/campaign/assignments`,
+      { params }
     );
 
     return data;
