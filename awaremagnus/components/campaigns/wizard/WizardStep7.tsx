@@ -5,7 +5,7 @@ import { CheckCircle } from "lucide-react";
 
 import { useTranslations } from "@/i18n/useTranslations";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { suiteSuiteService, Department, Group } from "@/services/suiteSuiteService";
+import { suiteSuiteService, type Department, type Group, type User } from "@/services/suiteSuiteService";
 
 interface WizardStep7Props {
   formData: {
@@ -16,7 +16,7 @@ interface WizardStep7Props {
     gamified: boolean;
     departments: number[];
     groups: number[];
-    manualUsers: number[];
+    manualUsers: User[];
     modules: number[];
     visualShortVideos: boolean;
     visualInteractive: boolean;
