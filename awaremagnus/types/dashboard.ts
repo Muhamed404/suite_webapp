@@ -1,7 +1,8 @@
 export interface SystemDashboardOverview {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     total_organizations: number;
     total_campaigns: number;
     total_employees_modules_enrolled: number;
@@ -45,9 +46,10 @@ export interface MonthlyCompletionData {
 }
 
 export interface SystemMonthlyCompletion {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     org_id: number;
     campaign_id: number | null;
     monthly_data: MonthlyCompletionData[];
@@ -65,9 +67,10 @@ export interface StrugglingModule {
 }
 
 export interface SystemStrugglingModules {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     struggling_modules: StrugglingModule[];
     total_count: number;
   };
@@ -85,11 +88,12 @@ export interface OrganizationLeadership {
 }
 
 export interface SystemLeaderboard {
-  success: boolean;
   message: string;
+  statusCode: number;
+  alertType: string;
   data: {
-    top_low_risk_organizations: OrganizationLeadership[];
-    top_high_risk_organizations: OrganizationLeadership[];
+    top_low_risk_employees: EmployeeLeaderboard[];
+    top_high_risk_employees: EmployeeLeaderboard[];
   };
 }
 
@@ -122,18 +126,20 @@ export interface OrganizationDashboardMetrics {
 }
 
 export interface OrganizationDashboardsResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     dashboardOrganizations: OrganizationDashboardMetrics[];
     count: number;
   };
 }
 
 export interface OrganizationMonthlyCompletion {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     org_id: number;
     campaign_id: number | null;
     monthly_data: MonthlyCompletionData[];
@@ -141,9 +147,10 @@ export interface OrganizationMonthlyCompletion {
 }
 
 export interface OrganizationStrugglingModulesResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     org_id: number;
     struggling_modules: StrugglingModule[];
     total_count: number;
@@ -162,8 +169,9 @@ export interface EmployeeLeaderboard {
 }
 
 export interface OrganizationLeaderboardResponse {
-  success: boolean;
   message: string;
+  statusCode: number;
+  alertType: string;
   data: {
     top_low_risk_employees: EmployeeLeaderboard[];
     top_high_risk_employees: EmployeeLeaderboard[];
@@ -201,9 +209,10 @@ export interface UserDashboardMetrics {
 }
 
 export interface UserDashboardsResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     dashboardUsers: UserDashboardMetrics[];
     count: number;
   };
@@ -219,8 +228,9 @@ export interface AchievementStat {
 }
 
 export interface AchievementStatisticsResponse {
-  success: boolean;
   message: string;
+  statusCode: number;
+  alertType: string;
   data: {
     total_achievements: number;
     total_unique_achievements_unlocked: number;
@@ -241,9 +251,10 @@ export interface Achievement {
 }
 
 export interface AchievementsResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     achievements: Achievement[];
     count: number;
   };
@@ -259,9 +270,10 @@ export interface AvatarStat {
 }
 
 export interface AvatarStatisticsResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     total_avatars: number;
     total_unique_avatars_unlocked: number;
     total_unique_avatars_locked: number;
@@ -278,9 +290,10 @@ export interface ScoreType {
 }
 
 export interface ScoreTypesResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     scoreTypes: ScoreType[];
     count: number;
   };
@@ -299,9 +312,10 @@ export interface ScoreLevel {
 }
 
 export interface ScoreLevelsResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     scoreLevels: ScoreLevel[];
     count: number;
   };

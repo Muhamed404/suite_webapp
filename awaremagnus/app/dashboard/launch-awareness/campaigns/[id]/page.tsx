@@ -10,6 +10,7 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useUpdateCampaign, useCampaignDashboard } from "@/hooks/useCampaigns";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
 import {
   useOrganizationLeaderboard,
   useAvatarStatistics,
@@ -21,6 +22,9 @@ export default function CampaignDetailsPage() {
   const router = useRouter();
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const t = useTranslations("dashboard");
+
+  const [isActive, setIsActive] = useState(true);
 
   const campaignId = Number(params.id);
   const updateCampaign = useUpdateCampaign();

@@ -31,6 +31,7 @@ import {
   useUserDashboards,
   useSystemStrugglingModules,
   useOrganizationStrugglingModules,
+  useOrganizationMonthlyCompletion,
 } from "@/hooks/useDashboard";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
@@ -52,32 +53,35 @@ export default function DashboardPage() {
   const { data: systemStrugglingRaw } = useSystemStrugglingModules();
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
 
+  // Organization monthly completion (used by org-admin Security Awareness Campaign graph)
+  const { data: orgMonthlyCompletion } = useOrganizationMonthlyCompletion();
+
   // Pick the right data source
   const dashboardData = useMemo(() => {
-    if (isPlatformAdmin && systemData?.success) {
-      return systemData.data;
+    if (isPlatformAdmin && systemData?.statusCode === 200) {
+      return systemData.object;
     }
     if (
       isOrgAdmin &&
-      orgDataResponse?.success &&
-      orgDataResponse.data.dashboardOrganizations.length > 0
+      orgDataResponse &&
+      orgDataResponse.object?.dashboardOrganizations?.length > 0
     ) {
-      return orgDataResponse.data.dashboardOrganizations[0];
+      return orgDataResponse.object.dashboardOrganizations[0];
     }
-    if (isUser && userDataResponse?.success && userDataResponse.data.dashboardUsers.length > 0) {
+    if (isUser && userDataResponse && userDataResponse.object?.dashboardUsers?.length > 0) {
       // Map User Data to generic structure where possible, or return specific
-      return userDataResponse.data.dashboardUsers[0];
+      return userDataResponse.object.dashboardUsers[0];
     }
 
     return null;
   }, [isPlatformAdmin, isOrgAdmin, isUser, systemData, orgDataResponse, userDataResponse]);
 
   const strugglingModules = useMemo(() => {
-    if (isPlatformAdmin && systemStrugglingRaw?.success) {
-      return systemStrugglingRaw.data.struggling_modules.slice(0, 3);
+    if (isPlatformAdmin && systemStrugglingRaw?.statusCode === 200) {
+      return systemStrugglingRaw.object.struggling_modules.slice(0, 3);
     }
-    if (isOrgAdmin && orgStrugglingRaw?.success) {
-      return orgStrugglingRaw.data.struggling_modules.slice(0, 3);
+    if (isOrgAdmin && orgStrugglingRaw) {
+      return orgStrugglingRaw.object?.struggling_modules?.slice(0, 3) || [];
     }
     // Fallback to data inside dashboardData if available (Top 3 usually included in overview)
     if (dashboardData && "top_struggling_modules" in dashboardData) {
@@ -86,6 +90,20 @@ export default function DashboardPage() {
 
     return [];
   }, [isPlatformAdmin, isOrgAdmin, systemStrugglingRaw, orgStrugglingRaw, dashboardData]);
+
+  // Map monthly completion -> chart data for Security Awareness Campaign (Org Admin)
+  const campaignMonthly = useMemo(() => {
+    const monthly = isOrgAdmin && orgMonthlyCompletion
+      ? orgMonthlyCompletion.object?.monthly_data
+      : [];
+
+    if (!monthly || monthly.length === 0) return { labels: [], data: [] };
+
+    const labels = monthly.map((m: any) => m.month_name || m.month);
+    const data = monthly.map((m: any) => Number(m.modules_completed || 0));
+
+    return { labels, data };
+  }, [isOrgAdmin, orgMonthlyCompletion]);
 
   // Extract values with fallbacks
   const totalLicenses = 100; // API doesn't seem to have "Total Licenses", only "Total User Licenses" in spec image but mapped to... total_employees?
@@ -132,9 +150,42 @@ export default function DashboardPage() {
       ? dashboardData.maximum_compliance_score
       : 100;
 
+  // --- Map additional API fields ---
+  const complianceGrade =
+    dashboardData && "compliance_score_grade" in dashboardData
+      ? (dashboardData as any).compliance_score_grade
+      : null;
+
+  // organization_risk_level may be `null` from API — treat null/empty as unknown/not-set
+  const orgRiskLabel =
+    dashboardData && "organization_risk_level" in dashboardData && (dashboardData as any).organization_risk_level != null &&
+    String((dashboardData as any).organization_risk_level).trim() !== ""
+      ? (dashboardData as any).organization_risk_level
+      : "-"; // show neutral fallback when not provided
+
+  const riskBadgeClass = (() => {
+    const raw = dashboardData && (dashboardData as any).organization_risk_level;
+    const lvl = raw != null ? String(raw).toLowerCase().trim() : "";
+    if (!lvl) return "bg-gray-400"; // neutral for unknown/null
+    if (lvl.includes("low")) return "bg-green-600";
+    if (lvl.includes("medium") || lvl.includes("med")) return "bg-yellow-500";
+    if (lvl.includes("high") || lvl.includes("critical")) return "bg-red-600";
+    return "bg-gray-400";
+  })();
+
+  const complianceBadgeClass = (() => {
+    const grade = complianceGrade ? String(complianceGrade).toLowerCase().trim() : "";
+    if (!grade) return "bg-gray-400"; // neutral for unknown/null
+    if (grade.includes("excellent")) return "bg-blue-600";
+    if (grade.includes("good")) return "bg-green-600";
+    if (grade.includes("fair")) return "bg-yellow-500";
+    if (grade.includes("poor")) return "bg-red-600";
+    return "bg-gray-400";
+  })();
+
   // User-specific data for learner dashboard
-  const userDashboardData = isUser && userDataResponse?.success && userDataResponse.data.dashboardUsers.length > 0
-    ? userDataResponse.data.dashboardUsers[0]
+  const userDashboardData = isUser && userDataResponse && userDataResponse.object?.dashboardUsers?.length > 0
+    ? userDataResponse.object.dashboardUsers[0]
     : null;
 
   const totalModulesEnrolled = userDashboardData?.total_modules_enrolled || 0;
@@ -277,7 +328,7 @@ export default function DashboardPage() {
                         <Image src="/awm/images/time-jar.svg" alt="" width={32} height={32} className="w-8 h-8" />
                       </div>
                       <div>
-                        <p className="text-gray-500 text-[10px] font-medium">Course Completed</p>
+                        <p className="text-gray-500 text-[10px] font-medium">{t("gamification.courseCompleted")}</p>
                         <p className="text-gray-900 text-lg font-bold">{totalCompletedModules}/{totalModulesEnrolled}</p>
                       </div>
                     </div>
@@ -840,8 +891,8 @@ export default function DashboardPage() {
                       </div>
                     </div>
 
-                    <p className="bg-red-600 text-white px-3 py-1 rounded-full text-base whitespace-nowrap">
-                      {t("cards.inRisk")}
+                    <p className={`${riskBadgeClass} text-white px-3 py-1 rounded-full text-base whitespace-nowrap`}>
+                      {orgRiskLabel}
                     </p>
                   </div>
                 </div>
@@ -861,7 +912,27 @@ export default function DashboardPage() {
                       {t("cards.lastCampaignDate", { date: "1/23/05" })}
                     </p>
                     <div className="flex-1 min-h-0">
-                      <AreaChart />
+                      {/*
+                        For Organization Admins: always render chart using API response (may be empty).
+                        Do NOT fall back to static sample data when API returns success with empty monthly_data.
+                      */}
+                      {isOrgAdmin ? (
+                        <AreaChart
+                          data={campaignMonthly.data}
+                          labels={campaignMonthly.labels}
+                          seriesName="Modules Completed"
+                          yLabel="Modules"
+                        />
+                      ) : campaignMonthly.data && campaignMonthly.data.length > 0 ? (
+                        <AreaChart
+                          data={campaignMonthly.data}
+                          labels={campaignMonthly.labels}
+                          seriesName="Modules Completed"
+                          yLabel="Modules"
+                        />
+                      ) : (
+                        <AreaChart />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -898,15 +969,15 @@ export default function DashboardPage() {
                             {t("cards.securityAwarenessScore")}
                           </h3>
                           <div className="flex items-center gap-1.5">
-                            <p className="text-2xl text-gray-800">{securityAwarenessScore}</p>
+                            <p className="text-2xl text-gray-800">{Number(securityAwarenessScore).toFixed(0)}</p>
                             <p className="text-gray-400 text-base font-medium">
                               /{Number(securityAwarenessMax).toFixed(0)}
                             </p>
                           </div>
                         </div>
                       </div>
-                      <span className="bg-[#00CCC4] text-white text-lg font-medium px-3 py-1 rounded-full">
-                        {t("cards.good")}
+                      <span className={`${complianceBadgeClass} text-white text-lg font-medium px-3 py-1 rounded-full`}>
+                        {complianceGrade || "N/A"}
                       </span>
                     </div>
                   </div>
