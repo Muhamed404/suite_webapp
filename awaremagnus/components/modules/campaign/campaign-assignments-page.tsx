@@ -18,7 +18,6 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useAssignedCampaigns } from "@/hooks/useCampaign";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useUserDashboards } from "@/hooks/useDashboard";
-import { Header } from "@/components/header";
 import {
   isPlatformAdmin as getIsPlatformAdmin,
   isOrgAdmin as getIsOrgAdmin,
@@ -62,23 +61,23 @@ function getCampaignStatus(campaign: CampaignAssignment): "active" | "pending" |
 
 function getStatusBadge(status: "active" | "pending" | "completed") {
   const badges = {
-    active: { 
-      class: 'bg-green-100 text-green-700 border border-green-200', 
-      icon: 'play-circle', 
-      text: 'Active' 
+    active: {
+      class: 'bg-green-100 text-green-700 border border-green-200',
+      icon: 'play-circle',
+      text: 'Active'
     },
-    pending: { 
-      class: 'bg-amber-100 text-amber-700 border border-amber-200', 
-      icon: 'clock', 
-      text: 'Pending' 
+    pending: {
+      class: 'bg-amber-100 text-amber-700 border border-amber-200',
+      icon: 'clock',
+      text: 'Pending'
     },
-    completed: { 
-      class: 'bg-gray-100 text-gray-700 border border-gray-200', 
-      icon: 'check-circle', 
-      text: 'Completed' 
+    completed: {
+      class: 'bg-gray-100 text-gray-700 border border-gray-200',
+      icon: 'check-circle',
+      text: 'Completed'
     }
   };
-  
+
   const badge = badges[status];
   return (
     <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${badge.class} text-[10px] font-semibold min-w-[100px] justify-center`}>
@@ -89,7 +88,7 @@ function getStatusBadge(status: "active" | "pending" | "completed") {
 
 function getActionButton(status: "active" | "pending" | "completed", campaignId: number) {
   const baseClasses = "inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full transition-all duration-200";
-  
+
   if (status === 'active') {
     return (
       <Link href="/module/physical-security">
@@ -313,18 +312,7 @@ export function CampaignAssignmentsPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        {/* Header */}
-        {!getIsUser(user?.role_id) && (
-          <Header
-            title="Welcome Alrajhi"
-            name="Alrajhi Bank"
-            email={user?.email || "info@user.com"}
-            onSearch={() => {}}
-            onMailClick={() => {}}
-            onNotificationClick={() => {}}
-            onProfileClick={() => {}}
-          />
-        )}
+
 
         <div className="p-3 min-h-screen">
           <h1 className="text-lg font-semibold mb-4">Assignment</h1>
@@ -483,7 +471,7 @@ export function CampaignAssignmentsPage() {
             <div className="flex gap-0 bg-white p-0.5 rounded-full relative" ref={tabsContainerRef}>
               {/* Sliding Background Indicator */}
               <div ref={tabIndicatorRef} className="absolute bg-[#051226] rounded-full transition-all duration-300" style={{ top: '3px', height: 'calc(100% - 6px)' }}></div>
-              
+
               {[
                 { key: "all", label: "All", count: stats.assignment },
                 { key: "active", label: "Active", count: stats.active },
@@ -515,29 +503,29 @@ export function CampaignAssignmentsPage() {
               {/* Search with Icon */}
               <div className="relative w-64">
                 <Search className="absolute text-gray-400 pointer-events-none z-10 w-4 h-4" style={{ left: '16px', top: '40%', transform: 'translateY(-50%)' }} />
-                <input 
+                <input
                   type="text"
                   placeholder="Search Campaign..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="datatable-input w-full pr-4 py-2 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-9 placeholder-gray-400" 
+                  className="datatable-input w-full pr-4 py-2 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-9 placeholder-gray-400"
                   style={{ paddingLeft: '40px' }}
                 />
               </div>
 
               {/* Date Filter with Modern Dropdown */}
               <div className="relative w-40 modern-dropdown-wrapper small rounded-full date-dropdown-container">
-                <button 
+                <button
                   onClick={() => setShowDateDropdown(!showDateDropdown)}
                   className="modern-dropdown-button"
                 >
                   <span>
-                    {dateFilter === 'all' ? 'All Time' : 
-                     dateFilter === '7' ? 'Last 7 Days' :
-                     dateFilter === '30' ? 'Last 30 Days' :
-                     dateFilter === '90' ? 'Last 3 Months' :
-                     dateFilter === '180' ? 'Last 6 Months' :
-                     'This Year'}
+                    {dateFilter === 'all' ? 'All Time' :
+                      dateFilter === '7' ? 'Last 7 Days' :
+                        dateFilter === '30' ? 'Last 30 Days' :
+                          dateFilter === '90' ? 'Last 3 Months' :
+                            dateFilter === '180' ? 'Last 6 Months' :
+                              'This Year'}
                   </span>
                   <div className="modern-dropdown-arrow">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -548,37 +536,37 @@ export function CampaignAssignmentsPage() {
 
                 {showDateDropdown && (
                   <div className="modern-dropdown-menu open">
-                    <button 
+                    <button
                       onClick={() => { setDateFilter('all'); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       All Time
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setDateFilter('7'); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       Last 7 Days
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setDateFilter('30'); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       Last 30 Days
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setDateFilter('90'); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       Last 3 Months
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setDateFilter('180'); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       Last 6 Months
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setDateFilter('365'); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
@@ -699,30 +687,30 @@ export function CampaignAssignmentsPage() {
                 <span>Showing {(currentPage - 1) * itemsPerPage + 1}–{Math.min(currentPage * itemsPerPage, filteredCampaigns.length)} out of {filteredCampaigns.length} Entries</span>
               </div>
               <div className="flex gap-1.5" id="paginationButtons">
-                <button 
-                  className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center" 
-                  onClick={() => setCurrentPage(currentPage - 1)} 
+                <button
+                  className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  onClick={() => setCurrentPage(currentPage - 1)}
                   disabled={currentPage === 1}
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                
+
                 {(() => {
                   const buttons = [];
                   const maxVisible = 5;
                   let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
                   let endPage = Math.min(totalPages, startPage + maxVisible - 1);
-                  
+
                   if (endPage - startPage < maxVisible - 1) {
                     startPage = Math.max(1, endPage - maxVisible + 1);
                   }
-                  
+
                   // First page + ellipsis
                   if (startPage > 1) {
                     buttons.push(
-                      <button 
+                      <button
                         key={1}
-                        className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100" 
+                        className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                         onClick={() => setCurrentPage(1)}
                       >
                         1
@@ -736,24 +724,23 @@ export function CampaignAssignmentsPage() {
                       );
                     }
                   }
-                  
+
                   // Page number buttons
                   for (let i = startPage; i <= endPage; i++) {
                     buttons.push(
-                      <button 
+                      <button
                         key={i}
-                        className={`min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all ${
-                          i === currentPage 
-                            ? 'bg-blue-50 text-blue-600 border-blue-500 font-semibold' 
+                        className={`min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all ${i === currentPage
+                            ? 'bg-blue-50 text-blue-600 border-blue-500 font-semibold'
                             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                        }`} 
+                          }`}
                         onClick={() => setCurrentPage(i)}
                       >
                         {i}
                       </button>
                     );
                   }
-                  
+
                   // Last page + ellipsis
                   if (endPage < totalPages) {
                     if (endPage < totalPages - 1) {
@@ -764,22 +751,22 @@ export function CampaignAssignmentsPage() {
                       );
                     }
                     buttons.push(
-                      <button 
+                      <button
                         key={totalPages}
-                        className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100" 
+                        className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                         onClick={() => setCurrentPage(totalPages)}
                       >
                         {totalPages}
                       </button>
                     );
                   }
-                  
+
                   return buttons;
                 })()}
-                
-                <button 
-                  className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center" 
-                  onClick={() => setCurrentPage(currentPage + 1)} 
+
+                <button
+                  className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={currentPage === totalPages}
                 >
                   <ChevronRight className="w-4 h-4" />

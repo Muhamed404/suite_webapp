@@ -95,11 +95,23 @@ export function VideoContentDetailScreen({
 
   const logoUrl = getContentAssetUrl(content?.logo_url ?? content?.logo_path);
   const sourceUrl = content?.source_url ?? (content as { source_path?: string })?.source_path;
+
+  // Use the local proxy /awm/contents/... instead of the direct service URL
+  // This avoids CORS issues and allows the same-origin proxy to handle Range headers.
   const fullVideoUrl = sourceUrl?.trim()
     ? sourceUrl.startsWith("http")
       ? sourceUrl
-      : getContentAssetUrl(sourceUrl)
+      : sourceUrl.startsWith("/contents/")
+        ? `/awm${sourceUrl}`
+        : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
     : null;
+
+  const completeImageUrl = logoUrl;
+
+  if (content) {
+    console.log("COMPLETE IMAGE URL:", completeImageUrl);
+    console.log("COMPLETE VIDEO URL (PROXY):", fullVideoUrl);
+  }
 
   if (!moduleData) return null;
 

@@ -96,11 +96,21 @@ export function DefaultContentDetailScreen({
   const logoUrl = content?.logo_url ?? content?.logo_path;
   const fallbackIcon = getContentTypeIconFor(contentTypeId, typeLabel ?? "");
   const sourceUrl = content?.source_url ?? (content as { source_path?: string })?.source_path;
+  // Use local same-origin proxy for generic content
   const fullSourceUrl = sourceUrl?.trim()
     ? sourceUrl.startsWith("http")
       ? sourceUrl
-      : getContentAssetUrl(sourceUrl)
+      : sourceUrl.startsWith("/contents/")
+        ? `/awm${sourceUrl}`
+        : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
     : null;
+
+  const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
+
+  if (content) {
+    console.log("COMPLETE IMAGE URL:", completeImageUrl);
+    console.log("COMPLETE SOURCE URL:", fullSourceUrl);
+  }
   const embedUrl =
     fullSourceUrl && isYouTubeUrl(fullSourceUrl) ? youtubeEmbedUrl(fullSourceUrl) : null;
 
