@@ -23,6 +23,7 @@ import { useModules } from "@/hooks/useQuiz";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { isPlatformAdmin } from "@/utils/roles";
 import { SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
+import { useAwmCategories } from "@/hooks/useSuiteAwm";
 import { LibraryPageSkeleton } from "@/components/ui/skeletons";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import {
@@ -98,6 +99,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
     filter,
   });
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
+  const { data: categories = [] } = useAwmCategories();
 
   const filteredModules = useMemo(() => {
     let list = searchQuery.trim()
@@ -122,9 +124,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
     return list;
   }, [modules, searchQuery, sortField, sortDir]);
 
-  const categories = Array.from(
-    new Map(modules.filter((m) => m.category).map((m) => [m.category!.id, m.category!])).values()
-  );
+
 
   const totalItems = filteredModules.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));

@@ -13,10 +13,15 @@ async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ pa
     const cleanBase = SERVICE_AWM_URL.replace(/\/+$/, "");
     const targetUrl = new URL(`${cleanBase}/contents/${endpoint}`);
 
-    // Build headers to forward — importantly include Range for video streaming
+    // Build headers to forward — importantly include Range for video streaming and Auth for protected assets
     const forwardHeaders: Record<string, string> = {
         'Accept': req.headers.get('accept') || '*/*',
     };
+
+    const authHeader = req.headers.get('authorization');
+    if (authHeader) {
+        forwardHeaders['Authorization'] = authHeader;
+    }
 
     // Forward Range header for video streaming (HTTP 206 Partial Content)
     const rangeHeader = req.headers.get('range');

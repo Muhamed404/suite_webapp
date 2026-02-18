@@ -431,4 +431,21 @@ export const quizService = {
       })
     );
   },
+
+  /**
+   * GET /api/awm/category
+   * Returns all global categories { categories, count }
+   */
+  getCategories: async () => {
+    const { data } = await awmClient.get<{
+      success: boolean;
+      message: string;
+      data: {
+        categories: Array<{ id: number; name: string; description: string | null }>;
+        count: number;
+      };
+    }>(`${API_BASE}/category`);
+
+    return data;
+  },
 };

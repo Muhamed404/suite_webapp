@@ -15,7 +15,6 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useUserCertificates } from "@/hooks/useCampaign";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Header } from "@/components/header";
 import { campaignService } from "@/services/campaignService";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import {
@@ -134,14 +133,14 @@ export function CertificateListPage() {
     };
 
     return (
-      <button 
+      <button
         onClick={handleDownload}
         className="flex items-center gap-2 border border-sky-500 text-sky-500 px-2 py-1.5 rounded-full text-[11px] text-xs hover:bg-sky-50"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="7,10 12,15 17,10"/>
-          <line x1="12" x2="12" y1="15" y2="3"/>
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7,10 12,15 17,10" />
+          <line x1="12" x2="12" y1="15" y2="3" />
         </svg>
         <span>Download</span>
       </button>
@@ -261,17 +260,7 @@ export function CertificateListPage() {
     <ProtectedRoute>
       <DashboardLayout>
         <div className="p-3">
-          {!getIsUser(user?.role_id) && (
-            <Header
-              title="Welcome Alrajhi"
-              name="Alrajhi Bank"
-              email="info@user.com"
-              onSearch={handleSearch}
-              onMailClick={handleMailClick}
-              onNotificationClick={handleNotificationClick}
-              onProfileClick={handleProfileClick}
-            />
-          )}
+
 
           {/* Breadcrumb */}
           <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5">
@@ -410,29 +399,29 @@ export function CertificateListPage() {
               {/* Search with Icon */}
               <div className="relative w-64">
                 <Search className="absolute text-gray-400 pointer-events-none z-10 w-4 h-4" style={{ left: '16px', top: '40%', transform: 'translateY(-50%)' }} />
-                <input 
+                <input
                   type="text"
                   placeholder={t("searchCertificates")}
                   value={currentSearch}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  className="datatable-input w-full pr-4 py-2 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-9 placeholder-gray-400" 
+                  className="datatable-input w-full pr-4 py-2 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-9 placeholder-gray-400"
                   style={{ paddingLeft: '40px' }}
                 />
               </div>
 
               {/* Date Filter with Modern Dropdown */}
               <div className="relative w-40 modern-dropdown-wrapper small rounded-full date-dropdown-container">
-                <button 
+                <button
                   onClick={() => setShowDateDropdown(!showDateDropdown)}
                   className="modern-dropdown-button"
                 >
                   <span>
-                    {currentDateFilter === 'all' ? 'All Time' : 
-                     currentDateFilter === '7' ? 'Last 7 Days' :
-                     currentDateFilter === '30' ? 'Last 30 Days' :
-                     currentDateFilter === '90' ? 'Last 3 Months' :
-                     currentDateFilter === '180' ? 'Last 6 Months' :
-                     'This Year'}
+                    {currentDateFilter === 'all' ? 'All Time' :
+                      currentDateFilter === '7' ? 'Last 7 Days' :
+                        currentDateFilter === '30' ? 'Last 30 Days' :
+                          currentDateFilter === '90' ? 'Last 3 Months' :
+                            currentDateFilter === '180' ? 'Last 6 Months' :
+                              'This Year'}
                   </span>
                   <div className="modern-dropdown-arrow">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -443,37 +432,37 @@ export function CertificateListPage() {
 
                 {showDateDropdown && (
                   <div className="modern-dropdown-menu open">
-                    <button 
+                    <button
                       onClick={() => { setCurrentDateFilter('all'); setCurrentPage(1); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       All Time
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setCurrentDateFilter('7'); setCurrentPage(1); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       Last 7 Days
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setCurrentDateFilter('30'); setCurrentPage(1); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       Last 30 Days
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setCurrentDateFilter('90'); setCurrentPage(1); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       Last 3 Months
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setCurrentDateFilter('180'); setCurrentPage(1); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
                       Last 6 Months
                     </button>
-                    <button 
+                    <button
                       onClick={() => { setCurrentDateFilter('365'); setCurrentPage(1); setShowDateDropdown(false); }}
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                     >
@@ -586,17 +575,17 @@ export function CertificateListPage() {
                     </th>
                   </tr>
                 </thead>
-                    <tbody id="tableBody" className="divide-y divide-gray-100">
-                      {pageData.map((cert) => (
-                        <tr key={cert.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-4 py-3.5 font-medium text-gray-700">{cert.name}</td>
-                          <td className="px-4 py-3.5 text-gray-600">{cert.content}</td>
-                          <td className="px-4 py-3.5 text-gray-600">{formatDate(cert.date)}</td>
-                          <td className="px-4 py-3.5">{statusBadge(cert.status)}</td>
-                          <td className="px-4 py-3.5">{actionButton(cert)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
+                <tbody id="tableBody" className="divide-y divide-gray-100">
+                  {pageData.map((cert) => (
+                    <tr key={cert.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3.5 font-medium text-gray-700">{cert.name}</td>
+                      <td className="px-4 py-3.5 text-gray-600">{cert.content}</td>
+                      <td className="px-4 py-3.5 text-gray-600">{formatDate(cert.date)}</td>
+                      <td className="px-4 py-3.5">{statusBadge(cert.status)}</td>
+                      <td className="px-4 py-3.5">{actionButton(cert)}</td>
+                    </tr>
+                  ))}
+                </tbody>
               </table>
 
               <div id="emptyState" className={`${total === 0 && !isLoading ? '' : 'hidden'} absolute inset-0 flex items-center justify-center bg-white`}>
@@ -629,11 +618,10 @@ export function CertificateListPage() {
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                   <button
                     key={page}
-                    className={`min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all ${
-                      page === currentPage
+                    className={`min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all ${page === currentPage
                         ? 'bg-blue-50 text-blue-600 border-blue-500 font-semibold'
                         : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                    }`}
+                      }`}
                     onClick={() => changePage(page)}
                   >
                     {page}

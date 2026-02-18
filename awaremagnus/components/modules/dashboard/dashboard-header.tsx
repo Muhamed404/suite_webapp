@@ -8,6 +8,7 @@ import clsx from "clsx";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 
 interface DashboardHeaderProps {
   onMenuClick?: () => void;
@@ -73,6 +74,7 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
         >
           <Image alt="" className="size-4" height={16} src={getContentAssetUrl("/images/img/bell.svg")} width={16} />
         </Button>
+        <LanguageSwitcher />
         <div
           className={clsx(
             "flex items-center gap-3 pl-2 border-l border-[var(--strokeGray)]",
@@ -95,23 +97,26 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
         </div>
       </div>
 
-      <Button
-        isIconOnly
-        aria-label="Menu"
-        className="shrink-0 lg:hidden w-9 h-9 min-w-9 min-h-9"
-        variant="light"
-        onPress={onMenuClick}
-      >
-        <svg
-          className="w-6 h-6 text-gray-800"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
+      <div className={clsx("flex lg:hidden items-center gap-2", isRtl && "flex-row-reverse")}>
+        <LanguageSwitcher />
+        <Button
+          isIconOnly
+          aria-label="Menu"
+          className="shrink-0 w-9 h-9 min-w-9 min-h-9"
+          variant="light"
+          onPress={onMenuClick}
         >
-          <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </Button>
+          <svg
+            className="w-6 h-6 text-gray-800"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Button>
+      </div>
     </header>
   );
 };

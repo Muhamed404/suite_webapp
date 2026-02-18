@@ -113,13 +113,23 @@ export function BrochureDocumentContentDetailScreen({
   const docSourceUrl = content
     ? (content.source_url ?? (content as { source_path?: string }).source_path?.trim())
     : null;
+
+  // Use local same-origin proxy for documents
   const fullDocUrl = docSourceUrl
     ? docSourceUrl.startsWith("http")
       ? docSourceUrl
-      : getContentAssetUrl(
-        (content as { source_path?: string })?.source_path ?? content?.source_url
-      )
+      : docSourceUrl.startsWith("/contents/")
+        ? `/awm${docSourceUrl}`
+        : `/awm/contents/${docSourceUrl.startsWith("/") ? docSourceUrl.slice(1) : docSourceUrl}`
     : null;
+
+  const logoUrl = content?.logo_url || (content as any)?.logo_path;
+  const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
+
+  if (content) {
+    console.log("COMPLETE IMAGE URL:", completeImageUrl);
+    console.log("COMPLETE DOCUMENT URL:", fullDocUrl);
+  }
 
   const isBrochure = contentTypeId === 3;
   const downloadLabelKey = isBrochure ? "library.downloadBrochure" : "library.downloadDocument";

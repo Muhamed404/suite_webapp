@@ -10,6 +10,7 @@ import { SidebarPrimaryMenu } from "@/components/ui/sidebar-primary-menu";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { isOrgUser } from "@/utils/roles";
+import { DashboardHeader } from "./dashboard-header";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -75,25 +76,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           isRtl && "lg:rounded-r-none lg:rounded-l-3xl"
         )}
       >
-        {/* Mobile-only: hamburger to open sidebar (no full header) */}
-        <div className="flex lg:hidden items-center gap-3 px-4 py-3 bg-white border-b border-[var(--strokeGray)] shrink-0">
-          <button
-            aria-label="Menu"
-            className="p-2 rounded-lg hover:bg-[var(--gray)]"
-            type="button"
-            onClick={() => setSidebarOpen((v) => !v)}
-          >
-            <svg
-              className="w-6 h-6 text-gray-800"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </div>
+        <DashboardHeader onMenuClick={() => setSidebarOpen((v) => !v)} />
         {/* Main Scrollable Content */}
         <main className="flex-1 overflow-y-auto overflow-x-hidden">{children}</main>
       </div>
