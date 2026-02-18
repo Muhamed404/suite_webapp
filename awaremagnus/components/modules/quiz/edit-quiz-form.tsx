@@ -3,6 +3,7 @@
 import type { QuizAnswer } from "./quiz-answer-row";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
@@ -19,6 +20,7 @@ import {
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useQuiz, useQuizAnswers, useUpdateQuiz } from "@/hooks/useQuiz";
+import { useAuthStore } from "@/hooks/useAuthStore";
 import { getApiErrorMessage } from "@/utils/apiError";
 
 function mapApiAnswersToForm(
@@ -54,6 +56,8 @@ export function EditQuizForm({
   const tCommon = useTranslations("common");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const router = useRouter();
+  const { user } = useAuthStore();
 
   const { data: quizRes, isLoading: quizLoading } = useQuiz(quizId, !!quizId);
   const { data: answersRes, isLoading: answersLoading } = useQuizAnswers(quizId, !!quizId);
@@ -117,6 +121,14 @@ export function EditQuizForm({
         },
       });
       setFormSuccess(t("updateSuccess") ?? t("createSuccess"));
+
+      // Redirect after success
+      setTimeout(() => {
+        const path = user?.role_id && (user.role_id === 1 || user.role_id === 2)
+          ? `/dashboard/training-library/system/${initialModuleId}`
+          : `/dashboard/training-library/my/${initialModuleId}`;
+        router.push(path);
+      }, 2000);
     } catch (err) {
       const msg = getApiErrorMessage(err, tCommon, {
         defaultKey: "errors.unknown",
@@ -238,6 +250,7 @@ export function EditQuizForm({
             <QuizLanguageCard
               key={String(form.langId ?? form.lang ?? formIndex)}
               form={form}
+              moduleId={initialModuleId ? Number(initialModuleId) : undefined}
               quizType={apiQuizTypeIdToCardType(selectedQuizTypeId)}
               onAddAnswer={(qIndex) => addAnswer(formIndex, qIndex)}
               onAddQuestion={() => addQuestion(formIndex)}
@@ -253,7 +266,7 @@ export function EditQuizForm({
                   questions: f.questions.map((q, i) => (i === qIndex ? { ...q, question } : q)),
                 }))
               }
-              onRemove={languageForms.length > 1 ? () => removeForm(formIndex) : () => {}}
+              onRemove={languageForms.length > 1 ? () => removeForm(formIndex) : () => { }}
               onRemoveQuestion={(qIndex) => removeQuestion(formIndex, qIndex)}
             />
           ))}
