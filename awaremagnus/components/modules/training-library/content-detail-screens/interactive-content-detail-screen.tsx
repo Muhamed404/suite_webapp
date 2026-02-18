@@ -103,11 +103,24 @@ export function InteractiveContentDetailScreen({
   const moduleTitle = moduleData ? moduleName(moduleData) : "";
 
   const sourceUrl = content?.source_url ?? (content as { source_path?: string })?.source_path;
+
+  // Use the local same-origin proxy /awm/contents/...
+  // This is better for SCORM/iSpring as it handles relative asset paths correctly.
   const fullInteractiveUrl = sourceUrl?.trim()
     ? sourceUrl.startsWith("http")
       ? sourceUrl
-      : getContentAssetUrl(sourceUrl)
+      : sourceUrl.startsWith("/contents/")
+        ? `/awm${sourceUrl}`
+        : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
     : null;
+
+  const logoUrl = content?.logo_url || (content as any)?.logo_path;
+  const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
+
+  if (content) {
+    console.log("COMPLETE IMAGE URL:", completeImageUrl);
+    console.log("COMPLETE INTERACTIVE URL:", fullInteractiveUrl);
+  }
 
   if (!moduleData) return null;
 

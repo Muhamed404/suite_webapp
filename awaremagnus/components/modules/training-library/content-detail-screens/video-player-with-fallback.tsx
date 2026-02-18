@@ -85,21 +85,40 @@ export function VideoPlayerWithFallback({
     );
   }
 
-  // Primary: React Player
+  // Primary: Native <video> tag for files (highest reliability for .mp4, etc.)
+  if (!isYouTube && !isVimeo && url.match(/\.(mp4|webm|mov|ogg|avi|m3u8)(\?|$)/i)) {
+    return (
+      <div className={`relative bg-black ${className}`} style={{ width, height }}>
+        <video
+          controls
+          playsInline
+          className="w-full h-full object-contain"
+          controlsList="nodownload"
+          src={url}
+          onContextMenu={(e) => e.preventDefault()}
+          onError={() => {
+            console.error("Native video error for URL:", url);
+            setUseEmbed(true);
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Secondary: React Player for platforms like YouTube/Vimeo
   return (
     <div className={`relative bg-black ${className}`} style={{ width, height }}>
       <ReactPlayer
         controls
         playsinline
-        config={
-          {
-            file: {
-              attributes: {
-                controlsList: "nodownload",
-              },
+        config={{
+          file: {
+            attributes: {
+              controlsList: "nodownload",
+              onContextMenu: (e: any) => e.preventDefault(),
             },
-          } as any
-        }
+          },
+        }}
         height="100%"
         url={url}
         width="100%"

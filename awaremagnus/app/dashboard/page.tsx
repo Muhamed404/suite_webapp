@@ -34,6 +34,7 @@ import {
   useOrganizationMonthlyCompletion,
   useUserAssignments,
 } from "@/hooks/useDashboard";
+import { useLicenseInfo } from "@/hooks/useSuiteAwm";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 export default function DashboardPage() {
@@ -54,6 +55,7 @@ export default function DashboardPage() {
 
   const { data: systemStrugglingRaw } = useSystemStrugglingModules();
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
+  const { data: licenseData } = useLicenseInfo(!isUser);
 
   // Organization monthly completion (used by org-admin Security Awareness Campaign graph)
   const { data: orgMonthlyCompletion } = useOrganizationMonthlyCompletion();
@@ -108,20 +110,10 @@ export default function DashboardPage() {
   }, [isOrgAdmin, orgMonthlyCompletion]);
 
   // Extract values with fallbacks
-  const totalLicenses = 100; // API doesn't seem to have "Total Licenses", only "Total User Licenses" in spec image but mapped to... total_employees?
-  // Spec says: "Total User Licenses / Total Consumed Licenses".
-  // Implementation note says "Total User Licenses" is available.
-  // BUT the JSON response for System Overview shows: total_organizations, total_employees_modules_enrolled, etc.
-  // It does NOT show "total_licenses".
-  // I will use placeholders or try to find a proxy.
-  // total_employees_modules_enrolled could be "Consumed"?
-
-  const consumedLicenses =
-    dashboardData && "total_employees_modules_enrolled" in dashboardData
-      ? dashboardData.total_employees_modules_enrolled
-      : dashboardData && "total_modules_enrolled" in dashboardData
-        ? dashboardData.total_modules_enrolled
-        : 0;
+  const licenseInfo = licenseData?.AwareMagnus?.Subscription || licenseData?.All?.Subscription;
+  const totalLicenses = licenseInfo?.TotalUserLicense ?? 100;
+  const availableLicenses = licenseInfo?.TotalAvailable ?? 0;
+  const consumedLicenses = licenseInfo ? totalLicenses - availableLicenses : 0;
 
   // Ensure numeric types for score/percent (API may return strings)
   const _complianceScore = Number(dashboardData?.total_compliance_score ?? 0);

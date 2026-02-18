@@ -168,16 +168,16 @@ export const suiteAwmService = {
   /** DELETE /api/awm/campaign/:id (AWM Backend) - Delete campaign */
   deleteCampaign: (id: number) => awmDel<any>(`${API_BASE}/campaign/${id}`),
 
-  /** POST /api/awm/campaign/:id/retry-user-fetch (AWM Backend) - Retry user fetch */
+  /** GET /api/awm/campaign/:id/retry-user-fetch (AWM Backend) - Retry user fetch */
   retryUserFetch: (id: number) =>
     awmPost<{ pending_groups: number; pending_departments: number }>(
       `${API_BASE}/campaign/${id}/retry-user-fetch`,
       {}
     ),
 
-  /** GET /api/awm/campaign/:id/leaderboard (AWM Backend) - Get campaign leaderboard */
-  getCampaignLeaderboard: (id: number) =>
-    awmGet<any>(`${API_BASE}/campaign/${id}/leaderboard`),
+  /** GET /api/awm/dashboard/organizations/campaign/users (AWM Backend) - Get campaign leaderboard with user statistics */
+  getCampaignLeaderboard: (campaignId: number) =>
+    awmGet<any>(`${API_BASE}/dashboard/organizations/campaign/users?campaign_id=${campaignId}`),
 
   /** GET /api/awm/dashboard/organizations/campaign (AWM Backend) - Get campaign dashboard with all details and metrics */
   getCampaignDashboard: (campaignId: number) =>

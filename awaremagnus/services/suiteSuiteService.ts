@@ -39,20 +39,20 @@ export interface User {
 
 async function request<T>(fn: () => Promise<{ data: any }>): Promise<T> {
   const { data } = await fn();
-  
+
   // service_suite returns various formats, try to extract array
   if (data.success && data.message && Array.isArray(data.message)) {
     return data.message as T;
   }
-  
+
   if (data.success && data.object && Array.isArray(data.object)) {
     return data.object as T;
   }
-  
+
   if (data.message !== undefined && Array.isArray(data.message)) {
     return data.message as T;
   }
-  
+
   if (data.object !== undefined && Array.isArray(data.object)) {
     return data.object as T;
   }
@@ -65,7 +65,7 @@ async function request<T>(fn: () => Promise<{ data: any }>): Promise<T> {
   if (data.data && Array.isArray(data.data)) {
     return data.data as T;
   }
-  
+
   // Fallback to data itself
   return data as T;
 }
@@ -92,16 +92,55 @@ function normalizeUser(apiUser: any): User {
  * - protectedRouter.use("/department", DepartmentRoute)
  * - protectedRouter.use("/group", GroupRoutes)
  */
+/** License subscription info per product */
+export interface LicenseSubscription {
+  id?: number;
+  TotalUserLicense: number;
+  TotalAvailable: number;
+  expiry_date?: string | null;
+}
+
+/** Shape of each product entry in suite/management/information response */
+export interface ProductLicenseInfo {
+  Subscription: LicenseSubscription;
+}
+
+/** The full management info keyed by product name */
+export interface SuiteManagementInfo {
+  [productName: string]: ProductLicenseInfo;
+}
+
 export const suiteSuiteService = {
+  /**
+   * GET /suite/management/information
+   * Returns license information for all products.
+   * NOTE: The backend responds with license data in `message` (not `object`).
+   */
+  getManagementInfo: async (): Promise<SuiteManagementInfo> => {
+    const { data } = await suiteClient.get<{
+      status: number;
+      message: SuiteManagementInfo;
+      alertType?: string;
+      object?: null;
+    }>(`/suite/management/information`);
+
+    // Data is in `message`
+    if (data.message && typeof data.message === "object") {
+      return data.message;
+    }
+
+    return {};
+  },
+
   /**
    * GET /department/list/:orgId?
    * Get all departments for an organization
    */
   getDepartments: async (orgId?: number) => {
-    const url = orgId 
-      ? `/department/list/${orgId}` 
+    const url = orgId
+      ? `/department/list/${orgId}`
       : `/department/list`;
-    
+
     return request<Department[]>(() => suiteClient.get(url));
   },
 
@@ -110,7 +149,7 @@ export const suiteSuiteService = {
    * Get all groups for an organization
    */
   getGroups: async (organizationId: number) => {
-    return request<Group[]>(() => 
+    return request<Group[]>(() =>
       suiteClient.get(`/group/findByOrganization/${organizationId}`)
     );
   },
@@ -120,7 +159,7 @@ export const suiteSuiteService = {
    * Get all users in a department (external API)
    */
   getDepartmentUsers: async (departmentId: number) => {
-    const users = await request<any[]>(() => 
+    const users = await request<any[]>(() =>
       suiteClient.get(`/external/department/${departmentId}/users`)
     );
     return users?.map(normalizeUser) || [];
@@ -131,7 +170,7 @@ export const suiteSuiteService = {
    * Get all users in a group (external API)
    */
   getGroupUsers: async (groupId: number) => {
-    const users = await request<any[]>(() => 
+    const users = await request<any[]>(() =>
       suiteClient.get(`/external/group/${groupId}/users`)
     );
     return users?.map(normalizeUser) || [];
@@ -145,7 +184,7 @@ export const suiteSuiteService = {
     const url = organizationId
       ? `/department/unassigned-users/${organizationId}`
       : `/department/unassigned-users`;
-    
+
     const users = await request<any[]>(() => suiteClient.get(url));
     // Normalize user data from API format to interface format
     return users?.map(normalizeUser) || [];
