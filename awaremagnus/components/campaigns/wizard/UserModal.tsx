@@ -11,7 +11,7 @@ import { useAuthStore } from "@/hooks/useAuthStore";
 interface UserModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (userIds: number[]) => void;
+  onSave: (users: User[]) => void;
   selectedUserIds: number[];
 }
 
@@ -57,7 +57,8 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
   };
 
   const handleSave = () => {
-    onSave(selectedIds);
+    const selectedUserObjects = users.filter((u) => selectedIds.includes(u.id));
+    onSave(selectedUserObjects);
     onClose();
   };
 

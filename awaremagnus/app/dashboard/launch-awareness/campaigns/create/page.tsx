@@ -15,6 +15,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useModules } from "@/hooks/useQuiz";
 import { CAMPAIGN_KEYS } from "@/hooks/useCampaigns";
 import { suiteAwmService } from "@/services/suiteAwmService";
+import type { User } from "@/services/suiteSuiteService";
 
 import { WizardStep1 } from "@/components/campaigns/wizard/WizardStep1";
 import { WizardStep2 } from "@/components/campaigns/wizard/WizardStep2";
@@ -33,7 +34,7 @@ interface FormData {
   gamified: boolean;
   departments: number[];
   groups: number[];
-  manualUsers: number[];
+  manualUsers: User[];
   modules: number[];
   visualShortVideos: boolean;
   visualInteractive: boolean;
@@ -241,7 +242,14 @@ export default function CreateCampaignPage() {
       modules: formData.modules,
       departments: formData.departments,
       groups: formData.groups,
-      invitees: formData.manualUsers,
+      invitees: formData.manualUsers.map((user) => ({
+        id: user.id,
+        first_name: user.firstName,
+        last_name: user.lastName,
+        email: user.email,
+        department_id: null,
+        group_id: null,
+      })),
       schedules: formData.schedules.length > 0 ? formData.schedules : undefined,
     };
 
@@ -401,8 +409,8 @@ export default function CreateCampaignPage() {
           <UserModal
             isOpen={showUserModal}
             onClose={() => setShowUserModal(false)}
-            onSave={(userIds) => handleChange("manualUsers", userIds)}
-            selectedUserIds={formData.manualUsers}
+            onSave={(users) => handleChange("manualUsers", users)}
+            selectedUserIds={formData.manualUsers.map((u) => u.id)}
           />
         </div>
       </DashboardLayout>

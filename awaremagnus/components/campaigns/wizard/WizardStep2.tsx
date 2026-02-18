@@ -6,14 +6,14 @@ import { Button } from "@heroui/button";
 import clsx from "clsx";
 
 import { useTranslations } from "@/i18n/useTranslations";
-import { suiteSuiteService, type Department, type Group } from "@/services/suiteSuiteService";
+import { suiteSuiteService, type Department, type Group, type User } from "@/services/suiteSuiteService";
 import { useAuthStore } from "@/hooks/useAuthStore";
 
 interface WizardStep2Props {
   formData: {
     departments: number[];
     groups: number[];
-    manualUsers: number[];
+    manualUsers: User[];
   };
   onChange: (field: string, value: any) => void;
   errors: Record<string, string>;
@@ -295,20 +295,20 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
           <div className="mt-3 space-y-2">
             <p className="text-sm font-medium">{t("form.manuallyAddedUsers")}:</p>
             <div className="flex flex-wrap gap-2">
-              {formData.manualUsers.map((userId) => (
+              {formData.manualUsers.map((user) => (
                 <span
-                  key={userId}
+                  key={user.id}
                   className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
                 >
-                  {users[userId] || `User ${userId}`}
+                  {user.firstName} {user.lastName}
                   <div
-                    onClick={() => onChange("manualUsers", formData.manualUsers.filter((id) => id !== userId))}
+                    onClick={() => onChange("manualUsers", formData.manualUsers.filter((u) => u.id !== user.id))}
                     className="hover:text-blue-900 cursor-pointer transition-colors"
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
-                        onChange("manualUsers", formData.manualUsers.filter((id) => id !== userId));
+                        onChange("manualUsers", formData.manualUsers.filter((u) => u.id !== user.id));
                       }
                     }}
                   >
