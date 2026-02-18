@@ -162,6 +162,7 @@ export interface EmployeeLeaderboard {
   modules_completed: number;
   achievement_count: number;
   avatar_current_level: number;
+  streak_day?: number;
   risk_level: string;
   compliance_score: number;
   total_xp_tokens: number;
@@ -191,17 +192,17 @@ export interface UserDashboardMetrics {
   total_quizzes_passed: number;
   total_mvideos_enrolled: number;
   total_mvideos_watched: number;
-  global_progress_percent: number;
+  global_progress_percent: string;
   level_number: number;
-  xp_total_tokens: number;
-  total_compliance_score: number;
-  total_compliance_percent: number;
+  xp_total_tokens: string;
+  total_compliance_score: string;
+  total_compliance_percent: string;
   total_achievements_completed: number;
-  user_risk_level: string;
-  quizzes_accuracy_percent: number;
-  weekly_progress_percent: number;
-  learning_velocity: number;
-  best_module_attempted: string;
+  user_risk_level: string | null;
+  quizzes_accuracy_percent: string;
+  weekly_progress_percent: string;
+  learning_velocity: string;
+  best_module_attempted: string | null;
   streak_day: number;
   total_study_time: number;
   createdAt: string;
@@ -317,6 +318,40 @@ export interface ScoreLevelsResponse {
   alertType: string;
   object: {
     scoreLevels: ScoreLevel[];
+    count: number;
+  };
+}
+
+export interface Assignment {
+  user_id: number;
+  campaign_id: number;
+  campaign_name: string;
+  module_id: number;
+  module_name: string;
+  description: string;
+  status: {
+    id: number;
+    name: string;
+  };
+  start_date: string;
+  end_date: string;
+  logo_banner_url: string;
+}
+
+export interface UserAssignmentsResponse {
+  message: string;
+  statusCode: number;
+  alertType: string;
+  object: {
+    user_summary: {
+      user_id: number;
+      total_pending_modules_assignments: number;
+      total_completed_modules: number;
+      total_modules_enrolled: number;
+      total_quizzes_enrolled: number;
+      total_quizzes_passed: number;
+    };
+    assignments: Assignment[];
     count: number;
   };
 }
