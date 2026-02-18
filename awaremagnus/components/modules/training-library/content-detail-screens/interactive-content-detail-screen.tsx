@@ -103,11 +103,24 @@ export function InteractiveContentDetailScreen({
   const moduleTitle = moduleData ? moduleName(moduleData) : "";
 
   const sourceUrl = content?.source_url ?? (content as { source_path?: string })?.source_path;
+
+  // Use the local same-origin proxy /awm/contents/...
+  // This is better for SCORM/iSpring as it handles relative asset paths correctly.
   const fullInteractiveUrl = sourceUrl?.trim()
     ? sourceUrl.startsWith("http")
       ? sourceUrl
-      : getContentAssetUrl(sourceUrl)
+      : sourceUrl.startsWith("/contents/")
+        ? `/awm${sourceUrl}`
+        : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
     : null;
+
+  const logoUrl = content?.logo_url || (content as any)?.logo_path;
+  const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
+
+  if (content) {
+    console.log("COMPLETE IMAGE URL:", completeImageUrl);
+    console.log("COMPLETE INTERACTIVE URL:", fullInteractiveUrl);
+  }
 
   if (!moduleData) return null;
 
@@ -167,8 +180,14 @@ export function InteractiveContentDetailScreen({
                   </div>
 
                   <div className="bg-white rounded-xl overflow-hidden">
-                    {/* Interactive content container - 60vh black area with embed/iframe */}
-                    <div className="relative bg-black" style={{ height: "60vh" }}>
+                    {/* Interactive content container - responsive, fills available space */}
+                    <div
+                      className="relative bg-black w-full"
+                      style={{
+                        height: "calc(100vh - 200px)",
+                        minHeight: "500px",
+                      }}
+                    >
                       {isLoading ? (
                         <div className="w-full h-full flex items-center justify-center bg-gray-900">
                           <div className="animate-pulse w-full h-full bg-gray-800" />
@@ -179,6 +198,11 @@ export function InteractiveContentDetailScreen({
                           allow="fullscreen; autoplay"
                           className="w-full h-full border-0"
                           src={fullInteractiveUrl}
+                          style={{
+                            display: "block",
+                            width: "100%",
+                            height: "100%",
+                          }}
                           title={content ? contentTitle(content) : "Interactive Training"}
                         />
                       ) : content ? (

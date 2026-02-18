@@ -100,19 +100,17 @@ export interface Quiz {
 
 export interface CreateQuizPayload {
   quiz: {
-    mod_content_id: number;
-    quiz_type_id: number;
+    con_id: number;
+    qtype_id: number;
     question: string;
-    explanation?: string;
+    description?: string; // Sometimes used as explanation
     difficulty?: number;
-    time_limit?: number;
     org_id?: number;
-    lang_id?: number;
   };
   answers: Array<{
-    answer_text: string;
-    is_correct: boolean;
-    order: number;
+    answer: string;
+    validity: boolean;
+    feedback?: string;
   }>;
 }
 
