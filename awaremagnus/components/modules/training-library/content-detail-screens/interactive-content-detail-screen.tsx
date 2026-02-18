@@ -167,8 +167,14 @@ export function InteractiveContentDetailScreen({
                   </div>
 
                   <div className="bg-white rounded-xl overflow-hidden">
-                    {/* Interactive content container - 60vh black area with embed/iframe */}
-                    <div className="relative bg-black" style={{ height: "60vh" }}>
+                    {/* Interactive content container - responsive, fills available space */}
+                    <div
+                      className="relative bg-black w-full"
+                      style={{
+                        height: "calc(100vh - 200px)",
+                        minHeight: "500px",
+                      }}
+                    >
                       {isLoading ? (
                         <div className="w-full h-full flex items-center justify-center bg-gray-900">
                           <div className="animate-pulse w-full h-full bg-gray-800" />
@@ -179,6 +185,11 @@ export function InteractiveContentDetailScreen({
                           allow="fullscreen; autoplay"
                           className="w-full h-full border-0"
                           src={fullInteractiveUrl}
+                          style={{
+                            display: "block",
+                            width: "100%",
+                            height: "100%",
+                          }}
                           title={content ? contentTitle(content) : "Interactive Training"}
                         />
                       ) : content ? (

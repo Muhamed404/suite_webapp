@@ -34,18 +34,13 @@ export function getContentAssetUrl(path: string | null | undefined): string {
   // so they resolve correctly under the Next.js basePath.
   // This applies to /images/, /icons/, /logo.svg, /favicon.ico, etc.
   if (trimmed.startsWith("/")) {
-    // If it's a backend asset (usually starting with /contents/), 
-    // we might want the full backend URL during SSR.
-    if (trimmed.startsWith("/contents/") && typeof window === "undefined") {
-      const base = (
-        process.env.NEXT_PUBLIC_SERVICE_AWM_URL ??
-        process.env.NEXT_PUBLIC_AWM_API_BASE ??
-        "http://localhost:3002"
-      ).replace(/\/$/, "");
-      return `${base}${trimmed}`;
+    // If it's a backend-served content asset (e.g. uploaded videos, logos),
+    // proxy through the Next.js route handler at /awm/contents/...
+    if (trimmed.startsWith("/contents/")) {
+      return `${AWM_BASE_PATH}${trimmed}`;
     }
 
-    // Otherwise, prepend /awm (basePath)
+    // Otherwise, prepend /awm (basePath) for local public assets
     return `${AWM_BASE_PATH}${trimmed}`;
   }
 
