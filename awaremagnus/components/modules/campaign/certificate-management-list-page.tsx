@@ -19,6 +19,7 @@ import { certificateService, type CertificateTemplate } from "@/services/certifi
 import { addToast } from "@heroui/toast";
 import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
 import { AuthImage } from "@/components/ui/auth-image";
+import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS } from "@/utils/supportedLanguages";
 
 export function CertificateManagementListPage() {
     const tMenu = useTranslations("dashboard");
@@ -142,9 +143,11 @@ export function CertificateManagementListPage() {
                                         onChange={(e) => setLanguage(e.target.value)}
                                     >
                                         <option value="all">All Languages</option>
-                                        <option value="English">English</option>
-                                        <option value="Arabic">Arabic</option>
-                                        <option value="French">French</option>
+                                        {SUPPORTED_LANGUAGES.map((lang) => (
+                                            <option key={lang.id} value={lang.name}>
+                                                {LANGUAGE_FLAGS[lang.id as keyof typeof LANGUAGE_FLAGS]} {lang.name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                             </div>

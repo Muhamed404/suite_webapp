@@ -31,6 +31,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { certificateService } from "@/services/certificateService";
 import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
+import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS } from "@/utils/supportedLanguages";
 import { AuthImage } from "@/components/ui/auth-image";
 
 // Import Quill dynamically to avoid SSR issues
@@ -209,7 +210,7 @@ export function CertificateBrandingForm() {
         const topic = "Physical Security";
         const courseName = "Cybersecurity Awareness on Physical Security";
         const completionDate = "1/27/2026";
-        
+
         const bottomLogo = assets.logo || '';
         const stampLogo = assets.stamp || '';
         const signImage = assets.signature || '';
@@ -581,11 +582,13 @@ export function CertificateBrandingForm() {
                                                     className="w-full px-4 py-1.5 text-xs border border-gray-200 rounded-full bg-white transition-all focus:outline-none focus:ring-1 focus:ring-sky-500 appearance-none h-9 cursor-pointer"
                                                     value={language}
                                                     onChange={(e) => setLanguage(e.target.value)}
-                                                    disabled={isEdit} // Lang ID often cannot be changed after creation
+                                                    disabled={isEdit}
                                                 >
-                                                    <option value="1">English</option>
-                                                    <option value="2">Arabic</option>
-                                                    <option value="3">French</option>
+                                                    {SUPPORTED_LANGUAGES.map((lang) => (
+                                                        <option key={lang.id} value={lang.id.toString()}>
+                                                            {LANGUAGE_FLAGS[lang.id as keyof typeof LANGUAGE_FLAGS]} {lang.name}
+                                                        </option>
+                                                    ))}
                                                 </select>
                                             </div>
                                         </div>
