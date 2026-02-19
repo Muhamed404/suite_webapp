@@ -16,11 +16,13 @@ import {
     Type,
     Sparkles,
     X,
-    FileText
+    FileText,
+    History,
+    FileImage
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@heroui/button";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from "@heroui/modal";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
 import { Spinner } from "@heroui/spinner";
 import { addToast } from "@heroui/toast";
 
@@ -117,7 +119,6 @@ function ImageUploadPill({ label, icon, initialUrl, onImageChange }: ImageUpload
 
 export function CertificateBrandingForm() {
     const tMenu = useTranslations("dashboard");
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
     const params = useParams();
     const router = useRouter();
     const certificateId = params?.id ? parseInt(params.id as string) : null;
@@ -187,16 +188,311 @@ export function CertificateBrandingForm() {
         ],
     }), []);
 
-    const getProcessedText = (html: string) => {
-        return html
-            .replace(/&lt;%first_name%&gt;/g, '<span class="text-[#00CCC4] font-semibold italic font-[Fondamento]">John</span>')
-            .replace(/&lt;%last_name%&gt;/g, '<span class="text-[#00CCC4] font-semibold italic font-[Fondamento]">Doe</span>')
-            .replace(/&lt;%content_name%&gt;/g, '<span class="font-bold">Cyber Security 101</span>')
-            .replace(/&lt;%completion_date%&gt;/g, '<span class="font-medium">March 25, 2026</span>')
-            .replace(/<%first_name%>/g, '<span class="text-[#00CCC4] font-semibold italic font-[Fondamento]">John</span>')
-            .replace(/<%last_name%>/g, '<span class="text-[#00CCC4] font-semibold italic font-[Fondamento]">Doe</span>')
-            .replace(/<%content_name%>/g, '<span class="font-bold">Cyber Security 101</span>')
-            .replace(/<%completion_date%>/g, '<span class="font-medium">March 25, 2026</span>');
+    const getProcessedText = (firstName: string, lastName: string, courseName: string, completionDate: string) => {
+        const defaultTemplate = 'This is to certify that <%first_name%> <%last_name%> has successfully completed <%content_name%> on <%completion_date%>';
+        const templateHtml = templateText?.trim() || defaultTemplate;
+
+        return templateHtml
+            .replace(/<%first_name%>/g, firstName)
+            .replace(/<%last_name%>/g, lastName)
+            .replace(/<%content_name%>/g, courseName)
+            .replace(/<%completion_date%>/g, completionDate)
+            .replace(/&lt;%first_name%&gt;/g, firstName)
+            .replace(/&lt;%last_name%&gt;/g, lastName)
+            .replace(/&lt;%content_name%&gt;/g, courseName)
+            .replace(/&lt;%completion_date%&gt;/g, completionDate);
+    };
+
+    const generateCertificateHtml = () => {
+        const firstName = "John";
+        const lastName = "Doe";
+        const topic = "Physical Security";
+        const courseName = "Cybersecurity Awareness on Physical Security";
+        const completionDate = "1/27/2026";
+        
+        const bottomLogo = assets.logo || '';
+        const stampLogo = assets.stamp || '';
+        const signImage = assets.signature || '';
+        const certificateText = getProcessedText(firstName, lastName, courseName, completionDate);
+
+        return `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body {
+        background-color: #f5f5f5;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      }
+      .certificate-wrapper {
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+      }
+      .export-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 24px;
+        border-radius: 999px;
+        border: none;
+        background: #0ea5e9;
+        color: white;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(14,165,233,0.35);
+        z-index: 100;
+      }
+      .certificate-container {
+        position: relative;
+        padding: 20px;
+        width: 100%;
+        max-width: 900px;
+        background-color: ${bgColor};
+        border: 4px solid #999;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.2);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        margin-top: 60px;
+      }
+      .certificate-header {
+        background: #ffffff;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: auto;
+        min-height: 150px;
+      }
+      .certificate-header-img {
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        object-fit: cover;
+      }
+      .certificate-content {
+        padding: 40px 40px 60px;
+        text-align: center;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .topic-section {
+        margin-bottom: 20px;
+      }
+      .topic-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #64748b;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+      }
+      .topic-label i {
+        font-size: 16px;
+      }
+      .topic-title {
+        font-size: 48px;
+        font-weight: bold;
+        color: #1e293b;
+        margin-bottom: 20px;
+      }
+      .divider {
+        width: 200px;
+        height: 2px;
+        background-color: #cbd5e1;
+        margin: 0 auto 30px;
+      }
+      .certification-text {
+        font-size: 16px;
+        color: #475569;
+        line-height: 1.8;
+        margin-bottom: 20px;
+        letter-spacing: 0.5px;
+      }
+      .user-name {
+        font-size: 24px;
+        font-weight: bold;
+        color: #1e293b;
+        margin-top: 20px;
+      }
+      .signature-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 30px;
+        margin-top: 40px;
+        padding-top: 20px;
+      }
+      .signature-item {
+        flex: 1;
+        text-align: center;
+      }
+      .signature-line {
+        width: 100%;
+        height: 2px;
+        background-color: #94a3b8;
+        margin-bottom: 8px;
+      }
+      .signature-img {
+        height: 50px;
+        margin-bottom: 8px;
+      }
+      .signature-label {
+        font-size: 12px;
+        color: #64748b;
+        font-weight: 600;
+      }
+      .logo-placeholder {
+        width: 160px;
+        height: 160px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 8px;
+        color: #94a3b8;
+        font-size: 28px;
+      }
+      .stamp {
+        width: 70px;
+        height: 70px;
+        border: 3px solid #dc2626;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 8px;
+        transform: rotate(15deg);
+        font-size: 10px;
+        font-weight: bold;
+        color: #dc2626;
+        text-align: center;
+        line-height: 1.2;
+      }
+      .stamp-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      /* Added overlays for Watermark and Border */
+      .certificate-border {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        z-index: 50;
+        ${assets.border ? `background-image: url('${assets.border}'); background-size: 100% 100%;` : ''}
+      }
+      .certificate-watermark {
+        position: absolute;
+        top: 55%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50%;
+        height: 50%;
+        opacity: 0.08;
+        pointer-events: none;
+        z-index: 0;
+        ${assets.watermark ? `background-image: url('${assets.watermark}'); background-size: contain; background-repeat: no-repeat; background-position: center;` : ''}
+      }
+      @media print {
+        .export-btn { display: none; }
+        body { background: white; padding: 0; }
+        .certificate-wrapper { padding: 0; margin: 0; }
+        .certificate-container { margin: 0; box-shadow: none; width: 100%; max-width: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="certificate-wrapper">
+      <button class="export-btn" onclick="window.print()">Export PDF</button>
+      
+      <div class="certificate-container">
+        <div class="certificate-border"></div>
+        <div class="certificate-watermark"></div>
+
+        <!-- Header -->
+        <div class="certificate-header">
+          <img src="/images/coc.png" alt="Certificate of Completion" class="certificate-header-img" onerror="this.src='https://placehold.co/1000x250/0ea5e9/ffffff?text=CERTIFICATE+OF+COMPLETION'" />
+        </div>
+
+        <!-- Content -->
+        <div class="certificate-content" style="position: relative; z-index: 10;">
+          <div>
+            <!-- Topic Section -->
+            <div class="topic-section">
+              <div class="topic-label">
+                <i class="bi bi-bookmark"></i>
+                <span>Topic</span>
+              </div>
+              <h2 class="topic-title">${topic}</h2>
+              <div class="divider"></div>
+            </div>
+            
+            <!-- Certification Text -->
+            <div class="certification-text">
+              ${certificateText}
+            </div>
+            
+            <!-- User Name -->
+            <div class="user-name">${firstName} ${lastName}</div>
+          </div>
+          
+          <!-- Signature Row -->
+          <div class="signature-row">
+            <div class="signature-item">
+              ${signImage ? `<img src="${signImage}" alt="Signature" class="signature-img" style="width: 100%; height: auto; max-height: 50px; object-fit: contain; margin-bottom: 8px;">` : `<div class="signature-line"></div>`}
+              <div class="signature-label">Authorized Signature</div>
+            </div>
+            
+            <div class="signature-item">
+              <div class="logo-placeholder">
+                ${bottomLogo ? `<img src="${bottomLogo}" alt="Logo" style="width: 170px; height: 170px; object-fit: contain;">` : `<i class="bi bi-building"></i>`}
+              </div>
+            </div>
+            
+            <div class="signature-item">
+              ${stampLogo ? `<img src="${stampLogo}" alt="Stamp" class="stamp-img" style="width: 70px; height: 70px; margin: 0 auto 8px; transform: rotate(15deg);">` : `<div class="stamp">OFFICIAL<br/>STAMP</div>`}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  </html>
+  `;
+    };
+
+    const handlePreview = () => {
+        const htmlContent = generateCertificateHtml();
+        const previewWindow = window.open('', '_blank');
+        if (previewWindow) {
+            previewWindow.document.open();
+            previewWindow.document.write(htmlContent);
+            previewWindow.document.close();
+        } else {
+            addToast({
+                title: "Error",
+                description: "Pop-up blocked. Please allow pop-ups to see the preview.",
+                color: "warning"
+            });
+        }
     };
 
     const handleAssetChange = (key: keyof typeof assets) => (file: File | null, url: string | null) => {
@@ -247,75 +543,6 @@ export function CertificateBrandingForm() {
         }
     };
 
-    const CertificatePreview = () => (
-        <div
-            className="relative w-full aspect-[1.414/1] bg-white shadow-2xl overflow-hidden print:shadow-none mx-auto border border-gray-100 flex items-center justify-center p-0"
-            style={{ backgroundColor: bgColor }}
-        >
-            <link href="https://fonts.googleapis.com/css2?family=Fondamento:ital@0;1&family=Nunito+Sans:wght@200..1000&display=swap" rel="stylesheet" />
-
-            {/* Border */}
-            {assets.border && (
-                <AuthImage src={assets.border} alt="" className="object-fill z-10 pointer-events-none" fill resolveUrl={false} />
-            )}
-
-            {/* Watermark */}
-            {assets.watermark && (
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] opacity-[0.08] z-0 pointer-events-none">
-                    <AuthImage src={assets.watermark} alt="" className="object-contain" fill resolveUrl={false} />
-                </div>
-            )}
-
-            <div className="relative z-20 flex flex-col items-center justify-between w-full h-full text-center py-12 px-20">
-                {/* Logo */}
-                <div className="h-20 w-48 relative flex items-center justify-center">
-                    {assets.logo ? (
-                        <AuthImage src={assets.logo} alt="Logo" className="object-contain" fill resolveUrl={false} />
-                    ) : (
-                        <div className="w-16 h-16 bg-gray-50 flex items-center justify-center rounded-full border border-dashed border-gray-200">
-                            <ImageIcon size={24} className="text-gray-300" />
-                        </div>
-                    )}
-                </div>
-
-                {/* Text Content */}
-                <div className="flex-1 flex items-center justify-center w-full my-6">
-                    <div
-                        className="certificate-content-render text-slate-800 font-['Nunito_Sans'] w-full"
-                        dangerouslySetInnerHTML={{ __html: getProcessedText(templateText) }}
-                        style={{ fontSize: 'clamp(14px, 2.2vw, 28px)', lineHeight: '1.6' }}
-                    />
-                </div>
-
-                {/* Footer Assets (Stamp & Signature) */}
-                <div className="w-full flex justify-between items-end mt-4">
-                    <div className="flex flex-col items-center gap-2">
-                        <div className="h-16 w-32 relative flex items-end">
-                            {assets.signature ? (
-                                <AuthImage src={assets.signature} alt="Signature" className="object-contain" fill resolveUrl={false} />
-                            ) : (
-                                <div className="h-px w-32 bg-slate-200" />
-                            )}
-                        </div>
-                        <div className="w-40 h-[1.5px] bg-slate-900" />
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-900 font-['Nunito_Sans']">Signature</span>
-                    </div>
-
-                    <div className="flex flex-col items-center justify-center">
-                        {assets.stamp ? (
-                            <div className="h-24 w-24 relative">
-                                <AuthImage src={assets.stamp} alt="Stamp" className="object-contain" fill resolveUrl={false} />
-                            </div>
-                        ) : (
-                            <div className="h-24 w-24 rounded-full border border-dashed border-gray-200 flex items-center justify-center">
-                                <span className="text-[8px] text-gray-300 font-['Nunito_Sans']">STAMP HERE</span>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
 
     return (
         <ProtectedRoute>
@@ -363,7 +590,43 @@ export function CertificateBrandingForm() {
                                             </div>
                                         </div>
                                     </div>
-                                    {/* ... rest unchanged inputs ... */}
+                                    {/* Background Color */}
+                                    <div className="bg-white rounded-2xl border border-slate-100 px-5 py-4">
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-2">
+                                                <Palette size={18} className="text-sky-500" />
+                                                <div className="flex flex-col">
+                                                    <span className="text-[13px] font-semibold text-slate-700">
+                                                        Background Color
+                                                    </span>
+                                                    <span className="text-[11px] text-slate-400 capitalize">
+                                                        {bgColor === "#ffffff" ? "White" : bgColor}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <div
+                                                    className="w-9 h-5 rounded-full border border-slate-200"
+                                                    style={{ backgroundColor: bgColor }}
+                                                ></div>
+
+                                                <label
+                                                    htmlFor="bgColorInput"
+                                                    className="flex items-center justify-center w-8 h-8 rounded-full border border-slate-200 bg-slate-50 text-slate-400 text-lg cursor-pointer hover:bg-slate-100 transition-colors"
+                                                >
+                                                    <Sparkles size={16} />
+                                                </label>
+                                                <input
+                                                    id="bgColorInput"
+                                                    type="color"
+                                                    value={bgColor}
+                                                    onChange={(e) => setBgColor(e.target.value)}
+                                                    className="hidden"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
                                     <ImageUploadPill
                                         label="Logo"
                                         icon={<ImageIcon size={18} className="text-sky-500" />}
@@ -404,7 +667,7 @@ export function CertificateBrandingForm() {
                                         </Link>
                                         <button
                                             type="button"
-                                            onClick={onOpen}
+                                            onClick={handlePreview}
                                             className="px-6 py-2 rounded-full bg-white border border-slate-200 text-[13px] font-semibold text-slate-500 hover:bg-slate-50 font-sans h-9 flex items-center gap-2"
                                         >
                                             <Eye size={16} />
@@ -457,43 +720,6 @@ export function CertificateBrandingForm() {
                     </div>
                 </div>
 
-                {/* PREVIEW MODAL */}
-                <Modal
-                    isOpen={isOpen}
-                    onOpenChange={onOpenChange}
-                    size="5xl"
-                    scrollBehavior="inside"
-                    classNames={{
-                        base: "bg-slate-50/95 backdrop-blur-xl",
-                        header: "border-b border-slate-100",
-                        footer: "border-t border-slate-100"
-                    }}
-                >
-                    <ModalContent>
-                        {(onClose) => (
-                            <>
-                                <ModalHeader className="flex flex-col gap-1">
-                                    <div className="flex items-center gap-2">
-                                        <FileText className="text-sky-500" size={20} />
-                                        <span>Certificate Preview</span>
-                                    </div>
-                                    <span className="text-[11px] font-normal text-slate-400">High-fidelity visualization of the final certificate</span>
-                                </ModalHeader>
-                                <ModalBody className="py-8 bg-slate-200/50">
-                                    <CertificatePreview />
-                                </ModalBody>
-                                <ModalFooter>
-                                    <Button variant="flat" onPress={onClose} className="rounded-full text-xs font-semibold">
-                                        Close Preview
-                                    </Button>
-                                    <Button color="primary" onPress={onClose} className="bg-sky-500 rounded-full text-xs font-semibold shadow-lg shadow-sky-200">
-                                        Save Configuration
-                                    </Button>
-                                </ModalFooter>
-                            </>
-                        )}
-                    </ModalContent>
-                </Modal>
 
                 <style jsx global>{`
           .quill .ql-toolbar {
