@@ -28,6 +28,8 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { certificateService } from "@/services/certificateService";
+import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
+import { AuthImage } from "@/components/ui/auth-image";
 
 // Import Quill dynamically to avoid SSR issues
 const ReactQuill = dynamic(() => import("react-quill-new"), {
@@ -84,7 +86,7 @@ function ImageUploadPill({ label, icon, initialUrl, onImageChange }: ImageUpload
                 {/* preview */}
                 <div className="relative flex items-center justify-center w-12 h-12 rounded-xl border border-dashed border-slate-300 bg-slate-50 text-slate-300 text-lg overflow-hidden shrink-0">
                     {preview ? (
-                        <img src={preview} alt="preview" className="w-full h-full object-contain" />
+                        <AuthImage src={preview} alt="preview" className="object-contain" fill resolveUrl={false} />
                     ) : (
                         <ImageIcon size={20} />
                     )}
@@ -155,11 +157,11 @@ export function CertificateBrandingForm() {
                         setBgColor(cert.bg_color || "#ffffff");
                         setTemplateText(cert.template_text);
                         setAssets({
-                            logo: cert.top_logo_url || null,
-                            border: cert.border_image_url || null,
-                            watermark: cert.bg_watermark_url || null,
-                            stamp: cert.stamp_logo_url || null,
-                            signature: cert.sign_image_url || null,
+                            logo: cert.top_logo_url ? getCertificateAssetUrl(cert.top_logo_url) : null,
+                            border: cert.border_image_url ? getCertificateAssetUrl(cert.border_image_url) : null,
+                            watermark: cert.bg_watermark_url ? getCertificateAssetUrl(cert.bg_watermark_url) : null,
+                            stamp: cert.stamp_logo_url ? getCertificateAssetUrl(cert.stamp_logo_url) : null,
+                            signature: cert.sign_image_url ? getCertificateAssetUrl(cert.sign_image_url) : null,
                         });
                     }
                 } catch (error) {
@@ -254,19 +256,21 @@ export function CertificateBrandingForm() {
 
             {/* Border */}
             {assets.border && (
-                <img src={assets.border} alt="" className="absolute inset-0 w-full h-full object-fill z-10 pointer-events-none" />
+                <AuthImage src={assets.border} alt="" className="object-fill z-10 pointer-events-none" fill resolveUrl={false} />
             )}
 
             {/* Watermark */}
             {assets.watermark && (
-                <img src={assets.watermark} alt="" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] opacity-[0.08] z-0 pointer-events-none" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] opacity-[0.08] z-0 pointer-events-none">
+                    <AuthImage src={assets.watermark} alt="" className="object-contain" fill resolveUrl={false} />
+                </div>
             )}
 
             <div className="relative z-20 flex flex-col items-center justify-between w-full h-full text-center py-12 px-20">
                 {/* Logo */}
-                <div className="h-20 flex items-center justify-center">
+                <div className="h-20 w-48 relative flex items-center justify-center">
                     {assets.logo ? (
-                        <img src={assets.logo} alt="Logo" className="max-h-full object-contain" />
+                        <AuthImage src={assets.logo} alt="Logo" className="object-contain" fill resolveUrl={false} />
                     ) : (
                         <div className="w-16 h-16 bg-gray-50 flex items-center justify-center rounded-full border border-dashed border-gray-200">
                             <ImageIcon size={24} className="text-gray-300" />
@@ -286,9 +290,9 @@ export function CertificateBrandingForm() {
                 {/* Footer Assets (Stamp & Signature) */}
                 <div className="w-full flex justify-between items-end mt-4">
                     <div className="flex flex-col items-center gap-2">
-                        <div className="h-16 flex items-end">
+                        <div className="h-16 w-32 relative flex items-end">
                             {assets.signature ? (
-                                <img src={assets.signature} alt="Signature" className="h-full w-auto object-contain" />
+                                <AuthImage src={assets.signature} alt="Signature" className="object-contain" fill resolveUrl={false} />
                             ) : (
                                 <div className="h-px w-32 bg-slate-200" />
                             )}
@@ -299,7 +303,9 @@ export function CertificateBrandingForm() {
 
                     <div className="flex flex-col items-center justify-center">
                         {assets.stamp ? (
-                            <img src={assets.stamp} alt="Stamp" className="h-24 w-24 object-contain" />
+                            <div className="h-24 w-24 relative">
+                                <AuthImage src={assets.stamp} alt="Stamp" className="object-contain" fill resolveUrl={false} />
+                            </div>
                         ) : (
                             <div className="h-24 w-24 rounded-full border border-dashed border-gray-200 flex items-center justify-center">
                                 <span className="text-[8px] text-gray-300 font-['Nunito_Sans']">STAMP HERE</span>

@@ -17,6 +17,8 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { certificateService, type CertificateTemplate } from "@/services/certificateService";
 import { addToast } from "@heroui/toast";
+import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
+import { AuthImage } from "@/components/ui/auth-image";
 
 export function CertificateManagementListPage() {
     const tMenu = useTranslations("dashboard");
@@ -186,13 +188,13 @@ export function CertificateManagementListPage() {
                                                 <td className="px-4 py-3.5 text-gray-900 font-medium">Certificate - {cert.language?.name || 'Unknown'}</td>
                                                 <td className="px-4 py-3.5 text-gray-600">{cert.language?.name || 'Unknown'}</td>
                                                 <td className="px-4 py-3.5 text-gray-400 italic">
-                                                    {cert.top_logo_url ? <img src={cert.top_logo_url} alt="Logo" className="h-8 w-auto object-contain" /> : "None"}
+                                                    {cert.top_logo_url ? <div className="h-8 w-16 relative"><AuthImage src={getCertificateAssetUrl(cert.top_logo_url)} alt="Logo" className="object-contain" fill resolveUrl={false} /></div> : "None"}
                                                 </td>
                                                 <td className="px-4 py-3.5 text-gray-400 italic">
-                                                    {cert.bg_watermark_url ? <img src={cert.bg_watermark_url} alt="Watermark" className="h-8 w-auto object-contain" /> : "None"}
+                                                    {cert.bg_watermark_url ? <div className="h-8 w-16 relative"><AuthImage src={getCertificateAssetUrl(cert.bg_watermark_url)} alt="Watermark" className="object-contain" fill resolveUrl={false} /></div> : "None"}
                                                 </td>
                                                 <td className="px-4 py-3.5 text-gray-400 italic">
-                                                    {cert.border_image_url ? <img src={cert.border_image_url} alt="Border" className="h-8 w-auto object-contain" /> : "None"}
+                                                    {cert.border_image_url ? <div className="h-8 w-16 relative"><AuthImage src={getCertificateAssetUrl(cert.border_image_url)} alt="Border" className="object-contain" fill resolveUrl={false} /></div> : "None"}
                                                 </td>
                                                 <td className="px-4 py-3.5 text-sky-500 font-semibold cursor-pointer">
                                                     <div className="flex items-center gap-3">
