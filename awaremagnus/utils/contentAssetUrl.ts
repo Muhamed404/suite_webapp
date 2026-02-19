@@ -47,3 +47,30 @@ export function getContentAssetUrl(path: string | null | undefined): string {
   // For paths NOT starting with / (relative to current page), prepend /awm/
   return `${AWM_BASE_PATH}/${trimmed}`;
 }
+
+/**
+ * Resolves a certificate asset URL (logos, watermarks, etc.) through the same-origin proxy.
+ */
+export function getCertificateAssetUrl(path: string | null | undefined): string {
+  if (!path?.trim()) return "";
+  const trimmed = path.trim();
+
+  // If already absolute, return as-is
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  // If already starts with base path /awm/certificates/, return as-is
+  if (trimmed.startsWith(`${AWM_BASE_PATH}/certificates/`)) {
+    return trimmed;
+  }
+
+  // If it starts with /certificates/, prepend /awm (basePath)
+  if (trimmed.startsWith("/certificates/")) {
+    return `${AWM_BASE_PATH}${trimmed}`;
+  }
+
+  // Otherwise, prepend /awm/certificates/
+  const cleanPath = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
+  return `${AWM_BASE_PATH}/certificates/${cleanPath}`;
+}
