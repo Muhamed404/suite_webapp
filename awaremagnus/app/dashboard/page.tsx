@@ -33,6 +33,7 @@ import {
   useOrganizationStrugglingModules,
   useOrganizationMonthlyCompletion,
   useUserAssignments,
+  useUserGameAchievements,
 } from "@/hooks/useDashboard";
 import { useLicenseInfo } from "@/hooks/useSuiteAwm";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
@@ -52,6 +53,7 @@ export default function DashboardPage() {
   const { data: orgDataResponse } = useOrganizationDashboards();
   const { data: userDataResponse } = useUserDashboards({ userId: user?.id });
   const { data: assignmentsData } = useUserAssignments({ language_id: 1 });
+  const { data: userGameAchievementsData } = useUserGameAchievements();
 
   const { data: systemStrugglingRaw } = useSystemStrugglingModules();
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
@@ -108,6 +110,20 @@ export default function DashboardPage() {
 
     return { labels, data };
   }, [isOrgAdmin, orgMonthlyCompletion]);
+
+  // Modules for Module Details chart
+  const modules = useMemo(() => {
+    if (assignmentsData?.object?.assignments && assignmentsData.object.assignments.length > 0) {
+      const colors = ['#3B82F6', '#F97316', '#A855F7', '#8B5CF6', '#06B6D4', '#10B981', '#EF4444', '#22C55E', '#F59E0B', '#8B5CF6'];
+      return assignmentsData.object.assignments.map((assignment: any, index: number) => ({
+        name: assignment.module_name,
+        value: 1,
+        color: colors[index % colors.length]
+      }));
+    }
+    // No default static modules, only dynamic ones
+    return [];
+  }, [assignmentsData]);
 
   // Extract values with fallbacks
   const licenseInfo = licenseData?.AwareMagnus?.Subscription || licenseData?.All?.Subscription;
@@ -193,7 +209,7 @@ export default function DashboardPage() {
     ? userDataResponse.object.dashboardUsers[0]
     : null;
 
-  const totalModulesEnrolled = userDashboardData?.total_modules_enrolled || 0;
+  const totalModulesEnrolled = assignmentsData?.object?.count || userDashboardData?.total_modules_enrolled || 0;
   const totalCompletedModules = userDashboardData?.total_completed_modules || 0;
   const totalCertificatesAvailable = userDashboardData?.total_certificates_available || 0;
   const totalCompletedCertificates = userDashboardData?.total_completed_certificates || 0;
@@ -269,6 +285,54 @@ export default function DashboardPage() {
       });
     }
   }, [compliancePercent]);
+
+  // Unlocked achievements for user
+  const unlockedAchievementIds = useMemo(() => {
+    const set = new Set<number>();
+    if (userGameAchievementsData?.statusCode === 200 && userGameAchievementsData.object?.userGameAchievements) {
+      for (const achievement of userGameAchievementsData.object.userGameAchievements) {
+        set.add(achievement.achievement_id);
+      }
+    }
+    return set;
+  }, [userGameAchievementsData]);
+
+  // Category stats for user achievements
+  const categoryStats = useMemo(() => {
+    const stats: Record<string, number> = {};
+    if (userGameAchievementsData?.statusCode === 200 && userGameAchievementsData.object?.userGameAchievements) {
+      for (const achievement of userGameAchievementsData.object.userGameAchievements) {
+        stats[achievement.category_name] = (stats[achievement.category_name] || 0) + achievement.count;
+      }
+    }
+    return stats;
+  }, [userGameAchievementsData]);
+
+  // Define total for each category (static for now)
+  const categoryTotals: Record<string, number> = {
+    'Performance': 5,
+    'Milestone': 4,
+    'Behavior': 4,
+    'Streak': 3,
+    'Completion': 3,
+  };
+
+  // Category config for display
+  const categoryConfig: Record<string, { bg: string, iconBg: string, icon: string }> = {
+    'Performance': { bg: 'bg-orange-100', iconBg: 'bg-orange-400', icon: 'chart-bar' },
+    'Milestone': { bg: 'bg-blue-100', iconBg: 'bg-blue-400', icon: 'rocket' },
+    'Behavior': { bg: 'bg-red-100', iconBg: 'bg-red-400', icon: 'clock' },
+    'Streak': { bg: 'bg-purple-100', iconBg: 'bg-purple-400', icon: 'star' },
+    'Completion': { bg: 'bg-teal-100', iconBg: 'bg-teal-400', icon: 'check-circle' },
+    'Learning': { bg: 'bg-indigo-100', iconBg: 'bg-indigo-400', icon: 'book' },
+    'Security': { bg: 'bg-gray-100', iconBg: 'bg-gray-400', icon: 'check-circle' },
+    'Awareness': { bg: 'bg-yellow-100', iconBg: 'bg-yellow-400', icon: 'question' },
+    'Training': { bg: 'bg-cyan-100', iconBg: 'bg-cyan-400', icon: 'star' },
+    'Compliance': { bg: 'bg-green-100', iconBg: 'bg-green-400', icon: 'check-circle' },
+    'Risk': { bg: 'bg-pink-100', iconBg: 'bg-pink-400', icon: 'clock' },
+    'Engagement': { bg: 'bg-lime-100', iconBg: 'bg-lime-400', icon: 'rocket' },
+    // Add more if needed
+  };
 
   return (
     <ProtectedRoute>
@@ -387,106 +451,66 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="grid grid-cols-4 gap-1.5 mb-3">
-                    {[
-                      "/awm/images/achivement/1.png",
-                      "/awm/images/achivement/2.png",
-                      "/awm/images/achivement/3.png",
-                      "/awm/images/achivement/4.png",
-                      "/awm/images/achivement/5.png",
-                      "/awm/images/achivement/6.png",
-                      "/awm/images/achivement/7.png",
-                      "/awm/images/achivement/8.png",
-                      "/awm/images/achivement/9.png",
-                      "/awm/images/achivement/10.png",
-                      "/awm/images/achivement/11.png",
-                      "/awm/images/achivement/12.png",
-                      "/awm/images/achivement/13.png",
-                      "/awm/images/achivement/14.png",
-                      "/awm/images/achivement/15.png",
-                      "/awm/images/achivement/16.png",
-                    ].map((src, index) => (
-                      <div key={index} className="relative">
-                        <div className="w-10 h-10 flex items-center justify-center">
-                          <Image src={src} alt="" width={40} height={40} className="w-full h-full object-contain" />
+                    {Array.from({ length: 16 }, (_, index) => {
+                      const achievementId = index + 1;
+                      const isUnlocked = unlockedAchievementIds.has(achievementId);
+                      return (
+                        <div key={index} className="relative">
+                          <div className={`w-10 h-10 flex items-center justify-center ${isUnlocked ? '' : 'opacity-40'}`}>
+                            <Image src={getContentAssetUrl(`/images/achivement/${achievementId}.png`)} alt="" width={40} height={40} className="w-full h-full object-contain" />
+                          </div>
+                          {isUnlocked && (
+                            <span className="absolute top-0 right-0 w-4 h-4 z-10">
+                              <Image src={getContentAssetUrl("/images/achivement/achived.svg")} alt="" width={16} height={16} className="w-full h-full object-contain" />
+                            </span>
+                          )}
                         </div>
-                        {index < 9 && (
-                          <span className="absolute top-0 right-6 w-4 h-4 z-10">
-                            <Image src="/awm/images/achivement/achived.svg" alt="" width={16} height={16} className="w-full h-full object-contain" />
-                          </span>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
 
                   <div className="flex flex-wrap gap-1 mb-3">
-                    <div className="flex items-center gap-0.5 bg-orange-100 px-1.5 py-0.5 rounded-full">
-                      <div className="w-3 h-3 bg-orange-400 rounded flex items-center justify-center">
-                        <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                        </svg>
-                      </div>
-                      <span className="text-gray-900 text-[9px] font-medium">Performance</span>
-                      <span className="text-gray-600 text-[9px]">3/5</span>
-                    </div>
-
-                    <div className="flex items-center gap-0.5 bg-blue-100 px-1.5 py-0.5 rounded-full">
-                      <div className="w-3 h-3 bg-blue-400 rounded flex items-center justify-center">
-                        <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <span className="text-gray-900 text-[9px] font-medium">Milestone</span>
-                      <span className="text-gray-600 text-[9px]">2/4</span>
-                    </div>
-
-                    <div className="flex items-center gap-0.5 bg-red-100 px-1.5 py-0.5 rounded-full">
-                      <div className="w-3 h-3 bg-red-400 rounded flex items-center justify-center">
-                        <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <span className="text-gray-900 text-[9px] font-medium">Behavior</span>
-                      <span className="text-gray-600 text-[9px]">2/4</span>
-                    </div>
-
-                    <div className="flex items-center gap-0.5 bg-purple-100 px-1.5 py-0.5 rounded-full">
-                      <div className="w-3 h-3 bg-purple-400 rounded flex items-center justify-center">
-                        <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      </div>
-                      <span className="text-gray-900 text-[9px] font-medium">Streak</span>
-                      <span className="text-gray-600 text-[9px]">1/3</span>
-                    </div>
-
-                    <div className="flex items-center gap-0.5 bg-teal-100 px-1.5 py-0.5 rounded-full">
-                      <div className="w-3 h-3 bg-teal-400 rounded flex items-center justify-center">
-                        <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                      <span className="text-gray-900 text-[9px] font-medium">Completion</span>
-                      <span className="text-gray-600 text-[9px]">1/3</span>
-                    </div>
+                    {Object.entries(categoryStats).sort(() => Math.random() - 0.5).slice(0, 5).map(([category, count]) => {
+                      const config = categoryConfig[category] || { bg: 'bg-gray-100', iconBg: 'bg-gray-400', icon: 'question' };
+                      const total = categoryTotals[category] || 0;
+                      return (
+                        <div key={category} className={`flex items-center gap-0.5 ${config.bg} px-1.5 py-0.5 rounded-full`}>
+                          <div className={`w-3 h-3 ${config.iconBg} rounded flex items-center justify-center`}>
+                            <svg className="w-1.5 h-1.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              {/* Icon based on config.icon */}
+                              {config.icon === 'chart-bar' && <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />}
+                              {config.icon === 'rocket' && <path fillRule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clipRule="evenodd" />}
+                              {config.icon === 'clock' && <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />}
+                              {config.icon === 'star' && <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />}
+                              {config.icon === 'check-circle' && <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />}
+                              {config.icon === 'book' && <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />}
+                              {config.icon === 'question' && <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 100 2z" clipRule="evenodd" />}
+                            </svg>
+                          </div>
+                          <span className="text-gray-900 text-[9px] font-medium">{category}</span>
+                          <span className="text-gray-600 text-[9px]">{count}</span>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <div className="bg-white rounded-lg p-2.5">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-gray-700 text-[10px] font-medium">Achievements</span>
                       <div>
-                        <span className="text-gray-900 text-sm font-bold">{totalAchievementsCompleted}</span>
-                        <span className="text-gray-400 text-[10px]">/15</span>
+                        <span className="text-gray-900 text-sm font-bold">{userGameAchievementsData?.object?.count || 0}</span>
+                        <span className="text-gray-400 text-[10px]">/16</span>
                       </div>
                     </div>
                     <div className="w-full bg-purple-100 rounded-full h-1.5">
-                      <div className="bg-gradient-to-r from-purple-500 to-purple-600 h-1.5 rounded-full transition-all duration-300" style={{ width: `${(totalAchievementsCompleted / 15) * 100}%` }}></div>
+                      <div className="bg-gradient-to-r from-purple-500 to-purple-600 h-1.5 rounded-full transition-all duration-300" style={{ width: `${((userGameAchievementsData?.object?.count || 0) / 16) * 100}%` }}></div>
                     </div>
                   </div>
                 </div>
 
                 {/* Module Chart */}
                 <div className="col-span-8 row-span-4">
-                  <ModuleChart />
+                  <ModuleChart modules={modules} />
                 </div>
 
                 {/* This Week Stats */}
@@ -515,15 +539,15 @@ export default function DashboardPage() {
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center justify-between">
                         <span className="text-gray-500 text-[10px]">Lesson completed</span>
-                        <span className="text-gray-900 text-sm font-bold">12</span>
+                        <span className="text-gray-900 text-sm font-bold">{(dashboardData as any)?.total_completed_modules || 0}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-gray-500 text-[10px]">Study Time</span>
-                        <span className="text-gray-900 text-sm font-bold">8.5h</span>
+                        <span className="text-gray-900 text-sm font-bold">{(dashboardData as any)?.total_study_time ? ((dashboardData as any).total_study_time / 60).toFixed(1) + 'h' : '0h'}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-gray-500 text-[10px]">XP gained</span>
-                        <span className="text-purple-600 text-sm font-bold">+480 XP</span>
+                        <span className="text-purple-600 text-sm font-bold">+{(dashboardData as any)?.xp_total_tokens || 0} XP</span>
                       </div>
                     </div>
 
@@ -571,7 +595,7 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
-                      {(assignmentsData?.object?.assignments?.filter(a => a.status.name === "PENDING" || a.status.name === "IN_PROGRESS").slice(0, 4) || []).map((assignment, index) => {
+                      {(assignmentsData?.object?.assignments?.filter((a: any) => a.status.name === "PENDING" || a.status.name === "IN_PROGRESS").slice(0, 4) || []).map((assignment: any, index: number) => {
                         const startDate = new Date(assignment.start_date);
                         const endDate = new Date(assignment.end_date);
                         // use numeric timestamps so TypeScript accepts the arithmetic and guard invalid dates
@@ -653,7 +677,7 @@ export default function DashboardPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {(assignmentsData?.object?.assignments || []).map((assignment, index) => (
+                        {(assignmentsData?.object?.assignments || []).map((assignment: any, index: number) => (
                           <tr key={index} className="hover:bg-gray-50">
                             <td className="px-4 py-2">{assignment.campaign_name}</td>
                             <td className="px-4 py-2">{assignment.module_name}</td>
