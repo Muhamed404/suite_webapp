@@ -29,6 +29,7 @@ export interface SubMenuItem {
 interface SubMenuProps {
   items: SubMenuItem[];
   isCollapsed?: boolean;
+  onLogout?: () => void;
 }
 
 function isPathUnder(basePath: string, pathname: string): boolean {
@@ -51,7 +52,7 @@ function ChevronIcon({ open }: { open: boolean }) {
   );
 }
 
-export const SubMenu = ({ items, isCollapsed = false }: SubMenuProps) => {
+export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) => {
   const pathname = usePathname();
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
@@ -114,6 +115,7 @@ export const SubMenu = ({ items, isCollapsed = false }: SubMenuProps) => {
         "bg-[var(--bg)] text-[var(--mainblue)] transition-all duration-300",
         "h-full min-h-0 lg:h-[98vh] rounded-l-3xl",
         isRtl && "rounded-l-none rounded-r-3xl",
+        "flex flex-col",
         isCollapsed ? "w-9 min-w-9" : "w-52 overflow-hidden"
       )}
     >
@@ -150,7 +152,7 @@ export const SubMenu = ({ items, isCollapsed = false }: SubMenuProps) => {
           />
         )}
       </div>
-      <nav aria-label="Dashboard navigation" className="py-3 overflow-y-auto overflow-x-visible">
+      <nav aria-label="Dashboard navigation" className="py-3 overflow-y-auto overflow-x-visible flex-1">
         <ul className={cn("space-y-0.5 text-xs", isCollapsed ? "px-1" : "px-2")}>
           {items.map((item) => {
             const hasChildren = item.children && item.children.length > 0;
@@ -337,6 +339,33 @@ export const SubMenu = ({ items, isCollapsed = false }: SubMenuProps) => {
           })}
         </ul>
       </nav>
+
+      {/* Logout Button at Bottom */}
+      {onLogout && (
+        <div className={cn("border-t border-[var(--strokeGray)] py-3", isCollapsed ? "px-1" : "px-2")}>
+          <button
+            className={cn(
+              navItemBase,
+              navItemPadding,
+              navItemDefault,
+              "hover:bg-red-500/20"
+            )}
+            onClick={onLogout}
+            title="Logout"
+            type="button"
+          >
+            <svg
+              aria-hidden
+              className="size-4 shrink-0 min-w-4 min-h-4"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
+            </svg>
+            {!isCollapsed && <span className="text-xs font-normal">Logout</span>}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
