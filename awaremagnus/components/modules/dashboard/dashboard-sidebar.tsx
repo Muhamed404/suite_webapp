@@ -1,11 +1,15 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
 import { SubMenu } from "@/components/ui/sidebar-sub-menu";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { authService } from "@/services/authService";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { clearAuthTokenCookie } from "@/services/httpClient";
 
 interface DashboardSidebarProps {
   /** On mobile: controls drawer visibility. On lg: ignored (sidebar always visible). */
@@ -24,9 +28,24 @@ export const DashboardSidebar = ({
   isCollapsed = false,
   isEndUser = false,
 }: DashboardSidebarProps) => {
+  const router = useRouter();
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
+  const resetAuth = useAuthStore((state) => state.reset);
+
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout API call failed:", error);
+    } finally {
+      // Clear auth state and cookies regardless of API success
+      resetAuth();
+      clearAuthTokenCookie();
+      router.push("/login");
+    }
+  };
 
   /* ─── Admin / Org Admin menu items (existing) ─── */
   const adminMenuItems = [
@@ -124,7 +143,7 @@ export const DashboardSidebar = ({
             : "-translate-x-full lg:translate-x-0"
       )}
     >
-      <SubMenu isCollapsed={isCollapsed} items={subMenuItems} />
+      <SubMenu isCollapsed={isCollapsed} items={subMenuItems} onLogout={handleLogout} />
     </div>
   );
 };
