@@ -338,6 +338,54 @@ export interface Assignment {
   logo_banner_url: string;
 }
 
+export interface UserGameAchievement {
+  achievement_id: number;
+  name: string;
+  description: string;
+  category_name: string;
+  image_small_url: string;
+  count: number;
+  issue_date: string;
+}
+
+export interface UserGameAchievement {
+  achievement_id: number;
+  name: string;
+  description: string;
+  category_name: string;
+  image_small_url: string;
+  count: number;
+  issue_date: string;
+}
+
+export interface UserGameAchievementsResponse {
+  message: string;
+  statusCode: number;
+  alertType: string;
+  object: {
+    userGameAchievements: UserGameAchievement[];
+    count: number;
+  };
+}
+
+export interface UserAssignment {
+  user_id: number;
+  campaign_id: number;
+  campaign_name: string;
+  module_id: number;
+  module_name: string;
+  description: string;
+  status: {
+    id: number;
+    name: string;
+  };
+  start_date: string;
+  end_date: string;
+  remaining_days: number;
+  progress_percentage: number | null;
+  logo_banner_url: string | null;
+}
+
 export interface UserAssignmentsResponse {
   message: string;
   statusCode: number;
@@ -351,7 +399,7 @@ export interface UserAssignmentsResponse {
       total_quizzes_enrolled: number;
       total_quizzes_passed: number;
     };
-    assignments: Assignment[];
+    assignments: UserAssignment[];
     count: number;
   };
 }

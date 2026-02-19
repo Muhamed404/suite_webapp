@@ -9,7 +9,7 @@ import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import clsx from "clsx";
 import { useState, useMemo, useRef, useEffect } from "react";
-import { ChevronUp, ChevronDown, ChevronsUpDown, Search, SearchX, Rocket, Clock, BarChart3, ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { ChevronUp, ChevronDown, ChevronsUpDown, Search, SearchX, Clock, BarChart3, ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -93,8 +93,7 @@ function getActionButton(status: "active" | "pending" | "completed", campaignId:
     return (
       <Link href="/module/physical-security">
         <button className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}>
-          <Rocket className="w-4 h-4" />
-          <span>Launch</span>
+          <span>View</span>
         </button>
       </Link>
     );
@@ -587,7 +586,7 @@ export function CampaignAssignmentsPage() {
                   <tr>
                     <th className="px-4 py-3.5 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => handleSort('name')}>
                       <div className="flex items-center gap-2">
-                        <span>Campaign Name</span>
+                        <span>Modules</span>
                         <span className="sort-icon text-gray-400">
                           {sortColumn === 'name' ? (
                             sortDirection === 'asc' ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />
