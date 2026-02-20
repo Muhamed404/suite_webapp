@@ -5,22 +5,128 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 import { useTranslations } from "@/i18n/useTranslations";
-import { useAchievementStatistics, useAvatarStatistics } from "@/hooks/useDashboard";
+import {
+  useAchievementStatistics,
+  useAvatarStatistics,
+  useSystemOverview,
+  useOrganizationDashboards,
+  useUserDashboards,
+} from "@/hooks/useDashboard";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { isPlatformAdmin as getIsPlatformAdmin, isOrgAdmin as getIsOrgAdmin, isUser as getIsUser } from "@/utils/roles";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 export const GamificationStats = () => {
   const t = useTranslations("dashboard");
   const { user: _user } = useAuthStore();
 
-  // Platform admins see aggregated stats by default unless orgId is passed (can be enhancement later)
-  // Org admins see their org stats.
-  // Users see their own stats (API handles it).
+  // Determine dashboard source (system / organization / user) and map module stats
+  const isPlatformAdmin = getIsPlatformAdmin(_user?.role_id);
+  const isOrgAdmin = getIsOrgAdmin(_user?.role_id);
+  const isUser = getIsUser(_user?.role_id);
+
+  const { data: systemData } = useSystemOverview();
+  const { data: orgDataResponse } = useOrganizationDashboards();
+  const { data: userDataResponse } = useUserDashboards({ userId: _user?.id });
+
+  const dashboardData = useMemo(() => {
+    if (isPlatformAdmin && systemData?.statusCode === 200) return systemData.object;
+    if (isOrgAdmin && orgDataResponse?.statusCode === 200 && orgDataResponse.object.dashboardOrganizations.length > 0)
+      return orgDataResponse.object.dashboardOrganizations[0];
+    if (isUser && userDataResponse?.statusCode === 200 && userDataResponse.object.dashboardUsers.length > 0)
+      return userDataResponse.object.dashboardUsers[0];
+    return null;
+  }, [isPlatformAdmin, isOrgAdmin, isUser, systemData, orgDataResponse, userDataResponse]);
+
+  const totalEmployeesModulesEnrolled =
+    dashboardData && "total_employees_modules_enrolled" in dashboardData
+      ? dashboardData.total_employees_modules_enrolled
+      : dashboardData && "total_modules_enrolled" in dashboardData
+        ? dashboardData.total_modules_enrolled
+        : 0;
+
+  const totalCompletedEmployeesModules =
+    dashboardData && "total_completed_employees_modules" in dashboardData
+      ? dashboardData.total_completed_employees_modules
+      : dashboardData && "total_completed_modules" in dashboardData
+        ? dashboardData.total_completed_modules
+        : 0;
+
+  const courseCompletionPercentage =
+    totalEmployeesModulesEnrolled > 0
+      ? Math.round((totalCompletedEmployeesModules / totalEmployeesModulesEnrolled) * 100)
+      : 0;
+
+  const studyTimeHours =
+    dashboardData && "total_study_time" in dashboardData
+      ? Math.floor(dashboardData.total_study_time / 3600)
+      : 0;
 
   const { data: achievementData } = useAchievementStatistics();
   const { data: avatarData } = useAvatarStatistics();
 
-  const stats = achievementData?.data;
-  const avatars = avatarData?.data;
+  const stats = (achievementData as any)?.object ?? (achievementData as any)?.data;
+  const avatars = (avatarData as any)?.object ?? (avatarData as any)?.data;
+
+  // Avatar numbers (1-9) present in backend and a lookup map by number.
+  // We parse the leading digit from `image_small_url` (e.g. "3-...png").
+  const unlockedAvatarNumbers = useMemo(() => {
+    const set = new Set<number>();
+    const items = avatars?.avatar_statistics ?? [];
+
+    for (const a of items) {
+      const img = a?.image_small_url ?? "";
+      const m = img.trim().match(/^(\d)/);
+      if (!m) continue;
+      const n = Number(m[1]);
+      if (n >= 1 && n <= 9) set.add(n);
+    }
+
+    return set;
+  }, [avatars]);
+
+  const avatarByNumber = useMemo(() => {
+    const map = new Map<number, any>();
+    for (const a of avatars?.avatar_statistics ?? []) {
+      const img = a?.image_small_url ?? "";
+      const m = img.trim().match(/^(\d)/);
+      if (!m) continue;
+      const n = Number(m[1]);
+      map.set(n, a);
+    }
+    return map;
+  }, [avatars]);
+
+  // whether Level 1 avatar is present in the backend response
+  const isMainUnlocked = avatarByNumber.has(1);
+
+  const AVATAR_LABEL_OVERRIDES: Record<number, string> = {
+    2: "Alert\nApprentice",
+    3: "Cautious\nLearner",
+    4: "Informed\nDefender",
+    5: "Vigilant\nGuardian",
+    6: "Skilled\nSentinel",
+    7: "Resilient\nProtector",
+    8: "Advanced\nWatchman",
+    9: "Expert\nEnforcer",
+  };
+
+  // Set of achievement numbers (1-16) present in the backend response. We
+  // parse the leading number from `image_small_url` (e.g. "1-quick-learner.png").
+  const unlockedAchievementNumbers = useMemo(() => {
+    const set = new Set<number>();
+    const items = stats?.achievement_statistics ?? [];
+
+    for (const a of items) {
+      const img = a?.image_small_url ?? "";
+      const m = img.trim().match(/^(\d{1,2})/);
+      if (!m) continue;
+      const n = Number(m[1]);
+      if (n >= 1 && n <= 16) set.add(n);
+    }
+
+    return set;
+  }, [stats]);
 
   const _totalAchievements = stats?.total_achievements || 0;
   const unlockedAchievements = stats?.total_unique_achievements_unlocked || 0;
@@ -45,6 +151,8 @@ export const GamificationStats = () => {
     return [...avatars.avatar_statistics].sort((a, b) => b.employee_count - a.employee_count)[0];
   }, [avatars]);
 
+  const mainAvatarCount = avatarByNumber.get(1)?.employee_count ?? mainAvatar?.employee_count;
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
@@ -60,24 +168,41 @@ export const GamificationStats = () => {
         */}
         <div className="col-span-3 row-span-1 bg-white rounded-xl p-4 flex flex-col justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-            <Image alt="" className="text-lg" height={28} src="/images/gard_cap.svg" width={28} />
+            <Image
+              alt=""
+              className="text-lg"
+              height={28}
+              src={getContentAssetUrl("/images/gard_cap.svg")}
+              width={28}
+            />
             <div>
               {t("gamification.courseCompleted")}
-              <div className="text-base font-semibold text-gray-900">8/12</div>
+              <div className="text-base font-semibold text-gray-900">
+                {totalCompletedEmployeesModules}/{totalEmployeesModulesEnrolled}
+              </div>
             </div>
           </div>
           <div className="w-full h-1.5 bg-gray-200 rounded-full mt-5">
-            <div className="h-1.5 bg-green-500 rounded-full" style={{ width: "70%" }} />
+            <div
+              className="h-1.5 bg-green-500 rounded-full"
+              style={{ width: `${courseCompletionPercentage}%` }}
+            />
           </div>
         </div>
 
         {/* Study Time */}
         <div className="col-span-3 col-start-4 row-span-1 bg-white rounded-xl p-4 flex flex-col justify-start">
           <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
-            <Image alt="" className="text-lg" height={28} src="/images/clock_icon.svg" width={28} />
+            <Image
+              alt=""
+              className="text-lg"
+              height={28}
+              src={getContentAssetUrl("/images/clock_icon.svg")}
+              width={28}
+            />
             <div>
               {t("gamification.studyTime")}
-              <div className="text-base font-semibold text-gray-900">127h</div>
+              <div className="text-base font-semibold text-gray-900">{studyTimeHours}h</div>
             </div>
           </div>
         </div>
@@ -91,7 +216,7 @@ export const GamificationStats = () => {
                   alt=""
                   className="text-lg"
                   height={28}
-                  src="/images/img/Icon_Trophy.svg"
+                  src={getContentAssetUrl("/images/img/Icon_Trophy.svg")}
                   width={28}
                 />
                 {t("gamification.achievementGallery")}
@@ -105,49 +230,32 @@ export const GamificationStats = () => {
             </Link>
           </div>
 
-          {/* Badges - Display fetched achievements */}
+          {/* Badges - Always show 16 local achievement icons (1..16). If the
+              backend response contains an item whose `image_small_url` starts
+              with that number, show the `achived.svg` overlay. */}
           <div className="grid grid-cols-8 gap-4 gap-y-5 mt-10">
-            {stats?.achievement_statistics?.slice(0, 15).map((ach, i) => (
-              <div
-                key={i}
-                className="w-14 h-14 rounded-full flex items-center justify-center relative group"
-              >
-                {/* Use the image URL from API if valid, else placeholder */}
-                {ach.image_small_url ? (
+            {Array.from({ length: 16 }).map((_, idx) => {
+              const num = idx + 1;
+              const isUnlocked = unlockedAchievementNumbers.has(num);
+
+              return (
+                <div
+                  key={num}
+                  className={`w-14 h-14 rounded-full flex items-center justify-center relative ${isUnlocked ? '' : 'opacity-40'}`}
+                  title={isUnlocked ? `Unlocked (#${num})` : `Locked (#${num})`}
+                  aria-disabled={!isUnlocked}
+                >
                   <Image
-                    alt={ach.achievement_name}
+                    unoptimized
+                    alt={`Achievement ${num}`}
                     className="w-14 h-14"
                     height={56}
-                    src={`/images/achivement/${ach.image_small_url}`}
-                    width={56}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/images/achivement/1.png";
-                    }}
-                  />
-                ) : (
-                  <Image
-                    alt=""
-                    className="w-14 h-14"
-                    height={56}
-                    src={`/images/achivement/${(i % 5) + 1}.png`}
+                    src={getContentAssetUrl(`/images/achivement/${num}.png`)}
                     width={56}
                   />
-                )}
-
-                {/* Show tooltip or count? */}
-                {ach.employee_count > 0 && (
-                  <span className="absolute top-0 -right-1 w-5 h-5 flex items-center justify-center bg-blue-500 text-white text-[10px] rounded-full">
-                    {ach.employee_count}
-                  </span>
-                )}
-              </div>
-            ))}
-
-            {(!stats?.achievement_statistics || stats.achievement_statistics.length === 0) && (
-              <div className="col-span-8 text-center text-gray-400 text-sm">
-                No achievements found
-              </div>
-            )}
+                </div>
+              );
+            })}
           </div>
 
           {/* Achievement Progress */}
@@ -180,57 +288,68 @@ export const GamificationStats = () => {
           </div>
 
           <div className="flex mt-5 gap-8">
-            {/* Main Avatar */}
-            {mainAvatar ? (
-              <div className="flex flex-col items-center justify-center">
-                <div className="w-24 h-24 bg-gray-200 rounded-full">
-                  <Image
-                    alt=""
-                    className="w-24 h-24 rounded-full"
-                    height={96}
-                    src={`/images/avatars/${mainAvatar.image_small_url}`}
-                    width={96}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/images/avatars/1.png";
-                    }}
-                  />
-                </div>
-                <p className="mt-5 text-gray-700 text-sm text-center leading-tight whitespace-pre-line">
-                  {mainAvatar.level_name}
-                </p>
-                <p className="text-xs text-gray-500 mt-1">{mainAvatar.employee_count} Users</p>
+            {/* Main Avatar — always show Level 1 in the large area; use backend metadata when available */}
+            <div className="flex flex-col items-center justify-center">
+              <div
+                className={`w-24 h-24 bg-gray-200 rounded-full ${!isMainUnlocked ? "opacity-40" : ""}`}
+                aria-disabled={!isMainUnlocked}
+              >
+                <Image
+                  unoptimized
+                  alt="Avatar 1"
+                  className="w-24 h-24 rounded-full"
+                  height={96}
+                  src={getContentAssetUrl(`/images/avatars/1.png`)}
+                  width={96}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = getContentAssetUrl("/images/avatars/1.png");
+                  }}
+                />
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center w-24">
-                <div className="w-24 h-24 bg-gray-200 rounded-full animate-pulse" />
-              </div>
-            )}
 
-            {/* Levels Grid */}
+              <p className="mt-5 text-gray-700 text-sm text-center leading-tight whitespace-pre-line">
+                {"Vulnerable\nNewbie"}
+              </p>
+            </div>
+
+            {/* Levels Grid — show avatars 2..9 (Level 1 is the main slot); overlay `achived.svg` when unlocked */}
             <div className="grid grid-cols-4 gap-5 flex-1 pl-5 border-l border-[#E6E6E6]">
-              {avatars?.avatar_statistics?.map((level, index) => (
-                <div
-                  key={index}
-                  className="col-span-1 text-center px-1 py-2.5 hover:bg-[#EFFAFF] transform duration-300 rounded-lg flex flex-col items-center group relative"
-                  title={`${level.employee_count} employees`}
-                >
-                  <div className="w-10 h-10 bg-gray-200 rounded-full mx-auto">
-                    <Image
-                      alt=""
-                      className="w-10 h-10 rounded-full"
-                      height={40}
-                      src={`/images/avatars/${level.image_small_url}`}
-                      width={40}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/images/avatars/1.png";
-                      }}
-                    />
+              {Array.from({ length: 8 }).map((_, i) => {
+                const num = i + 2; // start from 2 because Level 1 is shown above
+                const isUnlocked = unlockedAvatarNumbers.has(num);
+                const meta = avatarByNumber.get(num);
+                // DO NOT use backend-provided labels; use local overrides or fall back to `Level X`
+                const displayLabel = AVATAR_LABEL_OVERRIDES[num] ?? `Level ${num}`;
+
+                return (
+                  <div
+                    key={num}
+                    className={`col-span-1 text-center px-1 py-2.5 transform duration-300 rounded-lg flex flex-col items-center group relative ${isUnlocked ? 'hover:bg-[#EFFAFF]' : 'opacity-40'}`}
+                    title={meta?.employee_count ? `${meta.employee_count} employees` : (meta?.level_name ?? `Level ${num}`)}
+                    aria-disabled={!isUnlocked}
+                  >
+                    <div className="w-10 h-10 bg-gray-200 rounded-full mx-auto relative">
+                      <Image
+                        unoptimized
+                        alt={`Avatar ${num}`}
+                        className="w-10 h-10 rounded-full"
+                        height={40}
+                        src={getContentAssetUrl(`/images/avatars/${num}.png`)}
+                        width={40}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = getContentAssetUrl(
+                            "/images/avatars/1.png"
+                          );
+                        }}
+                      />
+                    </div>
+
+                    <p className={`text-xs leading-tight mt-2 w-[90%] whitespace-pre-line ${isUnlocked ? 'text-gray-700' : 'text-gray-400'}`}>
+                      {displayLabel}
+                    </p>
                   </div>
-                  <p className="text-xs leading-tight text-gray-700 mt-2 w-[90%] truncate">
-                    {level.level_name}
-                  </p>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

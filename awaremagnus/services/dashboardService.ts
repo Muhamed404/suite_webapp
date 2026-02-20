@@ -13,6 +13,8 @@ import type {
   AvatarStatisticsResponse,
   ScoreTypesResponse,
   ScoreLevelsResponse,
+  UserAssignmentsResponse,
+  UserGameAchievementsResponse,
 } from "../types/dashboard";
 
 import { awmClient, API_BASE } from "./httpClient";
@@ -46,7 +48,7 @@ export const dashboardService = {
 
   getSystemLeaderboard: async (params?: { count?: number; sortBy?: string }) => {
     const { data } = await awmClient.get<SystemLeaderboard>(
-      `${API_BASE}/dashboard/system/leaderboard`,
+      `${API_BASE}/dashboard/organizations/leaderboard`,
       { params }
     );
 
@@ -162,6 +164,25 @@ export const dashboardService = {
   getScoreLevelsByType: async (scoreTypeId: number) => {
     const { data } = await awmClient.get<ScoreLevelsResponse>(
       `${API_BASE}/gamification/scorelevels/type/${scoreTypeId}`
+    );
+
+    return data;
+  },
+
+  // --- User Assignments ---
+  getUserAssignments: async (params?: { language_id?: number }) => {
+    const { data } = await awmClient.get<UserAssignmentsResponse>(
+      `${API_BASE}/campaign/assignments`,
+      { params }
+    );
+
+    return data;
+  },
+
+  // --- User Game Achievements ---
+  getUserGameAchievements: async () => {
+    const { data } = await awmClient.get<UserGameAchievementsResponse>(
+      `${API_BASE}/usergame/achievements`
     );
 
     return data;

@@ -28,6 +28,8 @@ export function useModules(params?: {
   lang_id?: number;
   status?: number;
   org_id?: number;
+  assigned_only?: boolean;
+  filter?: string;
 }) {
   return useQuery({
     queryKey: [...QUIZ_KEYS.modules, params],
@@ -274,5 +276,30 @@ export function useDeleteContent() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: QUIZ_KEYS.contents() });
     },
+  });
+}
+
+export function useContentsWithQuizzes(
+  moduleId: number,
+  params?: { lang_id?: number; enabled?: boolean }
+) {
+  const enabled = params?.enabled ?? true;
+  return useQuery({
+    queryKey: ["quiz", "module", moduleId, "contents-with-quizzes", params?.lang_id],
+    queryFn: () => quizService.getContentsWithQuizzes(moduleId, params?.lang_id),
+    enabled: enabled && !!moduleId,
+  });
+}
+
+export function useContentsWithProgress(
+  moduleId: number,
+  campaignId: number,
+  params?: { lang_id?: number; enabled?: boolean }
+) {
+  const enabled = params?.enabled ?? true;
+  return useQuery({
+    queryKey: ["quiz", "module", moduleId, "contents-with-progress", campaignId, params?.lang_id],
+    queryFn: () => quizService.getContentsWithProgress(moduleId, campaignId, params?.lang_id),
+    enabled: enabled && !!moduleId && !!campaignId,
   });
 }

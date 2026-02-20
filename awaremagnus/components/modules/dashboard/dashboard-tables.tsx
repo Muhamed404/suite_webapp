@@ -32,14 +32,14 @@ export const DashboardTables = () => {
   let lowRiskData: any[] = [];
 
   if (isPlatformAdmin) {
-    if (systemLeaderboard?.success) {
-      highRiskData = systemLeaderboard.data.top_high_risk_organizations || [];
-      lowRiskData = systemLeaderboard.data.top_low_risk_organizations || [];
+    if (systemLeaderboard?.statusCode === 200) {
+      highRiskData = systemLeaderboard?.data?.top_high_risk_employees ?? [];
+      lowRiskData = systemLeaderboard?.data?.top_low_risk_employees ?? [];
     }
   } else {
-    if (orgLeaderboard?.success) {
-      highRiskData = orgLeaderboard.data.top_high_risk_employees || [];
-      lowRiskData = orgLeaderboard.data.top_low_risk_employees || [];
+    if (orgLeaderboard?.statusCode === 200) {
+      highRiskData = orgLeaderboard?.data?.top_high_risk_employees ?? [];
+      lowRiskData = orgLeaderboard?.data?.top_low_risk_employees ?? [];
     }
   }
 
@@ -55,7 +55,7 @@ export const DashboardTables = () => {
   const renderCell = (item: any, columnKey: React.Key) => {
     // Map API fields to columns
     // API: user_id/org_id, modules_completed, risk_level, compliance_score, etc.
-    // Columns: Employee Name, Start Date, Due Date, Badge, Exp
+    // Columns: User Id, Modules Completed, Achievement Count, Avatar Level, Risk Level
 
     const name =
       item.user_name ||
@@ -64,16 +64,18 @@ export const DashboardTables = () => {
     const _uniqueId = item.user_id || item.org_id; // For key
 
     switch (columnKey) {
-      case "name":
-        return <div className="text-sm font-medium">{name}</div>;
-      case "startDate":
-        return <div className="text-sm text-gray-500">-</div>;
-      case "dueDate":
-        return <div className="text-sm text-gray-500">-</div>;
-      case "badge":
-        return <div className="text-sm">{item.achievement_count > 0 ? "🏆" : ""}</div>;
-      case "exp":
-        return <div className="text-sm">{item.total_xp_tokens} XP</div>;
+      case "userId":
+        return <div className="text-sm font-medium">{item.user_id || item.org_id}</div>;
+      case "modulesCompleted":
+        return <div className="text-sm">{item.modules_completed || 0}</div>;
+      case "achievementCount":
+        return <div className="text-sm">{item.achievement_count || 0}</div>;
+      case "avatarLevel":
+        return <div className="text-sm">{item.avatar_current_level || 0}</div>;
+      case "streak":
+        return <div className="text-sm">{item.streak_day ?? 0}</div>;
+      case "riskLevel":
+        return <div className="text-sm">{item.risk_level || "N/A"}</div>;
       default:
         return <div className="text-sm">{(item as any)[columnKey as string]}</div>;
     }
@@ -86,7 +88,7 @@ export const DashboardTables = () => {
         <CardBody className="p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-[var(--mainblue)] whitespace-nowrap">
-              {isPlatformAdmin ? "Top High Risk Organizations" : t("tables.topHighRisk")}
+              {t("tables.topHighRisk")}
             </h2>
             <Select
               aria-label={t("tables.sortBy")}
@@ -105,13 +107,12 @@ export const DashboardTables = () => {
           <div className="overflow-x-auto">
             <Table removeWrapper aria-label="High risk table">
               <TableHeader>
-                <TableColumn key="name">
-                  {isPlatformAdmin ? "Organization" : t("tables.employeeName")}
-                </TableColumn>
-                <TableColumn key="startDate">{t("tables.startDate")}</TableColumn>
-                <TableColumn key="dueDate">{t("tables.dueDate")}</TableColumn>
-                <TableColumn key="badge">{t("tables.badge")}</TableColumn>
-                <TableColumn key="exp">{t("tables.exp")}</TableColumn>
+                <TableColumn key="userId">{t("tables.userId")}</TableColumn>
+                <TableColumn key="modulesCompleted">{t("tables.modulesCompleted")}</TableColumn>
+                <TableColumn key="achievementCount">{t("tables.achievementCount")}</TableColumn>
+                <TableColumn key="avatarLevel">{t("tables.avatarLevel")}</TableColumn>
+                <TableColumn key="streak">Streak</TableColumn>
+                <TableColumn key="riskLevel">{t("tables.riskLevel")}</TableColumn>
               </TableHeader>
               <TableBody items={highRiskPaginated}>
                 {(item: any) => (
@@ -162,7 +163,7 @@ export const DashboardTables = () => {
         <CardBody className="p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-semibold text-[var(--mainblue)] whitespace-nowrap">
-              {isPlatformAdmin ? "Top Low Risk Organizations" : t("tables.topLowRisk")}
+              {t("tables.topLowRisk")}
             </h2>
             <Select
               aria-label={t("tables.sortBy")}
@@ -181,13 +182,12 @@ export const DashboardTables = () => {
           <div className="overflow-x-auto">
             <Table removeWrapper aria-label="Low risk table">
               <TableHeader>
-                <TableColumn key="name">
-                  {isPlatformAdmin ? "Organization" : t("tables.employeeName")}
-                </TableColumn>
-                <TableColumn key="startDate">{t("tables.startDate")}</TableColumn>
-                <TableColumn key="dueDate">{t("tables.dueDate")}</TableColumn>
-                <TableColumn key="badge">{t("tables.badge")}</TableColumn>
-                <TableColumn key="exp">{t("tables.exp")}</TableColumn>
+                <TableColumn key="userId">{t("tables.userId")}</TableColumn>
+                <TableColumn key="modulesCompleted">{t("tables.modulesCompleted")}</TableColumn>
+                <TableColumn key="achievementCount">{t("tables.achievementCount")}</TableColumn>
+                <TableColumn key="avatarLevel">{t("tables.avatarLevel")}</TableColumn>
+                <TableColumn key="streak">Streak</TableColumn>
+                <TableColumn key="riskLevel">{t("tables.riskLevel")}</TableColumn>
               </TableHeader>
               <TableBody items={lowRiskPaginated}>
                 {(item: any) => (

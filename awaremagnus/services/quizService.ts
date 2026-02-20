@@ -44,14 +44,11 @@ export const quizService = {
     assigned_only?: boolean;
     campaign_id?: number;
     module_status?: string;
+    filter?: string;
     limit?: number;
     offset?: number;
   }) => {
     const p = { ...params };
-
-    if (p.status != null && p.status_id == null) {
-      p.status_id = p.status;
-    }
 
     return request<Module[]>(() =>
       awmClient.get<AWMResponseBody>(`${API_BASE}/module`, { params: p })
@@ -380,42 +377,13 @@ export const quizService = {
     return res;
   },
 
-  /** API: POST /quiz body: { quiz: { content_id, quiz_type_id, question, ... } }; backend may also accept answers in same payload. Then POST /quiz-answer per answer if not sent. */
+  /** API: POST /quiz body: { quiz: { con_id, qtype_id, question, ... }, answers: [...] } */
   createQuiz: async (payload: CreateQuizPayload) => {
-    const q = payload.quiz;
-    const contentId = q.mod_content_id ?? (q as { content_id?: number }).content_id ?? 0;
-    const quizBody = {
-      content_id: contentId,
-      quiz_type_id: q.quiz_type_id,
-      question: q.question,
-      explanation: q.explanation,
-      is_mandatory: true,
-      order: 1,
-    };
-    const body: { quiz: typeof quizBody; answers?: typeof payload.answers } = {
-      quiz: quizBody,
-    };
-
-    if (payload.answers?.length) {
-      body.answers = payload.answers;
-    }
-    const res = await request<Quiz>(() =>
-      awmClient.post<AWMResponseBody>(`${API_BASE}/quiz`, body)
+    // The backend now expects the exact structure defined in CreateQuizPayload.
+    // We can pass the payload directly as the body.
+    return request<Quiz>(() =>
+      awmClient.post<AWMResponseBody>(`${API_BASE}/quiz`, payload)
     );
-
-    if (!res.success || !res.data?.id || !payload.answers?.length) return res;
-    for (const a of payload.answers) {
-      await awmClient
-        .post<AWMResponseBody>(`${API_BASE}/quiz-answer`, {
-          quiz_id: res.data.id,
-          answer_text: a.answer_text,
-          is_correct: a.is_correct,
-          order: a.order,
-        })
-        .catch(() => ({}));
-    }
-
-    return res;
   },
 
   updateQuiz: async (id: number, payload: UpdateQuizPayload) => {
@@ -431,5 +399,57 @@ export const quizService = {
     return request<QuizAnswer[]>(() =>
       awmClient.get<AWMResponseBody>(`${API_BASE}/quiz/${quizId}/answers`)
     );
+  },
+
+  /** 
+   * GET /module/:id/contents-with-quizzes 
+   * Returns: { module_id, non_aggregated_contents: [...], aggregated_contents: {...} }
+   */
+  getContentsWithQuizzes: async (moduleId: number, lang_id?: number) => {
+    return request<any>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/module/${moduleId}/contents-with-quizzes`, {
+        params: lang_id ? { language_id: lang_id } : undefined,
+      })
+    );
+  },
+
+  /** 
+   * GET /module/:id/contents-with-progress 
+   * Requires campaign_id
+   */
+  getContentsWithProgress: async (
+    moduleId: number,
+    campaignId: number,
+    lang_id?: number
+  ) => {
+    return request<any>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/module/${moduleId}/contents-with-progress`, {
+        params: {
+          campaign_id: campaignId,
+          ...(lang_id ? { language_id: lang_id } : {}),
+        },
+      })
+    );
+  },
+
+  /**
+   * GET /api/awm/category
+   * Returns all global categories { categories, count }
+   */
+  getCategories: async () => {
+    const { data } = await awmClient.get<{
+      success?: boolean;
+      message?: string;
+      object?: {
+        categories: Array<{ id: number; name: string; description: string | null }>;
+        count: number;
+      };
+      data?: {
+        categories: Array<{ id: number; name: string; description: string | null }>;
+        count: number;
+      };
+    }>(`${API_BASE}/category`);
+
+    return data;
   },
 };

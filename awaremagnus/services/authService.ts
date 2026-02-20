@@ -93,7 +93,18 @@ export const authService = {
   },
 
   async logout(): Promise<void> {
-    await suiteClient.get("/logout");
+    try {
+      await suiteClient.get("/logout");
+    } catch (error: any) {
+      // If logout endpoint doesn't exist (404) or any other error, just continue
+      // The frontend will clear auth state and redirect to login
+      if (error?.response?.status === 404) {
+        console.info("Logout endpoint not found; clearing session locally");
+      } else {
+        console.warn("Logout API call failed:", error?.message);
+      }
+      // Continue without failing - JWT expiry will handle session termination
+    }
   },
 
   async getCurrentUser(): Promise<AuthUser | null> {

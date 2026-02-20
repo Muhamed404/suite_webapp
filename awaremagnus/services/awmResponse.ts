@@ -46,6 +46,15 @@ export function normalizeAWMResponse<T>(raw: AWMResponseBody<unknown>): Normaliz
     const o = obj as Record<string, unknown>;
     const count = typeof o.count === "number" ? o.count : undefined;
 
+    // Check if this is a single entity (has id/org_id) vs a wrapper object
+    const isSingleEntity = typeof o.id === "number" || typeof o.org_id === "number";
+
+    // If it's a single entity, return it as-is (don't extract nested arrays)
+    if (isSingleEntity) {
+      return { success, data: obj as T, message, statusCode: raw.statusCode };
+    }
+
+    // Otherwise, check for array properties (list/wrapper responses)
     if (Array.isArray(o.modules)) {
       return { success, data: o.modules as T, message, statusCode: raw.statusCode, count };
     }
@@ -69,6 +78,10 @@ export function normalizeAWMResponse<T>(raw: AWMResponseBody<unknown>): Normaliz
     }
     if (Array.isArray(o.contentTypes)) {
       return { success, data: o.contentTypes as T, message, statusCode: raw.statusCode, count };
+    }
+    if (Array.isArray(o.campaigns)) {
+      // For campaign list responses, return the whole wrapper so we have access to meta_statistics
+      return { success, data: o as T, message, statusCode: raw.statusCode, count };
     }
     if (Array.isArray(o.object)) {
       return { success, data: o.object as T, message, statusCode: raw.statusCode, count };

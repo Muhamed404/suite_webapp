@@ -62,7 +62,6 @@
   "loading": "Loading...",
   "filterByCategory": "Filter by category",
   "library": {
-    "description": "Contents some text and descriptions about the library, detail etc etc",
     "filterAll": "All",
     "filterModules": "Modules",
     "category": "Category",
@@ -75,6 +74,7 @@
     "viewList": "Table",
     "viewGrid": "Grid",
     "addNew": "Add New Module",
+    "view": "View",
     "viewDetails": "View",
     "edit": "Edit",
     "delete": "Delete",
@@ -141,8 +141,9 @@
     "progressHint": "To complete this module you need to complete interactive lesson, than quizzes to complete 100%",
     "coreModules": "Core Modules",
     "breadcrumbTrainingLibrary": "Training Library",
-    "breadcrumbMyLibrary": "My Library",
+    "breadcrumbMyLibrary": "My Modules",
     "breadcrumbAwarenessCampaign": "Awareness Campaign",
-    "breadcrumbCampaign": "Campaign"
+    "breadcrumbCampaign": "Campaign",
+    "viewDetails": "View Details"
   }
 }

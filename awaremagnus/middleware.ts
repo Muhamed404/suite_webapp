@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export function middleware(request: NextRequest) {
   console.log("Middleware triggered for:::::::::::::::::::::");
   const { method, url, nextUrl } = request;
-  const ip = request.headers.get("x-forwarded-for")  || "unknown";
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
   const userAgent = request.headers.get("user-agent") || "unknown";
 
   console.log(
@@ -14,5 +14,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api/awm|contents|_next/static|_next/image|favicon.ico).*)"],
 };

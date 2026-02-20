@@ -14,12 +14,12 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModule, useContent, useContentsByModule } from "@/hooks/useQuiz";
-import { useContentTypes } from "@/hooks/useSuiteAwm";
+import { CONTENT_TYPES } from "@/constants/content-types";
 import { AuthImage } from "@/components/ui/auth-image";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 /** Card asset used as fallback thumbnail when logo is invalid */
-const CARD_ASSET = "/images/Card.png";
+const CARD_ASSET = getContentAssetUrl("/images/Card.png");
 
 function moduleName(m: Module): string {
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
@@ -79,7 +79,7 @@ export function VideoContentDetailScreen({
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
   const { data: contentsRes } = useContentsByModule(moduleId, !!moduleId);
-  const { data: contentTypesList } = useContentTypes(!!moduleId);
+  const contentTypesList = CONTENT_TYPES;
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
   const rawContent = contentRes?.success ? contentRes.data : null;
@@ -95,11 +95,23 @@ export function VideoContentDetailScreen({
 
   const logoUrl = getContentAssetUrl(content?.logo_url ?? content?.logo_path);
   const sourceUrl = content?.source_url ?? (content as { source_path?: string })?.source_path;
+
+  // Use the local proxy /awm/contents/... instead of the direct service URL
+  // This avoids CORS issues and allows the same-origin proxy to handle Range headers.
   const fullVideoUrl = sourceUrl?.trim()
     ? sourceUrl.startsWith("http")
       ? sourceUrl
-      : getContentAssetUrl(sourceUrl)
+      : sourceUrl.startsWith("/contents/")
+        ? `/awm${sourceUrl}`
+        : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
     : null;
+
+  const completeImageUrl = logoUrl;
+
+  if (content) {
+    console.log("COMPLETE IMAGE URL:", completeImageUrl);
+    console.log("COMPLETE VIDEO URL (PROXY):", fullVideoUrl);
+  }
 
   if (!moduleData) return null;
 

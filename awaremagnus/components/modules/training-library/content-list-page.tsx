@@ -28,7 +28,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModule, useContentsByModule } from "@/hooks/useQuiz";
-import { useContentTypes } from "@/hooks/useSuiteAwm";
+import { CONTENT_TYPES } from "@/constants/content-types";
 import { SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
 import { AuthImage } from "@/components/ui/auth-image";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
@@ -116,7 +116,7 @@ export function ContentListPage({ moduleId, contentTypeId, libraryType }: Conten
     enabled: !!moduleId,
     lang_id: languageFilter ? Number(languageFilter) : undefined,
   });
-  const { data: contentTypesList } = useContentTypes(!!moduleId);
+  const contentTypesList = CONTENT_TYPES;
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
   const allContents = contentsRes?.success ? (contentsRes.data ?? []) : [];

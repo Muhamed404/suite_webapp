@@ -4,7 +4,8 @@ export interface SuiteCategory {
   id: number;
   name: string;
   code?: string;
-  description?: string;
+  /** API returns string or null; optional for backward compatibility */
+  description?: string | null;
   status?: boolean;
 }
 

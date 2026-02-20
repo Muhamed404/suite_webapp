@@ -13,7 +13,7 @@ pdfjs.GlobalWorkerOptions.workerSrc =
     : "";
 
 /** Demo fallback PDF in public folder when content URL fails or is missing. */
-export const DEMO_FALLBACK_PDF = "/brochure.pdf";
+export const DEMO_FALLBACK_PDF = getContentAssetUrl("/brochure.pdf");
 
 const ZOOM_PRESETS = [50, 75, 100, 125, 150, 200, 250] as const;
 const MIN_SCALE = 0.25;
@@ -61,11 +61,11 @@ export function PdfViewer({
     () =>
       authToken && !useFallback
         ? {
-            httpHeaders: {
-              Authorization: `Bearer ${authToken}`,
-              "ngrok-skip-browser-warning": "true",
-            },
-          }
+          httpHeaders: {
+            Authorization: `Bearer ${authToken}`,
+            "ngrok-skip-browser-warning": "true",
+          },
+        }
         : undefined,
     [authToken, useFallback]
   );
@@ -334,8 +334,8 @@ export function PdfViewer({
                 width={
                   fitMode === "width"
                     ? (typeof window !== "undefined"
-                        ? Math.min(window.innerWidth - 80, 900)
-                        : effectiveWidth) - 48
+                      ? Math.min(window.innerWidth - 80, 900)
+                      : effectiveWidth) - 48
                     : undefined
                 }
               />
