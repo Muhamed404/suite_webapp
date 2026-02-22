@@ -564,7 +564,7 @@
 		"labelOrganizationName": "Organization Name",
 		"labelHostName": "Host Name",
 		"labelPort": "Port",
-		"labelServiceAccount": "Service Account",
+		"labelServiceAccount": "SMTP Account",
 		"labelPassword": "Password",
 		"btnTestConfiguration": "Test Configuration",
 		"btnSaveSettings": "Save Settings",
