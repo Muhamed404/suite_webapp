@@ -162,6 +162,10 @@ module.exports = {
         PHISHING_SMTP: {
             LIST: (orgId) => `/phm/phishing-smtp/organization/${orgId}`,
             CREATE: (orgId) => `/phm/phishing-smtp/create/${orgId}`,
+            DETAIL: (smtpId) => `/phm/phishing-smtp/detail/${smtpId}`,
+            UPDATE: (smtpId) => `/phm/phishing-smtp/edit/${smtpId}`,
+            DELETE: (smtpId) => `/phm/phishing-smtp/delete/${smtpId}`,
+            TEST: (smtpId) => `/phm/phishing-smtp/test/${smtpId}`,
         },
 
     }

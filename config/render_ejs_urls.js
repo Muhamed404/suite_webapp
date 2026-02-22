@@ -10,9 +10,9 @@ module.exports = {
         LOGIN: 'pages/login/phm_login',
         LOGOUT: '/logout',
         SMTP_PHISHING: {
-   
             LIST: 'pages/settings/smtp/phishing/list-phishing-smtp',
-                CREATE: 'pages/settings/smtp/create-smtp',
+            CREATE: 'pages/settings/smtp/phishing/create-phishing-smtp',
+            EDIT: 'pages/settings/smtp/phishing/edit-phishing-smtp',
         },
         Campaign: {
             NFC: {

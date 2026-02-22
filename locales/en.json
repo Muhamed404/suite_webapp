@@ -566,6 +566,7 @@
 		"labelPort": "Port",
 		"labelServiceAccount": "SMTP Account",
 		"labelPassword": "Password",
+		"labelDetails": "Details",
 		"btnTestConfiguration": "Test Configuration",
 		"btnSaveSettings": "Save Settings",
 		"labelSenderEmail": "Sender Email",
