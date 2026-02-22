@@ -1,5 +1,5 @@
 const {createSMTP} = require('./createSmtpController')
-const {showAllSMTPByOrganization} = require('./list-smtp-configuration-organization')
+const {showAllSMTPByOrganization} = require('../../../phishmagnus/controllers/phishing_smtp/list-phishing-smtp-controller')
 const {testSMTPConnection} = require('./test-smtp-connection')
 
 

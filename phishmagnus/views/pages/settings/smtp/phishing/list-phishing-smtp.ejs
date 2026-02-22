@@ -1,0 +1,62 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex-1">
+ 
+      <h3 class="text-3xl font-medium">
+        Simulator Emails
+      </h3>
+    </div>
+    <div>
+        <a href="/phm/phishing-smtp/create"
+          class="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-teal-600 text-white font-semibold shadow hover:bg-teal-700 transition-all duration-200 border border-teal-600 hover:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 lg:order-2"
+          title="<%= __('system_template.homescreen.btnCreateTemplate') %>">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+            <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              d="M12 8v8m-4-4h8" />
+          </svg>
+          <span class="hidden sm:inline">Add New Email</span>
+        </a>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-col p-6 pt-0">
+  <div class="flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm">
+    <div class="p-6">
+      <table id="filter-table" class="min-w-full border-none text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} to {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
+        <thead class="bg-gray-50 text-gray-600 text-xs">
+          <tr>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              Email
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              Type
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              Details
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              Organization
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              Action
+            </th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof smtps !=='undefined' ) { smtps.forEach(tpl=> { %>
+            <tr class="bg-white border-b hover:bg-gray-50">
+
+            </tr>
+            <% }); } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

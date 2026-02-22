@@ -1,65 +1,42 @@
+const backend_api_urls = require("../../../config/backend_api_urls");
 const config = require("../../../config/env.config");
+const render_ejs_urls = require("../../../config/render_ejs_urls");
 
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client')
 
 
 exports.createSMTP = async (req, res) => {
-  logger.info(`Calling create smtp method`);
+  logger.info(`Create Phishing SMTP Controller: Calling Incoming request to create phishing smtp method`);
   if (req.method === "GET") {
     let orgId = req.params?.orgId || 0;
-    logger.info(`Create SMTP for org ID: ${orgId}`);
-    const url = `/settings/smtp/${orgId}`;
+    logger.info(`Create Phishing SMTP Controller: For organization code:- ${orgId}`);
+    let organizationName = 'SecureMagnus Organization';
+    const url = backend_api_urls.PRODUCT_SUITE.ORGANIZATION.Active_Organization_List;
     const apiClient = getApiClient(req);
-    logger.info(`:::::::::::${url}:::::::::::`);
+    return res.render(render_ejs_urls.PhishMagnus.SMTP_PHISHING.CREATE, {
+      enableSuiteManagementLeftMenu: true,
+      Organization: organizationName,
+      org: orgId,
+      showOrgSelect: true,
+
+    });
+    logger.info(`Create Phishing SMTP Controller: Calling API URL:- ${url} `);
     apiClient
       .get(url)
       .then((response) => {
         const data = response.data;
-        logger.info(`data is ${JSON.stringify(data)}`);
+        logger.info(`Create Phishing SMTP Controller: response data is ${JSON.stringify(data, null, 2)}`);
 
-        logger.info(`${JSON.stringify(data.message)}`);
 
         // Resolve smtp from either payload shape:
         // Payload 1: { message: { name, SMTPConfigurations: [{ host, port, ... }] } }
         // Payload 2: { message: { host, port, ... } }
         let smtp = null;
-        let organizationName = 'SecureMagnus Organization';
 
-        if (data.message.SMTPConfigurations && data.message.SMTPConfigurations.length > 0) {
-          smtp = data.message.SMTPConfigurations[0];
-          organizationName = data.message.name || organizationName;
-        } else if (data.message.host) {
-          smtp = data.message;
-        }
 
-        if (smtp) {
-          logger.info(`SMTP DATA HAS FOUND ${JSON.stringify(smtp)}`);
-          logger.info(`Organization Name for smtp ${organizationName}`);
-          res.render("pages/settings/smtp/create-smtp", {
-            enableSuiteManagementLeftMenu: true,
-            Organization: organizationName,
-            org: orgId,
-            host: smtp.host,
-            port: smtp.port,
-            smtp_account: smtp.smtp_account,
-            smtp_password: smtp.smtp_password,
-            isActive: smtp.is_active ? true : false,
-            enableTestBtn: smtp.id ? true : false,
-            sender_email: smtp.sender_email,
-            for_phishing_smtp: smtp.for_phishing_smtp
-          });
-        } else {
-          logger.info(`NO SMTP DATA HAS FOUND`);
-          organizationName = data.message.name;
-          res.render("pages/settings/smtp/create-smtp", {
-            enableSuiteManagementLeftMenu: true,
-            Organization: organizationName,
-            org: orgId,
-            isActive: false,
-            enableTestBtn: false
-          });
-        }
+
+
       })
       .catch((error) => {
         logger.error(`issue in fetching create SMTP smtps`);
