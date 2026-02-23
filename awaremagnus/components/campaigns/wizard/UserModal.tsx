@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from "@heroui/modal";
-import { Button } from "@heroui/button";
+import { useState, useEffect, useMemo } from "react";
+import { X, Users, Search, UserCheck, UserPlus, ChevronRight, ChevronsRight, ChevronLeft, ChevronsLeft, Check } from "lucide-react";
 
-import { useTranslations } from "@/i18n/useTranslations";
 import { suiteSuiteService, type User } from "@/services/suiteSuiteService";
 import { useAuthStore } from "@/hooks/useAuthStore";
 
@@ -15,24 +13,47 @@ interface UserModalProps {
   selectedUserIds: number[];
 }
 
+const AVATAR_COLORS = [
+  "bg-blue-100 text-blue-600",
+  "bg-green-100 text-green-600",
+  "bg-yellow-100 text-yellow-600",
+  "bg-purple-100 text-purple-600",
+  "bg-pink-100 text-pink-600",
+  "bg-orange-100 text-orange-600",
+  "bg-teal-100 text-teal-600",
+];
+
+function getInitials(firstName: string, lastName: string) {
+  return `${(firstName?.[0] || "").toUpperCase()}${(lastName?.[0] || "").toUpperCase()}`;
+}
+
+function getAvatarColor(index: number) {
+  return AVATAR_COLORS[index % AVATAR_COLORS.length];
+}
+
 export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModalProps) {
-  const t = useTranslations("campaigns");
   const { user } = useAuthStore();
   const [selectedIds, setSelectedIds] = useState<number[]>(selectedUserIds);
-  const [availableSelection, setAvailableSelection] = useState<number[]>([]);
-  const [selectedSelection, setSelectedSelection] = useState<number[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
+  const [availableHighlighted, setAvailableHighlighted] = useState<number[]>([]);
+  const [selectedHighlighted, setSelectedHighlighted] = useState<number[]>([]);
+  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
+    if (!isOpen) return;
+    setSelectedIds(selectedUserIds);
+    setAvailableHighlighted([]);
+    setSelectedHighlighted([]);
+    setSearchQuery("");
+
     const fetchUsers = async () => {
       const orgId = user?.organization_id || user?.org_id;
-      if (!orgId || !isOpen) return;
-
+      if (!orgId) return;
       try {
         setLoading(true);
-        const fetchedUsers = await suiteSuiteService.getUnassignedUsers(orgId);
-        setUsers(fetchedUsers || []);
+        const fetched = await suiteSuiteService.getUnassignedUsers(orgId);
+        setAllUsers(fetched || []);
       } catch (err) {
         console.error("Failed to fetch users:", err);
       } finally {
@@ -41,109 +62,271 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
     };
 
     fetchUsers();
-  }, [user?.organization_id, user?.org_id, isOpen]);
+  }, [isOpen]);
 
-  const availableUsers = users.filter((u) => !selectedIds.includes(u.id));
-  const selectedUsers = users.filter((u) => selectedIds.includes(u.id));
+  const availableUsers = useMemo(
+    () =>
+      allUsers
+        .filter((u) => !selectedIds.includes(u.id))
+        .filter((u) => {
+          const name = `${u.firstName} ${u.lastName}`.toLowerCase();
+          return name.includes(searchQuery.toLowerCase());
+        }),
+    [allUsers, selectedIds, searchQuery]
+  );
+
+  const selectedUsers = useMemo(
+    () => allUsers.filter((u) => selectedIds.includes(u.id)),
+    [allUsers, selectedIds]
+  );
+
+  const toggleAvailableHighlight = (id: number) => {
+    setAvailableHighlighted((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const toggleSelectedHighlight = (id: number) => {
+    setSelectedHighlighted((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
 
   const handleAdd = () => {
-    setSelectedIds([...selectedIds, ...availableSelection]);
-    setAvailableSelection([]);
+    setSelectedIds((prev) => [...prev, ...availableHighlighted]);
+    setAvailableHighlighted([]);
+  };
+
+  const handleAddAll = () => {
+    setSelectedIds((prev) => [...prev, ...availableUsers.map((u) => u.id)]);
+    setAvailableHighlighted([]);
   };
 
   const handleRemove = () => {
-    setSelectedIds(selectedIds.filter((id) => !selectedSelection.includes(id)));
-    setSelectedSelection([]);
+    setSelectedIds((prev) => prev.filter((id) => !selectedHighlighted.includes(id)));
+    setSelectedHighlighted([]);
+  };
+
+  const handleRemoveAll = () => {
+    setSelectedIds([]);
+    setSelectedHighlighted([]);
+  };
+
+  const handleRemoveSingle = (id: number) => {
+    setSelectedIds((prev) => prev.filter((x) => x !== id));
+    setSelectedHighlighted((prev) => prev.filter((x) => x !== id));
   };
 
   const handleSave = () => {
-    const selectedUserObjects = users.filter((u) => selectedIds.includes(u.id));
+    const selectedUserObjects = allUsers.filter((u) => selectedIds.includes(u.id));
     onSave(selectedUserObjects);
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="5xl">
-      <ModalContent>
-        <ModalHeader>{t("form.manuallyAddUsers")}</ModalHeader>
-        <ModalBody>
-          <div className="flex gap-4 items-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
+
+        {/* Header */}
+        <div className="bg-blue-500 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-white">Add Users Manually</h3>
+                <p className="text-[10px] text-white/70">Select users to add to the campaign</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
+          </div>
+        </div>
+
+        {/* Search Bar */}
+        <div className="p-4 border-b border-gray-100">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        {/* Users Lists */}
+        <div className="p-4">
+          <div className="flex items-stretch gap-4">
+
             {/* Available Users */}
             <div className="flex-1">
-              <h6 className="text-sm font-medium mb-2">{t("form.availableUsers")}</h6>
-              <select
-                multiple
-                value={availableSelection.map(String)}
-                onChange={(e) => {
-                  const values = Array.from(e.target.selectedOptions, (option) => parseInt(option.value));
-
-                  setAvailableSelection(values);
-                }}
-                className="w-full border border-gray-300 rounded-lg p-2 h-64 focus:ring-2 focus:ring-blue-500"
-              >
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
+                  <Users className="w-3 h-3 text-gray-400" />
+                  Available Users
+                </h4>
+                <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
+                  {availableUsers.length}
+                </span>
+              </div>
+              <div className="w-full h-52 rounded-lg bg-gray-50 overflow-y-auto p-2 space-y-1 border border-gray-200">
                 {loading ? (
-                  <option disabled>Loading users...</option>
+                  <div className="flex items-center justify-center h-full text-gray-400 text-xs">
+                    Loading users...
+                  </div>
                 ) : availableUsers.length === 0 ? (
-                  <option disabled>No users available</option>
+                  <div className="flex items-center justify-center h-full text-gray-400 text-xs">
+                    No users available
+                  </div>
                 ) : (
-                  availableUsers.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.firstName} {user.lastName}
-                    </option>
+                  availableUsers.map((u, idx) => (
+                    <div
+                      key={u.id}
+                      onClick={() => toggleAvailableHighlight(u.id)}
+                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-all select-none ${
+                        availableHighlighted.includes(u.id)
+                          ? "border-blue-400 bg-blue-50 shadow-sm"
+                          : "bg-white border-gray-100 hover:border-blue-200 hover:shadow-sm"
+                      }`}
+                    >
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold flex-shrink-0 ${getAvatarColor(idx)}`}>
+                        {getInitials(u.firstName, u.lastName)}
+                      </div>
+                      <span className="text-xs text-gray-700 flex-1 truncate">
+                        {u.firstName} {u.lastName}
+                      </span>
+                    </div>
                   ))
                 )}
-              </select>
+              </div>
             </div>
 
-            {/* Buttons */}
-            <div className="flex flex-col gap-2">
-              <Button
+            {/* Action Buttons */}
+            <div className="flex flex-col justify-center gap-2">
+              <button
+                type="button"
                 onClick={handleAdd}
-                isDisabled={availableSelection.length === 0}
-                className="bg-blue-500 text-white"
+                disabled={availableHighlighted.length === 0}
+                title="Add Selected"
+                className="p-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                →
-              </Button>
-              <Button
+                <ChevronRight className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={handleAddAll}
+                disabled={availableUsers.length === 0}
+                title="Add All"
+                className="p-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronsRight className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
                 onClick={handleRemove}
-                isDisabled={selectedSelection.length === 0}
-                className="bg-red-500 text-white"
+                disabled={selectedHighlighted.length === 0}
+                title="Remove Selected"
+                className="p-2.5 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                ←
-              </Button>
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={handleRemoveAll}
+                disabled={selectedUsers.length === 0}
+                title="Remove All"
+                className="p-2.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronsLeft className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* Selected Users */}
+            {/* Selected / Added Users */}
             <div className="flex-1">
-              <h6 className="text-sm font-medium mb-2">{t("form.selectedUsers")}</h6>
-              <select
-                multiple
-                value={selectedSelection.map(String)}
-                onChange={(e) => {
-                  const values = Array.from(e.target.selectedOptions, (option) => parseInt(option.value));
-
-                  setSelectedSelection(values);
-                }}
-                className="w-full border border-gray-300 rounded-lg p-2 h-64 focus:ring-2 focus:ring-blue-500"
-              >
-                {selectedUsers.map((user) => (
-                  <option key={user.id} value={user.id}>
-                    {user.firstName} {user.lastName}
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
+                  <UserCheck className="w-3 h-3 text-blue-500" />
+                  Added Users
+                </h4>
+                <span className="text-[10px] text-white bg-blue-500 px-2 py-0.5 rounded-full">
+                  {selectedUsers.length}
+                </span>
+              </div>
+              <div className="w-full h-52 border-2 border-dashed border-blue-300 rounded-lg bg-blue-50/50 overflow-y-auto p-2 space-y-1 transition-all">
+                {selectedUsers.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                    <UserPlus className="w-8 h-8 mb-2 opacity-50" />
+                    <p className="text-[10px]">Select users and click arrow</p>
+                  </div>
+                ) : (
+                  selectedUsers.map((u, idx) => (
+                    <div
+                      key={u.id}
+                      onClick={() => toggleSelectedHighlight(u.id)}
+                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-all select-none ${
+                        selectedHighlighted.includes(u.id)
+                          ? "border-sky-400 bg-sky-100"
+                          : "bg-sky-50 border-sky-200 hover:border-sky-300"
+                      }`}
+                    >
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold flex-shrink-0 ${getAvatarColor(idx)}`}>
+                        {getInitials(u.firstName, u.lastName)}
+                      </div>
+                      <span className="text-xs text-gray-700 flex-1 truncate">
+                        {u.firstName} {u.lastName}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); handleRemoveSingle(u.id); }}
+                        className="p-0.5 rounded hover:bg-red-100 hover:text-red-500 text-gray-400 transition-colors flex-shrink-0"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
+
           </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button onClick={onClose} variant="bordered">
-            {t("wizard.cancel")}
-          </Button>
-          <Button onClick={handleSave} className="bg-blue-500 text-white">
-            {t("form.done")}
-          </Button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between p-4 bg-gray-50 border-t border-gray-100">
+          <p className="text-[10px] text-gray-500">
+            <span className="font-semibold">{selectedUsers.length}</span> user(s) will be added
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-50 transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all shadow-sm"
+            >
+              <Check className="w-3 h-3" />
+              Confirm Selection
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
   );
 }
