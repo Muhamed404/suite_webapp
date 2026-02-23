@@ -24,24 +24,33 @@ export const campaignService = {
    * Get campaigns assigned to the current user (Org User).
    * API: GET /api/awm/campaign/assignments
    */
-  getAssignedCampaigns: async (userId: number) => {
+  getAssignedCampaigns: async (userId: number, campaignId?: string) => {
+    const params: Record<string, any> = {};
+    if (campaignId && campaignId !== 'all') {
+      params.campaign_id = campaignId;
+    }
     const response = await request<any>(() =>
-      awmClient.get<AWMResponseBody>(`${API_BASE}/campaign/assignments`)
+      awmClient.get<AWMResponseBody>(`${API_BASE}/campaign/assignments`, { params })
     );
-    if (response.success && response.data?.assignments) {
-      const campaigns: CampaignAssignment[] = response.data.assignments.map((item: any) => ({
+    const raw = response.data as any;
+    if (response.success && raw?.assignments) {
+      const campaigns: CampaignAssignment[] = raw.assignments.map((item: any) => ({
         id: item.module_id,
+        campaign_id: item.campaign_id,
         name: item.module_name,
+        campaign_name: item.campaign_name,
         description: item.description,
         status: item.status.name,
         start_date: item.start_date,
         end_date: item.end_date,
         progress_percent: item.progress_percentage,
       }));
+      // preserve user_summary from the original payload so callers can access metrics
       return {
         ...response,
         data: campaigns,
-      };
+        user_summary: raw.user_summary ?? undefined,
+      } as any;
     }
     return response as ApiResponse<CampaignAssignment[]>;
   },
@@ -70,23 +79,39 @@ export const campaignService = {
   },
 
   /**
-   * Download a certificate by ID.
-   * API: GET /certificate/download?id={certificateId}
+   * Download a certificate by ID. Optionally include module_id as query param.
+   * API: GET /certificate/download?id={certificateId}&module_id={moduleId}
    */
-  downloadCertificate: async (certificateId: number) => {
+  downloadCertificate: async (certificateId: number, moduleId?: number | null) => {
+    const params: Record<string, any> = { id: certificateId };
+    if (moduleId != null) params.module_id = moduleId;
+
     const response = await awmClient.get(`${API_BASE}/certificate/download`, {
-      params: { id: certificateId },
+      params,
       responseType: 'blob',
     });
 
     // Create a download link
+    const filename = moduleId ? `certificate_${certificateId}_module_${moduleId}.pdf` : `certificate_${certificateId}.pdf`;
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `certificate_${certificateId}.pdf`); // Assuming PDF, adjust if needed
+    link.setAttribute('download', filename);
     document.body.appendChild(link);
     link.click();
     link.remove();
     window.URL.revokeObjectURL(url);
+  },
+
+  /**
+   * Begin a campaign for the current user.
+   * API: POST /report-actions/begin-campaign
+   */
+  beginCampaign: async (campaignId: number) => {
+    return request<unknown>(() =>
+      awmClient.post<AWMResponseBody>(`${API_BASE}/report-actions/begin-campaign`, {
+        campaign_id: campaignId,
+      })
+    );
   },
 };

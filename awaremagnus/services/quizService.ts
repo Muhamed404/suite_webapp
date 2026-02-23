@@ -108,6 +108,7 @@ export const quizService = {
     mod_id?: number;
     module_id?: number;
     content_type_id?: number;
+    contype_id?: number;
     lang_id?: number;
     status?: number;
   }) => {

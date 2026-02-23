@@ -67,7 +67,9 @@ export interface CampaignTarget {
 
 export interface CampaignAssignment {
   id: number;
+  campaign_id?: number;
   name?: string;
+  campaign_name?: string;
   status?: string;
   start_date?: string;
   end_date?: string;
@@ -81,6 +83,7 @@ export interface Certificate {
   title?: string;
   campaign_name?: string;
   module_name?: string;
+  module_id?: number;
   certificate_issue_date?: string;
   created_at?: string;
   status?: string;

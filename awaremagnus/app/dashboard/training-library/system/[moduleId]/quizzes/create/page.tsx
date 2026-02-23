@@ -8,7 +8,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 export default function SystemLibraryModuleQuizCreatePage() {
   const params = useParams();
-  const moduleId = String(params.moduleId ?? "");
+  const moduleId = String(params?.moduleId ?? "");
   const basePath = "/dashboard/training-library/system";
   const returnHref = `${basePath}/${moduleId}/quizzes`;
 

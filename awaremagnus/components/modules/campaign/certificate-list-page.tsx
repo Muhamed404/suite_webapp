@@ -125,7 +125,10 @@ export function CertificateListPage() {
   const actionButton = (cert: typeof certificateData[0]) => {
     const handleDownload = async () => {
       try {
-        await campaignService.downloadCertificate(cert.id);
+        // Try to find original certificate object (may include module_id from API)
+        const original = certificates.find(c => c.id === cert.id) as any | undefined;
+        const moduleId = original?.module_id ?? undefined;
+        await campaignService.downloadCertificate(cert.id, moduleId);
       } catch (error) {
         console.error('Failed to download certificate:', error);
         // You might want to show a toast or alert here

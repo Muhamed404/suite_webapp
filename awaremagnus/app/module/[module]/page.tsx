@@ -12,6 +12,9 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { useContentsWithProgress, useModule, useModules } from "@/hooks/useQuiz";
+import { isOrgUser } from "@/utils/roles";
+import { quizService } from "@/services/quizService";
 
 export default function PhysicalSecurityPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -31,16 +34,111 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   const tabIndicatorRef = useRef<HTMLDivElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
+  
+  // Hard-coded moduleId for physical-security (you may want to make this dynamic)
+  const moduleId = 1;
+  const roleId = user?.role_id;
+  const isOrgUserView = isOrgUser(roleId);
 
-  // Mock data for items
-  const items = [
-    { title: "Video Training", status: "completed", date: "28 Oct, 2025", chapters: "10 Chapter", lessons: "6 video lessons", languages: ["en", "ar"] },
-    { title: "Quizzes", status: "completed", date: "28 Oct, 2025", chapters: "10 Quizzes", lessons: "106 questions", languages: ["en", "ar"] },
-    { title: "Posters", status: "pending", date: "28 Oct, 2025", chapters: "10 Chapter", lessons: "6 interactive lessons", languages: ["en", "ar"] },
-    { title: "Survey", status: "pending", date: "28 Oct, 2025", chapters: "5 Survey", lessons: "3 surveys", languages: ["en", "ar"] },
-    { title: "Interactive Lesson", status: "pending", date: "12 Nov, 2025", chapters: "8 Chapter", lessons: "4 interactive lessons", languages: ["en"] },
-    { title: "Quizzes", status: "completed", date: "03 Dec, 2025", chapters: "7 Quizzes", lessons: "55 questions", languages: ["ar"] }
-  ];
+  // Get campaign ID for Org Users
+  const { data: assignedModulesRes } = useModules({
+    assigned_only: true,
+  });
+
+  const campaignId = useMemo(() => {
+    if (!isOrgUserView || !assignedModulesRes?.success) return 1; // Default to 1
+    const modules = assignedModulesRes.data ?? [];
+    const currentModule = modules.find((m) => m.id === Number(moduleId));
+    if (currentModule && currentModule.assignments && currentModule.assignments.length > 0) {
+      return currentModule.assignments[0].campaign_id;
+    }
+    return 1; // Default campaign ID
+  }, [isOrgUserView, assignedModulesRes, moduleId]);
+
+  // Fetch content with progress data
+  const { data: contentsWithProgressRes, isLoading } = useContentsWithProgress(
+    moduleId,
+    campaignId,
+    {
+      enabled: !!campaignId
+    }
+  );
+
+  // Get module basic info
+  const { data: moduleRes } = useModule(moduleId, true);
+
+  // Transform API data to items format
+  const items = useMemo(() => {
+    if (!contentsWithProgressRes?.success) return [];
+    
+    const data = contentsWithProgressRes.data;
+    const transformedItems: any[] = [];
+
+    // Add non-aggregated contents (Interactive content, Videos, Documents, etc.)
+    if (data.non_aggregated_contents) {
+      data.non_aggregated_contents.forEach((content: any) => {
+        transformedItems.push({
+          id: content.id,
+          title: content.title || content.content_type,
+          status: content.status?.toLowerCase() === 'completed' ? 'completed' : 'pending',
+          date: content.created_at ? new Date(content.created_at).toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short", 
+            year: "numeric"
+          }) : "—",
+          chapters: `${content.content_type}`,
+          lessons: content.description || `1 ${content.content_type?.toLowerCase()}`,
+          languages: content.language ? [content.language.code] : ["en"],
+          type: content.content_type,
+          content_type_id: content.content_type_id
+        });
+      });
+    }
+
+    // Add aggregated contents (Posters, Brochures, etc.)
+    if (data.aggregated_contents) {
+      Object.values(data.aggregated_contents).forEach((agg: any) => {
+        if (agg.total_count > 0) {
+          transformedItems.push({
+            id: `agg_${agg.content_type_id}`,
+            title: agg.content_type,
+            status: agg.statuses?.some((s: any) => s.status === 2) ? 'completed' : 'pending',
+            date: agg.date_range?.latest_created ? new Date(agg.date_range.latest_created).toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric"
+            }) : "—",
+            chapters: `${agg.total_count} ${agg.content_type}`,
+            lessons: `${agg.total_count} items`,
+            languages: agg.languages_supported?.map((lang: string) => 
+              lang.toLowerCase() === 'arabic' ? 'ar' : 'en'
+            ) || ["en"],
+            type: agg.content_type,
+            content_type_id: agg.content_type_id,
+            isAggregated: true,
+            aggregatedData: agg
+          });
+        }
+      });
+    }
+
+    // Add user progress summary if available for quizzes
+    if (data.user_progress_summary?.quizzes?.total > 0) {
+      transformedItems.push({
+        id: 'quizzes',
+        title: 'Quizzes',
+        status: data.user_progress_summary.quizzes.status === 'completed' ? 'completed' : 'pending',
+        date: "—",
+        chapters: `${data.user_progress_summary.quizzes.total} Quizzes`,
+        lessons: `${data.user_progress_summary.quizzes.total} questions`,
+        languages: ["en", "ar"],
+        type: 'Quiz',
+        isQuizSummary: true
+      });
+    }
+
+    return transformedItems;
+  }, [contentsWithProgressRes]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
@@ -70,12 +168,34 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     };
   }, [items]);
 
+  // Calculate overall progress from API data
+  const overallProgress = useMemo(() => {
+    if (!contentsWithProgressRes?.success) return 0;
+    return contentsWithProgressRes.data?.user_progress_summary?.overall_progress_percent || 0;
+  }, [contentsWithProgressRes]);
+
+  // Get module info from API
+  const moduleInfo = useMemo(() => {
+    if (!contentsWithProgressRes?.success) {
+      return {
+        name: moduleName,
+        description: "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise."
+      };
+    }
+    
+    const data = contentsWithProgressRes.data;
+    return {
+      name: data.module_name || moduleName,
+      description: data.module_description || "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise."
+    };
+  }, [contentsWithProgressRes, moduleName]);
+
   useEffect(() => {
-    // Animate progress bar
+    // Animate progress bar with real data
     const progressBar = document.querySelector('.progress-bar') as HTMLElement;
     if (progressBar) {
       setTimeout(() => {
-        const targetWidth = 60; // 50%
+        const targetWidth = overallProgress; // Use real progress from API
         const duration = 2500; // 2.5 seconds
         const startTime = Date.now();
 
@@ -99,7 +219,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         animate();
       }, 100);
     }
-  }, []);
+  }, [overallProgress]);
 
   const updateTabIndicator = () => {
     if (!tabIndicatorRef.current || !tabsContainerRef.current) return;
@@ -267,6 +387,14 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
             opacity: 0.9;
           }
         `}</style>
+        {isLoading ? (
+          <div className="flex-1 flex items-center justify-center h-screen">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading module content...</p>
+            </div>
+          </div>
+        ) : (
         <div className="flex-1 flex flex-col h-screen bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-r-3xl">
 
           <main className="flex-1 overflow-y-auto">
@@ -285,15 +413,6 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                 {/* Header */}
                 <div className="flex items-center justify-between mb-4">
                   <h1 className="text-xl font-semibold text-gray-900">{moduleName}</h1>
-                  <Link href="add-new-module-content.html">
-                    <Button className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                      </svg>
-                      <span className="hidden md:inline">Add New Content</span>
-                    </Button>
-                  </Link>
                 </div>
 
                 {/* Filters */}
@@ -377,16 +496,16 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                   <div className="col-span-3 flex flex-col gap-4 justify-between bg-white rounded-2xl p-4 h-full">
                     <div>
                       <h2 className="text-sm font-semibold text-gray-900 mb-3">🎉 Welcome to the</h2>
-    <h3 className="text-2xl font-bold text-gray-900 mb-6">{moduleName}</h3>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-6">{moduleInfo.name}</h3>
                       <div className="mb-6">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div className="progress-bar h-full bg-green-500 rounded-full" style={{ "--progress-width": "50%" } as React.CSSProperties}></div>
+                            <div className="progress-bar h-full bg-green-500 rounded-full" style={{ "--progress-width": `${overallProgress}%` } as React.CSSProperties}></div>
                           </div>
                         </div>
                         <div className="flex w-full justify-between items-center">
                           <p className="text-[10px] text-gray-500">Progress</p>
-                          <p className="text-[10px] text-gray-700 font-semibold">50%</p>
+                          <p className="text-[10px] text-gray-700 font-semibold">{overallProgress}%</p>
                         </div>
                       </div>
 
@@ -398,7 +517,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                     <div>
                       <div className="bg-gray-50 rounded-lg p-3 mb-6">
                         <h4 className="text-xs font-bold text-gray-900 mb-3">About The Module</h4>
-                        <p className="text-xs text-gray-600 leading-relaxed">Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise.</p>
+                        <p className="text-xs text-gray-600 leading-relaxed">{moduleInfo.description}</p>
                       </div>
 
                       <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-full text-xs font-semibold flex items-center justify-center gap-2">
@@ -431,7 +550,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
                         const icon = iconMap[item.title] || "📘";
                         const color = colorMap[item.title] || "bg-cyan-100 text-cyan-600";
-                        const langChips = (item.languages || []).map(code => {
+                        const langChips = (item.languages || []).map((code: string) => {
                           const cfg = langMap[code];
                           if (!cfg) return null;
                           return (
@@ -467,7 +586,18 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                               {statusBadge}
                               <button 
                                 className="table-btn--primary table-btn"
-                                onClick={() => {
+                                onClick={async () => {
+                                  // Fetch module contents for this content type before navigating
+                                  if (item.content_type_id != null) {
+                                    quizService
+                                      .getContents({ mod_id: moduleId, contype_id: item.content_type_id })
+                                      .then((res) => {
+                                        console.log('[module] getContents by type', res);
+                                      })
+                                      .catch((err) => {
+                                        console.error('[module] getContents error', err);
+                                      });
+                                  }
                                   if (item.title === "Video Training") {
                                     router.push(`/module/${module}/video-training`);
                                   } else if (item.title === "Interactive Lesson") {
@@ -531,6 +661,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
             </div>
           </main>
         </div>
+        )}
       </DashboardLayout>
     </ProtectedRoute>
   );

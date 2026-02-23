@@ -45,6 +45,22 @@
   "pagination": {
     "showing": "Showing {{start}}–{{end}} out of {{total}} Entries"
   },
+  "certificatesTitle": "Certifications",
+  "certificatesDescription": "View and download certifications you have earned.",
+  "emptyCertificatesTitle": "No Certifications Yet",
+  "emptyCertificatesDescription": "Complete campaign modules to earn certifications.",
+  "searchCertificates": "Search certifications...",
+  "certificateName": "Certification Name",
+  "loadingCertificates": "Loading certifications...",
+  "campaignLabel": "Campaign",
+  "moduleLabel": "Module",
+  "issuedDate": "Issued",
+  "expiryDate": "Expires",
+  "downloadCertificate": "Download Certification",
+  "breadcrumb": {
+    "dashboard": "Dashboard"
+  },
+
   "wizard": {
     "step1": "Campaign Details",
     "step2": "Target Users",

@@ -91,7 +91,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
 
   const pathname = usePathname();
-  const filter = pathname.includes("/training-library/my") ? "my_module" : "global_module";
+  const filter = pathname?.includes("/training-library/my") ? "my_module" : "global_module";
 
   const { data: modulesRes, isLoading } = useModules({
     category_id: categoryFilter ? Number(categoryFilter) : undefined,

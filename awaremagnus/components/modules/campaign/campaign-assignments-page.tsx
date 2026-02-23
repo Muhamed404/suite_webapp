@@ -16,6 +16,8 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAssignedCampaigns } from "@/hooks/useCampaign";
+import { quizService } from "@/services/quizService";
+import { campaignService } from "@/services/campaignService";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useUserDashboards } from "@/hooks/useDashboard";
 import {
@@ -39,6 +41,15 @@ function formatDate(dateStr?: string): string {
 
 function campaignName(c: CampaignAssignment): string {
   return c.name ?? `Campaign ${c.id}`;
+}
+
+function generateModuleSlug(campaign: CampaignAssignment): string {
+  const name = campaignName(campaign);
+  return name.toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-')          // Replace spaces with hyphens
+    .replace(/-+/g, '-')           // Replace multiple hyphens with single
+    .replace(/^-|-$/g, '');        // Remove leading/trailing hyphens
 }
 
 function getCampaignStatus(campaign: CampaignAssignment): "active" | "pending" | "completed" {
@@ -86,17 +97,42 @@ function getStatusBadge(status: "active" | "pending" | "completed") {
   );
 }
 
-function getActionButton(status: "active" | "pending" | "completed", campaignId: number) {
+function getActionButton(status: "active" | "pending" | "completed", campaign: CampaignAssignment, onStart?: (campaignId: number) => void) {
   const baseClasses = "inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full transition-all duration-200";
+  const moduleSlug = generateModuleSlug(campaign);
 
   if (status === 'active') {
-    return (
-      <Link href="/module/physical-security">
-        <button className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}>
-          <span>View</span>
+    if (campaign.progress_percent === null && onStart) {
+      return (
+        <button
+          className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
+          onClick={() => onStart(campaign.id)}
+        >
+          <span>Start Module</span>
         </button>
-      </Link>
-    );
+      );
+    } else {
+      return (
+        <Link href={`/module/${moduleSlug}`}>
+          <button
+            className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
+            onClick={() => {
+              // Follow project service pattern: call quizService.getContentsWithProgress(moduleId, campaignId)
+              quizService
+                .getContentsWithProgress(campaign.id, campaign.id)
+                .then((res) => {
+                  console.log('[campaign-assignments] quizService.getContentsWithProgress', res);
+                })
+                .catch((err) => {
+                  console.error('[campaign-assignments] getContentsWithProgress error', err);
+                });
+            }}
+          >
+            <span>View</span>
+          </button>
+        </Link>
+      );
+    }
   } else if (status === 'pending') {
     return (
       <button className={`${baseClasses} bg-amber-500 text-white hover:bg-amber-600`}>
@@ -106,7 +142,7 @@ function getActionButton(status: "active" | "pending" | "completed", campaignId:
     );
   } else {
     return (
-      <Link href={`/dashboard/campaign-assignments/${campaignId}/modules`}>
+      <Link href={`/dashboard/campaign-assignments/${campaign.id}/modules`}>
         <button className={`${baseClasses} bg-gray-500 text-white hover:bg-gray-600`}>
           <BarChart3 className="w-4 h-4" />
           <span>View Report</span>
@@ -121,67 +157,40 @@ export function CampaignAssignmentsPage() {
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
-  const { data: campaignsRes, isLoading } = useAssignedCampaigns();
+  // State declarations first
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending" | "completed">("all");
+  const [campaignFilter, setCampaignFilter] = useState<string>("all");
+  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+  const [showCampaignDropdown, setShowCampaignDropdown] = useState(false);
+
+  // Hook calls after state declarations
+  const { data: allCampaignsRes } = useAssignedCampaigns(); // For dropdown options
+  const { data: campaignsRes, isLoading } = useAssignedCampaigns(campaignFilter);
+  const allAssignments = allCampaignsRes?.success ? (allCampaignsRes.data ?? []) : [];
   const campaigns = campaignsRes?.success ? (campaignsRes.data ?? []) : [];
+
+  // Get unique campaigns for dropdown
+  const uniqueCampaigns = useMemo(() => {
+    const campaignMap = new Map<number, { id: number; name: string }>();
+    allAssignments.forEach((assignment: CampaignAssignment) => {
+      if (assignment.campaign_name && assignment.campaign_id && !campaignMap.has(assignment.campaign_id)) {
+        campaignMap.set(assignment.campaign_id, {
+          id: assignment.campaign_id,
+          name: assignment.campaign_name,
+        });
+      }
+    });
+    return Array.from(campaignMap.values());
+  }, [allAssignments]);
 
   const { data: userDashboardsRes } = useUserDashboards();
   const userMetrics = userDashboardsRes?.object?.dashboardUsers?.[0] || null;
 
-  // Mock data for testing
-  const mockCampaigns: CampaignAssignment[] = [
-    { id: 1, name: "Phishing Awareness Q1", start_date: "2026-01-15", end_date: "2026-02-15", progress_percent: 75 },
-    { id: 2, name: "Password Security Training", start_date: "2026-01-10", end_date: "2026-02-10", progress_percent: 75 },
-    { id: 3, name: "Compliance Training 2026", start_date: "2026-01-20", end_date: "2026-03-20", progress_percent: 75 },
-    { id: 4, name: "Social Engineering Defense", start_date: "2026-01-05", end_date: "2026-02-05", progress_percent: 75 },
-    { id: 5, name: "Data Privacy Essentials", start_date: "2025-12-01", end_date: "2026-01-01", progress_percent: 100 },
-    { id: 6, name: "Device Safety Campaign", start_date: "2025-11-15", end_date: "2025-12-15", progress_percent: 100 },
-    { id: 7, name: "Cloud Security Basics", start_date: "2025-11-01", end_date: "2025-12-01", progress_percent: 100 },
-    { id: 8, name: "Email Security Training", start_date: "2025-10-20", end_date: "2025-11-20", progress_percent: 100 },
-    { id: 9, name: "Network Security Fundamentals", start_date: "2026-02-01", end_date: "2026-03-01", progress_percent: 0 },
-    { id: 10, name: "Ransomware Protection", start_date: "2026-02-10", end_date: "2026-03-10", progress_percent: 0 },
-    { id: 11, name: "Mobile Security Awareness", start_date: "2026-02-15", end_date: "2026-03-15", progress_percent: 0 },
-    { id: 12, name: "VPN Best Practices", start_date: "2026-02-20", end_date: "2026-03-20", progress_percent: 0 },
-    { id: 13, name: "Zero Trust Security", start_date: "2025-10-01", end_date: "2025-11-01", progress_percent: 100 },
-    { id: 14, name: "Incident Response Training", start_date: "2025-09-15", end_date: "2025-10-15", progress_percent: 100 },
-    { id: 15, name: "Security Audit Preparation", start_date: "2025-09-01", end_date: "2025-10-01", progress_percent: 100 },
-    { id: 16, name: "GDPR Compliance Module", start_date: "2026-01-12", end_date: "2026-02-12", progress_percent: 75 },
-    { id: 17, name: "ISO 27001 Training", start_date: "2026-01-18", end_date: "2026-02-18", progress_percent: 75 },
-    { id: 18, name: "PCI DSS Awareness", start_date: "2026-01-22", end_date: "2026-02-22", progress_percent: 75 },
-    { id: 19, name: "HIPAA Security Rules", start_date: "2026-02-05", end_date: "2026-03-05", progress_percent: 0 },
-    { id: 20, name: "SOC 2 Compliance", start_date: "2026-02-12", end_date: "2026-03-12", progress_percent: 0 },
-    { id: 21, name: "Cryptocurrency Security", start_date: "2025-08-20", end_date: "2025-09-20", progress_percent: 100 },
-    { id: 22, name: "API Security Essentials", start_date: "2025-08-01", end_date: "2025-09-01", progress_percent: 100 },
-    { id: 23, name: "Container Security", start_date: "2025-07-15", end_date: "2025-08-15", progress_percent: 100 },
-    { id: 24, name: "Kubernetes Security", start_date: "2025-07-01", end_date: "2025-08-01", progress_percent: 100 },
-    { id: 25, name: "DevSecOps Fundamentals", start_date: "2026-01-25", end_date: "2026-02-25", progress_percent: 75 },
-    { id: 26, name: "Secure Coding Practices", start_date: "2026-01-28", end_date: "2026-02-28", progress_percent: 75 },
-    { id: 27, name: "Web Application Security", start_date: "2026-02-18", end_date: "2026-03-18", progress_percent: 0 },
-    { id: 28, name: "SQL Injection Prevention", start_date: "2026-02-22", end_date: "2026-03-22", progress_percent: 0 },
-    { id: 29, name: "XSS Attack Prevention", start_date: "2026-02-25", end_date: "2026-03-25", progress_percent: 0 },
-    { id: 30, name: "CSRF Protection", start_date: "2025-06-20", end_date: "2025-07-20", progress_percent: 100 },
-    { id: 31, name: "Authentication Best Practices", start_date: "2025-06-01", end_date: "2025-07-01", progress_percent: 100 },
-    { id: 32, name: "Multi-Factor Authentication", start_date: "2026-01-30", end_date: "2026-02-28", progress_percent: 75 },
-    { id: 33, name: "Single Sign-On Security", start_date: "2026-02-28", end_date: "2026-03-28", progress_percent: 0 },
-    { id: 34, name: "OAuth 2.0 Security", start_date: "2025-05-15", end_date: "2025-06-15", progress_percent: 100 },
-    { id: 35, name: "JWT Security", start_date: "2025-05-01", end_date: "2025-06-01", progress_percent: 100 },
-    { id: 36, name: "Session Management", start_date: "2026-01-08", end_date: "2026-02-08", progress_percent: 75 },
-    { id: 37, name: "Access Control Basics", start_date: "2026-02-08", end_date: "2026-03-08", progress_percent: 0 },
-    { id: 38, name: "Role-Based Access Control", start_date: "2026-02-14", end_date: "2026-03-14", progress_percent: 0 },
-    { id: 39, name: "Attribute-Based Access", start_date: "2025-04-20", end_date: "2025-05-20", progress_percent: 100 },
-    { id: 40, name: "Privilege Escalation", start_date: "2025-04-01", end_date: "2025-05-01", progress_percent: 100 },
-    { id: 41, name: "Least Privilege Principle", start_date: "2026-01-16", end_date: "2026-02-16", progress_percent: 75 },
-    { id: 42, name: "Security Monitoring", start_date: "2026-02-26", end_date: "2026-03-26", progress_percent: 0 },
-    { id: 43, name: "SIEM Implementation", start_date: "2026-03-01", end_date: "2026-04-01", progress_percent: 0 },
-    { id: 44, name: "Threat Intelligence", start_date: "2025-03-15", end_date: "2025-04-15", progress_percent: 100 }
-  ];
-
-  const displayCampaigns = campaigns.length > 0 ? campaigns : mockCampaigns;
+  // Do not show static/mock data when API returns no data
+  const displayCampaigns = campaigns;
   const { user } = useAuthStore();
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending" | "completed">("all");
-  const [dateFilter, setDateFilter] = useState<string>("all");
-  const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [sortColumn, setSortColumn] = useState<'name' | 'start' | 'end' | 'status'>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
@@ -190,18 +199,30 @@ export function CampaignAssignmentsPage() {
   const tabIndicatorRef = useRef<HTMLDivElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
+  const handleStartCampaign = async (campaignId: number) => {
+    try {
+      await campaignService.beginCampaign(campaignId);
+      // Optionally refresh the campaigns list or show success message
+      window.location.reload(); // Simple refresh for now
+    } catch (error) {
+      console.error('Failed to start campaign:', error);
+      // Optionally show error message
+    }
+  };
+
   const filteredCampaigns = useMemo(() => {
     let filtered = displayCampaigns;
 
     // Status filter
     if (statusFilter !== "all") {
-      filtered = filtered.filter(c => getCampaignStatus(c) === statusFilter);
+      filtered = filtered.filter((c: CampaignAssignment) => getCampaignStatus(c) === statusFilter);
     }
 
     // Search filter
     if (searchQuery) {
-      filtered = filtered.filter(c =>
-        campaignName(c).toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter((c: CampaignAssignment) =>
+        campaignName(c).toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (c.campaign_name && c.campaign_name.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
@@ -210,14 +231,14 @@ export function CampaignAssignmentsPage() {
       const days = parseInt(dateFilter);
       const cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - days);
-      filtered = filtered.filter(c => {
+      filtered = filtered.filter((c: CampaignAssignment) => {
         const start = c.start_date ? new Date(c.start_date) : null;
         return start && start >= cutoff;
       });
     }
 
     // Sorting
-    filtered.sort((a, b) => {
+    filtered.sort((a: CampaignAssignment, b: CampaignAssignment) => {
       let aVal: any, bVal: any;
       switch (sortColumn) {
         case 'name':
@@ -282,14 +303,18 @@ export function CampaignAssignmentsPage() {
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (showDateDropdown && !(event.target as Element).closest('.date-dropdown-container')) {
+      const target = event.target as Element;
+      if (showDateDropdown && !target.closest('.date-dropdown-container')) {
         setShowDateDropdown(false);
+      }
+      if (showCampaignDropdown && !target.closest('.campaign-dropdown-container')) {
+        setShowCampaignDropdown(false);
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showDateDropdown]);
+  }, [showDateDropdown, showCampaignDropdown]);
 
   const handleTabClick = (status: "all" | "active" | "pending" | "completed") => {
     setStatusFilter(status);
@@ -297,16 +322,24 @@ export function CampaignAssignmentsPage() {
   };
 
   const stats = useMemo(() => {
-    if (!userMetrics) return { assignment: 0, completed: 0, pending: 0, responseRate: 0, active: 0 };
+    // Calculate counts from actual campaigns data
+    const campaignCounts = displayCampaigns.reduce(
+      (acc: { active: number; pending: number; completed: number }, campaign: CampaignAssignment) => {
+        const status = getCampaignStatus(campaign);
+        acc[status] = (acc[status] || 0) + 1;
+        return acc;
+      },
+      { active: 0, pending: 0, completed: 0 }
+    );
 
     return {
-      assignment: userMetrics.total_campaigns,
-      completed: userMetrics.total_completed_modules,
-      pending: userMetrics.total_modules_enrolled - userMetrics.total_completed_modules,
-      responseRate: userMetrics.global_progress_percent,
-      active: userMetrics.total_achievements_completed,
+      assignment: displayCampaigns.length,
+      completed: campaignCounts.completed,
+      pending: campaignCounts.pending,
+      responseRate: userMetrics?.global_progress_percent ?? 0,
+      active: campaignCounts.active,
     };
-  }, [userMetrics]);
+  }, [displayCampaigns, userMetrics]);
 
   return (
     <ProtectedRoute>
@@ -497,7 +530,7 @@ export function CampaignAssignmentsPage() {
               ))}
             </div>
 
-            {/* Search & Date Filter */}
+            {/* Search & Filters */}
             <div className="flex gap-2">
               {/* Search with Icon */}
               <div className="relative w-64">
@@ -510,6 +543,44 @@ export function CampaignAssignmentsPage() {
                   className="datatable-input w-full pr-4 py-2 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-9 placeholder-gray-400"
                   style={{ paddingLeft: '40px' }}
                 />
+              </div>
+
+              {/* Campaign Filter */}
+              <div className="relative w-48 modern-dropdown-wrapper small rounded-full campaign-dropdown-container">
+                <button
+                  onClick={() => setShowCampaignDropdown(!showCampaignDropdown)}
+                  className="modern-dropdown-button"
+                >
+                  <span>
+                    {campaignFilter === 'all' ? 'All Campaigns' :
+                      uniqueCampaigns.find(c => c.id.toString() === campaignFilter)?.name || 'All Campaigns'}
+                  </span>
+                  <div className="modern-dropdown-arrow">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </button>
+
+                {showCampaignDropdown && (
+                  <div className="modern-dropdown-menu open">
+                    <button
+                      onClick={() => { setCampaignFilter('all'); setShowCampaignDropdown(false); }}
+                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      All Campaigns
+                    </button>
+                    {uniqueCampaigns.map((campaign: { id: number; name: string }) => (
+                      <button
+                        key={campaign.id}
+                        onClick={() => { setCampaignFilter(campaign.id.toString()); setShowCampaignDropdown(false); }}
+                        className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        {campaign.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Date Filter with Modern Dropdown */}
@@ -584,6 +655,11 @@ export function CampaignAssignmentsPage() {
               <table className="w-full text-xs">
                 <thead className="bg-gray-50 text-gray-600 border-b sticky top-0 z-10">
                   <tr>
+                    <th className="px-4 py-3.5 text-left font-semibold">
+                      <div className="flex items-center gap-2">
+                        <span>Campaign Name</span>
+                      </div>
+                    </th>
                     <th className="px-4 py-3.5 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors" onClick={() => handleSort('name')}>
                       <div className="flex items-center gap-2">
                         <span>Modules</span>
@@ -640,10 +716,15 @@ export function CampaignAssignmentsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {paginatedCampaigns.length > 0 ? paginatedCampaigns.map((campaign) => {
+                  {paginatedCampaigns.length > 0 ? paginatedCampaigns.map((campaign: CampaignAssignment) => {
                     const status = getCampaignStatus(campaign);
                     return (
                       <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-3.5">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-gray-700">{campaign.campaign_name || 'N/A'}</span>
+                          </div>
+                        </td>
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-gray-700">{campaignName(campaign)}</span>
@@ -660,12 +741,12 @@ export function CampaignAssignmentsPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3.5">{getStatusBadge(status)}</td>
-                        <td className="px-4 py-3.5">{getActionButton(status, campaign.id)}</td>
+                        <td className="px-4 py-3.5">{getActionButton(status, campaign, handleStartCampaign)}</td>
                       </tr>
                     );
                   }) : (
                     <tr>
-                      <td colSpan={5} className="px-4 py-12 text-center">
+                      <td colSpan={6} className="px-4 py-12 text-center">
                         <div className="text-center py-12">
                           <div className="bg-gray-100 p-4 rounded-full inline-block mb-4">
                             <SearchX className="w-10 h-10 text-gray-400" />
