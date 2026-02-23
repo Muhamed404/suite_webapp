@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Users, ChevronDown, X } from "lucide-react";
-import { Button } from "@heroui/button";
 import clsx from "clsx";
 
 import { useTranslations } from "@/i18n/useTranslations";
@@ -31,6 +30,8 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
   const [error, setError] = useState<string | null>(null);
   const [deptDropdownOpen, setDeptDropdownOpen] = useState(false);
   const [groupDropdownOpen, setGroupDropdownOpen] = useState(false);
+  const [deptSearch, setDeptSearch] = useState("");
+  const [groupSearch, setGroupSearch] = useState("");
   const deptDropdownRef = useRef<HTMLDivElement>(null);
   const groupDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -128,31 +129,34 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
   const activeGroups = groups.filter((group) => group.is_Active !== false && group.is_Deleted !== true);
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
-        <Users className="w-6 h-6 text-blue-500" />
-        <span>{t("wizard.step2")} <span className="text-red-500">*</span></span>
-      </h2>
+    <div>
+      <div className="flex items-center gap-1.5 mb-4">
+        <Users className="w-4 h-4 text-blue-500" />
+        <h2 className="text-sm font-semibold text-[#051226]">
+          {t("wizard.step2")} <span className="text-red-500 text-[10px]">*</span>
+        </h2>
+      </div>
 
       {errors.targets && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs mb-3">
           {errors.targets}
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded-lg text-xs mb-3">
           {error}
         </div>
       )}
 
       {loading ? (
-        <div className="text-center py-8 text-gray-500">Loading departments and groups...</div>
+        <div className="text-center py-8 text-gray-400 text-xs">Loading departments and groups...</div>
       ) : (
         <>
+          <div className="grid grid-cols-1 gap-3">
           {/* Departments */}
-          <div>
-            <label className="block text-sm font-medium mb-3">{t("form.selectDepartments")}</label>
+          <div className="input-group">
+            <label className="block font-medium text-gray-600 mb-3 text-sm">{t("form.selectDepartments")}</label>
             
             <div className="relative" ref={deptDropdownRef}>
               <button
@@ -195,8 +199,19 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
 
               {deptDropdownOpen && activeDepartments.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
+                  <div className="p-2 border-b border-gray-100">
+                    <input
+                      type="text"
+                      value={deptSearch}
+                      onChange={(e) => setDeptSearch(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      placeholder="Search departments..."
+                      className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      autoFocus
+                    />
+                  </div>
                   <div className="max-h-48 overflow-y-auto">
-                    {activeDepartments.map((dept) => (
+                    {activeDepartments.filter((d) => d.name.toLowerCase().includes(deptSearch.toLowerCase())).map((dept) => (
                       <label
                         key={dept.id}
                         className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
@@ -214,12 +229,12 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                 </div>
               )}
             </div>
-            <small className="text-gray-500 mt-2 block">{t("form.departmentsPlaceholder")}</small>
+            <small className="text-gray-500 mt-1 block text-[10px]">{t("form.departmentsPlaceholder")}</small>
           </div>
 
           {/* Groups */}
-          <div>
-            <label className="block text-sm font-medium mb-3">{t("form.selectGroups")}</label>
+          <div className="input-group">
+            <label className="block font-medium text-gray-600 mb-3 text-sm">{t("form.selectGroups")}</label>
             
             <div className="relative" ref={groupDropdownRef}>
               <button
@@ -262,8 +277,19 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
 
               {groupDropdownOpen && activeGroups.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
+                  <div className="p-2 border-b border-gray-100">
+                    <input
+                      type="text"
+                      value={groupSearch}
+                      onChange={(e) => setGroupSearch(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      placeholder="Search groups..."
+                      className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      autoFocus
+                    />
+                  </div>
                   <div className="max-h-48 overflow-y-auto">
-                    {activeGroups.map((group) => (
+                    {activeGroups.filter((g) => g.name.toLowerCase().includes(groupSearch.toLowerCase())).map((group) => (
                       <label
                         key={group.id}
                         className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
@@ -281,29 +307,37 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                 </div>
               )}
             </div>
-            <small className="text-gray-500 mt-2 block">{t("form.groupsPlaceholder")}</small>
+            <small className="text-gray-500 mt-1 block text-[10px]">{t("form.groupsPlaceholder")}</small>
+          </div>
           </div>
         </>
       )}
 
       {/* Manual Users */}
       <div>
-        <Button onClick={onOpenUserModal} className="bg-blue-500 text-white">
-          {t("form.addUsersManually")}
-        </Button>
+        <button
+          type="button"
+          onClick={onOpenUserModal}
+          className="flex items-center gap-1.5 px-3 py-1.5 border border-blue-500 text-blue-500 rounded-full text-xs font-medium hover:bg-blue-500 hover:text-white transition-all"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+          <span>Add Users</span>
+        </button>
         {formData.manualUsers.length > 0 && (
-          <div className="mt-3 space-y-2">
-            <p className="text-sm font-medium">{t("form.manuallyAddedUsers")}:</p>
-            <div className="flex flex-wrap gap-2">
+          <div id="manualUsersList" className="mt-3">
+            <h4 className="text-xs font-medium text-gray-700 mb-1">Manually Added:</h4>
+            <ul className="space-y-1">
               {formData.manualUsers.map((user) => (
-                <span
+                <li
                   key={user.id}
-                  className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
+                  className="flex items-center gap-2 px-2 py-1.5 bg-gray-200 border border-gray-300 rounded-md"
                 >
-                  {user.firstName} {user.lastName}
+                  <span className="text-xs text-gray-700 flex-1">
+                    {user.firstName} {user.lastName}
+                  </span>
                   <div
                     onClick={() => onChange("manualUsers", formData.manualUsers.filter((u) => u.id !== user.id))}
-                    className="hover:text-blue-900 cursor-pointer transition-colors"
+                    className="text-gray-400 hover:text-red-500 cursor-pointer transition-colors"
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
@@ -312,11 +346,11 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                       }
                     }}
                   >
-                    ×
+                    <X className="w-3 h-3" />
                   </div>
-                </span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         )}
       </div>
