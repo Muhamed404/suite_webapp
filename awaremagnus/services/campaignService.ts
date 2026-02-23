@@ -22,26 +22,21 @@ async function request<T>(fn: () => Promise<{ data: AWMResponseBody }>): Promise
 export const campaignService = {
   /**
    * Get campaigns assigned to the current user (Org User).
-   * API: GET /api/awm/report/campaigns?userId={userId}
+   * API: GET /api/awm/campaign/assignments
    */
   getAssignedCampaigns: async (userId: number) => {
     const response = await request<any>(() =>
-      awmClient.get<AWMResponseBody>(`${API_BASE}/report/campaigns`, {
-        params: { userId },
-      })
+      awmClient.get<AWMResponseBody>(`${API_BASE}/campaign/assignments`)
     );
-    if (response.success && response.data?.reportCampaigns) {
-      const campaigns: CampaignAssignment[] = response.data.reportCampaigns.map((item: any) => ({
-        id: item.campaign.id,
-        name: item.campaign.name,
-        description: item.campaign.description,
+    if (response.success && response.data?.assignments) {
+      const campaigns: CampaignAssignment[] = response.data.assignments.map((item: any) => ({
+        id: item.module_id,
+        name: item.module_name,
+        description: item.description,
         status: item.status.name,
-        start_date: item.campaign.start_date,
-        end_date: item.campaign.end_date,
-        org_id: item.campaign.org_id,
-        progress_percent: parseFloat(item.progress_percentage),
-        createdAt: item.campaign.createdAt,
-        updatedAt: item.campaign.updatedAt,
+        start_date: item.start_date,
+        end_date: item.end_date,
+        progress_percent: item.progress_percentage,
       }));
       return {
         ...response,

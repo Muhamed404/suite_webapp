@@ -1,0 +1,182 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+      <span class="text-gray-400">›</span>
+      <a href="<%= actionUrl %>" class="hover:text-gray-700 transition"><%= Organization %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900"><%= __("breadcrumbs.smtp") %></span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900">
+      <%= Organization ? Organization : 'Secure Magnus' %> - <%= __("smtp.labelSMTPConfiguration") %>
+    </h3>
+  </div>
+</div>
+
+<div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white">
+  <div class="bg-white w-full mt-3 p-8">
+
+    <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10">
+      <%= __("smtp.labelSMTPConfiguration") %>
+    </h1>
+
+    <form id="smtpSettingsForm"
+      class="grid grid-cols-1 md:grid-cols-2 gap-8"
+      action="<%= actionUrl %>"
+      method="post">
+
+      <!-- Organization -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelOrganizationName") %>
+        </label>
+        <input type="text" readonly name="org"
+          value="<%= Organization ? Organization : 'Secure Magnus' %>"
+          class="w-full px-4 py-2 border rounded-lg bg-gray-50 text-gray-900" />
+      </div>
+
+      <% if (typeof showOrgSelect !== 'undefined' && showOrgSelect) { %>
+      <!-- Organization Select -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          Select Organization
+        </label>
+        <select name="selected_org"
+          class="w-full px-4 py-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-teal-400">
+          <option value="0">Default</option>
+          <% (typeof organizations !== 'undefined' ? organizations : []).forEach(function(o) { %>
+            <option value="<%= o.id %>"><%= o.name %></option>
+          <% }); %>
+        </select>
+      </div>
+      <% } %>
+
+      <!-- Host -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelHostName") %>
+        </label>
+        <input type="text" name="host" required id="host"
+          value="<%= typeof host !== 'undefined' && host ? host : '' %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+      <!-- Port -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelPort") %>
+        </label>
+        <input type="number" name="port" id="port" min="1" max="65535" required
+          value="<%= typeof port !== 'undefined' && port ? port : '' %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+      <!-- SMTP Account -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelServiceAccount") %>
+        </label>
+        <input type="text" name="smtp_account" id="smtp_account" maxlength="250" required
+          value="<%= typeof smtp_account !== 'undefined' && smtp_account ? smtp_account : '' %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+      <!-- Sender Email -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelSenderEmail") %>
+        </label>
+        <input type="email"
+          name="sender_email"
+          id="sender_email"
+          maxlength="250"
+          required
+          value="<%= typeof sender_email !== 'undefined' && sender_email ? sender_email : '' %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelPassword") %>
+        </label>
+        <input type="password" name="smtp_password" id="smtp_password" required
+          value="<%= typeof smtp_password !== 'undefined' && smtp_password ? smtp_password : '' %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+
+            <!-- details -->
+      <div class="md:col-span-2">
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelDetails") %>
+        </label>
+        <textarea name="details" id="details" maxlength="1000" rows="4"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900 resize-none"><%= typeof details !== 'undefined' && details ? details : '' %></textarea>
+        <p class="text-xs text-gray-400 mt-1 text-right">
+          <span id="details-count">0</span>/1000
+        </p>
+      </div>
+      <!-- Buttons -->
+      <div class="flex justify-end gap-4 mt-10 md:col-span-2">
+        <button type="submit" id="saveButton" disabled
+          class="px-8 py-2 rounded-lg bg-gray-400 text-white font-semibold cursor-not-allowed transition disabled:opacity-50">
+          <%= __("smtp.btnSaveSettings") %>
+        </button>
+
+        
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script src="/securemagnus_2025/js/custom_script/smtp-validator.js"></script>
+
+
+<script>
+  // Localization data
+  window.i18n = {
+    validation_messages: {
+      fill_required_fields_before_testing: "<%- __('validation_messages.fill_required_fields_before_testing') %>",
+      fix_validation_errors_before_testing: "<%- __('validation_messages.fix_validation_errors_before_testing') %>",
+      smtp_test_connection_successful: "<%- __('validation_messages.smtp_test_connection_successful') %>",
+      smtp_test_connection_failed: "<%- __('validation_messages.smtp_test_connection_failed') %>",
+      smtp_test_connection_issue: "<%- __('validation_messages.smtp_test_connection_issue') %>",
+      enter_valid_format: "<%- __('validation_messages.enter_valid_format') %>",
+      ensure_correct_smtp_port: "<%- __('validation_messages.ensure_correct_smtp_port') %>",
+      organization_name_required: "<%- __('validation_messages.organization_name_required') %>",
+      organization_name_minlength: "<%- __('validation_messages.organization_name_minlength') %>",
+      organization_name_maxlength: "<%- __('validation_messages.organization_name_maxlength') %>",
+      smtp_host_required: "<%- __('validation_messages.smtp_host_required') %>",
+      host_minlength: "<%- __('validation_messages.host_minlength') %>",
+      host_maxlength: "<%- __('validation_messages.host_maxlength') %>",
+      valid_hostname_ip: "<%- __('validation_messages.valid_hostname_ip') %>",
+      port_required: "<%- __('validation_messages.port_required') %>",
+      valid_port_number: "<%- __('validation_messages.valid_port_number') %>",
+      port_min: "<%- __('validation_messages.port_min') %>",
+      port_max: "<%- __('validation_messages.port_max') %>",
+      service_account_required: "<%- __('validation_messages.service_account_required') %>",
+      service_account_minlength: "<%- __('validation_messages.service_account_minlength') %>",
+      service_account_maxlength: "<%- __('validation_messages.service_account_maxlength') %>",
+      valid_email: "<%- __('validation_messages.valid_email') %>",
+      password_required: "<%- __('validation_messages.password_required') %>",
+      password_minlength: "<%- __('validation_messages.password_minlength') %>",
+      password_maxlength: "<%- __('validation_messages.password_maxlength') %>"
+    }
+  };
+
+  // Initialize SMTP form validator with configuration
+  initSMTPFormValidator({
+    orgId: '<%= org %>',
+    hasExistingData: '<%= typeof host !== "undefined" && host ? "true" : "false" %>' === 'true'
+  });
+
+  // Details character counter
+  var detailsEl = document.getElementById('details');
+  var detailsCount = document.getElementById('details-count');
+  detailsCount.textContent = detailsEl.value.length;
+  detailsEl.addEventListener('input', function() {
+    detailsCount.textContent = this.value.length;
+  });
+</script>

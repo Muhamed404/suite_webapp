@@ -1,0 +1,144 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex-1">
+
+      <h3 class="text-3xl font-medium">
+        Simulator Emails
+      </h3>
+    </div>
+    <div>
+        <a href="/phm/phishing-smtp/create"
+          class="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-teal-600 text-white font-semibold shadow hover:bg-teal-700 transition-all duration-200 border border-teal-600 hover:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 lg:order-2"
+          title="<%= __('system_template.homescreen.btnCreateTemplate') %>">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" />
+            <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              d="M12 8v8m-4-4h8" />
+          </svg>
+          <span class="hidden sm:inline">Add New Email</span>
+        </a>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-col p-6 pt-0">
+  <div class="flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm">
+    <div class="p-6">
+      <table id="filter-table" class="min-w-full border-none text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} to {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
+        <thead class="bg-gray-50 text-gray-600 text-xs">
+          <tr>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              Sender Email
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              Organization
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
+              Details
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              Status
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              Test Connection
+            </th>
+            <th class="px-4 py-3 text-sm font-normal">
+              Action
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (typeof smtpList !== 'undefined' && smtpList.length > 0) { smtpList.forEach(tpl => { %>
+            <tr class="bg-white border-b hover:bg-gray-50">
+              <td class="px-4 py-3"><%= tpl.sender_email %></td>
+              <td class="px-4 py-3"><%= tpl.organization_name || 'Default' %></td>
+              <td class="px-4 py-3 text-gray-400"><%= tpl.details || '' %></td>
+              <td class="px-4 py-3">
+                <% if (tpl.is_active) { %>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">
+                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500 inline-block"></span>
+                    Active
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block"></span>
+                    Inactive
+                  </span>
+                <% } %>
+              </td>
+              <% const isSameOrg = parseInt(tpl.organization_id) === parseInt(currentUserOrgId); %>
+              <% const allowEditAndTest = canManageDefault %>
+              <% const allowDelete = canManageDefault || isSameOrg; %>
+              <td class="px-4 py-3">
+                <% if (allowEditAndTest) { %>
+                  <button
+                    class="test-smtp-btn px-3 py-1 rounded-lg bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    data-smtp-id="<%= tpl.id %>">
+                    Test
+                  </button>
+                <% } else { %>
+                  <button disabled
+                    class="px-3 py-1 rounded-lg bg-gray-200 text-gray-400 text-xs font-semibold cursor-not-allowed"
+                    title="Not permitted for this organization">
+                    Test
+                  </button>
+                <% } %>
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <% if (allowEditAndTest) { %>
+                    <a href="/phm/phishing-smtp/edit/<%= tpl.id %>" class="text-teal-600 hover:text-teal-800 font-medium transition-colors duration-150">Edit</a>
+                  <% } else { %>
+                    <span class="text-gray-300 font-medium cursor-not-allowed" title="Not permitted for this organization">Edit</span>
+                  <% } %>
+                  <span class="text-gray-300">|</span>
+                  <% if (allowDelete) { %>
+                    <a href="/phm/phishing-smtp/delete/<%= tpl.id %>" class="text-red-500 hover:text-red-700 font-medium transition-colors duration-150" onclick="return confirm('Are you sure you want to delete this SMTP configuration?')">Delete</a>
+                  <% } else { %>
+                    <span class="text-gray-300 font-medium cursor-not-allowed" title="Not permitted for this organization">Delete</span>
+                  <% } %>
+                </div>
+              </td>
+            </tr>
+          <% }); } else { %>
+            <tr>
+              <td colspan="6" class="px-4 py-6 text-center text-gray-400">No SMTP configurations found.</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).on('click', '.test-smtp-btn', function() {
+    var $btn = $(this);
+    var smtpId = $btn.data('smtp-id');
+    var originalText = $btn.text();
+
+    $btn.prop('disabled', true).text('Testing...');
+
+    $.ajax({
+      url: '/phm/phishing-smtp/test/' + smtpId,
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        if (data.success) {
+          showCustomToast('success', data.message || 'SMTP connection successful.');
+        } else {
+          showCustomToast('error', data.message || 'SMTP connection failed.');
+        }
+      },
+      error: function() {
+        showCustomToast('error', 'Unable to reach the test endpoint. Please try again.');
+      },
+      complete: function() {
+        $btn.prop('disabled', false).text(originalText);
+      }
+    });
+  });
+</script>

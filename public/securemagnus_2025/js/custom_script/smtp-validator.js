@@ -51,8 +51,7 @@ function initSMTPFormValidator(config) {
         smtp_account: {
           required: true,
           minlength: 3,
-          maxlength: 255,
-          email: true
+          maxlength: 255
         },
         smtp_password: {
           required: true,
@@ -79,10 +78,9 @@ function initSMTPFormValidator(config) {
           max: window.i18n?.validation_messages?.port_max || "Port must be between 1 and 65535"
         },
         smtp_account: {
-          required: window.i18n?.validation_messages?.service_account_required || "Service account email is required",
+          required: window.i18n?.validation_messages?.service_account_required || "Service account is required",
           minlength: window.i18n?.validation_messages?.service_account_minlength || "Service account must be at least 3 characters",
-          maxlength: window.i18n?.validation_messages?.service_account_maxlength || "Service account cannot exceed 255 characters",
-          email: window.i18n?.validation_messages?.valid_email || "Please enter a valid email address"
+          maxlength: window.i18n?.validation_messages?.service_account_maxlength || "Service account cannot exceed 255 characters"
         },
         smtp_password: {
           required: window.i18n?.validation_messages?.password_required || "Password is required",

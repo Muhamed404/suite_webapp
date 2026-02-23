@@ -48,6 +48,7 @@ export const DASHBOARD_KEYS = {
       params,
     ],
     assignments: (params?: { language_id?: number }) => ["dashboard", "user", "assignments", params],
+    gameAchievements: ["dashboard", "user", "gameAchievements"],
   },
   gamification: {
     achievementStats: (orgId?: number) => ["gamification", "achievements", "statistics", { orgId }],
@@ -157,6 +158,13 @@ export const useUserAssignments = (params?: { language_id?: number }) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.user.assignments(params),
     queryFn: () => dashboardService.getUserAssignments(params),
+  });
+};
+
+export const useUserGameAchievements = () => {
+  return useQuery({
+    queryKey: DASHBOARD_KEYS.user.gameAchievements,
+    queryFn: dashboardService.getUserGameAchievements,
   });
 };
 

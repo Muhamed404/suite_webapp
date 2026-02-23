@@ -100,6 +100,10 @@ function generateSuiteManagementMenu(req, organization) {
         {
           labelKey: "menu.suite.serviceRegistry",
           link: "/service-registry/"
+        },
+        {
+          labelKey: "menu.suite.smtpNotifications",
+          link: "/settings/smtp/"
         }
       ]
     }

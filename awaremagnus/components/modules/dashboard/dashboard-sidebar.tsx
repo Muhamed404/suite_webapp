@@ -94,7 +94,7 @@ export const DashboardSidebar = ({
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Branding_Solid.svg"),
       label: t("menu.systemBranding"),
       children: [
-        { href: "#", icon: "", label: t("menu.certificate") },
+        { href: "/dashboard/system-branding/certificate", icon: "", label: t("menu.certificate") },
       ],
     },
     {

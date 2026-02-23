@@ -6,6 +6,9 @@ module.exports = {
     PRODUCT_SUITE: {
         LICENSE_INFORMATION: '/suite/management/information',
         PRODUCT_SUITE_DASHBOARD: '/phm/dashboard/',
+        ORGANIZATION:{
+            Active_Organization_List: '/organization/active/names',
+        },
         SERVICE_REGISTRY: {
             CREATE: '/service-registry/create',
             LIST: '/service-registry/',
@@ -155,6 +158,14 @@ module.exports = {
             ASSIGNED_USERS_BY_DEPARTMENT: (orgId, deptId) => `/department/assigned-users/${orgId}?department=${deptId}`,
             UNASSIGNED_USERS_BY_ORGANIZATION: (orgId) => `/department/unassigned-users/${orgId}`,
             EnrolUserToDepartment: (departmentId, hasRequestedToUnenroll) => `/department/enrolUserToDepartment/${departmentId}/${hasRequestedToUnenroll}`,
+        }, 
+        PHISHING_SMTP: {
+            LIST: (orgId) => `/phm/phishing-smtp/organization/${orgId}`,
+            CREATE: (orgId) => `/phm/phishing-smtp/create/${orgId}`,
+            DETAIL: (smtpId) => `/phm/phishing-smtp/detail/${smtpId}`,
+            UPDATE: (smtpId) => `/phm/phishing-smtp/edit/${smtpId}`,
+            DELETE: (smtpId) => `/phm/phishing-smtp/delete/${smtpId}`,
+            TEST: (smtpId) => `/phm/phishing-smtp/test/${smtpId}`,
         },
 
     }

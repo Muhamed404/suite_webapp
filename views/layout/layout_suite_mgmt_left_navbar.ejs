@@ -41,13 +41,15 @@
                         <span
                           class="transition-transform duration-300 group-[.open]:rotate-90 text-2xl menu-text">›</span>
                       </button>
-                      <%item.children.forEach((child) => { %>
                         <div id="menuA" class="mt-2 hidden flex-col space-y-2 pl-4">
+                    
+                      <%item.children.forEach((child) => { %>
                           <a href="<%= child.link %>" class="block px-4 py-2 rounded hover:bg-white/10 text-base font-medium menu-text">
                             <%= child.label %>
                           </a>
-                        </div>
                       <% }) %>
+                        </div>
+
                     </div>
                     <% } else { %>
                       <a href="<%= item.link %>"

@@ -14,6 +14,7 @@ import type {
   ScoreTypesResponse,
   ScoreLevelsResponse,
   UserAssignmentsResponse,
+  UserGameAchievementsResponse,
 } from "../types/dashboard";
 
 import { awmClient, API_BASE } from "./httpClient";
@@ -173,6 +174,15 @@ export const dashboardService = {
     const { data } = await awmClient.get<UserAssignmentsResponse>(
       `${API_BASE}/campaign/assignments`,
       { params }
+    );
+
+    return data;
+  },
+
+  // --- User Game Achievements ---
+  getUserGameAchievements: async () => {
+    const { data } = await awmClient.get<UserGameAchievementsResponse>(
+      `${API_BASE}/usergame/achievements`
     );
 
     return data;
