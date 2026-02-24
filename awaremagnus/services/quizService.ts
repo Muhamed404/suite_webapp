@@ -13,6 +13,7 @@ import type {
   CreateContentPayload,
   UpdateContentPayload,
   ApiResponse,
+  ReportContent,
 } from "@/types/quiz";
 import type { AWMResponseBody } from "./awmResponse";
 
@@ -440,6 +441,18 @@ export const quizService = {
   getModuleReport: async (moduleId: number) => {
     return request<any>(() =>
       awmClient.get<AWMResponseBody>(`${API_BASE}/report/modules/${moduleId}`)
+    );
+  },
+
+  /**
+   * GET /report/contents?reportModuleId={id}
+   * returns object.reportContents
+   */
+  getContentsReport: async (reportModuleId: number) => {
+    return request<{ reportContents: ReportContent[] }>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/report/contents`, {
+        params: { reportModuleId },
+      })
     );
   },
 

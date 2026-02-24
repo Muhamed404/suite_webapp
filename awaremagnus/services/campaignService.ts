@@ -129,6 +129,24 @@ export const campaignService = {
   },
 
   /**
+   * Begin a specific content item within a module/campaign for the current user.
+   * API: POST /report-actions/begin-content
+   */
+  beginContent: async (
+    campaignId: number,
+    moduleId: number,
+    contentId: number
+  ) => {
+    return request<unknown>(() =>
+      awmClient.post<AWMResponseBody>(`${API_BASE}/report-actions/begin-content`, {
+        campaign_id: campaignId,
+        module_id: moduleId,
+        content_id: contentId,
+      })
+    );
+  },
+
+  /**
    * Fetch module report (no mapping done yet).
    * API: GET /report/modules/:id
    */

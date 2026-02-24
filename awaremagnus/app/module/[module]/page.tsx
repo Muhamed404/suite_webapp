@@ -5,14 +5,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Search, ChevronRight, ChevronLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useContentsWithProgress, useModule, useModules, useModuleReport } from "@/hooks/useQuiz";
+import { useContentsWithProgress, useModule, useModules, useModuleReport, useContentsReport } from "@/hooks/useQuiz";
+import { campaignService } from "@/services/campaignService";
+import { awmClient, API_BASE } from "@/services/httpClient";
 import { isOrgUser } from "@/utils/roles";
 import { quizService } from "@/services/quizService";
 
@@ -24,6 +26,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const isRtl = dir === "rtl";
   const { user } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "completed">("all");
@@ -53,12 +56,18 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const roleId = user?.role_id;
   const isOrgUserView = isOrgUser(roleId);
 
-  // Get campaign ID for Org Users
+  // Get campaign ID from URL or assigned modules
   const { data: assignedModulesRes } = useModules({
     assigned_only: true,
   });
 
   const campaignId = useMemo(() => {
+    // searchParams may be null in some Next.js modes (e.g. during server rendering)
+    const campaignIdFromUrl = searchParams?.get('campaign_id');
+    if (campaignIdFromUrl) {
+      return parseInt(campaignIdFromUrl, 10);
+    }
+
     if (!isOrgUserView || !assignedModulesRes?.success) return 1; // Default to 1
     const modules = assignedModulesRes.data ?? [];
     const currentModule = modules.find((m) => m.id === Number(moduleId));
@@ -66,7 +75,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
       return currentModule.assignments[0].campaign_id;
     }
     return 1; // Default campaign ID
-  }, [isOrgUserView, assignedModulesRes, moduleId]);
+  }, [searchParams, isOrgUserView, assignedModulesRes, moduleId]);
 
   // Fetch content with progress data
   const { data: contentsWithProgressRes, isLoading } = useContentsWithProgress(
@@ -81,22 +90,55 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const { data: moduleRes } = useModule(moduleId, true);
 
   // Get module report with progress_percentage
-  const { data: moduleReportRes } = useModuleReport(moduleId);
+  const { data: moduleReportRes } = useModuleReport(moduleId, !!moduleId);
 
-  // Transform API data to items format
+  // If we have a report ID, fetch individual content statuses
+  const reportModuleId = moduleReportRes?.data?.id;
+  const { data: contentsReportRes } = useContentsReport(reportModuleId, !!reportModuleId);
+
+  // Transform API data to items format, merging report content statuses if available
   const items = useMemo(() => {
     if (!contentsWithProgressRes?.success) return [];
     
     const data = contentsWithProgressRes.data;
     const transformedItems: any[] = [];
 
+    // build a map of content_id -> report status name (lowercase)
+    // map content_id -> { statusName, contypeId }
+    const statusMap = new Map<number, { statusName: string; contypeId?: number }>();
+    if (contentsReportRes?.success && contentsReportRes.data?.reportContents) {
+      contentsReportRes.data.reportContents.forEach((rc: any) => {
+        if (rc.content_id != null && rc.status?.name) {
+          statusMap.set(rc.content_id, {
+            statusName: rc.status.name.toLowerCase(),
+            contypeId: rc.content?.contype_id,
+          });
+        }
+      });
+    }
+
     // Add non-aggregated contents (Interactive content, Videos, Documents, etc.)
     if (data.non_aggregated_contents) {
       data.non_aggregated_contents.forEach((content: any) => {
+        // prefer status from report if available
+        const reported = statusMap.get(content.id);
+        let statusValue: string;
+        if (reported) {
+          // use the raw status string from report (lowercased)
+          statusValue = reported.statusName;
+        } else if (content.status) {
+          statusValue = content.status.toLowerCase();
+        } else {
+          statusValue = 'pending';
+        }
+        // format label for display (capitalize words, replace underscores)
+        const statusLabel = statusValue.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+
         transformedItems.push({
           id: content.id,
           title: content.title || content.content_type,
-          status: content.status?.toLowerCase() === 'completed' ? 'completed' : 'pending',
+          status: statusValue,
+          statusLabel,
           date: content.created_at ? new Date(content.created_at).toLocaleDateString("en-GB", {
             day: "numeric",
             month: "short", 
@@ -115,10 +157,23 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     if (data.aggregated_contents) {
       Object.values(data.aggregated_contents).forEach((agg: any) => {
         if (agg.total_count > 0) {
+          // determine status based on report entries matching this content type
+          let aggStatus: string | undefined;
+          // iterate using forEach to avoid downlevelIteration issues
+          statusMap.forEach((rc) => {
+            if (aggStatus == null && rc.contypeId === agg.content_type_id) {
+              aggStatus = rc.statusName;
+            }
+          });
+          if (!aggStatus) {
+            aggStatus = agg.statuses?.some((s: any) => s.status === 2) ? 'completed' : 'pending';
+          }
+          const aggLabel = aggStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           transformedItems.push({
             id: `agg_${agg.content_type_id}`,
             title: agg.content_type,
-            status: agg.statuses?.some((s: any) => s.status === 2) ? 'completed' : 'pending',
+            status: aggStatus,
+            statusLabel: aggLabel,
             date: agg.date_range?.latest_created ? new Date(agg.date_range.latest_created).toLocaleDateString("en-GB", {
               day: "numeric",
               month: "short",
@@ -154,13 +209,17 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     }
 
     return transformedItems;
-  }, [contentsWithProgressRes]);
+  }, [contentsWithProgressRes, contentsReportRes]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
 
     if (statusFilter !== "all") {
-      filtered = filtered.filter(item => item.status === statusFilter);
+      if (statusFilter === "pending") {
+        filtered = filtered.filter(item => item.status !== "completed");
+      } else {
+        filtered = filtered.filter(item => item.status === statusFilter);
+      }
     }
 
     if (searchQuery) {
@@ -179,7 +238,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const tabCounts = useMemo(() => {
     return {
       all: items.length,
-      pending: items.filter(item => item.status === "pending").length,
+      pending: items.filter(item => item.status !== "completed").length,
       completed: items.filter(item => item.status === "completed").length
     };
   }, [items]);
@@ -580,12 +639,20 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                           );
                         });
 
-                        const statusBadge = item.status === "completed"
-                          ? <span className="text-[11px] text-green-600 bg-green-100 px-3 py-1 rounded-full">Completed</span>
-                          : <span className="text-[11px] text-amber-600 bg-amber-100 px-3 py-1 rounded-full">Pending</span>;
+                        // format status for display (e.g. "not_started" -> "Not Started")
+                        const displayStatus = item.status
+                          ? item.status
+                              .split('_')
+                              .map((s: string) => s[0].toUpperCase() + s.slice(1))
+                              .join(' ')
+                          : '';
+
+                        const statusBadge = displayStatus === "Completed"
+                          ? <span className="text-[11px] text-green-600 bg-green-100 px-3 py-1 rounded-full">{displayStatus}</span>
+                          : <span className="text-[11px] text-amber-600 bg-amber-100 px-3 py-1 rounded-full">{displayStatus || 'Pending'}</span>;
 
                         return (
-                          <div key={index} className="item bg-white rounded-2xl p-4 flex justify-between items-center border border-gray-100 hover:border-blue-200 transition-all hover:shadow-sm">
+                          <div key={`${item.id}-${index}`} className="item bg-white rounded-2xl p-4 flex justify-between items-center border border-gray-100 hover:border-blue-200 transition-all hover:shadow-sm">
                             <div className="flex gap-4 flex-1">
                               <div className={`w-12 h-12 ${color} rounded-lg flex items-center justify-center flex-shrink-0 text-lg`}>
                                 {icon}
@@ -606,6 +673,53 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                               <button 
                                 className="table-btn--primary table-btn"
                                 onClick={async () => {
+                                  console.log('[module] Start clicked, moduleId:', moduleId, 'campaignId:', campaignId, 'item.id:', item.id, 'typeof item.id:', typeof item.id);
+
+                                  // notify backend that user began this content
+                                  if (
+                                    campaignId != null &&
+                                    moduleId != null &&
+                                    typeof item.id === 'number'
+                                  ) {
+                                    try {
+                                      await campaignService.beginContent(
+                                        campaignId,
+                                        moduleId,
+                                        item.id
+                                      );
+                                      console.log('[module] beginContent success');
+                                    } catch (err) {
+                                      console.error('[module] beginContent error', err);
+                                    }
+                                  }
+
+                                  // Call the report-actions/begin-content API
+                                  if (moduleId != null) {
+                                    let contentId: number | null = null;
+                                    if (typeof item.id === 'number') {
+                                      contentId = item.id;
+                                    } else if (item.isAggregated && item.content_type_id) {
+                                      contentId = item.content_type_id;
+                                    }
+                                    if (contentId != null && item.status !== "in_progress") {
+                                      console.log('[module] Calling report-actions/begin-content with', { contentId });
+                                      try {
+                                      await awmClient.post(`${API_BASE}/useraction/report-actions/begin-content`, {
+                                          content_id: contentId,
+                                          module_id: moduleId,
+                                          campaign_id: campaignId
+                                        });
+                                        console.log('[module] report-actions begin-content success');
+                                      } catch (err) {
+                                        console.error('[module] report-actions begin-content error', err);
+                                      }
+                                    } else {
+                                      console.log('[module] Skipping report-actions call: no valid contentId or status is in_progress', item);
+                                    }
+                                  } else {
+                                    console.log('[module] Skipping report-actions call: moduleId is', moduleId);
+                                  }
+
                                   // Fetch module contents for this content type before navigating
                                   if (item.content_type_id != null) {
                                     quizService
