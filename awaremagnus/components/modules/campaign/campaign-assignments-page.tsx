@@ -97,7 +97,7 @@ function getStatusBadge(status: "active" | "pending" | "completed") {
   );
 }
 
-function getActionButton(status: "active" | "pending" | "completed", campaign: CampaignAssignment, onStart?: (campaignId: number) => void) {
+function getActionButton(status: "active" | "pending" | "completed", campaign: CampaignAssignment, onStart?: (campaign: CampaignAssignment) => void) {
   const baseClasses = "inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full transition-all duration-200";
   const moduleSlug = generateModuleSlug(campaign);
 
@@ -106,7 +106,7 @@ function getActionButton(status: "active" | "pending" | "completed", campaign: C
       return (
         <button
           className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
-          onClick={() => onStart(campaign.id)}
+          onClick={() => onStart(campaign)}
         >
           <span>Start Module</span>
         </button>
@@ -117,14 +117,14 @@ function getActionButton(status: "active" | "pending" | "completed", campaign: C
           <button
             className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
             onClick={() => {
-              // Follow project service pattern: call quizService.getContentsWithProgress(moduleId, campaignId)
-              quizService
-                .getContentsWithProgress(campaign.id, campaign.id)
+              // simply hit report endpoint; ignore response for now
+              campaignService
+                .getModuleReport(campaign.id)
                 .then((res) => {
-                  console.log('[campaign-assignments] quizService.getContentsWithProgress', res);
+                  console.log('[campaign-assignments] getModuleReport', res);
                 })
                 .catch((err) => {
-                  console.error('[campaign-assignments] getContentsWithProgress error', err);
+                  console.error('[campaign-assignments] getModuleReport error', err);
                 });
             }}
           >
@@ -161,8 +161,6 @@ export function CampaignAssignmentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending" | "completed">("all");
   const [campaignFilter, setCampaignFilter] = useState<string>("all");
-  const [dateFilter, setDateFilter] = useState<string>("all");
-  const [showDateDropdown, setShowDateDropdown] = useState(false);
   const [showCampaignDropdown, setShowCampaignDropdown] = useState(false);
 
   // Hook calls after state declarations
@@ -199,14 +197,18 @@ export function CampaignAssignmentsPage() {
   const tabIndicatorRef = useRef<HTMLDivElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
-  const handleStartCampaign = async (campaignId: number) => {
+  const handleStartModule = async (campaign: CampaignAssignment) => {
     try {
-      await campaignService.beginCampaign(campaignId);
-      // Optionally refresh the campaigns list or show success message
-      window.location.reload(); // Simple refresh for now
+      // campaign.id is module_id, campaign.campaign_id is campaign identifier
+      if (campaign.campaign_id == null) {
+        console.warn('Missing campaign_id on assignment', campaign);
+        return;
+      }
+      await campaignService.beginModule(campaign.campaign_id, campaign.id);
+      // refresh or indicate success
+      window.location.reload();
     } catch (error) {
-      console.error('Failed to start campaign:', error);
-      // Optionally show error message
+      console.error('Failed to start module:', error);
     }
   };
 
@@ -226,16 +228,6 @@ export function CampaignAssignmentsPage() {
       );
     }
 
-    // Date filter
-    if (dateFilter !== "all") {
-      const days = parseInt(dateFilter);
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - days);
-      filtered = filtered.filter((c: CampaignAssignment) => {
-        const start = c.start_date ? new Date(c.start_date) : null;
-        return start && start >= cutoff;
-      });
-    }
 
     // Sorting
     filtered.sort((a: CampaignAssignment, b: CampaignAssignment) => {
@@ -266,7 +258,7 @@ export function CampaignAssignmentsPage() {
     });
 
     return filtered;
-  }, [displayCampaigns, statusFilter, searchQuery, dateFilter, sortColumn, sortDirection]);
+  }, [displayCampaigns, statusFilter, searchQuery, sortColumn, sortDirection]);
 
   const paginatedCampaigns = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -304,9 +296,7 @@ export function CampaignAssignmentsPage() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (showDateDropdown && !target.closest('.date-dropdown-container')) {
-        setShowDateDropdown(false);
-      }
+      // removed date dropdown logic
       if (showCampaignDropdown && !target.closest('.campaign-dropdown-container')) {
         setShowCampaignDropdown(false);
       }
@@ -314,7 +304,7 @@ export function CampaignAssignmentsPage() {
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showDateDropdown, showCampaignDropdown]);
+  }, [showCampaignDropdown]);
 
   const handleTabClick = (status: "all" | "active" | "pending" | "completed") => {
     setStatusFilter(status);
@@ -583,68 +573,6 @@ export function CampaignAssignmentsPage() {
                 )}
               </div>
 
-              {/* Date Filter with Modern Dropdown */}
-              <div className="relative w-40 modern-dropdown-wrapper small rounded-full date-dropdown-container">
-                <button
-                  onClick={() => setShowDateDropdown(!showDateDropdown)}
-                  className="modern-dropdown-button"
-                >
-                  <span>
-                    {dateFilter === 'all' ? 'All Time' :
-                      dateFilter === '7' ? 'Last 7 Days' :
-                        dateFilter === '30' ? 'Last 30 Days' :
-                          dateFilter === '90' ? 'Last 3 Months' :
-                            dateFilter === '180' ? 'Last 6 Months' :
-                              'This Year'}
-                  </span>
-                  <div className="modern-dropdown-arrow">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </button>
-
-                {showDateDropdown && (
-                  <div className="modern-dropdown-menu open">
-                    <button
-                      onClick={() => { setDateFilter('all'); setShowDateDropdown(false); }}
-                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      All Time
-                    </button>
-                    <button
-                      onClick={() => { setDateFilter('7'); setShowDateDropdown(false); }}
-                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      Last 7 Days
-                    </button>
-                    <button
-                      onClick={() => { setDateFilter('30'); setShowDateDropdown(false); }}
-                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      Last 30 Days
-                    </button>
-                    <button
-                      onClick={() => { setDateFilter('90'); setShowDateDropdown(false); }}
-                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      Last 3 Months
-                    </button>
-                    <button
-                      onClick={() => { setDateFilter('180'); setShowDateDropdown(false); }}
-                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      Last 6 Months
-                    </button>
-                    <button
-                      onClick={() => { setDateFilter('365'); setShowDateDropdown(false); }}
-                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      This Year
-                    </button>
-                  </div>
-                )}
-              </div>
             </div>
           </div>
 
@@ -741,7 +669,7 @@ export function CampaignAssignmentsPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3.5">{getStatusBadge(status)}</td>
-                        <td className="px-4 py-3.5">{getActionButton(status, campaign, handleStartCampaign)}</td>
+                        <td className="px-4 py-3.5">{getActionButton(status, campaign, handleStartModule)}</td>
                       </tr>
                     );
                   }) : (

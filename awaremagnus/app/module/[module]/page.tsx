@@ -12,7 +12,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useContentsWithProgress, useModule, useModules } from "@/hooks/useQuiz";
+import { useContentsWithProgress, useModule, useModules, useModuleReport } from "@/hooks/useQuiz";
 import { isOrgUser } from "@/utils/roles";
 import { quizService } from "@/services/quizService";
 
@@ -35,8 +35,21 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const tabIndicatorRef = useRef<HTMLDivElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
   
-  // Hard-coded moduleId for physical-security (you may want to make this dynamic)
-  const moduleId = 1;
+  // Get module ID from slug
+  const { data: modulesRes } = useModules({ filter: module });
+  const moduleId = useMemo(() => {
+    if (modulesRes?.success && modulesRes.data) {
+      const found = modulesRes.data.find(m => {
+        const codeMatch = m.code?.toLowerCase() === module.toLowerCase();
+        const titleMatch = m.title?.toLowerCase() === moduleName.toLowerCase();
+        const translationMatch = m.translations?.some(t => t.name.toLowerCase() === moduleName.toLowerCase());
+        return codeMatch || titleMatch || translationMatch;
+      });
+      return found?.id || 1;
+    }
+    return 1;
+  }, [modulesRes, module, moduleName]);
+
   const roleId = user?.role_id;
   const isOrgUserView = isOrgUser(roleId);
 
@@ -66,6 +79,9 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   // Get module basic info
   const { data: moduleRes } = useModule(moduleId, true);
+
+  // Get module report with progress_percentage
+  const { data: moduleReportRes } = useModuleReport(moduleId);
 
   // Transform API data to items format
   const items = useMemo(() => {
@@ -170,9 +186,12 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   // Calculate overall progress from API data
   const overallProgress = useMemo(() => {
+    if (moduleReportRes?.success && moduleReportRes.data?.progress_percentage) {
+      return parseFloat(moduleReportRes.data.progress_percentage);
+    }
     if (!contentsWithProgressRes?.success) return 0;
     return contentsWithProgressRes.data?.user_progress_summary?.overall_progress_percent || 0;
-  }, [contentsWithProgressRes]);
+  }, [moduleReportRes, contentsWithProgressRes]);
 
   // Get module info from API
   const moduleInfo = useMemo(() => {

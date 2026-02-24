@@ -114,4 +114,27 @@ export const campaignService = {
       })
     );
   },
+
+  /**
+   * Begin a specific module within a campaign for the current user.
+   * API: POST /useraction/report-actions/begin-module
+   */
+  beginModule: async (campaignId: number, moduleId: number) => {
+    return request<unknown>(() =>
+      awmClient.post<AWMResponseBody>(`${API_BASE}/useraction/report-actions/begin-module`, {
+        campaign_id: campaignId,
+        module_id: moduleId,
+      })
+    );
+  },
+
+  /**
+   * Fetch module report (no mapping done yet).
+   * API: GET /report/modules/:id
+   */
+  getModuleReport: async (moduleId: number) => {
+    return request<unknown>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/report/modules/${moduleId}`)
+    );
+  },
 };
