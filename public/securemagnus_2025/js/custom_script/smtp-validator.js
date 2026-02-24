@@ -63,10 +63,6 @@ function initSMTPFormValidator(config) {
           minlength: 6,
           maxlength: 255
         },
-        details: {
-          required: true,
-          maxlength: 1000
-        }
       },
       messages: {
         org: {
@@ -101,10 +97,6 @@ function initSMTPFormValidator(config) {
           minlength: window.i18n?.validation_messages?.password_minlength || "Password must be at least 6 characters",
           maxlength: window.i18n?.validation_messages?.password_maxlength || "Password cannot exceed 255 characters"
         },
-        details: {
-          required: window.i18n?.validation_messages?.details_required || "Details are required",
-          maxlength: window.i18n?.validation_messages?.details_maxlength || "Details cannot exceed 1000 characters"
-        }
       },
       errorElement: 'span',
       errorPlacement: function(error, element) {
@@ -130,9 +122,8 @@ function initSMTPFormValidator(config) {
       var smtp_account = $('#smtp_account').val().trim();
       var sender_email = $('#sender_email').val().trim();
       var smtp_password = $('#smtp_password').val().trim();
-      var details = $('#details').val().trim();
 
-      return host && port && smtp_account && sender_email && smtp_password && details;
+      return host && port && smtp_account && sender_email && smtp_password;
     }
 
     // Function to enable save button
