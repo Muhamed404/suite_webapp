@@ -46,7 +46,7 @@ function generatePhishMagnusMenu(req, organization) {
       module: "Simulator Emails",
       labelKey: "menu.phishmagnus.simulatorEmails",
       link: "/phm/phishing-smtp/list",
-      img_path: "/securemagnus_2025/images/phishmagnus_sidebar/Simulator_Emails_Solid.svg",
+      img_path: "/securemagnus_2025/images/phishmagnus_sidebar/Campaign_Sold.svg",
       allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin, enums.userType.OrgSuperAdmin, enums.userType.OrgSubAdmin],
     },
     {

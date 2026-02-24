@@ -13,7 +13,7 @@ const checkPermission = (moduleName, allowedAccessTypes = []) => {
         return res.status(403).json({ message: 'Access denied: No permissions assigned' });
       }
 
-      logger.info('[CHECK PERMISSION] List of Assigned Permissions: ' + JSON.stringify(userPermissions));
+      // logger.info('[CHECK PERMISSION] List of Assigned Permissions: ' + JSON.stringify(userPermissions));
 
       // Normalize for case-insensitive comparison
       const normalizedModule = moduleName?.toLowerCase();

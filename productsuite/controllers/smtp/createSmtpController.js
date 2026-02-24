@@ -1,5 +1,3 @@
-const config = require("../../../config/env.config");
-
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client')
 
@@ -47,6 +45,8 @@ exports.createSMTP = async (req, res) => {
             isActive: smtp.is_active ? true : false,
             enableTestBtn: smtp.id ? true : false,
             sender_email: smtp.sender_email,
+            use_tls: smtp.use_tls,
+            use_ssl: smtp.use_ssl,
             for_phishing_smtp: smtp.for_phishing_smtp
           });
         } else {
@@ -74,7 +74,7 @@ exports.createSMTP = async (req, res) => {
       });
   } else {
     logger.info(`Calling post method of create smtp`);
-    const { host, port, smtp_account, smtp_password, sender_email } = req.body;
+    const { host, port, smtp_account, smtp_password, sender_email, use_tls, use_ssl } = req.body;
     logger.info(`Incoming param body ${JSON.stringify(req.body, null, 2)}`);
     let orgId = Number(req.params.orgId);
     const smtpObj = {
@@ -83,6 +83,8 @@ exports.createSMTP = async (req, res) => {
       smtp_account,
       smtp_password,
       sender_email,
+      use_tls: use_tls === 'true',
+      use_ssl: use_ssl === 'true',
       organization_id: orgId,
     };
     const apiClient = getApiClient(req);

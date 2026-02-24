@@ -49,7 +49,7 @@ exports.createSMTP = async (req, res) => {
       });
   } else if (req.method === "POST") {
     logger.info(`Create Phishing SMTP Controller: POST:- Calling post method of create smtp`);
-    const { host, port, smtp_account, smtp_password, sender_email, selected_org, details } = req.body;
+    const { host, port, smtp_account, smtp_password, sender_email, selected_org, details, use_tls, use_ssl } = req.body;
     // logger.info(`Incoming param body ${JSON.stringify(req.body, null, 2)}`);
     // let orgId = Number(selected_org) || req.session?.user?.organization_id || 0;
     const smtpObj = {
@@ -59,7 +59,9 @@ exports.createSMTP = async (req, res) => {
       smtp_password,
       sender_email,
       organization_id: selected_org,
-      details
+      details,
+      use_tls: use_tls === 'true',
+      use_ssl: use_ssl === 'true'
     };
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PHISHMAGNUS.PHISHING_SMTP.CREATE(selected_org);

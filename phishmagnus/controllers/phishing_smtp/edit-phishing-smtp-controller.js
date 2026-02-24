@@ -34,8 +34,9 @@ exports.editPhishingSMTP = async (req, res) => {
       });
 
   } else if (req.method === 'POST') {
-    const { host, port, smtp_account, smtp_password, sender_email, is_active, details } = req.body;
-    const smtpObj = { host, port, smtp_account, smtp_password, sender_email, is_active: is_active === 'true', details };
+    // console.log('Request body:'+ JSON.stringify(req.body, null, 2)); // Debug log to check incoming data
+    const { host, port, smtp_account, smtp_password, sender_email, is_active, details, use_tls, use_ssl } = req.body;
+    const smtpObj = { host, port, smtp_account, smtp_password, sender_email, is_active: is_active === 'true', details, use_tls: use_tls === 'true', use_ssl: use_ssl === 'true' };
 
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PHISHMAGNUS.PHISHING_SMTP.UPDATE(smtpId);

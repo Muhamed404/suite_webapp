@@ -100,12 +100,47 @@
           class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900" />
       </div>
 
+      <!-- Use TLS / Use SSL -->
+      <div class="md:col-span-2 flex gap-12">
+        <!-- Use TLS -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-3">
+            Use TLS
+          </label>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="hidden" name="use_tls" id="use_tls_input" value="<%= smtp.use_tls ? 'true' : 'false' %>" />
+            <input type="checkbox" id="use_tls" <%= smtp.use_tls ? 'checked' : '' %>
+              class="sr-only peer" />
+            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+            <span class="ms-3 text-sm text-gray-500 peer-checked:text-teal-600" id="use_tls_label">
+              <%= smtp.use_tls ? 'Enabled' : 'Disabled' %>
+            </span>
+          </label>
+        </div>
+
+        <!-- Use SSL -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-3">
+            Use SSL
+          </label>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="hidden" name="use_ssl" id="use_ssl_input" value="<%= smtp.use_ssl ? 'true' : 'false' %>" />
+            <input type="checkbox" id="use_ssl" <%= smtp.use_ssl ? 'checked' : '' %>
+              class="sr-only peer" />
+            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+            <span class="ms-3 text-sm text-gray-500 peer-checked:text-teal-600" id="use_ssl_label">
+              <%= smtp.use_ssl ? 'Enabled' : 'Disabled' %>
+            </span>
+          </label>
+        </div>
+      </div>
+
       <!-- Details -->
       <div class="md:col-span-2">
         <label class="block text-gray-700 font-medium mb-3">
           <%= __("smtp.labelDetails") %>
         </label>
-        <textarea name="details" id="details" maxlength="1000" rows="4"
+        <textarea name="details" id="details" maxlength="1000" rows="4" required
           class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900 resize-none"><%= smtp.details || '' %></textarea>
         <p class="text-xs text-gray-400 mt-1 text-right">
           <span id="details-count">0</span>/1000
@@ -151,6 +186,7 @@
       service_account_required: "<%- __('validation_messages.service_account_required') %>",
       service_account_minlength: "<%- __('validation_messages.service_account_minlength') %>",
       service_account_maxlength: "<%- __('validation_messages.service_account_maxlength') %>",
+      valid_email: "<%- __('validation_messages.valid_email') %>",
       password_required: "<%- __('validation_messages.password_required') %>",
       password_minlength: "<%- __('validation_messages.password_minlength') %>",
       password_maxlength: "<%- __('validation_messages.password_maxlength') %>"
@@ -168,6 +204,17 @@
   detailsCount.textContent = detailsEl.value.length;
   detailsEl.addEventListener('input', function() {
     detailsCount.textContent = this.value.length;
+  });
+
+  // TLS / SSL toggle labels + hidden input sync
+  ['use_tls', 'use_ssl'].forEach(function(id) {
+    var checkbox = document.getElementById(id);
+    var label = document.getElementById(id + '_label');
+    var hidden = document.getElementById(id + '_input');
+    checkbox.addEventListener('change', function() {
+      hidden.value = this.checked ? 'true' : 'false';
+      label.textContent = this.checked ? 'Enabled' : 'Disabled';
+    });
   });
 
   // Active / Inactive toggle logic
