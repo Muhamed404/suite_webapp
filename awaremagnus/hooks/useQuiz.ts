@@ -303,3 +303,11 @@ export function useContentsWithProgress(
     enabled: enabled && !!moduleId && !!campaignId,
   });
 }
+
+export function useModuleReport(moduleId: number, enabled = true) {
+  return useQuery({
+    queryKey: ["quiz", "module", moduleId, "report"],
+    queryFn: () => quizService.getModuleReport(moduleId),
+    enabled: enabled && !!moduleId,
+  });
+}
