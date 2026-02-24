@@ -25,8 +25,8 @@ export default function CampaignDetailsPage() {
   const t = useTranslations("dashboard");
 
   const [isActive, setIsActive] = useState(true);
-
-  const campaignId = Number(params.id);
+  
+  const campaignId = params?.id ? Number(params.id) : 0;
   const updateCampaign = useUpdateCampaign();
   
   // Fetch all campaign data from dashboard API

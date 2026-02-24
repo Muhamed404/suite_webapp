@@ -45,6 +45,22 @@
   "pagination": {
     "showing": "عرض {{start}}–{{end}} من أصل {{total}} إدخال"
   },
+  "certificatesTitle": "الشهادات",
+  "certificatesDescription": "عرض وتحميل الشهادات التي حصلت عليها.",
+  "emptyCertificatesTitle": "لا توجد شهادات بعد",
+  "emptyCertificatesDescription": "أكمل وحدات الحملة للحصول على الشهادات.",
+  "searchCertificates": "ابحث عن الشهادات...",
+  "certificateName": "اسم الشهادة",
+  "loadingCertificates": "جارٍ تحميل الشهادات...",
+  "campaignLabel": "الحملة",
+  "moduleLabel": "الوحدة",
+  "issuedDate": "تاريخ الإصدار",
+  "expiryDate": "تاريخ الانتهاء",
+  "downloadCertificate": "تحميل الشهادة",
+  "breadcrumb": {
+    "dashboard": "لوحة التحكم"
+  },
+
   "wizard": {
     "step1": "تفاصيل الحملة",
     "step2": "المستخدمون المستهدفون",

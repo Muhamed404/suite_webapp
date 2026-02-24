@@ -13,11 +13,11 @@ export const CAMPAIGN_KEYS = {
 };
 
 /** Fetch campaigns assigned to the current Org User */
-export function useAssignedCampaigns(enabled = true) {
+export function useAssignedCampaigns(campaignId?: string, enabled = true) {
   const { user } = useAuthStore();
   return useQuery({
-    queryKey: CAMPAIGN_KEYS.assignedCampaigns,
-    queryFn: () => campaignService.getAssignedCampaigns(user?.id || 0),
+    queryKey: [...CAMPAIGN_KEYS.assignedCampaigns, campaignId],
+    queryFn: () => campaignService.getAssignedCampaigns(user?.id || 0, campaignId),
     enabled: enabled && !!user?.id,
   });
 }

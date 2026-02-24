@@ -6,6 +6,7 @@ import { CampaignModuleContentsPage } from "@/components/modules/campaign";
 
 export default function CampaignModuleContentsRoute() {
   const params = useParams();
+  if (!params) return null;
   const campaignId = Number(params.campaignId);
   const moduleId = Number(params.moduleId);
 

@@ -8,9 +8,34 @@ import Image from "next/image";
 import { List, LayoutGrid, Eye, Pencil, Search, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight, Download, Share2, MoreVertical, Clock, Calendar } from "lucide-react";
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { quizService } from "@/services/quizService";
+
+// Maps URL slug → contype_id (add more as needed)
+const CONTENT_TYPE_ID: Record<string, number> = {
+  posters: 4,
+  brochures: 5,
+  documents: 6,
+  "screen-savers": 7,
+};
+
+// Maps language name → ISO code
+function toLangCode(name?: string): string {
+  if (!name) return "en";
+  const n = name.toLowerCase();
+  if (n === "arabic") return "ar";
+  if (n === "french") return "fr";
+  return "en";
+}
 
 export default function ContentPage() {
-  const { module, type } = useParams();
+  const params = useParams();
+  
+  const module = params?.module;
+  const type = params?.type;
+  
+  // determine slug (array or string) and check if we're on posters page
+  const slug = Array.isArray(type) ? type[0] : type ?? "";
+  const isPostersPage = slug === "posters";
   const [searchQuery, setSearchQuery] = useState("");
   const [languageFilter, setLanguageFilter] = useState("all");
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
@@ -19,162 +44,51 @@ export default function ContentPage() {
   const [sortOrder, setSortOrder] = useState("asc");
   const [viewingItem, setViewingItem] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [apiItems, setApiItems] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const itemsPerPage = 10;
 
-  const libraryItems = [
-    {
-      id: 1,
-      title: "Screen Saver 1",
-      description: "A simple clean screen saver",
-      languageCode: "en",
-      language: "English",
-      updated: "2026-01-18",
-      thumbnail: "images/img-frame.svg",
-      contentType: "screen-saver"
-    },
-    {
-      id: 2,
-      title: "Promo Intro Video",
-      description: "Short promotional intro",
-      languageCode: "en",
-      language: "English",
-      updated: "2026-02-04",
-      thumbnail: "images/img-frame.svg",
-      contentType: "video"
-    },
-    {
-      id: 3,
-      title: "HR Announcement",
-      description: "Company-wide HR update",
-      languageCode: "ar",
-      language: "Arabic",
-      updated: "2025-12-20",
-      thumbnail: "images/img-frame.svg",
-      contentType: "video"
-    },
-    {
-      id: 4,
-      title: "Daily Tips",
-      description: "Short daily motivational message",
-      languageCode: "fr",
-      language: "French",
-      updated: "2026-01-27",
-      thumbnail: "images/img-frame.svg",
-      contentType: "video"
-    },
-    {
-      id: 5,
-      title: "Safety Guidelines",
-      description: "Mandatory workplace safety rules",
-      languageCode: "en",
-      language: "English",
-      updated: "2025-11-02",
-      thumbnail: "images/img-frame.svg",
-      contentType: "video"
-    },
-    {
-      id: 6,
-      title: "Zero Trust Primer",
-      description: "Foundational zero-trust walkthrough",
-      languageCode: "en",
-      language: "English",
-      updated: "2026-02-10",
-      thumbnail: "images/img-frame.svg",
-      contentType: "video"
-    },
-    {
-      id: 7,
-      title: "Phishing 101",
-      description: "Spot and report basic phishing attempts",
-      languageCode: "ar",
-      language: "Arabic",
-      updated: "2026-01-08",
-      thumbnail: "images/img-frame.svg",
-      contentType: "video"
-    },
-    {
-      id: 8,
-      title: "Cloud Hygiene",
-      description: "Baseline cloud security posture tips",
-      languageCode: "fr",
-      language: "French",
-      updated: "2025-10-18",
-      thumbnail: "images/img-frame.svg",
-      contentType: "video"
-    },
-    {
-      id: 9,
-      title: "Password Pro",
-      description: "Create and manage strong passwords",
-      languageCode: "en",
-      language: "English",
-      updated: "2026-01-12",
-      thumbnail: "images/img-frame.svg",
-      contentType: "video"
-    },
-    {
-      id: 10,
-      title: "Mobile Safety",
-      description: "Secure mobile work practices",
-      languageCode: "ar",
-      language: "Arabic",
-      updated: "2026-02-01",
-      thumbnail: "images/img-frame.svg",
-      contentType: "video"
-    },
-    {
-      id: 11,
-      title: "Training Poster 1",
-      description: "Physical security training poster",
-      languageCode: "en",
-      language: "English",
-      updated: "2026-01-15",
-      thumbnail: "images/img-frame.svg",
-      contentType: "poster"
-    },
-    {
-      id: 12,
-      title: "Screen Saver Image",
-      description: "Custom screen saver image",
-      languageCode: "en",
-      language: "English",
-      updated: "2026-01-20",
-      thumbnail: "images/img-frame.svg",
-      contentType: "screen-saver"
-    },
-    {
-      id: 13,
-      title: "Awareness Image",
-      description: "Security awareness image content",
-      languageCode: "en",
-      language: "English",
-      updated: "2026-01-25",
-      thumbnail: "images/img-frame.svg",
-      contentType: "image"
-    },
-    {
-      id: 14,
-      title: "Physical Security Brochure",
-      description: "Interactive training brochure for physical security",
-      languageCode: "en",
-      language: "English",
-      updated: "2026-01-15",
-      thumbnail: "images/img-frame.svg",
-      contentType: "brochure",
-      fileUrl: "brochure.pdf"
-    },
-    {
-      id: 16,
-      title: "Security PDF Guide",
-      description: "Comprehensive PDF guide for security practices",
-      languageCode: "en",
-      language: "English",
-      updated: "2026-01-25",
-      thumbnail: "images/img-frame.svg",
-      contentType: "pdf",
-      fileUrl: "security-guide.pdf"
+  // Hard-coded moduleId (same approach as the module list page)
+  const moduleId = 1;
+
+  useEffect(() => {
+    const slug = Array.isArray(type) ? type[0] : type ?? "";
+    const contype_id = CONTENT_TYPE_ID[slug];
+    if (!contype_id) {
+      setIsLoading(false);
+      return;
     }
-  ];
+    setIsLoading(true);
+    quizService
+      .getContents({ mod_id: moduleId, contype_id })
+      .then((res) => {
+        if (res.success && Array.isArray(res.data)) {
+          const mapped = res.data.map((c: any) => ({
+            id: c.id,
+            title: c.title ?? c.name ?? `Content ${c.id}`,
+            description: c.description ?? "",
+            languageCode: toLangCode(c.language?.name),
+            language: c.language?.name ?? "English",
+            updated: c.createdAt ?? c.creation_date ?? c.created_at ?? "",
+            thumbnail: c.logo_url ?? "images/img-frame.svg",
+            contentType: slug,
+            source_url: c.source_url ?? null,
+          }));
+          setApiItems(mapped);
+        } else {
+          setApiItems([]);
+        }
+      })
+      .catch((err) => {
+        console.error("[content page] getContents error", err);
+        setApiItems([]);
+      })
+      .finally(() => setIsLoading(false));
+  }, [type]);
+
+  // items are populated via API; legacy static array removed
+
+  const libraryItems = apiItems;
 
   const filteredItems = useMemo(() => {
     let filtered = [...libraryItems];
@@ -260,6 +174,8 @@ export default function ContentPage() {
         console.log("View", item);
       }
     } else if (action === "edit") {
+      // editing is not supported on posters page
+      if (isPostersPage) return;
       console.log("Edit", item);
     }
   };
@@ -444,25 +360,47 @@ export default function ContentPage() {
 
                     {/* Image Display Container */}
                     <div className="bg-white rounded-xl overflow-hidden">
-                      {["pdf", "brochure", "document"].includes((viewingItem as any).contentType) ? (
-                        <iframe
-                          src={`../../../${(viewingItem as any).fileUrl || "brochure.pdf"}`}
-                          width="100%"
-                          height="800px"
-                          style={{ border: 'none' }}
-                        />
-                      ) : (
-                        <img
-                          src="posters.png"
-                          alt={(viewingItem as any).title}
-                          style={{
-                            maxWidth: "100%",
-                            height: "auto",
-                            display: "block",
-                            margin: "auto",
-                          }}
-                        />
-                      )}
+                      {(() => {
+                        const rawUrl = (viewingItem as any).source_url;
+                        const contentBase =
+                          process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://localhost:3002";
+                        const fullUrl = rawUrl
+                          ? `${contentBase}${rawUrl}`
+                          : null;
+                        const isPdf = fullUrl?.toLowerCase().endsWith(".pdf");
+
+                        if (!fullUrl) {
+                          return (
+                            <div className="flex items-center justify-center h-64 text-gray-400 text-sm">
+                              No content available
+                            </div>
+                          );
+                        }
+
+                        if (isPdf) {
+                          return (
+                            <iframe
+                              src={fullUrl}
+                              width="100%"
+                              height="800px"
+                              style={{ border: "none" }}
+                            />
+                          );
+                        }
+
+                        return (
+                          <img
+                            src={fullUrl}
+                            alt={(viewingItem as any).title}
+                            style={{
+                              maxWidth: "100%",
+                              height: "auto",
+                              display: "block",
+                              margin: "auto",
+                            }}
+                          />
+                        );
+                      })()}
 
                       {/* Image Info */}
                       <div className="p-4 border-b border-gray-100">
@@ -566,17 +504,19 @@ export default function ContentPage() {
                           Physical security description
                         </p>
                       </div>
-                      <a
-                        href="add-new-module-content.html"
-                        className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs"
-                      >
-                        <img
-                          src="./images/img/add.svg"
-                          className="size-3"
-                          alt=""
-                        />
-                        <span className="hidden md:inline">Add New</span>
-                      </a>
+                      {!isPostersPage && (
+                        <a
+                          href="add-new-module-content.html"
+                          className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs"
+                        >
+                          <img
+                            src="./images/img/add.svg"
+                            className="size-3"
+                            alt=""
+                          />
+                          <span className="hidden md:inline">Add New</span>
+                        </a>
+                      )}
                     </div>
 
                     {/* Filters row */}
@@ -809,14 +749,16 @@ export default function ContentPage() {
                                       >
                                         <Eye className="w-4 h-4" />
                                       </button>
-                                      <button
-                                        onClick={() =>
-                                          handleView("edit", item)
-                                        }
-                                        className="flex items-center gap-1 px-2 py-1 text-gray-700 text-[11px]"
-                                      >
-                                        <Pencil className="w-4 h-4" />
-                                      </button>
+                                      {!isPostersPage && (
+                                        <button
+                                          onClick={() =>
+                                            handleView("edit", item)
+                                          }
+                                          className="flex items-center gap-1 px-2 py-1 text-gray-700 text-[11px]"
+                                        >
+                                          <Pencil className="w-4 h-4" />
+                                        </button>
+                                      )}
                                     </div>
                                   </td>
                                 </tr>
@@ -873,15 +815,17 @@ export default function ContentPage() {
                                       <Eye className="w-4 h-4" />
                                       View
                                     </button>
-                                    <button
-                                      onClick={() =>
-                                        handleView("edit", item)
-                                      }
-                                      className="flex items-center gap-1 px-2 py-1.5 rounded-full border border-gray-200 text-gray-700 text-[11px] hover:bg-gray-100"
-                                    >
-                                      <Pencil className="w-4 h-4" />
-                                      Edit
-                                    </button>
+                                    {!isPostersPage && (
+                                      <button
+                                        onClick={() =>
+                                          handleView("edit", item)
+                                        }
+                                        className="flex items-center gap-1 px-2 py-1.5 rounded-full border border-gray-200 text-gray-700 text-[11px] hover:bg-gray-100"
+                                      >
+                                        <Pencil className="w-4 h-4" />
+                                        Edit
+                                      </button>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -889,8 +833,18 @@ export default function ContentPage() {
                           </div>
                         )}
 
+                        {/* Loading state */}
+                        {isLoading && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-white">
+                            <div className="text-center py-12">
+                              <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                              <p className="text-sm text-gray-500">Loading content…</p>
+                            </div>
+                          </div>
+                        )}
+
                         {/* Empty state */}
-                        {filteredItems.length === 0 && (
+                        {!isLoading && filteredItems.length === 0 && (
                           <div className="absolute inset-0 flex items-center justify-center bg-white">
                             <div className="text-center py-12">
                               <div className="bg-gray-100 p-4 rounded-full inline-block mb-4">

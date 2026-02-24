@@ -6,7 +6,7 @@ import { QuizListPage } from "@/components/modules/training-library/quiz-list-pa
 
 export default function MyLibraryModuleQuizzesPage() {
   const params = useParams();
-  const moduleId = Number(params.moduleId);
+  const moduleId = params?.moduleId ? Number(params.moduleId) : 0;
 
   if (!moduleId || Number.isNaN(moduleId)) return null;
 
