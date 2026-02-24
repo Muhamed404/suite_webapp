@@ -6,8 +6,8 @@ import { ContentListPage } from "@/components/modules/training-library/content-l
 
 export default function SystemLibraryModuleContentListPage() {
   const params = useParams();
-  const moduleId = Number(params.moduleId);
-  const contentTypeId = Number(params.contentTypeId);
+  const moduleId = params?.moduleId ? Number(params.moduleId) : 0;
+  const contentTypeId = params?.contentTypeId ? Number(params.contentTypeId) : 0;
 
   if (!moduleId || Number.isNaN(moduleId)) return null;
   if (!contentTypeId || Number.isNaN(contentTypeId)) return null;

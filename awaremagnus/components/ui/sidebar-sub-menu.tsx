@@ -64,7 +64,7 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
       if (item.children?.length) {
         const key = item.label.toLowerCase().replace(/\s+/g, "");
 
-        initial[key] = item.children!.some((c) => isPathUnder(c.href, pathname));
+        initial[key] = item.children!.some((c) => isPathUnder(c.href, pathname ?? ""));
       }
     });
 
@@ -159,7 +159,7 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
             const menuId = item.label.toLowerCase().replace(/\s+/g, "");
             const isOpen = openMenus[menuId];
             const isParentActive =
-              hasChildren && item.children!.some((c) => isPathUnder(c.href, pathname));
+              hasChildren && item.children!.some((c) => isPathUnder(c.href, pathname ?? ""));
 
             if (hasChildren) {
               const parentButton = (
@@ -247,7 +247,7 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
                           <ul className="space-y-0.5">
                             {item.children!.map((child) => {
                               const isChildActive =
-                                pathname === child.href || isPathUnder(child.href, pathname);
+                                pathname === child.href || isPathUnder(child.href, pathname ?? "");
 
                               return (
                                 <li key={child.href}>
@@ -277,7 +277,7 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
                     >
                       {item.children!.map((child) => {
                         const isChildActive =
-                          pathname === child.href || isPathUnder(child.href, pathname);
+                          pathname === child.href || isPathUnder(child.href, pathname ?? "");
 
                         return (
                           <li key={child.href}>

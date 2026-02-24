@@ -6,9 +6,10 @@ import { ContentDetailPage } from "@/components/modules/training-library/content
 
 export default function MyLibraryModuleContentDetailPage() {
   const params = useParams();
-  const moduleId = Number(params.moduleId);
-  const contentTypeId = Number(params.contentTypeId);
-  const contentId = Number(params.contentId);
+  
+  const moduleId = params?.moduleId ? Number(params.moduleId) : 0;
+  const contentTypeId = params?.contentTypeId ? Number(params.contentTypeId) : 0;
+  const contentId = params?.contentId ? Number(params.contentId) : 0;
 
   if (!moduleId || Number.isNaN(moduleId)) return null;
   if (!contentTypeId || Number.isNaN(contentTypeId)) return null;

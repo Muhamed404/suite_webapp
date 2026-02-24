@@ -89,101 +89,64 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-semibold">Campaign Ready to Create!</h2>
-        <p className="text-gray-600 mt-2">Review your campaign details below</p>
+    <div>
+      {/* Header Section */}
+      <div className="flex items-start gap-4 pb-4 mb-4 border-b border-gray-200">
+        <div className="w-12 h-12 bg-green-400 rounded-full flex items-center justify-center flex-shrink-0">
+          <CheckCircle className="w-6 h-6 text-white" />
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold text-[#051226]">Campaign Ready to Create!</h2>
+          <p className="text-xs text-gray-500">Review your campaign details before submitting</p>
+        </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <h3 className="font-semibold mb-2">Basic Information</h3>
-          <dl className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-gray-600">Campaign Name:</dt>
-              <dd className="font-medium">{formData.campaignName}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-600">Description:</dt>
-              <dd className="font-medium">{formData.description || "—"}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-600">Duration:</dt>
-              <dd className="font-medium">
-                {formData.startDate} to {formData.endDate}
-              </dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-600">Gamification:</dt>
-              <dd className="font-medium">{formData.gamified ? "Enabled" : "Disabled"}</dd>
-            </div>
-          </dl>
+      {/* Summary Details */}
+      <div className="space-y-0">
+        <div className="flex items-start gap-4 py-2 border-b border-gray-100">
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Name</span>
+          <span className="text-sm text-gray-600 flex-1">{formData.campaignName}</span>
         </div>
-
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <h3 className="font-semibold mb-2">Target Users</h3>
-          <dl className="space-y-2 text-sm">
-            <div className="flex flex-col">
-              <dt className="text-gray-600 mb-1">Departments:</dt>
-              <dd className="font-medium ml-4">{getDepartmentNames()}</dd>
-            </div>
-            <div className="flex flex-col">
-              <dt className="text-gray-600 mb-1">Groups:</dt>
-              <dd className="font-medium ml-4">{getGroupNames()}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-600">Manual Users:</dt>
-              <dd className="font-medium">{formData.manualUsers.length} users</dd>
-            </div>
-          </dl>
+        <div className="flex items-start gap-4 py-2 border-b border-gray-100">
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Description</span>
+          <span className="text-sm text-gray-600 flex-1">{formData.description || "—"}</span>
         </div>
-
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <h3 className="font-semibold mb-2">Modules & Content</h3>
-          <dl className="space-y-2 text-sm">
-            <div>
-              <dt className="text-gray-600 mb-1">Selected Modules:</dt>
-              <dd className="font-medium ml-4">
-                <ul className="list-disc">
-                  {formData.modules.map((id) => (
-                    <li key={id}>{getModuleName(id)}</li>
-                  ))}
-                </ul>
-              </dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-600">Short Videos:</dt>
-              <dd className="font-medium">{formData.visualShortVideos ? "Yes" : "No"}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-600">Interactive Content:</dt>
-              <dd className="font-medium">{formData.visualInteractive ? "Yes" : "No"}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-600">Quiz Enabled:</dt>
-              <dd className="font-medium">{formData.enableQuiz ? "Yes" : "No"}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-gray-600">Certificate Enabled:</dt>
-              <dd className="font-medium">{formData.enableCertificate ? "Yes" : "No"}</dd>
-            </div>
-          </dl>
+        <div className="flex items-start gap-4 py-2 border-b border-gray-100">
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Gamified</span>
+          <span className="text-sm text-gray-600 flex-1">{formData.gamified ? "Yes" : "No"}</span>
         </div>
-
-        {formData.schedules.length > 0 && (
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <h3 className="font-semibold mb-2">Schedule</h3>
-            <dl className="space-y-2 text-sm">
-              {formData.schedules.map((schedule) => (
-                <div key={schedule.module_id} className="flex justify-between">
-                  <dt className="text-gray-600">{getModuleName(schedule.module_id)}:</dt>
-                  <dd className="font-medium">{schedule.start_date}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-        )}
+        <div className="flex items-start gap-4 py-2 border-b border-gray-100">
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Departments</span>
+          <span className="text-sm text-gray-600 flex-1">{getDepartmentNames()}</span>
+        </div>
+        <div className="flex items-start gap-4 py-2 border-b border-gray-100">
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Groups</span>
+          <span className="text-sm text-gray-600 flex-1">{getGroupNames()}</span>
+        </div>
+        <div className="flex items-start gap-4 py-2 border-b border-gray-100">
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Users</span>
+          <span className="text-sm text-gray-600 flex-1">
+            {formData.manualUsers.length > 0
+              ? formData.manualUsers.map((u) => `${u.firstName} ${u.lastName}`).join(", ")
+              : "None"}
+          </span>
+        </div>
+        <div className="flex items-start gap-4 py-2 border-b border-gray-100">
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Topics</span>
+          <span className="text-sm text-gray-600 flex-1">
+            {formData.modules.length > 0
+              ? formData.modules.map((id) => getModuleName(id)).join(", ")
+              : "None"}
+          </span>
+        </div>
+        <div className="flex items-start gap-4 py-2 border-b border-gray-100">
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Start</span>
+          <span className="text-sm text-gray-600 flex-1">{formData.startDate || "—"}</span>
+        </div>
+        <div className="flex items-start gap-4 py-2">
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">End</span>
+          <span className="text-sm text-gray-600 flex-1">{formData.endDate || "—"}</span>
+        </div>
       </div>
     </div>
   );

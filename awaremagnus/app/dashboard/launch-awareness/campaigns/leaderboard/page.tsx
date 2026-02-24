@@ -18,6 +18,9 @@ export default function CampaignLeaderboardPage() {
   const isRtl = dir === "rtl";
   const searchParams = useSearchParams();
   const router = useRouter();
+  
+  if (!searchParams) return null;
+  
   const campaignId = searchParams.get("campaign");
 
   const [sortConfig, setSortConfig] = useState<{

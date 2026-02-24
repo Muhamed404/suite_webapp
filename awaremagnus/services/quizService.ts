@@ -108,6 +108,7 @@ export const quizService = {
     mod_id?: number;
     module_id?: number;
     content_type_id?: number;
+    contype_id?: number;
     lang_id?: number;
     status?: number;
   }) => {
@@ -433,6 +434,16 @@ export const quizService = {
   },
 
   /**
+   * GET /api/awm/report/modules/:id
+   * Returns module report with progress_percentage
+   */
+  getModuleReport: async (moduleId: number) => {
+    return request<any>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/report/modules/${moduleId}`)
+    );
+  },
+
+  /**
    * GET /api/awm/category
    * Returns all global categories { categories, count }
    */
@@ -452,4 +463,5 @@ export const quizService = {
 
     return data;
   },
+
 };

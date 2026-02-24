@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, GripVertical } from "lucide-react";
-import { Button } from "@heroui/button";
+import { Calendar, GripVertical, Info, CalendarCheck } from "lucide-react";
 
 import { useTranslations } from "@/i18n/useTranslations";
 
@@ -50,61 +49,71 @@ export function WizardStep6({ formData, onChange, onGenerateSchedule, modulesLis
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
-        <Calendar className="w-6 h-6 text-blue-500" />
-        <span>{t("wizard.step6")}</span>
-      </h2>
-
-      <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg">
-        <p className="text-sm">{t("form.campaignDates")}</p>
+    <div>
+      <div className="flex items-center gap-1.5 mb-4">
+        <Calendar className="w-4 h-4 text-blue-500" />
+        <h2 className="text-sm font-semibold text-[#051226]">{t("wizard.step6")}</h2>
       </div>
 
-      <div>
-        <Button onClick={onGenerateSchedule} className="bg-blue-500 text-white">
-          {t("form.scheduleModules")}
-        </Button>
-      </div>
-
-      {formData.schedules.length > 0 && (
-        <div>
-          <h6 className="text-sm font-medium mb-3">Module Schedule (Drag to reorder)</h6>
-          <div className="space-y-2">
-            {formData.schedules.map((schedule, index) => (
-              <div
-                key={index}
-                draggable
-                onDragStart={() => handleDragStart(index)}
-                onDragOver={(e) => handleDragOver(e, index)}
-                onDragEnd={handleDragEnd}
-                className={`flex items-center gap-3 p-3 border rounded-lg transition-all ${
-                  draggedIndex === index
-                    ? "bg-blue-100 opacity-50 scale-95"
-                    : "bg-gray-50 hover:bg-gray-100"
-                } cursor-move`}
-              >
-                <GripVertical className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                <span className="flex-1 text-sm font-medium">
-                  {index + 1}. {getModuleName(schedule.module_id)}
-                </span>
-                <input
-                  type="date"
-                  value={schedule.start_date}
-                  onChange={(e) => {
-                    const newSchedules = [...formData.schedules];
-
-                    newSchedules[index].start_date = e.target.value;
-                    onChange("schedules", newSchedules);
-                  }}
-                  min={formData.startDate}
-                  max={formData.endDate}
-                  className="px-3 py-1.5 border rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            ))}
-          </div>
+      <div className="grid grid-cols-1 gap-3">
+        {/* Info Alert */}
+        <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-100 rounded-md">
+          <Info className="w-4 h-4 text-blue-600 flex-shrink-0" />
+          <p className="text-[10px] text-blue-700">Dates are set in Step 1. Optionally schedule modules below.</p>
         </div>
-      )}
+
+        {/* Schedule Button */}
+        <div>
+          <button
+            type="button"
+            onClick={onGenerateSchedule}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all"
+          >
+            <CalendarCheck className="w-3 h-3" />
+            <span>Schedule</span>
+          </button>
+        </div>
+
+        {/* Schedule List */}
+        {formData.schedules.length > 0 && (
+          <div>
+            <h4 className="text-xs font-medium text-gray-700 mb-2">Modules (drag to reorder):</h4>
+            <ul className="space-y-1">
+              {formData.schedules.map((schedule, index) => (
+                <li
+                  key={index}
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={`flex items-center justify-between px-3 py-2 border rounded-lg text-xs text-gray-700 transition-all ${
+                    draggedIndex === index
+                      ? "opacity-40 bg-blue-50 border-blue-300"
+                      : "bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50/30"
+                  } cursor-grab active:cursor-grabbing`}
+                >
+                  <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <GripVertical className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <span className="truncate">{index + 1}. {getModuleName(schedule.module_id)}</span>
+                  </div>
+                  <input
+                    type="date"
+                    value={schedule.start_date}
+                    onChange={(e) => {
+                      const newSchedules = [...formData.schedules];
+                      newSchedules[index].start_date = e.target.value;
+                      onChange("schedules", newSchedules);
+                    }}
+                    min={formData.startDate}
+                    max={formData.endDate}
+                    className="w-36 flex-shrink-0 px-2 py-1 border border-gray-200 rounded-md text-[10px] focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
