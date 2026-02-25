@@ -284,9 +284,15 @@ export function CreateQuizForm({
         {t("backToQuizzes")}
       </Link>
       <div className="text-xs text-[var(--darkgray)] mb-2">
-        {t("breadcrumbPrefix")}
-        <span className="text-[var(--mainblue)] font-semibold px-1">/</span>
-        <span className="text-[var(--mainblue)] font-semibold">{t("breadcrumbCurrent")}</span>
+        <span>{t("breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}</span>
+        <span className="mx-1">›</span>
+        <span className="text-[var(--mainblue)] font-semibold">
+          {moduleId && modules.length > 0
+            ? moduleName(modules.find((m) => String(m.id) === moduleId) || {})
+            : "Select Module"}
+        </span>
+        <span className="mx-1">›</span>
+        <span className="text-[var(--mainblue)] font-semibold">{t("breadcrumbCurrent") ?? "Create Quiz"}</span>
       </div>
       <h2 className="text-xl font-bold text-[var(--mainblue)]">{t("title")}</h2>
       <p className="text-xs text-[var(--darkgray)] mb-5 mt-1">{t("subtitle")}</p>

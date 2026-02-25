@@ -19,7 +19,7 @@ import {
 
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
-import { useQuiz, useQuizAnswers, useUpdateQuiz } from "@/hooks/useQuiz";
+import { useQuiz, useQuizAnswers, useUpdateQuiz, useModule } from "@/hooks/useQuiz";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { getApiErrorMessage } from "@/utils/apiError";
 
@@ -39,6 +39,10 @@ function mapApiAnswersToForm(
     text: (a.answer_text ?? (a as { answer?: string }).answer ?? "").trim(),
     correct: (a as { is_correct?: boolean }).is_correct ?? !!(a as { validity?: boolean }).validity,
   }));
+}
+
+function moduleName(m: any): string {
+  return m?.title ?? m?.translations?.[0]?.name ?? m?.code ?? `Module ${m?.id}`;
 }
 
 export interface EditQuizFormProps {
@@ -61,10 +65,15 @@ export function EditQuizForm({
 
   const { data: quizRes, isLoading: quizLoading } = useQuiz(quizId, !!quizId);
   const { data: answersRes, isLoading: answersLoading } = useQuizAnswers(quizId, !!quizId);
+  const { data: moduleRes, isLoading: moduleLoading } = useModule(
+    initialModuleId ? Number(initialModuleId) : 0,
+    !!initialModuleId
+  );
   const updateQuiz = useUpdateQuiz();
 
   const quiz = quizRes?.success ? quizRes.data : null;
   const apiAnswers = answersRes?.success ? (answersRes.data ?? []) : [];
+  const module = moduleRes?.success ? moduleRes.data : null;
 
   const [selectedQuizTypeId, setSelectedQuizTypeId] = useState<number>(2);
   const [languageForms, setLanguageForms] = useState<QuizLanguageForm[]>([]);
@@ -215,7 +224,12 @@ export function EditQuizForm({
         {t("backToQuizzes")}
       </Link>
       <div className="text-sm text-[var(--darkgray)] mb-2">
-        {t("breadcrumbPrefix")}
+        <span>{t("breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}</span>
+        <span className="mx-1">›</span>
+        <span className="text-[var(--mainblue)] font-semibold">
+          {module ? moduleName(module) : "Loading..."}
+        </span>
+        <span className="mx-1">›</span>
         <span className="text-[var(--mainblue)] font-semibold">{t("editQuiz") ?? "Edit Quiz"}</span>
       </div>
       <h2 className="text-2xl font-semibold text-[var(--mainblue)]">
