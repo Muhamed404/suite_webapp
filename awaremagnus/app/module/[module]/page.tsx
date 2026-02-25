@@ -126,8 +126,15 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         if (reported) {
           // use the raw status string from report (lowercased)
           statusValue = reported.statusName;
-        } else if (content.status) {
+        } else if (content.user_completion_status) {
+          // use user_completion_status if available
+          statusValue = content.user_completion_status.toLowerCase();
+        } else if (content.status && typeof content.status === 'string') {
+          // status may occasionally be non-string (e.g. numeric codes) so guard before calling toLowerCase
           statusValue = content.status.toLowerCase();
+        } else if (content.status != null) {
+          // convert anything else gracefully
+          statusValue = String(content.status).toLowerCase();
         } else {
           statusValue = 'pending';
         }
@@ -135,18 +142,18 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         const statusLabel = statusValue.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 
         transformedItems.push({
-          id: content.id,
-          title: content.title || content.content_type,
+          id: content.content_id,
+          title: content.content_type,
           status: statusValue,
           statusLabel,
-          date: content.created_at ? new Date(content.created_at).toLocaleDateString("en-GB", {
+          date: content.created_date ? new Date(content.created_date).toLocaleDateString("en-GB", {
             day: "numeric",
             month: "short", 
             year: "numeric"
           }) : "—",
           chapters: `${content.content_type}`,
           lessons: content.description || `1 ${content.content_type?.toLowerCase()}`,
-          languages: content.language ? [content.language.code] : ["en"],
+          languages: content.language_name ? [content.language_name.toLowerCase() === 'arabic' ? 'ar' : 'en'] : ["en"],
           type: content.content_type,
           content_type_id: content.content_type_id
         });
@@ -178,6 +185,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
               day: "numeric",
               month: "short",
               year: "numeric"
+            }) : moduleRes?.data?.created_at ? new Date(moduleRes.data.created_at).toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric"
             }) : "—",
             chapters: `${agg.total_count} ${agg.content_type}`,
             lessons: `${agg.total_count} items`,
@@ -195,21 +206,40 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
     // Add user progress summary if available for quizzes
     if (data.user_progress_summary?.quizzes?.total > 0) {
+      // Collect content_ids from non_aggregated_contents that have quizzes
+      const quizContents = (data.non_aggregated_contents ?? [])
+        .filter((c: any) => (c.quizzes?.total_count ?? 0) > 0);
+
+      const quizContentIds = quizContents
+        .map((c: any) => c.content_id ?? c.id)
+        .filter(Boolean);
+
+      // Find the latest created_date from quiz contents
+      const latestQuizDate = quizContents
+        .map((c: any) => c.created_date)
+        .filter(Boolean)
+        .sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime())[0];
+
       transformedItems.push({
         id: 'quizzes',
         title: 'Quizzes',
         status: data.user_progress_summary.quizzes.status === 'completed' ? 'completed' : 'pending',
-        date: "—",
+        date: latestQuizDate ? new Date(latestQuizDate).toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric"
+        }) : "—",
         chapters: `${data.user_progress_summary.quizzes.total} Quizzes`,
         lessons: `${data.user_progress_summary.quizzes.total} questions`,
         languages: ["en", "ar"],
         type: 'Quiz',
-        isQuizSummary: true
+        isQuizSummary: true,
+        contentIds: quizContentIds,
       });
     }
 
     return transformedItems;
-  }, [contentsWithProgressRes, contentsReportRes]);
+  }, [contentsWithProgressRes, contentsReportRes, moduleRes]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
@@ -732,11 +762,18 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                       });
                                   }
                                   if (item.title === "Video Training") {
-                                    router.push(`/module/${module}/video-training`);
+                                    router.push(`/module/${module}/video-training?campaign_id=${campaignId}`);
                                   } else if (item.title === "Interactive Lesson") {
-                                    router.push(`/module/${module}/interactive-lesson`);
+                                    window.location.href = `http://localhost:8001/awm/module/${module}?campaign_id=${campaignId}`;
                                   } else if (item.title === "Quizzes") {
-                                    router.push(`/module/${module}/quizzes`);
+                                    const quizParams = new URLSearchParams();
+                                    quizParams.set('campaign_id', String(campaignId));
+                                    if (item.contentIds && item.contentIds.length > 0) {
+                                      quizParams.set('content_id', String(item.contentIds[0]));
+                                    }
+                                    router.push(`/module/${module}/quizzes?${quizParams.toString()}`);
+                                  } else if (item.title === "Motion Videos") {
+                                    router.push(`/module/${module}/video-training?campaign_id=${campaignId}`);
                                   } else {
                                     const contentTypes = ['Posters', 'Brochures', 'Documents', 'Screen savers'];
                                     if (contentTypes.includes(item.title)) {
