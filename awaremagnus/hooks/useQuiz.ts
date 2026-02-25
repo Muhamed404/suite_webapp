@@ -311,3 +311,11 @@ export function useModuleReport(moduleId: number, enabled = true) {
     enabled: enabled && !!moduleId,
   });
 }
+
+export function useContentsReport(reportModuleId: number, enabled = true) {
+  return useQuery({
+    queryKey: ["quiz", "contents-report", reportModuleId],
+    queryFn: () => quizService.getContentsReport(reportModuleId),
+    enabled: enabled && !!reportModuleId,
+  });
+}

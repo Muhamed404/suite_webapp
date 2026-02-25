@@ -113,7 +113,7 @@ function getActionButton(status: "active" | "pending" | "completed", campaign: C
       );
     } else {
       return (
-        <Link href={`/module/${moduleSlug}`}>
+        <Link href={`/module/${moduleSlug}?campaign_id=${campaign.campaign_id}`}>
           <button
             className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
             onClick={() => {
