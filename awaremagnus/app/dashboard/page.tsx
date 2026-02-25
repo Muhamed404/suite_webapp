@@ -37,12 +37,24 @@ import {
 } from "@/hooks/useDashboard";
 import { useLicenseInfo } from "@/hooks/useSuiteAwm";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { decodeJwt, extractUserDisplayName, extractUserEmail } from "@/utils/jwt";
 
 export default function DashboardPage() {
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
-  const { user } = useAuthStore();
+  const { user, token } = useAuthStore();
+
+  // Decode JWT to extract user details
+  const jwtPayload = useMemo(() => decodeJwt(token), [token]);
+  const userDisplayName = useMemo(
+    () => extractUserDisplayName(jwtPayload),
+    [jwtPayload]
+  );
+  const userEmail = useMemo(
+    () => user?.email || extractUserEmail(jwtPayload),
+    [user?.email, jwtPayload]
+  );
 
   const isPlatformAdmin = getIsPlatformAdmin(user?.role_id);
   const isOrgAdmin = getIsOrgAdmin(user?.role_id);
@@ -350,7 +362,7 @@ export default function DashboardPage() {
                   >
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-8 h-full">
                       <div className="flex-1">
-                        <p className="text-gray-300 text-xs">Welcome back, Farhan Khan!</p>
+                        <p className="text-gray-300 text-xs">Welcome back, {userDisplayName}!</p>
                         <h1 className="text-white text-2xl mt-2 leading-tight">
                           Ready To Continue Your Learning Journey?
                         </h1>
