@@ -45,7 +45,8 @@ function createLanguageFormByLangId(langId: number): QuizLanguageForm {
   };
 }
 
-function moduleName(m: Module): string {
+function moduleName(m?: Module | null): string {
+  if (!m) return "";
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
@@ -288,7 +289,7 @@ export function CreateQuizForm({
         <span className="mx-1">›</span>
         <span className="text-[var(--mainblue)] font-semibold">
           {moduleId && modules.length > 0
-            ? moduleName(modules.find((m) => String(m.id) === moduleId) || {})
+            ? moduleName(modules.find((m) => String(m.id) === moduleId))
             : "Select Module"}
         </span>
         <span className="mx-1">›</span>

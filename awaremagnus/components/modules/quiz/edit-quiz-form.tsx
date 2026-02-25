@@ -1,6 +1,7 @@
 "use client";
 
 import type { QuizAnswer } from "./quiz-answer-row";
+import type { Module } from "@/types/quiz";
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -41,8 +42,9 @@ function mapApiAnswersToForm(
   }));
 }
 
-function moduleName(m: any): string {
-  return m?.title ?? m?.translations?.[0]?.name ?? m?.code ?? `Module ${m?.id}`;
+function moduleName(m?: Module | null): string {
+  if (!m) return "";
+  return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
 export interface EditQuizFormProps {
