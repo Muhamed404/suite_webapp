@@ -4,75 +4,18 @@ import { useState, useEffect, useRef, useMemo, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@heroui/button";
-import { Search, ChevronRight, ChevronLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Search, ChevronRight, ChevronLeft, ArrowLeft } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
-
-const quizData = [
-  {
-    lesson: 1,
-    question: "What Is Phishing?",
-    options: ["Email Scam", "Personal Hack", "Firewall", "Virus"],
-    correct: 0,
-  },
-  {
-    lesson: 1,
-    question: "What is the primary purpose of a firewall?",
-    options: ["Monitor network traffic", "Encrypt data", "Create backups", "Update software"],
-    correct: 0,
-  },
-  {
-    lesson: 1,
-    question: "Which of the following is NOT a type of malware?",
-    options: ["Antivirus", "Virus", "Trojan", "Worm"],
-    correct: 0,
-  },
-  {
-    lesson: 1,
-    question: "What does VPN stand for?",
-    options: ["Virtual Private Network", "Very Personal Number", "Viral Protocol Network", "Virtual Protected Node"],
-    correct: 0,
-  },
-  {
-    lesson: 1,
-    question: "How often should you update your passwords?",
-    options: ["Every 3 months", "Every month", "Every week", "Never"],
-    correct: 0,
-  },
-  {
-    lesson: 1,
-    question: "What is two-factor authentication?",
-    options: [
-      "Using two passwords",
-      "Using password and another verification method",
-      "Using two devices",
-      "Using two email addresses",
-    ],
-    correct: 1,
-  },
-  {
-    lesson: 1,
-    question: "Which is a strong password characteristic?",
-    options: [
-      "Short and simple",
-      "Your birthdate",
-      "Mix of letters, numbers, and symbols",
-      "Your pet's name",
-    ],
-    correct: 2,
-  },
-  {
-    lesson: 1,
-    question: "What should you do with suspicious emails?",
-    options: ["Open attachments", "Report and delete", "Forward to friends", "Reply to sender"],
-    correct: 1,
-  },
-];
+import { useQuizzesByContent } from "@/hooks/useQuiz";
+import { suiteAwmService } from "@/services/suiteAwmService";
+import { quizService } from "@/services/quizService";
 
 export default function QuizzesPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -82,12 +25,71 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const isRtl = dir === "rtl";
   const { user } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Read content_id from URL params
+  const contentId = useMemo(() => {
+    const cid = searchParams?.get('content_id');
+    return cid ? parseInt(cid, 10) : 0;
+  }, [searchParams]);
+
+  // Read campaign_id from URL params
+  const campaignId = useMemo(() => {
+    const cid = searchParams?.get('campaign_id');
+    return cid ? parseInt(cid, 10) : 0;
+  }, [searchParams]);
+
+  // Fetch campaign details
+  const { data: campaignRes } = useQuery({
+    queryKey: ['campaign', campaignId],
+    queryFn: () => suiteAwmService.getCampaignById(campaignId),
+    enabled: !!campaignId,
+  });
+
+  // Fetch content details
+  const { data: contentRes } = useQuery({
+    queryKey: ['content', contentId],
+    queryFn: () => quizService.getContentById(contentId),
+    enabled: !!contentId,
+  });
+
+  // Fetch quizzes dynamically from the API
+  const { data: quizzesRes, isLoading: quizzesLoading } = useQuizzesByContent(contentId, !!contentId);
+
+  // Keep original quiz data for submission
+  const originalQuizzes = useMemo(() => {
+    if (!quizzesRes?.success || !Array.isArray(quizzesRes.data)) return [];
+    return quizzesRes.data;
+  }, [quizzesRes]);
+
+  // Transform API data into the shape used by the UI
+  const quizData = useMemo(() => {
+    if (!quizzesRes?.success || !Array.isArray(quizzesRes.data)) return [];
+    return quizzesRes.data.map((q, idx) => ({
+      lesson: idx + 1,
+      question: q.question,
+      options: (q.answers ?? []).map((a) => a.answer_text),
+      correct: (q.answers ?? []).findIndex((a) => a.is_correct),
+      quizTypeName: q.quizType?.name ?? 'Single Choice',
+    }));
+  }, [quizzesRes]);
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number[] }>({});
   const [savedAnswers, setSavedAnswers] = useState<{ [key: number]: number[] }>({});
   const [showCompletion, setShowCompletion] = useState(false);
   const [answerStatusMsg, setAnswerStatusMsg] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Reset to first question whenever the quiz data changes (e.g. content_id changes)
+  useEffect(() => {
+    setCurrentQuestion(0);
+    setSelectedAnswers({});
+    setSavedAnswers({});
+    setShowCompletion(false);
+    setAnswerStatusMsg("");
+    setIsSubmitting(false);
+  }, [quizData.length]);
 
   const quiz = quizData[currentQuestion];
 
@@ -133,7 +135,15 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
       return;
     }
 
-    setShowCompletion(true);
+    // Check if all questions have been answered
+    const allAnswered = quizData.every((_, index) => savedAnswers[index]?.length > 0);
+    if (!allAnswered) {
+      setAnswerStatusMsg('<span class="text-red-600 font-semibold">Please answer all questions before submitting!</span>');
+      return;
+    }
+
+    // Submit the quiz
+    submitQuiz();
   };
 
   const goBackToQuiz = () => {
@@ -142,6 +152,45 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     setSavedAnswers({});
     setShowCompletion(false);
     setAnswerStatusMsg("");
+    setIsSubmitting(false);
+  };
+
+  const submitQuiz = async () => {
+    if (!contentRes?.data?.mod_id) {
+      setAnswerStatusMsg('<span class="text-red-600 font-semibold">Module ID not found!</span>');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const payload = {
+        campaign_id: campaignId,
+        module_id: contentRes.data.mod_id,
+        content_id: contentId,
+        quizzes: originalQuizzes.map((quiz, index) => {
+          const savedAnswerIndices = savedAnswers[index] || [];
+          const answers = savedAnswerIndices.map(answerIndex => {
+            const answer = quiz.answers?.[answerIndex];
+            return {
+              question_id: quiz.id, // Use the quiz id as question_id
+              answer_id: answer?.id || 0
+            };
+          });
+          return {
+            quiz_id: quiz.id,
+            answers
+          };
+        }).filter(quiz => quiz.answers.length > 0)
+      };
+
+      await suiteAwmService.submitQuiz(payload);
+      setShowCompletion(true);
+    } catch (error) {
+      console.error('Failed to submit quiz:', error);
+      setAnswerStatusMsg('<span class="text-red-600 font-semibold">Failed to submit quiz. Please try again.</span>');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -226,25 +275,38 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
         <div className="flex-1 flex flex-col h-screen bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-r-3xl">
 
           <main className="flex-1 overflow-y-auto">
-            <nav className="flex items-center text-xs text-gray-500 mb-2 gap-1.5 p-3 pb-0">
-              <a href="#" className="hover:text-gray-700 transition">My Library</a>
-              <span className="text-gray-400">›</span>
-              <a href="#" className="hover:text-gray-700 transition">{moduleName}</a>
-              <span className="text-gray-400">›</span>
-              <a href="#" className="hover:text-gray-700 transition">System Library</a>
-              <span className="text-gray-400">›</span>
-              <span className="font-semibold text-gray-900">Add Quizzes</span>
-            </nav>
+            <div className="flex items-center gap-2 mb-3 p-3 pb-0">
+              <Button isIconOnly variant="light" size="sm" onClick={() => router.back()} className="-mt-1">
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <nav className="flex items-center text-xs text-gray-500 mb-2 gap-1.5">
+                <a href="#" className="hover:text-gray-700 transition">{campaignRes?.data?.name || 'Campaign'}</a>
+                <span className="text-gray-400">›</span>
+                <a href="#" className="hover:text-gray-700 transition">{moduleName}</a>
+                <span className="text-gray-400">›</span>
+                <a href="#" className="hover:text-gray-700 transition">{contentRes?.data?.title || 'Content'}</a>
+                <span className="text-gray-400">›</span>
+                <span className="font-semibold text-gray-900">Quizzes</span>
+              </nav>
+            </div>
 
             <div className="grid grid-cols-12 gap-2 p-3 pb-0">
               {/* Main Content */}
               <div className="col-span-9">
-                {!showCompletion ? (
+                {quizzesLoading ? (
+                  <div className="bg-white rounded-2xl p-6 flex items-center justify-center min-h-[300px]">
+                    <p className="text-sm text-gray-500">Loading quizzes...</p>
+                  </div>
+                ) : quizData.length === 0 ? (
+                  <div className="bg-white rounded-2xl p-6 flex items-center justify-center min-h-[300px]">
+                    <p className="text-sm text-gray-500">No quizzes available for this content.</p>
+                  </div>
+                ) : !showCompletion ? (
                   <div id="quizContainer" className="bg-white rounded-2xl p-3 w-full">
                     <div className="mb-2 flex items-center gap-3">
-                      <p className="text-[10px] text-blue-500" id="lessonInfo">Lesson {quiz.lesson} Of 2</p>
+                      <p className="text-[10px] text-blue-500" id="lessonInfo">Lesson {quiz.lesson} Of {quizData.length}</p>
                       <p className="text-sm text-gray-300 font-light">|</p>
-                      <p className="text-[10px] text-green-500">Multiple Choice</p>
+                      <p className="text-[10px] text-green-500">{quiz.quizTypeName}</p>
                     </div>
 
                     <h1 className="text-lg font-semibold text-gray-900 mb-3">{moduleName} Quiz</h1>
@@ -314,8 +376,16 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                         className="flex items-center gap-1.5 px-12 py-2 bg-transparent border border-blue-500 text-blue-800 rounded-full text-xs font-medium hover:bg-blue-600 hover:text-white transition-all"
                         id="nextBtn"
                         onClick={goToNextQuestion}
+                        disabled={isSubmitting}
                       >
-                        {currentQuestion === quizData.length - 1 ? "Submit Quiz" : "Next Quiz"}
+                        {isSubmitting ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            Submitting...
+                          </>
+                        ) : (
+                          currentQuestion === quizData.length - 1 ? "Submit Quiz" : "Next Quiz"
+                        )}
                       </button>
                     </div>
                   </div>
@@ -360,7 +430,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                       <span id="statusCount">{String(currentQuestion + 1).padStart(2, "0")}</span>/<span id="totalCount">{String(quizData.length).padStart(2, "0")}</span>
                     </p>
                     <p className="text-sm text-gray-600 mt-2">
-                      <span id="completedCount">1</span> out of <span id="totalQuizCount">12</span> quizzes are done
+                      <span id="completedCount">{currentQuestion + 1}</span> out of <span id="totalQuizCount">{quizData.length}</span> quizzes are done
                     </p>
                   </div>
                 </div>

@@ -5,13 +5,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Search, ChevronRight, ChevronLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { useModules } from "@/hooks/useQuiz";
+import { quizService } from "@/services/quizService";
+import { isOrgUser } from "@/utils/roles";
+
+const SERVICE_AWM_URL = process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://localhost:3002";
 
 export default function VideoTrainingPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -21,6 +26,146 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   const isRtl = dir === "rtl";
   const { user } = useAuthStore();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [contents, setContents] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Video tracking state
+  const [videoProgress, setVideoProgress] = useState<{ [key: number]: { currentTime: number; duration: number; watchedPercentage: number } }>({});
+  const [sentProgressMilestones, setSentProgressMilestones] = useState<{ [key: number]: { lastReported: number } }>({});
+  const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+
+  // Get module ID from slug
+  const { data: modulesRes } = useModules({ filter: module });
+  const moduleId = useMemo(() => {
+    if (modulesRes?.success && modulesRes.data) {
+      const found = modulesRes.data.find(m => {
+        const codeMatch = m.code?.toLowerCase() === module.toLowerCase();
+        const titleMatch = m.title?.toLowerCase() === moduleName.toLowerCase();
+        const translationMatch = m.translations?.some(t => t.name.toLowerCase() === moduleName.toLowerCase());
+        return codeMatch || titleMatch || translationMatch;
+      });
+      return found?.id || 1;
+    }
+    return 1;
+  }, [modulesRes, module, moduleName]);
+
+  const roleId = user?.role_id;
+  const isOrgUserView = isOrgUser(roleId);
+
+  // Video tracking functions
+  const handleVideoLoadedMetadata = (contentId: number, video: HTMLVideoElement) => {
+    const duration = video.duration;
+    setVideoProgress(prev => ({
+      ...prev,
+      [contentId]: {
+        ...prev[contentId],
+        duration,
+        currentTime: prev[contentId]?.currentTime || 0,
+        watchedPercentage: prev[contentId]?.watchedPercentage || 0
+      }
+    }));
+  };
+
+  const handleVideoTimeUpdate = (contentId: number, video: HTMLVideoElement) => {
+    const currentTime = video.currentTime;
+    const duration = video.duration;
+    const watchedPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+    setVideoProgress(prev => ({
+      ...prev,
+      [contentId]: {
+        ...prev[contentId],
+        currentTime,
+        duration,
+        watchedPercentage
+      }
+    }));
+
+    // Send progress update every 25%
+    const currentProgress = Math.floor(watchedPercentage / 25) * 25;
+    const lastReported = sentProgressMilestones[contentId]?.lastReported || 0;
+
+    if (currentProgress > lastReported && currentProgress <= 100 && currentProgress > 0) {
+      updateVideoProgress(contentId, currentProgress);
+      setSentProgressMilestones(prev => ({
+        ...prev,
+        [contentId]: {
+          ...prev[contentId],
+          lastReported: currentProgress
+        }
+      }));
+    }
+  };
+
+  const handleVideoEnded = (contentId: number) => {
+    // Mark as completed when video ends
+    setVideoProgress(prev => ({
+      ...prev,
+      [contentId]: {
+        ...prev[contentId],
+        watchedPercentage: 100
+      }
+    }));
+
+    // Send 100% completion
+    if ((sentProgressMilestones[contentId]?.lastReported || 0) < 100) {
+      updateVideoProgress(contentId, 100);
+      setSentProgressMilestones(prev => ({
+        ...prev,
+        [contentId]: {
+          ...prev[contentId],
+          lastReported: 100
+        }
+      }));
+    }
+  };
+
+  // Update video progress to backend
+  const updateVideoProgress = async (contentId: number, progressPercentage: number) => {
+    try {
+      const payload = {
+        campaign_id: campaignId,
+        module_id: moduleId,
+        content_id: contentId,
+        progress_percentage: progressPercentage
+      };
+
+      await quizService.updateContentProgress(payload);
+      console.log(`Progress updated: ${progressPercentage}% for content ${contentId}`);
+    } catch (error) {
+      console.error('Failed to update video progress:', error);
+    }
+  };
+
+  // Get campaign ID from URL
+  const campaignId = useMemo(() => {
+    const campaignIdFromUrl = searchParams?.get('campaign_id');
+    if (campaignIdFromUrl) {
+      return parseInt(campaignIdFromUrl, 10);
+    }
+    return 1; // Default campaign ID
+  }, [searchParams]);
+
+  // Fetch video training contents (content_type_id = 1)
+  useEffect(() => {
+    if (moduleId) {
+      setLoading(true);
+      quizService
+        .getContents({ mod_id: moduleId, contype_id: 2 }) // 2 = Motion Videos
+        .then((res) => {
+          if (res.success && res.data) {
+            setContents(res.data);
+          }
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error('Error fetching video training contents:', err);
+          setLoading(false);
+        });
+    }
+  }, [moduleId]);
 
   useEffect(() => {
     // Load header if needed, but since we're in DashboardLayout, it might already be there
@@ -42,45 +187,49 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
               <span className="text-gray-400">›</span>
               <a href="#" className="hover:text-gray-700 transition">{moduleName}</a>
               <span className="text-gray-400">›</span>
-              <span className="font-semibold text-gray-900">Video Training</span>
+              <span className="font-semibold text-gray-900">Motion Videos</span>
             </nav>
 
             <div className="flex flex-col px-3 gap-2">
-              <div className="">
-                <div className="flex flex-col">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="text-xl font-semibold">{moduleName} : Video Training </h3>
-                      <p className="text-xs text-gray-500 mt-1">This is a video training module that covers the basics of {moduleName.toLowerCase()}.</p>
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-xl overflow-hidden">
+              {loading ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                </div>
+              ) : contents.length > 0 ? (
+                contents.map((content, index) => (
+                  <div key={content.id || index} className="bg-white rounded-xl overflow-hidden mb-4">
                     <div className="relative bg-black" style={{ height: '60vh' }}>
-                      <video className="w-full h-full" controls>
-                        <source src="/videos/sample.mp4" type="video/mp4" />
-                        <source src="/videos/sample.webm" type="video/webm" />
+                      <video
+                        ref={(el) => { videoRefs.current[content.id] = el; }}
+                        controls
+                        className="w-full h-full object-contain"
+                        src={`${SERVICE_AWM_URL}${content.source_url}`}
+                        poster={content.logo_url}
+                        onLoadedMetadata={(e) => handleVideoLoadedMetadata(content.id, e.target as HTMLVideoElement)}
+                        onTimeUpdate={(e) => handleVideoTimeUpdate(content.id, e.target as HTMLVideoElement)}
+                        onEnded={() => handleVideoEnded(content.id)}
+                      >
                         Your browser does not support the video tag.
                       </video>
                     </div>
 
                     <div className="p-4 border-b border-gray-100">
-                      <h4 className="text-base font-semibold mb-1">{moduleName} Training</h4>
-                      <p className="text-xs text-gray-500">Learn about {moduleName.toLowerCase()} best practices and protocols</p>
+                      <h4 className="text-base font-semibold mb-1">{content.name || `${moduleName} Motion Video ${index + 1}`}</h4>
+                      <p className="text-xs text-gray-500">{content.description || `Learn about ${moduleName.toLowerCase()} best practices and protocols`}</p>
                       <div className="flex items-center gap-4 mt-3 text-xs text-gray-600">
                         <div className="flex items-center gap-1.5">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10"></circle>
                             <polyline points="12,6 12,12 16,14"></polyline>
                           </svg>
-                          <span>Duration: 20 to 60 minutes</span>
+                          <span>Duration: {content.duration || '20 to 60 minutes'}</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                           </svg>
-                          <span>1,234 views</span>
+                          <span>{content.views || '1,234'} views</span>
                         </div>
                         <div className="flex items-center gap-1.5">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +238,11 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                             <line x1="8" y1="2" x2="8" y2="6"></line>
                             <line x1="3" y1="10" x2="21" y2="10"></line>
                           </svg>
-                          <span>Jan 15, 2026</span>
+                          <span>{content.created_date ? new Date(content.created_date).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric"
+                          }) : 'Jan 15, 2026'}</span>
                         </div>
                       </div>
                     </div>
@@ -136,51 +289,12 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                       </div>
                     </div>
                   </div>
-
-                  <div className="mt-4 bg-white rounded-xl p-4">
-                    <h5 className="text-sm font-semibold mb-3">Next Video Training</h5>
-                    <div className="space-y-3">
-                      <div className="flex gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
-                        <div className="relative flex-shrink-0 w-32 h-20 bg-gray-200 rounded-lg overflow-hidden">
-                          <img src="/images/card.png" alt="Video thumbnail" className="w-full h-full object-cover" />
-                          <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] px-1.5 py-0.5 rounded">5:42</div>
-                        </div>
-                        <div className="flex-1">
-                          <h6 className="text-xs font-semibold mb-1 line-clamp-2">Access Control Systems</h6>
-                          <p className="text-[10px] text-gray-500 mb-1">{moduleName} Series</p>
-                          <p className="text-[10px] text-gray-400">856 views • 2 days ago</p>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
-                        <div className="relative flex-shrink-0 w-32 h-20 bg-gray-200 rounded-lg overflow-hidden">
-                          <img src="/images/card.png" alt="Video thumbnail" className="w-full h-full object-cover" />
-                          <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] px-1.5 py-0.5 rounded">8:15</div>
-                        </div>
-                        <div className="flex-1">
-                          <h6 className="text-xs font-semibold mb-1 line-clamp-2">Surveillance Best Practices</h6>
-                          <p className="text-[10px] text-gray-500 mb-1">{moduleName} Series</p>
-                          <p className="text-[10px] text-gray-400">1.2K views • 5 days ago</p>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer transition">
-                        <div className="relative flex-shrink-0 w-32 h-20 bg-gray-200 rounded-lg overflow-hidden">
-                          <img src="/images/card.png" alt="Video thumbnail" className="w-full h-full object-cover" />
-                          <div className="absolute bottom-1 right-1 bg-black/80 text-white text-[10px] px-1.5 py-0.5 rounded">12:30</div>
-                        </div>
-                        <div className="flex-1">
-                          <h6 className="text-xs font-semibold mb-1 line-clamp-2">Emergency Response Procedures</h6>
-                          <p className="text-[10px] text-gray-500 mb-1">{moduleName} Series</p>
-                          <p className="text-[10px] text-gray-400">945 views • 1 week ago</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <br />
+                ))
+              ) : (
+                <div className="flex items-center justify-center h-64">
+                  <p className="text-gray-500">No motion video content found for this module.</p>
                 </div>
-              </div>
+              )}
             </div>
           </main>
         </div>

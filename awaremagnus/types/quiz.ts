@@ -32,6 +32,28 @@ export interface Module {
   assignments?: { campaign_id: number; status: number }[];
 }
 
+// types returned by the report endpoints
+export interface ReportModule {
+  id: number;
+  report_campaign_id: number;
+  module_id: number;
+  status_id: number;
+  progress_percentage: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ReportContent {
+  id: number;
+  report_module_id: number;
+  content_id: number;
+  status_id: number;
+  progress_percentage: string;
+  reportModule?: ReportModule;
+  content?: { id: number; name?: string };
+  status?: { id: number; name: string };
+}
+
 export interface ContentTranslation {
   id: number;
   language_id: number;

@@ -37,12 +37,24 @@ import {
 } from "@/hooks/useDashboard";
 import { useLicenseInfo } from "@/hooks/useSuiteAwm";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { decodeJwt, extractUserDisplayName, extractUserEmail } from "@/utils/jwt";
 
 export default function DashboardPage() {
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
-  const { user } = useAuthStore();
+  const { user, token } = useAuthStore();
+
+  // Decode JWT to extract user details
+  const jwtPayload = useMemo(() => decodeJwt(token), [token]);
+  const userDisplayName = useMemo(
+    () => extractUserDisplayName(jwtPayload),
+    [jwtPayload]
+  );
+  const userEmail = useMemo(
+    () => user?.email || extractUserEmail(jwtPayload),
+    [user?.email, jwtPayload]
+  );
 
   const isPlatformAdmin = getIsPlatformAdmin(user?.role_id);
   const isOrgAdmin = getIsOrgAdmin(user?.role_id);
@@ -350,7 +362,7 @@ export default function DashboardPage() {
                   >
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-8 h-full">
                       <div className="flex-1">
-                        <p className="text-gray-300 text-xs">Welcome back, Farhan Khan!</p>
+                        <p className="text-gray-300 text-xs">Welcome back, {userDisplayName}!</p>
                         <h1 className="text-white text-2xl mt-2 leading-tight">
                           Ready To Continue Your Learning Journey?
                         </h1>
@@ -648,71 +660,182 @@ export default function DashboardPage() {
               </div>
 
               {/* Pending Assignments Table */}
-              <div className="bg-white rounded-2xl p-4 mt-5 flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-semibold whitespace-nowrap">Pending Assignments</h2>
-                  <div className="relative">
-                    <select className="appearance-none px-3 py-1.5 pr-8 rounded-full border border-gray-300 text-[10px] bg-white whitespace-nowrap">
-                      <option value="default">Sort by</option>
-                      <option value="name">Employee Name</option>
-                      <option value="startDate">Start Date</option>
-                      <option value="dueDate">Due Date</option>
-                    </select>
-                    <svg className="w-3 h-3 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                  </div>
-                </div>
+              {(() => {
+                // Sort all pending/in-progress assignments by start_date ascending (soonest first)
+                const allAssignments: any[] = assignmentsData?.object?.assignments || [];
+                const pendingAssignments = [...allAssignments]
+                  .filter((a: any) => a.status?.name === "PENDING" || a.status?.name === "IN_PROGRESS")
+                  .sort((a: any, b: any) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
+                  .slice(0, 10);
 
-                <div className="overflow-x-auto">
-                  <div className="overflow-y-auto border border-gray-200 rounded-lg">
-                    <table className="min-w-full text-left text-[10px] whitespace-nowrap">
-                      <thead className="sticky top-0 bg-gray-50 z-10">
-                        <tr className="text-gray-500 font-semibold">
-                          <th className="px-4 py-2">Campaign Name</th>
-                          <th className="px-4 py-2">Module Name</th>
-                          <th className="px-4 py-2">Start Date</th>
-                          <th className="px-4 py-2">🏆 Badge</th>
-                          <th className="px-4 py-2">⭐ Exp</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {(assignmentsData?.object?.assignments || []).map((assignment: any, index: number) => (
-                          <tr key={index} className="hover:bg-gray-50">
-                            <td className="px-4 py-2">{assignment.campaign_name}</td>
-                            <td className="px-4 py-2">{assignment.module_name}</td>
-                            <td className="px-4 py-2">{new Date(assignment.start_date).toLocaleDateString()}</td>
-                            <td className="px-4 py-2">
-                              <div className="w-7 h-7 rounded-full bg-purple-100 flex items-center justify-center">
-                                <span className="text-purple-500 text-sm">🔥</span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-2">
-                              <span className="px-3 py-1 rounded-full text-green-600 border border-green-400 bg-green-50">
-                                Experienced
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                // Separate module assignments from survey/assessment assignments
+                // Module assignments have a module_id; survey assignments have assessment_id (future API field)
+                // Currently all items are module assignments; survey section is ready for when API adds type field
+                const moduleAssignments = pendingAssignments.filter((a: any) => !a.assessment_id);
+                const surveyAssignments = pendingAssignments.filter((a: any) => !!a.assessment_id);
 
-                <div className="flex items-center justify-between">
-                  <p className="text-gray-500 text-[10px] whitespace-nowrap">
-                    Showing 1–{assignmentsData?.object?.assignments?.length || 0} out of {assignmentsData?.object?.count || 0} Entries
-                  </p>
-                  <div className="flex items-center gap-1.5">
-                    <button className="w-7 h-7 flex items-center justify-center rounded-full border border-gray-300 text-[10px] hover:bg-gray-100 opacity-40 cursor-not-allowed" disabled>‹</button>
-                    <div className="flex items-center gap-1.5 text-[10px]">
-                      <button className="w-7 h-7 flex items-center justify-center rounded-full border border-gray-300 bg-green-50 border-green-400 text-green-600">1</button>
-                      <button className="w-7 h-7 flex items-center justify-center rounded-full border border-gray-300">2</button>
+                const formatDate = (dateStr: string) => {
+                  const d = new Date(dateStr);
+                  return Number.isFinite(d.getTime()) ? d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
+                };
+
+                const statusBadge = (statusName: string) => {
+                  if (statusName === "PENDING")
+                    return <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-yellow-50 text-yellow-600 border border-yellow-300 whitespace-nowrap">Pending</span>;
+                  if (statusName === "IN_PROGRESS")
+                    return <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-blue-50 text-blue-600 border border-blue-300 whitespace-nowrap">In Progress</span>;
+                  return <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-gray-100 text-gray-500 border border-gray-300 whitespace-nowrap">{statusName}</span>;
+                };
+
+                return (
+                  <div className="grid lg:grid-cols-2 grid-cols-1 gap-4 mt-5">
+                    {/* Module Pending Assignments */}
+                    <div className="bg-white rounded-2xl p-4 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-semibold whitespace-nowrap">Pending Assignments</h2>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <div className="overflow-y-auto border border-gray-200 rounded-lg">
+                          <table className="min-w-full text-left text-[10px] whitespace-nowrap">
+                            <thead className="sticky top-0 bg-gray-50 z-10">
+                              <tr className="text-gray-500 font-semibold">
+                                <th className="px-4 py-2">Campaign Name</th>
+                                <th className="px-4 py-2">Module Name</th>
+                                <th className="px-4 py-2">Status</th>
+                                <th className="px-4 py-2">Start Date</th>
+                                <th className="px-4 py-2">End Date</th>
+                                <th className="px-4 py-2">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                              {moduleAssignments.length === 0 ? (
+                                <tr>
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={6}>No pending assignments</td>
+                                </tr>
+                              ) : (
+                                moduleAssignments.map((assignment: any, index: number) => {
+                                  const isFirst = index === 0;
+                                  return (
+                                    <tr
+                                      key={`${assignment.campaign_id}-${assignment.module_id}-${index}`}
+                                      className={isFirst
+                                        ? "bg-blue-50 border-l-4 border-blue-500 font-semibold"
+                                        : "hover:bg-gray-50"
+                                      }
+                                    >
+                                      <td className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-700"}`}>
+                                        {assignment.campaign_name || "—"}
+                                      </td>
+                                      <td className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-700"}`}>
+                                        {assignment.module_name || "—"}
+                                      </td>
+                                      <td className="px-4 py-2.5">
+                                        {statusBadge(assignment.status?.name || "")}
+                                      </td>
+                                      <td className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}>
+                                        {formatDate(assignment.start_date)}
+                                      </td>
+                                      <td className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}>
+                                        {formatDate(assignment.end_date)}
+                                      </td>
+                                      <td className="px-4 py-2.5">
+                                        <button
+                                          className="px-3 py-1 rounded-full text-[10px] font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors whitespace-nowrap"
+                                          onClick={() => window.location.href = `/dashboard/campaign-assignments`}
+                                        >
+                                          Start
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  );
+                                })
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <p className="text-gray-500 text-[10px] whitespace-nowrap">
+                          Showing 1–{moduleAssignments.length} out of {assignmentsData?.object?.count || 0} Entries
+                        </p>
+                        <a href="/dashboard/campaign-assignments" className="text-[10px] text-blue-600 hover:underline">View All</a>
+                      </div>
                     </div>
-                    <button className="w-7 h-7 flex items-center justify-center rounded-full border border-gray-300 text-[10px] hover:bg-gray-100">›</button>
+
+                    {/* Pending Assessment or Surveys */}
+                    <div className="bg-white rounded-2xl p-4 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <h2 className="text-sm font-semibold whitespace-nowrap">Pending Assessment or Surveys</h2>
+                      </div>
+
+                      <div className="overflow-x-auto">
+                        <div className="overflow-y-auto border border-gray-200 rounded-lg">
+                          <table className="min-w-full text-left text-[10px] whitespace-nowrap">
+                            <thead className="sticky top-0 bg-gray-50 z-10">
+                              <tr className="text-gray-500 font-semibold">
+                                <th className="px-4 py-2">Assessment Name / Survey</th>
+                                <th className="px-4 py-2">Status</th>
+                                <th className="px-4 py-2">Start Date</th>
+                                <th className="px-4 py-2">End Date</th>
+                                <th className="px-4 py-2">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                              {surveyAssignments.length === 0 ? (
+                                <tr>
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>No pending assessments or surveys</td>
+                                </tr>
+                              ) : (
+                                surveyAssignments.map((assignment: any, index: number) => {
+                                  const isFirst = index === 0;
+                                  return (
+                                    <tr
+                                      key={`survey-${assignment.campaign_id}-${index}`}
+                                      className={isFirst
+                                        ? "bg-blue-50 border-l-4 border-blue-500 font-semibold"
+                                        : "hover:bg-gray-50"
+                                      }
+                                    >
+                                      <td className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-700"}`}>
+                                        {assignment.assessment_name || assignment.module_name || "—"}
+                                      </td>
+                                      <td className="px-4 py-2.5">
+                                        {statusBadge(assignment.status?.name || "")}
+                                      </td>
+                                      <td className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}>
+                                        {formatDate(assignment.start_date)}
+                                      </td>
+                                      <td className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}>
+                                        {formatDate(assignment.end_date)}
+                                      </td>
+                                      <td className="px-4 py-2.5">
+                                        <button
+                                          className="px-3 py-1 rounded-full text-[10px] font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors whitespace-nowrap"
+                                          onClick={() => window.location.href = `/dashboard/campaign-assignments`}
+                                        >
+                                          Start
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  );
+                                })
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <p className="text-gray-500 text-[10px] whitespace-nowrap">
+                          Showing 1–{surveyAssignments.length} Entries
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                );
+              })()}
             </div>
           </>
         ) : (

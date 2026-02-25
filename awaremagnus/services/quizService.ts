@@ -13,6 +13,7 @@ import type {
   CreateContentPayload,
   UpdateContentPayload,
   ApiResponse,
+  ReportContent,
 } from "@/types/quiz";
 import type { AWMResponseBody } from "./awmResponse";
 
@@ -444,6 +445,18 @@ export const quizService = {
   },
 
   /**
+   * GET /report/contents?reportModuleId={id}
+   * returns object.reportContents
+   */
+  getContentsReport: async (reportModuleId: number) => {
+    return request<{ reportContents: ReportContent[] }>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/report/contents`, {
+        params: { reportModuleId },
+      })
+    );
+  },
+
+  /**
    * GET /api/awm/category
    * Returns all global categories { categories, count }
    */
@@ -462,6 +475,21 @@ export const quizService = {
     }>(`${API_BASE}/category`);
 
     return data;
+  },
+
+  /**
+   * POST /report-actions/update-content-progress
+   * Updates content progress for a user in a campaign
+   */
+  updateContentProgress: async (payload: {
+    campaign_id: number;
+    module_id: number;
+    content_id: number;
+    progress_percentage: number;
+  }) => {
+    return request<unknown>(() =>
+      awmClient.post<AWMResponseBody>(`${API_BASE}/useraction/report-actions/update-content-progress`, payload)
+    );
   },
 
 };

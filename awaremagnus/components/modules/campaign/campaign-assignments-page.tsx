@@ -10,6 +10,7 @@ import { Chip } from "@heroui/chip";
 import clsx from "clsx";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { ChevronUp, ChevronDown, ChevronsUpDown, Search, SearchX, Clock, BarChart3, ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -54,7 +55,9 @@ function generateModuleSlug(campaign: CampaignAssignment): string {
 
 function getCampaignStatus(campaign: CampaignAssignment): "active" | "pending" | "completed" {
   if (campaign.status) {
-    const status = campaign.status.toLowerCase();
+    // make sure status is string before calling toLowerCase
+    const statusString = typeof campaign.status === 'string' ? campaign.status : String(campaign.status);
+    const status = statusString.toLowerCase();
     if (status.includes('progress') || status.includes('in_progress')) return "active";
     if (status.includes('complete') || status.includes('completed')) return "completed";
     if (status.includes('pending')) return "pending";
@@ -113,7 +116,7 @@ function getActionButton(status: "active" | "pending" | "completed", campaign: C
       );
     } else {
       return (
-        <Link href={`/module/${moduleSlug}`}>
+        <Link href={`/module/${moduleSlug}?campaign_id=${campaign.campaign_id}`}>
           <button
             className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
             onClick={() => {
@@ -156,6 +159,7 @@ export function CampaignAssignmentsPage() {
   const t = useTranslations("campaigns");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const queryClient = useQueryClient();
 
   // State declarations first
   const [searchQuery, setSearchQuery] = useState("");
@@ -204,9 +208,19 @@ export function CampaignAssignmentsPage() {
         console.warn('Missing campaign_id on assignment', campaign);
         return;
       }
+
+      // first report the campaign start
+      const campaignRes = await campaignService.beginCampaign(campaign.campaign_id);
+      if (!campaignRes.success) {
+        console.error('beginCampaign did not succeed', campaignRes);
+        return; // don't start module if campaign start failed
+      }
+
+      // campaign start succeeded, now begin module
       await campaignService.beginModule(campaign.campaign_id, campaign.id);
-      // refresh or indicate success
-      window.location.reload();
+
+      // refresh data without page reload
+      queryClient.invalidateQueries({ queryKey: ["campaign", "assigned"] });
     } catch (error) {
       console.error('Failed to start module:', error);
     }
@@ -560,9 +574,9 @@ export function CampaignAssignmentsPage() {
                     >
                       All Campaigns
                     </button>
-                    {uniqueCampaigns.map((campaign: { id: number; name: string }) => (
+                    {uniqueCampaigns.map((campaign: { id: number; name: string }, idx: number) => (
                       <button
-                        key={campaign.id}
+                        key={`${campaign.id}-${idx}`}
                         onClick={() => { setCampaignFilter(campaign.id.toString()); setShowCampaignDropdown(false); }}
                         className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                       >
@@ -644,10 +658,14 @@ export function CampaignAssignmentsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {paginatedCampaigns.length > 0 ? paginatedCampaigns.map((campaign: CampaignAssignment) => {
+                  {paginatedCampaigns.length > 0 ? paginatedCampaigns.map((campaign: CampaignAssignment, index: number) => {
                     const status = getCampaignStatus(campaign);
+                    // use a composite key in case module IDs repeat across campaigns
+                    const rowKey = campaign.campaign_id != null
+                      ? `${campaign.campaign_id}-${campaign.id}`
+                      : `${campaign.id}-${index}`;
                     return (
-                      <tr key={campaign.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={rowKey} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3.5">
                           <div className="flex items-center gap-2">
                             <span className="font-medium text-gray-700">{campaign.campaign_name || 'N/A'}</span>
@@ -717,7 +735,7 @@ export function CampaignAssignmentsPage() {
                   if (startPage > 1) {
                     buttons.push(
                       <button
-                        key={1}
+                        key="page-1"
                         className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                         onClick={() => setCurrentPage(1)}
                       >
@@ -737,7 +755,7 @@ export function CampaignAssignmentsPage() {
                   for (let i = startPage; i <= endPage; i++) {
                     buttons.push(
                       <button
-                        key={i}
+                        key={`page-${i}`}
                         className={`min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all ${i === currentPage
                             ? 'bg-blue-50 text-blue-600 border-blue-500 font-semibold'
                             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
@@ -760,7 +778,7 @@ export function CampaignAssignmentsPage() {
                     }
                     buttons.push(
                       <button
-                        key={totalPages}
+                        key={`page-${totalPages}`}
                         className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                         onClick={() => setCurrentPage(totalPages)}
                       >

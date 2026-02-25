@@ -6,6 +6,8 @@ import type { ApiResponse } from "@/types/quiz";
 import { normalizeAWMResponse } from "./awmResponse";
 import { awmClient, API_BASE } from "./httpClient";
 
+const SERVICE_AWM_URL = process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://localhost:3002";
+
 async function request<T>(fn: () => Promise<{ data: AWMResponseBody }>): Promise<ApiResponse<T>> {
   const { data } = await fn();
   const normalized = normalizeAWMResponse<T>(data);
@@ -105,11 +107,11 @@ export const campaignService = {
 
   /**
    * Begin a campaign for the current user.
-   * API: POST /report-actions/begin-campaign
+   * API: POST /useraction/report-actions/begin-campaign
    */
   beginCampaign: async (campaignId: number) => {
     return request<unknown>(() =>
-      awmClient.post<AWMResponseBody>(`${API_BASE}/report-actions/begin-campaign`, {
+      awmClient.post<AWMResponseBody>(`${API_BASE}/useraction/report-actions/begin-campaign`, {
         campaign_id: campaignId,
       })
     );
@@ -124,6 +126,24 @@ export const campaignService = {
       awmClient.post<AWMResponseBody>(`${API_BASE}/useraction/report-actions/begin-module`, {
         campaign_id: campaignId,
         module_id: moduleId,
+      })
+    );
+  },
+
+  /**
+   * Begin a specific content item within a module/campaign for the current user.
+   * API: POST /api/awm/useraction/report-actions/begin-content
+   */
+  beginContent: async (
+    campaignId: number,
+    moduleId: number,
+    contentId: number
+  ) => {
+    return request<unknown>(() =>
+      awmClient.post<AWMResponseBody>(`${SERVICE_AWM_URL}/api/awm/useraction/report-actions/begin-content`, {
+        campaign_id: campaignId,
+        module_id: moduleId,
+        content_id: contentId,
       })
     );
   },
