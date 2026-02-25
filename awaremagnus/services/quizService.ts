@@ -477,4 +477,19 @@ export const quizService = {
     return data;
   },
 
+  /**
+   * POST /report-actions/update-content-progress
+   * Updates content progress for a user in a campaign
+   */
+  updateContentProgress: async (payload: {
+    campaign_id: number;
+    module_id: number;
+    content_id: number;
+    progress_percentage: number;
+  }) => {
+    return request<unknown>(() =>
+      awmClient.post<AWMResponseBody>(`${API_BASE}/useraction/report-actions/update-content-progress`, payload)
+    );
+  },
+
 };

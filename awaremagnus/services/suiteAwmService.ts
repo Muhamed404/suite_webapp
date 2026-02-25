@@ -182,4 +182,18 @@ export const suiteAwmService = {
   /** GET /api/awm/dashboard/organizations/campaign (AWM Backend) - Get campaign dashboard with all details and metrics */
   getCampaignDashboard: (campaignId: number) =>
     awmGet<any>(`${API_BASE}/dashboard/organizations/campaign?campaign_id=${campaignId}`),
+
+  /** POST /api/awm/report-actions/submit-quiz (AWM Backend) - Submit quiz answers */
+  submitQuiz: (payload: {
+    campaign_id: number;
+    module_id: number;
+    content_id: number;
+    quizzes: Array<{
+      quiz_id: number;
+      answers: Array<{
+        question_id: number;
+        answer_id: number;
+      }>;
+    }>;
+  }) => awmPost<any>(`${API_BASE}/useraction/report-actions/submit-quiz`, payload),
 };
