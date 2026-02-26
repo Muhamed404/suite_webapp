@@ -4,7 +4,8 @@ import Image from "next/image";
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 import { Button } from "@heroui/button";
 import Link from "next/link";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
@@ -38,12 +39,54 @@ import {
 import { useLicenseInfo } from "@/hooks/useSuiteAwm";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { decodeJwt, extractUserDisplayName, extractUserEmail } from "@/utils/jwt";
+import { campaignService } from "@/services/campaignService";
 
 export default function DashboardPage() {
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
+  const queryClient = useQueryClient();
   const { user, token } = useAuthStore();
+
+  // Track which assignments are currently being started (by `campaign_id-module_id` key)
+  const [startingKeys, setStartingKeys] = useState<Set<string>>(new Set());
+
+  // Helper: generate a URL-friendly slug from a module name
+  const generateModuleSlug = useCallback((name: string) =>
+    (name || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, ""),
+  []);
+
+  // Handle Start: call beginCampaign → beginModule, then refresh data
+  const handleStartAssignment = useCallback(
+    async (assignment: any) => {
+      const key = `${assignment.campaign_id}-${assignment.module_id}`;
+      if (!assignment.campaign_id) return;
+      setStartingKeys((prev) => new Set(prev).add(key));
+      try {
+        const campaignRes = await campaignService.beginCampaign(assignment.campaign_id);
+        if (!campaignRes.success) {
+          console.error("beginCampaign did not succeed", campaignRes);
+          return;
+        }
+        await campaignService.beginModule(assignment.campaign_id, assignment.module_id);
+        queryClient.invalidateQueries({ queryKey: ["user", "assignments"] });
+      } catch (error) {
+        console.error("Failed to start assignment:", error);
+      } finally {
+        setStartingKeys((prev) => {
+          const next = new Set(prev);
+          next.delete(key);
+          return next;
+        });
+      }
+    },
+    [queryClient],
+  );
 
   // Decode JWT to extract user details
   const jwtPayload = useMemo(() => decodeJwt(token), [token]);
@@ -740,12 +783,33 @@ export default function DashboardPage() {
                                         {formatDate(assignment.end_date)}
                                       </td>
                                       <td className="px-4 py-2.5">
-                                        <button
-                                          className="px-3 py-1 rounded-full text-[10px] font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors whitespace-nowrap"
-                                          onClick={() => window.location.href = `/dashboard/campaign-assignments`}
-                                        >
-                                          Start
-                                        </button>
+                                        {(() => {
+                                          const key = `${assignment.campaign_id}-${assignment.module_id}`;
+                                          const isStarting = startingKeys.has(key);
+                                          const statusName = assignment.status?.name;
+                                          // IN_PROGRESS + user already begun (progress_percentage != null) → View
+                                          if (statusName === "IN_PROGRESS" && assignment.progress_percentage != null) {
+                                            const slug = generateModuleSlug(assignment.module_name || "");
+                                            return (
+                                              <a
+                                                href={`/awm/module/${slug}?campaign_id=${assignment.campaign_id}`}
+                                                className="px-3 py-1 rounded-full text-[10px] font-semibold bg-[#3FBDFF] text-white hover:bg-opacity-90 transition-colors whitespace-nowrap inline-block"
+                                              >
+                                                View
+                                              </a>
+                                            );
+                                          }
+                                          // PENDING or IN_PROGRESS with progress_percentage === null → Start
+                                          return (
+                                            <button
+                                              disabled={isStarting}
+                                              className="px-3 py-1 rounded-full text-[10px] font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors whitespace-nowrap disabled:opacity-60"
+                                              onClick={() => handleStartAssignment(assignment)}
+                                            >
+                                              {isStarting ? "Starting…" : "Start"}
+                                            </button>
+                                          );
+                                        })()}
                                       </td>
                                     </tr>
                                   );
