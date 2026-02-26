@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Plus, FileText, ChevronsUpDown, SearchX, Trash2 } from "lucide-react";
+import { Search, Plus, FileText, ChevronsUpDown, SearchX, Trash2, Download } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Card } from "@heroui/card";
@@ -20,7 +20,7 @@ import { addToast } from "@heroui/toast";
 import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
 import { AuthImage } from "@/components/ui/auth-image";
 import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS } from "@/utils/supportedLanguages";
-
+import { generateCertificateHtml } from "@/utils/certificateHtmlGenerator";
 export function CertificateManagementListPage() {
     const tMenu = useTranslations("dashboard");
     const { dir } = useI18n();
@@ -75,6 +75,36 @@ export function CertificateManagementListPage() {
                 title: "Error",
                 description: "Failed to delete certificate template",
                 color: "danger"
+            });
+        }
+    };
+
+    const handleDownload = (cert: CertificateTemplate) => {
+        const htmlContent = generateCertificateHtml({
+            templateText: cert.template_text,
+            bgColor: cert.bg_color || "#ffffff",
+            assets: {
+                logo: cert.top_logo_url ? getCertificateAssetUrl(cert.top_logo_url) : null,
+                border: cert.border_image_url ? getCertificateAssetUrl(cert.border_image_url) : null,
+                watermark: cert.bg_watermark_url ? getCertificateAssetUrl(cert.bg_watermark_url) : null,
+                stamp: cert.stamp_logo_url ? getCertificateAssetUrl(cert.stamp_logo_url) : null,
+                signature: cert.sign_image_url ? getCertificateAssetUrl(cert.sign_image_url) : null,
+            }
+        });
+        const previewWindow = window.open('', '_blank');
+        if (previewWindow) {
+            previewWindow.document.open();
+            previewWindow.document.write(htmlContent);
+            previewWindow.document.close();
+            // Automatically trigger print dialog since they clicked download
+            previewWindow.onload = () => {
+                previewWindow.print();
+            };
+        } else {
+            addToast({
+                title: "Error",
+                description: "Pop-up blocked. Please allow pop-ups to download the certificate.",
+                color: "warning"
             });
         }
     };
@@ -205,8 +235,16 @@ export function CertificateManagementListPage() {
                                                             Edit
                                                         </Link>
                                                         <button
+                                                            onClick={() => handleDownload(cert)}
+                                                            className="text-sky-500 hover:text-sky-700 transition"
+                                                            title="Download Certificate"
+                                                        >
+                                                            <Download size={16} />
+                                                        </button>
+                                                        <button
                                                             onClick={() => cert.id && handleDelete(cert.id)}
                                                             className="text-rose-500 hover:text-rose-700 transition"
+                                                            title="Delete Certificate"
                                                         >
                                                             <Trash2 size={16} />
                                                         </button>
