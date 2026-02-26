@@ -506,24 +506,25 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                       setLanguageFilter(v === "all" ? "" : v);
                     }}
                   >
-                    <SelectItem key="all" textValue={t("moduleDetails.allLanguages")}>
-                      <div className="flex items-center gap-2 whitespace-nowrap">
-                        <span>🌐</span>
-                        <span className="whitespace-nowrap">{t("moduleDetails.allLanguages")}</span>
-                      </div>
-                    </SelectItem>
-                    {SUPPORTED_LANGUAGES.map((lang) => (
-                      <SelectItem key={String(lang.id)} textValue={lang.name}>
+                    {[
+                      { id: "all" as const, name: t("moduleDetails.allLanguages"), icon: "🌐" },
+                      ...SUPPORTED_LANGUAGES.map(lang => ({ id: String(lang.id), name: lang.name, flag: lang.id }))
+                    ].map((item: any) => (
+                      <SelectItem key={item.id} textValue={item.name}>
                         <div className="flex items-center gap-2 whitespace-nowrap">
-                          <ReactCountryFlag
-                            countryCode={getLanguageCountryCode(lang.id)}
-                            style={{
-                              fontSize: "1em",
-                              lineHeight: "1em",
-                            }}
-                            svg
-                          />
-                          <span className="whitespace-nowrap">{lang.name}</span>
+                          {item.icon ? (
+                            <span>{item.icon}</span>
+                          ) : item.flag ? (
+                            <ReactCountryFlag
+                              countryCode={getLanguageCountryCode(item.flag)}
+                              style={{
+                                fontSize: "1em",
+                                lineHeight: "1em",
+                              }}
+                              svg
+                            />
+                          ) : null}
+                          <span className="whitespace-nowrap">{item.name}</span>
                         </div>
                       </SelectItem>
                     ))}
