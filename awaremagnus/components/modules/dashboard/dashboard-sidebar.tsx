@@ -90,6 +90,23 @@ export const DashboardSidebar = ({
       ],
     },
     {
+      href: "/dashboard/survey",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Assessments_Solid.svg"),
+      label: t("menu.surveyManagement"),
+      children: [
+        {
+          href: "/dashboard/survey",
+          icon: "",
+          label: t("menu.viewSurveys"),
+        },
+        {
+          href: "/dashboard/survey/questions",
+          icon: "",
+          label: t("menu.quizQuestions"),
+        },
+      ],
+    },
+    {
       href: "/dashboard/system-branding",
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Branding_Solid.svg"),
       label: t("menu.systemBranding"),

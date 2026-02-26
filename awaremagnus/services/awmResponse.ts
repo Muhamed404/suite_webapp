@@ -83,6 +83,13 @@ export function normalizeAWMResponse<T>(raw: AWMResponseBody<unknown>): Normaliz
       // For campaign list responses, return the whole wrapper so we have access to meta_statistics
       return { success, data: o as T, message, statusCode: raw.statusCode, count };
     }
+    if (Array.isArray(o.surveys)) {
+      // For survey list responses, return the whole wrapper so we have access to meta_statistics
+      return { success, data: o as T, message, statusCode: raw.statusCode, count };
+    }
+    if (Array.isArray(o.questions)) {
+      return { success, data: o.questions as T, message, statusCode: raw.statusCode, count };
+    }
     if (Array.isArray(o.object)) {
       return { success, data: o.object as T, message, statusCode: raw.statusCode, count };
     }
