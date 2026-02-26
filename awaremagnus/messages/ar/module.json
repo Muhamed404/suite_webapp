@@ -109,6 +109,7 @@
     "description": "بعض الوصف",
     "languageFilter": "اللغة",
     "languageFilterHint": "سيتم عرض المحتوى حسب اللغة، مثل الإنجليزية والعربية. يتم التعامل معه من الخادم.",
+    "allLanguages": "جميع اللغات",
     "interactiveLesson": "الدرس التفاعلي",
     "quizzes": "الاختبارات",
     "posters": "الملصقات",
