@@ -1,5 +1,5 @@
 {
-  "breadcrumbPrefix": "مكتبة التدريب > مكتبتي > ",
+  "breadcrumbPrefix": "مكتبة الوعي > مكتبتي > ",
   "breadcrumbCurrent": "إنشاء وحدة",
   "title": "إنشاء وحدة",
   "subtitle": "قم بإنشاء الوحدة المخصصة الخاصة بك هنا",
@@ -140,7 +140,7 @@
     "progress": "التقدم",
     "progressHint": "لاكتمال هذه الوحدة تحتاج إلى إكمال الدرس التفاعلي ثم الاختبارات للوصول إلى 100٪",
     "coreModules": "الوحدات الأساسية",
-    "breadcrumbTrainingLibrary": "مكتبة التدريب",
+    "breadcrumbTrainingLibrary": "مكتبة الوعي",
     "breadcrumbMyLibrary": "وحداتي",
     "breadcrumbAwarenessCampaign": "حملة التوعية",
     "breadcrumbCampaign": "الحملة",
