@@ -196,4 +196,8 @@ export const suiteAwmService = {
       }>;
     }>;
   }) => awmPost<any>(`${API_BASE}/useraction/report-actions/submit-quiz`, payload),
+
+ 
+  getQuizAttemptDetail: (campaignId: number, moduleId: number, contentId: number) =>
+    awmGet<any>(`${API_BASE}/report/quiz-attempt-detail?campaign_id=${campaignId}&module_id=${moduleId}&content_id=${contentId}`),
 };
