@@ -138,6 +138,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         } else {
           statusValue = 'pending';
         }
+    
+        if (statusValue === 'pending') {
+          statusValue = 'in progress';
+        }
         // format label for display (capitalize words, replace underscores)
         const statusLabel = statusValue.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 
@@ -174,6 +178,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
           });
           if (!aggStatus) {
             aggStatus = agg.statuses?.some((s: any) => s.status === 2) ? 'completed' : 'pending';
+          }
+          // Change pending to in progress for consistency
+          if (aggStatus === 'pending') {
+            aggStatus = 'in progress';
           }
           const aggLabel = aggStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           transformedItems.push({
@@ -223,7 +231,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
       transformedItems.push({
         id: 'quizzes',
         title: 'Quizzes',
-        status: data.user_progress_summary.quizzes.status === 'completed' ? 'completed' : 'pending',
+        status: data.user_progress_summary.quizzes.status === 'completed' ? 'completed' : 'in Progress',
         date: latestQuizDate ? new Date(latestQuizDate).toLocaleDateString("en-GB", {
           day: "numeric",
           month: "short",
