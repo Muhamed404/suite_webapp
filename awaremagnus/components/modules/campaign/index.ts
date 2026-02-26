@@ -5,3 +5,4 @@ export { CampaignContentDetailPage } from "./campaign-content-detail-page";
 export { CertificateListPage } from "./certificate-list-page";
 export { CertificateManagementListPage } from "./certificate-management-list-page";
 export { CertificateBrandingForm } from "./certificate-branding-form";
+export { SurveyManagementListPage } from "./survey-management-list-page";
