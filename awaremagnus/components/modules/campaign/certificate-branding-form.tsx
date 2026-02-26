@@ -260,7 +260,7 @@ export function CertificateBrandingForm() {
                 <div className="p-3">
                     {/* Breadcrumb */}
                     <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
-                        <span className="hover:text-gray-700 transition cursor-pointer">Training Library</span>
+                        <span className="hover:text-gray-700 transition cursor-pointer">Awareness Library</span>
                         <span className="text-gray-400">›</span>
                         <span className="hover:text-gray-700 transition cursor-pointer">System Library</span>
                         <span className="text-gray-400">›</span>
