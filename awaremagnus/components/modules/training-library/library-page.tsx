@@ -399,9 +399,9 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
                   {paginatedModules.map((item: Module) => (
                     <Card key={item.id} className={cardClassName} shadow="sm">
-                      <CardBody className="p-4 flex flex-col bg-white">
-                        {/* Thumbnail: blue gradient + Card.png (match reference) */}
-                        <div className="aspect-square rounded-xl overflow-hidden mb-2 w-full bg-gradient-to-b from-[#0075a1] to-[#00b1bd] shrink-0 relative">
+                      <CardBody className="p-3 flex flex-col bg-white">
+                        {/* Thumbnail: sky blue gradient + Card.png (match reference) */}
+                        <div className="rounded-xl h-40 overflow-hidden mb-3 w-full bg-gradient-to-b from-sky-200 to-sky-400 flex items-center justify-center shrink-0 relative">
                           <img
                             alt=""
                             className="w-full h-full object-cover object-center"
@@ -431,9 +431,8 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                         >
                           <Button
                             as={Link}
-                            className="border border-black bg-white text-[var(--mainblue)] text-xs font-medium min-h-0 h-8 gap-1.5 hover:bg-gray-50"
+                            className="border border-gray-500 bg-white text-[var(--mainblue)] text-xs font-medium rounded-lg px-4 py-1 mt-4 flex items-center gap-1.5 hover:bg-gray-50"
                             href={`${basePath}/${item.id}`}
-                            radius="full"
                             size="sm"
                             variant="bordered"
                           >
@@ -563,9 +562,8 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                           >
                             <Button
                               as={Link}
-                              className="min-h-0 h-8 text-xs font-medium bg-white text-[var(--mainblue)] hover:bg-gray-50 border border-black gap-1.5"
+                              className="border border-gray-500 bg-white text-[var(--mainblue)] text-xs font-medium rounded-lg px-4 py-1 mt-4 flex items-center gap-1.5 hover:bg-gray-50"
                               href={`${basePath}/${item.id}`}
-                              radius="full"
                               size="sm"
                               variant="bordered"
                             >
