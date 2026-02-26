@@ -4,6 +4,7 @@ import type { QuizAnswer } from "./quiz-answer-row";
 import type { Module, ModuleContent } from "@/types/quiz";
 
 import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Select, SelectItem } from "@heroui/select";
@@ -22,6 +23,7 @@ import {
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useModules, useContentsByModule, useCreateQuiz, useQuizTypes } from "@/hooks/useQuiz";
+import { useAuthStore } from "@/hooks/useAuthStore";
 import { getApiErrorMessage } from "@/utils/apiError";
 
 function createEmptyAnswer(): QuizAnswer {
@@ -43,7 +45,8 @@ function createLanguageFormByLangId(langId: number): QuizLanguageForm {
   };
 }
 
-function moduleName(m: Module): string {
+function moduleName(m?: Module | null): string {
+  if (!m) return "";
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
@@ -66,6 +69,8 @@ export function CreateQuizForm({
   const tCommon = useTranslations("common");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const router = useRouter();
+  const { user } = useAuthStore();
 
   const [moduleId, setModuleId] = useState<string>(initialModuleId);
   const [contentId, setContentId] = useState<string>("");
@@ -110,7 +115,7 @@ export function CreateQuizForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
-  const { data: modulesRes } = useModules({ status: 1 });
+  const { data: modulesRes } = useModules();
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
 
   const { data: contentsRes } = useContentsByModule(moduleId ? Number(moduleId) : 0, !!moduleId);
@@ -225,26 +230,33 @@ export function CreateQuizForm({
           const answers = q.answers
             .filter((a) => a.text.trim() !== "")
             .map((a, i) => ({
-              answer_text: a.text.trim(),
-              is_correct: a.correct,
-              order: i + 1,
+              answer: a.text.trim(),
+              validity: a.correct,
+              // order: i + 1, // Not strictly in API docs but order matters
             }));
 
           await createQuiz.mutateAsync({
             quiz: {
-              mod_content_id: modContentId,
-              quiz_type_id: selectedQuizTypeId,
+              con_id: modContentId,
+              qtype_id: selectedQuizTypeId,
               question: q.question.trim() || "Untitled question",
               difficulty: 1,
-              time_limit: 60,
-              lang_id: form.langId, // Ensure lang_id is passed if API supports it
+              // time_limit: 60, // Not in API docs
+              // lang_id: form.langId, // Not in API docs, removing
             },
             answers,
           });
         }
       }
       setFormSuccess(t("createSuccess"));
-      // Optional: Clear form or redirect
+
+      // Redirect after success
+      setTimeout(() => {
+        const path = user?.role_id && (user.role_id === 1 || user.role_id === 2)
+          ? `/dashboard/training-library/system/${moduleId}`
+          : `/dashboard/training-library/my/${moduleId}`;
+        router.push(path);
+      }, 2000);
     } catch (err) {
       const msg = getApiErrorMessage(err, tCommon, {
         defaultKey: "errors.unknown",
@@ -273,9 +285,15 @@ export function CreateQuizForm({
         {t("backToQuizzes")}
       </Link>
       <div className="text-xs text-[var(--darkgray)] mb-2">
-        {t("breadcrumbPrefix")}
-        <span className="text-[var(--mainblue)] font-semibold px-1">/</span>
-        <span className="text-[var(--mainblue)] font-semibold">{t("breadcrumbCurrent")}</span>
+        <span>{t("breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}</span>
+        <span className="mx-1">›</span>
+        <span className="text-[var(--mainblue)] font-semibold">
+          {moduleId && modules.length > 0
+            ? moduleName(modules.find((m) => String(m.id) === moduleId))
+            : "Select Module"}
+        </span>
+        <span className="mx-1">›</span>
+        <span className="text-[var(--mainblue)] font-semibold">{t("breadcrumbCurrent") ?? "Create Quiz"}</span>
       </div>
       <h2 className="text-xl font-bold text-[var(--mainblue)]">{t("title")}</h2>
       <p className="text-xs text-[var(--darkgray)] mb-5 mt-1">{t("subtitle")}</p>
@@ -379,6 +397,7 @@ export function CreateQuizForm({
                 key={String(form.langId ?? form.lang ?? formIndex)}
                 allowAddQuestion={true}
                 contentId={contentId ? Number(contentId) : undefined}
+                moduleId={moduleId ? Number(moduleId) : undefined}
                 form={form}
                 quizType={selectedQuizType as any}
                 quizTypeId={getTypeIdFromCardType(selectedQuizType)}

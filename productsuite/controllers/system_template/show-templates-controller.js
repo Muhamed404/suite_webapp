@@ -62,8 +62,11 @@ exports.showTemplate = async (req, res) => {
   } catch (error) {
     logger.error(`My Template: Issue in retrieving fetching system templates`);
     logger.error(error.stack)
-    req.flash('message', 'Error fetching templates');
-    req.flash('alertType', 'error');
-    res.redirect(frontend_api_urls.PRODUCT_SUITE.System_Template.LIST);
+    
+    if (req.session) {
+      req.flash('message', 'Error fetching templates');
+      req.flash('alertType', 'error');
+    }
+    return res.redirect(frontend_api_urls.PRODUCT_SUITE.System_Template.LIST);
   }
 };

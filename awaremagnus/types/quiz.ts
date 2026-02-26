@@ -29,6 +29,29 @@ export interface Module {
   description?: string;
   category?: { id: number; name: string };
   translations?: ModuleTranslation[];
+  assignments?: { campaign_id: number; status: number }[];
+}
+
+// types returned by the report endpoints
+export interface ReportModule {
+  id: number;
+  report_campaign_id: number;
+  module_id: number;
+  status_id: number;
+  progress_percentage: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ReportContent {
+  id: number;
+  report_module_id: number;
+  content_id: number;
+  status_id: number;
+  progress_percentage: string;
+  reportModule?: ReportModule;
+  content?: { id: number; name?: string };
+  status?: { id: number; name: string };
 }
 
 export interface ContentTranslation {
@@ -44,6 +67,7 @@ export interface ModuleContent {
   mod_id?: number;
   module_id?: number;
   content_type_id: number;
+  content_type?: string;
   order: number;
   duration?: number;
   status?: number;
@@ -53,15 +77,21 @@ export interface ModuleContent {
   source_path?: string;
   source_url?: string;
   content_data?: string;
+  /** Alias for content_data or source_url in some contexts */
+  content_id?: number | string;
   description?: string;
   is_mandatory?: boolean;
   /** From API (single language or default) */
   title?: string;
   /** Language from API (e.g. { id, name }) */
   language?: { id: number; name?: string };
+  language_id?: number;
   translations?: ContentTranslation[];
   /** Set from API creation_date / createdAt when normalizing list/detail */
   created_at?: string;
+  created_date?: string;
+  quizzes?: { total_count: number };
+  user_completion_status?: string;
 }
 
 export interface QuizAnswer {
@@ -92,19 +122,17 @@ export interface Quiz {
 
 export interface CreateQuizPayload {
   quiz: {
-    mod_content_id: number;
-    quiz_type_id: number;
+    con_id: number;
+    qtype_id: number;
     question: string;
-    explanation?: string;
+    description?: string; // Sometimes used as explanation
     difficulty?: number;
-    time_limit?: number;
     org_id?: number;
-    lang_id?: number;
   };
   answers: Array<{
-    answer_text: string;
-    is_correct: boolean;
-    order: number;
+    answer: string;
+    validity: boolean;
+    feedback?: string;
   }>;
 }
 

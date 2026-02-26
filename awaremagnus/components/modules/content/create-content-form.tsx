@@ -17,13 +17,15 @@ import {
 } from "./content-type-selector";
 import { ContentForm, type ContentTranslation } from "./content-form";
 
-import { useContentTypes } from "@/hooks/useSuiteAwm";
+import { useRouter } from "next/navigation";
+import { CONTENT_TYPES } from "@/constants/content-types";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModules } from "@/hooks/useQuiz";
 import { useCreateContent } from "@/hooks/useQuiz";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { getLanguageId } from "@/utils/languageMapping";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 /** Minimal upload icon for dropzones */
 function UploadIcon({ className }: { className?: string }) {
@@ -79,9 +81,9 @@ export function CreateContentForm({
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
-  const { data: contentTypesList } = useContentTypes();
-  const apiContentTypes = Array.isArray(contentTypesList) ? contentTypesList : [];
-  const useApiContentTypes = apiContentTypes.length > 0;
+  const router = useRouter();
+  const apiContentTypes = CONTENT_TYPES;
+  const useApiContentTypes = true;
 
   const [moduleId, setModuleId] = useState<string>(initialModuleId);
   const [contentType, setContentType] = useState<ContentType | null>(initialContentType);
@@ -142,14 +144,16 @@ export function CreateContentForm({
   const isQuizType =
     useApiContentTypes && selectedContentTypeId != null
       ? (apiContentTypes
-          .find((ct) => ct.id === selectedContentTypeId)
-          ?.name?.toLowerCase()
-          .includes("quiz") ?? false)
+        .find((ct) => ct.id === selectedContentTypeId)
+        ?.name?.toLowerCase()
+        .includes("quiz") ?? false)
       : contentType === "Quiz";
 
-  const { data: modulesRes } = useModules({ status: 1 });
+  const { data: modulesRes } = useModules();
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
   const createContent = useCreateContent();
+
+  const backHref = returnHref ?? (moduleId ? `/dashboard/training-library/system/${moduleId}` : "/dashboard/module");
 
   const handleModuleChange = (keys: unknown) => {
     const v =
@@ -266,8 +270,8 @@ export function CreateContentForm({
     const requiresFileOrUrl = useApiContentTypes
       ? true
       : ["iSpring", "PDF", "Video", "Brochure", "Screen Saver", "Poster", "Game"].includes(
-          contentType!
-        );
+        contentType!
+      );
 
     if (!isQuizType && requiresFileOrUrl) {
       if (!allowsFileUpload) {
@@ -324,7 +328,13 @@ export function CreateContentForm({
 
       setFormSuccess(t("createSuccess"));
       setLastCreatedWasQuiz(isQuizType);
-      // Reset form
+
+      // Redirect to module details page after success
+      setTimeout(() => {
+        router.push(backHref);
+      }, 1500);
+
+      // Reset form (optional if redirecting)
       setModuleId("");
       setContentType(null);
       setSelectedContentTypeId(null);
@@ -383,20 +393,20 @@ export function CreateContentForm({
       ? true
       : contentType
         ? [
-            "iSpring",
-            "PDF",
-            "Video",
-            "Brochure",
-            "Screen Saver",
-            "Poster",
-            "Game",
-            "Misc",
-          ].includes(contentType)
+          "iSpring",
+          "PDF",
+          "Video",
+          "Brochure",
+          "Screen Saver",
+          "Poster",
+          "Game",
+          "Misc",
+        ].includes(contentType)
         : false;
   const showUrlOnly = requiresFileOrUrlForDisplay && !allowsFileUpload;
   const showFileOrUrlChoice = requiresFileOrUrlForDisplay && allowsFileUpload;
 
-  const backHref = returnHref ?? "/dashboard/module";
+
   const quizFormHref =
     returnHref && moduleId
       ? `${returnHref.replace(/\/$/, "")}/quizzes/create`
@@ -507,7 +517,7 @@ export function CreateContentForm({
               radius="full"
               size="md"
             >
-              <Image alt="" height={12} src="/images/img/add.svg" width={12} />
+              <Image alt="" height={12} src={getContentAssetUrl("/images/img/add.svg")} width={12} />
               <span className="md:flex hidden text-xs">{t("addNew")}</span>
             </Button>
           </div>

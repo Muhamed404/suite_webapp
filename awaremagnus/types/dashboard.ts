@@ -1,7 +1,8 @@
 export interface SystemDashboardOverview {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     total_organizations: number;
     total_campaigns: number;
     total_employees_modules_enrolled: number;
@@ -45,9 +46,10 @@ export interface MonthlyCompletionData {
 }
 
 export interface SystemMonthlyCompletion {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     org_id: number;
     campaign_id: number | null;
     monthly_data: MonthlyCompletionData[];
@@ -65,9 +67,10 @@ export interface StrugglingModule {
 }
 
 export interface SystemStrugglingModules {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     struggling_modules: StrugglingModule[];
     total_count: number;
   };
@@ -85,11 +88,12 @@ export interface OrganizationLeadership {
 }
 
 export interface SystemLeaderboard {
-  success: boolean;
   message: string;
+  statusCode: number;
+  alertType: string;
   data: {
-    top_low_risk_organizations: OrganizationLeadership[];
-    top_high_risk_organizations: OrganizationLeadership[];
+    top_low_risk_employees: EmployeeLeaderboard[];
+    top_high_risk_employees: EmployeeLeaderboard[];
   };
 }
 
@@ -122,18 +126,20 @@ export interface OrganizationDashboardMetrics {
 }
 
 export interface OrganizationDashboardsResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     dashboardOrganizations: OrganizationDashboardMetrics[];
     count: number;
   };
 }
 
 export interface OrganizationMonthlyCompletion {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     org_id: number;
     campaign_id: number | null;
     monthly_data: MonthlyCompletionData[];
@@ -141,9 +147,10 @@ export interface OrganizationMonthlyCompletion {
 }
 
 export interface OrganizationStrugglingModulesResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     org_id: number;
     struggling_modules: StrugglingModule[];
     total_count: number;
@@ -155,6 +162,7 @@ export interface EmployeeLeaderboard {
   modules_completed: number;
   achievement_count: number;
   avatar_current_level: number;
+  streak_day?: number;
   risk_level: string;
   compliance_score: number;
   total_xp_tokens: number;
@@ -162,8 +170,9 @@ export interface EmployeeLeaderboard {
 }
 
 export interface OrganizationLeaderboardResponse {
-  success: boolean;
   message: string;
+  statusCode: number;
+  alertType: string;
   data: {
     top_low_risk_employees: EmployeeLeaderboard[];
     top_high_risk_employees: EmployeeLeaderboard[];
@@ -183,17 +192,17 @@ export interface UserDashboardMetrics {
   total_quizzes_passed: number;
   total_mvideos_enrolled: number;
   total_mvideos_watched: number;
-  global_progress_percent: number;
+  global_progress_percent: string;
   level_number: number;
-  xp_total_tokens: number;
-  total_compliance_score: number;
-  total_compliance_percent: number;
+  xp_total_tokens: string;
+  total_compliance_score: string;
+  total_compliance_percent: string;
   total_achievements_completed: number;
-  user_risk_level: string;
-  quizzes_accuracy_percent: number;
-  weekly_progress_percent: number;
-  learning_velocity: number;
-  best_module_attempted: string;
+  user_risk_level: string | null;
+  quizzes_accuracy_percent: string;
+  weekly_progress_percent: string;
+  learning_velocity: string;
+  best_module_attempted: string | null;
   streak_day: number;
   total_study_time: number;
   createdAt: string;
@@ -201,9 +210,10 @@ export interface UserDashboardMetrics {
 }
 
 export interface UserDashboardsResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     dashboardUsers: UserDashboardMetrics[];
     count: number;
   };
@@ -219,8 +229,9 @@ export interface AchievementStat {
 }
 
 export interface AchievementStatisticsResponse {
-  success: boolean;
   message: string;
+  statusCode: number;
+  alertType: string;
   data: {
     total_achievements: number;
     total_unique_achievements_unlocked: number;
@@ -241,9 +252,10 @@ export interface Achievement {
 }
 
 export interface AchievementsResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     achievements: Achievement[];
     count: number;
   };
@@ -259,9 +271,10 @@ export interface AvatarStat {
 }
 
 export interface AvatarStatisticsResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     total_avatars: number;
     total_unique_avatars_unlocked: number;
     total_unique_avatars_locked: number;
@@ -278,9 +291,10 @@ export interface ScoreType {
 }
 
 export interface ScoreTypesResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     scoreTypes: ScoreType[];
     count: number;
   };
@@ -299,10 +313,93 @@ export interface ScoreLevel {
 }
 
 export interface ScoreLevelsResponse {
-  success: boolean;
   message: string;
-  data: {
+  statusCode: number;
+  alertType: string;
+  object: {
     scoreLevels: ScoreLevel[];
+    count: number;
+  };
+}
+
+export interface Assignment {
+  user_id: number;
+  campaign_id: number;
+  campaign_name: string;
+  module_id: number;
+  module_name: string;
+  description: string;
+  status: {
+    id: number;
+    name: string;
+  };
+  start_date: string;
+  end_date: string;
+  logo_banner_url: string;
+}
+
+export interface UserGameAchievement {
+  achievement_id: number;
+  name: string;
+  description: string;
+  category_name: string;
+  image_small_url: string;
+  count: number;
+  issue_date: string;
+}
+
+export interface UserGameAchievement {
+  achievement_id: number;
+  name: string;
+  description: string;
+  category_name: string;
+  image_small_url: string;
+  count: number;
+  issue_date: string;
+}
+
+export interface UserGameAchievementsResponse {
+  message: string;
+  statusCode: number;
+  alertType: string;
+  object: {
+    userGameAchievements: UserGameAchievement[];
+    count: number;
+  };
+}
+
+export interface UserAssignment {
+  user_id: number;
+  campaign_id: number;
+  campaign_name: string;
+  module_id: number;
+  module_name: string;
+  description: string;
+  status: {
+    id: number;
+    name: string;
+  };
+  start_date: string;
+  end_date: string;
+  remaining_days: number;
+  progress_percentage: number | null;
+  logo_banner_url: string | null;
+}
+
+export interface UserAssignmentsResponse {
+  message: string;
+  statusCode: number;
+  alertType: string;
+  object: {
+    user_summary: {
+      user_id: number;
+      total_pending_modules_assignments: number;
+      total_completed_modules: number;
+      total_modules_enrolled: number;
+      total_quizzes_enrolled: number;
+      total_quizzes_passed: number;
+    };
+    assignments: UserAssignment[];
     count: number;
   };
 }

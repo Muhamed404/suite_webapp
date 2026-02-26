@@ -4,9 +4,14 @@ import Image from "next/image";
 import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
+import { useMemo } from "react";
 
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { decodeJwt, extractUserDisplayName, extractUserEmail } from "@/utils/jwt";
 
 interface DashboardHeaderProps {
   onMenuClick?: () => void;
@@ -16,13 +21,25 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
+  const { user, token } = useAuthStore();
+
+  // Decode JWT to extract user details
+  const jwtPayload = useMemo(() => decodeJwt(token), [token]);
+  const userDisplayName = useMemo(
+    () => extractUserDisplayName(jwtPayload),
+    [jwtPayload]
+  );
+  const userEmail = useMemo(
+    () => user?.email || extractUserEmail(jwtPayload),
+    [user?.email, jwtPayload]
+  );
 
   const searchIcon = (
     <Image
       alt=""
       className="size-4 text-gray-400"
       height={16}
-      src="/images/img/search.svg"
+      src={getContentAssetUrl("/images/img/search.svg")}
       width={16}
     />
   );
@@ -36,7 +53,7 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
       )}
     >
       <h1 className="text-base font-semibold text-[var(--mainblue)] truncate min-w-0 flex-1">
-        {t("header.welcome", { name: t("header.profileCompany") })}
+        {t("header.welcome", { name: userDisplayName })}
       </h1>
 
       {/* Right Section for lg and up - compact row like PhishMagnus */}
@@ -62,7 +79,7 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[var(--strokeGray)] bg-white hover:bg-[var(--gray)]"
           variant="light"
         >
-          <Image alt="" className="size-4" height={16} src="/images/img/mail.svg" width={16} />
+          <Image alt="" className="size-4" height={16} src={getContentAssetUrl("/images/img/mail.svg")} width={16} />
         </Button>
         <Button
           isIconOnly
@@ -70,8 +87,9 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[var(--strokeGray)] bg-white hover:bg-[var(--gray)]"
           variant="light"
         >
-          <Image alt="" className="size-4" height={16} src="/images/img/bell.svg" width={16} />
+          <Image alt="" className="size-4" height={16} src={getContentAssetUrl("/images/img/bell.svg")} width={16} />
         </Button>
+        <LanguageSwitcher />
         <div
           className={clsx(
             "flex items-center gap-3 pl-2 border-l border-[var(--strokeGray)]",
@@ -82,35 +100,38 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
             alt=""
             className="w-9 h-9 rounded-full shrink-0"
             height={36}
-            src="/images/img/profile.png"
+            src={getContentAssetUrl("/images/img/profile.png")}
             width={36}
           />
           <div className="flex flex-col gap-0.5 min-w-0">
             <span className="text-sm font-medium text-[var(--mainblue)] truncate">
-              {t("header.profileCompany")}
+              {userDisplayName}
             </span>
-            <p className="text-xs text-[var(--darkgray)] truncate">{t("header.profileEmail")}</p>
+            <p className="text-xs text-[var(--darkgray)] truncate">{userEmail}</p>
           </div>
         </div>
       </div>
 
-      <Button
-        isIconOnly
-        aria-label="Menu"
-        className="shrink-0 lg:hidden w-9 h-9 min-w-9 min-h-9"
-        variant="light"
-        onPress={onMenuClick}
-      >
-        <svg
-          className="w-6 h-6 text-gray-800"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
+      <div className={clsx("flex lg:hidden items-center gap-2", isRtl && "flex-row-reverse")}>
+        <LanguageSwitcher />
+        <Button
+          isIconOnly
+          aria-label="Menu"
+          className="shrink-0 w-9 h-9 min-w-9 min-h-9"
+          variant="light"
+          onPress={onMenuClick}
         >
-          <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </Button>
+          <svg
+            className="w-6 h-6 text-gray-800"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </Button>
+      </div>
     </header>
   );
 };

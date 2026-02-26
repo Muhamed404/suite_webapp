@@ -1,10 +1,15 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import clsx from "clsx";
 
 import { SubMenu } from "@/components/ui/sidebar-sub-menu";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { authService } from "@/services/authService";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { clearAuthTokenCookie } from "@/services/httpClient";
 
 interface DashboardSidebarProps {
   /** On mobile: controls drawer visibility. On lg: ignored (sidebar always visible). */
@@ -13,87 +18,116 @@ interface DashboardSidebarProps {
   onClose?: () => void;
   /** When true, show icon-only (collapsed). When false, show full width. Matches PhishMagnus: sub collapsed when primary expanded. */
   isCollapsed?: boolean;
+  /** When true, user is Org User (end-user / learner): show limited menu (Campaign Assignments, Certificates). */
+  isEndUser?: boolean;
 }
 
 export const DashboardSidebar = ({
   open = false,
   onClose,
   isCollapsed = false,
+  isEndUser = false,
 }: DashboardSidebarProps) => {
+  const router = useRouter();
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
+  const resetAuth = useAuthStore((state) => state.reset);
 
-  const subMenuItems = [
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+    } catch (error) {
+      console.error("Logout API call failed:", error);
+    } finally {
+      // Clear auth state and cookies regardless of API success
+      resetAuth();
+      clearAuthTokenCookie();
+      router.push("/login");
+    }
+  };
+
+  /* ─── Admin / Org Admin menu items (existing) ─── */
+  const adminMenuItems = [
     {
       href: "/dashboard",
-      icon: "/images/icons/second-menu-dashboard-active.svg",
-      activeIcon: "/images/icons/second-menu-dashboard-active.svg",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Dashboard_Solid.svg"),
+      activeIcon: getContentAssetUrl("/images/awaremagnus_sidebar/Dashboard_Solid.svg"),
       label: t("menu.dashboard"),
     },
     {
-      href: "/dashboard/license-user",
-      icon: "/images/Icon_License.svg",
-      label: t("menu.licenseUser"),
-    },
-    {
-      href: "/dashboard/survey",
-      icon: "/images/Icon_Template.svg",
-      label: t("menu.survey"),
-    },
-    {
       href: "/dashboard/training-library/system",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Training_Library_Solid.svg"),
       label: t("menu.trainingLibrary"),
       children: [
         {
           href: "/dashboard/training-library/system",
-          icon: "/images/Icon_Template.svg",
+          icon: getContentAssetUrl("/images/awaremagnus_sidebar/Training_Library_Solid.svg"),
           label: t("menu.systemLibrary"),
         },
         {
           href: "/dashboard/training-library/my",
-          icon: "/images/Icon_Template.svg",
+          icon: getContentAssetUrl("/images/awaremagnus_sidebar/Training_Library_Solid.svg"),
           label: t("menu.myLibrary"),
         },
       ],
     },
     {
-      href: "/dashboard/system-branding",
-      icon: "/images/Icon_Template.svg",
-      label: t("menu.systemBranding"),
-      children: [
-        { href: "#", icon: "", label: "Certificate" },
-        { href: "#", icon: "", label: "Logo and Images" },
-      ],
-    },
-    {
       href: "/dashboard/launch-awareness",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Awareness_Solid.svg"),
       label: t("menu.launchAwareness"),
       children: [
-        { href: "#", icon: "", label: "Campaigns" },
-        { href: "#", icon: "", label: "Reports" },
+        {
+          href: "/dashboard/launch-awareness/campaigns/create",
+          icon: "",
+          label: t("menu.newCampaign"),
+        },
+        {
+          href: "/dashboard/launch-awareness/campaigns",
+          icon: "",
+          label: t("menu.campaigns"),
+        },
       ],
     },
     {
-      href: "/dashboard/settings",
-      icon: "/images/Icon_Template.svg",
-      label: t("menu.systemSettings"),
+      href: "/dashboard/system-branding",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Branding_Solid.svg"),
+      label: t("menu.systemBranding"),
+      children: [
+        { href: "/dashboard/system-branding/certificate", icon: "", label: t("menu.certificate") },
+      ],
     },
     {
       href: "/dashboard/my-awareness",
-      icon: "/images/Icon_Template.svg",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Report.svg"),
       label: t("menu.myAwareness"),
       children: [
-        { href: "#", icon: "", label: "Profile" },
-        { href: "#", icon: "", label: "Certificates" },
-        { href: "#", icon: "", label: "Achievements" },
-        { href: "#", icon: "", label: "Assignments" },
-        { href: "#", icon: "", label: "Report Card" },
+        { href: "/dashboard/certificates", icon: "", label: t("menu.certificates") },
       ],
     },
   ];
+
+  /* ─── Org User (end-user / learner) menu items ─── */
+  const endUserMenuItems = [
+    {
+      href: "/dashboard",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Dashboard_Solid.svg"),
+      activeIcon: getContentAssetUrl("/images/awaremagnus_sidebar/Dashboard_Solid.svg"),
+      label: t("menu.dashboard"),
+    },
+    {
+      href: "/dashboard/campaign-assignments",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Assessments_Solid.svg"),
+      label: t("menu.campaignAssignments"),
+    },
+    {
+      href: "/dashboard/certificates",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Licensed_user_Solid.svg"),
+      label: t("menu.certificates"),
+    },
+  ];
+
+  const subMenuItems = isEndUser ? endUserMenuItems : adminMenuItems;
 
   return (
     <div
@@ -109,7 +143,7 @@ export const DashboardSidebar = ({
             : "-translate-x-full lg:translate-x-0"
       )}
     >
-      <SubMenu isCollapsed={isCollapsed} items={subMenuItems} />
+      <SubMenu isCollapsed={isCollapsed} items={subMenuItems} onLogout={handleLogout} />
     </div>
   );
 };

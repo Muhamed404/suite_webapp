@@ -44,7 +44,6 @@ export default function ModuleListPage() {
   const [listError, setListError] = useState<string | null>(null);
 
   const { data: modulesRes, isLoading } = useModules({
-    status: 1,
     category_id: categoryFilter ? Number(categoryFilter) : undefined,
   });
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];

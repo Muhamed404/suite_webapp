@@ -14,7 +14,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModule, useContent, useContentsByModule } from "@/hooks/useQuiz";
-import { useContentTypes } from "@/hooks/useSuiteAwm";
+import { CONTENT_TYPES } from "@/constants/content-types";
 import { AuthImage } from "@/components/ui/auth-image";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
@@ -72,12 +72,12 @@ export function PosterContentDetailScreen({
   const basePath = `/dashboard/training-library/${libraryType}`;
   const libraryLabel = libraryType === "system" ? "System Library" : "My Library";
   const listHref = `${basePath}/${moduleId}/content/${contentTypeId}`;
-  const POSTER_FALLBACK = "/posters.png";
+  const POSTER_FALLBACK = getContentAssetUrl("/posters.png");
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
   const { data: contentsRes } = useContentsByModule(moduleId, !!moduleId);
-  const { data: contentTypesList } = useContentTypes(!!moduleId);
+  const contentTypesList = CONTENT_TYPES;
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
   const rawContent = contentRes?.success ? contentRes.data : null;
@@ -98,17 +98,26 @@ export function PosterContentDetailScreen({
     contentTypes.find((ct) => ct.id === contentTypeId)?.name ?? `Type ${contentTypeId}`;
   const moduleTitle = moduleData ? moduleName(moduleData) : "";
 
-  const posterImageUrl = content
+  const sourceUrl = content
     ? (content.source_url ?? (content as { source_path?: string }).source_path?.trim())
-      ? (content.source_url ?? (content as { source_path?: string }).source_path)!.startsWith(
-        "http"
-      )
-        ? (content.source_url ?? (content as { source_path?: string }).source_path)!
-        : getContentAssetUrl(
-          (content as { source_path?: string }).source_path ?? content.source_url
-        )
-      : getContentAssetUrl(content.logo_url ?? content.logo_path)
     : null;
+
+  // Use local same-origin proxy for posters
+  const posterImageUrl = sourceUrl
+    ? sourceUrl.startsWith("http")
+      ? sourceUrl
+      : sourceUrl.startsWith("/contents/")
+        ? `/awm${sourceUrl}`
+        : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
+    : content ? (content.logo_url ?? content.logo_path ? getContentAssetUrl(content.logo_url ?? content.logo_path) : null) : null;
+
+  const logoUrl = content?.logo_url || (content as any)?.logo_path;
+  const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
+
+  if (content) {
+    console.log("COMPLETE IMAGE URL:", completeImageUrl);
+    console.log("COMPLETE POSTER URL:", posterImageUrl);
+  }
 
   if (!moduleData) return null;
 
@@ -199,6 +208,11 @@ export function PosterContentDetailScreen({
                                   sizes="(max-width: 896px) 100vw, 896px"
                                   src={POSTER_FALLBACK}
                                 />
+                              }
+                              loadingContent={
+                                <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+                                  <div className="w-full h-full animate-pulse bg-gray-200" />
+                                </div>
                               }
                               sizes="(max-width: 896px) 100vw, 896px"
                               src={posterImageUrl}

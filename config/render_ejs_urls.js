@@ -9,6 +9,11 @@ module.exports = {
         PRODUCT_DASHBOARD: 'pages/dashboard/phm_product_dashboard',
         LOGIN: 'pages/login/phm_login',
         LOGOUT: '/logout',
+        SMTP_PHISHING: {
+            LIST: 'pages/settings/smtp/phishing/list-phishing-smtp',
+            CREATE: 'pages/settings/smtp/phishing/create-phishing-smtp',
+            EDIT: 'pages/settings/smtp/phishing/edit-phishing-smtp',
+        },
         Campaign: {
             NFC: {
                 CREATE: 'pages/campaign/nfc-campaign/createNFCCampaign',

@@ -14,6 +14,7 @@ import {
   type SupportedLanguageId,
 } from "@/utils/supportedLanguages";
 import ReactCountryFlag from "react-country-flag";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 /** @deprecated Use SupportedLanguageId (language id 1–6) for new code. Kept for content forms and languageMapping. */
 export type ModuleLocale = "en" | "ar" | "ur" | "zh" | "ru";
@@ -51,7 +52,7 @@ export function ModuleLanguageSelector({
           alt=""
           className="w-4 h-4 opacity-70 flex-shrink-0"
           height={16}
-          src="/images/lang-icon.svg"
+          src={getContentAssetUrl("/images/lang-icon.svg")}
           width={16}
         />
         <h3 className="text-base font-semibold text-gray-800">{t("selectLanguage")}</h3>

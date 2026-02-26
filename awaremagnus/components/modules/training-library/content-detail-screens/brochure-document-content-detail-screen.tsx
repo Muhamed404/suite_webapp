@@ -15,7 +15,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModule, useContent, useContentsByModule } from "@/hooks/useQuiz";
-import { useContentTypes } from "@/hooks/useSuiteAwm";
+import { CONTENT_TYPES } from "@/constants/content-types";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { AuthImage } from "@/components/ui/auth-image";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
@@ -27,7 +27,7 @@ const PdfViewer = dynamic(
 );
 
 /** Demo fallback when brochure/document URL fails or is missing (file in public folder). */
-const BROCHURE_DOCUMENT_FALLBACK_PDF = "/brochure.pdf";
+const BROCHURE_DOCUMENT_FALLBACK_PDF = getContentAssetUrl("/brochure.pdf");
 
 function moduleName(m: Module): string {
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
@@ -88,7 +88,7 @@ export function BrochureDocumentContentDetailScreen({
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
   const { data: contentsRes } = useContentsByModule(moduleId, !!moduleId);
-  const { data: contentTypesList } = useContentTypes(!!moduleId);
+  const contentTypesList = CONTENT_TYPES;
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
   const rawContent = contentRes?.success ? contentRes.data : null;
@@ -113,13 +113,23 @@ export function BrochureDocumentContentDetailScreen({
   const docSourceUrl = content
     ? (content.source_url ?? (content as { source_path?: string }).source_path?.trim())
     : null;
+
+  // Use local same-origin proxy for documents
   const fullDocUrl = docSourceUrl
     ? docSourceUrl.startsWith("http")
       ? docSourceUrl
-      : getContentAssetUrl(
-        (content as { source_path?: string })?.source_path ?? content?.source_url
-      )
+      : docSourceUrl.startsWith("/contents/")
+        ? `/awm${docSourceUrl}`
+        : `/awm/contents/${docSourceUrl.startsWith("/") ? docSourceUrl.slice(1) : docSourceUrl}`
     : null;
+
+  const logoUrl = content?.logo_url || (content as any)?.logo_path;
+  const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
+
+  if (content) {
+    console.log("COMPLETE IMAGE URL:", completeImageUrl);
+    console.log("COMPLETE DOCUMENT URL:", fullDocUrl);
+  }
 
   const isBrochure = contentTypeId === 3;
   const downloadLabelKey = isBrochure ? "library.downloadBrochure" : "library.downloadDocument";

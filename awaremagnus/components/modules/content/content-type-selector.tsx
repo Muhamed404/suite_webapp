@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 export type ContentType =
   | "iSpring"
@@ -39,43 +40,43 @@ interface ContentTypeCard {
 const CONTENT_TYPES: ContentTypeCard[] = [
   {
     type: "iSpring",
-    icon: "/images/ispring.png",
+    icon: getContentAssetUrl("/images/ispring.png"),
     labelKey: "contentTypes.iSpring",
   },
   {
     type: "Quiz",
-    icon: "/images/Icon_Bulb.svg",
+    icon: getContentAssetUrl("/images/Icon_Bulb.svg"),
     labelKey: "contentTypes.quiz",
   },
-  { type: "PDF", icon: "/images/Icon_Pdf.svg", labelKey: "contentTypes.pdf" },
+  { type: "PDF", icon: getContentAssetUrl("/images/Icon_Pdf.svg"), labelKey: "contentTypes.pdf" },
   {
     type: "Video",
-    icon: "/images/Icon_video.svg",
+    icon: getContentAssetUrl("/images/Icon_video.svg"),
     labelKey: "contentTypes.video",
   },
   {
     type: "Brochure",
-    icon: "/images/Icon_Brouchure.svg",
+    icon: getContentAssetUrl("/images/Icon_Brouchure.svg"),
     labelKey: "contentTypes.brochure",
   },
   {
     type: "Screen Saver",
-    icon: "/images/Icon_Ss.svg",
+    icon: getContentAssetUrl("/images/Icon_Ss.svg"),
     labelKey: "contentTypes.screenSaver",
   },
   {
     type: "Poster",
-    icon: "/images/Icon_Poster.svg",
+    icon: getContentAssetUrl("/images/Icon_Poster.svg"),
     labelKey: "contentTypes.poster",
   },
   {
     type: "Game",
-    icon: "/images/Icon_Game.svg",
+    icon: getContentAssetUrl("/images/Icon_Game.svg"),
     labelKey: "contentTypes.game",
   },
   {
     type: "Misc",
-    icon: "/images/Icon_Music.svg",
+    icon: getContentAssetUrl("/images/Icon_Music.svg"),
     labelKey: "contentTypes.misc",
   },
 ];
@@ -101,32 +102,32 @@ export interface ApiContentType {
 
 /** Map API content type name (AWM: Interactive Contents, Motion Videos, etc.) to icon path */
 const API_NAME_TO_ICON: Record<string, string> = {
-  "interactive contents": "/images/img/interact.svg",
-  "motion videos": "/images/Icon_video.svg",
-  brochures: "/images/Icon_Brouchure.svg",
-  brochure: "/images/Icon_Brouchure.svg",
-  posters: "/images/Icon_Poster.svg",
-  poster: "/images/Icon_Poster.svg",
-  "screen savers": "/images/Icon_Ss.svg",
-  "screen saver": "/images/Icon_Ss.svg",
-  games: "/images/Icon_Game.svg",
-  game: "/images/Icon_Game.svg",
-  documents: "/images/Icon_Pdf.svg",
-  document: "/images/Icon_Pdf.svg",
-  misc: "/images/Icon_Music.svg",
-  "vr games": "/images/Icon_Game.svg",
-  video: "/images/Icon_video.svg",
-  pdf: "/images/Icon_Pdf.svg",
-  quiz: "/images/Icon_Bulb.svg",
-  "manual quiz": "/images/Icon_Bulb.svg",
-  ispring: "/images/img/interact.svg",
-  "interactive lesson": "/images/img/interact.svg",
-  "interactive content": "/images/img/interact.svg",
-  text: "/images/Icon_Music.svg",
-  article: "/images/Icon_Music.svg",
+  "interactive contents": getContentAssetUrl("/images/img/interact.svg"),
+  "motion videos": getContentAssetUrl("/images/Icon_video.svg"),
+  brochures: getContentAssetUrl("/images/Icon_Brouchure.svg"),
+  brochure: getContentAssetUrl("/images/Icon_Brouchure.svg"),
+  posters: getContentAssetUrl("/images/Icon_Poster.svg"),
+  poster: getContentAssetUrl("/images/Icon_Poster.svg"),
+  "screen savers": getContentAssetUrl("/images/Icon_Ss.svg"),
+  "screen saver": getContentAssetUrl("/images/Icon_Ss.svg"),
+  games: getContentAssetUrl("/images/Icon_Game.svg"),
+  game: getContentAssetUrl("/images/Icon_Game.svg"),
+  documents: getContentAssetUrl("/images/Icon_Pdf.svg"),
+  document: getContentAssetUrl("/images/Icon_Pdf.svg"),
+  misc: getContentAssetUrl("/images/Icon_Music.svg"),
+  "vr games": getContentAssetUrl("/images/Icon_Game.svg"),
+  video: getContentAssetUrl("/images/Icon_video.svg"),
+  pdf: getContentAssetUrl("/images/Icon_Pdf.svg"),
+  quiz: getContentAssetUrl("/images/Icon_Bulb.svg"),
+  "manual quiz": getContentAssetUrl("/images/Icon_Bulb.svg"),
+  ispring: getContentAssetUrl("/images/img/interact.svg"),
+  "interactive lesson": getContentAssetUrl("/images/img/interact.svg"),
+  "interactive content": getContentAssetUrl("/images/img/interact.svg"),
+  text: getContentAssetUrl("/images/Icon_Music.svg"),
+  article: getContentAssetUrl("/images/Icon_Music.svg"),
 };
 
-const DEFAULT_CONTENT_ICON = "/images/Icon_Music.svg";
+const DEFAULT_CONTENT_ICON = getContentAssetUrl("/images/Icon_Music.svg");
 
 function getIconForApiContentType(name: string): string {
   const key = name.trim().toLowerCase();
@@ -209,7 +210,7 @@ export function ContentTypeSelector(props: ContentTypeSelectorProps) {
                   alt={t("contentTypes.quiz")}
                   className="w-6 h-6 mb-1.5 object-contain"
                   height={24}
-                  src="/images/Icon_Bulb.svg"
+                  src={getContentAssetUrl("/images/Icon_Bulb.svg")}
                   width={24}
                 />
                 <p className="text-[10px] text-center leading-tight text-gray-700">
@@ -276,7 +277,7 @@ export function ContentTypeSelector(props: ContentTypeSelectorProps) {
                 alt={t("contentTypes.quiz")}
                 className="w-6 h-6 mb-1.5 object-contain"
                 height={24}
-                src="/images/Icon_Bulb.svg"
+                src={getContentAssetUrl("/images/Icon_Bulb.svg")}
                 width={24}
               />
               <p className="text-[10px] text-center leading-tight text-gray-700">

@@ -89,17 +89,37 @@ exports.viewTemplate = async (req, res) => {
   } catch (err) {
     // Detailed logging for different axios failure modes
     logger.error(`Controller - View Template: error fetching template \n ${err.stack}`);
+    
+    if (err?.response?.status === 403) {
+      const errorMessage = err.response.data?.message || 'Access Denied';
+      logger.warn(`[View Template] Access denied: ${errorMessage}`);
+      
+      if (errorMessage.toLowerCase().includes('subscription')) {
+        if (req.session) {
+          req.flash('message', 'You do not have an active subscription to view templates.');
+          req.flash('alertType', 'error');
+        }
+        return res.redirect(frontend_api_urls.PHISHMAGNUS.Home.INDEX);
+      }
+    }
+    
     if (err?.response) {
-      req.flash('message', 'Error fetching template');
-      req.flash('alertType', 'error');
+      if (req.session) {
+        req.flash('message', 'Error fetching template');
+        req.flash('alertType', 'error');
+      }
       return res.redirect('/template/list');
     } else if (err?.request) {
-      req.flash('message', 'Error fetching template');
-      req.flash('alertType', 'error');
+      if (req.session) {
+        req.flash('message', 'Error fetching template');
+        req.flash('alertType', 'error');
+      }
       return res.redirect('/template/list');
     } else {
-      req.flash('message', 'Error fetching template');
-      req.flash('alertType', 'error');
+      if (req.session) {
+        req.flash('message', 'Error fetching template');
+        req.flash('alertType', 'error');
+      }
       return res.redirect('/template/list');
     }
   }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import clsx from "clsx";
 
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
@@ -22,6 +23,8 @@ interface AuthImageProps {
   resolveUrl?: boolean;
   /** Optional: content to render when image fails to load (e.g. fallback thumbnail) */
   fallbackContent?: React.ReactNode;
+  /** Optional: content to render while image is being fetched (e.g. skeleton) */
+  loadingContent?: React.ReactNode;
 }
 
 /**
@@ -40,9 +43,11 @@ export function AuthImage({
   unoptimized = false,
   resolveUrl = true,
   fallbackContent,
+  loadingContent,
 }: AuthImageProps) {
   const token = useAuthStore((s) => s.token);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const objectUrlRef = useRef<string | null>(null);
 
@@ -50,13 +55,14 @@ export function AuthImage({
   const isAbsolute = urlToFetch.startsWith("http://") || urlToFetch.startsWith("https://");
 
   useEffect(() => {
-    if (!urlToFetch || !isAbsolute) {
+    if (!urlToFetch) {
       setObjectUrl(null);
-      setError(!!src?.trim() && !urlToFetch);
+      setError(!!src?.trim());
 
       return;
     }
     setError(false);
+    setIsLoading(true);
     const controller = new AbortController();
     const headers: HeadersInit = {
       "ngrok-skip-browser-warning": "true",
@@ -76,10 +82,13 @@ export function AuthImage({
         if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
         objectUrlRef.current = url;
         setObjectUrl(url);
+        setIsLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        if (err.name === "AbortError") return;
         setObjectUrl(null);
         setError(true);
+        setIsLoading(false);
       });
 
     return () => {
@@ -89,11 +98,25 @@ export function AuthImage({
         objectUrlRef.current = null;
       }
       setObjectUrl(null);
+      setIsLoading(false);
     };
-  }, [urlToFetch, token, isAbsolute]);
+  }, [urlToFetch, token]);
 
   if (!src?.trim()) return null;
-  if (!isAbsolute) return null;
+
+  if (isLoading) {
+    if (loadingContent) return <>{loadingContent}</>;
+
+    return (
+      <div
+        className={clsx("animate-pulse bg-gray-100", className)}
+        style={
+          fill ? { width: "100%", height: "100%" } : { width: width ?? 48, height: height ?? 48 }
+        }
+      />
+    );
+  }
+
   if (error || !objectUrl) {
     if (fallbackContent) {
       return <>{fallbackContent}</>;

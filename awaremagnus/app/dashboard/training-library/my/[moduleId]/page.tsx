@@ -6,6 +6,9 @@ import { ModuleDetailsPage } from "@/components/modules/training-library/module-
 
 export default function MyLibraryModuleDetailsPage() {
   const params = useParams();
+  
+  if (!params) return null;
+  
   const moduleId = Number(params.moduleId);
 
   if (!moduleId || Number.isNaN(moduleId)) {

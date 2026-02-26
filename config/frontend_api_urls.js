@@ -37,7 +37,7 @@ module.exports = {
             EDIT: (templateId) => `/template/edit/${templateId}`,
             CREATE: '/template/create',
         },
-        App_Service:{
+        App_Service: {
             CREATE: '/app_service/create',
             LIST: '/app_service/list',
             EDIT_SERVICE: (serviceId) => `/app-service/update/${serviceId}`,
@@ -55,6 +55,13 @@ module.exports = {
         },
         Template: {
             LIST: '/phm/template/list',
+        },
+        SMTP_PHISHING: {
+            Create_Action_URL: (organizationId) => `/phm/phishing-smtp/create/${organizationId}`,
+            CREATE: '/phm/phishing-smtp/create',
+            LIST: `/phm/phishing-smtp/list`,
+            EDIT: (smtpId) => `/phm/phishing-smtp/edit/${smtpId}`,
+            TEST: (smtpId) => `/phm/phishing-smtp/test/${smtpId}`,
         },
         Campaign: {
             SMS: {

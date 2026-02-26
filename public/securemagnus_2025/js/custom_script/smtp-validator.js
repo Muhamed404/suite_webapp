@@ -51,14 +51,18 @@ function initSMTPFormValidator(config) {
         smtp_account: {
           required: true,
           minlength: 3,
-          maxlength: 255,
-          email: true
+          maxlength: 255
+        },
+        sender_email: {
+          required: true,
+          email: true,
+          maxlength: 250
         },
         smtp_password: {
           required: true,
           minlength: 6,
           maxlength: 255
-        }
+        },
       },
       messages: {
         org: {
@@ -79,16 +83,20 @@ function initSMTPFormValidator(config) {
           max: window.i18n?.validation_messages?.port_max || "Port must be between 1 and 65535"
         },
         smtp_account: {
-          required: window.i18n?.validation_messages?.service_account_required || "Service account email is required",
+          required: window.i18n?.validation_messages?.service_account_required || "Service account is required",
           minlength: window.i18n?.validation_messages?.service_account_minlength || "Service account must be at least 3 characters",
-          maxlength: window.i18n?.validation_messages?.service_account_maxlength || "Service account cannot exceed 255 characters",
-          email: window.i18n?.validation_messages?.valid_email || "Please enter a valid email address"
+          maxlength: window.i18n?.validation_messages?.service_account_maxlength || "Service account cannot exceed 255 characters"
+        },
+        sender_email: {
+          required: window.i18n?.validation_messages?.sender_email_required || "Sender email is required",
+          email: window.i18n?.validation_messages?.valid_email || "Please enter a valid email address",
+          maxlength: window.i18n?.validation_messages?.sender_email_maxlength || "Sender email cannot exceed 250 characters"
         },
         smtp_password: {
           required: window.i18n?.validation_messages?.password_required || "Password is required",
           minlength: window.i18n?.validation_messages?.password_minlength || "Password must be at least 6 characters",
           maxlength: window.i18n?.validation_messages?.password_maxlength || "Password cannot exceed 255 characters"
-        }
+        },
       },
       errorElement: 'span',
       errorPlacement: function(error, element) {
@@ -112,9 +120,10 @@ function initSMTPFormValidator(config) {
       var host = $('#host').val().trim();
       var port = $('#port').val().trim();
       var smtp_account = $('#smtp_account').val().trim();
+      var sender_email = $('#sender_email').val().trim();
       var smtp_password = $('#smtp_password').val().trim();
 
-      return host && port && smtp_account && smtp_password;
+      return host && port && smtp_account && sender_email && smtp_password;
     }
 
     // Function to enable save button
@@ -137,12 +146,12 @@ function initSMTPFormValidator(config) {
     enableSaveButton();
 
     // Add real-time validation on blur
-    $('#smtpSettingsForm input').on('blur', function() {
+    $('#smtpSettingsForm input, #smtpSettingsForm textarea').on('blur', function() {
       $(this).valid();
     });
 
     // Clear validation error on focus
-    $('#smtpSettingsForm input').on('focus', function() {
+    $('#smtpSettingsForm input, #smtpSettingsForm textarea').on('focus', function() {
       $(this).removeClass('border-red-500 focus:ring-red-400');
       $(this).next('span.text-red-500').remove();
     });

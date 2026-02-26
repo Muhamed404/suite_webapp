@@ -10,6 +10,8 @@ const router = express.Router();
 
 const controller = require("../../controllers/order-controller");
 const { validate, handleValidationResult } = require("../../../middleware/routes-validation");
+const checkPermission = require("../../../utility/check-permission");
+const enums = require("../../../contants/enum");
 
 // Routes
 const ordervalidation = [
@@ -46,6 +48,7 @@ const validateSubscriptionOrder = [
 
 router.get(
   "/invoice/:organizationId/:subscriptionId/:orderId",
+  checkPermission(enums.ModuleNames.Subscription_History, [enums.Access_Types.R_O, enums.Access_Types.RWD_O, enums.Access_Types.R_ALL, enums.Access_Types.RWD_ALL]),
   controller.displayInvoice
 );
 

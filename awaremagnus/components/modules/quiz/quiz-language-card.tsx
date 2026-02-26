@@ -3,6 +3,7 @@
 import type { QuizAnswer } from "./quiz-answer-row";
 
 import { useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import clsx from "clsx";
 
@@ -12,14 +13,15 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getLanguageName, getLanguageCountryCode } from "@/utils/supportedLanguages";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import ReactCountryFlag from "react-country-flag";
 import { Textarea } from "@heroui/input";
 
 export type QuizLocale = "en" | "ar";
 
 const LANG_META: Record<QuizLocale, { labelKey: string; flag: string }> = {
-  en: { labelKey: "languages.en", flag: "/images/eng.png" },
-  ar: { labelKey: "languages.ar", flag: "/images/ar.png" },
+  en: { labelKey: "languages.en", flag: getContentAssetUrl("/images/eng.png") },
+  ar: { labelKey: "languages.ar", flag: getContentAssetUrl("/images/ar.png") },
 };
 
 export interface QuizQuestion {
@@ -70,12 +72,14 @@ export function QuizLanguageCard({
   onRemoveQuestion,
   allowAddQuestion = true,
   contentId,
+  moduleId,
   quizTypeId,
 }: QuizLanguageCardProps) {
   const t = useTranslations("quiz");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
   const { token, user } = useAuthStore();
+  const router = useRouter();
 
   const meta = form.langId != null ? null : LANG_META[form.lang ?? "en"];
   const langLabel =
@@ -104,7 +108,7 @@ export function QuizLanguageCard({
     setCsvStatus("uploading");
     const formData = new FormData();
 
-    formData.append("file", csvFile);
+    formData.append("csvFile", csvFile);
     formData.append("con_id", contentId.toString());
     formData.append("qtype_id", quizTypeId.toString());
 
@@ -114,16 +118,14 @@ export function QuizLanguageCard({
     }
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_AWARE_MAGNUS_API_URL}/api/awm/quiz/import`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // Content-Type is set automatically by browser for FormData
-          },
-          body: formData,
-        }
+      const res = await fetch(`/awm/api/awm/quiz/import`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Content-Type is set automatically by browser for FormData
+        },
+        body: formData,
+      }
       );
 
       const result = await res.json();
@@ -131,7 +133,16 @@ export function QuizLanguageCard({
       if (res.ok) {
         setCsvStatus("success");
         setCsvMessage(result.message || t("importStarted"));
-        setTimeout(() => setShowCsvModal(false), 2000);
+        setTimeout(() => {
+          setShowCsvModal(false);
+          // Redirect to module details page if we have moduleId
+          if (moduleId) {
+            const path = user?.role_id && (user.role_id === 1 || user.role_id === 2)
+              ? `/dashboard/training-library/system/${moduleId}`
+              : `/dashboard/training-library/my/${moduleId}`;
+            router.push(path);
+          }
+        }, 2000);
       } else {
         setCsvStatus("error");
         setCsvMessage(result.message || t("importFailed"));
@@ -141,6 +152,32 @@ export function QuizLanguageCard({
       setCsvStatus("error");
       setCsvMessage(t("networkError"));
     }
+  };
+
+  const handleDownloadTemplate = () => {
+    let headers = "";
+    let exampleRow = "";
+
+    if (quizType === "truefalse") {
+      headers =
+        "Question,Answer_1,Validity_1,Feedback_1,Answer_2,Validity_2,Feedback_2,Difficulty";
+      exampleRow =
+        "An email address is considered PII.,TRUE,TRUE,Correct – contact details like email address are classified as PII.,FALSE,FALSE,Incorrect – emails are identifiers.,1";
+    } else {
+      // Single or Multiple choice
+      headers =
+        "Question,Answer_1,Validity_1,Feedback_1,Answer_2,Validity_2,Feedback_2,Answer_3,Validity_3,Feedback_3,Answer_4,Validity_4,Feedback_4,Difficulty";
+      exampleRow =
+        "Select examples of PII.,Name,TRUE,Correct – identifier.,Email,TRUE,Correct – contact info.,Office floor number,FALSE,Not unique to a person.,Passport number,TRUE,Highly sensitive PII.,1";
+    }
+
+    const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + "\n" + exampleRow);
+    const link = document.createElement("a");
+    link.setAttribute("href", csvContent);
+    link.setAttribute("download", `${quizType}_quiz_template.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -395,7 +432,30 @@ export function QuizLanguageCard({
             {/* Modal Header */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-1">{t("uploadCsvExcel")}</h3>
-              <p className="text-xs text-gray-500">{t("importCsvHelper")}</p>
+              <p className="text-xs text-gray-500 mb-3">{t("importCsvHelper")}</p>
+
+              <button
+                className="text-xs text-[#3FBDFF] font-medium hover:underline flex items-center gap-1"
+                type="button"
+                onClick={handleDownloadTemplate}
+              >
+                <svg
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" x2="12" y1="15" y2="3" />
+                </svg>
+                {t("downloadTemplate") || "Download Template"}
+              </button>
             </div>
 
             {/* Upload Area */}

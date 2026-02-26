@@ -1,5 +1,3 @@
-const config = require("../../../config/env.config");
-
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client')
 
@@ -7,7 +5,8 @@ const getApiClient = require('../../../utility/api-client')
 exports.createSMTP = async (req, res) => {
   logger.info(`Calling create smtp method`);
   if (req.method === "GET") {
-    let orgId = req.params.orgId;
+    let orgId = req.params?.orgId || 0;
+    logger.info(`Create SMTP for org ID: ${orgId}`);
     const url = `/settings/smtp/${orgId}`;
     const apiClient = getApiClient(req);
     logger.info(`:::::::::::${url}:::::::::::`);
@@ -18,16 +17,23 @@ exports.createSMTP = async (req, res) => {
         logger.info(`data is ${JSON.stringify(data)}`);
 
         logger.info(`${JSON.stringify(data.message)}`);
-        if (
-          data.message.SMTPConfigurations &&
-          data.message.SMTPConfigurations.length > 0
-        ) {
-          let smtp = data.message?.SMTPConfigurations[0];
-          let organizationName = data.message.name;
+
+        // Resolve smtp from either payload shape:
+        // Payload 1: { message: { name, SMTPConfigurations: [{ host, port, ... }] } }
+        // Payload 2: { message: { host, port, ... } }
+        let smtp = null;
+        let organizationName = 'SecureMagnus Organization';
+
+        if (data.message.SMTPConfigurations && data.message.SMTPConfigurations.length > 0) {
+          smtp = data.message.SMTPConfigurations[0];
+          organizationName = data.message.name || organizationName;
+        } else if (data.message.host) {
+          smtp = data.message;
+        }
+
+        if (smtp) {
           logger.info(`SMTP DATA HAS FOUND ${JSON.stringify(smtp)}`);
           logger.info(`Organization Name for smtp ${organizationName}`);
-          // console.log(smtp);
-          // console.log(smtp.is_active);
           res.render("pages/settings/smtp/create-smtp", {
             enableSuiteManagementLeftMenu: true,
             Organization: organizationName,
@@ -37,11 +43,15 @@ exports.createSMTP = async (req, res) => {
             smtp_account: smtp.smtp_account,
             smtp_password: smtp.smtp_password,
             isActive: smtp.is_active ? true : false,
-            enableTestBtn: smtp.id ? true : false
+            enableTestBtn: smtp.id ? true : false,
+            sender_email: smtp.sender_email,
+            use_tls: smtp.use_tls,
+            use_ssl: smtp.use_ssl,
+            for_phishing_smtp: smtp.for_phishing_smtp
           });
         } else {
           logger.info(`NO SMTP DATA HAS FOUND`);
-          let organizationName = data.message.name;
+          organizationName = data.message.name;
           res.render("pages/settings/smtp/create-smtp", {
             enableSuiteManagementLeftMenu: true,
             Organization: organizationName,
@@ -64,19 +74,23 @@ exports.createSMTP = async (req, res) => {
       });
   } else {
     logger.info(`Calling post method of create smtp`);
-    const { host, port, smtp_account, smtp_password, domain } = req.body;
+    const { host, port, smtp_account, smtp_password, sender_email, use_tls, use_ssl } = req.body;
     logger.info(`Incoming param body ${JSON.stringify(req.body, null, 2)}`);
-    let orgId = req.params.orgId;
+    let orgId = Number(req.params.orgId);
     const smtpObj = {
       host,
       port,
       smtp_account,
       smtp_password,
+      sender_email,
+      use_tls: use_tls === 'true',
+      use_ssl: use_ssl === 'true',
       organization_id: orgId,
     };
     const apiClient = getApiClient(req);
     const url = `/settings/smtp/` + orgId;
     logger.info(`:::::::::::${url}:::::::::::`);
+
     apiClient
       .post(url, smtpObj)
       .then((response) => {
@@ -86,7 +100,11 @@ exports.createSMTP = async (req, res) => {
           logger.info(`SMTP Account has created for organization` + orgId)
           req.flash('message', data.message);
           req.flash('alertType', data.alertType);
-          res.redirect(`/organization/profile/${orgId}`);
+          if (orgId === 0) {
+            res.redirect(`/settings/smtp/${orgId}`);
+          } else {
+            res.redirect(`/organization/profile/${orgId}`);
+          }
         } else {
           // console.log(`else is rinn`);
           res.render("pages/settings/smtp/create-smtp");

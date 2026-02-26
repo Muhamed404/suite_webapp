@@ -13,9 +13,16 @@ exports.redirectToAwareMagnus = (req, res) => {
     return res.status(503).send("Aware Magnus dashboard URL is not configured.");
   }
 
-  const token = req.session?.jwtToken;
+  // Try to get token from session first, then from cookies
+  let token = req.session?.jwtToken;
+  
+  if (!token && req.cookies) {
+    // Try common JWT cookie names
+    token = req.cookies.userToken || req.cookies.jwtToken || req.cookies.token;
+  }
+
   if (!token) {
-    logger.warn("[Redirect AWM]: No session token; user may not be logged in");
+    logger.warn("[Redirect AWM]: No authentication token found; user may not be logged in");
     return res.redirect("/login");
   }
 

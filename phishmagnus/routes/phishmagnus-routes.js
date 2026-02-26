@@ -18,7 +18,7 @@ const nfcCampaignRoute = require('./nfc-campaign/campaign-nfc-route')
 const authenticateMiddleware = require('../../middleware/jwt_authenticator/jwt-authenticate-middleware');
 const { renderAllCampaigns } = require('../controllers/campaign/render-all-campaigns');
 const { renderAllReports } = require('../controllers/campaign/render-all-reports');
-
+const PhishingSMTPRoute = require('./phishing_smtp/smtp-phishing-route');
 router.use((req, res, next) => {
     console.log('[ROUTE] PhishMagnus route used:', req.method, req.originalUrl);
     next();
@@ -39,6 +39,7 @@ protectedRouter.use('/campaign/nfc', nfcCampaignRoute)
 protectedRouter.use('/campaign/email', campaignRoute)
 protectedRouter.get('/campaign/all-campaigns', renderAllCampaigns)
 protectedRouter.get('/campaign/reports', checkPermission(enums.ModuleNames.Campaign_Reports, [enums.Access_Types.R_ALL, enums.Access_Types.R_O]), renderAllReports)
+protectedRouter.use("/phishing-smtp", PhishingSMTPRoute);
 protectedRouter.use("/", indexRoutes);
 
 

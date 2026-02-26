@@ -1,3 +1,5 @@
+import { getContentAssetUrl } from "./contentAssetUrl";
+
 /**
  * Maps content type id (from AWM API) to icon path in public folder.
  * 1=Interactive Contents, 2=Motion Videos, 3=Brochures, 4=Posters, 5=Screen Savers,
@@ -45,23 +47,24 @@ const CONTENT_TYPE_ICON_MAP: Record<string, string> = {
 
 /** Icon for content type by id (use when you have content_type_id). */
 export function getContentTypeIconById(contentTypeId: number): string {
-  return (
+  const path =
     CONTENT_TYPE_ICON_BY_ID[contentTypeId] ??
     CONTENT_TYPE_ICON_MAP.document ??
-    "/images/Icon_Pdf.svg"
-  );
+    "/images/Icon_Pdf.svg";
+
+  return getContentAssetUrl(path);
 }
 
 /** Icon for content type by name. */
 export function getContentTypeIcon(contentTypeName: string): string {
   if (!contentTypeName?.trim()) {
-    return CONTENT_TYPE_ICON_MAP.document ?? "/images/Icon_Pdf.svg";
+    return getContentAssetUrl(CONTENT_TYPE_ICON_MAP.document ?? "/images/Icon_Pdf.svg");
   }
   const normalized = contentTypeName.toLowerCase().trim();
+  const path =
+    CONTENT_TYPE_ICON_MAP[normalized] ?? CONTENT_TYPE_ICON_MAP.document ?? "/images/Icon_Pdf.svg";
 
-  return (
-    CONTENT_TYPE_ICON_MAP[normalized] ?? CONTENT_TYPE_ICON_MAP.document ?? "/images/Icon_Pdf.svg"
-  );
+  return getContentAssetUrl(path);
 }
 
 /** Prefer id when available, else name (e.g. from contentType.name). */
@@ -70,7 +73,7 @@ export function getContentTypeIconFor(
   contentTypeName: string | undefined
 ): string {
   if (contentTypeId != null && CONTENT_TYPE_ICON_BY_ID[contentTypeId]) {
-    return CONTENT_TYPE_ICON_BY_ID[contentTypeId];
+    return getContentAssetUrl(CONTENT_TYPE_ICON_BY_ID[contentTypeId]);
   }
 
   return getContentTypeIcon(contentTypeName ?? "");

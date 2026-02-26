@@ -15,8 +15,8 @@ export default function SystemLibraryModuleContentCreatePage() {
   const searchParams = useSearchParams();
   const t = useTranslations("dashboard");
 
-  const moduleId = String(params.moduleId ?? "");
-  const typeParam = searchParams.get("type");
+  const moduleId = String(params?.moduleId ?? "");
+  const typeParam = searchParams?.get("type");
   const initialContentTypeId = typeParam ? Number(typeParam) : undefined;
 
   const basePath = "/dashboard/training-library/system";

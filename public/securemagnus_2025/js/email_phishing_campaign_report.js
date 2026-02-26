@@ -291,7 +291,12 @@ function createSemiDonutChart(el, sentValue, openedValue, label1, label2, color1
               fontSize: '28px',
               fontWeight: 'medium',
               color: '#000',
-              show: true
+              show: true,
+              formatter: function (val) {
+                const localeEl = document.getElementById("locale-data");
+                const locale = localeEl ? localeEl.dataset.locale : 'en';
+                return locale === 'ar' ? val.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : val;
+              }
             },
             total: {
               show: true,
@@ -302,7 +307,10 @@ function createSemiDonutChart(el, sentValue, openedValue, label1, label2, color1
               formatter: function (w) {
                 let sent = w.globals.series[0];
                 let opened = w.globals.series[1];
-                return sent + opened;
+                const total = sent + opened;
+                const localeEl = document.getElementById("locale-data");
+                const locale = localeEl ? localeEl.dataset.locale : 'en';
+                return locale === 'ar' ? total.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : total;
               }
             }
           }
@@ -322,7 +330,11 @@ function createSemiDonutChart(el, sentValue, openedValue, label1, label2, color1
         vertical: 2
       },
       formatter: function (val, opts) {
-        return val + "  " + opts.w.globals.series[opts.seriesIndex];
+        const localeEl = document.getElementById("locale-data");
+        const locale = localeEl ? localeEl.dataset.locale : 'en';
+        const num = opts.w.globals.series[opts.seriesIndex];
+        const formattedNum = locale === 'ar' ? num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : num;
+        return val + "  " + formattedNum;
       }
     },
     dataLabels: {

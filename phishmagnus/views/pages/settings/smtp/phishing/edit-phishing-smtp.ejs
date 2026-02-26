@@ -1,0 +1,250 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+      <span class="text-gray-400">›</span>
+      <a href="/phm/phishing-smtp/list" class="hover:text-gray-700 transition">Simulator Emails</a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900">Edit SMTP</span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900">
+      Edit SMTP Configuration
+    </h3>
+  </div>
+</div>
+
+<div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white">
+  <div class="bg-white w-full mt-3 p-8">
+
+    <h1 class="text-2xl font-semibold text-[var(--mainblue)] mb-10">
+      <%= __("smtp.labelSMTPConfiguration") %>
+    </h1>
+
+    <form id="smtpSettingsForm"
+      class="grid grid-cols-1 md:grid-cols-2 gap-8"
+      action="<%= actionUrl %>"
+      method="post">
+
+      <!-- Active / Inactive Banner -->
+      <div class="md:col-span-2">
+        <div id="status-banner" class="flex items-center justify-between px-5 py-4 rounded-xl border transition-all duration-300
+          <%= smtp.is_active ? 'bg-teal-50 border-teal-200' : 'bg-gray-50 border-gray-200' %>">
+          <div class="flex items-center gap-3">
+            <span id="status-dot" class="inline-block w-3 h-3 rounded-full transition-colors duration-300
+              <%= smtp.is_active ? 'bg-teal-500' : 'bg-gray-400' %>"></span>
+            <div>
+              <p class="text-sm font-semibold text-gray-800">SMTP Status</p>
+              <p id="status-label" class="text-xs mt-0.5 <%= smtp.is_active ? 'text-teal-600' : 'text-gray-500' %>">
+                <%= smtp.is_active ? 'Active — This SMTP will be used for sending emails.' : 'Inactive — This SMTP is currently disabled.' %>
+              </p>
+            </div>
+          </div>
+          <!-- Toggle Switch -->
+          <label class="relative inline-flex items-center cursor-pointer select-none">
+            <input type="checkbox" id="is_active_toggle" class="sr-only" <%= smtp.is_active ? 'checked' : '' %>>
+            <div id="toggle-track" class="w-11 h-6 rounded-full transition-colors duration-300 <%= smtp.is_active ? 'bg-teal-500' : 'bg-gray-300' %>"></div>
+            <div id="toggle-thumb" class="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 <%= smtp.is_active ? 'translate-x-5' : 'translate-x-0' %>"></div>
+          </label>
+          <!-- Hidden input submitted with the form -->
+          <input type="hidden" name="is_active" id="is_active_input" value="<%= smtp.is_active ? 'true' : 'false' %>">
+        </div>
+      </div>
+
+      <!-- Host -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelHostName") %>
+        </label>
+        <input type="text" name="host" id="host" required
+          value="<%= smtp.host %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900" />
+      </div>
+
+      <!-- Port -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelPort") %>
+        </label>
+        <input type="number" name="port" id="port" min="1" max="65535" required
+          value="<%= smtp.port %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900" />
+      </div>
+
+      <!-- SMTP Account -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelServiceAccount") %>
+        </label>
+        <input type="text" name="smtp_account" id="smtp_account" maxlength="250" required
+          value="<%= smtp.smtp_account %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900" />
+      </div>
+
+      <!-- Sender Email -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelSenderEmail") %>
+        </label>
+        <input type="email" name="sender_email" id="sender_email" maxlength="250" required
+          value="<%= smtp.sender_email %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900" />
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelPassword") || 'Password' %>
+        </label>
+        <input type="password" name="smtp_password" id="smtp_password" required
+          value="<%= smtp.smtp_password %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900" />
+      </div>
+
+      <!-- Use TLS / Use SSL -->
+      <div class="md:col-span-2 flex gap-12">
+        <!-- Use TLS -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-3">
+            Use TLS
+          </label>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="hidden" name="use_tls" id="use_tls_input" value="<%= smtp.use_tls ? 'true' : 'false' %>" />
+            <input type="checkbox" id="use_tls" <%= smtp.use_tls ? 'checked' : '' %>
+              class="sr-only peer" />
+            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+            <span class="ms-3 text-sm text-gray-500 peer-checked:text-teal-600" id="use_tls_label">
+              <%= smtp.use_tls ? 'Enabled' : 'Disabled' %>
+            </span>
+          </label>
+        </div>
+
+        <!-- Use SSL -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-3">
+            Use SSL
+          </label>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="hidden" name="use_ssl" id="use_ssl_input" value="<%= smtp.use_ssl ? 'true' : 'false' %>" />
+            <input type="checkbox" id="use_ssl" <%= smtp.use_ssl ? 'checked' : '' %>
+              class="sr-only peer" />
+            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+            <span class="ms-3 text-sm text-gray-500 peer-checked:text-teal-600" id="use_ssl_label">
+              <%= smtp.use_ssl ? 'Enabled' : 'Disabled' %>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="md:col-span-2">
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelDetails") %>
+        </label>
+        <textarea name="details" id="details" maxlength="1000" rows="4" required
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900 resize-none"><%= smtp.details || '' %></textarea>
+        <p class="text-xs text-gray-400 mt-1 text-right">
+          <span id="details-count">0</span>/1000
+        </p>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex justify-end gap-4 mt-10 md:col-span-2">
+        <a href="/phm/phishing-smtp/list"
+          class="px-8 py-2 rounded-lg border border-gray-300 text-gray-600 font-semibold hover:bg-gray-50 transition">
+          Cancel
+        </a>
+        <button type="submit" id="saveButton"
+          class="px-8 py-2 rounded-lg bg-teal-500 text-white font-semibold hover:bg-teal-600 transition">
+          <%= __("smtp.btnSaveSettings") %>
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script src="/securemagnus_2025/js/custom_script/smtp-validator.js"></script>
+
+<script>
+  window.i18n = {
+    validation_messages: {
+      fill_required_fields_before_testing: "<%- __('validation_messages.fill_required_fields_before_testing') %>",
+      fix_validation_errors_before_testing: "<%- __('validation_messages.fix_validation_errors_before_testing') %>",
+      smtp_test_connection_successful: "<%- __('validation_messages.smtp_test_connection_successful') %>",
+      smtp_test_connection_failed: "<%- __('validation_messages.smtp_test_connection_failed') %>",
+      smtp_test_connection_issue: "<%- __('validation_messages.smtp_test_connection_issue') %>",
+      enter_valid_format: "<%- __('validation_messages.enter_valid_format') %>",
+      ensure_correct_smtp_port: "<%- __('validation_messages.ensure_correct_smtp_port') %>",
+      smtp_host_required: "<%- __('validation_messages.smtp_host_required') %>",
+      host_minlength: "<%- __('validation_messages.host_minlength') %>",
+      host_maxlength: "<%- __('validation_messages.host_maxlength') %>",
+      valid_hostname_ip: "<%- __('validation_messages.valid_hostname_ip') %>",
+      port_required: "<%- __('validation_messages.port_required') %>",
+      valid_port_number: "<%- __('validation_messages.valid_port_number') %>",
+      port_min: "<%- __('validation_messages.port_min') %>",
+      port_max: "<%- __('validation_messages.port_max') %>",
+      service_account_required: "<%- __('validation_messages.service_account_required') %>",
+      service_account_minlength: "<%- __('validation_messages.service_account_minlength') %>",
+      service_account_maxlength: "<%- __('validation_messages.service_account_maxlength') %>",
+      valid_email: "<%- __('validation_messages.valid_email') %>",
+      password_required: "<%- __('validation_messages.password_required') %>",
+      password_minlength: "<%- __('validation_messages.password_minlength') %>",
+      password_maxlength: "<%- __('validation_messages.password_maxlength') %>"
+    }
+  };
+
+  initSMTPFormValidator({
+    orgId: '<%= smtp.organization_id %>',
+    hasExistingData: true
+  });
+
+  // Details character counter
+  var detailsEl = document.getElementById('details');
+  var detailsCount = document.getElementById('details-count');
+  detailsCount.textContent = detailsEl.value.length;
+  detailsEl.addEventListener('input', function() {
+    detailsCount.textContent = this.value.length;
+  });
+
+  // TLS / SSL toggle labels + hidden input sync
+  ['use_tls', 'use_ssl'].forEach(function(id) {
+    var checkbox = document.getElementById(id);
+    var label = document.getElementById(id + '_label');
+    var hidden = document.getElementById(id + '_input');
+    checkbox.addEventListener('change', function() {
+      hidden.value = this.checked ? 'true' : 'false';
+      label.textContent = this.checked ? 'Enabled' : 'Disabled';
+    });
+  });
+
+  // Active / Inactive toggle logic
+  document.getElementById('is_active_toggle').addEventListener('change', function() {
+    var active = this.checked;
+    var banner  = document.getElementById('status-banner');
+    var dot     = document.getElementById('status-dot');
+    var label   = document.getElementById('status-label');
+    var track   = document.getElementById('toggle-track');
+    var thumb   = document.getElementById('toggle-thumb');
+    var hidden  = document.getElementById('is_active_input');
+
+    hidden.value = active ? 'true' : 'false';
+
+    if (active) {
+      banner.classList.replace('bg-gray-50', 'bg-teal-50');
+      banner.classList.replace('border-gray-200', 'border-teal-200');
+      dot.classList.replace('bg-gray-400', 'bg-teal-500');
+      label.classList.replace('text-gray-500', 'text-teal-600');
+      label.textContent = 'Active — This SMTP will be used for sending emails.';
+      track.classList.replace('bg-gray-300', 'bg-teal-500');
+      thumb.classList.replace('translate-x-0', 'translate-x-5');
+    } else {
+      banner.classList.replace('bg-teal-50', 'bg-gray-50');
+      banner.classList.replace('border-teal-200', 'border-gray-200');
+      dot.classList.replace('bg-teal-500', 'bg-gray-400');
+      label.classList.replace('text-teal-600', 'text-gray-500');
+      label.textContent = 'Inactive — This SMTP is currently disabled.';
+      track.classList.replace('bg-teal-500', 'bg-gray-300');
+      thumb.classList.replace('translate-x-5', 'translate-x-0');
+    }
+  });
+</script>

@@ -1,28 +1,7 @@
-/**
- * Base URL for content assets (logos, document sources).
- * Uses the AWM backend host so paths like "/contents/motion_videos/..." resolve to
- * e.g. https://your-awm-host/contents/motion_videos/system_files/0-2-2-logo-....jpeg
- */
-function getContentAssetBase(): string {
-  if (typeof window === "undefined") {
-    // Server side: return full URL
-    return (
-      process.env.NEXT_PUBLIC_SERVICE_AWM_URL ??
-      process.env.NEXT_PUBLIC_AWM_API_BASE ??
-      "http://localhost:3002"
-    ).replace(/\/$/, "");
-  }
-  // Client side: return proxy path. 
-  // Assets likely start with /contents/. We want /awm/contents/...
-  // So we return the base path /awm.
-  return "/awm";
-}
+const AWM_BASE_PATH = "/awm";
 
 /**
- * Resolves a content asset URL (e.g. logo_url, source_path) to a full URL.
- * If the path is already absolute (http/https), returns as-is.
- * Otherwise prepends the AWM backend host (NEXT_PUBLIC_AWM_API_BASE origin)
- * so logos and document sources load correctly.
+ * Resolves a content asset URL (e.g. logo_url, source_path, or public images) to a full URL.
  */
 export function getContentAssetUrl(path: string | null | undefined): string {
   if (!path?.trim()) return "";
@@ -30,6 +9,11 @@ export function getContentAssetUrl(path: string | null | undefined): string {
 
   // If already absolute, return as-is
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  // If already starts with base path, return as-is
+  if (trimmed.startsWith(AWM_BASE_PATH)) {
     return trimmed;
   }
 
@@ -46,9 +30,47 @@ export function getContentAssetUrl(path: string | null | undefined): string {
     return `https://${trimmed}`;
   }
 
-  const base = getContentAssetBase();
+  // For local relative paths (starting with /), we want to prepend /awm 
+  // so they resolve correctly under the Next.js basePath.
+  // This applies to /images/, /icons/, /logo.svg, /favicon.ico, etc.
+  if (trimmed.startsWith("/")) {
+    // If it's a backend-served content asset (e.g. uploaded videos, logos),
+    // proxy through the Next.js route handler at /awm/contents/...
+    if (trimmed.startsWith("/contents/")) {
+      return `${AWM_BASE_PATH}${trimmed}`;
+    }
 
-  if (!base) return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+    // Otherwise, prepend /awm (basePath) for local public assets
+    return `${AWM_BASE_PATH}${trimmed}`;
+  }
 
-  return `${base}${trimmed.startsWith("/") ? trimmed : `/${trimmed}`}`;
+  // For paths NOT starting with / (relative to current page), prepend /awm/
+  return `${AWM_BASE_PATH}/${trimmed}`;
+}
+
+/**
+ * Resolves a certificate asset URL (logos, watermarks, etc.) through the same-origin proxy.
+ */
+export function getCertificateAssetUrl(path: string | null | undefined): string {
+  if (!path?.trim()) return "";
+  const trimmed = path.trim();
+
+  // If already absolute, return as-is
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  // If already starts with base path /awm/certificates/, return as-is
+  if (trimmed.startsWith(`${AWM_BASE_PATH}/certificates/`)) {
+    return trimmed;
+  }
+
+  // If it starts with /certificates/, prepend /awm (basePath)
+  if (trimmed.startsWith("/certificates/")) {
+    return `${AWM_BASE_PATH}${trimmed}`;
+  }
+
+  // Otherwise, prepend /awm/certificates/
+  const cleanPath = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
+  return `${AWM_BASE_PATH}/certificates/${cleanPath}`;
 }

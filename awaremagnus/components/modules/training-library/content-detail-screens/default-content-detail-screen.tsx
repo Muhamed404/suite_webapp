@@ -16,7 +16,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModule, useContent } from "@/hooks/useQuiz";
-import { useContentTypes } from "@/hooks/useSuiteAwm";
+import { CONTENT_TYPES } from "@/constants/content-types";
 import { AuthImage } from "@/components/ui/auth-image";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { getContentTypeIconFor } from "@/utils/contentTypeIcons";
@@ -81,7 +81,7 @@ export function DefaultContentDetailScreen({
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
-  const { data: contentTypesList } = useContentTypes(!!moduleId);
+  const contentTypesList = CONTENT_TYPES;
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
   const rawContent = contentRes?.success ? contentRes.data : null;
@@ -96,11 +96,21 @@ export function DefaultContentDetailScreen({
   const logoUrl = content?.logo_url ?? content?.logo_path;
   const fallbackIcon = getContentTypeIconFor(contentTypeId, typeLabel ?? "");
   const sourceUrl = content?.source_url ?? (content as { source_path?: string })?.source_path;
+  // Use local same-origin proxy for generic content
   const fullSourceUrl = sourceUrl?.trim()
     ? sourceUrl.startsWith("http")
       ? sourceUrl
-      : getContentAssetUrl(sourceUrl)
+      : sourceUrl.startsWith("/contents/")
+        ? `/awm${sourceUrl}`
+        : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
     : null;
+
+  const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
+
+  if (content) {
+    console.log("COMPLETE IMAGE URL:", completeImageUrl);
+    console.log("COMPLETE SOURCE URL:", fullSourceUrl);
+  }
   const embedUrl =
     fullSourceUrl && isYouTubeUrl(fullSourceUrl) ? youtubeEmbedUrl(fullSourceUrl) : null;
 

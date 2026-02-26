@@ -72,6 +72,17 @@ app.use(storeSessionMiddleware);
  * Flash messages
  */
 app.use(flash());
+// Safe flash: when session is missing (e.g. some API/fetch requests), no-op instead of throwing
+app.use((req, res, next) => {
+  const originalFlash = req.flash;
+  if (originalFlash && req.session === undefined) {
+    req.flash = function (key, value) {
+      if (arguments.length === 1) return [];
+      // setter: no-op
+    };
+  }
+  next();
+});
 app.use((req, res, next) => {
   res.locals.message = req.flash('message');
   res.locals.alertType = req.flash('alertType');

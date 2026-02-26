@@ -1,9 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  port: 8001,
-  basePath:"/awm",
+  basePath: "/awm",
+  assetPrefix: "/awm",
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  experimental: {
+    middlewareClientMaxBodySize: 500 * 1024 * 1024, // 500MB
+    serverActions: {
+      bodySizeLimit: "500mb",
+    },
   },
 };
 

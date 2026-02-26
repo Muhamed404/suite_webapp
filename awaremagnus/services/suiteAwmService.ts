@@ -134,4 +134,66 @@ export const suiteAwmService = {
 
   /** DELETE /api/awm/content-types/:id (AWM Backend) */
   deleteContentType: (id: number) => awmDel<number>(`${API_BASE}/content-types/${id}`),
+
+  /** Campaign API Methods */
+
+  /** GET /api/awm/campaign (AWM Backend) - Get all campaigns */
+  getCampaigns: (params?: {
+    status_id?: number;
+    start_date?: string;
+    end_date?: string;
+    org_id?: number;
+  }) => {
+    const query = params
+      ? `?${new URLSearchParams(
+          Object.entries(params)
+            .filter(([_, v]) => v !== undefined)
+            .reduce((acc, [k, v]) => ({ ...acc, [k]: String(v) }), {})
+        )}`
+      : "";
+
+    return awmGet<any>(`${API_BASE}/campaign${query}`);
+  },
+
+  /** GET /api/awm/campaign/:id (AWM Backend) - Get campaign by ID */
+  getCampaignById: (id: number) => awmGet<any>(`${API_BASE}/campaign/${id}`),
+
+  /** POST /api/awm/campaign (AWM Backend) - Create campaign */
+  createCampaign: (payload: any) => awmPost<any>(`${API_BASE}/campaign`, payload),
+
+  /** PUT /api/awm/campaign/:id (AWM Backend) - Update campaign */
+  updateCampaign: (id: number, payload: any) =>
+    awmPut<any>(`${API_BASE}/campaign/${id}`, payload),
+
+  /** DELETE /api/awm/campaign/:id (AWM Backend) - Delete campaign */
+  deleteCampaign: (id: number) => awmDel<any>(`${API_BASE}/campaign/${id}`),
+
+  /** GET /api/awm/campaign/:id/retry-user-fetch (AWM Backend) - Retry user fetch */
+  retryUserFetch: (id: number) =>
+    awmPost<{ pending_groups: number; pending_departments: number }>(
+      `${API_BASE}/campaign/${id}/retry-user-fetch`,
+      {}
+    ),
+
+  /** GET /api/awm/dashboard/organizations/campaign/users (AWM Backend) - Get campaign leaderboard with user statistics */
+  getCampaignLeaderboard: (campaignId: number) =>
+    awmGet<any>(`${API_BASE}/dashboard/organizations/campaign/users?campaign_id=${campaignId}`),
+
+  /** GET /api/awm/dashboard/organizations/campaign (AWM Backend) - Get campaign dashboard with all details and metrics */
+  getCampaignDashboard: (campaignId: number) =>
+    awmGet<any>(`${API_BASE}/dashboard/organizations/campaign?campaign_id=${campaignId}`),
+
+  /** POST /api/awm/report-actions/submit-quiz (AWM Backend) - Submit quiz answers */
+  submitQuiz: (payload: {
+    campaign_id: number;
+    module_id: number;
+    content_id: number;
+    quizzes: Array<{
+      quiz_id: number;
+      answers: Array<{
+        question_id: number;
+        answer_id: number;
+      }>;
+    }>;
+  }) => awmPost<any>(`${API_BASE}/useraction/report-actions/submit-quiz`, payload),
 };
