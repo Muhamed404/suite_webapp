@@ -6,3 +6,4 @@ export { CertificateListPage } from "./certificate-list-page";
 export { CertificateManagementListPage } from "./certificate-management-list-page";
 export { CertificateBrandingForm } from "./certificate-branding-form";
 export { SurveyManagementListPage } from "./survey-management-list-page";
+export { SurveyStatsPage } from "./survey-stats-page";
