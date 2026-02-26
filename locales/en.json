@@ -200,7 +200,6 @@
 		"groupCreate": "Create Group",
 		"smtp": "SMTP Settings",
 		"serviceRegistry": "Service Registry",
-		"smtpNotifications": "SMTP Notifications",
 		"audit": "Audit Log",
 		"subscriptionHistory": "Subscription History",
 		"createSubscription": "Create Subscription",
@@ -284,7 +283,6 @@
 			"licensedUsers": "Licensed Users",
 			"templates": "Templates",
 			"systemTemplate": "System Template",
-			"simulatorEmails": "Simulator Emails",
 			"reports": "Reports",
 			"campaigns": "Campaigns",
 			"campaignEmail": "Email",
@@ -300,7 +298,6 @@
 			"services": "Services",
 			"settings": "Settings",
 			"serviceRegistry": "Service Registry",
-			"smtpNotifications": "SMTP Notifications",
 			"organization": "Organization",
 			"user": "User",
 			"cybersecurityCategories": "Categories",
@@ -311,7 +308,6 @@
 			"subscriptionHistory": "Subscription History",
 			"products": "Products",
 			"logout": "Logout"
-	 
 		}
 	},
 	"organization": {
@@ -564,14 +560,10 @@
 		"labelOrganizationName": "Organization Name",
 		"labelHostName": "Host Name",
 		"labelPort": "Port",
-		"labelServiceAccount": "SMTP Account",
+		"labelServiceAccount": "Service Account",
 		"labelPassword": "Password",
-		"labelDetails": "Details",
 		"btnTestConfiguration": "Test Configuration",
-		"btnSaveSettings": "Save Settings",
-		"labelSenderEmail": "Sender Email",
-		"labelPhishingSimulationSMTP": "Use for Phishing Simulation",
-		"labelPhishingSimulationDescription": "Enable this SMTP server for phishing campaign email delivery."
+		"btnSaveSettings": "Save Settings"
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "Secmagnus User Management",
@@ -1694,8 +1686,5 @@
 		"create_campaign": {
 			"title": "email.create_campaign.title"
 		}
-	},
-	" generic_label": {
-		"create": " generic_label.create"
 	}
 }
