@@ -396,7 +396,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                   </div>
                 </div>
               ) : viewMode === "grid" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
                   {paginatedModules.map((item: Module) => (
                     <Card key={item.id} className={cardClassName} shadow="sm">
                       <CardBody className="p-3 flex flex-col bg-white">
