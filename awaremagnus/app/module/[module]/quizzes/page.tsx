@@ -14,7 +14,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { isOrgUser } from "@/utils/roles";
-import { useQuizzesByContent } from "@/hooks/useQuiz";
+import { useQuizzesByContent, useModule } from "@/hooks/useQuiz";
 import { suiteAwmService } from "@/services/suiteAwmService";
 import { quizService } from "@/services/quizService";
 
@@ -64,6 +64,11 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
 
   // Fetch quizzes dynamically from the API
   const { data: quizzesRes, isLoading: quizzesLoading } = useQuizzesByContent(contentId, !!contentId);
+
+  // Get module data for dynamic description
+  // moduleId may be undefined initially; default to 0 so the hook always receives a number
+  const moduleId = contentRes?.data?.mod_id ?? 0;
+  const { data: moduleRes } = useModule(moduleId, !!moduleId);
 
   // Keep original quiz data for submission
   const originalQuizzes = useMemo(() => {
@@ -483,7 +488,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                   <h4 className="text-sm font-semibold text-gray-900 mb-4">Trivia</h4>
                   <img src="/images/hero.svg" alt="Security Illustration" className="w-full rounded-lg mb-4" />
                   <p className="text-[10px] text-gray-600 leading-relaxed">
-                    Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events—such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise.
+                    {moduleRes?.data?.description || "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events—such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise."}
                   </p>
                 </div>
               </div>
