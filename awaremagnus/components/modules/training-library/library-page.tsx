@@ -25,7 +25,7 @@ import { isPlatformAdmin } from "@/utils/roles";
 import { SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
 import { useAwmCategories } from "@/hooks/useSuiteAwm";
 import { LibraryPageSkeleton } from "@/components/ui/skeletons";
-import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { getContentAssetUrl, getModuleAssetUrl } from "@/utils/contentAssetUrl";
 import {
   SearchIcon,
   PlusIcon,
@@ -63,6 +63,21 @@ function moduleLanguageIds(m: Module): number[] {
 
     return true;
   });
+}
+
+function getModuleLogoUrl(module: Module, selectedLanguageId: string | number | null): string {
+  const defaultLogo = getContentAssetUrl("/awm/images/Card.png");
+
+  if (!selectedLanguageId) {
+    const url = module.translations?.[0]?.logo_banner_url;
+    return url ? getModuleAssetUrl(url) : defaultLogo;
+  }
+
+  const match = module.translations?.find(
+    (t) => String(t.language_id) === String(selectedLanguageId)
+  );
+
+  return match?.logo_banner_url ? getModuleAssetUrl(match.logo_banner_url) : defaultLogo;
 }
 
 interface LibraryPageProps {
@@ -400,12 +415,12 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                   {paginatedModules.map((item: Module) => (
                     <Card key={item.id} className={cardClassName} shadow="sm">
                       <CardBody className="p-3 flex flex-col bg-white">
-                        {/* Thumbnail: sky blue gradient + Card.png (match reference) */}
-                        <div className="rounded-xl h-40 overflow-hidden mb-3 w-full bg-gradient-to-b from-sky-200 to-sky-400 flex items-center justify-center shrink-0 relative">
+                        {/* Thumbnail: language-specific logo or default */}
+                        <div className="rounded-xl h-40 overflow-hidden mb-3 w-full bg-gray-100 flex items-center justify-center shrink-0 relative">
                           <img
                             alt=""
                             className="w-full h-full object-cover object-center"
-                            src={getContentAssetUrl("/images/Card.png")}
+                            src={getModuleLogoUrl(item, languageFilter)}
                             onError={(e) => {
                               const el = e.target as HTMLImageElement;
 
@@ -416,7 +431,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                           <img
                             aria-hidden
                             alt=""
-                            className="absolute inset-0 m-auto w-12 h-12 object-contain opacity-90 hidden"
+                            className="absolute inset-0 m-auto w-12 h-12 object-contain opacity-60 hidden"
                             src={getContentAssetUrl("/images/Icon_Template.svg")}
                           />
                         </div>
@@ -523,11 +538,11 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                     {(item: Module) => (
                       <TableRow key={item.id}>
                         <TableCell className="w-16 align-middle">
-                          <div className="relative w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shrink-0 bg-gradient-to-b from-[#0075a1] to-[#00b1bd]">
+                          <div className="relative w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shrink-0 bg-gray-100">
                             <img
                               alt=""
                               className="w-full h-full object-cover"
-                              src={getContentAssetUrl("/images/Card.png")}
+                              src={getModuleLogoUrl(item, languageFilter)}
                               onError={(e) => {
                                 const el = e.target as HTMLImageElement;
 
