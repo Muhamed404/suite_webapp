@@ -131,6 +131,7 @@ export function CreateModuleForm() {
           language_id: tr.language_id,
           name: tr.name.trim(),
           description: tr.description.trim() || undefined,
+          logo_banner: tr.iconFile instanceof File ? tr.iconFile : undefined,
         })),
       };
 

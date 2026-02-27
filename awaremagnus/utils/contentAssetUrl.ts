@@ -49,6 +49,35 @@ export function getContentAssetUrl(path: string | null | undefined): string {
 }
 
 /**
+ * Resolves a module translation asset URL (logos, banners, etc.) to a direct backend URL.
+ */
+export function getModuleAssetUrl(path: string | null | undefined): string {
+  if (!path?.trim()) return "";
+  const trimmed = path.trim();
+
+  // If already absolute, return as-is
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    return trimmed;
+  }
+
+  // Get backend URL from environment
+  const backendUrl = process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://localhost:3002";
+
+  // If path starts with /module_translations/, construct direct backend URL
+  if (trimmed.startsWith("/module_translations/")) {
+    return `${backendUrl}${trimmed}`;
+  }
+
+  // If it's a relative path, assume it's module_translations
+  if (!trimmed.startsWith("/")) {
+    return `${backendUrl}/module_translations/${trimmed}`;
+  }
+
+  // For other paths, fallback to direct backend
+  return `${backendUrl}${trimmed}`;
+}
+
+/**
  * Resolves a certificate asset URL (logos, watermarks, etc.) through the same-origin proxy.
  */
 export function getCertificateAssetUrl(path: string | null | undefined): string {
