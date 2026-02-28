@@ -60,7 +60,7 @@ export const quizService = {
     return request<Module>(() => awmClient.get<AWMResponseBody>(`${API_BASE}/module/${id}`));
   },
 
-  /** API: POST /module - backend expects { module: { category_id, code, name?, difficulty, org_id }, translations: [ { language_id, name, description }, ... ] } */
+  /** API: POST /module - backend expects multipart/form-data with module JSON, translations JSON, and logo_banner_N file fields */
   createModule: async (payload: CreateModulePayload) => {
     const moduleData = {
       category_id: payload.module.category_id,
@@ -70,14 +70,22 @@ export const quizService = {
       difficulty: payload.module.difficulty ?? 1,
       org_id: payload.module.org_id ?? 0,
     };
-    const translations = (payload.translations ?? []).map((tr) => ({
+    const translationsData = (payload.translations ?? []).map((tr) => ({
       language_id: tr.language_id,
       name: tr.name?.trim() ?? "",
       description: tr.description?.trim() ?? "",
     }));
-    const body = { module: moduleData, translations };
 
-    return request<Module>(() => awmClient.post<AWMResponseBody>(`${API_BASE}/module`, body));
+    const formData = new FormData();
+    formData.append("module", JSON.stringify(moduleData));
+    formData.append("translations", JSON.stringify(translationsData));
+    (payload.translations ?? []).forEach((tr, idx) => {
+      if (tr.logo_banner instanceof File) {
+        formData.append(`logo_banner_${idx}`, tr.logo_banner);
+      }
+    });
+
+    return request<Module>(() => awmClient.post<AWMResponseBody>(`${API_BASE}/module`, formData));
   },
 
   updateModule: async (id: number, payload: UpdateModulePayload) => {

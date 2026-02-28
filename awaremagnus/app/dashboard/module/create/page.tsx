@@ -20,7 +20,7 @@ export default function CreateModulePage() {
               className="flex items-center text-xs text-gray-500 mb-6 gap-1.5"
             >
               <Link className="hover:text-gray-700 transition" href="/dashboard/module">
-                Training Library
+                Awareness Library
               </Link>
               <span className="text-gray-400">›</span>
               <span className="font-semibold text-gray-900">{t("breadcrumbCurrent")}</span>

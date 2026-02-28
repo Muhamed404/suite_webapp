@@ -137,7 +137,7 @@ export function PosterContentDetailScreen({
                 className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
                 href={basePath}
               >
-                Training Library
+                Awareness Library
               </Link>
               <span className="text-gray-400">›</span>
               <Link

@@ -12,7 +12,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useModules } from "@/hooks/useQuiz";
+import { useModules, useModuleReport, useContentsReport } from "@/hooks/useQuiz";
 import { quizService } from "@/services/quizService";
 import { isOrgUser } from "@/utils/roles";
 
@@ -54,6 +54,50 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   const roleId = user?.role_id;
   const isOrgUserView = isOrgUser(roleId);
 
+  // Fetch saved progress from report
+  const { data: moduleReportRes } = useModuleReport(moduleId, !!moduleId);
+  const reportModuleId = moduleReportRes?.data?.id;
+  const { data: contentsReportRes } = useContentsReport(reportModuleId, !!reportModuleId);
+
+  // Build map: content_id -> saved progress_percentage (number)
+  const savedProgressMap = useMemo(() => {
+    const map = new Map<number, number>();
+    if (contentsReportRes?.success && contentsReportRes.data?.reportContents) {
+      contentsReportRes.data.reportContents.forEach((rc: any) => {
+        if (rc.content_id != null && rc.progress_percentage != null) {
+          map.set(rc.content_id, parseFloat(rc.progress_percentage));
+        }
+      });
+    }
+    return map;
+  }, [contentsReportRes]);
+
+  // Initialise milestone tracking from saved progress so we never send a lower value
+  useEffect(() => {
+    if (savedProgressMap.size === 0) return;
+    setSentProgressMilestones(prev => {
+      const next = { ...prev };
+      savedProgressMap.forEach((savedPct, contentId) => {
+        const currentLastReported = prev[contentId]?.lastReported ?? 0;
+        if (savedPct > currentLastReported) {
+          next[contentId] = { lastReported: savedPct };
+        }
+      });
+      return next;
+    });
+  }, [savedProgressMap]);
+
+  // Seek already-loaded videos when savedProgressMap is populated
+  useEffect(() => {
+    savedProgressMap.forEach((savedPct, contentId) => {
+      if (savedPct <= 0 || savedPct >= 100) return; // don't seek if not started or already completed
+      const video = videoRefs.current[contentId];
+      if (video && video.readyState >= 1 && isFinite(video.duration)) {
+        video.currentTime = (savedPct / 100) * video.duration;
+      }
+    });
+  }, [savedProgressMap]);
+
   // Video tracking functions
   const handleVideoLoadedMetadata = (contentId: number, video: HTMLVideoElement) => {
     const duration = video.duration;
@@ -66,6 +110,15 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
         watchedPercentage: prev[contentId]?.watchedPercentage || 0
       }
     }));
+
+    // Seek to saved position (only when partially watched, not completed)
+    const savedPct = savedProgressMap.get(contentId);
+    if (savedPct != null && savedPct > 0 && savedPct < 100) {
+      const seekTime = (savedPct / 100) * duration;
+      if (isFinite(seekTime)) {
+        video.currentTime = seekTime;
+      }
+    }
   };
 
   const handleVideoTimeUpdate = (contentId: number, video: HTMLVideoElement) => {
@@ -181,7 +234,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
 
           <main className="flex-1 overflow-y-auto">
             <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
-              <a href="#" className="hover:text-gray-700 transition">Training Library</a>
+              <a href="#" className="hover:text-gray-700 transition">Awareness Library</a>
               <span className="text-gray-400">›</span>
               <a href="#" className="hover:text-gray-700 transition">System Library</a>
               <span className="text-gray-400">›</span>

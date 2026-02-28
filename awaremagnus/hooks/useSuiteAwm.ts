@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 
 import { suiteAwmService } from "@/services/suiteAwmService";
 import { suiteSuiteService } from "@/services/suiteSuiteService";
-import { quizService } from "@/services/quizService";
 
 export const SUITE_AWM_KEYS = {
   categories: ["suite-awm", "categories"] as const,
@@ -16,9 +15,9 @@ export const SUITE_AWM_KEYS = {
 export function useCategories(enabled = true) {
   return useQuery({
     queryKey: SUITE_AWM_KEYS.categories,
-    queryFn: () => quizService.getCategories(),
+    queryFn: () => suiteAwmService.getCategories(),
     enabled,
-    select: (data) => data?.object?.categories ?? data?.data?.categories ?? [],
+    staleTime: 10 * 60 * 1000,
   });
 }
 
@@ -61,17 +60,16 @@ export function useLicenseInfo(enabled = true) {
 }
 
 /**
- * Fetch global categories from service_awm backend.
- * GET /api/awm/category
- * Returns { success, data: { categories: [...], count } }
+ * Fetch global categories from service_suite backend.
+ * GET /awm/categories (via suite client)
+ * Returns SuiteCategory[]
  */
 export function useAwmCategories(enabled = true) {
   return useQuery({
     queryKey: SUITE_AWM_KEYS.awmCategories,
-    queryFn: () => quizService.getCategories(),
+    queryFn: () => suiteAwmService.getCategories(),
     enabled,
     staleTime: 10 * 60 * 1000, // 10 minutes — categories rarely change
-    select: (data) => data?.object?.categories ?? data?.data?.categories ?? [],
   });
 }
 

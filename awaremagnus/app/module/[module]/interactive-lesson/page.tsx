@@ -36,7 +36,7 @@ export default function InteractiveLessonPage({ params }: { params: Promise<{ mo
 
           <main className="flex-1 overflow-y-auto">
             <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
-              <a href="#" className="hover:text-gray-700 transition">Training Library</a>
+              <a href="#" className="hover:text-gray-700 transition">Awareness Library</a>
               <span className="text-gray-400">›</span>
               <a href="#" className="hover:text-gray-700 transition">System Library</a>
               <span className="text-gray-400">›</span>

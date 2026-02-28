@@ -308,8 +308,7 @@
 			"groups": "Groups",
 			"subscriptionHistory": "Subscription History",
 			"products": "Products",
-			"logout": "Logout",
-			"smtpNotifications": "menu.suite.smtpNotifications"
+			"logout": "Logout"
 		}
 	},
 	"organization": {

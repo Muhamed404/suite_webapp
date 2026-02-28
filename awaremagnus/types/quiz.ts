@@ -10,6 +10,7 @@ export interface ModuleTranslation {
   language_id: number;
   name: string;
   description?: string;
+  logo_banner_url?: string | null;
 }
 
 export interface Module {
@@ -161,6 +162,8 @@ export interface CreateModulePayload {
     language_id: number;
     name: string;
     description?: string;
+    /** Optional logo banner image file for this translation (logo_banner_N) */
+    logo_banner?: File;
   }>;
 }
 

@@ -1,5 +1,5 @@
 {
-  "breadcrumbPrefix": "Training Library > My Library > ",
+  "breadcrumbPrefix": "Awareness Library > My Library > ",
   "breadcrumbCurrent": "Create Module",
   "title": "Create Module",
   "subtitle": "Create your custom module here",
@@ -110,6 +110,7 @@
     "description": "Some description",
     "languageFilter": "Language",
     "languageFilterHint": "This will list content based on the language e.g. English, Arabic. Will be handled from the backend.",
+    "allLanguages": "All Languages",
     "interactiveLesson": "Interactive Lesson",
     "quizzes": "Quizzes",
     "posters": "Posters",
@@ -140,7 +141,7 @@
     "progress": "Progress",
     "progressHint": "To complete this module you need to complete interactive lesson, than quizzes to complete 100%",
     "coreModules": "Core Modules",
-    "breadcrumbTrainingLibrary": "Training Library",
+    "breadcrumbTrainingLibrary": "Awareness Library",
     "breadcrumbMyLibrary": "My Modules",
     "breadcrumbAwarenessCampaign": "Awareness Campaign",
     "breadcrumbCampaign": "Campaign",

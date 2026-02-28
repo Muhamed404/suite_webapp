@@ -25,7 +25,7 @@ import { isPlatformAdmin } from "@/utils/roles";
 import { SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
 import { useAwmCategories } from "@/hooks/useSuiteAwm";
 import { LibraryPageSkeleton } from "@/components/ui/skeletons";
-import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { getContentAssetUrl, getModuleAssetUrl } from "@/utils/contentAssetUrl";
 import {
   SearchIcon,
   PlusIcon,
@@ -63,6 +63,21 @@ function moduleLanguageIds(m: Module): number[] {
 
     return true;
   });
+}
+
+function getModuleLogoUrl(module: Module, selectedLanguageId: string | number | null): string {
+  const defaultLogo = getContentAssetUrl("/awm/images/Card.png");
+
+  if (!selectedLanguageId) {
+    const url = module.translations?.[0]?.logo_banner_url;
+    return url ? getModuleAssetUrl(url) : defaultLogo;
+  }
+
+  const match = module.translations?.find(
+    (t) => String(t.language_id) === String(selectedLanguageId)
+  );
+
+  return match?.logo_banner_url ? getModuleAssetUrl(match.logo_banner_url) : defaultLogo;
 }
 
 interface LibraryPageProps {
@@ -159,7 +174,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
             )}
           >
             <Link className="hover:text-gray-700 transition-colors" href={basePath}>
-              Training Library
+              Awareness Library
             </Link>
             <span aria-hidden className="text-gray-400">
               ›
@@ -396,16 +411,16 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                   </div>
                 </div>
               ) : viewMode === "grid" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
                   {paginatedModules.map((item: Module) => (
                     <Card key={item.id} className={cardClassName} shadow="sm">
-                      <CardBody className="p-4 flex flex-col bg-white">
-                        {/* Thumbnail: blue gradient + Card.png (match reference) */}
-                        <div className="aspect-square rounded-xl overflow-hidden mb-2 w-full bg-gradient-to-b from-[#0075a1] to-[#00b1bd] shrink-0 relative">
+                      <CardBody className="p-3 flex flex-col bg-white">
+                        {/* Thumbnail: language-specific logo or default */}
+                        <div className="rounded-xl h-40 overflow-hidden mb-3 w-full bg-gray-100 flex items-center justify-center shrink-0 relative">
                           <img
                             alt=""
                             className="w-full h-full object-cover object-center"
-                            src={getContentAssetUrl("/images/Card.png")}
+                            src={getModuleLogoUrl(item, languageFilter)}
                             onError={(e) => {
                               const el = e.target as HTMLImageElement;
 
@@ -416,7 +431,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                           <img
                             aria-hidden
                             alt=""
-                            className="absolute inset-0 m-auto w-12 h-12 object-contain opacity-90 hidden"
+                            className="absolute inset-0 m-auto w-12 h-12 object-contain opacity-60 hidden"
                             src={getContentAssetUrl("/images/Icon_Template.svg")}
                           />
                         </div>
@@ -431,9 +446,8 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                         >
                           <Button
                             as={Link}
-                            className="border border-black bg-white text-[var(--mainblue)] text-xs font-medium min-h-0 h-8 gap-1.5 hover:bg-gray-50"
+                            className="border border-gray-500 bg-white text-[var(--mainblue)] text-xs font-medium rounded-lg px-4 py-1 mt-4 flex items-center gap-1.5 hover:bg-gray-50"
                             href={`${basePath}/${item.id}`}
-                            radius="full"
                             size="sm"
                             variant="bordered"
                           >
@@ -524,11 +538,11 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                     {(item: Module) => (
                       <TableRow key={item.id}>
                         <TableCell className="w-16 align-middle">
-                          <div className="relative w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shrink-0 bg-gradient-to-b from-[#0075a1] to-[#00b1bd]">
+                          <div className="relative w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shrink-0 bg-gray-100">
                             <img
                               alt=""
                               className="w-full h-full object-cover"
-                              src={getContentAssetUrl("/images/Card.png")}
+                              src={getModuleLogoUrl(item, languageFilter)}
                               onError={(e) => {
                                 const el = e.target as HTMLImageElement;
 
@@ -563,9 +577,8 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                           >
                             <Button
                               as={Link}
-                              className="min-h-0 h-8 text-xs font-medium bg-white text-[var(--mainblue)] hover:bg-gray-50 border border-black gap-1.5"
+                              className="border border-gray-500 bg-white text-[var(--mainblue)] text-xs font-medium rounded-lg px-4 py-1 mt-4 flex items-center gap-1.5 hover:bg-gray-50"
                               href={`${basePath}/${item.id}`}
-                              radius="full"
                               size="sm"
                               variant="bordered"
                             >

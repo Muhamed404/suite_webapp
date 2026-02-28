@@ -39,7 +39,7 @@ export const certificateService = {
      * Get all certificate templates.
      * API: GET /api/awm/certificate
      */
-    getCertificates: async (params?: { lang_id?: number; org_id?: number }) => {
+    getCertificates: async (params?: { lang_id?: number; org_id?: number; filter?: string }) => {
         return request<CertificateTemplate[]>(() =>
             awmClient.get<AWMResponseBody>(`${API_BASE}/certificate`, { params })
         );

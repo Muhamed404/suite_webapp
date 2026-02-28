@@ -6,6 +6,8 @@ import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Input, Textarea } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
+import { DatePicker } from "@heroui/date-picker";
+import { parseDate, today, getLocalTimeZone, type DateValue } from "@internationalized/date";
 import { Spinner } from "@heroui/spinner";
 import { Checkbox, CheckboxGroup } from "@heroui/checkbox";
 import clsx from "clsx";
@@ -54,13 +56,12 @@ export function NewSurveyForm() {
     const [currentStep, setCurrentStep] = useState(1);
     const [formError, setFormError] = useState<string | null>(null);
     const [formSuccess, setFormSuccess] = useState<string | null>(null);
-
     // Step 1: Survey Details
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [langId, setLangId] = useState<string>("1");
-    const [startDate, setStartDate] = useState("");
-    const [deadline, setDeadline] = useState("");
+    const [startDate, setStartDate] = useState<DateValue | null>(null);
+    const [deadline, setDeadline] = useState<DateValue | null>(null);
     const [maxQuestions, setMaxQuestions] = useState<string>("");
 
     // Step 2: Target Audience
@@ -81,7 +82,7 @@ export function NewSurveyForm() {
     // Fetch departments and groups
     useEffect(() => {
         const orgId = user?.organization_id ?? user?.org_id;
-        if (!orgId) return;
+        if (orgId === undefined || orgId === null) return;
 
         setLoadingDepts(true);
         suiteSuiteService
@@ -153,8 +154,8 @@ export function NewSurveyForm() {
                     description: description.trim() || undefined,
                     lang_id: Number(langId),
                     ques_type_id: quesTypeId,
-                    start_date: startDate || undefined,
-                    deadline: deadline || undefined,
+                    start_date: startDate ? startDate.toString() : undefined,
+                    deadline: deadline ? deadline.toString() : undefined,
                     max_questions: maxQuestions ? Number(maxQuestions) : undefined,
                 },
                 category_ids: selectedCategoryIds.map(Number),
@@ -316,30 +317,32 @@ export function NewSurveyForm() {
                                         <label className="text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
                                             <CalendarDays className="w-3.5 h-3.5" /> Start Date
                                         </label>
-                                        <Input
-                                            type="date"
+                                        <DatePicker
                                             value={startDate}
-                                            onValueChange={setStartDate}
+                                            onChange={setStartDate}
+                                            minValue={today(getLocalTimeZone())}
+                                            granularity="day"
+                                            className="w-full"
                                             classNames={{
-                                                inputWrapper:
-                                                    "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300 focus-within:!border-blue-500",
-                                                input: "text-sm",
+                                                selectorButton: "h-8 min-w-8",
                                             }}
+                                            aria-label="Start Date"
                                         />
                                     </div>
                                     <div>
                                         <label className="text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
                                             <CalendarDays className="w-3.5 h-3.5" /> Deadline
                                         </label>
-                                        <Input
-                                            type="date"
+                                        <DatePicker
                                             value={deadline}
-                                            onValueChange={setDeadline}
+                                            onChange={setDeadline}
+                                            minValue={startDate || today(getLocalTimeZone())}
+                                            granularity="day"
+                                            className="w-full"
                                             classNames={{
-                                                inputWrapper:
-                                                    "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300 focus-within:!border-blue-500",
-                                                input: "text-sm",
+                                                selectorButton: "h-8 min-w-8",
                                             }}
+                                            aria-label="Deadline"
                                         />
                                     </div>
                                     <div>
@@ -495,16 +498,16 @@ export function NewSurveyForm() {
 
                                 <div className="mt-4 flex items-center gap-4">
                                     <label className="text-xs font-medium text-gray-700">Deadline Date</label>
-                                    <Input
-                                        type="date"
+                                    <DatePicker
                                         value={deadline}
-                                        onValueChange={setDeadline}
+                                        onChange={setDeadline}
+                                        minValue={startDate || today(getLocalTimeZone())}
+                                        granularity="day"
+                                        className="w-48"
                                         classNames={{
-                                            base: "w-48",
-                                            inputWrapper:
-                                                "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300 focus-within:!border-blue-500",
-                                            input: "text-sm",
+                                            selectorButton: "h-8 min-w-8",
                                         }}
+                                        aria-label="Deadline Date (Step 3)"
                                     />
                                 </div>
                             </div>

@@ -13,7 +13,8 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useQuizzesByContent } from "@/hooks/useQuiz";
+import { isOrgUser } from "@/utils/roles";
+import { useQuizzesByContent, useModule } from "@/hooks/useQuiz";
 import { suiteAwmService } from "@/services/suiteAwmService";
 import { quizService } from "@/services/quizService";
 
@@ -39,22 +40,35 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     return cid ? parseInt(cid, 10) : 0;
   }, [searchParams]);
 
-  // Fetch campaign details
   const { data: campaignRes } = useQuery({
     queryKey: ['campaign', campaignId],
     queryFn: () => suiteAwmService.getCampaignById(campaignId),
     enabled: !!campaignId,
   });
 
-  // Fetch content details
   const { data: contentRes } = useQuery({
     queryKey: ['content', contentId],
     queryFn: () => quizService.getContentById(contentId),
     enabled: !!contentId,
   });
 
+  const { data: attemptRes } = useQuery<any>({
+    queryKey: ['quiz-attempt', campaignId, contentRes?.data?.mod_id, contentId],
+    queryFn: () => suiteAwmService.getQuizAttemptDetail(
+      campaignId,
+      contentRes?.data?.mod_id!, 
+      contentId
+    ),
+    enabled: !!campaignId && !!contentRes?.data?.mod_id && !!contentId,
+  });
+
   // Fetch quizzes dynamically from the API
   const { data: quizzesRes, isLoading: quizzesLoading } = useQuizzesByContent(contentId, !!contentId);
+
+  // Get module data for dynamic description
+  // moduleId may be undefined initially; default to 0 so the hook always receives a number
+  const moduleId = contentRes?.data?.mod_id ?? 0;
+  const { data: moduleRes } = useModule(moduleId, !!moduleId);
 
   // Keep original quiz data for submission
   const originalQuizzes = useMemo(() => {
@@ -74,6 +88,14 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     }));
   }, [quizzesRes]);
 
+ 
+  const threshold: number | null = (campaignRes as any)?.quiz_retry_threshold ?? null;
+
+  const attemptsArr: any[] = Array.isArray(attemptRes) ? (attemptRes as any[]) : [];
+  const attemptsMade = attemptsArr.length > 0 ? Math.max(...attemptsArr.map((q: any) => q.attempt_number || 0)) : 0;
+  const attemptsLeft: number | null = threshold !== null ? Math.max(0, threshold - attemptsMade) : null;
+  const noAttemptsLeft = attemptsLeft !== null && attemptsLeft <= 0;
+
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number[] }>({});
   const [savedAnswers, setSavedAnswers] = useState<{ [key: number]: number[] }>({});
@@ -81,7 +103,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const [answerStatusMsg, setAnswerStatusMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Reset to first question whenever the quiz data changes (e.g. content_id changes)
+ 
   useEffect(() => {
     setCurrentQuestion(0);
     setSelectedAnswers({});
@@ -142,6 +164,12 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
       return;
     }
 
+    // Check if no attempts left
+    if (noAttemptsLeft) {
+      setAnswerStatusMsg('<span class="text-red-600 font-semibold">You have no attempts left!</span>');
+      return;
+    }
+
     // Submit the quiz
     submitQuiz();
   };
@@ -153,6 +181,14 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     setShowCompletion(false);
     setAnswerStatusMsg("");
     setIsSubmitting(false);
+  };
+
+  const handleCompletionGoBack = () => {
+    if (user && isOrgUser(user.role_id)) {
+      router.push('/dashboard/campaign-assignments');
+    } else {
+      goBackToQuiz();
+    }
   };
 
   const submitQuiz = async () => {
@@ -361,6 +397,13 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                       </button>
                     </div>
 
+                    {/* Attempts Message */}
+                    {noAttemptsLeft && (
+                      <div className="mb-4 text-center">
+                        <p className="text-red-600 font-semibold text-sm">You have no attempts left!</p>
+                      </div>
+                    )}
+
                     {/* Navigation Buttons */}
                     <div className="flex gap-2 justify-end mb-20">
                       <button
@@ -373,10 +416,10 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                         Previous
                       </button>
                       <button
-                        className="flex items-center gap-1.5 px-12 py-2 bg-transparent border border-blue-500 text-blue-800 rounded-full text-xs font-medium hover:bg-blue-600 hover:text-white transition-all"
+                        className={`flex items-center gap-1.5 px-12 py-2 rounded-full text-xs font-medium transition-all ${noAttemptsLeft ? 'bg-gray-300 border border-gray-300 text-gray-500 cursor-not-allowed' : 'bg-transparent border border-blue-500 text-blue-800 hover:bg-blue-600 hover:text-white'}`}
                         id="nextBtn"
                         onClick={goToNextQuestion}
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || noAttemptsLeft}
                       >
                         {isSubmitting ? (
                           <>
@@ -384,7 +427,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                             Submitting...
                           </>
                         ) : (
-                          currentQuestion === quizData.length - 1 ? "Submit Quiz" : "Next Quiz"
+                          currentQuestion === quizData.length - 1 ? (noAttemptsLeft ? "No Attempts Left" : "Submit Quiz") : "Next Quiz"
                         )}
                       </button>
                     </div>
@@ -412,7 +455,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                       <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1.5 px-4 text-xs rounded-full transition" id="viewReportBtn" onClick={() => router.push('/report-card')}>
                         View Report
                       </button>
-                      <button className="border border-gray-300 text-gray-700 font-semibold py-1.5 px-4 text-xs rounded-full hover:bg-gray-50 transition" id="goBackBtn" onClick={goBackToQuiz}>
+                      <button className="border border-gray-300 text-gray-700 font-semibold py-1.5 px-4 text-xs rounded-full hover:bg-gray-50 transition" id="goBackBtn" onClick={handleCompletionGoBack}>
                         Go Back
                       </button>
                     </div>
@@ -432,6 +475,11 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                     <p className="text-sm text-gray-600 mt-2">
                       <span id="completedCount">{currentQuestion + 1}</span> out of <span id="totalQuizCount">{quizData.length}</span> quizzes are done
                     </p>
+                    {threshold !== null && threshold > 0 && (
+                      <p className={`text-sm mt-2 ${noAttemptsLeft ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>
+                        Attempts left: {attemptsLeft}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -440,7 +488,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                   <h4 className="text-sm font-semibold text-gray-900 mb-4">Trivia</h4>
                   <img src="/images/hero.svg" alt="Security Illustration" className="w-full rounded-lg mb-4" />
                   <p className="text-[10px] text-gray-600 leading-relaxed">
-                    Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events—such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise.
+                    {moduleRes?.data?.description || "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events—such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise."}
                   </p>
                 </div>
               </div>

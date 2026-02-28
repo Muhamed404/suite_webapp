@@ -138,6 +138,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         } else {
           statusValue = 'pending';
         }
+    
+        if (statusValue === 'pending') {
+          statusValue = 'in progress';
+        }
         // format label for display (capitalize words, replace underscores)
         const statusLabel = statusValue.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 
@@ -174,6 +178,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
           });
           if (!aggStatus) {
             aggStatus = agg.statuses?.some((s: any) => s.status === 2) ? 'completed' : 'pending';
+          }
+          // Change pending to in progress for consistency
+          if (aggStatus === 'pending') {
+            aggStatus = 'in progress';
           }
           const aggLabel = aggStatus.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           transformedItems.push({
@@ -223,7 +231,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
       transformedItems.push({
         id: 'quizzes',
         title: 'Quizzes',
-        status: data.user_progress_summary.quizzes.status === 'completed' ? 'completed' : 'pending',
+        status: data.user_progress_summary.quizzes.status === 'completed' ? 'completed' : 'in Progress',
         date: latestQuizDate ? new Date(latestQuizDate).toLocaleDateString("en-GB", {
           day: "numeric",
           month: "short",
@@ -287,16 +295,16 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     if (!contentsWithProgressRes?.success) {
       return {
         name: moduleName,
-        description: "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise."
+        description: moduleRes?.data?.description || "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise."
       };
     }
-    
+
     const data = contentsWithProgressRes.data;
     return {
       name: data.module_name || moduleName,
-      description: data.module_description || "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise."
+      description: data.module_description || moduleRes?.data?.description || "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise."
     };
-  }, [contentsWithProgressRes, moduleName]);
+  }, [contentsWithProgressRes, moduleName, moduleRes]);
 
   useEffect(() => {
     // Animate progress bar with real data
@@ -705,11 +713,14 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                 onClick={async () => {
                                   console.log('[module] Start clicked, moduleId:', moduleId, 'campaignId:', campaignId, 'item.id:', item.id, 'typeof item.id:', typeof item.id);
 
-                                  // notify backend that user began this content
+                                  // notify backend that user began this content (skip if already completed or in progress)
                                   if (
                                     campaignId != null &&
                                     moduleId != null &&
-                                    typeof item.id === 'number'
+                                    typeof item.id === 'number' &&
+                                    item.status !== 'completed' &&
+                                    item.status !== 'in_progress' &&
+                                    item.status !== 'in progress'
                                   ) {
                                     try {
                                       await campaignService.beginContent(
@@ -731,7 +742,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                     } else if (item.isAggregated && item.content_type_id) {
                                       contentId = item.content_type_id;
                                     }
-                                    if (contentId != null && item.status !== "in_progress") {
+                                    if (contentId != null && item.status !== 'in_progress' && item.status !== 'in progress' && item.status !== 'completed') {
                                       console.log('[module] Calling report-actions/begin-content with', { contentId });
                                       try {
                                       await awmClient.post(`${API_BASE}/useraction/report-actions/begin-content`, {
@@ -744,7 +755,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                         console.error('[module] report-actions begin-content error', err);
                                       }
                                     } else {
-                                      console.log('[module] Skipping report-actions call: no valid contentId or status is in_progress', item);
+                                      console.log('[module] Skipping report-actions call: no valid contentId or status is in_progress/completed', item);
                                     }
                                   } else {
                                     console.log('[module] Skipping report-actions call: moduleId is', moduleId);
@@ -763,8 +774,15 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                   }
                                   if (item.title === "Video Training") {
                                     router.push(`/module/${module}/video-training?campaign_id=${campaignId}`);
-                                  } else if (item.title === "Interactive Lesson") {
-                                    window.location.href = `http://localhost:8001/awm/module/${module}?campaign_id=${campaignId}`;
+                                  } else if (
+                                    item.title === "Interactive Contents" ||
+                                    item.title === "Interactive Lesson" ||
+                                    item.content_type_id === 1
+                                  ) {
+                                    // Dedicated org-user interactive content page
+                                    router.push(
+                                      `/module/${module}/interactive-content/${item.id}?campaign_id=${campaignId}&module_id=${moduleId}`
+                                    );
                                   } else if (item.title === "Quizzes") {
                                     const quizParams = new URLSearchParams();
                                     quizParams.set('campaign_id', String(campaignId));

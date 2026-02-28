@@ -48,8 +48,8 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
     setSearchQuery("");
 
     const fetchUsers = async () => {
-      const orgId = user?.organization_id || user?.org_id;
-      if (!orgId) return;
+      const orgId = user?.organization_id ?? user?.org_id;
+      if (orgId === undefined || orgId === null) return;
       try {
         setLoading(true);
         const fetched = await suiteSuiteService.getUnassignedUsers(orgId);
@@ -194,11 +194,10 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
                     <div
                       key={u.id}
                       onClick={() => toggleAvailableHighlight(u.id)}
-                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-all select-none ${
-                        availableHighlighted.includes(u.id)
+                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-all select-none ${availableHighlighted.includes(u.id)
                           ? "border-blue-400 bg-blue-50 shadow-sm"
                           : "bg-white border-gray-100 hover:border-blue-200 hover:shadow-sm"
-                      }`}
+                        }`}
                     >
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold flex-shrink-0 ${getAvatarColor(idx)}`}>
                         {getInitials(u.firstName, u.lastName)}
@@ -274,11 +273,10 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
                     <div
                       key={u.id}
                       onClick={() => toggleSelectedHighlight(u.id)}
-                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-all select-none ${
-                        selectedHighlighted.includes(u.id)
+                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-all select-none ${selectedHighlighted.includes(u.id)
                           ? "border-sky-400 bg-sky-100"
                           : "bg-sky-50 border-sky-200 hover:border-sky-300"
-                      }`}
+                        }`}
                     >
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold flex-shrink-0 ${getAvatarColor(idx)}`}>
                         {getInitials(u.firstName, u.lastName)}

@@ -491,7 +491,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     onValueChange={setSearchQuery}
                   />
                 </div>
-                <div className="w-[140px]">
+                <div className="w-[180px]">
                   <Select
                     aria-label={t("moduleDetails.languageFilter")}
                     className="w-full"
@@ -500,25 +500,31 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                       trigger: clsx(selectClassNames.trigger, "rounded-full text-xs min-h-9 h-9"),
                     }}
                     placeholder={t("moduleDetails.languageFilter")}
-                    selectedKeys={languageFilter ? [languageFilter] : []}
+                    selectedKeys={languageFilter ? [languageFilter] : ["all"]}
                     onSelectionChange={(keys) => {
                       const v = Array.from(keys as Set<string>)[0] ?? "";
-
-                      setLanguageFilter(v);
+                      setLanguageFilter(v === "all" ? "" : v);
                     }}
                   >
-                    {SUPPORTED_LANGUAGES.map((lang) => (
-                      <SelectItem key={String(lang.id)} textValue={lang.name}>
-                        <div className="flex items-center gap-2">
-                          <ReactCountryFlag
-                            countryCode={getLanguageCountryCode(lang.id)}
-                            style={{
-                              fontSize: "1em",
-                              lineHeight: "1em",
-                            }}
-                            svg
-                          />
-                          <span>{lang.name}</span>
+                    {[
+                      { id: "all" as const, name: t("moduleDetails.allLanguages"), icon: "🌐" },
+                      ...SUPPORTED_LANGUAGES.map(lang => ({ id: String(lang.id), name: lang.name, flag: lang.id }))
+                    ].map((item: any) => (
+                      <SelectItem key={item.id} textValue={item.name}>
+                        <div className="flex items-center gap-2 whitespace-nowrap">
+                          {item.icon ? (
+                            <span>{item.icon}</span>
+                          ) : item.flag ? (
+                            <ReactCountryFlag
+                              countryCode={getLanguageCountryCode(item.flag)}
+                              style={{
+                                fontSize: "1em",
+                                lineHeight: "1em",
+                              }}
+                              svg
+                            />
+                          ) : null}
+                          <span className="whitespace-nowrap">{item.name}</span>
                         </div>
                       </SelectItem>
                     ))}

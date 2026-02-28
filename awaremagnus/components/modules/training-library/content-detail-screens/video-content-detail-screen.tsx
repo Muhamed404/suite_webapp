@@ -128,7 +128,7 @@ export function VideoContentDetailScreen({
               )}
             >
               <Link className="hover:text-gray-700 transition" href={basePath}>
-                Training Library
+                Awareness Library
               </Link>
               <span className="text-gray-400">›</span>
               <Link className="hover:text-gray-700 transition" href={basePath}>
