@@ -2,6 +2,8 @@
 
 import { Megaphone } from "lucide-react";
 import clsx from "clsx";
+import { DatePicker } from "@heroui/date-picker";
+import { parseDate, today, getLocalTimeZone } from "@internationalized/date";
 
 import { useTranslations } from "@/i18n/useTranslations";
 
@@ -65,36 +67,38 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
         {/* Date Range */}
         <div className="grid grid-cols-2 gap-2">
           <div className="input-group">
-            <label className="block font-medium text-gray-600 mb-3 text-sm">
+            <label className="block font-medium text-gray-600 mb-2 text-sm">
               {t("form.startDate")} <span className="text-red-500">*</span>
             </label>
-            <input
-              type="date"
-              value={formData.startDate}
-              onChange={(e) => onChange("startDate", e.target.value)}
-              min={new Date().toISOString().split("T")[0]}
-              className={clsx(
-                "w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all",
-                errors.startDate ? "border-red-500" : "border-gray-200"
-              )}
+            <DatePicker
+              value={formData.startDate ? parseDate(formData.startDate) : null}
+              onChange={(date) => onChange("startDate", date ? date.toString() : "")}
+              minValue={today(getLocalTimeZone())}
+              granularity="day"
+              className="w-full"
+              classNames={{
+                selectorButton: "h-8 min-w-8",
+              }}
+              aria-label="Campaign Start Date"
             />
             {errors.startDate && (
               <p className="text-[10px] text-red-500 mt-0.5">{errors.startDate}</p>
             )}
           </div>
           <div className="input-group">
-            <label className="block font-medium text-gray-600 mb-3 text-sm">
+            <label className="block font-medium text-gray-600 mb-2 text-sm">
               {t("form.endDate")} <span className="text-red-500">*</span>
             </label>
-            <input
-              type="date"
-              value={formData.endDate}
-              onChange={(e) => onChange("endDate", e.target.value)}
-              min={formData.startDate || new Date().toISOString().split("T")[0]}
-              className={clsx(
-                "w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all",
-                errors.endDate ? "border-red-500" : "border-gray-200"
-              )}
+            <DatePicker
+              value={formData.endDate ? parseDate(formData.endDate) : null}
+              onChange={(date) => onChange("endDate", date ? date.toString() : "")}
+              minValue={formData.startDate ? parseDate(formData.startDate) : today(getLocalTimeZone())}
+              granularity="day"
+              className="w-full"
+              classNames={{
+                selectorButton: "h-8 min-w-8",
+              }}
+              aria-label="Campaign End Date"
             />
             {errors.endDate && (
               <p className="text-[10px] text-red-500 mt-0.5">{errors.endDate}</p>

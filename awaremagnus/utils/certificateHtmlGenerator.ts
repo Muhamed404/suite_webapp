@@ -1,62 +1,64 @@
 export interface CertificateTemplateAssets {
-    logo?: string | null;
-    border?: string | null;
-    watermark?: string | null;
-    stamp?: string | null;
-    signature?: string | null;
+  logo?: string | null;
+  bottomLogo?: string | null;
+  border?: string | null;
+  watermark?: string | null;
+  stamp?: string | null;
+  signature?: string | null;
 }
 
 export interface CertificateTemplateData {
-    templateText: string;
-    bgColor: string;
-    assets: CertificateTemplateAssets;
-    firstName?: string;
-    lastName?: string;
-    courseName?: string;
-    completionDate?: string;
+  templateText: string;
+  bgColor: string;
+  assets: CertificateTemplateAssets;
+  firstName?: string;
+  lastName?: string;
+  courseName?: string;
+  completionDate?: string;
 }
 
 export const getProcessedText = (
-    templateText: string,
-    firstName: string,
-    lastName: string,
-    courseName: string,
-    completionDate: string
+  templateText: string,
+  firstName: string,
+  lastName: string,
+  courseName: string,
+  completionDate: string
 ) => {
-    const defaultTemplate = 'This is to certify that <%first_name%> <%last_name%> has successfully completed <%content_name%> on <%completion_date%>';
-    const templateHtml = templateText?.trim() || defaultTemplate;
+  const defaultTemplate = 'This is to certify that <%first_name%> <%last_name%> has successfully completed <%content_name%> on <%completion_date%>';
+  const templateHtml = templateText?.trim() || defaultTemplate;
 
-    return templateHtml
-        .replace(/<%first_name%>/g, firstName)
-        .replace(/<%last_name%>/g, lastName)
-        .replace(/<%content_name%>/g, courseName)
-        .replace(/<%completion_date%>/g, completionDate)
-        .replace(/&lt;%first_name%&gt;/g, firstName)
-        .replace(/&lt;%last_name%&gt;/g, lastName)
-        .replace(/&lt;%content_name%&gt;/g, courseName)
-        .replace(/&lt;%completion_date%&gt;/g, completionDate);
+  return templateHtml
+    .replace(/<%first_name%>/g, firstName)
+    .replace(/<%last_name%>/g, lastName)
+    .replace(/<%content_name%>/g, courseName)
+    .replace(/<%completion_date%>/g, completionDate)
+    .replace(/&lt;%first_name%&gt;/g, firstName)
+    .replace(/&lt;%last_name%&gt;/g, lastName)
+    .replace(/&lt;%content_name%&gt;/g, courseName)
+    .replace(/&lt;%completion_date%&gt;/g, completionDate);
 };
 
 export const generateCertificateHtml = (data: CertificateTemplateData) => {
-    const {
-        templateText,
-        bgColor = '#ffffff',
-        assets,
-        firstName = "John",
-        lastName = "Doe",
-        courseName = "Cybersecurity Awareness on Physical Security",
-        completionDate = "1/27/2026"
-    } = data;
+  const {
+    templateText,
+    bgColor = '#ffffff',
+    assets,
+    firstName = "John",
+    lastName = "Doe",
+    courseName = "Cybersecurity Awareness on Physical Security",
+    completionDate = "1/27/2026"
+  } = data;
 
-    const logo = assets.logo || '';
-    const stampLogo = assets.stamp || '';
-    const signImage = assets.signature || '';
-    const borderImage = assets.border || '';
-    const watermarkImage = assets.watermark || '';
+  const logo = assets.logo || '';
+  const bottomLogo = assets.bottomLogo || '';
+  const stampLogo = assets.stamp || '';
+  const signImage = assets.signature || '';
+  const borderImage = assets.border || '';
+  const watermarkImage = assets.watermark || '';
 
-    const certificateText = getProcessedText(templateText, firstName, lastName, courseName, completionDate);
+  const certificateText = getProcessedText(templateText, firstName, lastName, courseName, completionDate);
 
-    return `
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -175,7 +177,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
       object-fit: contain;
     }
 
-    /* Bottom logo (optional fallback if needed) */
+    /* Bottom logo */
     .certificate-bottom-logo {
       position: absolute;
       bottom: 40px;
@@ -184,7 +186,6 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
       height: 60px;
       z-index: 2;
       object-fit: contain;
-      display: none;
     }
 
     .certificate-content {
@@ -271,6 +272,9 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
 
       <!-- Top Logo -->
       ${logo ? `<img class="certificate-top-logo" src="${logo}" alt="Logo">` : ''}
+
+      <!-- Bottom Logo -->
+      ${bottomLogo ? `<img class="certificate-bottom-logo" src="${bottomLogo}" alt="Bottom Logo">` : ''}
 
       <!-- Content -->
       <div class="certificate-content">

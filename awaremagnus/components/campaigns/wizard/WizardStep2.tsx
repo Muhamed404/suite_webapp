@@ -22,7 +22,7 @@ interface WizardStep2Props {
 export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: WizardStep2Props) {
   const t = useTranslations("campaigns");
   const { user } = useAuthStore();
-  
+
   const [departments, setDepartments] = useState<Department[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [users, setUsers] = useState<Record<number, string>>({}); // Map of userId -> userName
@@ -54,26 +54,26 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
 
   useEffect(() => {
     const fetchData = async () => {
-      const orgId = user?.organization_id || user?.org_id;
-      if (!orgId) return;
-      
+      const orgId = user?.organization_id ?? user?.org_id;
+      if (orgId === undefined || orgId === null) return;
+
       try {
         setLoading(true);
         setError(null);
-        
+
         const [depts, grps, fetchedUsers] = await Promise.all([
           suiteSuiteService.getDepartments(orgId),
           suiteSuiteService.getGroups(orgId),
           suiteSuiteService.getUnassignedUsers(orgId),
         ]);
-        
+
         console.log('Departments response:', depts);
         console.log('Groups response:', grps);
         console.log('Users response:', fetchedUsers);
-        
+
         setDepartments(depts || []);
         setGroups(grps || []);
-        
+
         // Build user map for display
         const userMap: Record<number, string> = {};
         if (fetchedUsers && Array.isArray(fetchedUsers)) {
@@ -154,161 +154,161 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
       ) : (
         <>
           <div className="grid grid-cols-1 gap-3">
-          {/* Departments */}
-          <div className="input-group">
-            <label className="block font-medium text-gray-600 mb-3 text-sm">{t("form.selectDepartments")}</label>
-            
-            <div className="relative" ref={deptDropdownRef}>
-              <button
-                onClick={() => setDeptDropdownOpen(!deptDropdownOpen)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
-              >
-                <div className="flex flex-wrap gap-2 flex-1">
-                  {formData.departments.length === 0 ? (
-                    <span className="text-gray-500">{t("form.selectDepartments")}</span>
-                  ) : (
-                    formData.departments.map((deptId) => (
-                      <span
-                        key={deptId}
-                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
-                      >
-                        {getDepartmentName(deptId)}
-                        <div
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeDepartment(deptId);
-                          }}
-                          className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
+            {/* Departments */}
+            <div className="input-group">
+              <label className="block font-medium text-gray-600 mb-3 text-sm">{t("form.selectDepartments")}</label>
+
+              <div className="relative" ref={deptDropdownRef}>
+                <button
+                  onClick={() => setDeptDropdownOpen(!deptDropdownOpen)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
+                >
+                  <div className="flex flex-wrap gap-2 flex-1">
+                    {formData.departments.length === 0 ? (
+                      <span className="text-gray-500">{t("form.selectDepartments")}</span>
+                    ) : (
+                      formData.departments.map((deptId) => (
+                        <span
+                          key={deptId}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
+                        >
+                          {getDepartmentName(deptId)}
+                          <div
+                            onClick={(e) => {
                               e.stopPropagation();
                               removeDepartment(deptId);
-                            }
-                          }}
+                            }}
+                            className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.stopPropagation();
+                                removeDepartment(deptId);
+                              }
+                            }}
+                          >
+                            <X className="w-3 h-3" />
+                          </div>
+                        </span>
+                      ))
+                    )}
+                  </div>
+                  <ChevronDown className={clsx("w-4 h-4 transition-transform flex-shrink-0", deptDropdownOpen && "rotate-180")} />
+                </button>
+
+                {deptDropdownOpen && activeDepartments.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
+                    <div className="p-2 border-b border-gray-100">
+                      <input
+                        type="text"
+                        value={deptSearch}
+                        onChange={(e) => setDeptSearch(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        placeholder="Search departments..."
+                        className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                      {activeDepartments.filter((d) => d.name.toLowerCase().includes(deptSearch.toLowerCase())).map((dept) => (
+                        <label
+                          key={dept.id}
+                          className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
                         >
-                          <X className="w-3 h-3" />
-                        </div>
-                      </span>
-                    ))
-                  )}
-                </div>
-                <ChevronDown className={clsx("w-4 h-4 transition-transform flex-shrink-0", deptDropdownOpen && "rotate-180")} />
-              </button>
-
-              {deptDropdownOpen && activeDepartments.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
-                  <div className="p-2 border-b border-gray-100">
-                    <input
-                      type="text"
-                      value={deptSearch}
-                      onChange={(e) => setDeptSearch(e.target.value)}
-                      onClick={(e) => e.stopPropagation()}
-                      placeholder="Search departments..."
-                      className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      autoFocus
-                    />
+                          <input
+                            type="checkbox"
+                            checked={formData.departments.includes(dept.id)}
+                            onChange={() => toggleDepartment(dept.id)}
+                            className="w-4 h-4 text-blue-500 rounded"
+                          />
+                          <span className="text-sm">{dept.name}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                  <div className="max-h-48 overflow-y-auto">
-                    {activeDepartments.filter((d) => d.name.toLowerCase().includes(deptSearch.toLowerCase())).map((dept) => (
-                      <label
-                        key={dept.id}
-                        className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={formData.departments.includes(dept.id)}
-                          onChange={() => toggleDepartment(dept.id)}
-                          className="w-4 h-4 text-blue-500 rounded"
-                        />
-                        <span className="text-sm">{dept.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
+              <small className="text-gray-500 mt-1 block text-[10px]">{t("form.departmentsPlaceholder")}</small>
             </div>
-            <small className="text-gray-500 mt-1 block text-[10px]">{t("form.departmentsPlaceholder")}</small>
-          </div>
 
-          {/* Groups */}
-          <div className="input-group">
-            <label className="block font-medium text-gray-600 mb-3 text-sm">{t("form.selectGroups")}</label>
-            
-            <div className="relative" ref={groupDropdownRef}>
-              <button
-                onClick={() => setGroupDropdownOpen(!groupDropdownOpen)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
-              >
-                <div className="flex flex-wrap gap-2 flex-1">
-                  {formData.groups.length === 0 ? (
-                    <span className="text-gray-500">{t("form.selectGroups")}</span>
-                  ) : (
-                    formData.groups.map((groupId) => (
-                      <span
-                        key={groupId}
-                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
-                      >
-                        {getGroupName(groupId)}
-                        <div
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeGroup(groupId);
-                          }}
-                          className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
-                          role="button"
-                          tabIndex={0}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ' ') {
+            {/* Groups */}
+            <div className="input-group">
+              <label className="block font-medium text-gray-600 mb-3 text-sm">{t("form.selectGroups")}</label>
+
+              <div className="relative" ref={groupDropdownRef}>
+                <button
+                  onClick={() => setGroupDropdownOpen(!groupDropdownOpen)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
+                >
+                  <div className="flex flex-wrap gap-2 flex-1">
+                    {formData.groups.length === 0 ? (
+                      <span className="text-gray-500">{t("form.selectGroups")}</span>
+                    ) : (
+                      formData.groups.map((groupId) => (
+                        <span
+                          key={groupId}
+                          className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
+                        >
+                          {getGroupName(groupId)}
+                          <div
+                            onClick={(e) => {
                               e.stopPropagation();
                               removeGroup(groupId);
-                            }
-                          }}
-                        >
-                          <X className="w-3 h-3" />
-                        </div>
-                      </span>
-                    ))
-                  )}
-                </div>
-                <ChevronDown className={clsx("w-4 h-4 transition-transform flex-shrink-0", groupDropdownOpen && "rotate-180")} />
-              </button>
+                            }}
+                            className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.stopPropagation();
+                                removeGroup(groupId);
+                              }
+                            }}
+                          >
+                            <X className="w-3 h-3" />
+                          </div>
+                        </span>
+                      ))
+                    )}
+                  </div>
+                  <ChevronDown className={clsx("w-4 h-4 transition-transform flex-shrink-0", groupDropdownOpen && "rotate-180")} />
+                </button>
 
-              {groupDropdownOpen && activeGroups.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
-                  <div className="p-2 border-b border-gray-100">
-                    <input
-                      type="text"
-                      value={groupSearch}
-                      onChange={(e) => setGroupSearch(e.target.value)}
-                      onClick={(e) => e.stopPropagation()}
-                      placeholder="Search groups..."
-                      className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      autoFocus
-                    />
+                {groupDropdownOpen && activeGroups.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
+                    <div className="p-2 border-b border-gray-100">
+                      <input
+                        type="text"
+                        value={groupSearch}
+                        onChange={(e) => setGroupSearch(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        placeholder="Search groups..."
+                        className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                      {activeGroups.filter((g) => g.name.toLowerCase().includes(groupSearch.toLowerCase())).map((group) => (
+                        <label
+                          key={group.id}
+                          className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formData.groups.includes(group.id)}
+                            onChange={() => toggleGroup(group.id)}
+                            className="w-4 h-4 text-blue-500 rounded"
+                          />
+                          <span className="text-sm">{group.name}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                  <div className="max-h-48 overflow-y-auto">
-                    {activeGroups.filter((g) => g.name.toLowerCase().includes(groupSearch.toLowerCase())).map((group) => (
-                      <label
-                        key={group.id}
-                        className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={formData.groups.includes(group.id)}
-                          onChange={() => toggleGroup(group.id)}
-                          className="w-4 h-4 text-blue-500 rounded"
-                        />
-                        <span className="text-sm">{group.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
+              <small className="text-gray-500 mt-1 block text-[10px]">{t("form.groupsPlaceholder")}</small>
             </div>
-            <small className="text-gray-500 mt-1 block text-[10px]">{t("form.groupsPlaceholder")}</small>
-          </div>
           </div>
         </>
       )}

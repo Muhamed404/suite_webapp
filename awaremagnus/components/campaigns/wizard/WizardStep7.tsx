@@ -38,8 +38,8 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const orgId = user?.organization_id || user?.org_id;
-        if (!orgId) return;
+        const orgId = user?.organization_id ?? user?.org_id;
+        if (orgId === undefined || orgId === null) return;
 
         const [deptData, groupData] = await Promise.all([
           suiteSuiteService.getDepartments(orgId),
@@ -67,7 +67,7 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
   const getDepartmentNames = () => {
     if (loading) return "Loading...";
     if (formData.departments.length === 0) return "None";
-    
+
     return formData.departments
       .map((id) => {
         const dept = departments.find((d) => d.id === id);
@@ -79,7 +79,7 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
   const getGroupNames = () => {
     if (loading) return "Loading...";
     if (formData.groups.length === 0) return "None";
-    
+
     return formData.groups
       .map((id) => {
         const group = groups.find((g) => g.id === id);

@@ -290,7 +290,8 @@
 			"campaignNFC": "NFC",
 			"campaignUSB": "USB",
 			"campaignSMS": "SMS",
-			"campaignWhatsapp": "Whatsapp"
+			"campaignWhatsapp": "Whatsapp",
+			"simulatorEmails": "menu.phishmagnus.simulatorEmails"
 		},
 		"suite": {
 			"suiteManagement": "Suite Management",

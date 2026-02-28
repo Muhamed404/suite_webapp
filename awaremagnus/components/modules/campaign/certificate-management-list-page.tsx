@@ -19,13 +19,17 @@ import { certificateService, type CertificateTemplate } from "@/services/certifi
 import { addToast } from "@heroui/toast";
 import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
 import { AuthImage } from "@/components/ui/auth-image";
-import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS } from "@/utils/supportedLanguages";
+import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS, getLanguageFlag } from "@/utils/supportedLanguages";
 import { generateCertificateHtml } from "@/utils/certificateHtmlGenerator";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { isPlatformAdmin, isOrgAdmin } from "@/utils/roles";
+import { Image as ImageIcon } from "lucide-react";
 export function CertificateManagementListPage() {
     const tMenu = useTranslations("dashboard");
     const { dir } = useI18n();
     const isRtl = dir === "rtl";
 
+    const { user } = useAuthStore();
     const [certificates, setCertificates] = useState<CertificateTemplate[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -36,7 +40,14 @@ export function CertificateManagementListPage() {
     const fetchCertificates = async () => {
         setIsLoading(true);
         try {
-            const response = await certificateService.getCertificates();
+            let filter = "";
+            if (isPlatformAdmin(user?.role_id)) {
+                filter = "default_brandings";
+            } else if (isOrgAdmin(user?.role_id)) {
+                filter = "my_brandings";
+            }
+
+            const response = await certificateService.getCertificates({ filter });
             if (response.success && response.data) {
                 setCertificates(response.data);
             }
@@ -53,8 +64,10 @@ export function CertificateManagementListPage() {
     };
 
     useEffect(() => {
-        fetchCertificates();
-    }, []);
+        if (user) {
+            fetchCertificates();
+        }
+    }, [user?.role_id]);
 
     const handleDelete = async (id: number) => {
         if (!window.confirm("Are you sure you want to delete this certificate branding?")) return;
@@ -85,6 +98,7 @@ export function CertificateManagementListPage() {
             bgColor: cert.bg_color || "#ffffff",
             assets: {
                 logo: cert.top_logo_url ? getCertificateAssetUrl(cert.top_logo_url) : null,
+                bottomLogo: cert.bottom_logo_url ? getCertificateAssetUrl(cert.bottom_logo_url) : null,
                 border: cert.border_image_url ? getCertificateAssetUrl(cert.border_image_url) : null,
                 watermark: cert.bg_watermark_url ? getCertificateAssetUrl(cert.bg_watermark_url) : null,
                 stamp: cert.stamp_logo_url ? getCertificateAssetUrl(cert.stamp_logo_url) : null,
@@ -219,15 +233,38 @@ export function CertificateManagementListPage() {
                                         ) : items.length > 0 ? items.map((cert) => (
                                             <tr key={cert.id} className="hover:bg-gray-50 transition-colors">
                                                 <td className="px-4 py-3.5 text-gray-900 font-medium">Certificate - {cert.language?.name || 'Unknown'}</td>
-                                                <td className="px-4 py-3.5 text-gray-600">{cert.language?.name || 'Unknown'}</td>
-                                                <td className="px-4 py-3.5 text-gray-400 italic">
-                                                    {cert.top_logo_url ? <div className="h-8 w-16 relative"><AuthImage src={getCertificateAssetUrl(cert.top_logo_url)} alt="Logo" className="object-contain" fill resolveUrl={false} /></div> : "None"}
+                                                <td className="px-4 py-3.5 text-gray-600">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-lg leading-none">{getLanguageFlag(cert.lang_id)}</span>
+                                                        <span>{cert.language?.name || 'Unknown'}</span>
+                                                    </div>
                                                 </td>
-                                                <td className="px-4 py-3.5 text-gray-400 italic">
-                                                    {cert.bg_watermark_url ? <div className="h-8 w-16 relative"><AuthImage src={getCertificateAssetUrl(cert.bg_watermark_url)} alt="Watermark" className="object-contain" fill resolveUrl={false} /></div> : "None"}
+                                                <td className="px-4 py-3.5">
+                                                    <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+                                                        {cert.top_logo_url ? (
+                                                            <AuthImage src={getCertificateAssetUrl(cert.top_logo_url)} alt="Logo" className="object-contain" fill resolveUrl={false} />
+                                                        ) : (
+                                                            <ImageIcon size={18} className="text-gray-300" />
+                                                        )}
+                                                    </div>
                                                 </td>
-                                                <td className="px-4 py-3.5 text-gray-400 italic">
-                                                    {cert.border_image_url ? <div className="h-8 w-16 relative"><AuthImage src={getCertificateAssetUrl(cert.border_image_url)} alt="Border" className="object-contain" fill resolveUrl={false} /></div> : "None"}
+                                                <td className="px-4 py-3.5">
+                                                    <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+                                                        {cert.bg_watermark_url ? (
+                                                            <AuthImage src={getCertificateAssetUrl(cert.bg_watermark_url)} alt="Watermark" className="object-contain" fill resolveUrl={false} />
+                                                        ) : (
+                                                            <ImageIcon size={18} className="text-gray-300" />
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3.5">
+                                                    <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+                                                        {cert.border_image_url ? (
+                                                            <AuthImage src={getCertificateAssetUrl(cert.border_image_url)} alt="Border" className="object-contain" fill resolveUrl={false} />
+                                                        ) : (
+                                                            <ImageIcon size={18} className="text-gray-300" />
+                                                        )}
+                                                    </div>
                                                 </td>
                                                 <td className="px-4 py-3.5 text-sky-500 font-semibold cursor-pointer">
                                                     <div className="flex items-center gap-3">

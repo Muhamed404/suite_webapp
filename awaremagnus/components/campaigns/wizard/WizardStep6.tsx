@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Calendar, GripVertical, Info, CalendarCheck } from "lucide-react";
+import { DatePicker } from "@heroui/date-picker";
+import { parseDate } from "@internationalized/date";
 
 import { useTranslations } from "@/i18n/useTranslations";
 
@@ -39,7 +41,7 @@ export function WizardStep6({ formData, onChange, onGenerateSchedule, modulesLis
     const draggedItem = newSchedules[draggedIndex];
     newSchedules.splice(draggedIndex, 1);
     newSchedules.splice(index, 0, draggedItem);
-    
+
     onChange("schedules", newSchedules);
     setDraggedIndex(index);
   };
@@ -86,27 +88,31 @@ export function WizardStep6({ formData, onChange, onGenerateSchedule, modulesLis
                   onDragStart={() => handleDragStart(index)}
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragEnd={handleDragEnd}
-                  className={`flex items-center justify-between px-3 py-2 border rounded-lg text-xs text-gray-700 transition-all ${
-                    draggedIndex === index
-                      ? "opacity-40 bg-blue-50 border-blue-300"
-                      : "bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50/30"
-                  } cursor-grab active:cursor-grabbing`}
+                  className={`flex items-center justify-between px-3 py-2 border rounded-lg text-xs text-gray-700 transition-all ${draggedIndex === index
+                    ? "opacity-40 bg-blue-50 border-blue-300"
+                    : "bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50/30"
+                    } cursor-grab active:cursor-grabbing`}
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <GripVertical className="w-4 h-4 text-gray-400 flex-shrink-0" />
                     <span className="truncate">{index + 1}. {getModuleName(schedule.module_id)}</span>
                   </div>
-                  <input
-                    type="date"
-                    value={schedule.start_date}
-                    onChange={(e) => {
+                  <DatePicker
+                    value={schedule.start_date ? parseDate(schedule.start_date) : null}
+                    onChange={(date) => {
                       const newSchedules = [...formData.schedules];
-                      newSchedules[index].start_date = e.target.value;
+                      newSchedules[index].start_date = date ? date.toString() : "";
                       onChange("schedules", newSchedules);
                     }}
-                    min={formData.startDate}
-                    max={formData.endDate}
-                    className="w-36 flex-shrink-0 px-2 py-1 border border-gray-200 rounded-md text-[10px] focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    minValue={formData.startDate ? parseDate(formData.startDate) : undefined}
+                    maxValue={formData.endDate ? parseDate(formData.endDate) : undefined}
+                    granularity="day"
+                    className="w-40"
+                    size="sm"
+                    classNames={{
+                      selectorButton: "h-7 min-w-7",
+                    }}
+                    aria-label={`Module ${index + 1} Start Date`}
                   />
                 </li>
               ))}

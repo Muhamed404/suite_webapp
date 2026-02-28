@@ -133,6 +133,7 @@ export function CertificateBrandingForm() {
 
     const [assets, setAssets] = useState({
         logo: null as string | null,
+        bottom_logo: null as string | null,
         border: null as string | null,
         watermark: null as string | null,
         stamp: null as string | null,
@@ -141,6 +142,7 @@ export function CertificateBrandingForm() {
 
     const [files, setFiles] = useState({
         logo: null as File | null,
+        bottom_logo: null as File | null,
         border: null as File | null,
         watermark: null as File | null,
         stamp: null as File | null,
@@ -160,6 +162,7 @@ export function CertificateBrandingForm() {
                         setTemplateText(cert.template_text);
                         setAssets({
                             logo: cert.top_logo_url ? getCertificateAssetUrl(cert.top_logo_url) : null,
+                            bottom_logo: cert.bottom_logo_url ? getCertificateAssetUrl(cert.bottom_logo_url) : null,
                             border: cert.border_image_url ? getCertificateAssetUrl(cert.border_image_url) : null,
                             watermark: cert.bg_watermark_url ? getCertificateAssetUrl(cert.bg_watermark_url) : null,
                             stamp: cert.stamp_logo_url ? getCertificateAssetUrl(cert.stamp_logo_url) : null,
@@ -190,7 +193,15 @@ export function CertificateBrandingForm() {
     }), []);
 
     const handlePreview = () => {
-        const htmlContent = generateCertificateHtml({ templateText, bgColor, assets });
+        const previewAssets = {
+            logo: assets.logo,
+            bottomLogo: assets.bottom_logo,
+            border: assets.border,
+            watermark: assets.watermark,
+            stamp: assets.stamp,
+            signature: assets.signature,
+        };
+        const htmlContent = generateCertificateHtml({ templateText, bgColor, assets: previewAssets });
         const previewWindow = window.open('', '_blank');
         if (previewWindow) {
             previewWindow.document.open();
@@ -220,6 +231,7 @@ export function CertificateBrandingForm() {
         formData.append("bg_color", bgColor);
 
         if (files.logo) formData.append("top_logo", files.logo);
+        if (files.bottom_logo) formData.append("bottom_logo", files.bottom_logo);
         if (files.border) formData.append("border_image", files.border);
         if (files.watermark) formData.append("bg_watermark", files.watermark);
         if (files.stamp) formData.append("stamp_logo", files.stamp);
@@ -241,11 +253,14 @@ export function CertificateBrandingForm() {
                 });
                 router.push("/dashboard/system-branding/certificate");
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error("Failed to save certificate:", error);
+            const errorMessage = error.response?.data?.message || error.message || "Failed to save certificate template";
+            const statusCode = error.response?.status;
+
             addToast({
-                title: "Error",
-                description: "Failed to save certificate template",
+                title: statusCode === 409 ? "Conflict" : "Error",
+                description: errorMessage,
                 color: "danger"
             });
         } finally {
@@ -344,6 +359,12 @@ export function CertificateBrandingForm() {
                                         icon={<ImageIcon size={18} className="text-sky-500" />}
                                         initialUrl={assets.logo}
                                         onImageChange={handleAssetChange("logo")}
+                                    />
+                                    <ImageUploadPill
+                                        label="Bottom Logo"
+                                        icon={<ImageIcon size={18} className="text-sky-500" />}
+                                        initialUrl={assets.bottom_logo}
+                                        onImageChange={handleAssetChange("bottom_logo")}
                                     />
                                     <ImageUploadPill
                                         label="Border Image"
