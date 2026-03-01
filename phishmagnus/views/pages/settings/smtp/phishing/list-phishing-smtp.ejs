@@ -3,7 +3,7 @@
     <div class="flex-1">
 
       <h3 class="text-3xl font-medium">
-        Simulator Emails
+        <%= __('phishing_smtp.list.title') %>
       </h3>
     </div>
     <%if(canManageDefault) { %>
@@ -16,12 +16,13 @@
             <path stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               d="M12 8v8m-4-4h8" />
           </svg>
-          <span class="hidden sm:inline">Add New Email</span>
+          <span class="hidden sm:inline"><%= __('phishing_smtp.list.btn_add_new') %></span>
         </a>
     </div>
     <% }%>
   </div>
 </div>
+<% const allowEditAndTest = canManageDefault %>
 
 <div class="flex flex-col p-6 pt-0">
   <div class="flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm">
@@ -31,83 +32,86 @@
           <tr>
             <th class="px-4 py-3 text-sm font-normal">
               <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
-              Sender Email
+              <%= __('phishing_smtp.list.col_sender_email') %>
             </th>
             <th class="px-4 py-3 text-sm font-normal">
               <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
-              Organization
+              <%= __('phishing_smtp.list.col_organization') %>
             </th>
+
             <th class="px-4 py-3 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="Sort" class="size-3.5 ml-3 inline">
-              Details
+              <%= __('generic_label.status') %>
             </th>
+          <% if (allowEditAndTest) { %>
+
             <th class="px-4 py-3 text-sm font-normal">
-              Status
+              <%= __('phishing_smtp.list.col_test_connection') %>
             </th>
+          <% } %>
             <th class="px-4 py-3 text-sm font-normal">
-              Test Connection
-            </th>
-            <th class="px-4 py-3 text-sm font-normal">
-              Action
+              <%= __('generic_label.action') %>
             </th>
           </tr>
         </thead>
         <tbody>
           <% if (typeof smtpList !== 'undefined' && smtpList.length > 0) { smtpList.forEach(tpl => { %>
-            <tr class="bg-white border-b hover:bg-gray-50">
+            <tr class="smtp-row bg-white border-b hover:bg-gray-50 cursor-pointer"
+              data-id="<%= tpl.id %>"
+              data-sender-email="<%= tpl.sender_email %>"
+              data-organization="<%= tpl.organization_name || 'Default' %>"
+              data-host="<%= tpl.host || '' %>"
+              data-port="<%= tpl.port || '' %>"
+              data-account="<%= tpl.smtp_account || '' %>"
+              data-use-tls="<%= tpl.use_tls %>"
+              data-use-ssl="<%= tpl.use_ssl %>"
+              data-active="<%= tpl.is_active %>"
+              data-details="<%= tpl.details || '' %>">
               <td class="px-4 py-3"><%= tpl.sender_email %></td>
-              <td class="px-4 py-3"><%= tpl.organization_name || 'Default' %></td>
-              <td class="px-4 py-3 text-gray-400"><%= tpl.details || '' %></td>
+              <td class="px-4 py-3"><%= tpl.organization_name || __('phishing_smtp.list.default_org') %></td>
               <td class="px-4 py-3">
                 <% if (tpl.is_active) { %>
                   <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">
                     <span class="w-1.5 h-1.5 rounded-full bg-teal-500 inline-block"></span>
-                    Active
+                    <%= __('generic_label.active') %>
                   </span>
                 <% } else { %>
                   <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
                     <span class="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block"></span>
-                    Inactive
+                    <%= __('generic_label.inactive') %>
                   </span>
                 <% } %>
               </td>
               <% const isSameOrg = parseInt(tpl.organization_id) === parseInt(currentUserOrgId); %>
-              <% const allowEditAndTest = canManageDefault %>
               <% const allowDelete = canManageDefault || isSameOrg; %>
-              <td class="px-4 py-3">
                 <% if (allowEditAndTest) { %>
+
+              <td class="px-4 py-3">
                   <button
                     class="test-smtp-btn px-3 py-1 rounded-lg bg-green-500 text-white text-xs font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     data-smtp-id="<%= tpl.id %>">
-                    Test
+                    <%= __('phishing_smtp.list.btn_test') %>
                   </button>
-                <% } else { %>
-                  <button disabled
-                    class="px-3 py-1 rounded-lg bg-gray-200 text-gray-400 text-xs font-semibold cursor-not-allowed"
-                    title="Not permitted for this organization">
-                    Test
-                  </button>
-                <% } %>
               </td>
+             <% }%>
+
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
                   <% if (allowEditAndTest) { %>
-                    <a href="/phm/phishing-smtp/edit/<%= tpl.id %>" class="text-teal-600 hover:text-teal-800 font-medium transition-colors duration-150">Edit</a>
-                  <% } else { %>
-                    <span class="text-gray-300 font-medium cursor-not-allowed" title="Not permitted for this organization">Edit</span>
-                  <% } %>
+                    <a href="/phm/phishing-smtp/edit/<%= tpl.id %>" class="text-teal-600 hover:text-teal-800 font-medium transition-colors duration-150"><%= __('generic_label.edit') %></a>
                   <span class="text-gray-300">|</span>
-                  <% if (allowDelete) { %>
-                    <a href="/phm/phishing-smtp/delete/<%= tpl.id %>" class="text-red-500 hover:text-red-700 font-medium transition-colors duration-150" onclick="return confirm('Are you sure you want to delete this SMTP configuration?')">Delete</a>
-                  <% } else { %>
-                    <span class="text-gray-300 font-medium cursor-not-allowed" title="Not permitted for this organization">Delete</span>
+
                   <% } %>
+                  
+                  <% if (allowDelete) { %>
+                    <a href="/phm/phishing-smtp/delete/<%= tpl.id %>" class="text-red-500 hover:text-red-700 font-medium transition-colors duration-150" onclick="return confirm(this.dataset.confirm)" data-confirm="<%= __('phishing_smtp.list.confirm_delete') %>"><%= __('generic_label.delete') %></a>
+                  <% }%>
+                  
                 </div>
               </td>
             </tr>
           <% }); } else { %>
             <tr>
-              <td colspan="6" class="px-4 py-6 text-center text-gray-400">No SMTP configurations found.</td>
+              <td colspan="6" class="px-4 py-6 text-center text-gray-400"><%= __('phishing_smtp.list.no_records') %></td>
             </tr>
           <% } %>
         </tbody>
@@ -116,31 +120,176 @@
   </div>
 </div>
 
+<!-- SMTP Detail Modal -->
+<div id="smtpDetailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h3 class="text-lg font-semibold text-gray-800"><%= __('phishing_smtp.modal.title') %></h3>
+      <button id="closeSmtpModal" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <div class="px-6 py-5 grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
+      <div>
+        <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_sender_email') %></p>
+        <p id="modal-sender-email" class="font-medium text-gray-800 break-all">—</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_organization') %></p>
+        <p id="modal-organization" class="font-medium text-gray-800">—</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_host') %></p>
+        <p id="modal-host" class="font-medium text-gray-800 break-all">—</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_port') %></p>
+        <p id="modal-port" class="font-medium text-gray-800">—</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_account') %></p>
+        <p id="modal-account" class="font-medium text-gray-800 break-all">—</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-xs mb-0.5"><%= __('generic_label.status') %></p>
+        <p id="modal-status" class="font-medium">—</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_tls') %></p>
+        <p id="modal-tls" class="font-medium text-gray-800">—</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_ssl') %></p>
+        <p id="modal-ssl" class="font-medium text-gray-800">—</p>
+      </div>
+      <div class="col-span-2">
+        <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_details') %></p>
+        <p id="modal-details" class="font-medium text-gray-800">—</p>
+      </div>
+    </div>
+    <% if (allowEditAndTest) { %>
+    <!-- <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+      <button id="modalTestSmtpBtn"
+        class="px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span id="modalTestSmtpBtnLabel"><%= __('phishing_smtp.modal.btn_test_config') %></span>
+      </button>
+    </div> -->
+    <% } %>
+  </div>
+</div>
+
 <script>
+  var i18n = {
+    btnTesting:        "<%= __('phishing_smtp.list.btn_testing') %>",
+    btnTestConfig:     "<%= __('phishing_smtp.modal.btn_test_config') %>",
+    enabled:           "<%= __('phishing_smtp.modal.enabled') %>",
+    disabled:          "<%= __('phishing_smtp.modal.disabled') %>",
+    active:            "<%= __('generic_label.active') %>",
+    inactive:          "<%= __('generic_label.inactive') %>",
+    toastSuccess:      "<%= __('phishing_smtp.toast.connection_success') %>",
+    toastFailed:       "<%= __('phishing_smtp.toast.connection_failed') %>",
+    toastEndpointErr:  "<%= __('phishing_smtp.toast.endpoint_error') %>"
+  };
+
   $(document).on('click', '.test-smtp-btn', function() {
     var $btn = $(this);
     var smtpId = $btn.data('smtp-id');
     var originalText = $btn.text();
 
-    $btn.prop('disabled', true).text('Testing...');
+    $btn.prop('disabled', true).text(i18n.btnTesting);
 
     $.ajax({
-      url: '/phm/phishing-smtp/test/' + smtpId,
+      url: '/phm/phishing-smtp/test-connection/' + smtpId,
       type: 'GET',
       dataType: 'json',
       success: function(data) {
         if (data.success) {
-          showCustomToast('success', data.message || 'SMTP connection successful.');
+          showCustomToast('success', data.message || i18n.toastSuccess);
         } else {
-          showCustomToast('error', data.message || 'SMTP connection failed.');
+          showCustomToast('error', data.message || i18n.toastFailed);
         }
       },
       error: function() {
-        showCustomToast('error', 'Unable to reach the test endpoint. Please try again.');
+        showCustomToast('error', i18n.toastEndpointErr);
       },
       complete: function() {
         $btn.prop('disabled', false).text(originalText);
       }
     });
   });
+
+  // Row click → open detail modal
+  $(document).on('click', '.smtp-row', function(e) {
+    // Ignore clicks on interactive elements inside the row
+    if ($(e.target).closest('a, button').length) return;
+
+    var $row = $(this);
+    var isActive = $row.data('active');
+
+    $('#modal-sender-email').text($row.data('sender-email') || '—');
+    $('#modal-organization').text($row.data('organization') || '—');
+    $('#modal-host').text($row.data('host') || '—');
+    $('#modal-port').text($row.data('port') || '—');
+    $('#modal-account').text($row.data('account') || '—');
+    $('#modal-tls').text($row.data('use-tls') == 'true' ? i18n.enabled : i18n.disabled);
+    $('#modal-ssl').text($row.data('use-ssl') == 'true' ? i18n.enabled : i18n.disabled);
+    $('#modal-details').text($row.data('details') || '—');
+
+    if (isActive == 'true' || isActive === true) {
+      $('#modal-status').html('<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 inline-block"></span>' + i18n.active + '</span>');
+    } else {
+      $('#modal-status').html('<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500"><span class="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block"></span>' + i18n.inactive + '</span>');
+    }
+
+    $('#smtpDetailModal').data('smtp-id', $row.data('id')).removeClass('hidden');
+  });
+
+  // Close modal
+  $(document).on('click', '#closeSmtpModal', function() {
+    $('#smtpDetailModal').addClass('hidden');
+  });
+
+  // Close on backdrop click
+  $(document).on('click', '#smtpDetailModal', function(e) {
+    if ($(e.target).is('#smtpDetailModal')) {
+      $('#smtpDetailModal').addClass('hidden');
+    }
+  });
+
+  // Modal → Test Configuration button
+  $(document).on('click', '#modalTestSmtpBtn', function() {
+    var $btn = $(this);
+    var $label = $('#modalTestSmtpBtnLabel');
+    var smtpId = $('#smtpDetailModal').data('smtp-id');
+
+    $btn.prop('disabled', true);
+    $label.text(i18n.btnTesting);
+    // alert(smtpId);
+    $.ajax({
+      url: '/phm/phishing-smtp/test-connection/' + smtpId,
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        if (data.success) {
+          showCustomToast('success', data.message || i18n.toastSuccess);
+        } else {
+          showCustomToast('error', data.message || i18n.toastFailed);
+        }
+      },
+      error: function() {
+        showCustomToast('error', i18n.toastEndpointErr);
+      },
+      complete: function() {
+        $btn.prop('disabled', false);
+        $label.text(i18n.btnTestConfig);
+      }
+    });
+  });
+
+
 </script>

@@ -116,6 +116,7 @@
 
                     </div>
                 </div>
+
             </div>
             <div class="step hidden">
                 <h2 class="text-2xl font-bold mb-2" id="step-heading">
@@ -181,6 +182,20 @@
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
                     </div>
 
+                    <!-- Phishing SMTP (Email only) -->
+                    <div id="phishing-smtp-container" class="mb-6 hidden">
+                        <label class="block text-base font-semibold mb-2">
+                            <%= __("system_template.create.email_domain") %>
+                        </label>
+                        <div class="relative">
+                            <select name="phishing_smtp" id="phishing_smtp"
+                                class="appearance-none w-full border border-gray-300 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value=""><%= __("system_template.create.select_email_domain") %></option>
+                            </select>
+                        </div>
+                        <p id="phishing-smtp-error" class="text-red-500 text-sm mt-1 hidden"><%= __("system_template.create.failed_to_load_smtp_configurations") %></p>
+                    </div>
+
                     <!-- Sender Email -->
                     <div id="divSenderEmail">
                         <label class="block text-base font-semibold mb-2">
@@ -207,17 +222,17 @@
                         <input type="text" name="company_name" id="companyName"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
                     </div>
-                </div>
 
-
-                <!-- Company Domain -->
-                <div class="my-6">
+                                    <!-- Company Domain -->
+                <div>
                     <label class="block text-base font-semibold mb-2">
                         <%= __("system_template.create.labelDetails_level1_CompanyDomain") %>
                     </label>
                     <input type="text" name="company_domain" id="companyDomain"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
                 </div>
+                </div>
+
 
                 <!-- Email Message with CKEditor -->
                 <div>
@@ -609,6 +624,7 @@
             urlInvalid: "<%= __('system_template.create.urlInvalid') %>",
             fetchButtonText: "<%= __('system_template.create.fetchButtonText') %>",
             fetchingButtonText: "<%= __('system_template.create.fetchingButtonText') %>",
+            selectPhishingSmtp: "<%= __('system_template.create.selectPhishingSmtp') %>",
             sms_content_required: "<%= __('validation_messages.sms_content_required') %>",
             template_name_minlength: "<%= __('validation_messages.template_name_minlength') %>",
             file_name_minlength: "<%= __('validation_messages.file_name_minlength') %>",
@@ -718,6 +734,62 @@
             charCount.textContent = this.value.length;
         });
     }
+
+    // Phishing SMTP dropdown: show when Email is selected, populate via AJAX
+    (function () {
+        var smtpContainer = document.getElementById('phishing-smtp-container');
+        var smtpSelect = document.getElementById('phishing_smtp');
+        var smtpError = document.getElementById('phishing-smtp-error');
+        var smtpLoaded = false;
+
+        function loadPhishingSmtp() {
+            if (smtpLoaded) return;
+            console.log('[PhishingSMTP] Fetching from /phm/phishing-smtp/name');
+            fetch('/phm/phishing-smtp/name')
+                .then(function (res) {
+                    // console.log('[PhishingSMTP] HTTP status:', res.status);
+                    return res.json();
+                })
+                .then(function (data) {
+                    // console.log('[PhishingSMTP] Raw response:', data);
+                    smtpLoaded = true;
+                    var list = Array.isArray(data) ? data : (data.smtpList || data.data || data.message || []);
+                    // console.log('[PhishingSMTP] Parsed list:', list);
+                    smtpSelect.innerHTML = '<option value="">' + (window.i18n.validation_messages.selectPhishingSmtp || '-- Select Phishing SMTP --') + '</option>';
+                    list.forEach(function (item) {
+                        // console.log('[PhishingSMTP] Adding option:', item);
+                        var opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.dataset.senderEmail = item.sender_email || '';
+                        opt.textContent = '#' + item.organization_name + ' - ' + item.sender_email;
+                        smtpSelect.appendChild(opt);
+                    });
+
+                    smtpSelect.addEventListener('change', function () {
+                        var selected = this.options[this.selectedIndex];
+                        document.getElementById('sender_email').value = selected.dataset.senderEmail || '';
+                    });
+                })
+                .catch(function (err) {
+                    console.error('[PhishingSMTP] Fetch error:', err);
+                    smtpError.classList.remove('hidden');
+                });
+        }
+
+        function onPhishTypeChange() {
+            var selected = document.querySelector('input[name="phishType"]:checked');
+            if (selected && selected.value === 'email') {
+                smtpContainer.classList.remove('hidden');
+                loadPhishingSmtp();
+            } else {
+                smtpContainer.classList.add('hidden');
+            }
+        }
+
+        document.querySelectorAll('input[name="phishType"]').forEach(function (radio) {
+            radio.addEventListener('change', onPhishTypeChange);
+        });
+    })();
 
     // Insert placeholder into SMS textarea
     function insertSMSPlaceholder(placeholder) {

@@ -165,7 +165,7 @@ module.exports = {
             DETAIL: (smtpId) => `/phm/phishing-smtp/detail/${smtpId}`,
             UPDATE: (smtpId) => `/phm/phishing-smtp/edit/${smtpId}`,
             DELETE: (smtpId) => `/phm/phishing-smtp/delete/${smtpId}`,
-            TEST: (smtpId) => `/phm/phishing-smtp/test/${smtpId}`,
+            TEST: (smtpId) => `/phm/phishing-smtp/test-connection/${smtpId}`,
         },
 
     }

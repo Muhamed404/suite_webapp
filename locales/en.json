@@ -155,9 +155,8 @@
 		"sms_content_maxlength": "SMS message must not exceed 160 characters.",
 		"fill_required_fields_before_testing": "Please fill in all required fields before testing connection.",
 		"fix_validation_errors_before_testing": "Please fix all validation errors before testing connection.",
-		"smtp_test_connection_successful": "SMTP TEST: CONNECTION SUCCESSFUL.",
-		"smtp_test_connection_failed": "SMTP TEST: CONNECTION FAILED.",
-		"smtp_test_connection_issue": "SMTP TEST: ISSUE IN CONNECTION FAILURE.",
+		"smtp_test_connection_successful": "Connection Successful!",
+		"smtp_test_connection_failed": "Connection Failed.",
 		"enter_valid_format": "Please enter a valid format.",
 		"ensure_correct_smtp_port": "Ensure this is the correct SMTP port.",
 		"organization_name_required": "Organization name is required",
@@ -291,7 +290,7 @@
 			"campaignUSB": "USB",
 			"campaignSMS": "SMS",
 			"campaignWhatsapp": "Whatsapp",
-			"simulatorEmails": "menu.phishmagnus.simulatorEmails"
+			"simulatorEmails": "Simulator Emails"
 		},
 		"suite": {
 			"suiteManagement": "Suite Management",
@@ -308,7 +307,8 @@
 			"groups": "Groups",
 			"subscriptionHistory": "Subscription History",
 			"products": "Products",
-			"logout": "Logout"
+			"logout": "Logout",
+			"smtpNotifications": "SMTP Notifications"
 		}
 	},
 	"organization": {
@@ -564,7 +564,12 @@
 		"labelServiceAccount": "Service Account",
 		"labelPassword": "Password",
 		"btnTestConfiguration": "Test Configuration",
-		"btnSaveSettings": "Save Settings"
+		"btnSaveSettings": "Save Settings",
+		"labelSenderEmail": "Sender Email",
+		"labelDetails": "Detail",
+		"enableStartTLS": "Enable STARTTLS",
+		"enableSSL": "Enable SSL",
+		"enablePasswordEncryption": "Enable Password Encryption"
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "Secmagnus User Management",
@@ -671,7 +676,7 @@
 		"placeHolder_phishingFile": "Phishing File",
 		"placeHolder_sender": "Sender Email",
 		"placeHolder_company": "Company Name",
-		"placeHolder_companyDomain": "Company Domain",
+		"placeHolder_companyDomain": "Simulated Company Domain",
 		"homescreen": {
 			"labelTitleSystemTemplateManagement": "System Template Management",
 			"labelTitleOrganizationTemplateManagement": "Organization Template Management",
@@ -712,7 +717,7 @@
 			"labelDetails_level1_SenderEmail": "Email Sender",
 			"labelDetails_level1_SenderName": "Sender Name",
 			"labelDetails_level1_CompanyName": "Company Name",
-			"labelDetails_level1_CompanyDomain": "Company Domain",
+			"labelDetails_level1_CompanyDomain": "Simulated Company Domain",
 			"labelDetails_level1_Content": "Email Phishing Content",
 			"labelPhishingWebContentEditor": "Phishing Webpage Template Content",
 			"labelLandingPageContentEditor": "Landing Webpage Template Content",
@@ -747,13 +752,17 @@
 			"invalidUrlFormat": "Invalid URL format.",
 			"fetchButtonText": "Fetch",
 			"fetchingButtonText": "Fetching...",
+			"selectPhishingSmtp": "Select Email Domain",
 			"labelDetails_level2_title": "Setup File Attachment",
 			"whatsappShortMessageTitle": "Short Message",
 			"whatsappShortMessageDescription": "Send a simple SMS message.",
 			"whatsappAttachUrlTitle": "Attach URL",
 			"whatsappAttachUrlDescription": "Include a clickable link in SMS.",
 			"whatsappDownloadTemplateTitle": "Download Template",
-			"whatsappDownloadTemplateDescription": "Use a ready-made SMS template."
+			"whatsappDownloadTemplateDescription": "Use a ready-made SMS template.",
+			"email_domain": "Email Domain",
+			"select_email_domain": "Select Email Domain",
+			"failed_to_load_smtp_configurations": "Failed to load Email Domains."
 		}
 	},
 	"campaign": {
@@ -1335,7 +1344,7 @@
 		"senderEmail": "Sender Email",
 		"senderName": "Sender Name",
 		"companyName": "Company Name",
-		"companyDomain": "Company Domain",
+		"companyDomain": "Simulated Company Domain",
 		"phishPage": "Phishing Page",
 		"template_deleted_successfully": "Template deleted successfully"
 	},
@@ -1686,6 +1695,39 @@
 	"email": {
 		"create_campaign": {
 			"title": "email.create_campaign.title"
+		}
+	},
+	"phishing_smtp": {
+		"list": {
+			"title": "Simulator Emails",
+			"btn_add_new": "Add New Email",
+			"col_sender_email": "Sender Email",
+			"col_organization": "Organization",
+			"col_test_connection": "Test Connection",
+			"btn_test": "Test",
+			"btn_testing": "Testing...",
+			"confirm_delete": "Are you sure you want to delete this SMTP configuration?",
+			"no_records": "No SMTP configurations found.",
+			"default_org": "Default"
+		},
+		"modal": {
+			"title": "SMTP Configuration Details",
+			"label_sender_email": "Sender Email",
+			"label_organization": "Organization",
+			"label_host": "SMTP Host",
+			"label_port": "Port",
+			"label_account": "SMTP Account",
+			"label_tls": "TLS",
+			"label_ssl": "SSL",
+			"label_details": "Details",
+			"btn_test_config": "Test Configuration",
+			"enabled": "Enabled",
+			"disabled": "Disabled"
+		},
+		"toast": {
+			"connection_success": "SMTP connection successful.",
+			"connection_failed": "SMTP connection failed.",
+			"endpoint_error": "Unable to reach the test endpoint. Please try again."
 		}
 	}
 }

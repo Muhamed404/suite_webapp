@@ -6,10 +6,6 @@ const { disableTemplate } = require('../../controllers/template/disable-template
 const { viewTemplate } = require('../../controllers/template/view-template.js')
 const { viewTemplateApi } = require('../../controllers/template/view-template-api.js')
 
-// const { updateSystemTemplate } = require('../../controllers/system_template/updateSystemTemplateController')
-
-
-// const SystemTemplateController = require("../../controllers/system_template/systemTemplateController");
 const checkPermission = require("../../../utility/check-permission");
 const enums = require('../../../contants/enum');
 const { updateTemplateController } = require("../../controllers/template/upate-template-controller");
@@ -35,29 +31,6 @@ router.get("/view/:templateId", checkPermission(enums.ModuleNames.My_Template, [
 
 router.delete("/delete/:templateId", checkPermission(enums.ModuleNames.My_Template, [enums.Access_Types.RWD_O]),
     disableTemplate);
-
-
-
-
-// for disable the template
-
-
-
-// for editing the template
-// router.get("/edit/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), 
-// SystemTemplateController.renderEditFormTemplate);
-
-
-
-// router.get("/duplicate/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_O]), SystemTemplateController.renderDuplicateTemplate); // for making clonning of the system template
-// router.post("/duplicate/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_O]), SystemTemplateController.createDuplicateTemplate);
-
-// for template creation either secure magnus admins / organization admins
-// router.post("/update/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]),
-//     updateSystemTemplate);
-
-
-
 
 
 

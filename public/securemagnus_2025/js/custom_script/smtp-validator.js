@@ -193,24 +193,23 @@ function initSMTPFormValidator(config) {
       var $testBtn = $(this);
       var originalText = $testBtn.text();
       $testBtn.prop('disabled', true).text('Testing...');
+      var testUrl = '/settings/smtp/test-connection/' + config.orgId;
+        // ? '/phm/phishing-smtp/test/' + config.smtpId
+        // : '/settings/smtp/test-connection?organization=' + config.orgId;
 
-      var orgId = config.orgId;
       $.ajax({
-        url: '/settings/smtp/test-connection?organization=' + orgId,
+        url: testUrl,
         type: 'GET',
         dataType: 'json',
         success: function (response) {
-          // Check different response structures
-          if (response.message && response.message.message && response.message.message.Code == 200) {
-            showCustomToast('success', window.i18n?.validation_messages?.smtp_test_connection_successful || "SMTP TEST: CONNECTION SUCCESSFUL.");
-          } else if (response.message && response.message.alertType === 'success') {
-            showCustomToast('success', window.i18n?.validation_messages?.smtp_test_connection_successful || "SMTP TEST: CONNECTION SUCCESSFUL.");
+          if (response.success) {
+            showCustomToast('success', response.message || window.i18n?.validation_messages?.smtp_test_connection_successful || "SMTP TEST: CONNECTION SUCCESSFUL.");
           } else {
-            showCustomToast('error', window.i18n?.validation_messages?.smtp_test_connection_failed || "SMTP TEST: CONNECTION FAILED.");
+            showCustomToast('error', response.message || window.i18n?.validation_messages?.smtp_test_connection_failed || "SMTP TEST: CONNECTION FAILED.");
           }
         },
-        error: function (jqXHR, textStatus, errorThrown) {
-          showCustomToast('error', window.i18n?.validation_messages?.smtp_test_connection_issue || "SMTP TEST: ISSUE IN CONNECTION FAILURE.");
+        error: function () {
+          showCustomToast('error', window.i18n?.validation_messages?.smtp_test_connection_failed || "SMTP TEST: ISSUE IN CONNECTION FAILURE.");
         },
         complete: function() {
           // Re-enable test button

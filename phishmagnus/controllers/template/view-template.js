@@ -75,6 +75,7 @@ exports.viewTemplate = async (req, res) => {
 
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
+    tpl.phishing_smtp = tpl.phishing_smtp_id; // ensure this property exists for the view, even if null
     // if(!tpl.phish_option){
     //   if(tpl.phishcat_id === enums.phishingCategories.DataEntryBasedPhishing){
     //     tpl.phish_option = 'data_entry';

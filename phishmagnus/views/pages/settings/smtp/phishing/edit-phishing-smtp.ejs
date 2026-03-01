@@ -105,7 +105,7 @@
         <!-- Use TLS -->
         <div>
           <label class="block text-gray-700 font-medium mb-3">
-            Use TLS
+            <%= __("smtp.enableStartTLS") %>
           </label>
           <label class="inline-flex items-center cursor-pointer">
             <input type="hidden" name="use_tls" id="use_tls_input" value="<%= smtp.use_tls ? 'true' : 'false' %>" />
@@ -121,7 +121,8 @@
         <!-- Use SSL -->
         <div>
           <label class="block text-gray-700 font-medium mb-3">
-            Use SSL
+                        <%= __("smtp.enableSSL") %>
+
           </label>
           <label class="inline-flex items-center cursor-pointer">
             <input type="hidden" name="use_ssl" id="use_ssl_input" value="<%= smtp.use_ssl ? 'true' : 'false' %>" />
@@ -130,6 +131,23 @@
             <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
             <span class="ms-3 text-sm text-gray-500 peer-checked:text-teal-600" id="use_ssl_label">
               <%= smtp.use_ssl ? 'Enabled' : 'Disabled' %>
+            </span>
+          </label>
+        </div>
+
+        <!-- Encrypt Password -->
+        <div>
+          <label class="block text-gray-700 font-medium mb-3">
+                        <%= __("smtp.enablePasswordEncryption") %>
+
+          </label>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="hidden" name="encrypt_password" id="encrypt_password_input" value="<%= smtp.encrypt_password ? 'true' : 'false' %>" />
+            <input type="checkbox" id="encrypt_password" <%= smtp.encrypt_password ? 'checked' : '' %>
+              class="sr-only peer" />
+            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+            <span class="ms-3 text-sm text-gray-500 peer-checked:text-teal-600" id="encrypt_password_label">
+              <%= smtp.encrypt_password ? 'Enabled' : 'Disabled' %>
             </span>
           </label>
         </div>
@@ -172,7 +190,7 @@
       fix_validation_errors_before_testing: "<%- __('validation_messages.fix_validation_errors_before_testing') %>",
       smtp_test_connection_successful: "<%- __('validation_messages.smtp_test_connection_successful') %>",
       smtp_test_connection_failed: "<%- __('validation_messages.smtp_test_connection_failed') %>",
-      smtp_test_connection_issue: "<%- __('validation_messages.smtp_test_connection_issue') %>",
+      
       enter_valid_format: "<%- __('validation_messages.enter_valid_format') %>",
       ensure_correct_smtp_port: "<%- __('validation_messages.ensure_correct_smtp_port') %>",
       smtp_host_required: "<%- __('validation_messages.smtp_host_required') %>",
@@ -207,7 +225,7 @@
   });
 
   // TLS / SSL toggle labels + hidden input sync
-  ['use_tls', 'use_ssl'].forEach(function(id) {
+  ['use_tls', 'use_ssl', 'encrypt_password'].forEach(function(id) {
     var checkbox = document.getElementById(id);
     var label = document.getElementById(id + '_label');
     var hidden = document.getElementById(id + '_input');

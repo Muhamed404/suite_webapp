@@ -47,7 +47,8 @@ exports.createSMTP = async (req, res) => {
             sender_email: smtp.sender_email,
             use_tls: smtp.use_tls,
             use_ssl: smtp.use_ssl,
-            for_phishing_smtp: smtp.for_phishing_smtp
+            for_phishing_smtp: smtp.for_phishing_smtp,
+            encrypt_password: smtp.is_encrypted ? true : false
           });
         } else {
           logger.info(`NO SMTP DATA HAS FOUND`);
@@ -74,7 +75,7 @@ exports.createSMTP = async (req, res) => {
       });
   } else {
     logger.info(`Calling post method of create smtp`);
-    const { host, port, smtp_account, smtp_password, sender_email, use_tls, use_ssl } = req.body;
+    const { host, port, smtp_account, smtp_password, sender_email, use_tls, use_ssl, encrypt_password = true } = req.body;
     logger.info(`Incoming param body ${JSON.stringify(req.body, null, 2)}`);
     let orgId = Number(req.params.orgId);
     const smtpObj = {
@@ -86,6 +87,7 @@ exports.createSMTP = async (req, res) => {
       use_tls: use_tls === 'true',
       use_ssl: use_ssl === 'true',
       organization_id: orgId,
+      is_encrypted: encrypt_password === 'true'
     };
     const apiClient = getApiClient(req);
     const url = `/settings/smtp/` + orgId;

@@ -58,6 +58,8 @@ exports.createTemplate = async (req, res) => {
   // Build immutable payload from request body
   const payload = { ...req.body };
 
+  logger.info(`Create System Template: Initial payload from request body: ${JSON.stringify(payload, null, 2)}`);
+
   logger.info(`[Create System Template] Raw posted data: ${JSON.stringify(req.body, null, 2)}`);
 
   try {
@@ -151,6 +153,11 @@ exports.createTemplate = async (req, res) => {
       payload.phishing_content = payload.sms_content;
       delete payload.sms_content;
       logger.info('[Create System Template] Mapped sms_content to phishing_content for SMS phishType');
+    }else if(payload.phishType === enums.phishingType.Email){
+      
+      const rawSmtpId = req.body.phishing_smtp;
+      payload.phishing_smtp_id = rawSmtpId !== '' && rawSmtpId != null ? parseInt(rawSmtpId, 10) : null;
+      logger.info(`[Create System Template] Set phishing_smtp_id to ${payload.phishing_smtp_id} for Email phishType`);
     }
 
     payload.organizationId = req.user.organization_id;

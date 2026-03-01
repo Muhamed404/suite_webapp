@@ -73,6 +73,7 @@ exports.viewTemplate = async (req, res) => {
 
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
+    tpl.phishing_smtp = tpl.phishing_smtp_id;
     if(tpl.PhishingCampaignType && tpl.PhishingCampaignType.name === enums.phishingTypeByNames.SMS) {
       tpl.sms_content = tpl?.phishing_content || '';
     }

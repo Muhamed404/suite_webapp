@@ -42,36 +42,5 @@ router.post('/api/fetch-html', async (req, res) => {
 
 
 
-// router.get("/showTemplate/:orgId?", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]) ,viewTemplate);
-
-
-// display all templates by organization id is an optional value here.
-
-// for create template to display the webpage
-
-
-// for update template to display the webpage
-// router.post("/update/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), SystemTemplateController.update);
-
-// for disable the template
-// router.get("/delete/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), 
-// disableTemplate);
-
-
-// for editing the template
-// router.get("/edit/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), 
-// SystemTemplateController.renderEditFormTemplate);
-
-
-
-
-// for template creation either secure magnus admins / organization admins
-// router.post("/update/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), 
-// updateTemplateController);
-
-
-
-
-
 
 module.exports = router;

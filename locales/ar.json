@@ -170,7 +170,7 @@
 		"fix_validation_errors_before_testing": "يرجى إصلاح جميع أخطاء التحقق قبل اختبار الاتصال.",
 		"smtp_test_connection_successful": "اختبار SMTP: الاتصال ناجح.",
 		"smtp_test_connection_failed": "اختبار SMTP: فشل الاتصال.",
-		"smtp_test_connection_issue": "اختبار SMTP: مشكلة في فشل الاتصال.",
+		
 		"enter_valid_format": "يرجى إدخال تنسيق صالح.",
 		"ensure_correct_smtp_port": "تأكد من أن هذا هو منفذ SMTP الصحيح.",
 		"organization_name_required": "اسم المؤسسة مطلوب",
@@ -751,6 +751,7 @@
 			"invalidUrlFormat": "تنسيق الرابط غير صحيح.",
 			"fetchButtonText": "جلب",
 			"fetchingButtonText": "جاري الجلب...",
+			"selectPhishingSmtp": "-- اختر بريد SMTP للتصيد --",
 			"labelImportHtmlUrl": "استيراد صفحة الوصول من رابط خارجي",
 			"labelLandingPageContentEditor": "محتوى قالب صفحة الوصول",
 			"sms_content": "محتوى قالب الرسائل النصية",
@@ -2003,5 +2004,38 @@
 			"passwords_must_match": "يجب أن تتطابق كلمات المرور"
 		}
 	},
-	"Submit": "Submit"
+	"Submit": "Submit",
+	"phishing_smtp": {
+		"list": {
+			"title": "بريد المحاكاة",
+			"btn_add_new": "إضافة بريد جديد",
+			"col_sender_email": "بريد المرسل",
+			"col_organization": "المنظمة",
+			"col_test_connection": "اختبار الاتصال",
+			"btn_test": "اختبار",
+			"btn_testing": "جارٍ الاختبار...",
+			"confirm_delete": "هل أنت متأكد أنك تريد حذف إعداد SMTP هذا؟",
+			"no_records": "لم يتم العثور على إعدادات SMTP.",
+			"default_org": "افتراضي"
+		},
+		"modal": {
+			"title": "تفاصيل إعداد SMTP",
+			"label_sender_email": "بريد المرسل",
+			"label_organization": "المنظمة",
+			"label_host": "مضيف SMTP",
+			"label_port": "المنفذ",
+			"label_account": "حساب SMTP",
+			"label_tls": "TLS",
+			"label_ssl": "SSL",
+			"label_details": "التفاصيل",
+			"btn_test_config": "اختبار الإعداد",
+			"enabled": "مفعّل",
+			"disabled": "معطّل"
+		},
+		"toast": {
+			"connection_success": "تم الاتصال بـ SMTP بنجاح.",
+			"connection_failed": "فشل الاتصال بـ SMTP.",
+			"endpoint_error": "تعذّر الوصول إلى نقطة الاختبار. يرجى المحاولة مرة أخرى."
+		}
+	}
 }
