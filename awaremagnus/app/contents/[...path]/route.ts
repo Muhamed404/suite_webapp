@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SERVICE_AWM_URL = process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://localhost:3002";
+const SERVICE_AWM_URL = process.env.NEXT_PUBLIC_SERVICE_AWM_URL || "http://localhost:3002";
 
 async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
@@ -11,7 +11,14 @@ async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ pa
 
     const endpoint = path.join("/");
     const cleanBase = SERVICE_AWM_URL.replace(/\/+$/, "");
-    const targetUrl = new URL(`${cleanBase}/contents/${endpoint}`);
+
+    let targetUrl: URL;
+    try {
+        targetUrl = new URL(`${cleanBase}/contents/${endpoint}`);
+    } catch (e) {
+        console.error("Invalid Contents URL construction:", { cleanBase, endpoint, SERVICE_AWM_URL });
+        return NextResponse.json({ error: "Invalid configuration: AWM Backend URL is not absolute" }, { status: 500 });
+    }
 
     // Build headers to forward — importantly include Range for video streaming and Auth for protected assets
     const forwardHeaders: Record<string, string> = {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SERVICE_SUITE_URL = process.env.NEXT_PUBLIC_SERVICE_SUITE_URL ?? "http://localhost:3000";
+const SERVICE_SUITE_URL = process.env.NEXT_PUBLIC_SERVICE_SUITE_URL || "http://localhost:3000";
 
 async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
@@ -11,7 +11,14 @@ async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ pa
 
     const endpoint = path.join("/");
     const cleanBase = SERVICE_SUITE_URL.replace(/\/+$/, "");
-    const targetUrl = new URL(`${cleanBase}/${endpoint}`);
+
+    let targetUrl: URL;
+    try {
+        targetUrl = new URL(`${cleanBase}/${endpoint}`);
+    } catch (e) {
+        console.error("Invalid URL construction:", { cleanBase, endpoint, SERVICE_SUITE_URL });
+        return NextResponse.json({ error: "Invalid configuration: Backend URL is not absolute" }, { status: 500 });
+    }
 
     req.nextUrl.searchParams.forEach((value, key) => {
         targetUrl.searchParams.append(key, value);

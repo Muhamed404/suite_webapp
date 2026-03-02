@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SERVICE_AWM_URL = process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://localhost:3002";
+const SERVICE_AWM_URL = process.env.NEXT_PUBLIC_SERVICE_AWM_URL || "http://localhost:3002";
 
 async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
@@ -12,9 +12,16 @@ async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ pa
 
     const endpoint = path.join("/");
     const cleanBase = SERVICE_AWM_URL.replace(/\/+$/, "");
+
     // We explicitly add /api/awm because this route handler handles /api/awm requests
     // and we want to forward them to the backend's /api/awm structure.
-    const targetUrl = new URL(`${cleanBase}/api/awm/${endpoint}`);
+    let targetUrl: URL;
+    try {
+        targetUrl = new URL(`${cleanBase}/api/awm/${endpoint}`);
+    } catch (e) {
+        console.error("Invalid AWM URL construction:", { cleanBase, endpoint, SERVICE_AWM_URL });
+        return NextResponse.json({ error: "Invalid AWM configuration: Backend URL is not absolute" }, { status: 500 });
+    }
 
     // Append query parameters
     req.nextUrl.searchParams.forEach((value, key) => {
