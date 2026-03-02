@@ -135,6 +135,77 @@ function showCustomToast(alertType, alertMessage = null) {
   }, 3000);
 }
 
+/**
+ * Displays a modern confirmation modal.
+ * @param {string} message - Body text shown in the modal.
+ * @param {Function} onConfirm - Called when the user clicks Confirm.
+ * @param {Function} [onCancel] - Optional callback when the user cancels.
+ */
+function showCustomConfirm(message, onConfirm, onCancel) {
+  const backdrop = document.createElement('div');
+  backdrop.className =
+    'fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in';
+
+  backdrop.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 flex flex-col gap-6">
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+          <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+        </div>
+        <p class="text-gray-800 font-medium text-base leading-relaxed pt-2">${message}</p>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button id="_confirmModalCancel" type="button"
+          class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition">
+          Cancel
+        </button>
+        <button id="_confirmModalConfirm" type="button"
+          class="px-6 py-2.5 rounded-lg bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition">
+          Confirm
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+
+  function close() {
+    backdrop.classList.add('opacity-0', 'transition-opacity', 'duration-200');
+    setTimeout(() => backdrop.remove(), 200);
+  }
+
+  backdrop.querySelector('#_confirmModalCancel').addEventListener('click', function () {
+    close();
+    if (typeof onCancel === 'function') onCancel();
+  });
+
+  backdrop.querySelector('#_confirmModalConfirm').addEventListener('click', function () {
+    close();
+    onConfirm();
+  });
+
+  // Click outside modal to cancel
+  backdrop.addEventListener('click', function (e) {
+    if (e.target === backdrop) {
+      close();
+      if (typeof onCancel === 'function') onCancel();
+    }
+  });
+
+  // Escape key to cancel
+  function onKeyDown(e) {
+    if (e.key === 'Escape') {
+      document.removeEventListener('keydown', onKeyDown);
+      close();
+      if (typeof onCancel === 'function') onCancel();
+    }
+  }
+  document.addEventListener('keydown', onKeyDown);
+}
+
 // Inject fade-in animation CSS dynamically
 (function addFadeInStyle() {
   const style = document.createElement('style');

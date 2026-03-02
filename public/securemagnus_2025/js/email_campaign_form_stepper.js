@@ -1337,37 +1337,14 @@ class EmailCampaignStepper {
   submitForm() {
     if (!this.form || this.isSubmitting) return;
 
-    // Show confirmation alert
-    const confirmSubmit = confirm(
-      window.i18n?.messages?.confirmSubmit || 
-      'Are you sure you want to submit this campaign? This action cannot be undone.'
-    );
+    const message = window.i18n?.messages?.confirmSubmit ||
+      'Are you sure you want to submit this campaign? This action cannot be undone.';
 
-    if (!confirmSubmit) {
-      console.log('Form submission cancelled by user');
-      return;
-    }
-
-    this.isSubmitting = true;
-    this.updateButtons();
-
-    console.log('Submitting form:', {
-      action: this.form.action,
-      method: this.form.method
+    showCustomConfirm(message, () => {
+      this.isSubmitting = true;
+      this.updateButtons();
+      this.form.submit();
     });
-
-    // Debug: Log all form fields
-    const allInputs = this.form.querySelectorAll('input, select, textarea');
-    console.log('Form fields count:', allInputs.length);
-    allInputs.forEach(input => {
-      if (input.type !== 'hidden') {
-        console.log(`Field: ${input.name} = ${input.value}`);
-      }
-    });
-
-    // Traditional form submission - no fetch()
-    // alert('Form is being submitted to: ' + this.form.action);
-    this.form.submit();
   }
 }
 
