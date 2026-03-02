@@ -39,7 +39,7 @@ function initSMTPFormValidator(config) {
           minlength: 3,
           maxlength: 255,
           // Validate hostname format (domain or IP)
-          pattern: /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$|^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/
+          
         },
         port: {
           required: true,

@@ -569,7 +569,8 @@
 		"labelDetails": "Detail",
 		"enableStartTLS": "Enable STARTTLS",
 		"enableSSL": "Enable SSL",
-		"enablePasswordEncryption": "Enable Password Encryption"
+		"enableSMTPEncryption": "Enable Encryption",
+		"enablePasswordEncryption": "smtp.enablePasswordEncryption"
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "Secmagnus User Management",

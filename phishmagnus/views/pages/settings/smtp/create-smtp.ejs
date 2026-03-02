@@ -125,7 +125,7 @@
         <!-- Encrypt Password -->
         <div>
           <label class="block text-gray-700 font-medium mb-3">
-            <%= __("smtp.enablePasswordEncryption") %>
+            <%= __("smtp.enableSMTPEncryption") %>
           </label>
           <label class="inline-flex items-center cursor-pointer">
             <input type="hidden" name="encrypt_password" id="encrypt_password_input" value="<%= typeof encrypt_password !== 'undefined' ? (encrypt_password ? 'true' : 'false') : 'true' %>" />

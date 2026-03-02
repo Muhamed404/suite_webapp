@@ -145,7 +145,7 @@
         <!-- Encrypt Password -->
         <div>
           <label class="block text-gray-700 font-medium mb-3">
-            <%= __("smtp.enablePasswordEncryption") %>
+            <%= __("smtp.enableSMTPEncryption") %>
             
           </label>
           <label class="inline-flex items-center cursor-pointer">
@@ -226,8 +226,8 @@
     hasExistingData: '<%= typeof host !== "undefined" && host ? "true" : "false" %>' === 'true'
   });
 
-  // TLS / SSL / Encrypt Password toggle labels + hidden input sync
-  ['use_tls', 'use_ssl', 'encrypt_password'].forEach(function(id) {
+  // TLS / SSL toggle labels + hidden input sync
+  ['use_tls', 'use_ssl'].forEach(function(id) {
     var checkbox = document.getElementById(id);
     var label = document.getElementById(id + '_label');
     var hidden = document.getElementById(id + '_input');
@@ -236,6 +236,17 @@
       label.textContent = this.checked ? 'Enabled' : 'Disabled';
     });
   });
+
+  // Encrypt Password toggle
+  (function() {
+    var checkbox = document.getElementById('encrypt_password');
+    var label    = document.getElementById('encrypt_password_label');
+    var hidden   = document.getElementById('encrypt_password_input');
+    checkbox.addEventListener('change', function() {
+      hidden.value = this.checked ? 'true' : 'false';
+      label.textContent = this.checked ? 'Enabled' : 'Disabled';
+    });
+  })();
 
   // Details character counter
   var detailsEl = document.getElementById('details');

@@ -87,7 +87,8 @@ exports.createSMTP = async (req, res) => {
       use_tls: use_tls === 'true',
       use_ssl: use_ssl === 'true',
       organization_id: orgId,
-      is_encrypted: encrypt_password === 'true'
+      is_encrypted: encrypt_password === 'true',
+      is_active: true
     };
     const apiClient = getApiClient(req);
     const url = `/settings/smtp/` + orgId;
