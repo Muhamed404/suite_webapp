@@ -130,6 +130,10 @@ LOGS_DIR=${LOGS_DIR:-/opt/secure-magnus/logs}
 LOGS_FILENAME=${LOGS_FILENAME:-suite_webapp}
 
 BACKEND_SUITE_PUBLIC_KEY_PATH=${BACKEND_SUITE_PUBLIC_KEY_PATH:-/opt/secure-magnus/secure_magnus_workspace/keys/public.pem}
+
+AWAREMAGNUS_DASHBOARD_URL=${AWAREMAGNUS_DASHBOARD_URL:-https://dev-machine.securemagnus.com/awm/}
+
+
 EOF
 
 # Set proper permissions for .env file (readable only by owner)
