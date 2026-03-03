@@ -868,6 +868,7 @@
 		"usb": {
 			"totalUSB": "Total USB's",
 			"envVariables": "USB Env Variables",
+			"envVariables_info": "The Security Administrator must configure a dedicated system environment variable on all corporate endpoints. This variable shall store the employee's official corporate email address as its value. The USB security application will retrieve this value from the operating system's environment variables to accurately associate device activity with the corresponding user account, ensuring proper identification, logging, monitoring, and audit traceability in accordance with the organization's cybersecurity controls and compliance requirements.",
 			"fileName": "USB File Name"
 		},
 		"report": {

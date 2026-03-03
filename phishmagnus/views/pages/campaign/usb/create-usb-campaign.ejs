@@ -160,8 +160,18 @@
                 <label class="block text-gray-700 font-medium mb-3">
                   <%= __('usb_campaign.usb.envVariables') %><span class="text-red-500">*</span>
                 </label>
+
                 <input type="text" id="envVariable" name="envVariable"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+
+                <!-- Info banner -->
+                <div class="flex items-start gap-2 mt-3 p-3 rounded-lg bg-blue-50 border border-blue-100 text-blue-700">
+                  <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-4m0-4h.01"/>
+                  </svg>
+                  <p class="text-xs leading-relaxed"><%= __('usb_campaign.usb.envVariables_info') %></p>
+                </div>
               </div>
             </div>
 
