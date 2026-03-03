@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SERVICE_SUITE_URL = process.env.NEXT_PUBLIC_SERVICE_SUITE_URL!;
+const SERVICE_SUITE_URL = process.env.NEXT_PUBLIC_SERVICE_SUITE_URL || "http://localhost:3000";
 
 async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
@@ -36,6 +36,9 @@ async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ pa
         headers.set("cookie", cookieHeader);
     }
 
+    // Log the proxy attempt
+    console.log(`[Suite Proxy] ${req.method} ${targetUrl.toString()}`);
+
     try {
         const hasBody = !['GET', 'HEAD'].includes(req.method);
         const body = hasBody ? req.body : undefined;
@@ -47,6 +50,19 @@ async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ pa
             // @ts-ignore
             duplex: hasBody ? 'half' : undefined,
         });
+
+        // Log the response status from the backend
+        if (!upstreamResponse.ok) {
+            try {
+                const errorClone = upstreamResponse.clone();
+                const errorData = await errorClone.text();
+                console.error(`[Suite Proxy Backend Error] Status: ${upstreamResponse.status} Body: ${errorData.slice(0, 500)}`);
+            } catch (e) {
+                console.error(`[Suite Proxy Backend Error] Status: ${upstreamResponse.status} (Could not read body)`);
+            }
+        } else {
+            console.log(`[Suite Proxy] Success: ${upstreamResponse.status} for ${targetUrl.toString()}`);
+        }
 
         const responseHeaders = new Headers(upstreamResponse.headers);
         responseHeaders.delete('server');
@@ -61,8 +77,13 @@ async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ pa
         });
 
     } catch (error: any) {
-        console.error("Suite Proxy error:", error);
-        return NextResponse.json({ error: "Service unavailable" }, { status: 502 });
+        // Log a concise error message instead of the full object
+        console.error(`[Suite Proxy Network Error] ${req.method} ${targetUrl.toString()}: ${error.message || error}`);
+        return NextResponse.json({
+            error: "Service unavailable",
+            details: error.message,
+            target: targetUrl.toString()
+        }, { status: 502 });
     }
 }
 

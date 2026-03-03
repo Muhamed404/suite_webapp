@@ -6,10 +6,6 @@ export function middleware(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") || "unknown";
   const userAgent = request.headers.get("user-agent") || "unknown";
 
-  console.log(
-    `[${new Date().toISOString()}] ${method} ${nextUrl.pathname}${nextUrl.search} - IP: ${ip} - UA: ${userAgent}`
-  );
-
   return NextResponse.next();
 }
 
