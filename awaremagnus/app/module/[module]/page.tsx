@@ -118,22 +118,33 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     }
 
     // Add non-aggregated contents (Interactive content, Videos, Documents, etc.)
+    // Group gallery items so posters/brochures/documents/screen‑savers appear as one card.
     if (data.non_aggregated_contents) {
+      const GALLERY_TYPES = ['Posters', 'Brochures', 'Documents', 'Screen Savers', 'Screen savers'];
+      const galleryGroups = new Map<number, any[]>();
+
       data.non_aggregated_contents.forEach((content: any) => {
-        // prefer status from report if available
+        const isGallery = GALLERY_TYPES.some(
+          (gt) => gt.toLowerCase() === (content.content_type ?? '').toLowerCase()
+        );
+        if (isGallery && content.content_type_id != null) {
+          if (!galleryGroups.has(content.content_type_id)) {
+            galleryGroups.set(content.content_type_id, []);
+          }
+          galleryGroups.get(content.content_type_id)!.push(content);
+          return; // will be pushed as an aggregated card below
+        }
+
+        // process a regular non-gallery item
         const reported = statusMap.get(content.id);
         let statusValue: string;
         if (reported) {
-          // use the raw status string from report (lowercased)
           statusValue = reported.statusName;
         } else if (content.user_completion_status) {
-          // use user_completion_status if available
           statusValue = content.user_completion_status.toLowerCase();
         } else if (content.status && typeof content.status === 'string') {
-          // status may occasionally be non-string (e.g. numeric codes) so guard before calling toLowerCase
           statusValue = content.status.toLowerCase();
         } else if (content.status != null) {
-          // convert anything else gracefully
           statusValue = String(content.status).toLowerCase();
         } else {
           statusValue = 'pending';
@@ -142,7 +153,6 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         if (statusValue === 'pending') {
           statusValue = 'in progress';
         }
-        // format label for display (capitalize words, replace underscores)
         const statusLabel = statusValue.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 
         transformedItems.push({
@@ -160,6 +170,59 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
           languages: content.language_name ? [content.language_name.toLowerCase() === 'arabic' ? 'ar' : 'en'] : ["en"],
           type: content.content_type,
           content_type_id: content.content_type_id
+        });
+      });
+
+      // push a single card for each gallery type collected above
+      galleryGroups.forEach((items, ctypeId) => {
+        const first = items[0];
+        const contentTypeName: string = first.content_type ?? 'Documents';
+        const count = items.length;
+
+        // Determine aggregated status: completed if all completed, else in progress
+        let aggStatus = 'in progress';
+        const allCompleted = items.every((c: any) => {
+          const rep = statusMap.get(c.id ?? c.content_id);
+          const sv = rep?.statusName ?? c.user_completion_status ?? c.status ?? '';
+          return String(sv).toLowerCase() === 'completed';
+        });
+        if (allCompleted) aggStatus = 'completed';
+        const aggLabel = aggStatus.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+
+        // Latest date across all items in the group
+        const latestDate = items
+          .map((c: any) => c.created_date)
+          .filter(Boolean)
+          .sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime())[0];
+
+        // Collect unique language codes
+        const langs = Array.from(
+          new Set(
+            items.map((c: any) =>
+              c.language_name ? (c.language_name.toLowerCase() === 'arabic' ? 'ar' : 'en') : 'en'
+            )
+          )
+        );
+
+        transformedItems.push({
+          id: `agg_non_${ctypeId}`,
+          title: contentTypeName,
+          status: aggStatus,
+          statusLabel: aggLabel,
+          date: latestDate
+            ? new Date(latestDate).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
+            : "—",
+          chapters: `${count} ${contentTypeName}`,
+          lessons: `${count} item${count !== 1 ? 's' : ''}`,
+          languages: langs,
+          type: contentTypeName,
+          content_type_id: ctypeId,
+          isAggregated: true,
+          aggregatedData: { total_count: count, content_type: contentTypeName, content_type_id: ctypeId },
         });
       });
     }
@@ -809,9 +872,13 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                     }
                                     router.push(`/module/${module}/video-training?${videoParams.toString()}`);
                                   } else {
-                                    const contentTypes = ['Posters', 'Brochures', 'Documents', 'Screen savers'];
-                                    if (contentTypes.includes(item.title)) {
-                                      router.push(`/module/${module}/content/${item.title.toLowerCase().replace(/\s+/g, '-')}`);
+                                    const contentTypes = ['Posters', 'Brochures', 'Documents', 'Screen Savers', 'Screen savers'];
+                                    if (contentTypes.some(ct => ct.toLowerCase() === item.title?.toLowerCase())) {
+                                      const typeSlug = item.title.toLowerCase().replace(/\s+/g, '-');
+                                      const ctParams = new URLSearchParams();
+                                      if (moduleId) ctParams.set('mod_id', String(moduleId));
+                                      if (item.content_type_id != null) ctParams.set('contype_id', String(item.content_type_id));
+                                      router.push(`/module/${module}/content/${typeSlug}?${ctParams.toString()}`);
                                     } else {
                                       // Handle other types
                                     }
