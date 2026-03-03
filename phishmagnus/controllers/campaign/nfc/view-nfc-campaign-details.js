@@ -60,6 +60,7 @@ exports.viewNFCCampaignDetails = async (req, res) => {
         ...device,
         download_url: ApplicationConstants.BACKEND_TVBS_URL + ApplicationConstants.TVB_Main_Routes.NFC +`?`+ ApplicationConstants.TVB_Query_Params.NFC_Device_Code + `=${device.nfc_code}&` + ApplicationConstants.TVB_Query_Params.Campaign_Id + `=${campaignId}`
       }));
+      nfcDevices.forEach(device => logger.info(`NFC Device download_url: ${device.download_url}`));
     }
 
     logger.info('NFC Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));

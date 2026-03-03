@@ -367,8 +367,8 @@
         // alert('Copy URL button clicked');
         const url = $(this).data('url');
         navigator.clipboard.writeText(url)
-            .then(() => alert('URL copied!'))
-            .catch(() => alert('Failed to copy URL'));
+            .then(() => showCustomToast('success', 'URL copied!'))
+            .catch(() => showCustomToast('error', 'Failed to copy URL'));
     });
 
     window.localizedLabels = {
