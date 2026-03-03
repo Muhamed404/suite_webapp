@@ -108,7 +108,8 @@ export function SurveyStatsPage() {
     const { dir } = useI18n();
     const isRtl = dir === "rtl";
     const searchParams = useSearchParams();
-    const surveyId = Number(searchParams.get("id") || 0);
+    // useSearchParams can return null during initial render in some cases
+    const surveyId = Number(searchParams?.get("id") ?? 0);
 
     // Fetch Data
     const { data: survey, isLoading: surveyLoading } = useSurvey(surveyId, !!surveyId);
