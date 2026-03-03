@@ -72,6 +72,8 @@ export function CampaignContentDetailPage({
           contentTypeId={contentTypeId}
           libraryType={libraryType}
           moduleId={moduleId}
+          breadcrumbContext="campaign"
+          campaignId={campaignId}
         />
       );
     }
@@ -82,6 +84,8 @@ export function CampaignContentDetailPage({
           contentTypeId={contentTypeId}
           libraryType={libraryType}
           moduleId={moduleId}
+          breadcrumbContext="campaign"
+          campaignId={campaignId}
         />
       );
     }
@@ -92,6 +96,8 @@ export function CampaignContentDetailPage({
           contentTypeId={contentTypeId}
           libraryType={libraryType}
           moduleId={moduleId}
+          breadcrumbContext="campaign"
+          campaignId={campaignId}
         />
       );
     }
@@ -102,6 +108,8 @@ export function CampaignContentDetailPage({
           contentTypeId={contentTypeId}
           libraryType={libraryType}
           moduleId={moduleId}
+          breadcrumbContext="campaign"
+          campaignId={campaignId}
         />
       );
     }
@@ -112,6 +120,8 @@ export function CampaignContentDetailPage({
         contentTypeId={contentTypeId}
         libraryType={libraryType}
         moduleId={moduleId}
+        breadcrumbContext="campaign"
+        campaignId={campaignId}
       />
     );
   };

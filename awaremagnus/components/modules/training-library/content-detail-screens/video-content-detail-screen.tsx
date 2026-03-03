@@ -60,6 +60,8 @@ interface VideoContentDetailScreenProps {
   contentTypeId: number;
   contentId: number;
   libraryType: LibraryType;
+  breadcrumbContext?: "training-library" | "campaign";
+  campaignId?: number;
 }
 
 export function VideoContentDetailScreen({
@@ -67,14 +69,19 @@ export function VideoContentDetailScreen({
   contentTypeId,
   contentId,
   libraryType,
+  breadcrumbContext = "training-library",
+  campaignId,
 }: VideoContentDetailScreenProps) {
   const t = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
-  const basePath = `/dashboard/training-library/${libraryType}`;
-  const libraryLabel = libraryType === "system" ? "System Library" : "My Library";
-  const listHref = `${basePath}/${moduleId}/content/${contentTypeId}`;
+  const basePath = breadcrumbContext === "campaign" 
+    ? `/dashboard/campaign-assignments/${campaignId}` 
+    : `/dashboard/training-library/${libraryType}`;
+  const listHref = breadcrumbContext === "campaign"
+    ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
+    : `${basePath}/${moduleId}/content/${contentTypeId}`;
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
@@ -127,19 +134,39 @@ export function VideoContentDetailScreen({
                 isRtl && "flex-row-reverse"
               )}
             >
-              <Link className="hover:text-gray-700 transition" href={basePath}>
-                Awareness Library
-              </Link>
-              <span className="text-gray-400">›</span>
-              <Link className="hover:text-gray-700 transition" href={basePath}>
-                {libraryLabel}
-              </Link>
-              <span className="text-gray-400">›</span>
-              <Link className="hover:text-gray-700 transition" href={`${basePath}/${moduleId}`}>
-                {moduleTitle}
-              </Link>
-              <span className="text-gray-400">›</span>
-              <span className="font-semibold text-gray-900">{typeLabel}</span>
+              {breadcrumbContext === "campaign" ? (
+                <>
+                  <Link className="hover:text-gray-700 transition" href="/dashboard/campaign-assignments">
+                    {t("moduleDetails.breadcrumbAwarenessCampaign")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <Link className="hover:text-gray-700 transition" href={basePath}>
+                    {t("moduleDetails.breadcrumbCampaign")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <Link className="hover:text-gray-700 transition" href={`${basePath}/modules/${moduleId}`}>
+                    {moduleTitle}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">{typeLabel}</span>
+                </>
+              ) : (
+                <>
+                  <Link className="hover:text-gray-700 transition" href={basePath}>
+                    {t("moduleDetails.breadcrumbTrainingLibrary")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <Link className="hover:text-gray-700 transition" href={basePath}>
+                    {libraryType === "system" ? t("moduleDetails.coreModules") : t("moduleDetails.breadcrumbMyLibrary")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <Link className="hover:text-gray-700 transition" href={`${basePath}/${moduleId}`}>
+                    {moduleTitle}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">{typeLabel}</span>
+                </>
+              )}
             </nav>
 
             <div className="flex flex-col px-3 gap-2">

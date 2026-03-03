@@ -17,6 +17,7 @@ import { isOrgUser } from "@/utils/roles";
 import { useQuizzesByContent, useModule } from "@/hooks/useQuiz";
 import { suiteAwmService } from "@/services/suiteAwmService";
 import { quizService } from "@/services/quizService";
+import { breadcrumbLinkClassName } from "@/components/modules/training-library/shared-styles";
 
 export default function QuizzesPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -315,14 +316,44 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
               <Button isIconOnly variant="light" size="sm" onClick={() => router.back()} className="-mt-1">
                 <ArrowLeft className="w-4 h-4" />
               </Button>
-              <nav className="flex items-center text-xs text-gray-500 mb-2 gap-1.5">
-                <a href="#" className="hover:text-gray-700 transition">{campaignRes?.data?.name || 'Campaign'}</a>
-                <span className="text-gray-400">›</span>
-                <a href="#" className="hover:text-gray-700 transition">{moduleName}</a>
-                <span className="text-gray-400">›</span>
-                <a href="#" className="hover:text-gray-700 transition">{contentRes?.data?.title || 'Content'}</a>
-                <span className="text-gray-400">›</span>
-                <span className="font-semibold text-gray-900">Quizzes</span>
+              <nav className={clsx("flex items-center text-xs text-gray-500 mb-2 gap-1.5 overflow-x-auto", isRtl && "flex-row-reverse")}>
+                {campaignId ? (
+                  <>
+                    <Link href="/dashboard/campaign-assignments" className={breadcrumbLinkClassName}>
+                      {t("moduleDetails.breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <Link href={`/dashboard/campaign-assignments/${campaignId}`} className={breadcrumbLinkClassName}>
+                      {campaignRes?.data?.name || 'Campaign'}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <Link href={`/dashboard/campaign-assignments/${campaignId}/modules/${module}`} className={breadcrumbLinkClassName}>
+                      {moduleName}
+                    </Link>
+                    {contentId ? (
+                      <>
+                        <span className="text-gray-400">›</span>
+                        <Link href={`/dashboard/campaign-assignments/${campaignId}/modules/${module}/content/${contentId}`} className={breadcrumbLinkClassName}>
+                          {contentRes?.data?.title || 'Content'}
+                        </Link>
+                      </>
+                    ) : null}
+                    <span className="text-gray-400">›</span>
+                    <span className="font-semibold text-gray-900">{t("moduleDetails.quizzes") ?? "Quizzes"}</span>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/dashboard/training-library/my" className={breadcrumbLinkClassName}>
+                      {t("moduleDetails.breadcrumbTrainingLibrary") ?? "Awareness Library"}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <Link href={`/dashboard/training-library/my/${module}`} className={breadcrumbLinkClassName}>
+                      {moduleName}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <span className="font-semibold text-gray-900">{t("moduleDetails.quizzes") ?? "Quizzes"}</span>
+                  </>
+                )}
               </nav>
             </div>
 
