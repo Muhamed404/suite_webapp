@@ -123,8 +123,6 @@ export const quizService = {
   }) => {
     const p = { ...params };
 
-    if (p.mod_id != null && p.module_id == null) p.module_id = p.mod_id;
-
     return request<ModuleContent[]>(() =>
       awmClient.get<AWMResponseBody>(`${API_BASE}/module-content`, { params: p })
     );

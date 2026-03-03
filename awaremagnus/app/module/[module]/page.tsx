@@ -40,7 +40,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   
   // Get module ID from slug
   const { data: modulesRes } = useModules({ filter: module });
-  const moduleId = useMemo(() => {
+  const moduleId = useMemo<number | null>(() => {
     if (modulesRes?.success && modulesRes.data) {
       const found = modulesRes.data.find(m => {
         const codeMatch = m.code?.toLowerCase() === module.toLowerCase();
@@ -48,9 +48,9 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         const translationMatch = m.translations?.some(t => t.name.toLowerCase() === moduleName.toLowerCase());
         return codeMatch || titleMatch || translationMatch;
       });
-      return found?.id || 1;
+      return found?.id ?? 1;
     }
-    return 1;
+    return null; // Not yet resolved — prevents premature API calls with wrong default ID
   }, [modulesRes, module, moduleName]);
 
   const roleId = user?.role_id;
@@ -79,18 +79,18 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   // Fetch content with progress data
   const { data: contentsWithProgressRes, isLoading } = useContentsWithProgress(
-    moduleId,
+    moduleId ?? 1,
     campaignId,
     {
-      enabled: !!campaignId
+      enabled: !!moduleId && !!campaignId
     }
   );
 
   // Get module basic info
-  const { data: moduleRes } = useModule(moduleId, true);
+  const { data: moduleRes } = useModule(moduleId ?? 1, !!moduleId);
 
   // Get module report with progress_percentage
-  const { data: moduleReportRes } = useModuleReport(moduleId, !!moduleId);
+  const { data: moduleReportRes } = useModuleReport(moduleId ?? 1, !!moduleId);
 
   // If we have a report ID, fetch individual content statuses
   const reportModuleId = moduleReportRes?.data?.id;
@@ -231,7 +231,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
       transformedItems.push({
         id: 'quizzes',
         title: 'Quizzes',
-        status: data.user_progress_summary.quizzes.status === 'completed' ? 'completed' : 'in Progress',
+        status: data.user_progress_summary.quizzes.status,
         date: latestQuizDate ? new Date(latestQuizDate).toLocaleDateString("en-GB", {
           day: "numeric",
           month: "short",
@@ -254,7 +254,9 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
     if (statusFilter !== "all") {
       if (statusFilter === "pending") {
-        filtered = filtered.filter(item => item.status !== "completed");
+        filtered = filtered.filter(item => item.status !== "completed" && item.status !== "passed" && item.status !== "failed");
+      } else if (statusFilter === "completed") {
+        filtered = filtered.filter(item => item.status === "completed" || item.status === "passed" || item.status === "failed");
       } else {
         filtered = filtered.filter(item => item.status === statusFilter);
       }
@@ -276,8 +278,8 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const tabCounts = useMemo(() => {
     return {
       all: items.length,
-      pending: items.filter(item => item.status !== "completed").length,
-      completed: items.filter(item => item.status === "completed").length
+      pending: items.filter(item => item.status !== "completed" && item.status !== "passed" && item.status !== "failed").length,
+      completed: items.filter(item => item.status === "completed" || item.status === "passed" || item.status === "failed").length
     };
   }, [items]);
 
@@ -685,8 +687,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                               .join(' ')
                           : '';
 
-                        const statusBadge = displayStatus === "Completed"
+                        const statusBadge = displayStatus === "Completed" || displayStatus === "Passed"
                           ? <span className="text-[11px] text-green-600 bg-green-100 px-3 py-1 rounded-full">{displayStatus}</span>
+                          : displayStatus === "Failed"
+                          ? <span className="text-[11px] text-red-600 bg-red-100 px-3 py-1 rounded-full">{displayStatus}</span>
                           : <span className="text-[11px] text-amber-600 bg-amber-100 px-3 py-1 rounded-full">{displayStatus || 'Pending'}</span>;
 
                         return (
@@ -719,6 +723,8 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                     moduleId != null &&
                                     typeof item.id === 'number' &&
                                     item.status !== 'completed' &&
+                                    item.status !== 'passed' &&
+                                    item.status !== 'failed' &&
                                     item.status !== 'in_progress' &&
                                     item.status !== 'in progress'
                                   ) {
@@ -742,7 +748,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                     } else if (item.isAggregated && item.content_type_id) {
                                       contentId = item.content_type_id;
                                     }
-                                    if (contentId != null && item.status !== 'in_progress' && item.status !== 'in progress' && item.status !== 'completed') {
+                                    if (contentId != null && item.status !== 'in_progress' && item.status !== 'in progress' && item.status !== 'completed' && item.status !== 'passed' && item.status !== 'failed') {
                                       console.log('[module] Calling report-actions/begin-content with', { contentId });
                                       try {
                                       await awmClient.post(`${API_BASE}/useraction/report-actions/begin-content`, {
@@ -764,7 +770,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                   // Fetch module contents for this content type before navigating
                                   if (item.content_type_id != null) {
                                     quizService
-                                      .getContents({ mod_id: moduleId, contype_id: item.content_type_id })
+                                      .getContents({ mod_id: moduleId ?? undefined, contype_id: item.content_type_id })
                                       .then((res) => {
                                         console.log('[module] getContents by type', res);
                                       })
@@ -773,7 +779,12 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                       });
                                   }
                                   if (item.title === "Video Training") {
-                                    router.push(`/module/${module}/video-training?campaign_id=${campaignId}`);
+                                    const vtParams = new URLSearchParams();
+                                    vtParams.set('campaign_id', String(campaignId));
+                                    if (item.id && !String(item.id).startsWith('agg_')) {
+                                      vtParams.set('content_id', String(item.id));
+                                    }
+                                    router.push(`/module/${module}/video-training?${vtParams.toString()}`);
                                   } else if (
                                     item.title === "Interactive Contents" ||
                                     item.title === "Interactive Lesson" ||
@@ -791,7 +802,12 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                     }
                                     router.push(`/module/${module}/quizzes?${quizParams.toString()}`);
                                   } else if (item.title === "Motion Videos") {
-                                    router.push(`/module/${module}/video-training?campaign_id=${campaignId}`);
+                                    const videoParams = new URLSearchParams();
+                                    videoParams.set('campaign_id', String(campaignId));
+                                    if (item.id && !String(item.id).startsWith('agg_')) {
+                                      videoParams.set('content_id', String(item.id));
+                                    }
+                                    router.push(`/module/${module}/video-training?${videoParams.toString()}`);
                                   } else {
                                     const contentTypes = ['Posters', 'Brochures', 'Documents', 'Screen savers'];
                                     if (contentTypes.includes(item.title)) {
