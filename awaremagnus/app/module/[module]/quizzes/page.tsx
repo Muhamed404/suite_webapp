@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Search, ChevronRight, ChevronLeft, ArrowLeft } from "lucide-react";
+import clsx from "clsx";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
