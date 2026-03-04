@@ -35,6 +35,8 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   const [videoProgress, setVideoProgress] = useState<{ [key: number]: { currentTime: number; duration: number; watchedPercentage: number } }>({});
   const [sentProgressMilestones, setSentProgressMilestones] = useState<{ [key: number]: { lastReported: number } }>({});
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+  const lastSentPercentRef = useRef<{ [key: number]: number }>({});
+  const videoIntervals = useRef<{ [key: number]: ReturnType<typeof setInterval> | null }>({});
 
   // Read contentId early so we can conditionally disable useModules
   const contentIdFromUrl = useMemo(() => {
@@ -185,6 +187,38 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     }
   };
 
+  // Format seconds as m:ss
+  const formatTime = (secs: number) => {
+    if (!isFinite(secs) || isNaN(secs)) return '0:00';
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
+
+  // Start 5-second polling interval while video is playing
+  const startVideoInterval = (contentId: number) => {
+    if (videoIntervals.current[contentId]) return;
+    videoIntervals.current[contentId] = setInterval(() => {
+      const video = videoRefs.current[contentId];
+      if (!video || video.paused || video.ended) return;
+      const dur = video.duration;
+      if (!dur || isNaN(dur) || dur <= 0) return;
+      const pct = Math.round((video.currentTime / dur) * 100);
+      const last = lastSentPercentRef.current[contentId] ?? 0;
+      if (pct > last) {
+        lastSentPercentRef.current[contentId] = pct;
+        updateVideoProgress(contentId, pct);
+      }
+    }, 5000);
+  };
+
+  const stopVideoInterval = (contentId: number) => {
+    if (videoIntervals.current[contentId]) {
+      clearInterval(videoIntervals.current[contentId]!);
+      videoIntervals.current[contentId] = null;
+    }
+  };
+
   // Update video progress to backend
   const updateVideoProgress = async (contentId: number, progressPercentage: number) => {
     try {
@@ -287,7 +321,6 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                     <div className="relative bg-black" style={{ height: '60vh' }}>
                       <video
                         ref={(el) => { videoRefs.current[content.id] = el; }}
-                        controls
                         className="w-full h-full object-contain"
                         src={
                           !content.source_url
@@ -300,9 +333,63 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         onLoadedMetadata={(e) => handleVideoLoadedMetadata(content.id, e.target as HTMLVideoElement)}
                         onTimeUpdate={(e) => handleVideoTimeUpdate(content.id, e.target as HTMLVideoElement)}
                         onEnded={() => handleVideoEnded(content.id)}
+                        onPlay={() => startVideoInterval(content.id)}
+                        onPause={() => stopVideoInterval(content.id)}
                       >
                         Your browser does not support the video tag.
                       </video>
+                    </div>
+
+                    {/* Custom Video Controls */}
+                    <div className="px-4 pt-3 pb-2 bg-white border-b border-gray-100">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <button
+                          onClick={() => videoRefs.current[content.id]?.play()}
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                        >Play</button>
+                        <button
+                          onClick={() => videoRefs.current[content.id]?.pause()}
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                        >Pause</button>
+                        <button
+                          onClick={() => {
+                            const v = videoRefs.current[content.id];
+                            if (v) v.currentTime = Math.max(0, v.currentTime - 10);
+                          }}
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                        >Back 10s</button>
+                        <button
+                          onClick={() => {
+                            const v = videoRefs.current[content.id];
+                            if (v && isFinite(v.duration)) v.currentTime = Math.min(v.duration, v.currentTime + 10);
+                          }}
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                        >Forward 10s</button>
+                        <button
+                          onClick={() => {
+                            const v = videoRefs.current[content.id];
+                            if (v) { v.currentTime = 0; v.play(); }
+                          }}
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                        >Restart</button>
+                        <span className="ml-1 text-sm text-gray-700">
+                          {formatTime(videoProgress[content.id]?.currentTime ?? 0)} / {formatTime(videoProgress[content.id]?.duration ?? 0)}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-gray-700">
+                        Progress: {Math.round(videoProgress[content.id]?.watchedPercentage ?? 0)}% ({Math.floor(videoProgress[content.id]?.currentTime ?? 0)} / {Math.floor(videoProgress[content.id]?.duration ?? 0)} seconds)
+                      </p>
+                      <div className="mt-2">
+                        <button
+                          onClick={() => {
+                            const v = videoRefs.current[content.id];
+                            if (!v || !v.duration || isNaN(v.duration)) return;
+                            const pct = Math.round((v.currentTime / v.duration) * 100);
+                            updateVideoProgress(content.id, pct);
+                          }}
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                        >Send Progress Now</button>
+                      </div>
                     </div>
 
                     <div className="p-4 border-b border-gray-100">
