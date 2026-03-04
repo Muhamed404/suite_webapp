@@ -149,30 +149,20 @@ export function OrgUserPosterBrochureDetailScreen({
               isRtl && "flex-row-reverse"
             )}
           >
-            <Link className="hover:text-gray-700 transition-colors" href="/dashboard">
-              {tc("breadcrumb.dashboard") ?? "Dashboard"}
+            <Link className="hover:text-gray-700 transition-colors" href="/dashboard/campaign-assignments">
+              {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
             </Link>
             <span className="text-gray-400">›</span>
-            <Link
-              className="hover:text-gray-700 transition-colors"
-              href="/dashboard/campaign-assignments"
-            >
-              {tc("title") ?? "My Campaigns"}
-            </Link>
-            <span className="text-gray-400">›</span>
-            <Link className="hover:text-gray-700 transition-colors" href={campaignModulesHref}>
-              {tc("modulesTitle") ?? "Modules"}
-            </Link>
-            <span className="text-gray-400">›</span>
-            <Link
-              className="hover:text-gray-700 transition-colors"
-              href={campaignModuleContentsHref}
-            >
-              {moduleTitle}
-            </Link>
+            {campaignId ? (
+              <Link className="hover:text-gray-700 transition-colors" href={campaignModuleContentsHref}>
+                {moduleTitle}
+              </Link>
+            ) : (
+              <span>{moduleTitle}</span>
+            )}
             <span className="text-gray-400">›</span>
             <span className="font-semibold text-gray-900">
-              {content ? getContentTitle(content) : typeLabel}
+              {typeLabel}
             </span>
           </nav>
 

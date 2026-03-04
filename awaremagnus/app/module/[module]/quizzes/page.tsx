@@ -347,7 +347,23 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                 <ArrowLeft className="w-4 h-4" />
               </Button>
               <nav className={clsx("flex items-center text-xs text-gray-500 mb-2 gap-1.5 overflow-x-auto", isRtl && "flex-row-reverse")}>
-                {campaignId ? (
+                {isOrgUser(user?.role_id) ? (
+                  <>
+                    <Link href="/dashboard/campaign-assignments" className={breadcrumbLinkClassName}>
+                      {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    {campaignId && moduleId ? (
+                      <Link href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`} className={breadcrumbLinkClassName}>
+                        {triviaTitle}
+                      </Link>
+                    ) : (
+                      <span>{triviaTitle}</span>
+                    )}
+                    <span className="text-gray-400">›</span>
+                    <span className="font-semibold text-gray-900">{t("moduleDetails.quizzes") ?? "Quizzes"}</span>
+                  </>
+                ) : campaignId ? (
                   <>
                     <Link href="/dashboard/campaign-assignments" className={breadcrumbLinkClassName}>
                       {t("moduleDetails.breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}

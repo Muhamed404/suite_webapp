@@ -5,10 +5,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { List, LayoutGrid, Eye, Search, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight, Download, Share2, MoreVertical, Clock, Calendar } from "lucide-react";
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { quizService } from "@/services/quizService";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { useTranslations } from "@/i18n/useTranslations";
+import { isOrgUser } from "@/utils/roles";
 
 // Maps URL slug → contype_id (matches API content_type_id values)
 const CONTENT_TYPE_ID: Record<string, number> = {
@@ -31,9 +35,12 @@ export default function ContentPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+  const t = useTranslations("module");
+  const { user } = useAuthStore();
+
   const module = params?.module;
   const type = params?.type;
+  const campaignIdFromUrl = searchParams?.get('campaign_id') ?? null;
   
   // determine slug (array or string) and check if we're on posters page
   const slug = Array.isArray(type) ? type[0] : type ?? "";
@@ -358,17 +365,17 @@ export default function ContentPage() {
                     Back
                   </button>
                   <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">
-                    Awareness Library
-                  </a>
-                  <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">
-                    System Library
-                  </a>
-                  <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">
-                    Physical Security
-                  </a>
+                  {isOrgUser(user?.role_id) ? (
+                    <Link href="/dashboard/campaign-assignments" className="hover:text-gray-700 transition">
+                      {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                    </Link>
+                  ) : (
+                    <>
+                      <a href="#" className="hover:text-gray-700 transition">Awareness Library</a>
+                      <span className="text-gray-400">›</span>
+                      <a href="#" className="hover:text-gray-700 transition">System Library</a>
+                    </>
+                  )}
                   <span className="text-gray-400">›</span>
                   <span className="font-semibold text-gray-900">
                     {(viewingItem as any).contentType === "brochure" ? "Interactive Training" : (viewingItem as any).title}
@@ -501,17 +508,31 @@ export default function ContentPage() {
             ) : (
               <div>
                 <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
-                  <a href="#" className="hover:text-gray-700 transition">
-                    Awareness Library
-                  </a>
-                  <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">
-                    System Library
-                  </a>
-                  <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">
-                    Physical Security
-                  </a>
+                  {isOrgUser(user?.role_id) ? (
+                    <>
+                      <Link href="/dashboard/campaign-assignments" className="hover:text-gray-700 transition">
+                        {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                      </Link>
+                      <span className="text-gray-400">›</span>
+                      {campaignIdFromUrl ? (
+                        <Link href={`/module/${Array.isArray(module) ? module[0] : module}?campaign_id=${campaignIdFromUrl}`} className="hover:text-gray-700 transition">
+                          {(Array.isArray(module) ? module[0] : module ?? "").replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                        </Link>
+                      ) : (
+                        <span>{(Array.isArray(module) ? module[0] : module ?? "").replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}</span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <a href="#" className="hover:text-gray-700 transition">Awareness Library</a>
+                      <span className="text-gray-400">›</span>
+                      <a href="#" className="hover:text-gray-700 transition">System Library</a>
+                      <span className="text-gray-400">›</span>
+                      <a href="#" className="hover:text-gray-700 transition">
+                        {(Array.isArray(module) ? module[0] : module ?? "").replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                      </a>
+                    </>
+                  )}
                   <span className="text-gray-400">›</span>
                   <span className="font-semibold text-gray-900">
                     {(type as string)

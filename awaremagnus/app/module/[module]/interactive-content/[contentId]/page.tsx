@@ -8,8 +8,11 @@ import clsx from "clsx";
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useContent, useModule, useModules, useContentsByModule } from "@/hooks/useQuiz";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { isOrgUser } from "@/utils/roles";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -52,6 +55,9 @@ export default function OrgUserInteractiveContentPage({
 
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const t = useTranslations("module");
+  const user = useAuthStore((s) => s.user);
+  const isOrgUserCheck = isOrgUser(user?.role_id);
 
   // Resolve moduleId – prefer explicit query param, fall back to slug lookup
   const { data: modulesRes } = useModules({ filter: moduleSlug });
@@ -119,15 +125,35 @@ export default function OrgUserInteractiveContentPage({
               isRtl && "flex-row-reverse"
             )}
           >
-            <Link className="hover:text-gray-700 transition-colors" href="/dashboard">
-              Dashboard
-            </Link>
-            <span className="text-gray-400">›</span>
-            <Link className="hover:text-gray-700 transition-colors" href={backHref}>
-              {moduleTitle}
-            </Link>
-            <span className="text-gray-400">›</span>
-            <span className="font-semibold text-gray-900">Interactive Content</span>
+            {isOrgUserCheck ? (
+              <>
+                <Link className="hover:text-gray-700 transition-colors" href="/dashboard/campaign-assignments">
+                  {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                </Link>
+                <span className="text-gray-400">›</span>
+                {campaignId ? (
+                  <Link className="hover:text-gray-700 transition-colors" href={backHref}>
+                    {moduleTitle}
+                  </Link>
+                ) : (
+                  <span>{moduleTitle}</span>
+                )}
+                <span className="text-gray-400">›</span>
+                <span className="font-semibold text-gray-900">Interactive Content</span>
+              </>
+            ) : (
+              <>
+                <Link className="hover:text-gray-700 transition-colors" href="/dashboard">
+                  Dashboard
+                </Link>
+                <span className="text-gray-400">›</span>
+                <Link className="hover:text-gray-700 transition-colors" href={backHref}>
+                  {moduleTitle}
+                </Link>
+                <span className="text-gray-400">›</span>
+                <span className="font-semibold text-gray-900">Interactive Content</span>
+              </>
+            )}
           </nav>
 
           {/* Title */}

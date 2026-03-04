@@ -59,7 +59,7 @@ interface InteractiveContentDetailScreenProps {
   contentTypeId: number;
   contentId: number;
   libraryType: LibraryType;
-  breadcrumbContext?: "training-library" | "campaign";
+  breadcrumbContext?: "training-library" | "campaign" | "my-assignments";
   campaignId?: number;
 }
 
@@ -74,6 +74,8 @@ export function InteractiveContentDetailScreen({
   const t = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+
+  console.log("🎮 InteractiveContentDetailScreen - breadcrumbContext:", breadcrumbContext, "campaignId:", campaignId, "libraryType:", libraryType);
 
   const basePath = breadcrumbContext === "campaign" 
     ? `/dashboard/campaign-assignments/${campaignId}` 
@@ -164,6 +166,28 @@ export function InteractiveContentDetailScreen({
                   >
                     {moduleTitle}
                   </Link>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">{typeLabel}</span>
+                </>
+              ) : breadcrumbContext === "my-assignments" ? (
+                <>
+                  <Link
+                    className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                    href="/dashboard/campaign-assignments"
+                  >
+                    {t("moduleDetails.breadcrumbMyAssignments")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  {campaignId ? (
+                    <Link
+                      className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                      href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}
+                    >
+                      {moduleTitle}
+                    </Link>
+                  ) : (
+                    <span>{moduleTitle}</span>
+                  )}
                   <span className="text-gray-400">›</span>
                   <span className="font-semibold text-gray-900">{typeLabel}</span>
                 </>

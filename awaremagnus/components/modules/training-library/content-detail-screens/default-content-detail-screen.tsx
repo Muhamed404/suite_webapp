@@ -63,7 +63,7 @@ interface DefaultContentDetailScreenProps {
   contentTypeId: number;
   contentId: number;
   libraryType: LibraryType;
-  breadcrumbContext?: "training-library" | "campaign";
+  breadcrumbContext?: "training-library" | "campaign" | "my-assignments";
   campaignId?: number;
 }
 
@@ -78,6 +78,8 @@ export function DefaultContentDetailScreen({
   const t = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+
+  console.log("📋 DefaultContentDetailScreen - breadcrumbContext:", breadcrumbContext, "campaignId:", campaignId, "libraryType:", libraryType);
 
   const basePath = breadcrumbContext === "campaign" 
     ? `/dashboard/campaign-assignments/${campaignId}` 
@@ -152,6 +154,22 @@ export function DefaultContentDetailScreen({
                 <span className="font-medium text-[var(--mainblue)]">
                   {content ? contentTitle(content) : `Content ${contentId}`}
                 </span>
+              </>
+            ) : breadcrumbContext === "my-assignments" ? (
+              <>
+                <Link className={breadcrumbLinkClassName} href="/dashboard/campaign-assignments">
+                  {t("moduleDetails.breadcrumbMyAssignments")}
+                </Link>
+                <span className="text-[var(--darkgray)]">›</span>
+                {campaignId ? (
+                  <Link className={breadcrumbLinkClassName} href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}>
+                    {moduleTitle}
+                  </Link>
+                ) : (
+                  <span>{moduleTitle}</span>
+                )}
+                <span className="text-[var(--darkgray)]">›</span>
+                <span className="font-medium text-[var(--mainblue)]">{typeLabel}</span>
               </>
             ) : (
               <>

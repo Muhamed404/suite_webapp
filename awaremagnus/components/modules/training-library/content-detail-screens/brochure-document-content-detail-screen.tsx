@@ -68,7 +68,7 @@ interface BrochureDocumentContentDetailScreenProps {
   contentTypeId: number;
   contentId: number;
   libraryType: LibraryType;
-  breadcrumbContext?: "training-library" | "campaign";
+  breadcrumbContext?: "training-library" | "campaign" | "my-assignments";
   campaignId?: number;
 }
 
@@ -84,6 +84,8 @@ export function BrochureDocumentContentDetailScreen({
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
   const token = useAuthStore((s) => s.token);
+
+  console.log("📄 BrochureDocumentContentDetailScreen - breadcrumbContext:", breadcrumbContext, "campaignId:", campaignId, "libraryType:", libraryType);
 
   const basePath = breadcrumbContext === "campaign" 
     ? `/dashboard/campaign-assignments/${campaignId}` 
@@ -190,6 +192,28 @@ export function BrochureDocumentContentDetailScreen({
                   <span className="font-semibold text-gray-900">
                     {content ? contentTitle(content) : isBrochure ? "Brochure Training" : "Document"}
                   </span>
+                </>
+              ) : breadcrumbContext === "my-assignments" ? (
+                <>
+                  <Link
+                    className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                    href="/dashboard/campaign-assignments"
+                  >
+                    {t("moduleDetails.breadcrumbMyAssignments")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  {campaignId ? (
+                    <Link
+                      className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                      href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}
+                    >
+                      {moduleTitle}
+                    </Link>
+                  ) : (
+                    <span>{moduleTitle}</span>
+                  )}
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">{typeLabel}</span>
                 </>
               ) : (
                 <>

@@ -29,9 +29,11 @@ export default function ModuleContentDetailPage() {
   if (!moduleId || Number.isNaN(moduleId)) return null;
   if (!contentTypeId || Number.isNaN(contentTypeId)) return null;
 
+  const isOrgUserCheck = isOrgUser(user?.role_id);
+
   // Org user viewing a poster/brochure/document/screen-saver (types 3,4,5,6,7)
   if (
-    isOrgUser(user?.role_id) &&
+    isOrgUserCheck &&
     (isPosterContentType(contentTypeId) || isBrochureDocumentContentType(contentTypeId) || contentTypeId === 5 || contentTypeId === 6)
   ) {
     return (
@@ -44,9 +46,11 @@ export default function ModuleContentDetailPage() {
     );
   }
 
-  // Org admin / platform admin → standard system library view
+  // For org-users viewing other content types, also use my-assignments breadcrumb
   return (
     <ContentDetailPage
+      breadcrumbContext={isOrgUserCheck ? "my-assignments" : "training-library"}
+      campaignId={isOrgUserCheck && campaignId ? campaignId : undefined}
       contentId={contentId}
       contentTypeId={contentTypeId}
       libraryType="system"

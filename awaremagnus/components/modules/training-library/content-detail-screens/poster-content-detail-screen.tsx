@@ -57,7 +57,7 @@ interface PosterContentDetailScreenProps {
   contentTypeId: number;
   contentId: number;
   libraryType: LibraryType;
-  breadcrumbContext?: "training-library" | "campaign";
+  breadcrumbContext?: "training-library" | "campaign" | "my-assignments";
   campaignId?: number;
 }
 
@@ -72,6 +72,8 @@ export function PosterContentDetailScreen({
   const t = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+
+  console.log("🖼️ PosterContentDetailScreen - breadcrumbContext:", breadcrumbContext, "campaignId:", campaignId, "libraryType:", libraryType);
 
   const basePath = breadcrumbContext === "campaign" 
     ? `/dashboard/campaign-assignments/${campaignId}` 
@@ -173,6 +175,28 @@ export function PosterContentDetailScreen({
                   <span className="font-semibold text-gray-900">
                     {content ? contentTitle(content) : "Training Poster"}
                   </span>
+                </>
+              ) : breadcrumbContext === "my-assignments" ? (
+                <>
+                  <Link
+                    className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                    href="/dashboard/campaign-assignments"
+                  >
+                    {t("moduleDetails.breadcrumbMyAssignments")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  {campaignId ? (
+                    <Link
+                      className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                      href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}
+                    >
+                      {moduleTitle}
+                    </Link>
+                  ) : (
+                    <span>{moduleTitle}</span>
+                  )}
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">{typeLabel}</span>
                 </>
               ) : (
                 <>

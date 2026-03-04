@@ -60,7 +60,7 @@ interface VideoContentDetailScreenProps {
   contentTypeId: number;
   contentId: number;
   libraryType: LibraryType;
-  breadcrumbContext?: "training-library" | "campaign";
+  breadcrumbContext?: "training-library" | "campaign" | "my-assignments";
   campaignId?: number;
 }
 
@@ -75,6 +75,15 @@ export function VideoContentDetailScreen({
   const t = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+
+  console.log("🎥 VideoContentDetailScreen RECEIVED:");
+  console.log("   breadcrumbContext:", breadcrumbContext);
+  console.log("   campaignId:", campaignId);
+  console.log("   libraryType:", libraryType);
+  console.log("   moduleId:", moduleId);
+  console.log("   contentTypeId:", contentTypeId);
+  console.log("   Breadcrumb condition check - campaignId check:", !!campaignId);
+  console.log("   Breadcrumb will render:", breadcrumbContext === "campaign" ? "CAMPAIGN" : breadcrumbContext === "my-assignments" ? "MY-ASSIGNMENTS" : "TRAINING-LIBRARY");
 
   const basePath = breadcrumbContext === "campaign" 
     ? `/dashboard/campaign-assignments/${campaignId}` 
@@ -147,6 +156,22 @@ export function VideoContentDetailScreen({
                   <Link className="hover:text-gray-700 transition" href={`${basePath}/modules/${moduleId}`}>
                     {moduleTitle}
                   </Link>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">{typeLabel}</span>
+                </>
+              ) : breadcrumbContext === "my-assignments" ? (
+                <>
+                  <Link className="hover:text-gray-700 transition" href="/dashboard/campaign-assignments">
+                    {t("moduleDetails.breadcrumbMyAssignments")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  {campaignId ? (
+                    <Link className="hover:text-gray-700 transition" href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}>
+                      {moduleTitle}
+                    </Link>
+                  ) : (
+                    <span>{moduleTitle}</span>
+                  )}
                   <span className="text-gray-400">›</span>
                   <span className="font-semibold text-gray-900">{typeLabel}</span>
                 </>

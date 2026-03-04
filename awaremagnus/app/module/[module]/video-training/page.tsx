@@ -267,13 +267,33 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
 
           <main className="flex-1 overflow-y-auto">
             <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
-              <a href="#" className="hover:text-gray-700 transition">Awareness Library</a>
-              <span className="text-gray-400">›</span>
-              <a href="#" className="hover:text-gray-700 transition">System Library</a>
-              <span className="text-gray-400">›</span>
-              <a href="#" className="hover:text-gray-700 transition">{moduleName}</a>
-              <span className="text-gray-400">›</span>
-              <span className="font-semibold text-gray-900">Motion Videos</span>
+              {isOrgUser(user?.role_id) ? (
+                <>
+                  <Link href="/dashboard/campaign-assignments" className="hover:text-gray-700 transition">
+                    {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  {searchParams?.get('campaign_id') ? (
+                    <Link href={`/module/${module}?campaign_id=${searchParams.get('campaign_id')}`} className="hover:text-gray-700 transition">
+                      {moduleName}
+                    </Link>
+                  ) : (
+                    <span>{moduleName}</span>
+                  )}
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">Motion Videos</span>
+                </>
+              ) : (
+                <>
+                  <a href="#" className="hover:text-gray-700 transition">Awareness Library</a>
+                  <span className="text-gray-400">›</span>
+                  <a href="#" className="hover:text-gray-700 transition">System Library</a>
+                  <span className="text-gray-400">›</span>
+                  <a href="#" className="hover:text-gray-700 transition">{moduleName}</a>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">Motion Videos</span>
+                </>
+              )}
             </nav>
 
             <div className="flex flex-col px-3 gap-2">
