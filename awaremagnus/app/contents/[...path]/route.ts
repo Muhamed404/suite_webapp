@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SERVICE_AWM_URL = process.env.NEXT_PUBLIC_SERVICE_AWM_URL || "http://localhost:3002";
+const SERVICE_AWM_URL = process.env.SERVICE_AWM_URL || process.env.NEXT_PUBLIC_SERVICE_AWM_URL || "http://localhost:3002";
 
 async function proxyHandler(req: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
     const { path } = await params;
