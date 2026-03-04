@@ -100,7 +100,9 @@
     "next": "التالي",
     "beginTraining": "بدء التدريب",
     "posterViews": "1,234 مشاهدة",
-    "nextBrochureTraining": "الكتيبات التدريبية التالية",
+    "nextBrochureTraining": "المزيد من الكتيبات",
+    "nextPosterTraining": "المزيد من الملصقات",
+    "nextScreenSaverTraining": "المزيد من شاشات التوقف",
     "nextDocumentTraining": "المستندات التدريبية التالية",
     "nextInteractiveTraining": "التدريب التفاعلي التالي"
   },

@@ -19,6 +19,7 @@ import { useQuizzesByContent, useModule } from "@/hooks/useQuiz";
 import { suiteAwmService } from "@/services/suiteAwmService";
 import { quizService } from "@/services/quizService";
 import { breadcrumbLinkClassName } from "@/components/modules/training-library/shared-styles";
+import { getModuleAssetUrl } from "@/utils/contentAssetUrl";
 
 export default function QuizzesPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -72,6 +73,14 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const moduleId = contentRes?.data?.mod_id ?? 0;
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
 
+  // Derive display values from the module's first translation (falling back gracefully)
+  const moduleTranslation = moduleRes?.data?.translations?.[0];
+  const triviaTitle = moduleTranslation?.name || moduleName;
+  const triviaDescription = moduleTranslation?.description ?? moduleRes?.data?.description;
+  const triviaBannerUrl = moduleTranslation?.logo_banner_url
+    ? getModuleAssetUrl(moduleTranslation.logo_banner_url)
+    : '/images/hero.svg';
+
   // Keep original quiz data for submission
   const originalQuizzes = useMemo(() => {
     if (!quizzesRes?.success || !Array.isArray(quizzesRes.data)) return [];
@@ -87,6 +96,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
       options: (q.answers ?? []).map((a) => a.answer_text),
       correct: (q.answers ?? []).findIndex((a) => a.is_correct),
       quizTypeName: q.quizType?.name ?? 'Single Choice',
+      quizTypeId: q.quiz_type_id,
     }));
   }, [quizzesRes]);
 
@@ -117,6 +127,11 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
 
   const quiz = quizData[currentQuestion];
 
+  // Determine if the current question is single-choice (radio) or multi-choice (checkbox)
+  const isSingleChoice = quiz
+    ? !quiz.quizTypeName.toLowerCase().includes('multiple')
+    : true;
+
   const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
 
   const hasAnswer = selectedAnswers[currentQuestion]?.length > 0;
@@ -125,6 +140,11 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const toggleAnswer = (index: number) => {
     setSelectedAnswers(prev => {
       const current = prev[currentQuestion] || [];
+      if (isSingleChoice) {
+        // Radio behaviour: selecting a new option replaces the previous selection
+        return { ...prev, [currentQuestion]: current[0] === index ? [] : [index] };
+      }
+      // Checkbox behaviour: toggle the option
       if (current.includes(index)) {
         return { ...prev, [currentQuestion]: current.filter(i => i !== index) };
       } else {
@@ -276,13 +296,22 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
           .option-check {
             width: 16px;
             height: 16px;
-            border-radius: 9999px;
             border: 1.5px solid #d1d5db;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             background: #fff;
             transition: border-color 0.2s ease, background-color 0.2s ease;
+          }
+
+          /* Single choice → circular (radio) */
+          .option-check.is-radio {
+            border-radius: 9999px;
+          }
+
+          /* Multiple choice → square (checkbox) */
+          .option-check.is-checkbox {
+            border-radius: 4px;
           }
 
           .option-check.is-checked {
@@ -400,15 +429,31 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                     <div className="space-y-2 mb-8" id="optionsContainer">
                       {quiz.options.map((option, index) => {
                         const isChecked = selectedAnswers[currentQuestion]?.includes(index) || false;
+                        const shapeClass = isSingleChoice ? 'is-radio' : 'is-checkbox';
                         return (
                           <label key={index} className="flex items-center gap-2 cursor-pointer">
-                            <span className={`option-check ${isChecked ? "is-checked" : ""}`}>
-                              <svg className={`${isChecked ? "opacity-100" : "opacity-0"}`} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                              </svg>
+                            <span className={`option-check ${shapeClass} ${isChecked ? 'is-checked' : ''}`}>
+                              {isSingleChoice ? (
+                                // Radio inner dot
+                                <span
+                                  className={`block rounded-full bg-white transition-all duration-200 ${isChecked ? 'w-[6px] h-[6px] opacity-100' : 'w-0 h-0 opacity-0'}`}
+                                />
+                              ) : (
+                                // Checkbox checkmark
+                                <svg className={`${isChecked ? 'opacity-100' : 'opacity-0'}`} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                  <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                              )}
                             </span>
-                            <input type="checkbox" name="answer" value={index} checked={isChecked} onChange={() => toggleAnswer(index)} className="hidden" />
-                            <div className={`flex-1 border rounded-lg px-2 py-1.5 transition-colors duration-200 text-xs ${isChecked ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 hover:border-blue-300 text-gray-700"}`}>
+                            <input
+                              type={isSingleChoice ? 'radio' : 'checkbox'}
+                              name={`question-${currentQuestion}`}
+                              value={index}
+                              checked={isChecked}
+                              onChange={() => toggleAnswer(index)}
+                              className="hidden"
+                            />
+                            <div className={`flex-1 border rounded-lg px-2 py-1.5 transition-colors duration-200 text-xs ${isChecked ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:border-blue-300 text-gray-700'}`}>
                               <span className="font-medium">{option}</span>
                             </div>
                           </label>
@@ -517,11 +562,16 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
 
                 {/* Trivia Card */}
                 <div className="bg-white rounded-2xl p-4">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-4">Trivia</h4>
-                  <img src="/images/hero.svg" alt="Security Illustration" className="w-full rounded-lg mb-4" />
-                  <p className="text-[10px] text-gray-600 leading-relaxed">
-                    {moduleRes?.data?.description || "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events—such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise."}
-                  </p>
+                  <h4 className="text-sm font-semibold text-gray-900 mb-4">{triviaTitle}</h4>
+                  <img
+                    src={triviaBannerUrl}
+                    alt={triviaTitle}
+                    className="w-full rounded-lg mb-4"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/hero.svg'; }}
+                  />
+                  {triviaDescription && (
+                    <p className="text-[10px] text-gray-600 leading-relaxed">{triviaDescription}</p>
+                  )}
                 </div>
               </div>
             </div>
