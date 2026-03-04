@@ -101,7 +101,9 @@
     "next": "Next",
     "beginTraining": "Begin Training",
     "posterViews": "1,234 views",
-    "nextBrochureTraining": "Next Brochure Training",
+    "nextBrochureTraining": "More Brochures",
+    "nextPosterTraining": "More Posters",
+    "nextScreenSaverTraining": "More Screen Savers",
     "nextDocumentTraining": "Next Document Training",
     "nextInteractiveTraining": "Next Interactive Training"
   },

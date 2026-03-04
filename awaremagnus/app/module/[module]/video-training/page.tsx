@@ -12,7 +12,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useModules, useModuleReport, useContentsReport } from "@/hooks/useQuiz";
+import { useModules, useContentsReport } from "@/hooks/useQuiz";
 import { quizService } from "@/services/quizService";
 import { isOrgUser } from "@/utils/roles";
 
@@ -36,9 +36,21 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   const [sentProgressMilestones, setSentProgressMilestones] = useState<{ [key: number]: { lastReported: number } }>({});
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
 
-  // Get module ID from slug
-  const { data: modulesRes } = useModules({ filter: module });
-  const moduleId = useMemo(() => {
+  // Read contentId early so we can conditionally disable useModules
+  const contentIdFromUrl = useMemo(() => {
+    const id = searchParams?.get('content_id');
+    return id ? parseInt(id, 10) : null;
+  }, [searchParams]);
+
+  // moduleId resolved from content fetch (when content_id is in URL)
+  const [contentDerivedModuleId, setContentDerivedModuleId] = useState<number | null>(null);
+
+  // Only call /module?filter=... when no content_id — we derive moduleId from content response instead
+  const { data: modulesRes } = useModules({ filter: module }, !contentIdFromUrl);
+  const moduleId = useMemo<number | null>(() => {
+    // When navigating with content_id, prefer the mod_id extracted from the content response
+    if (contentIdFromUrl && contentDerivedModuleId != null) return contentDerivedModuleId;
+    // Fallback: derive from the modules list (used when no content_id is in the URL)
     if (modulesRes?.success && modulesRes.data) {
       const found = modulesRes.data.find(m => {
         const codeMatch = m.code?.toLowerCase() === module.toLowerCase();
@@ -46,18 +58,16 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
         const translationMatch = m.translations?.some(t => t.name.toLowerCase() === moduleName.toLowerCase());
         return codeMatch || titleMatch || translationMatch;
       });
-      return found?.id || 1;
+      return found?.id ?? null;
     }
-    return 1;
-  }, [modulesRes, module, moduleName]);
+    return null;
+  }, [contentIdFromUrl, contentDerivedModuleId, modulesRes, module, moduleName]);
 
   const roleId = user?.role_id;
   const isOrgUserView = isOrgUser(roleId);
 
-  // Fetch saved progress from report
-  const { data: moduleReportRes } = useModuleReport(moduleId, !!moduleId);
-  const reportModuleId = moduleReportRes?.data?.id;
-  const { data: contentsReportRes } = useContentsReport(reportModuleId, !!reportModuleId);
+  // Fetch saved progress from report — only enabled once the real moduleId is resolved
+  const { data: contentsReportRes } = useContentsReport(moduleId!, !!moduleId);
 
   // Build map: content_id -> saved progress_percentage (number)
   const savedProgressMap = useMemo(() => {
@@ -180,7 +190,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     try {
       const payload = {
         campaign_id: campaignId,
-        module_id: moduleId,
+        module_id: moduleId ?? 1,
         content_id: contentId,
         progress_percentage: progressPercentage
       };
@@ -201,24 +211,47 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     return 1; // Default campaign ID
   }, [searchParams]);
 
-  // Fetch video training contents (content_type_id = 1)
+  // Get specific content_id from URL — reuse the value already computed above
+  const contentId = contentIdFromUrl;
+
+  // Fetch by specific content ID — only depends on contentId, never re-runs due to moduleId changes
   useEffect(() => {
-    if (moduleId) {
-      setLoading(true);
-      quizService
-        .getContents({ mod_id: moduleId, contype_id: 2 }) // 2 = Motion Videos
-        .then((res) => {
-          if (res.success && res.data) {
-            setContents(res.data);
-          }
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error('Error fetching video training contents:', err);
-          setLoading(false);
-        });
-    }
-  }, [moduleId]);
+    if (!contentId) return;
+    setLoading(true);
+    quizService
+      .getContentById(contentId)
+      .then((res) => {
+        if (res.success && res.data) {
+          setContents([res.data]);
+          // Derive moduleId from the content response so we don't need /module?filter=...
+          const modId = (res.data as any).mod_id as number | undefined;
+          if (modId) setContentDerivedModuleId(modId);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error fetching video content by id:', err);
+        setLoading(false);
+      });
+  }, [contentId]);
+
+  // Fallback: fetch all motion videos for the module when no specific content is selected
+  useEffect(() => {
+    if (contentId || !moduleId) return;
+    setLoading(true);
+    quizService
+      .getContents({ mod_id: moduleId, contype_id: 2 }) // 2 = Motion Videos
+      .then((res) => {
+        if (res.success && res.data) {
+          setContents(res.data);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error fetching video training contents:', err);
+        setLoading(false);
+      });
+  }, [moduleId, contentId]);
 
   useEffect(() => {
     // Load header if needed, but since we're in DashboardLayout, it might already be there
@@ -256,7 +289,13 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         ref={(el) => { videoRefs.current[content.id] = el; }}
                         controls
                         className="w-full h-full object-contain"
-                        src={`${SERVICE_AWM_URL}${content.source_url}`}
+                        src={
+                          !content.source_url
+                            ? undefined
+                            : content.source_url.startsWith("http://") || content.source_url.startsWith("https://")
+                            ? content.source_url
+                            : `${SERVICE_AWM_URL}${content.source_url}`
+                        }
                         poster={content.logo_url}
                         onLoadedMetadata={(e) => handleVideoLoadedMetadata(content.id, e.target as HTMLVideoElement)}
                         onTimeUpdate={(e) => handleVideoTimeUpdate(content.id, e.target as HTMLVideoElement)}

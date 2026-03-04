@@ -3,19 +3,19 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { List, LayoutGrid, Eye, Pencil, Search, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight, Download, Share2, MoreVertical, Clock, Calendar } from "lucide-react";
+import { List, LayoutGrid, Eye, Search, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight, Download, Share2, MoreVertical, Clock, Calendar } from "lucide-react";
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { quizService } from "@/services/quizService";
 
-// Maps URL slug → contype_id (add more as needed)
+// Maps URL slug → contype_id (matches API content_type_id values)
 const CONTENT_TYPE_ID: Record<string, number> = {
+  brochures: 3,
   posters: 4,
-  brochures: 5,
+  "screen-savers": 5,
   documents: 6,
-  "screen-savers": 7,
 };
 
 // Maps language name → ISO code
@@ -29,6 +29,8 @@ function toLangCode(name?: string): string {
 
 export default function ContentPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   
   const module = params?.module;
   const type = params?.type;
@@ -48,13 +50,14 @@ export default function ContentPage() {
   const [isLoading, setIsLoading] = useState(true);
   const itemsPerPage = 10;
 
-  // Hard-coded moduleId (same approach as the module list page)
-  const moduleId = 1;
+  // Read mod_id and contype_id directly from URL query params
+  const moduleId = searchParams?.get('mod_id') ? Number(searchParams.get('mod_id')) : 1;
+  const contypeIdFromUrl = searchParams?.get('contype_id') ? Number(searchParams.get('contype_id')) : null;
 
   useEffect(() => {
     const slug = Array.isArray(type) ? type[0] : type ?? "";
-    const contype_id = CONTENT_TYPE_ID[slug];
-    if (!contype_id) {
+    const contype_id = contypeIdFromUrl ?? CONTENT_TYPE_ID[slug];
+    if (!contype_id || !moduleId) {
       setIsLoading(false);
       return;
     }
@@ -70,7 +73,7 @@ export default function ContentPage() {
             languageCode: toLangCode(c.language?.name),
             language: c.language?.name ?? "English",
             updated: c.createdAt ?? c.creation_date ?? c.created_at ?? "",
-            thumbnail: c.logo_url ?? "images/img-frame.svg",
+            thumbnail: c.logo_url ?? null,
             contentType: slug,
             source_url: c.source_url ?? null,
           }));
@@ -84,7 +87,7 @@ export default function ContentPage() {
         setApiItems([]);
       })
       .finally(() => setIsLoading(false));
-  }, [type]);
+  }, [type, moduleId, contypeIdFromUrl]);
 
   // items are populated via API; legacy static array removed
 
@@ -168,11 +171,14 @@ export default function ContentPage() {
 
   const handleView = (action: string, item: any) => {
     if (action === "view") {
-      if (["posters", "screen-savers", "images"].includes(type as string)) {
-        setViewingItem(item);
-      } else {
-        console.log("View", item);
-      }
+      const moduleSlug = Array.isArray(module) ? module[0] : module ?? "";
+      const contype_id = contypeIdFromUrl ?? CONTENT_TYPE_ID[slug];
+      const detailParams = new URLSearchParams();
+      if (moduleId) detailParams.set("mod_id", String(moduleId));
+      if (contype_id) detailParams.set("contype_id", String(contype_id));
+      const campaignId = searchParams?.get("campaign_id");
+      if (campaignId) detailParams.set("campaign_id", campaignId);
+      router.push(`/module/${moduleSlug}/content/${slug}/${item.id}?${detailParams.toString()}`);
     } else if (action === "edit") {
       // editing is not supported on posters page
       if (isPostersPage) return;
@@ -193,6 +199,30 @@ export default function ContentPage() {
 
   const getFlagClass = (languageCode: string) => {
     return flagClassMap[languageCode] || flagClassMap.en;
+  };
+
+  const resolveLogoUrl = (raw: string | null): string | null => {
+    if (!raw?.trim()) return null;
+    const s = raw.trim();
+    if (s.startsWith("http")) return s;
+    if (s.startsWith("/contents/")) return `/awm${s}`;
+    return `/awm/contents/${s.startsWith("/") ? s.slice(1) : s}`;
+  };
+
+  const ItemThumbnail = ({ src }: { src: string | null }) => {
+    const url = resolveLogoUrl(src);
+    if (url) {
+      return (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={url}
+          alt=""
+          className="w-10 h-10 rounded-lg object-cover"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.removeAttribute('style'); }}
+        />
+      );
+    }
+    return <ThumbnailSVG />;
   };
 
   const ThumbnailSVG = () => (
@@ -737,7 +767,7 @@ export default function ContentPage() {
                                     </span>
                                   </td>
                                   <td className="px-4 py-3">
-                                    <ThumbnailSVG />
+                                    <ItemThumbnail src={item.thumbnail} />
                                   </td>
                                   <td className="px-4 py-3">
                                     <div className="inline-flex items-center">
@@ -749,16 +779,6 @@ export default function ContentPage() {
                                       >
                                         <Eye className="w-4 h-4" />
                                       </button>
-                                      {!isPostersPage && (
-                                        <button
-                                          onClick={() =>
-                                            handleView("edit", item)
-                                          }
-                                          className="flex items-center gap-1 px-2 py-1 text-gray-700 text-[11px]"
-                                        >
-                                          <Pencil className="w-4 h-4" />
-                                        </button>
-                                      )}
                                     </div>
                                   </td>
                                 </tr>
@@ -778,8 +798,8 @@ export default function ContentPage() {
                               >
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-                                      <ThumbnailSVG />
+                                    <div className="w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden">
+                                      <ItemThumbnail src={item.thumbnail} />
                                     </div>
                                     <div>
                                       <p className="text-sm font-semibold text-gray-800">
@@ -815,17 +835,6 @@ export default function ContentPage() {
                                       <Eye className="w-4 h-4" />
                                       View
                                     </button>
-                                    {!isPostersPage && (
-                                      <button
-                                        onClick={() =>
-                                          handleView("edit", item)
-                                        }
-                                        className="flex items-center gap-1 px-2 py-1.5 rounded-full border border-gray-200 text-gray-700 text-[11px] hover:bg-gray-100"
-                                      >
-                                        <Pencil className="w-4 h-4" />
-                                        Edit
-                                      </button>
-                                    )}
                                   </div>
                                 </div>
                               </div>
