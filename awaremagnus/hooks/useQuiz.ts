@@ -30,10 +30,11 @@ export function useModules(params?: {
   org_id?: number;
   assigned_only?: boolean;
   filter?: string;
-}) {
+}, enabled = true) {
   return useQuery({
     queryKey: [...QUIZ_KEYS.modules, params],
     queryFn: () => quizService.getModules(params),
+    enabled,
   });
 }
 
