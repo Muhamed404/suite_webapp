@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Search, ChevronRight, ChevronLeft, ArrowLeft } from "lucide-react";
+import clsx from "clsx";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 
@@ -17,6 +18,7 @@ import { isOrgUser } from "@/utils/roles";
 import { useQuizzesByContent, useModule } from "@/hooks/useQuiz";
 import { suiteAwmService } from "@/services/suiteAwmService";
 import { quizService } from "@/services/quizService";
+import { breadcrumbLinkClassName } from "@/components/modules/training-library/shared-styles";
 import { getModuleAssetUrl } from "@/utils/contentAssetUrl";
 
 export default function QuizzesPage({ params }: { params: Promise<{ module: string }> }) {
@@ -344,14 +346,60 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
               <Button isIconOnly variant="light" size="sm" onClick={() => router.back()} className="-mt-1">
                 <ArrowLeft className="w-4 h-4" />
               </Button>
-              <nav className="flex items-center text-xs text-gray-500 mb-2 gap-1.5">
-                <a href="#" className="hover:text-gray-700 transition">{campaignRes?.data?.name || 'Campaign'}</a>
-                <span className="text-gray-400">›</span>
-                <a href="#" className="hover:text-gray-700 transition">{moduleName}</a>
-                <span className="text-gray-400">›</span>
-                <a href="#" className="hover:text-gray-700 transition">{contentRes?.data?.title || 'Content'}</a>
-                <span className="text-gray-400">›</span>
-                <span className="font-semibold text-gray-900">Quizzes</span>
+              <nav className={clsx("flex items-center text-xs text-gray-500 mb-2 gap-1.5 overflow-x-auto", isRtl && "flex-row-reverse")}>
+                {isOrgUser(user?.role_id) ? (
+                  <>
+                    <Link href="/dashboard/campaign-assignments" className={breadcrumbLinkClassName}>
+                      {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    {campaignId && moduleId ? (
+                      <Link href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`} className={breadcrumbLinkClassName}>
+                        {triviaTitle}
+                      </Link>
+                    ) : (
+                      <span>{triviaTitle}</span>
+                    )}
+                    <span className="text-gray-400">›</span>
+                    <span className="font-semibold text-gray-900">{t("moduleDetails.quizzes") ?? "Quizzes"}</span>
+                  </>
+                ) : campaignId ? (
+                  <>
+                    <Link href="/dashboard/campaign-assignments" className={breadcrumbLinkClassName}>
+                      {t("moduleDetails.breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <Link href={`/dashboard/campaign-assignments/${campaignId}`} className={breadcrumbLinkClassName}>
+                      {campaignRes?.data?.name || 'Campaign'}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <Link href={`/dashboard/campaign-assignments/${campaignId}/modules/${module}`} className={breadcrumbLinkClassName}>
+                      {moduleName}
+                    </Link>
+                    {contentId ? (
+                      <>
+                        <span className="text-gray-400">›</span>
+                        <Link href={`/dashboard/campaign-assignments/${campaignId}/modules/${module}/content/${contentId}`} className={breadcrumbLinkClassName}>
+                          {contentRes?.data?.title || 'Content'}
+                        </Link>
+                      </>
+                    ) : null}
+                    <span className="text-gray-400">›</span>
+                    <span className="font-semibold text-gray-900">{t("moduleDetails.quizzes") ?? "Quizzes"}</span>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/dashboard/training-library/my" className={breadcrumbLinkClassName}>
+                      {t("moduleDetails.breadcrumbTrainingLibrary") ?? "Awareness Library"}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <Link href={`/dashboard/training-library/my/${module}`} className={breadcrumbLinkClassName}>
+                      {moduleName}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <span className="font-semibold text-gray-900">{t("moduleDetails.quizzes") ?? "Quizzes"}</span>
+                  </>
+                )}
               </nav>
             </div>
 
@@ -497,7 +545,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                     </div>
 
                     <div id="completionActions" className="flex flex-col gap-2 max-w-xs w-full transition-all duration-500 ease-out opacity-100 translate-y-0">
-                      <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1.5 px-4 text-xs rounded-full transition" id="viewReportBtn" onClick={() => router.push('/report-card')}>
+                      <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1.5 px-4 text-xs rounded-full transition" id="viewReportBtn" onClick={() => router.push('/dashboard/my-report-card')}>
                         View Report
                       </button>
                       <button className="border border-gray-300 text-gray-700 font-semibold py-1.5 px-4 text-xs rounded-full hover:bg-gray-50 transition" id="goBackBtn" onClick={handleCompletionGoBack}>
