@@ -19,6 +19,8 @@ interface ContentDetailPageProps {
   contentTypeId: number;
   contentId: number;
   libraryType: "my" | "system";
+  breadcrumbContext?: "training-library" | "campaign" | "my-assignments";
+  campaignId?: number;
 }
 
 /**
@@ -32,6 +34,8 @@ export function ContentDetailPage({
   contentTypeId,
   contentId,
   libraryType,
+  breadcrumbContext = "training-library",
+  campaignId,
 }: ContentDetailPageProps) {
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
   const content = contentRes?.success ? contentRes.data : null;
@@ -53,6 +57,8 @@ export function ContentDetailPage({
   if (isVideo) {
     return (
       <VideoContentDetailScreen
+        breadcrumbContext={breadcrumbContext}
+        campaignId={campaignId}
         contentId={contentId}
         contentTypeId={contentTypeIdFromApi}
         libraryType={libraryType}
@@ -64,6 +70,8 @@ export function ContentDetailPage({
   if (isPoster) {
     return (
       <PosterContentDetailScreen
+        breadcrumbContext={breadcrumbContext}
+        campaignId={campaignId}
         contentId={contentId}
         contentTypeId={contentTypeIdFromApi}
         libraryType={libraryType}
@@ -75,6 +83,8 @@ export function ContentDetailPage({
   if (isBrochureDoc) {
     return (
       <BrochureDocumentContentDetailScreen
+        breadcrumbContext={breadcrumbContext}
+        campaignId={campaignId}
         contentId={contentId}
         contentTypeId={contentTypeIdFromApi}
         libraryType={libraryType}
@@ -86,6 +96,8 @@ export function ContentDetailPage({
   if (isInteractive) {
     return (
       <InteractiveContentDetailScreen
+        breadcrumbContext={breadcrumbContext}
+        campaignId={campaignId}
         contentId={contentId}
         contentTypeId={contentTypeIdFromApi}
         libraryType={libraryType}
@@ -96,6 +108,8 @@ export function ContentDetailPage({
 
   return (
     <DefaultContentDetailScreen
+      breadcrumbContext={breadcrumbContext}
+      campaignId={campaignId}
       contentId={contentId}
       contentTypeId={contentTypeIdFromApi}
       libraryType={libraryType}

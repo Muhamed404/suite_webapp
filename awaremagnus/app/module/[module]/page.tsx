@@ -608,11 +608,23 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
               <div className="flex-1">
                 {/* Breadcrumb */}
                 <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5">
-                  <Link href="#" className="hover:text-gray-700 transition">Awareness Campaign</Link>
-                  <ChevronRight className="w-3 h-3" />
-                  <Link href="#" className="hover:text-gray-700 transition">Campaign 123</Link>
-                  <ChevronRight className="w-3 h-3" />
-                  <span className="font-semibold text-gray-900">{moduleName}</span>
+                  {isOrgUserView ? (
+                    <>
+                      <Link href="/dashboard/campaign-assignments" className="hover:text-gray-700 transition">
+                        {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                      </Link>
+                      <ChevronRight className="w-3 h-3" />
+                      <span className="font-semibold text-gray-900">{moduleName}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="#" className="hover:text-gray-700 transition">Awareness Campaign</Link>
+                      <ChevronRight className="w-3 h-3" />
+                      <Link href="#" className="hover:text-gray-700 transition">Campaign 123</Link>
+                      <ChevronRight className="w-3 h-3" />
+                      <span className="font-semibold text-gray-900">{moduleName}</span>
+                    </>
+                  )}
                 </nav>
 
                 {/* Header */}
@@ -910,6 +922,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                       const ctParams = new URLSearchParams();
                                       if (moduleId) ctParams.set('mod_id', String(moduleId));
                                       if (item.content_type_id != null) ctParams.set('contype_id', String(item.content_type_id));
+                                      if (campaignId) ctParams.set('campaign_id', String(campaignId));
                                       router.push(`/module/${module}/content/${typeSlug}?${ctParams.toString()}`);
                                     } else {
                                       // Handle other types

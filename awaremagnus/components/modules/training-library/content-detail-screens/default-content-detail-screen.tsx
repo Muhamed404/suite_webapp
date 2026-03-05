@@ -63,6 +63,8 @@ interface DefaultContentDetailScreenProps {
   contentTypeId: number;
   contentId: number;
   libraryType: LibraryType;
+  breadcrumbContext?: "training-library" | "campaign" | "my-assignments";
+  campaignId?: number;
 }
 
 export function DefaultContentDetailScreen({
@@ -70,14 +72,21 @@ export function DefaultContentDetailScreen({
   contentTypeId,
   contentId,
   libraryType,
+  breadcrumbContext = "training-library",
+  campaignId,
 }: DefaultContentDetailScreenProps) {
   const t = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
-  const basePath = `/dashboard/training-library/${libraryType}`;
-  const libraryLabel = libraryType === "system" ? "System Library" : "My Library";
-  const listHref = `${basePath}/${moduleId}/content/${contentTypeId}`;
+  console.log("📋 DefaultContentDetailScreen - breadcrumbContext:", breadcrumbContext, "campaignId:", campaignId, "libraryType:", libraryType);
+
+  const basePath = breadcrumbContext === "campaign" 
+    ? `/dashboard/campaign-assignments/${campaignId}` 
+    : `/dashboard/training-library/${libraryType}`;
+  const listHref = breadcrumbContext === "campaign"
+    ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
+    : `${basePath}/${moduleId}/content/${contentTypeId}`;
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
@@ -124,21 +133,67 @@ export function DefaultContentDetailScreen({
               isRtl && "flex-row-reverse"
             )}
           >
-            <Link className={breadcrumbLinkClassName} href={basePath}>
-              {libraryLabel}
-            </Link>
-            <span className="text-[var(--darkgray)]">›</span>
-            <Link className={breadcrumbLinkClassName} href={`${basePath}/${moduleId}`}>
-              {moduleTitle}
-            </Link>
-            <span className="text-[var(--darkgray)]">›</span>
-            <Link className={breadcrumbLinkClassName} href={listHref}>
-              {typeLabel}
-            </Link>
-            <span className="text-[var(--darkgray)]">›</span>
-            <span className="font-medium text-[var(--mainblue)]">
-              {content ? contentTitle(content) : `Content ${contentId}`}
-            </span>
+            {breadcrumbContext === "campaign" ? (
+              <>
+                <Link className={breadcrumbLinkClassName} href="/dashboard/campaign-assignments">
+                  {t("moduleDetails.breadcrumbAwarenessCampaign")}
+                </Link>
+                <span className="text-[var(--darkgray)]">›</span>
+                <Link className={breadcrumbLinkClassName} href={basePath}>
+                  {t("moduleDetails.breadcrumbCampaign")}
+                </Link>
+                <span className="text-[var(--darkgray)]">›</span>
+                <Link className={breadcrumbLinkClassName} href={`${basePath}/modules/${moduleId}`}>
+                  {moduleTitle}
+                </Link>
+                <span className="text-[var(--darkgray)]">›</span>
+                <Link className={breadcrumbLinkClassName} href={listHref}>
+                  {typeLabel}
+                </Link>
+                <span className="text-[var(--darkgray)]">›</span>
+                <span className="font-medium text-[var(--mainblue)]">
+                  {content ? contentTitle(content) : `Content ${contentId}`}
+                </span>
+              </>
+            ) : breadcrumbContext === "my-assignments" ? (
+              <>
+                <Link className={breadcrumbLinkClassName} href="/dashboard/campaign-assignments">
+                  {t("moduleDetails.breadcrumbMyAssignments")}
+                </Link>
+                <span className="text-[var(--darkgray)]">›</span>
+                {campaignId ? (
+                  <Link className={breadcrumbLinkClassName} href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}>
+                    {moduleTitle}
+                  </Link>
+                ) : (
+                  <span>{moduleTitle}</span>
+                )}
+                <span className="text-[var(--darkgray)]">›</span>
+                <span className="font-medium text-[var(--mainblue)]">{typeLabel}</span>
+              </>
+            ) : (
+              <>
+                <Link className={breadcrumbLinkClassName} href={basePath}>
+                  {t("moduleDetails.breadcrumbTrainingLibrary")}
+                </Link>
+                <span className="text-[var(--darkgray)]">›</span>
+                <Link className={breadcrumbLinkClassName} href={basePath}>
+                  {libraryType === "system" ? t("moduleDetails.coreModules") : t("moduleDetails.breadcrumbMyLibrary")}
+                </Link>
+                <span className="text-[var(--darkgray)]">›</span>
+                <Link className={breadcrumbLinkClassName} href={`${basePath}/${moduleId}`}>
+                  {moduleTitle}
+                </Link>
+                <span className="text-[var(--darkgray)]">›</span>
+                <Link className={breadcrumbLinkClassName} href={listHref}>
+                  {typeLabel}
+                </Link>
+                <span className="text-[var(--darkgray)]">›</span>
+                <span className="font-medium text-[var(--mainblue)]">
+                  {content ? contentTitle(content) : `Content ${contentId}`}
+                </span>
+              </>
+            )}
           </nav>
 
           {isLoading ? (

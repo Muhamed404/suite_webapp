@@ -17,6 +17,7 @@ import {
   type QuizLanguageForm,
   type QuizQuestion,
 } from "./quiz-language-card";
+import { breadcrumbLinkClassName } from "../training-library/shared-styles";
 
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
@@ -51,14 +52,21 @@ export interface EditQuizFormProps {
   quizId: number;
   initialModuleId?: string;
   returnHref?: string;
+  campaignId?: number;
+  breadcrumbContext?: "training-library" | "campaign";
+  libraryType?: "my" | "system";
 }
 
 export function EditQuizForm({
   quizId,
   initialModuleId = "",
   returnHref = "/dashboard/quiz",
+  campaignId,
+  breadcrumbContext = "training-library",
+  libraryType = "my",
 }: EditQuizFormProps) {
   const t = useTranslations("quiz");
+  const tModule = useTranslations("module");
   const tCommon = useTranslations("common");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
@@ -225,15 +233,46 @@ export function EditQuizForm({
       >
         {t("backToQuizzes")}
       </Link>
-      <div className="text-sm text-[var(--darkgray)] mb-2">
-        <span>{t("breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}</span>
-        <span className="mx-1">›</span>
-        <span className="text-[var(--mainblue)] font-semibold">
-          {module ? moduleName(module) : "Loading..."}
-        </span>
-        <span className="mx-1">›</span>
-        <span className="text-[var(--mainblue)] font-semibold">{t("editQuiz") ?? "Edit Quiz"}</span>
-      </div>
+      <nav
+        className={clsx(
+          "flex flex-wrap items-center gap-1.5 text-sm mb-4 sm:mb-5 overflow-x-auto",
+          isRtl && "flex-row-reverse"
+        )}
+      >
+        {breadcrumbContext === "campaign" && campaignId ? (
+          <>
+            <Link className={breadcrumbLinkClassName} href="/dashboard/campaign-assignments">
+              {tModule("moduleDetails.breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}
+            </Link>
+            <span className="text-[var(--darkgray)]">›</span>
+            <Link className={breadcrumbLinkClassName} href={`/dashboard/campaign-assignments/${campaignId}`}>
+              {tModule("moduleDetails.breadcrumbCampaign") ?? "Campaign"}
+            </Link>
+            <span className="text-[var(--darkgray)]">›</span>
+            <Link className={breadcrumbLinkClassName} href={`/dashboard/campaign-assignments/${campaignId}/modules/${initialModuleId}`}>
+              {module ? moduleName(module) : "Loading..."}
+            </Link>
+            <span className="text-[var(--darkgray)]">›</span>
+            <span className="font-medium text-[var(--mainblue)]">{t("editQuiz") ?? "Edit Quiz"}</span>
+          </>
+        ) : (
+          <>
+            <Link className={breadcrumbLinkClassName} href={`/dashboard/training-library/${libraryType}`}>
+              {tModule("moduleDetails.breadcrumbTrainingLibrary") ?? "Awareness Library"}
+            </Link>
+            <span className="text-[var(--darkgray)]">›</span>
+            <Link className={breadcrumbLinkClassName} href={`/dashboard/training-library/${libraryType}`}>
+              {libraryType === "system" ? (tModule("moduleDetails.coreModules") ?? "Core Modules") : (tModule("moduleDetails.breadcrumbMyLibrary") ?? "My Modules")}
+            </Link>
+            <span className="text-[var(--darkgray)]">›</span>
+            <Link className={breadcrumbLinkClassName} href={`/dashboard/training-library/${libraryType}/${initialModuleId}`}>
+              {module ? moduleName(module) : "Loading..."}
+            </Link>
+            <span className="text-[var(--darkgray)]">›</span>
+            <span className="font-medium text-[var(--mainblue)]">{t("editQuiz") ?? "Edit Quiz"}</span>
+          </>
+        )}
+      </nav>
       <h2 className="text-2xl font-semibold text-[var(--mainblue)]">
         {t("editQuiz") ?? "Edit Quiz"}
       </h2>

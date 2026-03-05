@@ -17,7 +17,9 @@ import { Search, ChevronsUpDown, Pencil, Trash2, SearchX, Plus } from "lucide-re
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
 import { useModule, useQuizzesByModule, useQuizTypes, useDeleteQuiz } from "@/hooks/useQuiz";
+import { breadcrumbLinkClassName } from "./shared-styles";
 
 // API answer structure from the backend
 interface ApiAnswer {
@@ -41,6 +43,7 @@ const ITEMS_PER_PAGE = 10;
 export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const t = useTranslations("module");
 
   const basePath = `/dashboard/training-library/${libraryType}`;
   const createPath = `${basePath}/${moduleId}/quizzes/create`;
@@ -196,6 +199,28 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
     <ProtectedRoute>
       <DashboardLayout>
         <div className={clsx("flex flex-col p-3", isRtl && "text-right")}>
+          {/* Breadcrumb */}
+          <nav
+            className={clsx(
+              "flex items-center text-xs text-gray-500 mb-4 gap-1.5 overflow-x-auto",
+              isRtl && "flex-row-reverse"
+            )}
+          >
+            <Link className={breadcrumbLinkClassName} href={basePath}>
+              {t("moduleDetails.breadcrumbTrainingLibrary")}
+            </Link>
+            <span className="text-gray-400">›</span>
+            <Link className={breadcrumbLinkClassName} href={basePath}>
+              {libraryType === "system" ? t("moduleDetails.coreModules") : t("moduleDetails.breadcrumbMyLibrary")}
+            </Link>
+            <span className="text-gray-400">›</span>
+            <Link className={breadcrumbLinkClassName} href={`${basePath}/${moduleId}`}>
+              {moduleData ? (moduleData.title ?? moduleData.translations?.[0]?.name ?? `Module ${moduleId}`) : `Module ${moduleId}`}
+            </Link>
+            <span className="text-gray-400">›</span>
+            <span className="font-semibold text-gray-900">{t("moduleDetails.quizzes")}</span>
+          </nav>
+
           {/* Header Section */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-[var(--mainblue)]">Quiz and Answer</h2>

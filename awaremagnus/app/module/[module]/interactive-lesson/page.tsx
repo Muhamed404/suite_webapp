@@ -12,6 +12,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { isOrgUser } from "@/utils/roles";
 
 export default function InteractiveLessonPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -36,13 +37,27 @@ export default function InteractiveLessonPage({ params }: { params: Promise<{ mo
 
           <main className="flex-1 overflow-y-auto">
             <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
-              <a href="#" className="hover:text-gray-700 transition">Awareness Library</a>
-              <span className="text-gray-400">›</span>
-              <a href="#" className="hover:text-gray-700 transition">System Library</a>
-              <span className="text-gray-400">›</span>
-              <a href="#" className="hover:text-gray-700 transition">{moduleName}</a>
-              <span className="text-gray-400">›</span>
-              <span className="font-semibold text-gray-900">Interactive Training</span>
+              {isOrgUser(user?.role_id) ? (
+                <>
+                  <Link href="/dashboard/campaign-assignments" className="hover:text-gray-700 transition">
+                    {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <span>{moduleName}</span>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">Interactive Training</span>
+                </>
+              ) : (
+                <>
+                  <a href="#" className="hover:text-gray-700 transition">Awareness Library</a>
+                  <span className="text-gray-400">›</span>
+                  <a href="#" className="hover:text-gray-700 transition">System Library</a>
+                  <span className="text-gray-400">›</span>
+                  <a href="#" className="hover:text-gray-700 transition">{moduleName}</a>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">Interactive Training</span>
+                </>
+              )}
             </nav>
 
             <div className="flex flex-col px-3 gap-2">
