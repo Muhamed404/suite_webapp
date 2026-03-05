@@ -1,22 +1,22 @@
 "use client";
 
-import { use, useMemo } from "react";
+import { use, useMemo, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import clsx from "clsx";
+import { useMutation } from "@tanstack/react-query";
+import { quizService } from "@/services/quizService";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { useContent, useModule, useModules, useContentsByModule } from "@/hooks/useQuiz";
+import { useContent, useModule, useModules, useContentsByModule, useContentReportByContentId } from "@/hooks/useQuiz";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+
 import { isOrgUser } from "@/utils/roles";
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 
 function formatDuration(minutes: number | undefined): string {
   if (minutes == null || minutes <= 0) return "20 to 60 minutes";
@@ -37,9 +37,45 @@ function formatDate(dateStr: string | undefined): string {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Page
-// ---------------------------------------------------------------------------
+
+
+const CONNECTOR_SCRIPT = [
+  '(function() {',
+  '  window.ispringPresentationConnector = {};',
+  '  window.ispringPresentationConnector.register = function(player) {',
+  '    try {',
+  '      var controller = (player.view && player.view().playbackController) ? player.view().playbackController() : (player.getPlaybackController && player.getPlaybackController());',
+  '      var presentation = (player.presentation && player.presentation()) || (player.getPresentation && player.getPresentation());',
+  '      if (!controller || !presentation) { console.error("[ispring] player API mismatch"); return; }',
+  '      var slides = presentation.slides ? presentation.slides() : (presentation.getSlides && presentation.getSlides());',
+  '      var totalSlides = slides ? (slides.count ? slides.count() : (slides.getSlidesCount ? slides.getSlidesCount() : 0)) : 0;',
+  '      var sendUpdate = function() {',
+  '        try {',
+  '          var currentIndex = controller.currentSlideIndex();',
+  '          var currentSlide = currentIndex + 1;',
+  '          var slidesLeft = totalSlides - currentSlide;',
+  '          var progressPct = totalSlides > 0 ? Math.round((currentSlide / totalSlides) * 100) : 0;',
+  '          window.parent.postMessage({',
+  '            type: "ispringProgress",',
+  '            current_slide: currentSlide,',
+  '            total_slides: totalSlides,',
+  '            slides_left: slidesLeft,',
+  '            progress_percentage: progressPct',
+  '          }, "*");',
+  '        } catch (e) { console.error("[ispring] sendUpdate:", e); }',
+  '      };',
+  '      if (controller.slideChangeEvent && controller.slideChangeEvent().addHandler) {',
+  '        controller.slideChangeEvent().addHandler(sendUpdate, null);',
+  '      } else {',
+  '        setInterval(sendUpdate, 500);',
+  '      }',
+  '      sendUpdate();',
+  '    } catch (e) {',
+  '      console.error("[ispring] register error:", e);',
+  '    }',
+  '  };',
+  '})();',
+].join('\n');
 
 export default function OrgUserInteractiveContentPage({
   params,
@@ -53,8 +89,22 @@ export default function OrgUserInteractiveContentPage({
   const campaignId = searchParams?.get("campaign_id") ?? "";
   const moduleIdParam = searchParams?.get("module_id");
 
+  const token = useAuthStore((s) => s.token);
+
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+
+  // Refs for iSpring integration
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const infoRef = useRef<HTMLSpanElement>(null);
+  const [iframeSrcdoc, setIframeSrcdoc] = useState<string | null>(null);
+  const campaignIdRef = useRef(campaignId);
+  const moduleIdRef = useRef(0);
+  const contentIdRef = useRef(contentId);
+  const tokenRef = useRef(token);
+  const existingProgressRef = useRef<number>(-1);
+  useEffect(() => { campaignIdRef.current = campaignId; }, [campaignId]);
+  useEffect(() => { tokenRef.current = token; }, [token]);
   const t = useTranslations("module");
   const user = useAuthStore((s) => s.user);
   const isOrgUserCheck = isOrgUser(user?.role_id);
@@ -79,7 +129,19 @@ export default function OrgUserInteractiveContentPage({
   const { data: moduleRes } = useModule(resolvedModuleId, !!resolvedModuleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
 
-  // Sibling interactive contents for the "Next" list
+  const { data: contentReportData } = useContentReportByContentId(contentId, !!contentId);
+
+  useEffect(() => {
+    if (!contentReportData) return;
+    const items: any[] =
+      contentReportData?.object?.reportContents ??
+      (Array.isArray(contentReportData?.object) ? contentReportData.object : []);
+    const match = items.find((rc: any) => rc.content_id === contentId || rc.id === contentId);
+    if (match != null && match.progress_percentage != null) {
+      existingProgressRef.current = parseFloat(match.progress_percentage);
+    }
+  }, [contentReportData, contentId]);
+
   const { data: siblingsRes } = useContentsByModule(resolvedModuleId, { enabled: !!resolvedModuleId });
   const siblings = useMemo(() => {
     if (!siblingsRes?.success) return [];
@@ -92,6 +154,9 @@ export default function OrgUserInteractiveContentPage({
     moduleRes?.data?.title ??
     moduleRes?.data?.translations?.[0]?.name ??
     moduleSlug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+
+  useEffect(() => { moduleIdRef.current = resolvedModuleId; }, [resolvedModuleId]);
+  useEffect(() => { contentIdRef.current = contentId; }, [contentId]);
 
   const content = contentRes?.success ? contentRes.data : null;
   const contentName =
@@ -109,7 +174,87 @@ export default function OrgUserInteractiveContentPage({
   const logoUrl = content?.logo_url || (content as any)?.logo_path;
   const coverImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
 
-  // Back-link preserves campaign context
+  const progressMutation = useMutation({
+    mutationFn: (payload: {
+      campaign_id: number;
+      module_id: number;
+      content_id: number;
+      progress_percentage: number;
+    }) => quizService.updateContentProgress(payload),
+  });
+
+  useEffect(() => {
+    const handler = async (event: MessageEvent) => {
+      if (!event.data || event.data.type !== 'ispringProgress') return;
+      const d = event.data as {
+        current_slide: number; total_slides: number;
+        slides_left: number; progress_percentage: number;
+      };
+      // Update info span directly — no React re-render needed
+      if (infoRef.current) {
+        infoRef.current.innerHTML =
+          `Slide: ${d.current_slide} / ${d.total_slides} &nbsp;|&nbsp; Slides left: ${d.slides_left}`;
+      }
+      (window as any).__ispringLastProgress = d;
+      const cid = campaignIdRef.current;
+      const mid = moduleIdRef.current;
+      const ctid = contentIdRef.current;
+      if (!cid || !mid || !ctid) return;
+
+      const existing = existingProgressRef.current;
+      const incoming = d.progress_percentage;
+
+      // Already completed – never send another update
+      if (existing >= 100) return;
+      // No improvement over what was already saved – skip
+      if (incoming <= existing) return;
+
+      try {
+        await progressMutation.mutateAsync({
+          campaign_id: Number(cid),
+          module_id: mid,
+          content_id: ctid,
+          progress_percentage: incoming,
+        });
+        // Keep ref in sync so the next slide event compares correctly
+        existingProgressRef.current = incoming;
+      } catch (e) {
+        console.error("[updateProgressAPI] error:", e);
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [progressMutation]); // include mutation in deps just to satisfy lint
+
+  useEffect(() => {
+    if (!interactiveUrl) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(interactiveUrl);
+        if (!res.ok || cancelled) return;
+        let html = await res.text();
+        // Compute absolute base URL so all relative assets still resolve
+        const absoluteUrl = new URL(interactiveUrl, window.location.href).href;
+        const baseUrl = absoluteUrl.substring(0, absoluteUrl.lastIndexOf('/') + 1);
+        const baseTag = `<base href="${baseUrl}">`;
+        const connectorTag = `<script>${CONNECTOR_SCRIPT}<\/script>`;
+        // Inject as early as possible so connector exists before player.js runs
+        if (html.includes('<head>')) {
+          html = html.replace('<head>', `<head>${baseTag}${connectorTag}`);
+        } else if (/<html[^>]*>/i.test(html)) {
+          html = html.replace(/<html[^>]*>/i, (m) => `${m}<head>${baseTag}${connectorTag}</head>`);
+        } else {
+          html = baseTag + connectorTag + html;
+        }
+        if (!cancelled) setIframeSrcdoc(html);
+      } catch (e) {
+        console.error('[ispring] fetch error:', e);
+      }
+    })();
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [interactiveUrl]);
   const backHref = campaignId
     ? `/module/${moduleSlug}?campaign_id=${campaignId}`
     : `/module/${moduleSlug}`;
@@ -156,7 +301,6 @@ export default function OrgUserInteractiveContentPage({
             )}
           </nav>
 
-          {/* Title */}
           <div className="mb-4">
             <h1 className="text-xl font-semibold text-gray-900">{contentName}</h1>
             {content?.description && (
@@ -164,7 +308,6 @@ export default function OrgUserInteractiveContentPage({
             )}
           </div>
 
-          {/* ── Interactive frame ───────────────────────────────────────── */}
           <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200">
             <div
               className="relative bg-black w-full"
@@ -176,10 +319,11 @@ export default function OrgUserInteractiveContentPage({
                 </div>
               ) : interactiveUrl ? (
                 <iframe
+                  ref={iframeRef}
                   allowFullScreen
                   allow="fullscreen; autoplay"
                   className="w-full h-full border-0"
-                  src={interactiveUrl}
+                  {...(iframeSrcdoc ? { srcDoc: iframeSrcdoc } : { src: interactiveUrl })}
                   style={{ display: "block", width: "100%", height: "100%" }}
                   title={contentName}
                 />
@@ -198,7 +342,10 @@ export default function OrgUserInteractiveContentPage({
               )}
             </div>
 
-            {/* ── Meta bar ──────────────────────────────────────────────── */}
+            <div className={clsx("flex items-center gap-4 px-4 py-2 bg-gray-50 border-t border-gray-200 text-sm text-gray-700", isRtl && "flex-row-reverse")}>
+              <span ref={infoRef} id="ispring-info" style={{ fontFamily: "Arial, sans-serif" }}>Loading...</span>
+            </div>
+
             {content && (
               <>
                 <div className="p-4 border-b border-gray-100">
@@ -223,7 +370,6 @@ export default function OrgUserInteractiveContentPage({
                   </div>
                 </div>
 
-                {/* ── Action bar ─────────────────────────────────────────── */}
                 <div className={clsx("p-4 flex items-center gap-3 flex-wrap", isRtl && "flex-row-reverse")}>
                   {interactiveUrl && (
                     <a
@@ -237,16 +383,6 @@ export default function OrgUserInteractiveContentPage({
                     </a>
                   )}
 
-                  {siblings.length > 0 && (
-                    <Link
-                      className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-full text-xs font-medium transition"
-                      href={`/module/${moduleSlug}/interactive-content/${siblings[0].id}?campaign_id=${campaignId}&module_id=${resolvedModuleId}`}
-                    >
-                      Next
-                      <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><polyline points="9 18 15 12 9 6" /></svg>
-                    </Link>
-                  )}
-
                   <Link
                     className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-full text-xs font-medium transition ms-auto"
                     href={backHref}
@@ -258,32 +394,7 @@ export default function OrgUserInteractiveContentPage({
             )}
           </div>
 
-          {/* ── Sibling list ─────────────────────────────────────────────── */}
-          {siblings.length > 0 && (
-            <div className="mt-4 bg-white rounded-2xl p-4 border border-gray-200">
-              <h5 className="text-sm font-semibold mb-3 text-gray-900">More Interactive Content</h5>
-              <div className="space-y-2">
-                {siblings.slice(0, 5).map((s) => (
-                  <Link
-                    key={s.id}
-                    className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-lg transition"
-                    href={`/module/${moduleSlug}/interactive-content/${s.id}?campaign_id=${campaignId}&module_id=${resolvedModuleId}`}
-                  >
-                    <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center text-sky-600 flex-shrink-0 text-sm">
-                      📘
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-medium text-gray-900 truncate">
-                        {(s as any).title ?? (s as any).name ?? `Content ${s.id}`}
-                      </p>
-                      <p className="text-[10px] text-gray-400">{formatDate(s.created_at)}</p>
-                    </div>
-                    <svg className="text-gray-400 flex-shrink-0" fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><polyline points="9 18 15 12 9 6" /></svg>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+
         </div>
       </DashboardLayout>
     </ProtectedRoute>

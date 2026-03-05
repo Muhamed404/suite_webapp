@@ -25,7 +25,7 @@ export const GamificationStats = () => {
   const isOrgAdmin = getIsOrgAdmin(_user?.role_id);
   const isUser = getIsUser(_user?.role_id);
 
-  const { data: systemData } = useSystemOverview();
+  const { data: systemData } = useSystemOverview({ enabled: isPlatformAdmin });
   const { data: orgDataResponse } = useOrganizationDashboards();
   const { data: userDataResponse } = useUserDashboards({ userId: _user?.id });
 
