@@ -463,6 +463,18 @@ export const quizService = {
   },
 
   /**
+   * GET /report/contents?contentId={id}
+   * Returns the report/content info for a specific contentId.
+   * Used to retrieve the existing progress before sending an update.
+   */
+  getContentReportByContentId: async (contentId: number) => {
+    const { data } = await awmClient.get<any>(`${API_BASE}/report/contents`, {
+      params: { contentId },
+    });
+    return data;
+  },
+
+  /**
    * GET /api/awm/category
    * Returns all global categories { categories, count }
    */

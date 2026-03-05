@@ -320,3 +320,11 @@ export function useContentsReport(reportModuleId: number, enabled = true) {
     enabled: enabled && !!reportModuleId,
   });
 }
+
+export function useContentReportByContentId(contentId: number, enabled = true) {
+  return useQuery({
+    queryKey: ["quiz", "content-report-by-content-id", contentId],
+    queryFn: () => quizService.getContentReportByContentId(contentId),
+    enabled: enabled && !!contentId,
+  });
+}
