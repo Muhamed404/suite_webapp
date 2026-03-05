@@ -354,7 +354,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                     </Link>
                     <span className="text-gray-400">›</span>
                     {campaignId && moduleId ? (
-                      <Link href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`} className={breadcrumbLinkClassName}>
+                      <Link href={`/module/${module}?campaign_id=${campaignId}`} className={breadcrumbLinkClassName}>
                         {triviaTitle}
                       </Link>
                     ) : (

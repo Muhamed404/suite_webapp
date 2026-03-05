@@ -13,7 +13,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useContentsWithProgress, useModule, useModules, useModuleReport, useContentsReport } from "@/hooks/useQuiz";
+import { useContentsWithProgress, useModule, useModules } from "@/hooks/useQuiz";
 import { campaignService } from "@/services/campaignService";
 import { awmClient, API_BASE } from "@/services/httpClient";
 import { isOrgUser } from "@/utils/roles";
@@ -113,33 +113,14 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   // Get module basic info
   const { data: moduleRes } = useModule(moduleId ?? 1, !!moduleId);
 
-  // Get module report with progress_percentage
-  const { data: moduleReportRes } = useModuleReport(moduleId ?? 1, !!moduleId);
-
-  // If we have a report ID, fetch individual content statuses
-  const reportModuleId = moduleReportRes?.data?.id;
-  const { data: contentsReportRes } = useContentsReport(reportModuleId, !!reportModuleId);
-
-  // Transform API data to items format, merging report content statuses if available
+  // Transform API data to items format
   const items = useMemo(() => {
     if (!contentsWithProgressRes?.success) return [];
     
     const data = contentsWithProgressRes.data;
     const transformedItems: any[] = [];
 
-    // build a map of content_id -> report status name (lowercase)
-    // map content_id -> { statusName, contypeId }
-    const statusMap = new Map<number, { statusName: string; contypeId?: number }>();
-    if (contentsReportRes?.success && contentsReportRes.data?.reportContents) {
-      contentsReportRes.data.reportContents.forEach((rc: any) => {
-        if (rc.content_id != null && rc.status?.name) {
-          statusMap.set(rc.content_id, {
-            statusName: rc.status.name.toLowerCase(),
-            contypeId: rc.content?.contype_id,
-          });
-        }
-      });
-    }
+
 
     // Add non-aggregated contents (Interactive content, Videos, Documents, etc.)
     // Group gallery items so posters/brochures/documents/screen‑savers appear as one card.
@@ -160,11 +141,8 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         }
 
         // process a regular non-gallery item
-        const reported = statusMap.get(content.id);
         let statusValue: string;
-        if (reported) {
-          statusValue = reported.statusName;
-        } else if (content.user_completion_status) {
+        if (content.user_completion_status) {
           statusValue = content.user_completion_status.toLowerCase();
         } else if (content.status && typeof content.status === 'string') {
           statusValue = content.status.toLowerCase();
@@ -206,8 +184,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         // Determine aggregated status: completed if all completed, else in progress
         let aggStatus = 'in progress';
         const allCompleted = items.every((c: any) => {
-          const rep = statusMap.get(c.id ?? c.content_id);
-          const sv = rep?.statusName ?? c.user_completion_status ?? c.status ?? '';
+          const sv = c.user_completion_status ?? c.status ?? '';
           return String(sv).toLowerCase() === 'completed';
         });
         if (allCompleted) aggStatus = 'completed';
@@ -257,15 +234,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         if (agg.total_count > 0) {
           // determine status based on report entries matching this content type
           let aggStatus: string | undefined;
-          // iterate using forEach to avoid downlevelIteration issues
-          statusMap.forEach((rc) => {
-            if (aggStatus == null && rc.contypeId === agg.content_type_id) {
-              aggStatus = rc.statusName;
-            }
-          });
-          if (!aggStatus) {
-            aggStatus = agg.statuses?.some((s: any) => s.status === 2) ? 'completed' : 'pending';
-          }
+          aggStatus = agg.statuses?.some((s: any) => s.status === 2) ? 'completed' : 'pending';
           // Change pending to in progress for consistency
           if (aggStatus === 'pending') {
             aggStatus = 'in progress';
@@ -334,7 +303,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     }
 
     return transformedItems;
-  }, [contentsWithProgressRes, contentsReportRes, moduleRes]);
+  }, [contentsWithProgressRes, moduleRes]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
@@ -372,12 +341,9 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   // Calculate overall progress from API data
   const overallProgress = useMemo(() => {
-    if (moduleReportRes?.success && moduleReportRes.data?.progress_percentage) {
-      return parseFloat(moduleReportRes.data.progress_percentage);
-    }
     if (!contentsWithProgressRes?.success) return 0;
     return contentsWithProgressRes.data?.user_progress_summary?.overall_progress_percent || 0;
-  }, [moduleReportRes, contentsWithProgressRes]);
+  }, [contentsWithProgressRes]);
 
   // Get module info from API
   const moduleInfo = useMemo(() => {
@@ -667,7 +633,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                       <input
                         id="searchInput"
                         type="text"
-                        placeholder="Search Campaign..."
+                        placeholder="Search Content..."
                         value={searchQuery}
                         onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
                         className="datatable-input w-full pr-4 py-2 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-9 placeholder-gray-400"

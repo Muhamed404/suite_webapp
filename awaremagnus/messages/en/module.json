@@ -106,7 +106,9 @@
     "nextPosterTraining": "More Posters",
     "nextScreenSaverTraining": "More Screen Savers",
     "nextDocumentTraining": "Next Document Training",
-    "nextInteractiveTraining": "Next Interactive Training"
+    "nextInteractiveTraining": "Next Interactive Training",
+    "markAsCompleted": "Mark as Completed",
+    "markingAsCompleted": "Marking…"
   },
   "moduleDetails": {
     "title": "Module",

@@ -444,6 +444,22 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
 
                     </div>
 
+                    {(() => {
+                      const fullUrl = !content.source_url ? undefined : content.source_url.startsWith("http://") || content.source_url.startsWith("https://") ? content.source_url : `${SERVICE_AWM_URL}${content.source_url}`;
+                      return fullUrl ? (
+                        <div className="p-4 flex items-center gap-3 flex-wrap">
+                          <a
+                            className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
+                            href={fullUrl}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                          >
+                            <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                            Open Full Screen
+                          </a>
+                        </div>
+                      ) : null;
+                    })()}
 
                   </div>
                 ))

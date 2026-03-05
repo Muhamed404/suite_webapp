@@ -10,7 +10,15 @@ import clsx from "clsx";
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AuthImage } from "@/components/ui/auth-image";
-import { useModule, useContent, useContentsByModule } from "@/hooks/useQuiz";
+import {
+  useModule,
+  useContent,
+  useContentsByModule,
+  useReportCampaign,
+  useReportModuleByParams,
+  useDocumentContentReport,
+  useCompleteContent,
+} from "@/hooks/useQuiz";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -85,10 +93,50 @@ export function OrgUserPosterBrochureDetailScreen({
 
   const isBrochure = contentTypeId === 3 || contentTypeId === 6 || contentTypeId === 7;
   const isPoster = contentTypeId === 4 || contentTypeId === 5;
+  const isDocument = contentTypeId === 6 || contentTypeId === 7;
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
   const { data: contentsRes } = useContentsByModule(moduleId, !!moduleId);
+
+  // Document-specific: two-step resolution of reportModuleId
+  // Step 1: get report_campaign_id
+  const { data: reportCampaignRes } = useReportCampaign(campaignId, isDocument && !!campaignId);
+  const reportCampaignId: number | undefined =
+    reportCampaignRes?.data?.id ??
+    reportCampaignRes?.data?.reportCampaign?.id ??
+    (Array.isArray(reportCampaignRes?.data) ? reportCampaignRes.data[0]?.id : undefined) ??
+    undefined;
+  // Step 2: get report_module_id using report_campaign_id + module_id
+  const { data: reportModuleRes } = useReportModuleByParams(
+    reportCampaignId ?? 0,
+    moduleId,
+    isDocument && !!reportCampaignId && !!moduleId
+  );
+  const reportModuleId: number | undefined =
+    reportModuleRes?.data?.id ??
+    reportModuleRes?.data?.reportModule?.id ??
+    (Array.isArray(reportModuleRes?.data) ? reportModuleRes.data[0]?.id : undefined) ??
+    undefined;
+  const { data: docReportRes, refetch: refetchDocReport } = useDocumentContentReport(
+    contentId,
+    reportModuleId,
+    isDocument && !!contentId
+  );
+  const completeContentMutation = useCompleteContent();
+
+  const docReportContents = docReportRes?.data?.reportContents ?? [];
+  const docReportEntry = docReportContents.find((rc: any) => rc.content_id === contentId) ?? docReportContents[0];
+  const docStatusName: string = (docReportEntry?.status?.name ?? "").toUpperCase();
+  const isCompleted = docStatusName === "COMPLETED";
+  const showMarkAsCompleted = isDocument && !!docReportEntry && !isCompleted;
+
+  function handleMarkAsCompleted() {
+    completeContentMutation.mutate(
+      { campaign_id: campaignId, module_id: moduleId, content_id: contentId },
+      { onSuccess: () => { void refetchDocReport(); } }
+    );
+  }
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
   const content = (contentRes?.success ? contentRes.data : null) as ModuleContent | null;
@@ -154,7 +202,7 @@ export function OrgUserPosterBrochureDetailScreen({
             </Link>
             <span className="text-gray-400">›</span>
             {campaignId ? (
-              <Link className="hover:text-gray-700 transition-colors" href={campaignModuleContentsHref}>
+              <Link className="hover:text-gray-700 transition-colors" href={`/module/${moduleData?.code ?? moduleId}?campaign_id=${campaignId}`}>
                 {moduleTitle}
               </Link>
             ) : (
@@ -308,10 +356,12 @@ export function OrgUserPosterBrochureDetailScreen({
                           <line x1="12" x2="12" y1="15" y2="3" />
                         </svg>
                         {contentTypeId === 4
-                          ? (t("library.downloadPoster") ?? "Download")
+                          ? (t("library.downloadPoster") ?? "Download Poster")
                           : contentTypeId === 5
                           ? (t("library.downloadScreenSaver") ?? "Download Screen Saver")
-                          : (t("library.downloadBrochure") ?? "Download")}
+                          : (contentTypeId === 6 || contentTypeId === 7)
+                          ? (t("library.downloadDocument") ?? "Download Document")
+                          : (t("library.downloadBrochure") ?? "Download Brochure")}
                       </a>
 
                       {/* Next item */}
@@ -336,45 +386,23 @@ export function OrgUserPosterBrochureDetailScreen({
                     </div>
 
                     {/* Right: icon actions */}
-                    <div className={clsx("flex items-center gap-1", isRtl && "flex-row-reverse")}>
-                      <button
-                        aria-label="Share"
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                        type="button"
-                      >
-                        <svg className="text-gray-500" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15">
-                          <circle cx="18" cy="5" r="3" />
-                          <circle cx="6" cy="12" r="3" />
-                          <circle cx="18" cy="19" r="3" />
-                          <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
-                          <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
-                        </svg>
-                      </button>
-                      <a
-                        download
-                        aria-label="Download"
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                        href={isPoster ? (posterDisplayUrl ?? "#") : (resolvedUrl ?? "#")}
-                        rel="noopener noreferrer"
-                        target="_blank"
-                      >
-                        <svg className="text-gray-500" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                          <polyline points="7 10 12 15 17 10" />
-                          <line x1="12" x2="12" y1="15" y2="3" />
-                        </svg>
-                      </a>
-                      <button
-                        aria-label="More options"
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                        type="button"
-                      >
-                        <svg className="text-gray-500" fill="none" height="15" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="15">
-                          <circle cx="12" cy="5" r="1" />
-                          <circle cx="12" cy="12" r="1" />
-                          <circle cx="12" cy="19" r="1" />
-                        </svg>
-                      </button>
+                    <div className={clsx("flex items-center gap-2", isRtl && "flex-row-reverse")}>
+                      {/* Mark as Completed button (documents only, shown when not yet completed) */}
+                      {showMarkAsCompleted && (
+                        <button
+                          className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:opacity-60 text-white rounded-full text-xs font-medium transition-colors"
+                          disabled={completeContentMutation.isPending}
+                          type="button"
+                          onClick={handleMarkAsCompleted}
+                        >
+                          <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                          {completeContentMutation.isPending
+                            ? t("library.markingAsCompleted")
+                            : t("library.markAsCompleted")}
+                        </button>
+                      )}
                     </div>
                   </div>
                 </>

@@ -313,6 +313,26 @@ export function useModuleReport(moduleId: number, enabled = true) {
   });
 }
 
+export function useReportCampaign(campaignId: number, enabled = true) {
+  return useQuery({
+    queryKey: ["quiz", "report-campaign", campaignId],
+    queryFn: () => quizService.getReportCampaign(campaignId),
+    enabled: enabled && !!campaignId,
+  });
+}
+
+export function useReportModuleByParams(
+  reportCampaignId: number,
+  moduleId: number,
+  enabled = true
+) {
+  return useQuery({
+    queryKey: ["quiz", "report-module-by-params", reportCampaignId, moduleId],
+    queryFn: () => quizService.getReportModuleByParams(reportCampaignId, moduleId),
+    enabled: enabled && !!reportCampaignId && !!moduleId,
+  });
+}
+
 export function useContentsReport(reportModuleId: number, enabled = true) {
   return useQuery({
     queryKey: ["quiz", "contents-report", reportModuleId],
@@ -326,5 +346,30 @@ export function useContentReportByContentId(contentId: number, enabled = true) {
     queryKey: ["quiz", "content-report-by-content-id", contentId],
     queryFn: () => quizService.getContentReportByContentId(contentId),
     enabled: enabled && !!contentId,
+  });
+}
+
+export function useDocumentContentReport(
+  contentId: number,
+  reportModuleId?: number,
+  enabled = true
+) {
+  return useQuery({
+    queryKey: ["quiz", "document-content-report", contentId, reportModuleId],
+    queryFn: () => quizService.getDocumentContentReport(contentId, reportModuleId),
+    enabled: enabled && !!contentId,
+  });
+}
+
+export function useCompleteContent() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (payload: { campaign_id: number; module_id: number; content_id: number }) =>
+      quizService.completeContent(payload),
+    onSuccess: (_, { content_id }) => {
+      qc.invalidateQueries({ queryKey: ["quiz", "document-content-report", content_id] });
+      qc.invalidateQueries({ queryKey: ["quiz", "contents-report"] });
+    },
   });
 }

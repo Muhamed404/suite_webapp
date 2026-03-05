@@ -451,6 +451,30 @@ export const quizService = {
   },
 
   /**
+   * GET /report/campaigns?campaignId={id}
+   * Returns the report campaign entry (contains id = report_campaign_id)
+   */
+  getReportCampaign: async (campaignId: number) => {
+    return request<any>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/report/campaigns`, {
+        params: { campaignId },
+      })
+    );
+  },
+
+  /**
+   * GET /report/modules?reportCampaignId={id}&moduleId={id}
+   * Returns the report module entry (contains id = report_module_id)
+   */
+  getReportModuleByParams: async (reportCampaignId: number, moduleId: number) => {
+    return request<any>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/report/modules`, {
+        params: { reportCampaignId, moduleId },
+      })
+    );
+  },
+
+  /**
    * GET /report/contents?reportModuleId={id}
    * returns object.reportContents
    */
@@ -507,6 +531,32 @@ export const quizService = {
   }) => {
     return request<unknown>(() =>
       awmClient.post<AWMResponseBody>(`${API_BASE}/useraction/report-actions/update-content-progress`, payload)
+    );
+  },
+
+  /**
+   * GET /report/contents?contentId={id}&reportModuleId={id}
+   * Fetches the report content record for a specific content (used on document pages).
+   */
+  getDocumentContentReport: async (contentId: number, reportModuleId?: number) => {
+    const params: Record<string, number> = { contentId };
+    if (reportModuleId) params.reportModuleId = reportModuleId;
+    return request<{ reportContents: ReportContent[] }>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/report/contents`, { params })
+    );
+  },
+
+  /**
+   * POST /useraction/report-actions/complete-content
+   * Marks a content item as completed for a user in a campaign.
+   */
+  completeContent: async (payload: {
+    campaign_id: number;
+    module_id: number;
+    content_id: number;
+  }) => {
+    return request<unknown>(() =>
+      awmClient.post<AWMResponseBody>(`${API_BASE}/useraction/report-actions/complete-content`, payload)
     );
   },
 

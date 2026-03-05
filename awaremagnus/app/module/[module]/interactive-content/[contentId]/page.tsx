@@ -14,7 +14,6 @@ import { useAuthStore } from "@/hooks/useAuthStore";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
-import { useAuthStore } from "@/hooks/useAuthStore";
 
 import { isOrgUser } from "@/utils/roles";
 
@@ -345,20 +344,6 @@ export default function OrgUserInteractiveContentPage({
 
             <div className={clsx("flex items-center gap-4 px-4 py-2 bg-gray-50 border-t border-gray-200 text-sm text-gray-700", isRtl && "flex-row-reverse")}>
               <span ref={infoRef} id="ispring-info" style={{ fontFamily: "Arial, sans-serif" }}>Loading...</span>
-              <button
-                type="button"
-                className="ms-auto px-4 py-1.5 border border-gray-300 bg-white hover:bg-gray-100 text-gray-700 rounded text-xs font-medium transition cursor-pointer"
-                onClick={() => {
-                    const last = (window as any).__ispringLastProgress;
-                    if (last) {
-                                window.dispatchEvent(new MessageEvent('message', {
-                        data: { ...last, type: 'ispringProgress' }
-                      }));
-                    }
-                  }}
-              >
-                Test Update Progress
-              </button>
             </div>
 
             {content && (
