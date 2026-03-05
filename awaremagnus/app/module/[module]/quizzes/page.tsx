@@ -545,7 +545,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                     </div>
 
                     <div id="completionActions" className="flex flex-col gap-2 max-w-xs w-full transition-all duration-500 ease-out opacity-100 translate-y-0">
-                      <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1.5 px-4 text-xs rounded-full transition" id="viewReportBtn" onClick={() => router.push('/report-card')}>
+                      <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1.5 px-4 text-xs rounded-full transition" id="viewReportBtn" onClick={() => router.push('/dashboard/my-report-card')}>
                         View Report
                       </button>
                       <button className="border border-gray-300 text-gray-700 font-semibold py-1.5 px-4 text-xs rounded-full hover:bg-gray-50 transition" id="goBackBtn" onClick={handleCompletionGoBack}>
