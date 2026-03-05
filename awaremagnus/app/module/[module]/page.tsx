@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo, use } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Search, ChevronRight, ChevronLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCampaignModules } from "@/hooks/useCampaign";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -20,7 +21,7 @@ import { quizService } from "@/services/quizService";
 
 export default function PhysicalSecurityPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
-  const moduleName = module.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Convert slug to title
+  const moduleName = module.replace(/-/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()); // Convert slug to title
   const t = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
@@ -77,6 +78,29 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     return 1; // Default campaign ID
   }, [searchParams, isOrgUserView, assignedModulesRes, moduleId]);
 
+  // fetch list of modules that belong to this campaign so we can wire up "next module" navigation
+  const { data: campaignModulesRes } = useCampaignModules(campaignId, !!campaignId);
+
+  // helper for slugs (same as dashboard and campaign assignments)
+  const generateModuleSlug = useCallback((name: string) =>
+    (name || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, ""),
+  []);
+
+  const nextModuleSlug = useMemo(() => {
+    if (!campaignModulesRes?.success || !moduleId) return null;
+    const list = campaignModulesRes.data || [];
+    const idx = list.findIndex((m: any) => m.id === moduleId);
+    if (idx === -1 || idx === list.length - 1) return null;
+    const next = list[idx + 1];
+    // Module type defines `title`, so just use that.  Cast to any in case third-party returns extra
+    return generateModuleSlug((next as any).title || "");
+  }, [campaignModulesRes, moduleId, generateModuleSlug]);
+
   // Fetch content with progress data
   const { data: contentsWithProgressRes, isLoading } = useContentsWithProgress(
     moduleId ?? 1,
@@ -120,7 +144,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     // Add non-aggregated contents (Interactive content, Videos, Documents, etc.)
     // Group gallery items so posters/brochures/documents/screen‑savers appear as one card.
     if (data.non_aggregated_contents) {
-      const GALLERY_TYPES = ['Posters', 'Brochures', 'Documents', 'Screen Savers', 'Screen savers'];
+      const GALLERY_TYPES = ['Posters', 'Brochures', 'Screen Savers', 'Screen savers'];
       const galleryGroups = new Map<number, any[]>();
 
       data.non_aggregated_contents.forEach((content: any) => {
@@ -701,8 +725,16 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                         <p className="text-xs text-gray-600 leading-relaxed">{moduleInfo.description}</p>
                       </div>
 
-                      <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-full text-xs font-semibold flex items-center justify-center gap-2">
-                        <span>Next Module</span>
+                      <Button
+                        disabled={!nextModuleSlug}
+                        onClick={() => {
+                          if (nextModuleSlug) {
+                            router.push(`/module/${nextModuleSlug}?campaign_id=${campaignId}`);
+                          }
+                        }}
+                        className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-full text-xs font-semibold flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        <span>{t("moduleDetails.nextModule")}</span>
                       </Button>
                     </div>
                   </div>

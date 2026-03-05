@@ -104,13 +104,14 @@ export default function DashboardPage() {
   const isUser = getIsUser(user?.role_id);
 
   // --- Data Fetching ---
-  const { data: systemData } = useSystemOverview();
+  // query fetching is disabled for non-platform users to avoid unnecessary system endpoints
+  const { data: systemData } = useSystemOverview({ enabled: isPlatformAdmin });
   const { data: orgDataResponse } = useOrganizationDashboards();
   const { data: userDataResponse } = useUserDashboards({ userId: user?.id });
   const { data: assignmentsData } = useUserAssignments({ language_id: 1 });
   const { data: userGameAchievementsData } = useUserGameAchievements();
 
-  const { data: systemStrugglingRaw } = useSystemStrugglingModules();
+  const { data: systemStrugglingRaw } = useSystemStrugglingModules({ enabled: isPlatformAdmin });
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
   const { data: licenseData } = useLicenseInfo(!isUser);
 

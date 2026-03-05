@@ -72,31 +72,43 @@ export const DASHBOARD_KEYS = {
 
 // --- System Dashboard Hooks ---
 
-export const useSystemOverview = () => {
+export const useSystemOverview = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.system.overview,
     queryFn: dashboardService.getSystemOverview,
+    // allow caller to disable when not needed (e.g. non-platform users)
+    ...options,
   });
 };
 
-export const useSystemMonthlyCompletion = (orgId?: number) => {
+export const useSystemMonthlyCompletion = (
+  orgId?: number,
+  options?: { enabled?: boolean }
+) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.system.monthlyCompletion(orgId),
     queryFn: () => dashboardService.getSystemMonthlyCompletion({ orgId }),
+    ...options,
   });
 };
 
-export const useSystemStrugglingModules = () => {
+export const useSystemStrugglingModules = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.system.strugglingModules,
     queryFn: dashboardService.getSystemStrugglingModules,
+    ...options,
   });
 };
 
-export const useSystemLeaderboard = (count?: number, sortBy?: string) => {
+export const useSystemLeaderboard = (
+  count?: number,
+  sortBy?: string,
+  options?: { enabled?: boolean }
+) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.system.leaderboard(count, sortBy),
     queryFn: () => dashboardService.getSystemLeaderboard({ count, sortBy }),
+    ...options,
   });
 };
 

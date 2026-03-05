@@ -317,8 +317,10 @@ export function OrgUserPosterBrochureDetailScreen({
                           <polyline points="7 10 12 15 17 10" />
                           <line x1="12" x2="12" y1="15" y2="3" />
                         </svg>
-                        {isPoster
+                        {contentTypeId === 4
                           ? (t("library.downloadPoster") ?? "Download")
+                          : contentTypeId === 5
+                          ? (t("library.downloadScreenSaver") ?? "Download Screen Saver")
                           : (t("library.downloadBrochure") ?? "Download")}
                       </a>
 
@@ -398,6 +400,8 @@ export function OrgUserPosterBrochureDetailScreen({
                     : contentTypeId === 5
                     ? (t("library.nextScreenSaverTraining") ?? "More Screen Savers")
                     : contentTypeId === 6
+                    ? (t("library.nextDocumentTraining") ?? "More Documents")
+                    : contentTypeId === 7
                     ? (t("library.nextDocumentTraining") ?? "More Documents")
                     : (t("library.nextBrochureTraining") ?? "More Brochures")}
                 </h4>
