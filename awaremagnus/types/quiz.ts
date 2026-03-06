@@ -181,6 +181,8 @@ export interface AddModuleTranslationPayload {
   description?: string;
   /** Legacy: some backends use name */
   name?: string;
+  /** Optional logo banner image file */
+  logo_banner?: File | null;
 }
 
 export interface CreateContentPayload {
