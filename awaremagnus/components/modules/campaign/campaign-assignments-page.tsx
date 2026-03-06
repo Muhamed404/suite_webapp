@@ -326,7 +326,7 @@ export function CampaignAssignmentsPage() {
   };
 
   const stats = useMemo(() => {
-    // Calculate counts from actual campaigns data
+    // Calculate counts from actual campaigns data (fallbacks only)
     const campaignCounts = displayCampaigns.reduce(
       (acc: { active: number; pending: number; completed: number }, campaign: CampaignAssignment) => {
         const status = getCampaignStatus(campaign);
@@ -336,11 +336,41 @@ export function CampaignAssignmentsPage() {
       { active: 0, pending: 0, completed: 0 }
     );
 
+    // Prefer values returned by the dashboardUsers API when available
+    // "assignment" card should reflect modules enrolled, not campaigns
+    const totalAssignments =
+      userMetrics && typeof userMetrics.total_modules_enrolled === 'number'
+        ? userMetrics.total_modules_enrolled
+        : // fallback to campaign count if modules data is missing
+          (userMetrics && typeof userMetrics.total_campaigns === 'number'
+            ? userMetrics.total_campaigns
+            : displayCampaigns.length);
+
+    const completedCount =
+      userMetrics && typeof userMetrics.total_completed_modules === 'number'
+        ? userMetrics.total_completed_modules
+        : campaignCounts.completed;
+
+    // pending should be based on the number of modules enrolled
+    const pendingCount =
+      // if we were able to compute totalAssignments above, use that
+      typeof totalAssignments === 'number'
+        ? totalAssignments - completedCount
+        : // fallback to old logic (campaign-based) if modules info is unavailable
+          userMetrics && typeof userMetrics.total_campaigns === 'number'
+            ? userMetrics.total_campaigns - (userMetrics.total_completed_modules ?? 0)
+            : campaignCounts.pending;
+
+    const responseRateValue =
+      userMetrics && userMetrics.global_progress_percent != null
+        ? Number(userMetrics.global_progress_percent)
+        : 0;
+
     return {
-      assignment: displayCampaigns.length,
-      completed: campaignCounts.completed,
-      pending: campaignCounts.pending,
-      responseRate: userMetrics?.global_progress_percent ?? 0,
+      assignment: totalAssignments,
+      completed: completedCount,
+      pending: pendingCount,
+      responseRate: responseRateValue,
       active: campaignCounts.active,
     };
   }, [displayCampaigns, userMetrics]);
