@@ -120,7 +120,7 @@ export const DashboardSidebar = ({
       label: t("menu.myAwareness"),
       children: [
         { href: "/dashboard/certificates", icon: "", label: t("menu.certificates") },
-        { href: "/dashboard/my-report-card", icon: "", label: t("menu.reportCard") },
+       
       ],
     },
   ];
