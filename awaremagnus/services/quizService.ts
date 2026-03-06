@@ -100,10 +100,22 @@ export const quizService = {
 
   addModuleTranslation: async (moduleId: number, payload: AddModuleTranslationPayload) => {
     const name = payload.name ?? payload.title ?? "";
+
+     if (payload.logo_banner instanceof File) {
+      const formData = new FormData();
+      formData.append("language_id", String(payload.language_id));
+      formData.append("name", name);
+      if (payload.description) formData.append("description", payload.description);
+      formData.append("logo_banner", payload.logo_banner);
+      return request<ModuleTranslation>(() =>
+        awmClient.post<AWMResponseBody>(`${API_BASE}/module/${moduleId}/translation`, formData)
+      );
+    }
+
     const body = {
       language_id: payload.language_id,
       name,
-      title: name,
+      // title: name,
       description: payload.description,
     };
 
