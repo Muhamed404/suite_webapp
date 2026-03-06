@@ -19,7 +19,8 @@ import { certificateService, type CertificateTemplate } from "@/services/certifi
 import { addToast } from "@heroui/toast";
 import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
 import { AuthImage } from "@/components/ui/auth-image";
-import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS, getLanguageFlag } from "@/utils/supportedLanguages";
+import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS, getLanguageFlag, getLanguageCountryCode } from "@/utils/supportedLanguages";
+import ReactCountryFlag from "react-country-flag";
 import { generateCertificateHtml } from "@/utils/certificateHtmlGenerator";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { isPlatformAdmin, isOrgAdmin } from "@/utils/roles";
@@ -235,7 +236,14 @@ export function CertificateManagementListPage() {
                                                 <td className="px-4 py-3.5 text-gray-900 font-medium">Certificate - {cert.language?.name || 'Unknown'}</td>
                                                 <td className="px-4 py-3.5 text-gray-600">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-lg leading-none">{getLanguageFlag(cert.lang_id)}</span>
+                                                        <span className="flex items-center justify-center w-5 h-5 overflow-hidden rounded-full border border-gray-100">
+                                                            <ReactCountryFlag
+                                                                countryCode={getLanguageCountryCode(cert.lang_id)}
+                                                                svg
+                                                                style={{ fontSize: "1.5em", lineHeight: "1.5em" }}
+                                                                title={cert.language?.name || 'Unknown'}
+                                                            />
+                                                        </span>
                                                         <span>{cert.language?.name || 'Unknown'}</span>
                                                     </div>
                                                 </td>
