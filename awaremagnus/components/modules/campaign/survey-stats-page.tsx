@@ -152,8 +152,8 @@ export function SurveyStatsPage() {
 
   const overall = stats?.overall_risk_level;
 
-  const surveyLink = survey?.survey_unique_code
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/survey/${survey.survey_unique_code}`
+  const surveyLink = survey?.id
+    ? `${typeof window !== "undefined" ? window.location.origin : ""}/awm/survey/${survey.id}`
     : "";
 
   const handleCopyLink = () => {

@@ -216,4 +216,8 @@ export const surveyService = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+
+  /** POST /api/awm/survey/:id/submit - Submit survey answers */
+  submitSurveyAnswers: (id: number, payload: any) =>
+    awmPost<any>(`${API_BASE}/survey/${id}/submit`, payload),
 };
