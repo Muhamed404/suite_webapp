@@ -36,14 +36,14 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
             {t("form.campaignName")} <span className="text-red-500">*</span>
           </label>
           <input
-            type="text"
-            value={formData.campaignName}
-            onChange={(e) => onChange("campaignName", e.target.value)}
             className={clsx(
               "w-full px-3 py-2.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all",
               errors.campaignName ? "border-red-500" : "border-gray-200"
             )}
             placeholder={t("form.campaignNamePlaceholder")}
+            type="text"
+            value={formData.campaignName}
+            onChange={(e) => onChange("campaignName", e.target.value)}
           />
           {errors.campaignName && (
             <p className="text-[10px] text-red-500 mt-0.5">{errors.campaignName}</p>
@@ -56,11 +56,11 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
             {t("form.description")}
           </label>
           <textarea
-            value={formData.description}
-            onChange={(e) => onChange("description", e.target.value)}
-            rows={2}
             className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all resize-none"
             placeholder={t("form.descriptionPlaceholder")}
+            rows={2}
+            value={formData.description}
+            onChange={(e) => onChange("description", e.target.value)}
           />
         </div>
 
@@ -71,15 +71,15 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
               {t("form.startDate")} <span className="text-red-500">*</span>
             </label>
             <DatePicker
-              value={formData.startDate ? parseDate(formData.startDate) : null}
-              onChange={(date) => onChange("startDate", date ? date.toString() : "")}
-              minValue={today(getLocalTimeZone())}
-              granularity="day"
+              aria-label="Campaign Start Date"
               className="w-full"
               classNames={{
                 selectorButton: "h-8 min-w-8",
               }}
-              aria-label="Campaign Start Date"
+              granularity="day"
+              minValue={today(getLocalTimeZone())}
+              value={formData.startDate ? parseDate(formData.startDate) : null}
+              onChange={(date) => onChange("startDate", date ? date.toString() : "")}
             />
             {errors.startDate && (
               <p className="text-[10px] text-red-500 mt-0.5">{errors.startDate}</p>
@@ -90,19 +90,19 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
               {t("form.endDate")} <span className="text-red-500">*</span>
             </label>
             <DatePicker
-              value={formData.endDate ? parseDate(formData.endDate) : null}
-              onChange={(date) => onChange("endDate", date ? date.toString() : "")}
-              minValue={formData.startDate ? parseDate(formData.startDate) : today(getLocalTimeZone())}
-              granularity="day"
+              aria-label="Campaign End Date"
               className="w-full"
               classNames={{
                 selectorButton: "h-8 min-w-8",
               }}
-              aria-label="Campaign End Date"
+              granularity="day"
+              minValue={
+                formData.startDate ? parseDate(formData.startDate) : today(getLocalTimeZone())
+              }
+              value={formData.endDate ? parseDate(formData.endDate) : null}
+              onChange={(date) => onChange("endDate", date ? date.toString() : "")}
             />
-            {errors.endDate && (
-              <p className="text-[10px] text-red-500 mt-0.5">{errors.endDate}</p>
-            )}
+            {errors.endDate && <p className="text-[10px] text-red-500 mt-0.5">{errors.endDate}</p>}
           </div>
         </div>
 
@@ -110,17 +110,23 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
         <div className="flex items-center gap-2">
           <label className="flex items-center gap-1.5 cursor-pointer group">
             <div
-              onClick={() => onChange("gamified", !formData.gamified)}
               className={clsx(
                 "w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all",
                 formData.gamified
                   ? "bg-blue-500 border-blue-500"
                   : "border-gray-300 group-hover:border-blue-400"
               )}
+              onClick={() => onChange("gamified", !formData.gamified)}
             >
               {formData.gamified && (
-                <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-2.5 h-2.5 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={3}
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               )}
             </div>

@@ -1,5 +1,8 @@
 "use client";
 
+import type { SupportedLanguageId } from "@/utils/supportedLanguages";
+import type { Department, Group } from "@/services/suiteSuiteService";
+
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -7,7 +10,7 @@ import { Button } from "@heroui/button";
 import { Input, Textarea } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
 import { DatePicker } from "@heroui/date-picker";
-import { parseDate, today, getLocalTimeZone, type DateValue } from "@internationalized/date";
+import { today, getLocalTimeZone, type DateValue } from "@internationalized/date";
 import { Spinner } from "@heroui/spinner";
 import { Checkbox, CheckboxGroup } from "@heroui/checkbox";
 import clsx from "clsx";
@@ -17,7 +20,6 @@ import {
     Check,
     FileText,
     Users,
-    ClipboardList,
     HelpCircle,
     CalendarDays,
 } from "lucide-react";
@@ -26,18 +28,16 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useCreateSurvey } from "@/hooks/useSurvey";
+import { useCreateSurvey, useSurveyQuestions } from "@/hooks/useSurvey";
 import { useCategories } from "@/hooks/useSuiteAwm";
 import { suiteSuiteService } from "@/services/suiteSuiteService";
+import { surveyService } from "@/services/surveyService";
 import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS } from "@/utils/supportedLanguages";
-import type { SupportedLanguageId } from "@/utils/supportedLanguages";
-import type { Department, Group } from "@/services/suiteSuiteService";
 
 const STEPS = [
     { id: 1, label: "Survey Details", icon: FileText },
     { id: 2, label: "Target Audience", icon: Users },
-    { id: 3, label: "Quiz Type", icon: ClipboardList },
-    { id: 4, label: "Categories", icon: HelpCircle },
+    { id: 3, label: "Add Questions by Category", icon: HelpCircle },
 ];
 
 const QUIZ_TYPES = [
@@ -56,6 +56,7 @@ export function NewSurveyForm() {
     const [currentStep, setCurrentStep] = useState(1);
     const [formError, setFormError] = useState<string | null>(null);
     const [formSuccess, setFormSuccess] = useState<string | null>(null);
+    const [isValidatingQuestions, setIsValidatingQuestions] = useState(false);
     // Step 1: Survey Details
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
@@ -79,9 +80,31 @@ export function NewSurveyForm() {
     const { data: categories = [], isLoading: categoriesLoading } = useCategories();
     const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
 
+    // Fetch questions for selected categories and quiz type to show preview
+    const { data: previewQuestions = [], isLoading: previewQuestionsLoading } = useSurveyQuestions(
+        {
+            // We can only pass one category_id to the endpoint based on the hook signature,
+            // but the user wants to see all questions for all selected categories.
+            // Since the API might not support multiple category_ids or omitting category_id
+            // to fetch all (and then filter locally), we will fetch them manually if needed,
+            // or we'd just pass undefined to get all and filter locally.
+            // Let's pass undefined for category_id to fetch all questions for the org and ques_type,
+            // then filter them locally based on selectedCategoryIds.
+            ques_type_id: quesTypeId,
+            org_id: user?.organization_id ?? user?.org_id,
+        },
+        selectedCategoryIds.length > 0
+    );
+
+    // Filter questions based on selected categories
+    const filteredPreviewQuestions = previewQuestions.filter(
+        (q) => q.category_id && selectedCategoryIds.includes(String(q.category_id))
+    );
+
     // Fetch departments and groups
     useEffect(() => {
         const orgId = user?.organization_id ?? user?.org_id;
+
         if (orgId === undefined || orgId === null) return;
 
         setLoadingDepts(true);
@@ -107,22 +130,26 @@ export function NewSurveyForm() {
                 case 1:
                     if (!name.trim()) {
                         setFormError("Survey name is required");
+
                         return false;
                     }
+
                     return true;
                 case 2:
                     if (selectedDeptIds.length === 0 && selectedGroupIds.length === 0) {
                         setFormError("Select at least one department or group");
+
                         return false;
                     }
+
                     return true;
                 case 3:
-                    return true;
-                case 4:
                     if (selectedCategoryIds.length === 0) {
                         setFormError("Select at least one category");
+
                         return false;
                     }
+
                     return true;
                 default:
                     return true;
@@ -133,7 +160,7 @@ export function NewSurveyForm() {
 
     const handleNext = () => {
         if (validateStep(currentStep)) {
-            setCurrentStep((s) => Math.min(s + 1, 4));
+            setCurrentStep((s) => Math.min(s + 1, 3));
         }
     };
 
@@ -143,11 +170,36 @@ export function NewSurveyForm() {
     };
 
     const handleSubmit = async () => {
-        if (!validateStep(4)) return;
+        if (!validateStep(3)) return;
         setFormError(null);
         setFormSuccess(null);
+        setIsValidatingQuestions(true);
 
         try {
+            // Check if selected categories have questions for the selected quiz type
+            let hasQuestions = false;
+
+            // Iterate over selected categories to see if any contain questions for this quiz type
+            for (const categoryId of selectedCategoryIds) {
+                const questions = await surveyService.getSurveyQuestions({
+                    category_id: Number(categoryId),
+                    ques_type_id: quesTypeId,
+                });
+
+                if (questions && questions.length > 0) {
+                    hasQuestions = true;
+                    break;
+                }
+            }
+
+            if (!hasQuestions) {
+                setFormError(
+                    "No questions found for the selected categories and quiz type combination. Survey cannot be created."
+                );
+                setIsValidatingQuestions(false);
+
+                return;
+            }
             await createSurvey.mutateAsync({
                 survey: {
                     name: name.trim(),
@@ -167,10 +219,11 @@ export function NewSurveyForm() {
             setTimeout(() => router.push("/dashboard/survey"), 2000);
         } catch (err: any) {
             setFormError(err?.message ?? "Failed to create survey");
+            setIsValidatingQuestions(false);
         }
     };
 
-    const isSubmitting = createSurvey.isPending;
+    const isSubmitting = createSurvey.isPending || isValidatingQuestions;
 
     return (
         <ProtectedRoute>
@@ -179,13 +232,13 @@ export function NewSurveyForm() {
                     {/* Back */}
                     <div className="flex items-center gap-3 mb-6">
                         <Button
-                            as={Link}
-                            href="/dashboard/survey"
                             isIconOnly
+                            as={Link}
+                            className="bg-white border border-gray-200"
+                            href="/dashboard/survey"
                             radius="full"
                             size="sm"
                             variant="flat"
-                            className="bg-white border border-gray-200"
                         >
                             <ArrowLeft className="w-4 h-4" />
                         </Button>
@@ -206,7 +259,8 @@ export function NewSurveyForm() {
                                             className={clsx(
                                                 "w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300",
                                                 isCompleted && "bg-green-500 text-white shadow-lg shadow-green-500/25",
-                                                isActive && "bg-blue-500 text-white shadow-lg shadow-blue-500/25 ring-4 ring-blue-100",
+                                                isActive &&
+                                                "bg-blue-500 text-white shadow-lg shadow-blue-500/25 ring-4 ring-blue-100",
                                                 !isCompleted && !isActive && "bg-gray-100 text-gray-400"
                                             )}
                                         >
@@ -215,7 +269,11 @@ export function NewSurveyForm() {
                                         <span
                                             className={clsx(
                                                 "text-[10px] mt-1.5 font-medium",
-                                                isActive ? "text-blue-600" : isCompleted ? "text-green-600" : "text-gray-400"
+                                                isActive
+                                                    ? "text-blue-600"
+                                                    : isCompleted
+                                                        ? "text-green-600"
+                                                        : "text-gray-400"
                                             )}
                                         >
                                             {step.label}
@@ -252,7 +310,9 @@ export function NewSurveyForm() {
                         {currentStep === 1 && (
                             <div className="space-y-5">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-2">Survey Details</h3>
-                                <p className="text-xs text-gray-500 mb-4">Enter the basic information for your survey</p>
+                                <p className="text-xs text-gray-500 mb-4">
+                                    Enter the basic information for your survey
+                                </p>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -260,30 +320,31 @@ export function NewSurveyForm() {
                                             Survey Name <span className="text-red-500">*</span>
                                         </label>
                                         <Input
-                                            value={name}
-                                            onValueChange={setName}
-                                            placeholder="e.g. Security Awareness Assessment"
                                             classNames={{
                                                 inputWrapper:
                                                     "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300 focus-within:!border-blue-500",
                                                 input: "text-sm",
                                             }}
+                                            placeholder="e.g. Security Awareness Assessment"
+                                            value={name}
+                                            onValueChange={setName}
                                         />
                                     </div>
                                     <div>
                                         <label className="text-xs font-medium text-gray-700 mb-1 block">Language</label>
                                         <Select
-                                            selectedKeys={[langId]}
-                                            onSelectionChange={(keys) => {
-                                                const v = Array.from(keys as Set<string>)[0];
-                                                if (v) setLangId(v);
-                                            }}
+                                            aria-label="Language"
                                             classNames={{
                                                 trigger:
                                                     "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300",
                                                 value: "text-sm",
                                             }}
-                                            aria-label="Language"
+                                            selectedKeys={[langId]}
+                                            onSelectionChange={(keys) => {
+                                                const v = Array.from(keys as Set<string>)[0];
+
+                                                if (v) setLangId(v);
+                                            }}
                                         >
                                             {SUPPORTED_LANGUAGES.map((lang) => (
                                                 <SelectItem key={String(lang.id)} textValue={lang.name}>
@@ -298,17 +359,19 @@ export function NewSurveyForm() {
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-medium text-gray-700 mb-1 block">Description</label>
+                                    <label className="text-xs font-medium text-gray-700 mb-1 block">
+                                        Description
+                                    </label>
                                     <Textarea
-                                        value={description}
-                                        onValueChange={setDescription}
-                                        placeholder="Describe this survey..."
-                                        minRows={3}
                                         classNames={{
                                             inputWrapper:
                                                 "bg-white border border-gray-200 rounded-xl hover:border-gray-300 focus-within:!border-blue-500",
                                             input: "text-sm",
                                         }}
+                                        minRows={3}
+                                        placeholder="Describe this survey..."
+                                        value={description}
+                                        onValueChange={setDescription}
                                     />
                                 </div>
 
@@ -318,15 +381,15 @@ export function NewSurveyForm() {
                                             <CalendarDays className="w-3.5 h-3.5" /> Start Date
                                         </label>
                                         <DatePicker
-                                            value={startDate}
-                                            onChange={setStartDate}
-                                            minValue={today(getLocalTimeZone())}
-                                            granularity="day"
+                                            aria-label="Start Date"
                                             className="w-full"
                                             classNames={{
                                                 selectorButton: "h-8 min-w-8",
                                             }}
-                                            aria-label="Start Date"
+                                            granularity="day"
+                                            minValue={today(getLocalTimeZone())}
+                                            value={startDate}
+                                            onChange={setStartDate}
                                         />
                                     </div>
                                     <div>
@@ -334,29 +397,31 @@ export function NewSurveyForm() {
                                             <CalendarDays className="w-3.5 h-3.5" /> Deadline
                                         </label>
                                         <DatePicker
-                                            value={deadline}
-                                            onChange={setDeadline}
-                                            minValue={startDate || today(getLocalTimeZone())}
-                                            granularity="day"
+                                            aria-label="Deadline"
                                             className="w-full"
                                             classNames={{
                                                 selectorButton: "h-8 min-w-8",
                                             }}
-                                            aria-label="Deadline"
+                                            granularity="day"
+                                            minValue={startDate || today(getLocalTimeZone())}
+                                            value={deadline}
+                                            onChange={setDeadline}
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-medium text-gray-700 mb-1 block">Max Questions</label>
+                                        <label className="text-xs font-medium text-gray-700 mb-1 block">
+                                            Max Questions
+                                        </label>
                                         <Input
-                                            type="number"
-                                            value={maxQuestions}
-                                            onValueChange={setMaxQuestions}
-                                            placeholder="e.g. 20"
                                             classNames={{
                                                 inputWrapper:
                                                     "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300 focus-within:!border-blue-500",
                                                 input: "text-sm",
                                             }}
+                                            placeholder="e.g. 20"
+                                            type="number"
+                                            value={maxQuestions}
+                                            onValueChange={setMaxQuestions}
                                         />
                                     </div>
                                 </div>
@@ -383,17 +448,19 @@ export function NewSurveyForm() {
                                                     <Spinner size="sm" />
                                                 </div>
                                             ) : departments.length === 0 ? (
-                                                <p className="text-xs text-gray-400 text-center py-4">No departments found</p>
+                                                <p className="text-xs text-gray-400 text-center py-4">
+                                                    No departments found
+                                                </p>
                                             ) : (
                                                 <CheckboxGroup value={selectedDeptIds} onChange={setSelectedDeptIds as any}>
                                                     {departments.map((dept) => (
                                                         <Checkbox
                                                             key={dept.id}
-                                                            value={String(dept.id)}
                                                             classNames={{
                                                                 label: "text-xs text-gray-700",
                                                                 wrapper: "before:border-gray-300",
                                                             }}
+                                                            value={String(dept.id)}
                                                         >
                                                             <div className="flex items-center justify-between w-full">
                                                                 <span>{dept.name}</span>
@@ -423,15 +490,18 @@ export function NewSurveyForm() {
                                             ) : groups.length === 0 ? (
                                                 <p className="text-xs text-gray-400 text-center py-4">No groups found</p>
                                             ) : (
-                                                <CheckboxGroup value={selectedGroupIds} onChange={setSelectedGroupIds as any}>
+                                                <CheckboxGroup
+                                                    value={selectedGroupIds}
+                                                    onChange={setSelectedGroupIds as any}
+                                                >
                                                     {groups.map((group) => (
                                                         <Checkbox
                                                             key={group.id}
-                                                            value={String(group.id)}
                                                             classNames={{
                                                                 label: "text-xs text-gray-700",
                                                                 wrapper: "before:border-gray-300",
                                                             }}
+                                                            value={String(group.id)}
                                                         >
                                                             <div className="flex items-center justify-between w-full">
                                                                 <span>{group.name}</span>
@@ -457,127 +527,130 @@ export function NewSurveyForm() {
                             </div>
                         )}
 
-                        {/* STEP 3: Quiz Type */}
+                        {/* STEP 3: Quiz Type & Categories */}
                         {currentStep === 3 && (
-                            <div className="space-y-5">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Quiz Type</h3>
-                                <p className="text-xs text-gray-500 mb-4">
-                                    Select the question type for this survey
-                                </p>
+                            <div className="space-y-6">
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Quiz Type</h3>
+                                    <p className="text-xs text-gray-500 mb-4">
+                                        Select the question type for this survey
+                                    </p>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    {QUIZ_TYPES.map((qt) => (
-                                        <button
-                                            key={qt.id}
-                                            type="button"
-                                            onClick={() => setQuesTypeId(qt.id)}
-                                            className={clsx(
-                                                "p-5 rounded-2xl border-2 text-left transition-all duration-200 hover:shadow-md",
-                                                quesTypeId === qt.id
-                                                    ? "border-blue-500 bg-blue-50 shadow-md shadow-blue-100"
-                                                    : "border-gray-200 bg-white hover:border-gray-300"
-                                            )}
-                                        >
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <div
-                                                    className={clsx(
-                                                        "w-5 h-5 rounded-full border-2 flex items-center justify-center",
-                                                        quesTypeId === qt.id ? "border-blue-500" : "border-gray-300"
-                                                    )}
-                                                >
-                                                    {quesTypeId === qt.id && (
-                                                        <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-                                                    )}
-                                                </div>
-                                                <span className="font-medium text-sm text-gray-800">{qt.name}</span>
-                                            </div>
-                                            <p className="text-xs text-gray-500 ml-8">{qt.description}</p>
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <div className="mt-4 flex items-center gap-4">
-                                    <label className="text-xs font-medium text-gray-700">Deadline Date</label>
-                                    <DatePicker
-                                        value={deadline}
-                                        onChange={setDeadline}
-                                        minValue={startDate || today(getLocalTimeZone())}
-                                        granularity="day"
-                                        className="w-48"
-                                        classNames={{
-                                            selectorButton: "h-8 min-w-8",
-                                        }}
-                                        aria-label="Deadline Date (Step 3)"
-                                    />
-                                </div>
-                            </div>
-                        )}
-
-                        {/* STEP 4: Categories */}
-                        {currentStep === 4 && (
-                            <div className="space-y-5">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Add Questions by Category</h3>
-                                <p className="text-xs text-gray-500 mb-4">
-                                    Select categories to include questions from. Questions will be randomly selected from these categories.
-                                </p>
-
-                                {categoriesLoading ? (
-                                    <div className="flex justify-center py-8">
-                                        <Spinner size="md" />
-                                    </div>
-                                ) : (
-                                    <div className="border border-gray-200 rounded-xl p-4 max-h-80 overflow-y-auto">
-                                        <CheckboxGroup value={selectedCategoryIds} onChange={setSelectedCategoryIds as any}>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                {(categories as any[]).map((cat: any) => (
-                                                    <Checkbox
-                                                        key={cat.id}
-                                                        value={String(cat.id)}
-                                                        classNames={{
-                                                            base: clsx(
-                                                                "p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all cursor-pointer max-w-full",
-                                                                selectedCategoryIds.includes(String(cat.id)) &&
-                                                                "bg-blue-50 border-blue-200"
-                                                            ),
-                                                            label: "text-xs text-gray-700 font-medium",
-                                                            wrapper: "before:border-gray-300",
-                                                        }}
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        {QUIZ_TYPES.map((qt) => (
+                                            <button
+                                                key={qt.id}
+                                                className={clsx(
+                                                    "p-5 rounded-2xl border-2 text-left transition-all duration-200 hover:shadow-md",
+                                                    quesTypeId === qt.id
+                                                        ? "border-blue-500 bg-blue-50 shadow-md shadow-blue-100"
+                                                        : "border-gray-200 bg-white hover:border-gray-300"
+                                                )}
+                                                type="button"
+                                                onClick={() => setQuesTypeId(qt.id)}
+                                            >
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <div
+                                                        className={clsx(
+                                                            "w-5 h-5 rounded-full border-2 flex items-center justify-center",
+                                                            quesTypeId === qt.id ? "border-blue-500" : "border-gray-300"
+                                                        )}
                                                     >
-                                                        {cat.name}
-                                                    </Checkbox>
+                                                        {quesTypeId === qt.id && (
+                                                            <div className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+                                                        )}
+                                                    </div>
+                                                    <span className="font-medium text-sm text-gray-800">{qt.name}</span>
+                                                </div>
+                                                <p className="text-xs text-gray-500 ml-8">{qt.description}</p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-gray-100 pt-6">
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                                        Add Questions by Category
+                                    </h3>
+                                    <p className="text-xs text-gray-500 mb-4">
+                                        Select categories to include questions from. Questions will be randomly selected
+                                        from these categories.
+                                    </p>
+
+                                    {categoriesLoading ? (
+                                        <div className="flex justify-center py-8">
+                                            <Spinner size="md" />
+                                        </div>
+                                    ) : (
+                                        <div className="border border-gray-200 rounded-xl p-4 max-h-80 overflow-y-auto">
+                                            <CheckboxGroup
+                                                value={selectedCategoryIds}
+                                                onChange={setSelectedCategoryIds as any}
+                                            >
+                                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                    {(categories as any[]).map((cat: any) => (
+                                                        <Checkbox
+                                                            key={cat.id}
+                                                            classNames={{
+                                                                base: clsx(
+                                                                    "p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-all cursor-pointer max-w-full",
+                                                                    selectedCategoryIds.includes(String(cat.id)) &&
+                                                                    "bg-blue-50 border-blue-200"
+                                                                ),
+                                                                label: "text-xs text-gray-700 font-medium",
+                                                                wrapper: "before:border-gray-300",
+                                                            }}
+                                                            value={String(cat.id)}
+                                                        >
+                                                            {cat.name}
+                                                        </Checkbox>
+                                                    ))}
+                                                </div>
+                                            </CheckboxGroup>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Preview Questions */}
+                                {selectedCategoryIds.length > 0 && (
+                                    <div className="border-t border-gray-100 pt-6">
+                                        <h3 className="text-sm font-semibold text-gray-800 mb-2">
+                                            Available Questions ({filteredPreviewQuestions.length})
+                                        </h3>
+                                        <p className="text-xs text-gray-500 mb-4">
+                                            These questions belong to the selected categories and match the chosen quiz
+                                            type.
+                                        </p>
+
+                                        {previewQuestionsLoading ? (
+                                            <div className="flex justify-center py-4">
+                                                <Spinner size="sm" />
+                                            </div>
+                                        ) : filteredPreviewQuestions.length === 0 ? (
+                                            <p className="text-xs text-gray-400 text-center py-4">
+                                                No questions found for the selected categories.
+                                            </p>
+                                        ) : (
+                                            <div className="border border-gray-200 rounded-xl p-4 max-h-64 overflow-y-auto space-y-3">
+                                                {filteredPreviewQuestions.map((q, idx) => (
+                                                    <div
+                                                        key={q.id}
+                                                        className="p-3 bg-gray-50 rounded-lg border border-gray-100"
+                                                    >
+                                                        <p className="text-sm font-medium text-gray-800 mb-1">
+                                                            {idx + 1}. {q.question}
+                                                        </p>
+                                                        {q.category && (
+                                                            <span className="inline-block px-2 py-1 bg-gray-200 text-gray-600 text-[10px] rounded-md mt-1">
+                                                                {q.category.name}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 ))}
                                             </div>
-                                        </CheckboxGroup>
+                                        )}
                                     </div>
                                 )}
-
-                                {/* Language Selection for Step 4 */}
-                                <div className="mt-4">
-                                    <label className="text-xs font-medium text-gray-700 mb-2 block">Survey Language</label>
-                                    <Select
-                                        selectedKeys={[langId]}
-                                        onSelectionChange={(keys) => {
-                                            const v = Array.from(keys as Set<string>)[0];
-                                            if (v) setLangId(v);
-                                        }}
-                                        classNames={{
-                                            base: "w-48",
-                                            trigger:
-                                                "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300",
-                                            value: "text-sm",
-                                        }}
-                                        aria-label="Survey Language"
-                                    >
-                                        {SUPPORTED_LANGUAGES.map((lang) => (
-                                            <SelectItem key={String(lang.id)} textValue={lang.name}>
-                                                <span className="flex items-center gap-2">
-                                                    <span>{LANGUAGE_FLAGS[lang.id as SupportedLanguageId]}</span>
-                                                    <span>{lang.name}</span>
-                                                </span>
-                                            </SelectItem>
-                                        ))}
-                                    </Select>
-                                </div>
                             </div>
                         )}
                     </div>
@@ -585,34 +658,38 @@ export function NewSurveyForm() {
                     {/* ── Navigation Buttons */}
                     <div className="flex justify-between items-center mt-6">
                         <Button
-                            radius="full"
-                            variant="bordered"
                             className="border-gray-200 text-gray-600 px-6"
                             isDisabled={currentStep === 1 || isSubmitting}
+                            radius="full"
                             startContent={<ArrowLeft className="w-4 h-4" />}
+                            variant="bordered"
                             onPress={handleBack}
                         >
                             Back
                         </Button>
 
-                        {currentStep < 4 ? (
+                        {currentStep < 3 ? (
                             <Button
-                                radius="full"
                                 className="bg-blue-500 hover:bg-blue-600 text-white px-8"
                                 endContent={<ArrowRight className="w-4 h-4" />}
+                                radius="full"
                                 onPress={handleNext}
                             >
                                 Next
                             </Button>
                         ) : (
                             <Button
-                                radius="full"
                                 className="bg-green-500 hover:bg-green-600 text-white px-8"
                                 isLoading={isSubmitting}
+                                radius="full"
                                 startContent={!isSubmitting && <Check className="w-4 h-4" />}
                                 onPress={handleSubmit}
                             >
-                                {isSubmitting ? "Creating Survey..." : "Finish & Launch"}
+                                {isValidatingQuestions
+                                    ? "Validating..."
+                                    : isSubmitting
+                                        ? "Creating Survey..."
+                                        : "Finish & Launch"}
                             </Button>
                         )}
                     </div>

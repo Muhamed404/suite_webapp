@@ -47,7 +47,12 @@ export const DASHBOARD_KEYS = {
       "list",
       params,
     ],
-    assignments: (params?: { language_id?: number }) => ["dashboard", "user", "assignments", params],
+    assignments: (params?: { language_id?: number }) => [
+      "dashboard",
+      "user",
+      "assignments",
+      params,
+    ],
     gameAchievements: ["dashboard", "user", "gameAchievements"],
   },
   gamification: {

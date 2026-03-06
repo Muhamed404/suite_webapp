@@ -46,10 +46,8 @@ export function CampaignStatsCards({ data }: CampaignStatsCardsProps) {
             <p className="text-xs text-gray-500">{stat.label}</p>
             <p className="text-lg font-semibold">{stat.value}</p>
           </div>
-          <div
-            className={`w-7 h-7 ${stat.bgColor} rounded-full flex items-center justify-center`}
-          >
-            <img src={stat.icon} alt="" className="w-4 h-4" />
+          <div className={`w-7 h-7 ${stat.bgColor} rounded-full flex items-center justify-center`}>
+            <img alt="" className="w-4 h-4" src={stat.icon} />
           </div>
         </div>
       ))}

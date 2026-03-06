@@ -13,7 +13,11 @@ import {
   useUserDashboards,
 } from "@/hooks/useDashboard";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { isPlatformAdmin as getIsPlatformAdmin, isOrgAdmin as getIsOrgAdmin, isUser as getIsUser } from "@/utils/roles";
+import {
+  isPlatformAdmin as getIsPlatformAdmin,
+  isOrgAdmin as getIsOrgAdmin,
+  isUser as getIsUser,
+} from "@/utils/roles";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 export const GamificationStats = () => {
@@ -31,10 +35,19 @@ export const GamificationStats = () => {
 
   const dashboardData = useMemo(() => {
     if (isPlatformAdmin && systemData?.statusCode === 200) return systemData.object;
-    if (isOrgAdmin && orgDataResponse?.statusCode === 200 && orgDataResponse.object.dashboardOrganizations.length > 0)
+    if (
+      isOrgAdmin &&
+      orgDataResponse?.statusCode === 200 &&
+      orgDataResponse.object.dashboardOrganizations.length > 0
+    )
       return orgDataResponse.object.dashboardOrganizations[0];
-    if (isUser && userDataResponse?.statusCode === 200 && userDataResponse.object.dashboardUsers.length > 0)
+    if (
+      isUser &&
+      userDataResponse?.statusCode === 200 &&
+      userDataResponse.object.dashboardUsers.length > 0
+    )
       return userDataResponse.object.dashboardUsers[0];
+
     return null;
   }, [isPlatformAdmin, isOrgAdmin, isUser, systemData, orgDataResponse, userDataResponse]);
 
@@ -77,8 +90,10 @@ export const GamificationStats = () => {
     for (const a of items) {
       const img = a?.image_small_url ?? "";
       const m = img.trim().match(/^(\d)/);
+
       if (!m) continue;
       const n = Number(m[1]);
+
       if (n >= 1 && n <= 9) set.add(n);
     }
 
@@ -87,13 +102,17 @@ export const GamificationStats = () => {
 
   const avatarByNumber = useMemo(() => {
     const map = new Map<number, any>();
+
     for (const a of avatars?.avatar_statistics ?? []) {
       const img = a?.image_small_url ?? "";
       const m = img.trim().match(/^(\d)/);
+
       if (!m) continue;
       const n = Number(m[1]);
+
       map.set(n, a);
     }
+
     return map;
   }, [avatars]);
 
@@ -120,8 +139,10 @@ export const GamificationStats = () => {
     for (const a of items) {
       const img = a?.image_small_url ?? "";
       const m = img.trim().match(/^(\d{1,2})/);
+
       if (!m) continue;
       const n = Number(m[1]);
+
       if (n >= 1 && n <= 16) set.add(n);
     }
 
@@ -241,9 +262,9 @@ export const GamificationStats = () => {
               return (
                 <div
                   key={num}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center relative ${isUnlocked ? '' : 'opacity-40'}`}
-                  title={isUnlocked ? `Unlocked (#${num})` : `Locked (#${num})`}
                   aria-disabled={!isUnlocked}
+                  className={`w-14 h-14 rounded-full flex items-center justify-center relative ${isUnlocked ? "" : "opacity-40"}`}
+                  title={isUnlocked ? `Unlocked (#${num})` : `Locked (#${num})`}
                 >
                   <Image
                     unoptimized
@@ -291,8 +312,8 @@ export const GamificationStats = () => {
             {/* Main Avatar — always show Level 1 in the large area; use backend metadata when available */}
             <div className="flex flex-col items-center justify-center">
               <div
-                className={`w-24 h-24 bg-gray-200 rounded-full ${!isMainUnlocked ? "opacity-40" : ""}`}
                 aria-disabled={!isMainUnlocked}
+                className={`w-24 h-24 bg-gray-200 rounded-full ${!isMainUnlocked ? "opacity-40" : ""}`}
               >
                 <Image
                   unoptimized
@@ -302,7 +323,8 @@ export const GamificationStats = () => {
                   src={getContentAssetUrl(`/images/avatars/1.png`)}
                   width={96}
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = getContentAssetUrl("/images/avatars/1.png");
+                    (e.target as HTMLImageElement).src =
+                      getContentAssetUrl("/images/avatars/1.png");
                   }}
                 />
               </div>
@@ -324,9 +346,13 @@ export const GamificationStats = () => {
                 return (
                   <div
                     key={num}
-                    className={`col-span-1 text-center px-1 py-2.5 transform duration-300 rounded-lg flex flex-col items-center group relative ${isUnlocked ? 'hover:bg-[#EFFAFF]' : 'opacity-40'}`}
-                    title={meta?.employee_count ? `${meta.employee_count} employees` : (meta?.level_name ?? `Level ${num}`)}
                     aria-disabled={!isUnlocked}
+                    className={`col-span-1 text-center px-1 py-2.5 transform duration-300 rounded-lg flex flex-col items-center group relative ${isUnlocked ? "hover:bg-[#EFFAFF]" : "opacity-40"}`}
+                    title={
+                      meta?.employee_count
+                        ? `${meta.employee_count} employees`
+                        : (meta?.level_name ?? `Level ${num}`)
+                    }
                   >
                     <div className="w-10 h-10 bg-gray-200 rounded-full mx-auto relative">
                       <Image
@@ -337,14 +363,15 @@ export const GamificationStats = () => {
                         src={getContentAssetUrl(`/images/avatars/${num}.png`)}
                         width={40}
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = getContentAssetUrl(
-                            "/images/avatars/1.png"
-                          );
+                          (e.target as HTMLImageElement).src =
+                            getContentAssetUrl("/images/avatars/1.png");
                         }}
                       />
                     </div>
 
-                    <p className={`text-xs leading-tight mt-2 w-[90%] whitespace-pre-line ${isUnlocked ? 'text-gray-700' : 'text-gray-400'}`}>
+                    <p
+                      className={`text-xs leading-tight mt-2 w-[90%] whitespace-pre-line ${isUnlocked ? "text-gray-700" : "text-gray-400"}`}
+                    >
                       {displayLabel}
                     </p>
                   </div>

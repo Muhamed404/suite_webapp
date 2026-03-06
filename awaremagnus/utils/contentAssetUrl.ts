@@ -30,7 +30,7 @@ export function getContentAssetUrl(path: string | null | undefined): string {
     return `https://${trimmed}`;
   }
 
-  // For local relative paths (starting with /), we want to prepend /awm 
+  // For local relative paths (starting with /), we want to prepend /awm
   // so they resolve correctly under the Next.js basePath.
   // This applies to /images/, /icons/, /logo.svg, /favicon.ico, etc.
   if (trimmed.startsWith("/")) {
@@ -101,5 +101,6 @@ export function getCertificateAssetUrl(path: string | null | undefined): string 
 
   // Otherwise, prepend /awm/certificates/
   const cleanPath = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
+
   return `${AWM_BASE_PATH}/certificates/${cleanPath}`;
 }

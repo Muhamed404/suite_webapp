@@ -33,11 +33,12 @@ export const decodeJwt = (token: string | null | undefined): JwtPayload | null =
 
   try {
     const parts = token.split(".");
+
     if (parts.length !== 3) return null;
 
     const base64Url = parts[1];
     const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    
+
     const jsonPayload = decodeURIComponent(
       atob(base64)
         .split("")
@@ -75,13 +76,16 @@ export const extractUserDisplayName = (payload: JwtPayload | null): string => {
   // Extract from email (before @)
   if (userData.email) {
     const namePart = userData.email.split("@")[0];
+
     // Convert snake_case, dot notation, or numbers to title case
-    return namePart
-      .split(/[._\-]/)
-      .filter((part: string) => part && isNaN(Number(part))) // Filter out numbers and empty
-      .map((part: string) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-      .join(" ")
-      .trim() || "User"; // Fallback if all parts were numbers
+    return (
+      namePart
+        .split(/[._\-]/)
+        .filter((part: string) => part && isNaN(Number(part))) // Filter out numbers and empty
+        .map((part: string) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+        .join(" ")
+        .trim() || "User"
+    ); // Fallback if all parts were numbers
   }
 
   return "User";
@@ -93,8 +97,9 @@ export const extractUserDisplayName = (payload: JwtPayload | null): string => {
  */
 export const extractUserEmail = (payload: JwtPayload | null): string => {
   if (!payload) return "user@example.com";
-  
+
   const userData = (payload as any)?.user || payload;
+
   return userData?.email || "user@example.com";
 };
 
@@ -104,7 +109,8 @@ export const extractUserEmail = (payload: JwtPayload | null): string => {
  */
 export const extractUserId = (payload: JwtPayload | null): number | null => {
   if (!payload) return null;
-  
+
   const userData = (payload as any)?.user || payload;
+
   return userData?.userId || userData?.id || null;
 };

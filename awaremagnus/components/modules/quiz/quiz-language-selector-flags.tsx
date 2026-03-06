@@ -1,10 +1,10 @@
 "use client";
 
 import clsx from "clsx";
+import ReactCountryFlag from "react-country-flag";
 
 import { useTranslations } from "@/i18n/useTranslations";
 import { SUPPORTED_LANGUAGES, getLanguageCountryCode } from "@/utils/supportedLanguages";
-import ReactCountryFlag from "react-country-flag";
 
 interface QuizLanguageSelectorFlagsProps {
   value: number[];
@@ -66,13 +66,13 @@ export function QuizLanguageSelectorFlags({
               </span>
               <span className="flex items-center justify-center w-5 h-5 overflow-hidden rounded-full border border-gray-100">
                 <ReactCountryFlag
+                  svg
                   className="w-full h-full object-cover"
                   countryCode={getLanguageCountryCode(lang.id)}
                   style={{
                     fontSize: "1.5em",
                     lineHeight: "1.5em",
                   }}
-                  svg
                   title={lang.name}
                 />
               </span>

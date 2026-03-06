@@ -77,6 +77,7 @@ export const quizService = {
     }));
 
     const formData = new FormData();
+
     formData.append("module", JSON.stringify(moduleData));
     formData.append("translations", JSON.stringify(translationsData));
     (payload.translations ?? []).forEach((tr, idx) => {
@@ -325,11 +326,11 @@ export const quizService = {
       (raw as Quiz).answers;
     const answers: QuizAnswer[] = Array.isArray(apiAnswers)
       ? apiAnswers.map((a, i) => ({
-        id: a.id,
-        answer_text: (a as { answer_text?: string }).answer_text ?? a.answer ?? "",
-        is_correct: (a as { is_correct?: boolean }).is_correct ?? !!a.validity,
-        order: i + 1,
-      }))
+          id: a.id,
+          answer_text: (a as { answer_text?: string }).answer_text ?? a.answer ?? "",
+          is_correct: (a as { is_correct?: boolean }).is_correct ?? !!a.validity,
+          order: i + 1,
+        }))
       : ((raw as Quiz).answers ?? []);
 
     (res as ApiResponse<Quiz>).data = {
@@ -359,14 +360,22 @@ export const quizService = {
         const quizType = (raw.quizType as { id?: number; name?: string }) ?? q.quizType;
 
         // Normalize answers array - API uses "answer" and "validity", we normalize to answer_text and is_correct
-        const apiAnswers = raw.answers as Array<{ id?: number; answer?: string; answer_text?: string; validity?: boolean; is_correct?: boolean }> | undefined;
+        const apiAnswers = raw.answers as
+          | Array<{
+              id?: number;
+              answer?: string;
+              answer_text?: string;
+              validity?: boolean;
+              is_correct?: boolean;
+            }>
+          | undefined;
         const normalizedAnswers: QuizAnswer[] = Array.isArray(apiAnswers)
           ? apiAnswers.map((a, i) => ({
-            id: a.id,
-            answer_text: a.answer_text ?? a.answer ?? "",
-            is_correct: a.is_correct ?? a.validity ?? false,
-            order: i + 1,
-          }))
+              id: a.id,
+              answer_text: a.answer_text ?? a.answer ?? "",
+              is_correct: a.is_correct ?? a.validity ?? false,
+              order: i + 1,
+            }))
           : (q.answers ?? []);
 
         return {
@@ -389,9 +398,7 @@ export const quizService = {
   createQuiz: async (payload: CreateQuizPayload) => {
     // The backend now expects the exact structure defined in CreateQuizPayload.
     // We can pass the payload directly as the body.
-    return request<Quiz>(() =>
-      awmClient.post<AWMResponseBody>(`${API_BASE}/quiz`, payload)
-    );
+    return request<Quiz>(() => awmClient.post<AWMResponseBody>(`${API_BASE}/quiz`, payload));
   },
 
   updateQuiz: async (id: number, payload: UpdateQuizPayload) => {
@@ -409,8 +416,8 @@ export const quizService = {
     );
   },
 
-  /** 
-   * GET /module/:id/contents-with-quizzes 
+  /**
+   * GET /module/:id/contents-with-quizzes
    * Returns: { module_id, non_aggregated_contents: [...], aggregated_contents: {...} }
    */
   getContentsWithQuizzes: async (moduleId: number, lang_id?: number) => {
@@ -421,15 +428,11 @@ export const quizService = {
     );
   },
 
-  /** 
-   * GET /module/:id/contents-with-progress 
+  /**
+   * GET /module/:id/contents-with-progress
    * Requires campaign_id
    */
-  getContentsWithProgress: async (
-    moduleId: number,
-    campaignId: number,
-    lang_id?: number
-  ) => {
+  getContentsWithProgress: async (moduleId: number, campaignId: number, lang_id?: number) => {
     return request<any>(() =>
       awmClient.get<AWMResponseBody>(`${API_BASE}/module/${moduleId}/contents-with-progress`, {
         params: {
@@ -494,8 +497,10 @@ export const quizService = {
     progress_percentage: number;
   }) => {
     return request<unknown>(() =>
-      awmClient.post<AWMResponseBody>(`${API_BASE}/useraction/report-actions/update-content-progress`, payload)
+      awmClient.post<AWMResponseBody>(
+        `${API_BASE}/useraction/report-actions/update-content-progress`,
+        payload
+      )
     );
   },
-
 };

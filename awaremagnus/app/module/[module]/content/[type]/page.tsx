@@ -1,11 +1,24 @@
-
-
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useSearchParams, useRouter } from "next/navigation";
-import Image from "next/image";
-import { List, LayoutGrid, Eye, Search, ChevronUp, ChevronDown, ChevronsUpDown, ChevronLeft, ChevronRight, Download, Share2, MoreVertical, Clock, Calendar } from "lucide-react";
+import {
+  List,
+  LayoutGrid,
+  Eye,
+  Search,
+  ChevronUp,
+  ChevronDown,
+  ChevronsUpDown,
+  ChevronLeft,
+  ChevronRight,
+  Download,
+  Share2,
+  MoreVertical,
+  Clock,
+  Calendar,
+} from "lucide-react";
+
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { quizService } from "@/services/quizService";
@@ -22,8 +35,10 @@ const CONTENT_TYPE_ID: Record<string, number> = {
 function toLangCode(name?: string): string {
   if (!name) return "en";
   const n = name.toLowerCase();
+
   if (n === "arabic") return "ar";
   if (n === "french") return "fr";
+
   return "en";
 }
 
@@ -31,12 +46,12 @@ export default function ContentPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   const module = params?.module;
   const type = params?.type;
-  
+
   // determine slug (array or string) and check if we're on posters page
-  const slug = Array.isArray(type) ? type[0] : type ?? "";
+  const slug = Array.isArray(type) ? type[0] : (type ?? "");
   const isPostersPage = slug === "posters";
   const [searchQuery, setSearchQuery] = useState("");
   const [languageFilter, setLanguageFilter] = useState("all");
@@ -51,14 +66,18 @@ export default function ContentPage() {
   const itemsPerPage = 10;
 
   // Read mod_id and contype_id directly from URL query params
-  const moduleId = searchParams?.get('mod_id') ? Number(searchParams.get('mod_id')) : 1;
-  const contypeIdFromUrl = searchParams?.get('contype_id') ? Number(searchParams.get('contype_id')) : null;
+  const moduleId = searchParams?.get("mod_id") ? Number(searchParams.get("mod_id")) : 1;
+  const contypeIdFromUrl = searchParams?.get("contype_id")
+    ? Number(searchParams.get("contype_id"))
+    : null;
 
   useEffect(() => {
-    const slug = Array.isArray(type) ? type[0] : type ?? "";
+    const slug = Array.isArray(type) ? type[0] : (type ?? "");
     const contype_id = contypeIdFromUrl ?? CONTENT_TYPE_ID[slug];
+
     if (!contype_id || !moduleId) {
       setIsLoading(false);
+
       return;
     }
     setIsLoading(true);
@@ -77,6 +96,7 @@ export default function ContentPage() {
             contentType: slug,
             source_url: c.source_url ?? null,
           }));
+
           setApiItems(mapped);
         } else {
           setApiItems([]);
@@ -111,6 +131,7 @@ export default function ContentPage() {
     if (sortBy) {
       filtered.sort((a, b) => {
         let valA: any, valB: any;
+
         if (sortBy === "title") {
           valA = a.title.toLowerCase();
           valB = b.title.toLowerCase();
@@ -123,6 +144,7 @@ export default function ContentPage() {
         }
         if (valA < valB) return sortOrder === "asc" ? -1 : 1;
         if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+
         return 0;
       });
     }
@@ -132,6 +154,7 @@ export default function ContentPage() {
 
   const paginatedItems = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
+
     return filteredItems.slice(start, start + itemsPerPage);
   }, [filteredItems, currentPage, itemsPerPage]);
 
@@ -148,6 +171,7 @@ export default function ContentPage() {
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showLanguageDropdown]);
 
@@ -166,17 +190,20 @@ export default function ContentPage() {
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const year = date.getFullYear();
+
     return `${day}/${month}/${year}`;
   };
 
   const handleView = (action: string, item: any) => {
     if (action === "view") {
-      const moduleSlug = Array.isArray(module) ? module[0] : module ?? "";
+      const moduleSlug = Array.isArray(module) ? module[0] : (module ?? "");
       const contype_id = contypeIdFromUrl ?? CONTENT_TYPE_ID[slug];
       const detailParams = new URLSearchParams();
+
       if (moduleId) detailParams.set("mod_id", String(moduleId));
       if (contype_id) detailParams.set("contype_id", String(contype_id));
       const campaignId = searchParams?.get("campaign_id");
+
       if (campaignId) detailParams.set("campaign_id", campaignId);
       router.push(`/module/${moduleSlug}/content/${slug}/${item.id}?${detailParams.toString()}`);
     } else if (action === "edit") {
@@ -204,35 +231,42 @@ export default function ContentPage() {
   const resolveLogoUrl = (raw: string | null): string | null => {
     if (!raw?.trim()) return null;
     const s = raw.trim();
+
     if (s.startsWith("http")) return s;
     if (s.startsWith("/contents/")) return `/awm${s}`;
+
     return `/awm/contents/${s.startsWith("/") ? s.slice(1) : s}`;
   };
 
   const ItemThumbnail = ({ src }: { src: string | null }) => {
     const url = resolveLogoUrl(src);
+
     if (url) {
       return (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={url}
           alt=""
           className="w-10 h-10 rounded-lg object-cover"
-          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; (e.currentTarget.nextElementSibling as HTMLElement | null)?.removeAttribute('style'); }}
+          src={url}
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).style.display = "none";
+            (e.currentTarget.nextElementSibling as HTMLElement | null)?.removeAttribute("style");
+          }}
         />
       );
     }
+
     return <ThumbnailSVG />;
   };
 
   const ThumbnailSVG = () => (
     <svg
-      width="40"
+      className="rounded-lg"
+      fill="none"
       height="40"
       viewBox="0 0 32 32"
-      fill="none"
+      width="40"
       xmlns="http://www.w3.org/2000/svg"
-      className="rounded-lg"
     >
       <path
         d="M25.3333 4H6.66667C5.19391 4 4 5.19391 4 6.66667V25.3333C4 26.8061 5.19391 28 6.66667 28H25.3333C26.8061 28 28 26.8061 28 25.3333V6.66667C28 5.19391 26.8061 4 25.3333 4Z"
@@ -259,8 +293,8 @@ export default function ContentPage() {
     <ProtectedRoute>
       <DashboardLayout>
         <link
-          rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/flag-icons@6.14.0/css/flag-icons.min.css"
+          rel="stylesheet"
         />
         <style jsx>{`
           .modern-dropdown-button {
@@ -326,7 +360,8 @@ export default function ContentPage() {
             background: white;
             border: 1px solid #e5e7eb;
             border-radius: 0.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+            box-shadow:
+              0 10px 15px -3px rgba(0, 0, 0, 0.1),
               0 4px 6px -2px rgba(0, 0, 0, 0.05);
             max-height: 240px;
             overflow-y: auto;
@@ -351,27 +386,29 @@ export default function ContentPage() {
               <div>
                 <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
                   <button
-                    onClick={() => setViewingItem(null)}
                     className="hover:text-gray-700 transition flex items-center gap-1"
+                    onClick={() => setViewingItem(null)}
                   >
                     <ChevronLeft className="w-4 h-4" />
                     Back
                   </button>
                   <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">
+                  <a className="hover:text-gray-700 transition" href="#">
                     Awareness Library
                   </a>
                   <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">
+                  <a className="hover:text-gray-700 transition" href="#">
                     System Library
                   </a>
                   <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">
+                  <a className="hover:text-gray-700 transition" href="#">
                     Physical Security
                   </a>
                   <span className="text-gray-400">›</span>
                   <span className="font-semibold text-gray-900">
-                    {(viewingItem as any).contentType === "brochure" ? "Interactive Training" : (viewingItem as any).title}
+                    {(viewingItem as any).contentType === "brochure"
+                      ? "Interactive Training"
+                      : (viewingItem as any).title}
                   </span>
                 </nav>
 
@@ -380,7 +417,9 @@ export default function ContentPage() {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-semibold">
-                          {(viewingItem as any).contentType === "brochure" ? "Physical Security : Brochure Training" : `Physical Security : ${(viewingItem as any).title}`}
+                          {(viewingItem as any).contentType === "brochure"
+                            ? "Physical Security : Brochure Training"
+                            : `Physical Security : ${(viewingItem as any).title}`}
                         </h3>
                         <p className="text-xs text-gray-500 mt-1">
                           {(viewingItem as any).description}
@@ -394,9 +433,7 @@ export default function ContentPage() {
                         const rawUrl = (viewingItem as any).source_url;
                         const contentBase =
                           process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://localhost:3002";
-                        const fullUrl = rawUrl
-                          ? `${contentBase}${rawUrl}`
-                          : null;
+                        const fullUrl = rawUrl ? `${contentBase}${rawUrl}` : null;
                         const isPdf = fullUrl?.toLowerCase().endsWith(".pdf");
 
                         if (!fullUrl) {
@@ -410,18 +447,18 @@ export default function ContentPage() {
                         if (isPdf) {
                           return (
                             <iframe
-                              src={fullUrl}
-                              width="100%"
                               height="800px"
+                              src={fullUrl}
                               style={{ border: "none" }}
+                              width="100%"
                             />
                           );
                         }
 
                         return (
                           <img
-                            src={fullUrl}
                             alt={(viewingItem as any).title}
+                            src={fullUrl}
                             style={{
                               maxWidth: "100%",
                               height: "auto",
@@ -435,10 +472,14 @@ export default function ContentPage() {
                       {/* Image Info */}
                       <div className="p-4 border-b border-gray-100">
                         <h4 className="text-base font-semibold mb-1">
-                          {(viewingItem as any).contentType === "brochure" ? "Physical Security Training" : (viewingItem as any).title}
+                          {(viewingItem as any).contentType === "brochure"
+                            ? "Physical Security Training"
+                            : (viewingItem as any).title}
                         </h4>
                         <p className="text-xs text-gray-500">
-                          {(viewingItem as any).contentType === "brochure" ? "Learn about physical security best practices and protocols" : (viewingItem as any).description}
+                          {(viewingItem as any).contentType === "brochure"
+                            ? "Learn about physical security best practices and protocols"
+                            : (viewingItem as any).description}
                         </p>
                         <div className="flex items-center gap-4 mt-3 text-xs text-gray-600">
                           {(viewingItem as any).contentType === "brochure" && (
@@ -467,9 +508,11 @@ export default function ContentPage() {
                           <button className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition">
                             <span>
                               Download{" "}
-                              {(viewingItem as any).contentType === "brochure" ? "Brochure" : (type as string)
-                                .replace(/-/g, " ")
-                                .replace(/\b\w/g, (l) => l.toUpperCase())}
+                              {(viewingItem as any).contentType === "brochure"
+                                ? "Brochure"
+                                : (type as string)
+                                    .replace(/-/g, " ")
+                                    .replace(/\b\w/g, (l) => l.toUpperCase())}
                             </span>
                           </button>
                           <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-full text-xs font-medium transition">
@@ -501,22 +544,20 @@ export default function ContentPage() {
             ) : (
               <div>
                 <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
-                  <a href="#" className="hover:text-gray-700 transition">
+                  <a className="hover:text-gray-700 transition" href="#">
                     Awareness Library
                   </a>
                   <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">
+                  <a className="hover:text-gray-700 transition" href="#">
                     System Library
                   </a>
                   <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">
+                  <a className="hover:text-gray-700 transition" href="#">
                     Physical Security
                   </a>
                   <span className="text-gray-400">›</span>
                   <span className="font-semibold text-gray-900">
-                    {(type as string)
-                      .replace(/-/g, " ")
-                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                    {(type as string).replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                   </span>
                 </nav>
 
@@ -530,20 +571,14 @@ export default function ContentPage() {
                             .replace(/-/g, " ")
                             .replace(/\b\w/g, (l) => l.toUpperCase())}
                         </h3>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Physical security description
-                        </p>
+                        <p className="text-xs text-gray-500 mt-1">Physical security description</p>
                       </div>
                       {!isPostersPage && (
                         <a
-                          href="add-new-module-content.html"
                           className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs"
+                          href="add-new-module-content.html"
                         >
-                          <img
-                            src="./images/img/add.svg"
-                            className="size-3"
-                            alt=""
-                          />
+                          <img alt="" className="size-3" src="./images/img/add.svg" />
                           <span className="hidden md:inline">Add New</span>
                         </a>
                       )}
@@ -563,10 +598,10 @@ export default function ContentPage() {
                             }}
                           />
                           <input
-                            id="searchInput"
-                            type="text"
-                            placeholder="Search content..."
                             className="w-full pl-10 pr-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            id="searchInput"
+                            placeholder="Search content..."
+                            type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                           />
@@ -575,33 +610,27 @@ export default function ContentPage() {
                         {/* Language dropdown */}
                         <div className="relative w-44 modern-dropdown-wrapper small rounded-full language-dropdown-container">
                           <button
-                            onClick={() =>
-                              setShowLanguageDropdown(!showLanguageDropdown)
-                            }
                             className="modern-dropdown-button"
+                            onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
                           >
                             <span>
                               {languageFilter === "all"
                                 ? "All Languages"
                                 : languageFilter === "en"
-                                ? "English"
-                                : languageFilter === "ar"
-                                ? "Arabic"
-                                : languageFilter === "fr"
-                                ? "French"
-                                : "All Languages"}
+                                  ? "English"
+                                  : languageFilter === "ar"
+                                    ? "Arabic"
+                                    : languageFilter === "fr"
+                                      ? "French"
+                                      : "All Languages"}
                             </span>
                             <div className="modern-dropdown-arrow">
-                              <svg
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
+                              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
+                                  d="M19 9l-7 7-7-7"
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth="2"
-                                  d="M19 9l-7 7-7-7"
                                 />
                               </svg>
                             </div>
@@ -617,11 +646,11 @@ export default function ContentPage() {
                               ].map((opt) => (
                                 <button
                                   key={opt.code}
+                                  className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                                   onClick={() => {
                                     setLanguageFilter(opt.code);
                                     setShowLanguageDropdown(false);
                                   }}
-                                  className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                                 >
                                   {opt.label}
                                 </button>
@@ -633,19 +662,16 @@ export default function ContentPage() {
 
                       {/* View toggle */}
                       <div
-                        id="viewToggle"
                         className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-1 py-1 z-40 relative"
+                        id="viewToggle"
                       >
                         <div
-                          id="viewIndicator"
                           className="absolute bg-[#051226] rounded-full"
+                          id="viewIndicator"
                           style={{
                             top: "4px",
                             height: "calc(100% - 8px)",
-                            left:
-                              viewMode === "table"
-                                ? "4px"
-                                : "calc(50% - 2px)",
+                            left: viewMode === "table" ? "4px" : "calc(50% - 2px)",
                             width: "calc(50% - 4px)",
                             transition:
                               "left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -653,9 +679,7 @@ export default function ContentPage() {
                         />
                         <button
                           className={`view-btn inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition relative z-10 ${
-                            viewMode === "table"
-                              ? "text-white"
-                              : "text-gray-700"
+                            viewMode === "table" ? "text-white" : "text-gray-700"
                           }`}
                           onClick={() => setViewMode("table")}
                         >
@@ -664,9 +688,7 @@ export default function ContentPage() {
                         </button>
                         <button
                           className={`view-btn inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition relative z-10 ${
-                            viewMode === "grid"
-                              ? "text-white"
-                              : "text-gray-700"
+                            viewMode === "grid" ? "text-white" : "text-gray-700"
                           }`}
                           onClick={() => setViewMode("grid")}
                         >
@@ -684,9 +706,9 @@ export default function ContentPage() {
                       >
                         {viewMode === "table" ? (
                           <table
+                            aria-label="Library table"
                             className="w-full text-xs"
                             id="libraryTable"
-                            aria-label="Library table"
                           >
                             <thead className="bg-gray-50 text-gray-600 border-b sticky top-0 z-10">
                               <tr>
@@ -709,9 +731,7 @@ export default function ContentPage() {
                                     </span>
                                   </div>
                                 </th>
-                                <th className="px-4 py-3.5 text-left font-semibold">
-                                  Description
-                                </th>
+                                <th className="px-4 py-3.5 text-left font-semibold">Description</th>
                                 <th
                                   className="px-4 py-3.5 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors"
                                   onClick={() => handleSort("language")}
@@ -731,29 +751,17 @@ export default function ContentPage() {
                                     </span>
                                   </div>
                                 </th>
-                                <th className="px-4 py-3.5 text-left font-semibold">
-                                  Thumbnail
-                                </th>
-                                <th className="px-4 py-3.5 text-left font-semibold">
-                                  Action
-                                </th>
+                                <th className="px-4 py-3.5 text-left font-semibold">Thumbnail</th>
+                                <th className="px-4 py-3.5 text-left font-semibold">Action</th>
                               </tr>
                             </thead>
-                            <tbody
-                              id="tableBody"
-                              className="divide-y divide-gray-100"
-                            >
+                            <tbody className="divide-y divide-gray-100" id="tableBody">
                               {paginatedItems.map((item) => (
-                                <tr
-                                  key={item.id}
-                                  className="hover:bg-gray-50 transition-colors"
-                                >
+                                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                                   <td className="px-4 py-3 font-medium text-gray-700">
                                     {item.title}
                                   </td>
-                                  <td className="px-4 py-3 text-gray-600">
-                                    {item.description}
-                                  </td>
+                                  <td className="px-4 py-3 text-gray-600">{item.description}</td>
                                   <td className="px-4 py-3 text-gray-700">
                                     <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-gray-700 bg-white text-xs">
                                       <span className="w-4 h-4 rounded-full overflow-hidden border border-gray-200 bg-white flex items-center justify-center">
@@ -772,10 +780,8 @@ export default function ContentPage() {
                                   <td className="px-4 py-3">
                                     <div className="inline-flex items-center">
                                       <button
-                                        onClick={() =>
-                                          handleView("view", item)
-                                        }
                                         className="flex items-center gap-1 px-2 py-1 text-gray-700 text-[11px]"
+                                        onClick={() => handleView("view", item)}
                                       >
                                         <Eye className="w-4 h-4" />
                                       </button>
@@ -788,8 +794,8 @@ export default function ContentPage() {
                         ) : (
                           /* Grid view */
                           <div
-                            id="gridWrapper"
                             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 p-4"
+                            id="gridWrapper"
                           >
                             {paginatedItems.map((item) => (
                               <div
@@ -827,10 +833,8 @@ export default function ContentPage() {
                                   </span>
                                   <div className="flex items-center gap-2">
                                     <button
-                                      onClick={() =>
-                                        handleView("view", item)
-                                      }
                                       className="flex items-center gap-1 px-2 py-1.5 rounded-full border border-sky-500 text-sky-500 text-[11px] hover:bg-sky-50"
+                                      onClick={() => handleView("view", item)}
                                     >
                                       <Eye className="w-4 h-4" />
                                       View
@@ -873,35 +877,28 @@ export default function ContentPage() {
                       {/* Pagination */}
                       <div className="mt-4 flex items-center justify-between px-4 pb-4">
                         <p className="text-xs text-gray-600">
-                          Showing{" "}
-                          {(currentPage - 1) * itemsPerPage + 1}–
-                          {Math.min(
-                            currentPage * itemsPerPage,
-                            filteredItems.length
-                          )}{" "}
-                          of {filteredItems.length} Entries
+                          Showing {(currentPage - 1) * itemsPerPage + 1}–
+                          {Math.min(currentPage * itemsPerPage, filteredItems.length)} of{" "}
+                          {filteredItems.length} Entries
                         </p>
                         <div className="flex items-center gap-1">
                           <button
                             className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                            onClick={() => changePage(currentPage - 1)}
                             disabled={currentPage === 1}
+                            onClick={() => changePage(currentPage - 1)}
                           >
                             <ChevronLeft className="w-4 h-4" />
                           </button>
 
-                          {Array.from(
-                            { length: totalPages },
-                            (_, i) => i + 1
-                          ).map((page) => (
+                          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                             <button
                               key={page}
-                              onClick={() => changePage(page)}
                               className={`min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all ${
                                 page === currentPage
                                   ? "bg-blue-50 text-blue-600 border-blue-500 font-semibold"
                                   : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                               }`}
+                              onClick={() => changePage(page)}
                             >
                               {page}
                             </button>
@@ -909,8 +906,8 @@ export default function ContentPage() {
 
                           <button
                             className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                            onClick={() => changePage(currentPage + 1)}
                             disabled={currentPage === totalPages}
+                            onClick={() => changePage(currentPage + 1)}
                           >
                             <ChevronRight className="w-4 h-4" />
                           </button>

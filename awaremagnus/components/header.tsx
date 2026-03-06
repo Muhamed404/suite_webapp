@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
+
 import { useI18n } from "@/i18n/I18nProvider";
 
 interface HeaderProps {
@@ -44,11 +44,11 @@ export const Header = ({
         {/* Search */}
         <div className="relative">
           <input
-            type="text"
+            className="w-64 px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Search..."
+            type="text"
             value={searchValue}
             onChange={handleSearchChange}
-            className="w-64 px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <svg
             className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
@@ -57,18 +57,18 @@ export const Header = ({
             viewBox="0 0 24 24"
           >
             <path
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
             />
           </svg>
         </div>
 
         {/* Mail */}
         <button
-          onClick={onMailClick}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          onClick={onMailClick}
         >
           <svg
             className="w-5 h-5 text-gray-600"
@@ -77,18 +77,18 @@ export const Header = ({
             viewBox="0 0 24 24"
           >
             <path
+              d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
             />
           </svg>
         </button>
 
         {/* Notification */}
         <button
-          onClick={onNotificationClick}
           className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          onClick={onNotificationClick}
         >
           <svg
             className="w-5 h-5 text-gray-600"
@@ -97,18 +97,18 @@ export const Header = ({
             viewBox="0 0 24 24"
           >
             <path
+              d="M15 17h5l-5 5v-5zM15 7v5h5l-5-5zM5 17h5l-5 5v-5zM5 7v5H0l5-5z"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth="2"
-              d="M15 17h5l-5 5v-5zM15 7v5h5l-5-5zM5 17h5l-5 5v-5zM5 7v5H0l5-5z"
             />
           </svg>
         </button>
 
         {/* Profile */}
         <button
-          onClick={onProfileClick}
           className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          onClick={onProfileClick}
         >
           <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
             <svg
@@ -118,10 +118,10 @@ export const Header = ({
               viewBox="0 0 24 24"
             >
               <path
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
               />
             </svg>
           </div>

@@ -54,17 +54,22 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
 
   const formulaParts = useMemo(() => {
     const parts: string[] = [];
+
     if (formData.visualShortVideos) parts.push(`Videos (${formData.motionVideoWeight}%)`);
-    if (formData.visualInteractive) parts.push(`Interactive (${formData.interactiveContentWeight}%)`);
+    if (formData.visualInteractive)
+      parts.push(`Interactive (${formData.interactiveContentWeight}%)`);
     if (formData.enableQuiz) parts.push(`Quiz (${formData.quizProgressWeight}%)`);
-    if (formData.visualOthers && formData.enableDocuments) parts.push(`Documents (${formData.documentWeight}%)`);
-    if (formData.visualOthers && formData.enableGames) parts.push(`Games (${formData.gameWeight}%)`);
+    if (formData.visualOthers && formData.enableDocuments)
+      parts.push(`Documents (${formData.documentWeight}%)`);
+    if (formData.visualOthers && formData.enableGames)
+      parts.push(`Games (${formData.gameWeight}%)`);
     if (formData.visualOthers && formData.enableMiscItems) {
       parts.push(`Brochures (${formData.brochureWeight}%)`);
       parts.push(`Posters (${formData.posterWeight}%)`);
       parts.push(`Screensavers (${formData.screensaverWeight}%)`);
       parts.push(`VR Games (${formData.vrGameWeight}%)`);
     }
+
     return parts;
   }, [formData]);
 
@@ -91,15 +96,23 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
             <div className="grid grid-cols-3 gap-3">
               <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all">
                 <div
-                  onClick={() => onChange("enableDocuments", !formData.enableDocuments)}
                   className={clsx(
                     "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
-                    formData.enableDocuments ? "bg-blue-500 border-blue-500" : "border-gray-300 group-hover:border-blue-400"
+                    formData.enableDocuments
+                      ? "bg-blue-500 border-blue-500"
+                      : "border-gray-300 group-hover:border-blue-400"
                   )}
+                  onClick={() => onChange("enableDocuments", !formData.enableDocuments)}
                 >
                   {formData.enableDocuments && (
-                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-2.5 h-2.5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
                 </div>
@@ -108,15 +121,23 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
 
               <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all">
                 <div
-                  onClick={() => onChange("enableGames", !formData.enableGames)}
                   className={clsx(
                     "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
-                    formData.enableGames ? "bg-blue-500 border-blue-500" : "border-gray-300 group-hover:border-blue-400"
+                    formData.enableGames
+                      ? "bg-blue-500 border-blue-500"
+                      : "border-gray-300 group-hover:border-blue-400"
                   )}
+                  onClick={() => onChange("enableGames", !formData.enableGames)}
                 >
                   {formData.enableGames && (
-                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-2.5 h-2.5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
                 </div>
@@ -125,15 +146,23 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
 
               <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all">
                 <div
-                  onClick={() => onChange("enableMiscItems", !formData.enableMiscItems)}
                   className={clsx(
                     "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
-                    formData.enableMiscItems ? "bg-blue-500 border-blue-500" : "border-gray-300 group-hover:border-blue-400"
+                    formData.enableMiscItems
+                      ? "bg-blue-500 border-blue-500"
+                      : "border-gray-300 group-hover:border-blue-400"
                   )}
+                  onClick={() => onChange("enableMiscItems", !formData.enableMiscItems)}
                 >
                   {formData.enableMiscItems && (
-                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-2.5 h-2.5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
                 </div>
@@ -146,109 +175,139 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
         {/* Weight Configuration */}
         <div>
           <h6 className="text-sm font-semibold text-[#051226] mb-2">
-            How would you like users to complete their module? <span className="text-red-500">*</span>
+            How would you like users to complete their module?{" "}
+            <span className="text-red-500">*</span>
           </h6>
           <div className="grid grid-cols-2 gap-2">
             {formData.visualShortVideos && (
               <div className="input-group">
-                <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.motionVideoWeight")}</label>
+                <label className="block font-medium text-gray-600 mb-1 text-xs">
+                  {t("form.motionVideoWeight")}
+                </label>
                 <input
+                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  max={100}
+                  min={0}
                   type="number"
                   value={formData.motionVideoWeight}
                   onChange={(e) => onChange("motionVideoWeight", parseInt(e.target.value) || 0)}
-                  min={0} max={100}
-                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 />
               </div>
             )}
             {formData.visualInteractive && (
               <div className="input-group">
-                <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.interactiveContentWeight")}</label>
+                <label className="block font-medium text-gray-600 mb-1 text-xs">
+                  {t("form.interactiveContentWeight")}
+                </label>
                 <input
+                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  max={100}
+                  min={0}
                   type="number"
                   value={formData.interactiveContentWeight}
-                  onChange={(e) => onChange("interactiveContentWeight", parseInt(e.target.value) || 0)}
-                  min={0} max={100}
-                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  onChange={(e) =>
+                    onChange("interactiveContentWeight", parseInt(e.target.value) || 0)
+                  }
                 />
               </div>
             )}
             {formData.enableQuiz && (
               <div className="input-group">
-                <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.quizProgressWeight")}</label>
+                <label className="block font-medium text-gray-600 mb-1 text-xs">
+                  {t("form.quizProgressWeight")}
+                </label>
                 <input
+                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  max={100}
+                  min={0}
                   type="number"
                   value={formData.quizProgressWeight}
                   onChange={(e) => onChange("quizProgressWeight", parseInt(e.target.value) || 0)}
-                  min={0} max={100}
-                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 />
               </div>
             )}
             {formData.visualOthers && formData.enableDocuments && (
               <div className="input-group">
-                <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.documentWeight")}</label>
+                <label className="block font-medium text-gray-600 mb-1 text-xs">
+                  {t("form.documentWeight")}
+                </label>
                 <input
+                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  max={100}
+                  min={0}
                   type="number"
                   value={formData.documentWeight}
                   onChange={(e) => onChange("documentWeight", parseInt(e.target.value) || 0)}
-                  min={0} max={100}
-                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 />
               </div>
             )}
             {formData.visualOthers && formData.enableGames && (
               <div className="input-group">
-                <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.gameWeight")}</label>
+                <label className="block font-medium text-gray-600 mb-1 text-xs">
+                  {t("form.gameWeight")}
+                </label>
                 <input
+                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  max={100}
+                  min={0}
                   type="number"
                   value={formData.gameWeight}
                   onChange={(e) => onChange("gameWeight", parseInt(e.target.value) || 0)}
-                  min={0} max={100}
-                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 />
               </div>
             )}
             {formData.visualOthers && formData.enableMiscItems && (
               <>
                 <div className="input-group">
-                  <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.brochureWeight")}</label>
+                  <label className="block font-medium text-gray-600 mb-1 text-xs">
+                    {t("form.brochureWeight")}
+                  </label>
                   <input
+                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    max={100}
+                    min={0}
                     type="number"
                     value={formData.brochureWeight}
                     onChange={(e) => onChange("brochureWeight", parseInt(e.target.value) || 0)}
-                    min={0} max={100}
-                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
                   />
                 </div>
                 <div className="input-group">
-                  <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.posterWeight")}</label>
+                  <label className="block font-medium text-gray-600 mb-1 text-xs">
+                    {t("form.posterWeight")}
+                  </label>
                   <input
+                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    max={100}
+                    min={0}
                     type="number"
                     value={formData.posterWeight}
                     onChange={(e) => onChange("posterWeight", parseInt(e.target.value) || 0)}
-                    min={0} max={100}
-                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
                   />
                 </div>
                 <div className="input-group">
-                  <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.screensaverWeight")}</label>
+                  <label className="block font-medium text-gray-600 mb-1 text-xs">
+                    {t("form.screensaverWeight")}
+                  </label>
                   <input
+                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    max={100}
+                    min={0}
                     type="number"
                     value={formData.screensaverWeight}
                     onChange={(e) => onChange("screensaverWeight", parseInt(e.target.value) || 0)}
-                    min={0} max={100}
-                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
                   />
                 </div>
                 <div className="input-group">
-                  <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.vrGameWeight")}</label>
+                  <label className="block font-medium text-gray-600 mb-1 text-xs">
+                    {t("form.vrGameWeight")}
+                  </label>
                   <input
+                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    max={100}
+                    min={0}
                     type="number"
                     value={formData.vrGameWeight}
                     onChange={(e) => onChange("vrGameWeight", parseInt(e.target.value) || 0)}
-                    min={0} max={100}
-                    className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
                   />
                 </div>
               </>
@@ -259,13 +318,20 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
           <div className="mt-3">
             <strong className="text-sm">
               Total:{" "}
-              <span className={clsx("text-lg font-bold", totalWeight === 100 ? "text-blue-500" : "text-red-600")}>
+              <span
+                className={clsx(
+                  "text-lg font-bold",
+                  totalWeight === 100 ? "text-blue-500" : "text-red-600"
+                )}
+              >
                 {totalWeight}
               </span>
               /100
             </strong>
             {totalWeight !== 100 && (
-              <div className="text-[10px] text-red-500 mt-0.5">Total weights must equal exactly 100.</div>
+              <div className="text-[10px] text-red-500 mt-0.5">
+                Total weights must equal exactly 100.
+              </div>
             )}
           </div>
 

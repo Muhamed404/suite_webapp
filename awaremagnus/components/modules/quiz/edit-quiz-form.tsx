@@ -44,6 +44,7 @@ function mapApiAnswersToForm(
 
 function moduleName(m?: Module | null): string {
   if (!m) return "";
+
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
@@ -135,9 +136,11 @@ export function EditQuizForm({
 
       // Redirect after success
       setTimeout(() => {
-        const path = user?.role_id && (user.role_id === 1 || user.role_id === 2)
-          ? `/dashboard/training-library/system/${initialModuleId}`
-          : `/dashboard/training-library/my/${initialModuleId}`;
+        const path =
+          user?.role_id && (user.role_id === 1 || user.role_id === 2)
+            ? `/dashboard/training-library/system/${initialModuleId}`
+            : `/dashboard/training-library/my/${initialModuleId}`;
+
         router.push(path);
       }, 2000);
     } catch (err) {
@@ -282,7 +285,7 @@ export function EditQuizForm({
                   questions: f.questions.map((q, i) => (i === qIndex ? { ...q, question } : q)),
                 }))
               }
-              onRemove={languageForms.length > 1 ? () => removeForm(formIndex) : () => { }}
+              onRemove={languageForms.length > 1 ? () => removeForm(formIndex) : () => {}}
               onRemoveQuestion={(qIndex) => removeQuestion(formIndex, qIndex)}
             />
           ))}

@@ -6,7 +6,7 @@ import { ContentDetailPage } from "@/components/modules/training-library/content
 
 export default function MyLibraryModuleContentDetailPage() {
   const params = useParams();
-  
+
   const moduleId = params?.moduleId ? Number(params.moduleId) : 0;
   const contentTypeId = params?.contentTypeId ? Number(params.contentTypeId) : 0;
   const contentId = params?.contentId ? Number(params.contentId) : 0;

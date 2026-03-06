@@ -1,11 +1,16 @@
 import axios, { type InternalAxiosRequestConfig, type AxiosError } from "axios";
 
-const SERVICE_AWM_URL = process.env.SERVICE_AWM_URL || process.env.NEXT_PUBLIC_SERVICE_AWM_URL || "http://localhost:3002";
+const SERVICE_AWM_URL =
+  process.env.SERVICE_AWM_URL || process.env.NEXT_PUBLIC_SERVICE_AWM_URL || "http://localhost:3002";
 
 /** API path prefix per AWM docs: {BASE_URL}/api. Set NEXT_PUBLIC_AWM_API_BASE=/api/awm if your backend is mounted there. */
-export const API_BASE = process.env.AWM_API_BASE || process.env.NEXT_PUBLIC_AWM_API_BASE || "/api/awm";
+export const API_BASE =
+  process.env.AWM_API_BASE || process.env.NEXT_PUBLIC_AWM_API_BASE || "/api/awm";
 
-const SERVICE_SUITE_URL = process.env.SERVICE_SUITE_URL || process.env.NEXT_PUBLIC_SERVICE_SUITE_URL || "http://localhost:3000";
+const SERVICE_SUITE_URL =
+  process.env.SERVICE_SUITE_URL ||
+  process.env.NEXT_PUBLIC_SERVICE_SUITE_URL ||
+  "http://localhost:3000";
 
 /**
  * Optional test token sent to all API requests when set.

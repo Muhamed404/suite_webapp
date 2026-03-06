@@ -5,7 +5,12 @@ import { CheckCircle } from "lucide-react";
 
 import { useTranslations } from "@/i18n/useTranslations";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { suiteSuiteService, type Department, type Group, type User } from "@/services/suiteSuiteService";
+import {
+  suiteSuiteService,
+  type Department,
+  type Group,
+  type User,
+} from "@/services/suiteSuiteService";
 
 interface WizardStep7Props {
   formData: {
@@ -25,7 +30,13 @@ interface WizardStep7Props {
     enableCertificate: boolean;
     schedules: Array<{ module_id: number; start_date: string }>;
   };
-  modulesList: Array<{ id: number; title?: string; name?: string; code?: string; translations?: Array<{ name?: string }> }>;
+  modulesList: Array<{
+    id: number;
+    title?: string;
+    name?: string;
+    code?: string;
+    translations?: Array<{ name?: string }>;
+  }>;
 }
 
 export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
@@ -39,6 +50,7 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
     const fetchData = async () => {
       try {
         const orgId = user?.organization_id ?? user?.org_id;
+
         if (orgId === undefined || orgId === null) return;
 
         const [deptData, groupData] = await Promise.all([
@@ -61,7 +73,13 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
   const getModuleName = (moduleId: number) => {
     const module = modulesList.find((m) => m.id === moduleId);
 
-    return module?.title || module?.name || module?.translations?.[0]?.name || module?.code || `Module ${moduleId}`;
+    return (
+      module?.title ||
+      module?.name ||
+      module?.translations?.[0]?.name ||
+      module?.code ||
+      `Module ${moduleId}`
+    );
   };
 
   const getDepartmentNames = () => {
@@ -71,6 +89,7 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
     return formData.departments
       .map((id) => {
         const dept = departments.find((d) => d.id === id);
+
         return dept?.name || `Department ${id}`;
       })
       .join(", ");
@@ -83,6 +102,7 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
     return formData.groups
       .map((id) => {
         const group = groups.find((g) => g.id === id);
+
         return group?.name || `Group ${id}`;
       })
       .join(", ");
@@ -108,7 +128,9 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
           <span className="text-sm text-gray-600 flex-1">{formData.campaignName}</span>
         </div>
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">
-          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Description</span>
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
+            Description
+          </span>
           <span className="text-sm text-gray-600 flex-1">{formData.description || "—"}</span>
         </div>
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">
@@ -116,7 +138,9 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
           <span className="text-sm text-gray-600 flex-1">{formData.gamified ? "Yes" : "No"}</span>
         </div>
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">
-          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Departments</span>
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
+            Departments
+          </span>
           <span className="text-sm text-gray-600 flex-1">{getDepartmentNames()}</span>
         </div>
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">

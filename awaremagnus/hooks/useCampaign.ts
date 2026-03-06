@@ -1,6 +1,3 @@
-import type { CampaignAssignment, Certificate } from "@/types/campaign";
-import type { Module } from "@/types/quiz";
-
 import { useQuery } from "@tanstack/react-query";
 
 import { campaignService } from "@/services/campaignService";
@@ -15,6 +12,7 @@ export const CAMPAIGN_KEYS = {
 /** Fetch campaigns assigned to the current Org User */
 export function useAssignedCampaigns(campaignId?: string, enabled = true) {
   const { user } = useAuthStore();
+
   return useQuery({
     queryKey: [...CAMPAIGN_KEYS.assignedCampaigns, campaignId],
     queryFn: () => campaignService.getAssignedCampaigns(user?.id || 0, campaignId),

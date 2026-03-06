@@ -109,7 +109,11 @@ export function PosterContentDetailScreen({
       : sourceUrl.startsWith("/contents/")
         ? `/awm${sourceUrl}`
         : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
-    : content ? (content.logo_url ?? content.logo_path ? getContentAssetUrl(content.logo_url ?? content.logo_path) : null) : null;
+    : content
+      ? (content.logo_url ?? content.logo_path)
+        ? getContentAssetUrl(content.logo_url ?? content.logo_path)
+        : null
+      : null;
 
   const logoUrl = content?.logo_url || (content as any)?.logo_path;
   const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;

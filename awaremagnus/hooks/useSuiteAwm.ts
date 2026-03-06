@@ -75,4 +75,3 @@ export function useAwmCategories(enabled = true) {
     select: (data) => data?.object?.categories ?? data?.data?.categories ?? [],
   });
 }
-

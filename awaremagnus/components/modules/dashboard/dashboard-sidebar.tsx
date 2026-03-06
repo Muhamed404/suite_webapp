@@ -118,9 +118,7 @@ export const DashboardSidebar = ({
       href: "/dashboard/my-awareness",
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Report.svg"),
       label: t("menu.myAwareness"),
-      children: [
-        { href: "/dashboard/certificates", icon: "", label: t("menu.certificates") },
-      ],
+      children: [{ href: "/dashboard/certificates", icon: "", label: t("menu.certificates") }],
     },
   ];
 

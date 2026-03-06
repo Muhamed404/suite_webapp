@@ -29,6 +29,7 @@ export function WizardStep4({ formData, onChange }: WizardStep4Props) {
   const getMaxQuizzes = () => {
     if (formData.quizDependency === "short_videos") return 5;
     if (formData.quizDependency === "interactive_videos") return 40;
+
     return 80;
   };
 
@@ -46,15 +47,23 @@ export function WizardStep4({ formData, onChange }: WizardStep4Props) {
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all">
               <div
-                onClick={() => onChange("enableQuiz", !formData.enableQuiz)}
                 className={clsx(
                   "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
-                  formData.enableQuiz ? "bg-blue-500 border-blue-500" : "border-gray-300 group-hover:border-blue-400"
+                  formData.enableQuiz
+                    ? "bg-blue-500 border-blue-500"
+                    : "border-gray-300 group-hover:border-blue-400"
                 )}
+                onClick={() => onChange("enableQuiz", !formData.enableQuiz)}
               >
                 {formData.enableQuiz && (
-                  <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-2.5 h-2.5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </div>
@@ -63,15 +72,23 @@ export function WizardStep4({ formData, onChange }: WizardStep4Props) {
 
             <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all">
               <div
-                onClick={() => onChange("enableCertificate", !formData.enableCertificate)}
                 className={clsx(
                   "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
-                  formData.enableCertificate ? "bg-blue-500 border-blue-500" : "border-gray-300 group-hover:border-blue-400"
+                  formData.enableCertificate
+                    ? "bg-blue-500 border-blue-500"
+                    : "border-gray-300 group-hover:border-blue-400"
                 )}
+                onClick={() => onChange("enableCertificate", !formData.enableCertificate)}
               >
                 {formData.enableCertificate && (
-                  <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-2.5 h-2.5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </div>
@@ -87,17 +104,19 @@ export function WizardStep4({ formData, onChange }: WizardStep4Props) {
 
             {/* Quiz Dependency */}
             <div className="mb-3">
-              <label className="block font-medium text-gray-600 mb-3 text-sm">{t("form.quizDependency")}</label>
+              <label className="block font-medium text-gray-600 mb-3 text-sm">
+                {t("form.quizDependency")}
+              </label>
               <div className="flex flex-wrap gap-4">
                 {formData.visualShortVideos && (
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
-                      type="radio"
-                      name="quizDependency"
-                      value="short_videos"
                       checked={formData.quizDependency === "short_videos"}
-                      onChange={(e) => onChange("quizDependency", e.target.value)}
                       className="w-4 h-4 text-blue-500"
+                      name="quizDependency"
+                      type="radio"
+                      value="short_videos"
+                      onChange={(e) => onChange("quizDependency", e.target.value)}
                     />
                     <span className="text-xs text-gray-700">{t("form.quizDepShortVideos")}</span>
                   </label>
@@ -105,25 +124,27 @@ export function WizardStep4({ formData, onChange }: WizardStep4Props) {
                 {formData.visualInteractive && (
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
-                      type="radio"
-                      name="quizDependency"
-                      value="interactive_videos"
                       checked={formData.quizDependency === "interactive_videos"}
-                      onChange={(e) => onChange("quizDependency", e.target.value)}
                       className="w-4 h-4 text-blue-500"
+                      name="quizDependency"
+                      type="radio"
+                      value="interactive_videos"
+                      onChange={(e) => onChange("quizDependency", e.target.value)}
                     />
-                    <span className="text-xs text-gray-700">{t("form.quizDepInteractiveVideos")}</span>
+                    <span className="text-xs text-gray-700">
+                      {t("form.quizDepInteractiveVideos")}
+                    </span>
                   </label>
                 )}
                 {formData.visualOthers && (
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
-                      type="radio"
-                      name="quizDependency"
-                      value="custom"
                       checked={formData.quizDependency === "custom"}
-                      onChange={(e) => onChange("quizDependency", e.target.value)}
                       className="w-4 h-4 text-blue-500"
+                      name="quizDependency"
+                      type="radio"
+                      value="custom"
+                      onChange={(e) => onChange("quizDependency", e.target.value)}
                     />
                     <span className="text-xs text-gray-700">{t("form.quizDepCustom")}</span>
                   </label>
@@ -134,35 +155,43 @@ export function WizardStep4({ formData, onChange }: WizardStep4Props) {
             {/* Quiz Settings */}
             <div className="grid grid-cols-3 gap-2">
               <div className="input-group">
-                <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.quizzesPerModule")}</label>
+                <label className="block font-medium text-gray-600 mb-1 text-xs">
+                  {t("form.quizzesPerModule")}
+                </label>
                 <input
+                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  max={getMaxQuizzes()}
+                  min={1}
                   type="number"
                   value={formData.totalQuizzesPerModule}
                   onChange={(e) => onChange("totalQuizzesPerModule", parseInt(e.target.value) || 1)}
-                  min={1}
-                  max={getMaxQuizzes()}
-                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 />
               </div>
               <div className="input-group">
-                <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.quizPassingThreshold")}</label>
+                <label className="block font-medium text-gray-600 mb-1 text-xs">
+                  {t("form.quizPassingThreshold")}
+                </label>
                 <input
+                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  max={100}
+                  min={1}
                   type="number"
                   value={formData.quizPassingThreshold}
-                  onChange={(e) => onChange("quizPassingThreshold", Math.min(100, parseInt(e.target.value) || 0))}
-                  min={1}
-                  max={100}
-                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  onChange={(e) =>
+                    onChange("quizPassingThreshold", Math.min(100, parseInt(e.target.value) || 0))
+                  }
                 />
               </div>
               <div className="input-group">
-                <label className="block font-medium text-gray-600 mb-1 text-xs">{t("form.quizRetryLimit")}</label>
+                <label className="block font-medium text-gray-600 mb-1 text-xs">
+                  {t("form.quizRetryLimit")}
+                </label>
                 <input
+                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                  min={1}
                   type="number"
                   value={formData.quizRetryThreshold}
                   onChange={(e) => onChange("quizRetryThreshold", parseInt(e.target.value) || 1)}
-                  min={1}
-                  className="w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-400 focus:outline-none"
                 />
               </div>
             </div>

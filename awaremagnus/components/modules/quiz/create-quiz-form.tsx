@@ -47,6 +47,7 @@ function createLanguageFormByLangId(langId: number): QuizLanguageForm {
 
 function moduleName(m?: Module | null): string {
   if (!m) return "";
+
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
@@ -252,9 +253,11 @@ export function CreateQuizForm({
 
       // Redirect after success
       setTimeout(() => {
-        const path = user?.role_id && (user.role_id === 1 || user.role_id === 2)
-          ? `/dashboard/training-library/system/${moduleId}`
-          : `/dashboard/training-library/my/${moduleId}`;
+        const path =
+          user?.role_id && (user.role_id === 1 || user.role_id === 2)
+            ? `/dashboard/training-library/system/${moduleId}`
+            : `/dashboard/training-library/my/${moduleId}`;
+
         router.push(path);
       }, 2000);
     } catch (err) {
@@ -293,7 +296,9 @@ export function CreateQuizForm({
             : "Select Module"}
         </span>
         <span className="mx-1">›</span>
-        <span className="text-[var(--mainblue)] font-semibold">{t("breadcrumbCurrent") ?? "Create Quiz"}</span>
+        <span className="text-[var(--mainblue)] font-semibold">
+          {t("breadcrumbCurrent") ?? "Create Quiz"}
+        </span>
       </div>
       <h2 className="text-xl font-bold text-[var(--mainblue)]">{t("title")}</h2>
       <p className="text-xs text-[var(--darkgray)] mb-5 mt-1">{t("subtitle")}</p>
@@ -397,8 +402,8 @@ export function CreateQuizForm({
                 key={String(form.langId ?? form.lang ?? formIndex)}
                 allowAddQuestion={true}
                 contentId={contentId ? Number(contentId) : undefined}
-                moduleId={moduleId ? Number(moduleId) : undefined}
                 form={form}
+                moduleId={moduleId ? Number(moduleId) : undefined}
                 quizType={selectedQuizType as any}
                 quizTypeId={getTypeIdFromCardType(selectedQuizType)}
                 onAddAnswer={(qIndex) => addAnswer(formIndex, qIndex)}

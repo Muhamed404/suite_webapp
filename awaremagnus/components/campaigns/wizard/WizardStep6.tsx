@@ -16,17 +16,34 @@ interface WizardStep6Props {
   };
   onChange: (field: string, value: any) => void;
   onGenerateSchedule: () => void;
-  modulesList: Array<{ id: number; title?: string; name?: string; code?: string; translations?: Array<{ name?: string }> }>;
+  modulesList: Array<{
+    id: number;
+    title?: string;
+    name?: string;
+    code?: string;
+    translations?: Array<{ name?: string }>;
+  }>;
 }
 
-export function WizardStep6({ formData, onChange, onGenerateSchedule, modulesList }: WizardStep6Props) {
+export function WizardStep6({
+  formData,
+  onChange,
+  onGenerateSchedule,
+  modulesList,
+}: WizardStep6Props) {
   const t = useTranslations("campaigns");
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
   const getModuleName = (moduleId: number) => {
     const module = modulesList.find((m) => m.id === moduleId);
 
-    return module?.title || module?.name || module?.translations?.[0]?.name || module?.code || `Module ${moduleId}`;
+    return (
+      module?.title ||
+      module?.name ||
+      module?.translations?.[0]?.name ||
+      module?.code ||
+      `Module ${moduleId}`
+    );
   };
 
   const handleDragStart = (index: number) => {
@@ -39,6 +56,7 @@ export function WizardStep6({ formData, onChange, onGenerateSchedule, modulesLis
 
     const newSchedules = [...formData.schedules];
     const draggedItem = newSchedules[draggedIndex];
+
     newSchedules.splice(draggedIndex, 1);
     newSchedules.splice(index, 0, draggedItem);
 
@@ -61,15 +79,17 @@ export function WizardStep6({ formData, onChange, onGenerateSchedule, modulesLis
         {/* Info Alert */}
         <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-100 rounded-md">
           <Info className="w-4 h-4 text-blue-600 flex-shrink-0" />
-          <p className="text-[10px] text-blue-700">Dates are set in Step 1. Optionally schedule modules below.</p>
+          <p className="text-[10px] text-blue-700">
+            Dates are set in Step 1. Optionally schedule modules below.
+          </p>
         </div>
 
         {/* Schedule Button */}
         <div>
           <button
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all"
             type="button"
             onClick={onGenerateSchedule}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all"
           >
             <CalendarCheck className="w-3 h-3" />
             <span>Schedule</span>
@@ -85,34 +105,38 @@ export function WizardStep6({ formData, onChange, onGenerateSchedule, modulesLis
                 <li
                   key={index}
                   draggable
-                  onDragStart={() => handleDragStart(index)}
-                  onDragOver={(e) => handleDragOver(e, index)}
+                  className={`flex items-center justify-between px-3 py-2 border rounded-lg text-xs text-gray-700 transition-all ${
+                    draggedIndex === index
+                      ? "opacity-40 bg-blue-50 border-blue-300"
+                      : "bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50/30"
+                  } cursor-grab active:cursor-grabbing`}
                   onDragEnd={handleDragEnd}
-                  className={`flex items-center justify-between px-3 py-2 border rounded-lg text-xs text-gray-700 transition-all ${draggedIndex === index
-                    ? "opacity-40 bg-blue-50 border-blue-300"
-                    : "bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50/30"
-                    } cursor-grab active:cursor-grabbing`}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragStart={() => handleDragStart(index)}
                 >
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <GripVertical className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <span className="truncate">{index + 1}. {getModuleName(schedule.module_id)}</span>
+                    <span className="truncate">
+                      {index + 1}. {getModuleName(schedule.module_id)}
+                    </span>
                   </div>
                   <DatePicker
-                    value={schedule.start_date ? parseDate(schedule.start_date) : null}
-                    onChange={(date) => {
-                      const newSchedules = [...formData.schedules];
-                      newSchedules[index].start_date = date ? date.toString() : "";
-                      onChange("schedules", newSchedules);
-                    }}
-                    minValue={formData.startDate ? parseDate(formData.startDate) : undefined}
-                    maxValue={formData.endDate ? parseDate(formData.endDate) : undefined}
-                    granularity="day"
+                    aria-label={`Module ${index + 1} Start Date`}
                     className="w-40"
-                    size="sm"
                     classNames={{
                       selectorButton: "h-7 min-w-7",
                     }}
-                    aria-label={`Module ${index + 1} Start Date`}
+                    granularity="day"
+                    maxValue={formData.endDate ? parseDate(formData.endDate) : undefined}
+                    minValue={formData.startDate ? parseDate(formData.startDate) : undefined}
+                    size="sm"
+                    value={schedule.start_date ? parseDate(schedule.start_date) : null}
+                    onChange={(date) => {
+                      const newSchedules = [...formData.schedules];
+
+                      newSchedules[index].start_date = date ? date.toString() : "";
+                      onChange("schedules", newSchedules);
+                    }}
                   />
                 </li>
               ))}

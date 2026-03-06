@@ -23,14 +23,17 @@ export const QUIZ_KEYS = {
   quizAnswers: (quizId: number) => ["quiz", "quiz", quizId, "answers"] as const,
 };
 
-export function useModules(params?: {
-  category_id?: number;
-  lang_id?: number;
-  status?: number;
-  org_id?: number;
-  assigned_only?: boolean;
-  filter?: string;
-}, enabled = true) {
+export function useModules(
+  params?: {
+    category_id?: number;
+    lang_id?: number;
+    status?: number;
+    org_id?: number;
+    assigned_only?: boolean;
+    filter?: string;
+  },
+  enabled = true
+) {
   return useQuery({
     queryKey: [...QUIZ_KEYS.modules, params],
     queryFn: () => quizService.getModules(params),
@@ -129,6 +132,7 @@ export function useQuizzesByModule(moduleId: number, enabled = true) {
 
       // Create a map of content_id to content name for category display
       const contentMap: Record<number, string> = {};
+
       contents.forEach((c: { id: number; title?: string; name?: string }) => {
         contentMap[c.id] = c.title || (c as { name?: string }).name || `Content ${c.id}`;
       });
@@ -285,6 +289,7 @@ export function useContentsWithQuizzes(
   params?: { lang_id?: number; enabled?: boolean }
 ) {
   const enabled = params?.enabled ?? true;
+
   return useQuery({
     queryKey: ["quiz", "module", moduleId, "contents-with-quizzes", params?.lang_id],
     queryFn: () => quizService.getContentsWithQuizzes(moduleId, params?.lang_id),
@@ -298,6 +303,7 @@ export function useContentsWithProgress(
   params?: { lang_id?: number; enabled?: boolean }
 ) {
   const enabled = params?.enabled ?? true;
+
   return useQuery({
     queryKey: ["quiz", "module", moduleId, "contents-with-progress", campaignId, params?.lang_id],
     queryFn: () => quizService.getContentsWithProgress(moduleId, campaignId, params?.lang_id),

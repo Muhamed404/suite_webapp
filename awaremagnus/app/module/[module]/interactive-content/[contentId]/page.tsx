@@ -20,6 +20,7 @@ function formatDuration(minutes: number | undefined): string {
   if (minutes < 60) return `${minutes} minutes`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
+
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
@@ -27,7 +28,9 @@ function formatDate(dateStr: string | undefined): string {
   if (!dateStr) return "—";
   try {
     const d = new Date(dateStr);
+
     if (Number.isNaN(d.getTime())) return "—";
+
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   } catch {
     return "—";
@@ -65,8 +68,10 @@ export default function OrgUserInteractiveContentPage({
           m.title?.toLowerCase() === title.toLowerCase() ||
           m.translations?.some((t) => t.name.toLowerCase() === title.toLowerCase())
       );
+
       return found?.id ?? 0;
     }
+
     return 0;
   }, [moduleIdParam, modulesRes, moduleSlug]);
 
@@ -74,12 +79,13 @@ export default function OrgUserInteractiveContentPage({
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
 
   // Sibling interactive contents for the "Next" list
-  const { data: siblingsRes } = useContentsByModule(resolvedModuleId, { enabled: !!resolvedModuleId });
+  const { data: siblingsRes } = useContentsByModule(resolvedModuleId, {
+    enabled: !!resolvedModuleId,
+  });
   const siblings = useMemo(() => {
     if (!siblingsRes?.success) return [];
-    return (siblingsRes.data ?? []).filter(
-      (c) => c.content_type_id === 1 && c.id !== contentId
-    );
+
+    return (siblingsRes.data ?? []).filter((c) => c.content_type_id === 1 && c.id !== contentId);
   }, [siblingsRes, contentId]);
 
   const moduleTitle =
@@ -96,8 +102,8 @@ export default function OrgUserInteractiveContentPage({
     ? sourceUrl.startsWith("http")
       ? sourceUrl
       : sourceUrl.startsWith("/contents/")
-      ? `/awm${sourceUrl}`
-      : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
+        ? `/awm${sourceUrl}`
+        : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
     : null;
 
   const logoUrl = content?.logo_url || (content as any)?.logo_path;
@@ -111,7 +117,12 @@ export default function OrgUserInteractiveContentPage({
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className={clsx("flex flex-col p-4 sm:p-6 max-w-6xl mx-auto w-full", isRtl && "text-right")}>
+        <div
+          className={clsx(
+            "flex flex-col p-4 sm:p-6 max-w-6xl mx-auto w-full",
+            isRtl && "text-right"
+          )}
+        >
           {/* Breadcrumb */}
           <nav
             className={clsx(
@@ -187,18 +198,49 @@ export default function OrgUserInteractiveContentPage({
                     )}
                   >
                     <span className="flex items-center gap-1">
-                      <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                      <svg
+                        fill="none"
+                        height="14"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        width="14"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
                       {formatDuration(content.duration)}
                     </span>
                     <span className="flex items-center gap-1">
-                      <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><rect height="18" rx="2" ry="2" width="18" x="3" y="4" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" /></svg>
+                      <svg
+                        fill="none"
+                        height="14"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        width="14"
+                      >
+                        <rect height="18" rx="2" ry="2" width="18" x="3" y="4" />
+                        <line x1="16" x2="16" y1="2" y2="6" />
+                        <line x1="8" x2="8" y1="2" y2="6" />
+                        <line x1="3" x2="21" y1="10" y2="10" />
+                      </svg>
                       {formatDate(content.created_at)}
                     </span>
                   </div>
                 </div>
 
                 {/* ── Action bar ─────────────────────────────────────────── */}
-                <div className={clsx("p-4 flex items-center gap-3 flex-wrap", isRtl && "flex-row-reverse")}>
+                <div
+                  className={clsx(
+                    "p-4 flex items-center gap-3 flex-wrap",
+                    isRtl && "flex-row-reverse"
+                  )}
+                >
                   {interactiveUrl && (
                     <a
                       className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
@@ -206,7 +248,18 @@ export default function OrgUserInteractiveContentPage({
                       rel="noopener noreferrer"
                       target="_blank"
                     >
-                      <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                      <svg
+                        fill="none"
+                        height="14"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        width="14"
+                      >
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
                       Open Full Screen
                     </a>
                   )}
@@ -217,7 +270,18 @@ export default function OrgUserInteractiveContentPage({
                       href={`/module/${moduleSlug}/interactive-content/${siblings[0].id}?campaign_id=${campaignId}&module_id=${resolvedModuleId}`}
                     >
                       Next
-                      <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><polyline points="9 18 15 12 9 6" /></svg>
+                      <svg
+                        fill="none"
+                        height="14"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        width="14"
+                      >
+                        <polyline points="9 18 15 12 9 6" />
+                      </svg>
                     </Link>
                   )}
 
@@ -252,7 +316,19 @@ export default function OrgUserInteractiveContentPage({
                       </p>
                       <p className="text-[10px] text-gray-400">{formatDate(s.created_at)}</p>
                     </div>
-                    <svg className="text-gray-400 flex-shrink-0" fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><polyline points="9 18 15 12 9 6" /></svg>
+                    <svg
+                      className="text-gray-400 flex-shrink-0"
+                      fill="none"
+                      height="14"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      width="14"
+                    >
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
                   </Link>
                 ))}
               </div>

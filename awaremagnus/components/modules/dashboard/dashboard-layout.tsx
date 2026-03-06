@@ -5,12 +5,12 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 import { DashboardSidebar } from "./dashboard-sidebar";
+import { DashboardHeader } from "./dashboard-header";
 
 import { SidebarPrimaryMenu } from "@/components/ui/sidebar-primary-menu";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { isOrgUser } from "@/utils/roles";
-import { DashboardHeader } from "./dashboard-header";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

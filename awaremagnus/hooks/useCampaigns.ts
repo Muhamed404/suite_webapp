@@ -2,8 +2,6 @@ import type {
   CampaignCreatePayload,
   CampaignUpdatePayload,
   CampaignQueryParams,
-  CampaignListResponse,
-  CampaignWithDetails,
 } from "@/types/campaign";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
