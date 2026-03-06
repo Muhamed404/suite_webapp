@@ -133,6 +133,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
 
   const basePath = `/dashboard/training-library/${libraryType}`;
   const createContentHref = `${basePath}/${moduleId}/content/create`;
+  const editModuleHref = `${basePath}/${moduleId}/edit`;
 
   const [languageFilter, setLanguageFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
@@ -376,24 +377,47 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
             >
               <h1 className="text-xl font-semibold text-gray-900">{moduleTitle}</h1>
               {!isOrgUserView && canEditContent && (
-                <Button
-                  as={Link}
-                  className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs font-medium"
-                  href={createContentHref}
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
+                <div className="flex items-center gap-2">
+                  <Button
+                    as={Link}
+                    className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-full text-xs font-medium"
+                    href={editModuleHref}
                   >
-                    <line x1="12" x2="12" y1="5" y2="19" />
-                    <line x1="5" x2="19" y1="12" y2="12" />
-                  </svg>
-                  <span className="hidden md:inline">{t("moduleDetails.addNewContent")}</span>
-                </Button>
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    <span className="hidden md:inline">{t("moduleDetails.editModule") ?? "Edit Module"}</span>
+                  </Button>
+                  <Button
+                    as={Link}
+                    className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs font-medium"
+                    href={createContentHref}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <line x1="12" x2="12" y1="5" y2="19" />
+                      <line x1="5" x2="19" y1="12" y2="12" />
+                    </svg>
+                    <span className="hidden md:inline">{t("moduleDetails.addNewContent")}</span>
+                  </Button>
+                </div>
               )}
             </div>
 
