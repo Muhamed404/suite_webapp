@@ -173,7 +173,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
             )}
           >
             <Link className="hover:text-gray-700 transition-colors" href={basePath}>
-              Awareness Library
+              {t("moduleDetails.breadcrumbTrainingLibrary")}
             </Link>
             <span aria-hidden className="text-gray-400">
               ›

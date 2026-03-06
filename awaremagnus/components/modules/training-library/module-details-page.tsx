@@ -346,11 +346,16 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
   const breadcrumbFirst = isOrgUserView
     ? t("moduleDetails.breadcrumbAwarenessCampaign")
     : t("moduleDetails.breadcrumbTrainingLibrary");
-  const breadcrumbMiddle = isAdminView
-    ? t("moduleDetails.coreModules")
-    : isOrgUserView
-      ? t("moduleDetails.breadcrumbCampaign")
+  const breadcrumbMiddle = isOrgUserView
+    ? t("moduleDetails.breadcrumbCampaign")
+    : libraryType === "system"
+      ? t("moduleDetails.coreModules")
       : t("moduleDetails.breadcrumbMyLibrary");
+
+  // Different base paths for different user types
+  const breadcrumbFirstHref = isOrgUserView ? "/dashboard/campaign-assignments" : basePath;
+  const breadcrumbMiddleHref =
+    isOrgUserView && campaignId ? `/dashboard/campaign-assignments/${campaignId}` : basePath;
 
   const progressPercent = userProgress?.overall_progress_percent || 0;
 
@@ -365,11 +370,14 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                 isRtl && "flex-row-reverse"
               )}
             >
-              <Link className="hover:text-gray-700 transition text-inherit" href={basePath}>
+              <Link
+                className="hover:text-gray-700 transition text-inherit"
+                href={breadcrumbFirstHref}
+              >
                 {breadcrumbFirst}
               </Link>
               <span className="text-gray-400">›</span>
-              <Link className={breadcrumbLinkClassName} href={basePath}>
+              <Link className={breadcrumbLinkClassName} href={breadcrumbMiddleHref}>
                 {breadcrumbMiddle}
               </Link>
               <span className="text-gray-400">›</span>

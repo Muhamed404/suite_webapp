@@ -97,11 +97,14 @@
     "downloadPoster": "تحميل الملصق",
     "downloadBrochure": "تحميل الكتيب",
     "downloadDocument": "تحميل المستند",
+    "downloadScreenSaver": "تحميل شاشة التوقف",
     "next": "التالي",
     "beginTraining": "بدء التدريب",
     "posterViews": "1,234 مشاهدة",
     "nextBrochureTraining": "المزيد من الكتيبات",
     "nextPosterTraining": "المزيد من الملصقات",
+    "markAsCompleted": "تحديد كمكتمل",
+    "markingAsCompleted": "جارٍ التحديد…",
     "nextScreenSaverTraining": "المزيد من شاشات التوقف",
     "nextDocumentTraining": "المستندات التدريبية التالية",
     "nextInteractiveTraining": "التدريب التفاعلي التالي"
@@ -144,6 +147,7 @@
     "coreModules": "الوحدات الأساسية",
     "breadcrumbTrainingLibrary": "مكتبة الوعي",
     "breadcrumbMyLibrary": "وحداتي",
+    "breadcrumbMyAssignments": "مهامي",
     "breadcrumbAwarenessCampaign": "حملة التوعية",
     "breadcrumbCampaign": "الحملة",
     "viewDetails": "عرض التفاصيل"

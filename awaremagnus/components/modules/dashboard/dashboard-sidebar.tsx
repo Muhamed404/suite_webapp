@@ -118,7 +118,10 @@ export const DashboardSidebar = ({
       href: "/dashboard/my-awareness",
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Report.svg"),
       label: t("menu.myAwareness"),
-      children: [{ href: "/dashboard/certificates", icon: "", label: t("menu.certificates") }],
+      children: [
+        { href: "/dashboard/certificates", icon: "", label: t("menu.certificates") },
+        { href: "/dashboard/my-report-card", icon: "", label: t("menu.reportCard") },
+      ],
     },
   ];
 
@@ -139,6 +142,11 @@ export const DashboardSidebar = ({
       href: "/dashboard/certificates",
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Licensed_user_Solid.svg"),
       label: t("menu.certificates"),
+    },
+    {
+      href: "/dashboard/my-report-card",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Report.svg"),
+      label: t("menu.reportCard"),
     },
   ];
 

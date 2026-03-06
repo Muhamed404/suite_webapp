@@ -59,6 +59,8 @@ interface InteractiveContentDetailScreenProps {
   contentTypeId: number;
   contentId: number;
   libraryType: LibraryType;
+  breadcrumbContext?: "training-library" | "campaign" | "my-assignments";
+  campaignId?: number;
 }
 
 export function InteractiveContentDetailScreen({
@@ -66,14 +68,30 @@ export function InteractiveContentDetailScreen({
   contentTypeId,
   contentId,
   libraryType,
+  breadcrumbContext = "training-library",
+  campaignId,
 }: InteractiveContentDetailScreenProps) {
   const t = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
-  const basePath = `/dashboard/training-library/${libraryType}`;
-  const libraryLabel = libraryType === "system" ? "System Library" : "My Library";
-  const listHref = `${basePath}/${moduleId}/content/${contentTypeId}`;
+  console.log(
+    "🎮 InteractiveContentDetailScreen - breadcrumbContext:",
+    breadcrumbContext,
+    "campaignId:",
+    campaignId,
+    "libraryType:",
+    libraryType
+  );
+
+  const basePath =
+    breadcrumbContext === "campaign"
+      ? `/dashboard/campaign-assignments/${campaignId}`
+      : `/dashboard/training-library/${libraryType}`;
+  const listHref =
+    breadcrumbContext === "campaign"
+      ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
+      : `${basePath}/${moduleId}/content/${contentTypeId}`;
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
@@ -135,28 +153,81 @@ export function InteractiveContentDetailScreen({
                 isRtl && "flex-row-reverse"
               )}
             >
-              <Link
-                className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
-                href={basePath}
-              >
-                Awareness Library
-              </Link>
-              <span className="text-gray-400">›</span>
-              <Link
-                className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
-                href={basePath}
-              >
-                {libraryLabel}
-              </Link>
-              <span className="text-gray-400">›</span>
-              <Link
-                className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
-                href={`${basePath}/${moduleId}`}
-              >
-                {moduleTitle}
-              </Link>
-              <span className="text-gray-400">›</span>
-              <span className="font-semibold text-gray-900">{typeLabel}</span>
+              {breadcrumbContext === "campaign" ? (
+                <>
+                  <Link
+                    className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                    href="/dashboard/campaign-assignments"
+                  >
+                    {t("moduleDetails.breadcrumbAwarenessCampaign")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <Link
+                    className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                    href={basePath}
+                  >
+                    {t("moduleDetails.breadcrumbCampaign")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <Link
+                    className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                    href={`${basePath}/modules/${moduleId}`}
+                  >
+                    {moduleTitle}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">{typeLabel}</span>
+                </>
+              ) : breadcrumbContext === "my-assignments" ? (
+                <>
+                  <Link
+                    className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                    href="/dashboard/campaign-assignments"
+                  >
+                    {t("moduleDetails.breadcrumbMyAssignments")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  {campaignId ? (
+                    <Link
+                      className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                      href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}
+                    >
+                      {moduleTitle}
+                    </Link>
+                  ) : (
+                    <span>{moduleTitle}</span>
+                  )}
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">{typeLabel}</span>
+                </>
+              ) : (
+                <>
+                  <Link
+                    className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                    href={basePath}
+                  >
+                    {t("moduleDetails.breadcrumbTrainingLibrary")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <Link
+                    className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                    href={basePath}
+                  >
+                    {libraryType === "system"
+                      ? t("moduleDetails.coreModules")
+                      : t("moduleDetails.breadcrumbMyLibrary")}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <Link
+                    className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
+                    href={`${basePath}/${moduleId}`}
+                  >
+                    {moduleTitle}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">{typeLabel}</span>
+                </>
+              )}
             </nav>
 
             <div className="flex flex-col px-3 gap-2">

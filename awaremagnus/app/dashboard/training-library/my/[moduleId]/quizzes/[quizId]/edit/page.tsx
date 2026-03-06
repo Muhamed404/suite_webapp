@@ -18,7 +18,12 @@ export default function MyLibraryModuleQuizEditPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <EditQuizForm initialModuleId={moduleId} quizId={Number(quizId)} returnHref={returnHref} />
+        <EditQuizForm
+          initialModuleId={moduleId}
+          libraryType="my"
+          quizId={Number(quizId)}
+          returnHref={returnHref}
+        />
       </DashboardLayout>
     </ProtectedRoute>
   );

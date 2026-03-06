@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useRef, useMemo, use } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { useModules, useContentsReport } from "@/hooks/useQuiz";
+import { useModules, useContentReportByContentId } from "@/hooks/useQuiz";
 import { quizService } from "@/services/quizService";
 import { isOrgUser } from "@/utils/roles";
 
@@ -27,7 +28,6 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   const [contents, setContents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Video tracking state
   const [videoProgress, setVideoProgress] = useState<{
     [key: number]: { currentTime: number; duration: number; watchedPercentage: number };
   }>({});
@@ -35,18 +35,25 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     [key: number]: { lastReported: number };
   }>({});
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+  const lastSentPercentRef = useRef<{ [key: number]: number }>({});
+  const videoIntervals = useRef<{ [key: number]: ReturnType<typeof setInterval> | null }>({});
+  const moduleIdRef = useRef<number | null>(null);
+  const campaignIdRef = useRef<number>(
+    (() => {
+      const v = searchParams?.get("campaign_id");
 
-  // Read contentId early so we can conditionally disable useModules
+      return v ? parseInt(v, 10) : 1;
+    })()
+  );
+
   const contentIdFromUrl = useMemo(() => {
     const id = searchParams?.get("content_id");
 
     return id ? parseInt(id, 10) : null;
   }, [searchParams]);
 
-  // moduleId resolved from content fetch (when content_id is in URL)
   const [contentDerivedModuleId, setContentDerivedModuleId] = useState<number | null>(null);
 
-  // Only call /module?filter=... when no content_id — we derive moduleId from content response instead
   const { data: modulesRes } = useModules({ filter: module }, !contentIdFromUrl);
   const moduleId = useMemo<number | null>(() => {
     // When navigating with content_id, prefer the mod_id extracted from the content response
@@ -72,25 +79,42 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   const roleId = user?.role_id;
   const isOrgUserView = isOrgUser(roleId);
 
-  // Fetch saved progress from report — only enabled once the real moduleId is resolved
-  const { data: contentsReportRes } = useContentsReport(moduleId!, !!moduleId);
+  useEffect(() => {
+    moduleIdRef.current = moduleId;
+  }, [moduleId]);
 
-  // Build map: content_id -> saved progress_percentage (number)
+  const { data: contentReportData } = useContentReportByContentId(
+    contentIdFromUrl ?? 0,
+    !!contentIdFromUrl
+  );
+
   const savedProgressMap = useMemo(() => {
     const map = new Map<number, number>();
 
-    if (contentsReportRes?.success && contentsReportRes.data?.reportContents) {
-      contentsReportRes.data.reportContents.forEach((rc: any) => {
-        if (rc.content_id != null && rc.progress_percentage != null) {
-          map.set(rc.content_id, parseFloat(rc.progress_percentage));
+    if (!contentReportData) return map;
+    const currentCampaignId = campaignIdRef.current;
+    const items: any[] =
+      contentReportData?.object?.reportContents ??
+      (Array.isArray(contentReportData?.object) ? contentReportData.object : []);
+
+    items.forEach((rc: any) => {
+      const itemCampaignId = rc.reportModule?.report_campaign_id;
+
+      if (itemCampaignId != null && itemCampaignId !== currentCampaignId) return;
+      const cid = rc.content_id ?? rc.id;
+
+      if (cid != null && rc.progress_percentage != null) {
+        const pct = parseFloat(rc.progress_percentage);
+
+        if (!map.has(cid) || pct > map.get(cid)!) {
+          map.set(cid, pct);
         }
-      });
-    }
+      }
+    });
 
     return map;
-  }, [contentsReportRes]);
+  }, [contentReportData]);
 
-  // Initialise milestone tracking from saved progress so we never send a lower value
   useEffect(() => {
     if (savedProgressMap.size === 0) return;
     setSentProgressMilestones((prev) => {
@@ -106,12 +130,18 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
 
       return next;
     });
+    savedProgressMap.forEach((savedPct, contentId) => {
+      const current = lastSentPercentRef.current[contentId] ?? 0;
+
+      if (savedPct > current) {
+        lastSentPercentRef.current[contentId] = savedPct;
+      }
+    });
   }, [savedProgressMap]);
 
-  // Seek already-loaded videos when savedProgressMap is populated
   useEffect(() => {
     savedProgressMap.forEach((savedPct, contentId) => {
-      if (savedPct <= 0 || savedPct >= 100) return; // don't seek if not started or already completed
+      if (savedPct <= 0 || savedPct >= 100) return;
       const video = videoRefs.current[contentId];
 
       if (video && video.readyState >= 1 && isFinite(video.duration)) {
@@ -120,7 +150,6 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     });
   }, [savedProgressMap]);
 
-  // Video tracking functions
   const handleVideoLoadedMetadata = (contentId: number, video: HTMLVideoElement) => {
     const duration = video.duration;
 
@@ -200,12 +229,56 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     }
   };
 
-  // Update video progress to backend
+  const formatTime = (secs: number) => {
+    if (!isFinite(secs) || isNaN(secs)) return "0:00";
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const startVideoInterval = (contentId: number) => {
+    if (videoIntervals.current[contentId]) return;
+    videoIntervals.current[contentId] = setInterval(() => {
+      const video = videoRefs.current[contentId];
+
+      if (!video || video.paused || video.ended) return;
+      const dur = video.duration;
+
+      if (!dur || isNaN(dur) || dur <= 0) return;
+      const pct = Math.round((video.currentTime / dur) * 100);
+      const last = lastSentPercentRef.current[contentId] ?? 0;
+
+      if (pct > last) {
+        lastSentPercentRef.current[contentId] = pct;
+        updateVideoProgress(contentId, pct);
+      }
+    }, 5000);
+  };
+
+  const stopVideoInterval = (contentId: number) => {
+    if (videoIntervals.current[contentId]) {
+      clearInterval(videoIntervals.current[contentId]!);
+      videoIntervals.current[contentId] = null;
+    }
+  };
+
   const updateVideoProgress = async (contentId: number, progressPercentage: number) => {
+    const mid = moduleIdRef.current;
+    const cid = campaignIdRef.current;
+
+    if (!mid || !cid) {
+      console.warn(
+        "[video] updateVideoProgress skipped — moduleId or campaignId not yet resolved",
+        { mid, cid }
+      );
+
+      return;
+    }
     try {
       const payload = {
-        campaign_id: campaignId,
-        module_id: moduleId ?? 1,
+        campaign_id: cid,
+        module_id: mid,
         content_id: contentId,
         progress_percentage: progressPercentage,
       };
@@ -217,7 +290,6 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     }
   };
 
-  // Get campaign ID from URL
   const campaignId = useMemo(() => {
     const campaignIdFromUrl = searchParams?.get("campaign_id");
 
@@ -228,10 +300,12 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     return 1; // Default campaign ID
   }, [searchParams]);
 
-  // Get specific content_id from URL — reuse the value already computed above
+  useEffect(() => {
+    campaignIdRef.current = campaignId;
+  }, [campaignId]);
+
   const contentId = contentIdFromUrl;
 
-  // Fetch by specific content ID — only depends on contentId, never re-runs due to moduleId changes
   useEffect(() => {
     if (!contentId) return;
     setLoading(true);
@@ -253,7 +327,6 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
       });
   }, [contentId]);
 
-  // Fallback: fetch all motion videos for the module when no specific content is selected
   useEffect(() => {
     if (contentId || !moduleId) return;
     setLoading(true);
@@ -271,10 +344,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
       });
   }, [moduleId, contentId]);
 
-  useEffect(() => {
-    // Load header if needed, but since we're in DashboardLayout, it might already be there
-    // Assuming DashboardLayout handles the header
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <ProtectedRoute>
@@ -287,19 +357,45 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
         <div className="flex-1 flex flex-col h-screen bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-r-3xl">
           <main className="flex-1 overflow-y-auto">
             <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
-              <a className="hover:text-gray-700 transition" href="#">
-                Awareness Library
-              </a>
-              <span className="text-gray-400">›</span>
-              <a className="hover:text-gray-700 transition" href="#">
-                System Library
-              </a>
-              <span className="text-gray-400">›</span>
-              <a className="hover:text-gray-700 transition" href="#">
-                {moduleName}
-              </a>
-              <span className="text-gray-400">›</span>
-              <span className="font-semibold text-gray-900">Motion Videos</span>
+              {isOrgUser(user?.role_id) ? (
+                <>
+                  <Link
+                    className="hover:text-gray-700 transition"
+                    href="/dashboard/campaign-assignments"
+                  >
+                    {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  {searchParams?.get("campaign_id") ? (
+                    <Link
+                      className="hover:text-gray-700 transition"
+                      href={`/module/${module}?campaign_id=${searchParams.get("campaign_id")}`}
+                    >
+                      {moduleName}
+                    </Link>
+                  ) : (
+                    <span>{moduleName}</span>
+                  )}
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">Motion Videos</span>
+                </>
+              ) : (
+                <>
+                  <a className="hover:text-gray-700 transition" href="#">
+                    Awareness Library
+                  </a>
+                  <span className="text-gray-400">›</span>
+                  <a className="hover:text-gray-700 transition" href="#">
+                    System Library
+                  </a>
+                  <span className="text-gray-400">›</span>
+                  <a className="hover:text-gray-700 transition" href="#">
+                    {moduleName}
+                  </a>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">Motion Videos</span>
+                </>
+              )}
             </nav>
 
             <div className="flex flex-col px-3 gap-2">
@@ -318,7 +414,6 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         ref={(el) => {
                           videoRefs.current[content.id] = el;
                         }}
-                        controls
                         className="w-full h-full object-contain"
                         poster={content.logo_url}
                         src={
@@ -330,15 +425,96 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                               : `${SERVICE_AWM_URL}${content.source_url}`
                         }
                         onEnded={() => handleVideoEnded(content.id)}
-                        onLoadedMetadata={(e) =>
-                          handleVideoLoadedMetadata(content.id, e.target as HTMLVideoElement)
-                        }
-                        onTimeUpdate={(e) =>
-                          handleVideoTimeUpdate(content.id, e.target as HTMLVideoElement)
-                        }
+                        onPause={() => stopVideoInterval(content.id)}
+                        onPlay={() => startVideoInterval(content.id)}
                       >
                         Your browser does not support the video tag.
                       </video>
+                    </div>
+
+                    {}
+                    <div className="px-4 pt-3 pb-2 bg-white border-b border-gray-100">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                          onClick={() => videoRefs.current[content.id]?.play()}
+                        >
+                          Play
+                        </button>
+                        <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                          onClick={() => videoRefs.current[content.id]?.pause()}
+                        >
+                          Pause
+                        </button>
+                        <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                          onClick={() => {
+                            const v = videoRefs.current[content.id];
+
+                            if (v) v.currentTime = Math.max(0, v.currentTime - 10);
+                          }}
+                        >
+                          Back 10s
+                        </button>
+                        <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                          onClick={() => {
+                            const v = videoRefs.current[content.id];
+
+                            if (v && isFinite(v.duration))
+                              v.currentTime = Math.min(v.duration, v.currentTime + 10);
+                          }}
+                        >
+                          Forward 10s
+                        </button>
+                        <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                          onClick={() => {
+                            const v = videoRefs.current[content.id];
+
+                            if (v) {
+                              v.currentTime = 0;
+                              v.play();
+                            }
+                          }}
+                        >
+                          Restart
+                        </button>
+                        <span className="ml-1 text-sm text-gray-700">
+                          {formatTime(videoProgress[content.id]?.currentTime ?? 0)} /{" "}
+                          {formatTime(videoProgress[content.id]?.duration ?? 0)}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-sm text-gray-700">
+                        Progress: {Math.round(videoProgress[content.id]?.watchedPercentage ?? 0)}% (
+                        {Math.floor(videoProgress[content.id]?.currentTime ?? 0)} /{" "}
+                        {Math.floor(videoProgress[content.id]?.duration ?? 0)} seconds)
+                      </p>
+                      <div className="mt-2">
+                        <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                          onClick={() => {
+                            const v = videoRefs.current[content.id];
+
+                            if (!v || !v.duration || isNaN(v.duration)) return;
+                            const pct = Math.round((v.currentTime / v.duration) * 100);
+                            const lastReported =
+                              sentProgressMilestones[content.id]?.lastReported ?? 0;
+
+                            // Only send if current progress is strictly higher than what was already saved
+                            if (pct <= lastReported) return;
+                            updateVideoProgress(content.id, pct);
+                            setSentProgressMilestones((prev) => ({
+                              ...prev,
+                              [content.id]: { lastReported: pct },
+                            }));
+                            lastSentPercentRef.current[content.id] = pct;
+                          }}
+                        >
+                          Send Progress Now
+                        </button>
+                      </div>
                     </div>
 
                     <div className="p-4 border-b border-gray-100">
@@ -349,122 +525,41 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         {content.description ||
                           `Learn about ${moduleName.toLowerCase()} best practices and protocols`}
                       </p>
-                      <div className="flex items-center gap-4 mt-3 text-xs text-gray-600">
-                        <div className="flex items-center gap-1.5">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle cx="12" cy="12" r="10" />
-                            <polyline points="12,6 12,12 16,14" />
-                          </svg>
-                          <span>Duration: {content.duration || "20 to 60 minutes"}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                          <span>{content.views || "1,234"} views</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <rect height="18" rx="2" ry="2" width="18" x="3" y="4" />
-                            <line x1="16" x2="16" y1="2" y2="6" />
-                            <line x1="8" x2="8" y1="2" y2="6" />
-                            <line x1="3" x2="21" y1="10" y2="10" />
-                          </svg>
-                          <span>
-                            {content.created_date
-                              ? new Date(content.created_date).toLocaleDateString("en-GB", {
-                                  day: "numeric",
-                                  month: "short",
-                                  year: "numeric",
-                                })
-                              : "Jan 15, 2026"}
-                          </span>
-                        </div>
-                      </div>
                     </div>
 
-                    <div className="p-4 flex items-center justify-between flex-wrap gap-3">
-                      <div className="flex items-center gap-2">
-                        <button className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                    {(() => {
+                      const fullUrl = !content.source_url
+                        ? undefined
+                        : content.source_url.startsWith("http://") ||
+                            content.source_url.startsWith("https://")
+                          ? content.source_url
+                          : `${SERVICE_AWM_URL}${content.source_url}`;
+
+                      return fullUrl ? (
+                        <div className="p-4 flex items-center gap-3 flex-wrap">
+                          <a
+                            className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
+                            href={fullUrl}
+                            rel="noopener noreferrer"
+                            target="_blank"
                           >
-                            <polygon points="5,3 19,12 5,21 5,3" />
-                          </svg>
-                          Begin Training
-                        </button>
-                        <button className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-full text-xs font-medium transition">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                          </svg>
-                          Next
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button className="p-2 hover:bg-gray-100 rounded-full transition">
-                          <svg
-                            className="w-4 h-4 text-gray-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle cx="18" cy="5" r="3" />
-                            <circle cx="6" cy="12" r="3" />
-                            <circle cx="18" cy="19" r="3" />
-                            <path d="M8.59 13.51l6.83 3.98" />
-                            <path d="M15.41 6.51l-6.82 3.98" />
-                          </svg>
-                        </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-full transition">
-                          <svg
-                            className="w-4 h-4 text-gray-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="7,10 12,15 17,10" />
-                            <line x1="12" x2="12" y1="15" y2="3" />
-                          </svg>
-                        </button>
-                        <button className="p-2 hover:bg-gray-100 rounded-full transition">
-                          <svg
-                            className="w-4 h-4 text-gray-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle cx="12" cy="12" r="1" />
-                            <circle cx="12" cy="5" r="1" />
-                            <circle cx="12" cy="19" r="1" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
+                            <svg
+                              fill="none"
+                              height="14"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              width="14"
+                            >
+                              <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                            Open Full Screen
+                          </a>
+                        </div>
+                      ) : null;
+                    })()}
                   </div>
                 ))
               ) : (

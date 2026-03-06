@@ -105,7 +105,6 @@ export function ContentListPage({ moduleId, contentTypeId, libraryType }: Conten
   const isRtl = dir === "rtl";
 
   const basePath = `/dashboard/training-library/${libraryType}`;
-  const libraryLabel = libraryType === "system" ? "System Library" : "My Library";
   const createPath = `${basePath}/${moduleId}/content/create?type=${contentTypeId}`;
 
   const [languageFilter, setLanguageFilter] = useState<string>("");
@@ -142,7 +141,13 @@ export function ContentListPage({ moduleId, contentTypeId, libraryType }: Conten
             )}
           >
             <Link className={breadcrumbLinkClassName} href={basePath}>
-              {libraryLabel}
+              {t("moduleDetails.breadcrumbTrainingLibrary")}
+            </Link>
+            <span className="text-[var(--darkgray)]">›</span>
+            <Link className={breadcrumbLinkClassName} href={basePath}>
+              {libraryType === "system"
+                ? t("moduleDetails.coreModules")
+                : t("moduleDetails.breadcrumbMyLibrary")}
             </Link>
             <span className="text-[var(--darkgray)]">›</span>
             <Link className={breadcrumbLinkClassName} href={`${basePath}/${moduleId}`}>

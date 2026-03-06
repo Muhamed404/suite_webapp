@@ -3,8 +3,10 @@
 import { useState, useEffect, useMemo, use } from "react";
 import { Button } from "@heroui/button";
 import { ArrowLeft } from "lucide-react";
+import clsx from "clsx";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -15,6 +17,7 @@ import { isOrgUser } from "@/utils/roles";
 import { useQuizzesByContent, useModule } from "@/hooks/useQuiz";
 import { suiteAwmService } from "@/services/suiteAwmService";
 import { quizService } from "@/services/quizService";
+import { breadcrumbLinkClassName } from "@/components/modules/training-library/shared-styles";
 import { getModuleAssetUrl } from "@/utils/contentAssetUrl";
 
 export default function QuizzesPage({ params }: { params: Promise<{ module: string }> }) {
@@ -115,6 +118,8 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const [showCompletion, setShowCompletion] = useState(false);
   const [answerStatusMsg, setAnswerStatusMsg] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [quizResults, setQuizResults] = useState<any[]>([]);
+  const [moduleProgress, setModuleProgress] = useState<number | null>(null);
 
   useEffect(() => {
     setCurrentQuestion(0);
@@ -123,6 +128,8 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     setShowCompletion(false);
     setAnswerStatusMsg("");
     setIsSubmitting(false);
+    setQuizResults([]);
+    setModuleProgress(null);
   }, [quizData.length]);
 
   const quiz = quizData[currentQuestion];
@@ -228,6 +235,13 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     }
   };
 
+  // Helper: Get quiz question text by quiz_id
+  const getQuizQuestion = (quizId: number): string => {
+    const quiz = originalQuizzes.find((q) => q.id === quizId);
+
+    return quiz?.question || `Quiz ${quizId}`;
+  };
+
   const submitQuiz = async () => {
     if (!contentRes?.data?.mod_id) {
       setAnswerStatusMsg('<span class="text-red-600 font-semibold">Module ID not found!</span>');
@@ -261,7 +275,17 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
           .filter((quiz) => quiz.answers.length > 0),
       };
 
-      await suiteAwmService.submitQuiz(payload);
+      const response: any = await suiteAwmService.submitQuiz(payload);
+
+      if (response?.quizResults) {
+        setQuizResults(response.quizResults);
+      } else {
+        console.log("No quizResults found in response. Response structure:", response);
+      }
+      if (response?.moduleProgress) {
+        console.log("Module Progress:", response.moduleProgress);
+        setModuleProgress(parseFloat(response.moduleProgress));
+      }
       setShowCompletion(true);
     } catch (error) {
       console.error("Failed to submit quiz:", error);
@@ -378,20 +402,92 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
-              <nav className="flex items-center text-xs text-gray-500 mb-2 gap-1.5">
-                <a className="hover:text-gray-700 transition" href="#">
-                  {campaignRes?.data?.name || "Campaign"}
-                </a>
-                <span className="text-gray-400">›</span>
-                <a className="hover:text-gray-700 transition" href="#">
-                  {moduleName}
-                </a>
-                <span className="text-gray-400">›</span>
-                <a className="hover:text-gray-700 transition" href="#">
-                  {contentRes?.data?.title || "Content"}
-                </a>
-                <span className="text-gray-400">›</span>
-                <span className="font-semibold text-gray-900">Quizzes</span>
+              <nav
+                className={clsx(
+                  "flex items-center text-xs text-gray-500 mb-2 gap-1.5 overflow-x-auto",
+                  isRtl && "flex-row-reverse"
+                )}
+              >
+                {isOrgUser(user?.role_id) ? (
+                  <>
+                    <Link
+                      className={breadcrumbLinkClassName}
+                      href="/dashboard/campaign-assignments"
+                    >
+                      {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    {campaignId && moduleId ? (
+                      <Link
+                        className={breadcrumbLinkClassName}
+                        href={`/module/${module}?campaign_id=${campaignId}`}
+                      >
+                        {triviaTitle}
+                      </Link>
+                    ) : (
+                      <span>{triviaTitle}</span>
+                    )}
+                    <span className="text-gray-400">›</span>
+                    <span className="font-semibold text-gray-900">
+                      {t("moduleDetails.quizzes") ?? "Quizzes"}
+                    </span>
+                  </>
+                ) : campaignId ? (
+                  <>
+                    <Link
+                      className={breadcrumbLinkClassName}
+                      href="/dashboard/campaign-assignments"
+                    >
+                      {t("moduleDetails.breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <Link
+                      className={breadcrumbLinkClassName}
+                      href={`/dashboard/campaign-assignments/${campaignId}`}
+                    >
+                      {campaignRes?.data?.name || "Campaign"}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <Link
+                      className={breadcrumbLinkClassName}
+                      href={`/dashboard/campaign-assignments/${campaignId}/modules/${module}`}
+                    >
+                      {moduleName}
+                    </Link>
+                    {contentId ? (
+                      <>
+                        <span className="text-gray-400">›</span>
+                        <Link
+                          className={breadcrumbLinkClassName}
+                          href={`/dashboard/campaign-assignments/${campaignId}/modules/${module}/content/${contentId}`}
+                        >
+                          {contentRes?.data?.title || "Content"}
+                        </Link>
+                      </>
+                    ) : null}
+                    <span className="text-gray-400">›</span>
+                    <span className="font-semibold text-gray-900">
+                      {t("moduleDetails.quizzes") ?? "Quizzes"}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Link className={breadcrumbLinkClassName} href="/dashboard/training-library/my">
+                      {t("moduleDetails.breadcrumbTrainingLibrary") ?? "Awareness Library"}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <Link
+                      className={breadcrumbLinkClassName}
+                      href={`/dashboard/training-library/my/${module}`}
+                    >
+                      {moduleName}
+                    </Link>
+                    <span className="text-gray-400">›</span>
+                    <span className="font-semibold text-gray-900">
+                      {t("moduleDetails.quizzes") ?? "Quizzes"}
+                    </span>
+                  </>
+                )}
               </nav>
             </div>
 
@@ -559,7 +655,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                 ) : (
                   /* Completion Screen */
                   <div
-                    className="bg-white rounded-2xl p-6 text-center min-h-full flex flex-col items-center justify-center opacity-100 translate-y-0 transition-all duration-500 ease-out"
+                    className="bg-white rounded-2xl p-6 min-h-full flex flex-col items-center justify-center opacity-100 translate-y-0 transition-all duration-500 ease-out"
                     id="completionContainer"
                   >
                     <div
@@ -601,7 +697,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                     </div>
 
                     <div
-                      className="transition-all duration-500 ease-out opacity-100 translate-y-0"
+                      className="transition-all duration-500 ease-out opacity-100 translate-y-0 text-center"
                       id="completionText"
                     >
                       <h2 className="text-2xl font-bold text-gray-900 mb-1">Congratulations!</h2>
@@ -610,6 +706,134 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                       </p>
                     </div>
 
+                    {/* Quiz Results Summary */}
+                    {quizResults.length > 0 && (
+                      <div className="w-full mb-6 max-w-lg">
+                        {/* Module Progress Header */}
+                        {moduleProgress !== null && (
+                          <div className="mb-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-semibold text-gray-700">
+                                Module Progress
+                              </span>
+                              <span className="text-sm font-bold text-green-600">
+                                {moduleProgress.toFixed(2)}%
+                              </span>
+                            </div>
+                            <div className="w-full h-3 bg-green-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-green-400 to-emerald-500"
+                                style={{ width: `${Math.min(100, moduleProgress)}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Performance Summary Header */}
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="text-sm font-semibold text-gray-900">
+                            Quiz Performance Summary
+                          </h3>
+                          <div className="text-xs text-gray-500">
+                            Overall Score
+                            <span className="ml-2 font-semibold text-gray-900">
+                              {Math.round(
+                                quizResults.reduce((s, r) => s + (Number(r.score) || 0), 0) /
+                                  quizResults.length || 0
+                              )}
+                              %
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
+                          <div className="space-y-3">
+                            {quizResults.map((result, idx) => (
+                              <div
+                                key={idx}
+                                className={`flex items-center gap-3 rounded-lg p-3 border shadow-sm transition-all ${result.passed ? "bg-white border-green-100" : "bg-white border-red-100"}`}
+                              >
+                                <div
+                                  className={`${result.passed ? "bg-green-50" : "bg-red-50"} w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0`}
+                                >
+                                  {result.passed ? (
+                                    <svg
+                                      className="w-5 h-5 text-green-600"
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                    >
+                                      <path
+                                        clipRule="evenodd"
+                                        d="M16.707 6.293a1 1 0 00-1.414-1.414L8 12.172 4.707 8.879a1 1 0 10-1.414 1.414l4 4a1 1 0 001.414 0l8-8z"
+                                        fillRule="evenodd"
+                                      />
+                                    </svg>
+                                  ) : (
+                                    <svg
+                                      className="w-5 h-5 text-red-600"
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                    >
+                                      <path
+                                        clipRule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0-1.414-1.414L10 8.586 8.707 7.293z"
+                                        fillRule="evenodd"
+                                      />
+                                    </svg>
+                                  )}
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 text-left">
+                                    <p className="text-sm font-medium text-gray-800 truncate flex-1 text-left">
+                                      {getQuizQuestion(result.quiz_id)}
+                                    </p>
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                      <div
+                                        className={`text-sm font-semibold ${result.passed ? "text-green-600" : "text-red-600"}`}
+                                      >
+                                        {result.score}%
+                                      </div>
+                                      <span className="text-[10px] text-gray-500 px-2 py-0.5 bg-gray-100 rounded">
+                                        Threshold: {result.passing_threshold}%
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="mt-1 flex items-center justify-between text-xs text-gray-600">
+                                    <div className="font-medium">
+                                      {result.correct_answers}/{result.total_questions} correct
+                                    </div>
+                                    <div className="flex gap-3">
+                                      <span>
+                                        Attempt:{" "}
+                                        <span className="font-semibold text-gray-800">
+                                          {result.attempt_number}
+                                        </span>
+                                      </span>
+                                      <span>
+                                        Remaining:{" "}
+                                        <span className="font-semibold text-gray-800">
+                                          {result.attempts_remaining}
+                                        </span>
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="mt-2 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div
+                                      className={`h-full ${result.passed ? "bg-gradient-to-r from-green-400 to-emerald-500" : "bg-gradient-to-r from-red-400 to-red-500"}`}
+                                      style={{
+                                        width: `${Math.min(100, Number(result.score) || 0)}%`,
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
                     <div
                       className="flex flex-col gap-2 max-w-xs w-full transition-all duration-500 ease-out opacity-100 translate-y-0"
                       id="completionActions"
@@ -617,7 +841,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                       <button
                         className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1.5 px-4 text-xs rounded-full transition"
                         id="viewReportBtn"
-                        onClick={() => router.push("/report-card")}
+                        onClick={() => router.push("/dashboard/my-report-card")}
                       >
                         View Report
                       </button>
@@ -663,9 +887,13 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                   <img
                     alt={triviaTitle}
                     className="w-full rounded-lg mb-4"
-                    src={triviaBannerUrl}
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "/images/hero.svg";
+                      const img = e.currentTarget as HTMLImageElement;
+
+                      if (!img.src.includes("data:image")) {
+                        img.src =
+                          'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23e5e7eb" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-family="sans-serif" font-size="18" fill="%239ca3af"%3EImage Not Available%3C/text%3E%3C/svg%3E';
+                      }
                     }}
                   />
                   {triviaDescription && (

@@ -98,6 +98,7 @@
     "downloadPoster": "Download Poster",
     "downloadBrochure": "Download Brochure",
     "downloadDocument": "Download Document",
+    "downloadScreenSaver": "Download Screen Saver",
     "next": "Next",
     "beginTraining": "Begin Training",
     "posterViews": "1,234 views",
@@ -105,7 +106,9 @@
     "nextPosterTraining": "More Posters",
     "nextScreenSaverTraining": "More Screen Savers",
     "nextDocumentTraining": "Next Document Training",
-    "nextInteractiveTraining": "Next Interactive Training"
+    "nextInteractiveTraining": "Next Interactive Training",
+    "markAsCompleted": "Mark as Completed",
+    "markingAsCompleted": "Marking…"
   },
   "moduleDetails": {
     "title": "Module",
@@ -145,6 +148,7 @@
     "coreModules": "Core Modules",
     "breadcrumbTrainingLibrary": "Awareness Library",
     "breadcrumbMyLibrary": "My Modules",
+    "breadcrumbMyAssignments": "My Assignments",
     "breadcrumbAwarenessCampaign": "Awareness Campaign",
     "breadcrumbCampaign": "Campaign",
     "viewDetails": "View Details"

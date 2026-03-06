@@ -2,12 +2,14 @@
 
 import { useEffect, use } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { isOrgUser } from "@/utils/roles";
 
 export default function InteractiveLessonPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -34,19 +36,36 @@ export default function InteractiveLessonPage({ params }: { params: Promise<{ mo
         <div className="flex-1 flex flex-col h-screen bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-r-3xl">
           <main className="flex-1 overflow-y-auto">
             <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
-              <a className="hover:text-gray-700 transition" href="#">
-                Awareness Library
-              </a>
-              <span className="text-gray-400">›</span>
-              <a className="hover:text-gray-700 transition" href="#">
-                System Library
-              </a>
-              <span className="text-gray-400">›</span>
-              <a className="hover:text-gray-700 transition" href="#">
-                {moduleName}
-              </a>
-              <span className="text-gray-400">›</span>
-              <span className="font-semibold text-gray-900">Interactive Training</span>
+              {isOrgUser(user?.role_id) ? (
+                <>
+                  <Link
+                    className="hover:text-gray-700 transition"
+                    href="/dashboard/campaign-assignments"
+                  >
+                    {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
+                  </Link>
+                  <span className="text-gray-400">›</span>
+                  <span>{moduleName}</span>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">Interactive Training</span>
+                </>
+              ) : (
+                <>
+                  <a className="hover:text-gray-700 transition" href="#">
+                    Awareness Library
+                  </a>
+                  <span className="text-gray-400">›</span>
+                  <a className="hover:text-gray-700 transition" href="#">
+                    System Library
+                  </a>
+                  <span className="text-gray-400">›</span>
+                  <a className="hover:text-gray-700 transition" href="#">
+                    {moduleName}
+                  </a>
+                  <span className="text-gray-400">›</span>
+                  <span className="font-semibold text-gray-900">Interactive Training</span>
+                </>
+              )}
             </nav>
 
             <div className="flex flex-col px-3 gap-2">
