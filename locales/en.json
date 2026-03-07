@@ -1176,7 +1176,7 @@
 		"tagQuantity": "Tag Quantity",
 		"uploadBrandLogo": "Upload Brand Logo",
 		"phishingCampaignResponseMetrics": "Phishing Campaign Response Metrics",
-		"totalQrImagesCreated": "Images",
+		"totalQrImagesCreated": "QR Images",
 		"notScanQrImages": "Not Scan",
 		"totalQrScans": "Scans",
 		"campaignMetrics": "Campaign Metrics",
@@ -1654,7 +1654,7 @@
 		"scanned": "Scanned",
 		"attachment_open": "Attachment Open",
 		"qr_created": "QR Created",
-		"interaction_timeline": "qr_report.interaction_timeline"
+		"interaction_timeline": "Interaction Timeline"
 	},
 	"phishingCampaignResponseMetrics": "Phishing Campaign Response Metrics",
 	"tabCompleted": "tabCompleted",

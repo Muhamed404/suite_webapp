@@ -29,7 +29,7 @@ if (qrTagReportDetails.length > 0) {
   const ipColors = ['#38bdf8', '#f87171', '#a78bfa', '#4ade80', '#fbbf24', '#fb923c'];
 
   // One series per IP — points at each event category
-  const timelineSeries = qrTagReportDetails.map((row, idx) => ({
+  const timelineSeries = qrTagReportDetails.map((row) => ({
     name: row.ip_address || `User ${row.id}`,
     data: eventFields.map(({ key }) => {
       const iso = row[key];
@@ -93,7 +93,7 @@ if (qrTagReportDetails.length > 0) {
   const topRows = [...qrTagReportDetails]
     .sort((a, b) => (b.total_scanned ?? 0) - (a.total_scanned ?? 0))
     .slice(0, 4);
-  topRows.forEach((row, idx) => {
+  topRows.forEach((row, _idx) => {
     const ip = row.ip_address || `User ${row.id}`;
     const events = eventFields
       .map(f => ({ label: f.label, color: f.color, date: fmtDate(row[f.key]) }))
@@ -111,19 +111,73 @@ if (qrTagReportDetails.length > 0) {
         </div>
       </div>`).join('');
 
+    // Parse user_data JSON
+    let userDataHtml = '';
+    if (row.user_data) {
+      try {
+        const parsed = JSON.parse(row.user_data);
+        const entries = Object.entries(parsed);
+        if (entries.length > 0) {
+          const rows = entries.map(([k, v]) => `
+            <div class="flex items-start gap-2 py-2 border-b border-dashed last:border-0" style="border-color:#f43f5e22">
+              <span class="text-xs font-semibold capitalize min-w-[90px] flex-shrink-0" style="color:#e11d48">${k.replace(/_/g,' ')}</span>
+              <span class="text-xs text-gray-700 break-all font-mono">${String(v)}</span>
+            </div>`).join('');
+          userDataHtml = `
+            <div class="mt-3 rounded-lg overflow-hidden" style="border:1px solid #f43f5e33">
+              <div class="flex items-center gap-1.5 px-3 py-2" style="background:#fff1f2">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" style="color:#e11d48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>
+                <span class="text-xs font-bold uppercase tracking-widest" style="color:#e11d48">Captured Data</span>
+              </div>
+              <div class="px-3 divide-y" style="background:#fff8f8">${rows}</div>
+            </div>`;
+        }
+      } catch (_) { /* invalid JSON — skip */ }
+    }
+
+    // User identity
+    const profile = row.user?.UserProfile;
+    const fullName = profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : '';
+    const avatarInitials = fullName
+      ? (profile.first_name?.[0] || '') + (profile.last_name?.[0] || '')
+      : ip.slice(0, 2).toUpperCase();
+
+    const nameLine = fullName
+      ? `<p class="text-sm font-semibold text-gray-800">${fullName}</p>`
+      : `<p class="text-sm font-semibold text-gray-800">${ip}</p>`;
+
+    const subLine = fullName
+      ? `<div class="flex items-center gap-1.5 flex-wrap">
+           <span class="text-xs text-gray-400">${ip}</span>
+           ${row.user_email ? `<span class="text-xs px-1.5 py-0.5 rounded font-medium" style="background:#f0fdf4;color:#16a34a">${row.user_email}</span>` : ''}
+         </div>`
+      : row.user_email
+        ? `<span class="text-xs px-1.5 py-0.5 rounded font-medium" style="background:#f0fdf4;color:#16a34a">${row.user_email}</span>`
+        : '';
+
     cardsContainer.innerHTML += `
-      <div class="border border-gray-100 rounded-xl p-4 bg-gray-50">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <span class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">${idx + 1}</span>
+      <div class="rounded-xl overflow-hidden" style="border:1px solid #e5e7eb">
+        <!-- Card header -->
+        <div class="flex items-center justify-between px-4 py-3" style="background:#f8fafc;border-bottom:1px solid #e5e7eb">
+          <div class="flex items-center gap-2.5">
+            <span class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style="background:linear-gradient(135deg,#38bdf8,#0284c7)">${avatarInitials}</span>
             <div>
-              <p class="text-sm font-semibold text-gray-800">${ip}</p>
-              <p class="text-xs text-gray-400">Total scans: ${row.total_scanned ?? '—'}</p>
+              ${nameLine}
+              ${subLine}
             </div>
           </div>
-          <span class="text-xs px-2 py-1 rounded-full bg-blue-50 text-blue-600 font-medium">${events.length} event${events.length !== 1 ? 's' : ''}</span>
+          <div class="flex items-center gap-2">
+            <span class="text-xs px-2 py-1 rounded-full font-medium" style="background:#eff6ff;color:#2563eb">${row.total_scanned ?? 0} scan${(row.total_scanned ?? 0) !== 1 ? 's' : ''}</span>
+            <span class="text-xs px-2 py-1 rounded-full font-medium" style="background:#f5f3ff;color:#7c3aed">${events.length} event${events.length !== 1 ? 's' : ''}</span>
+          </div>
         </div>
-        <div class="flex flex-col gap-3">${steps || '<p class="text-xs text-gray-400">No events recorded</p>'}</div>
+        <!-- Card body -->
+        <div class="p-4 bg-white">
+          <div class="flex flex-col gap-3">${steps || '<p class="text-xs text-gray-400">No events recorded</p>'}</div>
+          ${userDataHtml}
+        </div>
       </div>`;
   });
 
