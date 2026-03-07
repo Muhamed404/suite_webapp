@@ -67,7 +67,7 @@ exports.viewQRCampaignDetails = async (req, res) => {
       formSubmittedSegmentStats,
       formInteractionSegmentStats,
       qrImageUrls,
-
+      tvbs_backend_url: config.BACKEND_TVBS_URL || '',
     });
 
 

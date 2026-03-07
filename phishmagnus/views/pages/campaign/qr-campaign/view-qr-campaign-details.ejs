@@ -132,54 +132,9 @@
             </div>
 
             <!-- Phishing Success -->
-            <div class="bg-white p-6 rounded-xl gap-11  flex flex-col items-start  justify-start">
+            <div class="bg-white p-6 rounded-xl flex flex-col">
                 <h2 class="text-lg font-semibold mb-4"><%= __("qr_campaign.phishingSuccess") %></h2>
-
-                <div class="flex items-center  gap-10 w-full justify-between">
-                    <!-- Left Side Labels -->
-                    <div class="space-y-6">
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#3b82f6]"></span> <!-- Blue -->
-                            <div>
-                                <p class="text-gray-500 text-sm"><%= __( "qr_campaign.tagScan" ) %></p>
-                                <p class="text-lg font-bold text-gray-900" id="scanText"><%= __("generic_label.people") %></p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#9ca3af]"></span> <!-- Gray -->
-                            <div>
-                                <p class="text-gray-500 text-sm"><%= __( "qr_campaign.notScanTag" ) %></p>
-                                <p class="text-lg font-bold text-gray-900" id="notScanText"><%= __("generic_label.people") %></p>
-                            </div>
-
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#fb923c]"></span> <!-- Orange -->
-                            <div>
-                                <p class="text-gray-500 text-sm"><%= __( "generic_label.formInteraction" ) %></p>
-                                <p class="text-lg font-bold text-gray-900" id="formInteractionText"><%= __("generic_label.people") %></p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#34d399]"></span> <!-- Green -->
-                            <div>
-                                <p class="text-gray-500 text-sm"><%= __( "generic_label.attachmentOpened" ) %></p>
-                                <p class="text-lg font-bold text-gray-900" id="attachmentDownloadedText"><%= __("generic_label.people") %></p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-[#ef4444]"></span> <!-- Red -->
-                            <div>
-                                <p class="text-gray-500 text-sm"><%= __( "generic_label.targetCompromised" ) %></p>
-
-                                <p class="text-lg font-bold text-gray-900" id="targetCompromisedText"><%= __("generic_label.people") %></p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Donut Chart -->
-                    <div id="successChart" style="width:50%; height:50%;"></div>
-                </div>
+                <div id="successChart"></div>
             </div>
         </div>
 
@@ -398,6 +353,9 @@
                             <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap">
                                 <%= __( "qr_campaign.viewReport" ) %>
                             </th>
+                            <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap">
+                                Test URL
+                            </th>
 
 
                         </tr>
@@ -447,10 +405,14 @@
                                                 </path>
                                             </svg>
                                         </a>
-
                                     </div>
-
-
+                                </td>
+                                <td class="px-6 py-4">
+                                    <a href="<%=tvbs_backend_url%>/rq?iqr=<%=images.qr_code%>"
+                                        target="_blank"
+                                        class="text-teal-600 hover:underline text-sm break-all">
+                                        Click to Test
+                                    </a>
                                 </td>
                                 
                             </tr>
@@ -473,16 +435,16 @@
         qrCodesNotScanned: '<%= __("qr_campaign.notScanQrImages") %>',
         qrCodeScanned: '<%= __("qr_campaign.totalQrScans") %>',
         qrCodeSubmitData: '<%= __("qr_campaign.submittedForm") %>',
-        qrCodeAttachmentOpened: '<%= __("qr_campaign.attachmentOpened") %>',
+        qrCodeAttachmentOpened: '<%= __("qr_campaign.downloadFile") %>',
         qrCodes: '<%= __("qr_campaign.totalQrImagesCreated") %>',
         totalScans: '<%= __("qr_campaign.totalQrScans") %>',
         openedLink: '<%= __("qr_campaign.scanAndOpenUrl") %>',
-        interactForm: '<%= __("generic_label.formInteraction") %>',
+        interactForm: '<%= __("qr_campaign.totalInteract") %>',
         submitForm: '<%= __("qr_campaign.submittedForm") %>',
-        attachmentDownloaded: '<%= __("qr_campaign.attachmentOpened") %>',
+        attachmentDownloaded: '<%= __("qr_campaign.downloadFile") %>',
         scanned: '<%= __("qr_campaign.tagScan") %>',
-        interaction: '<%= __("generic_label.formInteraction") %>',
-        fileDownloaded: '<%= __("qr_campaign.attachmentOpened") %>',
+        interaction: '<%= __("qr_campaign.totalInteract") %>',
+        fileDownloaded: '<%= __("qr_campaign.downloadFile") %>',
         targetCompromised: '<%= __("generic_label.targetCompromised") %>',
         notScanned: '<%= __("qr_campaign.notScanTag") %>',
         uniqueScans: '<%= __("qr_campaign.uniqueScans") %>',
@@ -514,6 +476,10 @@
         totalQRImages: <%= typeof openSegmentStats !== 'undefined' && openSegmentStats?.totalQRCodeCount || 0 %>,
         totalScans: <%= typeof campaignStats !== 'undefined' && campaignStats?.number_of_scans || 0 %>,
         totalNotScans: <%= typeof openSegmentStats !== 'undefined' && openSegmentStats?.noScanCount || 0 %>,
+        uniqueScans: <%= typeof openSegmentStats !== 'undefined' && openSegmentStats?.uniqueScanCount || 0 %>,
+        uniqueInteractedCount: <%= typeof formInteractionSegmentStats !== 'undefined' && formInteractionSegmentStats?.uniqueInteractedCount || 0 %>,
+        uniqueFormSubmittedCount: <%= typeof formSubmittedSegmentStats !== 'undefined' && formSubmittedSegmentStats?.uniqueSubmittedCount || 0 %>,
+        uniqueDownloadedCount: <%= typeof downloadSegmentStats !== 'undefined' && downloadSegmentStats?.uniqueDownloadCount || 0 %>,
     };
 
 
