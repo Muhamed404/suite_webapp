@@ -1,5 +1,6 @@
 <div class="flex flex-col p-6 gap">
-<% if(locals_phm_subscription){%>
+    
+<% if(locals_phm_subscription || locals_awm_subscription){%>
 
     <%if(magnusAdmin===false) {%>
         <div class="flex flex-col md:flex-row justify-between gap-4 md:items-center">
@@ -38,7 +39,7 @@
                         </div>
                     </div>
 
-                    <%}%>
+                <%}%>
 
                         <div class="grid grid-cols-2 md:grid-cols-12 gap-3 md:gap-4">
 
