@@ -1639,7 +1639,9 @@
 		"repeatedInteractions": "التفاعلات المتكررة",
 		"repeatedSubmitted": "الإرسالات المتكررة",
 		"repeatedDownloads": "التحميلات المتكررة",
-		"searchHere": "ابحث هنا..."
+		"searchHere": "ابحث هنا...",
+		"clickToTest": "انقر للاختبار",
+		"testUrl": "رابط الاختبار"
 	},
 	"whatsapp": {
 		"create": {

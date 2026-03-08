@@ -1220,7 +1220,9 @@
 		"noScans": "No Scans",
 		"repeatedInteractions": "Repeated Interactions",
 		"repeatedSubmitted": "Repeated Submitted",
-		"repeatedDownloads": "Repeated Downloads"
+		"repeatedDownloads": "Repeated Downloads",
+		"clickToTest": "Click to Test",
+		"testUrl": "Test URL"
 	},
 	"nfc_campaign": {
 		"title": "NFC Campaign",
@@ -1239,7 +1241,7 @@
 		"campaignMetrics": "Campaign Metrics",
 		"campaignDetails": "Campaign Details",
 		"senderAddress": "Sender Address",
-		"url": "URL",
+		"domain_url": "Simulated Company Website",
 		"phishingPage": "Phishing Page",
 		"launchDate": "Launch Date",
 		"phishingSegments": "Phishing Segments",

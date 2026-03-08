@@ -159,28 +159,25 @@
                             <%= campaignDetails.name %>
                         </span>
                     </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">
-                            <%= __( "qr_campaign.url" ) %>
+                    <% if (tvbs_backend_url) { %>
+                    <div class="flex justify-between items-center text-sm gap-2">
+                        <span class="text-gray-500 flex-shrink-0">
+                            <%= __( "qr_campaign.phishingPage" ) %>
                         </span>
-                        <span class="text-gray-800 font-medium">
-
-                        </span>
+                        <button
+                            class="copyUrlButton flex items-center gap-1 text-teal-500 hover:text-white hover:bg-teal-500 border border-teal-500 px-2 py-1 rounded-lg transition text-xs"
+                            data-url="<%= tvbs_backend_url %>/rq?iqr=test&cid=<%= campaignDetails.id %>" title="Copy URL">
+                            <%= __('nfc_campaign.copyUrl') %>
+                            <img src="/securemagnus_2025/images/copy.svg" class="svg w-3.5 h-3.5" alt="">
+                        </button>
                     </div>
+                    <% } %>
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-500">
                             <%= __( "qr_campaign.templateName" ) %>
                         </span>
                         <span class="text-gray-800 font-medium">
                             <%= templateDetails.name %>
-
-                        </span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500">
-                            <%= __( "qr_campaign.phishingPage" ) %>
-                        </span>
-                        <span class="text-gray-800 font-medium">
 
                         </span>
                     </div>
@@ -343,10 +340,8 @@
                                 <%= __( "qr_campaign.viewReport" ) %>
                             </th>
                             <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap">
-                                Test URL
+                                <%= __('qr_campaign.testUrl') %>
                             </th>
-
-
                         </tr>
                     </thead>
                     <tbody>
@@ -400,7 +395,7 @@
                                     <a href="<%=tvbs_backend_url%>/rq?iqr=<%=images.qr_code%>"
                                         target="_blank"
                                         class="text-teal-600 hover:underline text-sm break-all">
-                                        Click to Test
+                                        <%= __('qr_campaign.clickToTest') %>
                                     </a>
                                 </td>
                                 
@@ -474,5 +469,13 @@
 
 
 
+</script>
+<script>
+    $(document).on('click', '.copyUrlButton', function () {
+        const url = $(this).data('url');
+        navigator.clipboard.writeText(url)
+            .then(() => showCustomToast('success', 'URL copied!'))
+            .catch(() => showCustomToast('error', 'Failed to copy URL'));
+    });
 </script>
 <script src="/securemagnus_2025/js/qr_camp_view.js"></script>
