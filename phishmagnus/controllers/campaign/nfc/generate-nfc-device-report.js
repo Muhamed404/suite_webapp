@@ -42,11 +42,16 @@ exports.generateNFCDeviceReport = async (req, res) => {
     const interactionTimeline = transformInteractionStatsTimeline(nfcReportProfile, req);
     logger.info(`[NFC Device Report Controller]: Interaction Timeline: ${JSON.stringify(interactionTimeline, null, 2)}`);
 
+    // Extract nfc_report_details for the per-IP timeline chart
+    const nfcReportDetails = nfcReportProfile?.NFCReport?.[0]?.nfc_report_details || [];
+    logger.info(`[NFC Device Report Controller]: NFC Report Details: ${JSON.stringify(nfcReportDetails, null, 2)}`);
+
     return res.render(render_ejs_urls.PhishMagnus.Campaign.NFC.RENDER_TAG_REPORT, {
       interactionStats,
       campaignDetails,
       nfcReportProfile,
-      interactionTimeline // Pass timeline separately for easier access
+      interactionTimeline,
+      nfcReportDetails
     });
 
   } catch (error) {

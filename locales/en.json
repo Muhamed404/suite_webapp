@@ -1264,7 +1264,7 @@
 		"totalNotScans": "Total Not Scans",
 		"totalSubmitted": "Total Submitted",
 		"totalInteract": "Total Interact",
-		"qrView": "QR View",
+		"nfcView": "NFC Scan",
 		"formInteracted": "Form Interacted",
 		"totalActivity": "Total Activity",
 		"employeeResponse": "Employee response",
@@ -1289,7 +1289,8 @@
 		"status": "Status",
 		"totalNFCDevices": "Total NFC Devices",
 		"action": "Action",
-		"results": "results"
+		"results": "results",
+		"ipInteractions": "Interactions Timeline"
 	},
 	"Active": "Active",
 	"SubscriptionCancelled": "Subscription Cancelled",

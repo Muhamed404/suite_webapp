@@ -190,7 +190,9 @@ if (qrTagReportDetails.length > 0) {
 // ===============================
 // Timeline Chart Configuration (Updated)
 // ===============================
-if (events.length > 0) {
+const events = window.interactionTimeline || [];
+const _chartEl = document.querySelector('#chart');
+if (_chartEl && events.length > 0) {
   var options = {
     series: [{
       name: "User Journey",
@@ -270,9 +272,9 @@ if (events.length > 0) {
 
   var chart = new ApexCharts(document.querySelector("#chart"), options);
   chart.render();
-} else {
+} else if (_chartEl) {
   // Handle case when no timeline data is available
-  document.querySelector("#chart").innerHTML = `
+  _chartEl.innerHTML = `
     <div class="flex items-center justify-center h-96 text-gray-500">
       <div class="text-center">
         <h3 class="text-lg font-medium mb-2">${window.i18n?.qr_report?.no_timeline_data || 'No Timeline Data'}</h3>
@@ -407,28 +409,34 @@ var segmentsOptions = {
 
 new ApexCharts(document.querySelector("#userPhishingSegmentsChart"), segmentsOptions).render();
 
-// Reported To Admin chart with real data
-var reportOptions = {
-  series: [
-    qrScanned - reportedToAdmin, // Opened but not reported
-    reportedToAdmin, // Reported
-    0 // Not opened but reported (adjust based on your logic)
-  ],
-  chart: { type: 'pie', height: 300 },
-  labels: ['Email Opened Not Reported', 'Email Opened & Reported', 'Email Not Opened & Reported'],
-  colors: ['#f87171', '#60a5fa', '#4ade80'],
-  legend: { position: 'bottom' },
-  dataLabels: { enabled: false },
-  tooltip: { 
-    enabled: true,
-    y: {
-      formatter: function (val) {
-        return val + ' ' + (window.i18n?.qr_report?.times || 'Times');
+// Employee Response chart — NFC interaction breakdown
+const reportedToAdmin = interactionStats.reportedToAdmin || 0;
+const _reportEl = document.querySelector('#reportChart');
+if (_reportEl) {
+  var reportOptions = {
+    series: [qrScanned, formInteracted, formSubmitted, attachmentDownloaded],
+    chart: { type: 'donut', height: 300 },
+    labels: [
+      window.i18n?.qr_report?.qr_scanned || 'Scanned',
+      window.i18n?.qr_report?.interact_form || 'Form Interacted',
+      window.i18n?.qr_report?.submit_data || 'Form Submitted',
+      window.i18n?.qr_report?.attachment_opened || 'File Downloaded'
+    ],
+    colors: ['#38bdf8', '#fbbf24', '#a78bfa', '#4ade80'],
+    legend: { position: 'bottom', fontSize: '13px' },
+    dataLabels: { enabled: false },
+    plotOptions: { pie: { donut: { size: '75%' } } },
+    tooltip: {
+      enabled: true,
+      y: {
+        formatter: function (val) {
+          return val + ' ' + (window.i18n?.qr_report?.times || 'Times');
+        }
       }
     }
-  }
-};
-new ApexCharts(document.querySelector("#reportChart"), reportOptions).render();
+  };
+  new ApexCharts(_reportEl, reportOptions).render();
+}
 
 // Semi Donut Charts for bottom
 function createSemiDonut(selector, colors, total) {
