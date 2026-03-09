@@ -210,3 +210,15 @@ export function useDeleteSurveyQuestion() {
     },
   });
 }
+
+/** Import survey questions from CSV */
+export function useImportSurveyQuestions() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: (formData: FormData) => surveyService.importSurveyQuestions(formData),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["survey-questions"] });
+    },
+  });
+}

@@ -2,13 +2,12 @@
 
 import type { SupportedLanguageId } from "@/utils/supportedLanguages";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@heroui/button";
-import { Input, Textarea } from "@heroui/input";
+import { Textarea } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
-import { Checkbox } from "@heroui/checkbox";
 import { Radio, RadioGroup } from "@heroui/radio";
 import { Spinner } from "@heroui/spinner";
 import clsx from "clsx";
@@ -20,14 +19,17 @@ import {
   FileText,
   HelpCircle,
   Plus,
-  Trash2,
+  Upload,
+  Download,
+  X,
 } from "lucide-react";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useCreateSurveyQuestion } from "@/hooks/useSurvey";
+import { useCreateSurveyQuestion, useImportSurveyQuestions } from "@/hooks/useSurvey";
 import { useCategories } from "@/hooks/useSuiteAwm";
+import { useAuthStore } from "@/hooks/useAuthStore";
 import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS } from "@/utils/supportedLanguages";
 
 const STEPS = [
@@ -53,7 +55,9 @@ export function CreateSurveyQuestionForm() {
   const isRtl = dir === "rtl";
   const router = useRouter();
   const createQuestion = useCreateSurveyQuestion();
+  const importQuestions = useImportSurveyQuestions();
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+  const { user } = useAuthStore();
 
   const [currentStep, setCurrentStep] = useState(1);
   const [formError, setFormError] = useState<string | null>(null);
@@ -72,6 +76,13 @@ export function CreateSurveyQuestionForm() {
 
   // Step 3: Answers (only for Single/Multiple)
   const [answers, setAnswers] = useState<AnswerItem[]>([createAnswer(), createAnswer()]);
+
+  // CSV Upload State
+  const [showCsvModal, setShowCsvModal] = useState(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [csvStatus, setCsvStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
+  const [csvMessage, setCsvMessage] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isTrueFalse = quesTypeId === 1;
   const isSingleChoice = quesTypeId === 2;
@@ -157,6 +168,67 @@ export function CreateSurveyQuestionForm() {
       // Checkbox: multiple can be correct
       setAnswers(answers.map((a) => (a.id === id ? { ...a, isCorrect: !a.isCorrect } : a)));
     }
+  };
+
+  const handleCsvFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCsvFile(e.target.files[0]);
+    }
+  };
+
+  const handleUploadCsv = async () => {
+    if (!csvFile) return;
+
+    setCsvStatus("uploading");
+    const formData = new FormData();
+    formData.append("csvFile", csvFile);
+    formData.append("ques_type_id", String(quesTypeId));
+    if (categoryId) {
+      formData.append("category_id", categoryId);
+    }
+    if (user?.organization_id) {
+      formData.append("org_id", user.organization_id.toString());
+    }
+
+    try {
+      await importQuestions.mutateAsync(formData);
+      setCsvStatus("success");
+      setCsvMessage("Questions imported successfully! Redirecting...");
+      setTimeout(() => {
+        router.push("/dashboard/survey/questions");
+      }, 2000);
+    } catch (err: any) {
+      setCsvStatus("error");
+      setCsvMessage(err?.message ?? "Import failed. Please check your CSV format.");
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    let headers: string;
+    let exampleRow: string;
+
+    if (isTrueFalse) {
+      headers = "Question,Category_ID,Answer_1,Validity_1,Answer_2,Validity_2";
+      exampleRow = "Is phishing a social engineering attack?,1,True,1,False,0";
+    } else {
+      headers = "Question,Category_ID,Answer_1,Validity_1,Answer_2,Validity_2,Answer_3,Validity_3,Answer_4,Validity_4";
+      exampleRow = "Which of these is a strong password?,1,password123,0,MyP@ssw0rd!,1,12345678,0,qwerty,0";
+    }
+
+    const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + "\n" + exampleRow);
+    const link = document.createElement("a");
+    link.setAttribute("href", csvContent);
+    link.setAttribute("download", `survey_question_template_${isTrueFalse ? "truefalse" : "choice"}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const resetCsvModal = () => {
+    setShowCsvModal(false);
+    setCsvFile(null);
+    setCsvStatus("idle");
+    setCsvMessage("");
   };
 
   const handleSubmit = async () => {
@@ -373,9 +445,41 @@ export function CreateSurveyQuestionForm() {
               <div className="space-y-5">
                 <h3 className="text-lg font-semibold text-gray-800 mb-1">Add Question</h3>
                 <p className="text-xs text-gray-500 mb-4">
-                  Enter the question text{isTrueFalse ? " and select the correct answer" : ""}
+                  Upload a CSV to bulk import questions, or add a question manually below.
                 </p>
 
+                {/* CSV Upload Button */}
+                <div>
+                  <p className="text-[10px] text-gray-500 mb-1">
+                    Upload a CSV or Excel file to import questions in bulk
+                  </p>
+                  <button
+                    className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-dashed border-[#3FBDFF] rounded-lg text-xs font-medium text-[#3FBDFF] bg-[#E8F5FF] hover:bg-[#D0ECFF] transition w-full"
+                    type="button"
+                    onClick={() => setShowCsvModal(true)}
+                  >
+                    <Upload className="w-4 h-4" />
+                    <span>Upload CSV / Excel</span>
+                  </button>
+
+                  {csvStatus === "success" && (
+                    <div className="mt-2 text-[10px] text-green-600 font-medium">
+                      {csvMessage}
+                    </div>
+                  )}
+                </div>
+
+                {/* Or Divider */}
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-200" />
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-white px-2 text-gray-400 font-medium">or</span>
+                  </div>
+                </div>
+
+                {/* Manual Question Entry */}
                 <div>
                   <label className="text-xs font-medium text-gray-700 mb-1 block">
                     Question <span className="text-red-500">*</span>
@@ -383,8 +487,8 @@ export function CreateSurveyQuestionForm() {
                   <Textarea
                     classNames={{
                       inputWrapper:
-                        "bg-white border border-gray-200 rounded-xl hover:border-gray-300 focus-within:!border-blue-500",
-                      input: "text-sm",
+                        "bg-white border border-gray-200 rounded-xl hover:border-gray-300 focus-within:!border-[#3FBDFF] focus-within:!ring-1 focus-within:!ring-[#3FBDFF]/10",
+                      input: "text-sm placeholder:text-gray-400",
                     }}
                     minRows={3}
                     placeholder="Enter your question here..."
@@ -453,88 +557,95 @@ export function CreateSurveyQuestionForm() {
                 <h3 className="text-lg font-semibold text-gray-800 mb-1">Add Answers</h3>
                 <p className="text-xs text-gray-500 mb-4">
                   {isSingleChoice
-                    ? "Add answer options and select the correct one (radio)"
-                    : "Add answer options and check all correct answers (checkbox)"}
+                    ? "Add answer options and select the correct one"
+                    : "Add answer options and check all correct answers"}
                 </p>
 
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {answers.map((answer, idx) => (
-                    <div
-                      key={answer.id}
-                      className={clsx(
-                        "flex items-center gap-3 p-3 rounded-xl border transition-all",
-                        answer.isCorrect
-                          ? "border-green-300 bg-green-50"
-                          : "border-gray-200 bg-white"
-                      )}
-                    >
-                      <span className="text-xs text-gray-400 font-medium w-12 flex-shrink-0">
-                        Answer {idx + 1}
-                      </span>
-                      <Input
-                        classNames={{
-                          inputWrapper:
-                            "h-9 bg-white border border-gray-200 rounded-lg hover:border-gray-300 focus-within:!border-blue-500 shadow-none",
-                          input: "text-sm",
-                        }}
-                        placeholder={`Enter answer ${idx + 1}...`}
+                    <div key={answer.id} className="flex items-center gap-2.5">
+                      <input
+                        className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg outline-none focus:border-[#3FBDFF] focus:ring-1 focus:ring-[#3FBDFF]/10 transition-all placeholder:text-gray-400"
+                        placeholder={`Answer ${idx + 1}`}
+                        type="text"
                         value={answer.text}
-                        onValueChange={(v) => updateAnswerText(answer.id, v)}
+                        onChange={(e) => updateAnswerText(answer.id, e.target.value)}
                       />
 
-                      {/* Valid answer toggle */}
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {isSingleChoice ? (
-                          <button
-                            className={clsx(
-                              "w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all",
-                              answer.isCorrect ? "border-green-500 bg-green-500" : "border-gray-300"
-                            )}
-                            type="button"
-                            onClick={() => toggleAnswerCorrect(answer.id)}
-                          >
-                            {answer.isCorrect && <div className="w-2 h-2 rounded-full bg-white" />}
-                          </button>
-                        ) : (
-                          <Checkbox
-                            classNames={{
-                              wrapper: "before:border-gray-300",
-                            }}
-                            isSelected={answer.isCorrect}
-                            onValueChange={() => toggleAnswerCorrect(answer.id)}
-                          />
+                      {/* Correct pill (quiz-style) */}
+                      <label
+                        className={clsx(
+                          "flex items-center gap-2 px-2 py-1 border rounded-lg cursor-pointer transition-all select-none",
+                          "hover:bg-[#3FBDFF]/5 hover:border-[#3FBDFF]",
+                          answer.isCorrect ? "bg-[#EAF6FF] border-[#3FBDFF]" : "bg-white border-gray-300"
                         )}
-                        <span className="text-[10px] text-gray-500 w-16">
-                          {answer.isCorrect ? "✓ Valid" : "Valid"}
-                        </span>
-                      </div>
-
-                      {/* Delete */}
-                      {answers.length > 2 && (
-                        <Button
-                          isIconOnly
-                          className="text-gray-400 hover:text-red-500 flex-shrink-0"
-                          size="sm"
-                          variant="light"
-                          onPress={() => removeAnswer(answer.id)}
+                        style={{ width: "fit-content" }}
+                      >
+                        <input
+                          checked={answer.isCorrect}
+                          className="hidden"
+                          type="checkbox"
+                          onChange={() => toggleAnswerCorrect(answer.id)}
+                        />
+                        <span
+                          className={clsx(
+                            "flex items-center justify-center w-4 h-4 border-2 flex-shrink-0 transition-all bg-white",
+                            isMultipleChoice ? "rounded-sm" : "rounded-full",
+                            answer.isCorrect ? "border-[#3FBDFF]" : "border-gray-300"
+                          )}
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
+                          {isMultipleChoice ? (
+                            <span
+                              className={clsx(
+                                "transform transition-all",
+                                answer.isCorrect ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                              )}
+                            >
+                              <svg
+                                className="w-2.5 h-2.5 text-[#3FBDFF]"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                viewBox="0 0 24 24"
+                              >
+                                <polyline points="20 6 9 17 4 12" />
+                              </svg>
+                            </span>
+                          ) : (
+                            <span
+                              className={clsx(
+                                "w-2 h-2 rounded-full bg-[#3FBDFF] transition-all",
+                                answer.isCorrect ? "opacity-100 scale-100" : "opacity-0 scale-0"
+                              )}
+                            />
+                          )}
+                        </span>
+                        <span className="text-[10px] text-gray-700 font-medium">Correct</span>
+                      </label>
+
+                      {/* Remove answer */}
+                      {answers.length > 2 && (
+                        <button
+                          className="w-5 h-5 flex items-center justify-center rounded-full border border-red-300 text-red-400 hover:bg-red-50 hover:text-red-500 hover:border-red-400 transition-colors flex-shrink-0"
+                          type="button"
+                          onClick={() => removeAnswer(answer.id)}
+                        >
+                          <X className="w-2.5 h-2.5" />
+                        </button>
                       )}
                     </div>
                   ))}
                 </div>
 
                 {answers.length < 10 && (
-                  <Button
-                    className="text-blue-600 bg-blue-50"
-                    size="sm"
-                    startContent={<Plus className="w-3.5 h-3.5" />}
-                    variant="flat"
-                    onPress={addAnswer}
+                  <button
+                    className="text-[#3FBDFF] text-[10px] font-medium flex items-center gap-1 py-1 rounded-full mt-2 hover:bg-[#EAF8FF] px-2 w-fit transition-colors"
+                    type="button"
+                    onClick={addAnswer}
                   >
-                    Add More Answer
-                  </Button>
+                    <Plus className="w-3 h-3" />
+                    Add New Answer
+                  </button>
                 )}
               </div>
             )}
@@ -574,6 +685,97 @@ export function CreateSurveyQuestionForm() {
               </Button>
             )}
           </div>
+
+          {/* CSV Upload Modal */}
+          {showCsvModal && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999] flex items-center justify-center">
+              <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 m-4 relative">
+                {/* Close Button */}
+                <button
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+                  type="button"
+                  onClick={resetCsvModal}
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+
+                {/* Modal Header */}
+                <div className="mb-5">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Upload CSV / Excel</h3>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Import survey questions from a CSV file. The question type and category selected in Step 1 will be used.
+                  </p>
+
+                  <button
+                    className="text-xs text-[#3FBDFF] font-medium hover:underline flex items-center gap-1"
+                    type="button"
+                    onClick={handleDownloadTemplate}
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Download Template
+                  </button>
+                </div>
+
+                {/* Upload Area */}
+                <div className="mb-4">
+                  <label className="block w-full cursor-pointer">
+                    <input
+                      ref={fileInputRef}
+                      accept=".csv,.xlsx,.xls"
+                      className="hidden"
+                      type="file"
+                      onChange={handleCsvFileChange}
+                    />
+                    <div
+                      className={clsx(
+                        "border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-[#3FBDFF] hover:bg-[#F0F9FF] transition",
+                        csvFile && "border-[#3FBDFF] bg-[#F0F9FF]"
+                      )}
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-10 h-10 rounded-full bg-[#E8F5FF] flex items-center justify-center">
+                          <Upload className="w-5 h-5 text-[#3FBDFF]" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 mb-0.5">
+                            {csvFile ? csvFile.name : "Click to upload"}
+                          </p>
+                          <p className="text-xs text-gray-500">CSV or Excel files only</p>
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Status Messages */}
+                {csvStatus === "error" && (
+                  <p className="text-xs text-red-500 mb-4">{csvMessage}</p>
+                )}
+                {csvStatus === "success" && (
+                  <p className="text-xs text-green-600 mb-4">{csvMessage}</p>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-2 justify-end mt-4">
+                  <button
+                    className="px-4 py-2 rounded-full border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50 transition"
+                    type="button"
+                    onClick={resetCsvModal}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-4 py-2 rounded-full bg-[#3FBDFF] text-white text-xs font-medium hover:bg-[#29AAE8] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!csvFile || csvStatus === "uploading"}
+                    type="button"
+                    onClick={handleUploadCsv}
+                  >
+                    {csvStatus === "uploading" ? "Uploading..." : "Confirm Upload"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </DashboardLayout>
     </ProtectedRoute>

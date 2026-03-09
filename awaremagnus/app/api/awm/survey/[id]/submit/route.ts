@@ -9,17 +9,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         console.log(`[AWM Mock API] Survey ${id} submitted:`, body);
 
         return NextResponse.json({
-            success: true,
             message: "Survey submitted successfully",
-            data: {
+            statusCode: 200,
+            alertType: "success",
+            object: {
                 survey_id: parseInt(id, 10),
                 status: "COMPLETED"
             }
         });
     } catch (error) {
         return NextResponse.json({
-            success: false,
-            message: "Invalid payload"
+            message: "Invalid payload",
+            statusCode: 400,
+            alertType: "error",
+            object: null
         }, { status: 400 });
     }
 }

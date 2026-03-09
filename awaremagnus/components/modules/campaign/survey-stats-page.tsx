@@ -400,6 +400,16 @@ export function SurveyStatsPage() {
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-semibold">Answers List</h2>
+                  <Button
+                    as={Link}
+                    className="inline-flex items-center gap-1 px-4 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition"
+                    href={`/dashboard/survey/users?id=${surveyId}`}
+                    radius="full"
+                    size="sm"
+                    startContent={<Users className="w-3.5 h-3.5" />}
+                  >
+                    View All Users
+                  </Button>
                 </div>
 
                 <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
@@ -489,7 +499,7 @@ export function SurveyStatsPage() {
                                   <Button
                                     as={Link}
                                     className="text-[10px] h-7 px-3 bg-blue-50 text-blue-600"
-                                    href={`/dashboard/survey/stats?id=${surveyId}&userId=${user.user_id}`}
+                                    href={`/dashboard/survey/users/answers?surveyId=${surveyId}&userId=${user.user_id}`}
                                     radius="full"
                                     size="sm"
                                     startContent={<Eye className="w-3 h-3" />}

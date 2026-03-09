@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
@@ -20,13 +20,17 @@ import {
   Trash2,
   CheckCircle,
   XCircle,
+  Upload,
+  Download,
+  X,
 } from "lucide-react";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useSurveyQuestions, useDeleteSurveyQuestion } from "@/hooks/useSurvey";
+import { useSurveyQuestions, useDeleteSurveyQuestion, useImportSurveyQuestions } from "@/hooks/useSurvey";
 import { useCategories } from "@/hooks/useSuiteAwm";
+import { useAuthStore } from "@/hooks/useAuthStore";
 
 const ROWS_PER_PAGE = 10;
 
@@ -64,6 +68,86 @@ export function SurveyQuestionsPage() {
   const { data: questions = [], isLoading, error } = useSurveyQuestions(queryParams);
   const { data: categories = [] } = useCategories();
   const deleteQuestion = useDeleteSurveyQuestion();
+  const importQuestions = useImportSurveyQuestions();
+  const { user } = useAuthStore();
+
+  // CSV Upload State
+  const [showCsvModal, setShowCsvModal] = useState(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [csvQuesTypeId, setCsvQuesTypeId] = useState<string>("2");
+  const [csvCategoryId, setCsvCategoryId] = useState<string>("");
+  const [csvStatus, setCsvStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
+  const [csvMessage, setCsvMessage] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleCsvFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setCsvFile(e.target.files[0]);
+    }
+  };
+
+  const handleUploadCsv = async () => {
+    if (!csvFile) return;
+
+    setCsvStatus("uploading");
+    const formData = new FormData();
+    formData.append("csvFile", csvFile);
+    formData.append("ques_type_id", csvQuesTypeId);
+    if (csvCategoryId) {
+      formData.append("category_id", csvCategoryId);
+    }
+    if (user?.organization_id) {
+      formData.append("org_id", user.organization_id.toString());
+    }
+
+    try {
+      await importQuestions.mutateAsync(formData);
+      setCsvStatus("success");
+      setCsvMessage("Questions imported successfully!");
+      setTimeout(() => {
+        setShowCsvModal(false);
+        setCsvFile(null);
+        setCsvStatus("idle");
+        setCsvMessage("");
+        setCsvQuesTypeId("2");
+        setCsvCategoryId("");
+      }, 2000);
+    } catch (err: any) {
+      setCsvStatus("error");
+      setCsvMessage(err?.message ?? "Import failed. Please check your CSV format.");
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const isTrueFalse = csvQuesTypeId === "1";
+    let headers: string;
+    let exampleRow: string;
+
+    if (isTrueFalse) {
+      headers = "Question,Category_ID,Answer_1,Validity_1,Answer_2,Validity_2";
+      exampleRow = "Is phishing a social engineering attack?,1,True,1,False,0";
+    } else {
+      headers = "Question,Category_ID,Answer_1,Validity_1,Answer_2,Validity_2,Answer_3,Validity_3,Answer_4,Validity_4";
+      exampleRow = "Which of these is a strong password?,1,password123,0,MyP@ssw0rd!,1,12345678,0,qwerty,0";
+    }
+
+    const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + "\n" + exampleRow);
+    const link = document.createElement("a");
+    link.setAttribute("href", csvContent);
+    link.setAttribute("download", `survey_question_template_${isTrueFalse ? "truefalse" : "choice"}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const resetCsvModal = () => {
+    setShowCsvModal(false);
+    setCsvFile(null);
+    setCsvStatus("idle");
+    setCsvMessage("");
+    setCsvQuesTypeId("2");
+    setCsvCategoryId("");
+  };
 
   const handleSort = useCallback(
     (field: SortField) => {
@@ -184,16 +268,28 @@ export function SurveyQuestionsPage() {
               </Button>
               <h2 className="text-lg font-semibold">Quiz and Questions</h2>
             </div>
-            <Button
-              as={Link}
-              className="flex items-center gap-2 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition"
-              href="/dashboard/survey/questions/create"
-              radius="full"
-              size="md"
-              startContent={<Plus className="w-4 h-4" />}
-            >
-              New Quiz/Question
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                className="flex items-center gap-2 px-5 py-2 bg-white border border-[#3FBDFF] text-[#3FBDFF] text-sm font-medium hover:bg-[#E8F5FF] transition"
+                radius="full"
+                size="md"
+                startContent={<Upload className="w-4 h-4" />}
+                variant="bordered"
+                onPress={() => setShowCsvModal(true)}
+              >
+                Import CSV
+              </Button>
+              <Button
+                as={Link}
+                className="flex items-center gap-2 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition"
+                href="/dashboard/survey/questions/create"
+                radius="full"
+                size="md"
+                startContent={<Plus className="w-4 h-4" />}
+              >
+                New Quiz/Question
+              </Button>
+            </div>
           </div>
 
           {/* Table */}
@@ -403,6 +499,148 @@ export function SurveyQuestionsPage() {
               )}
             </div>
           </div>
+
+          {/* CSV Upload Modal */}
+          {showCsvModal && (
+            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[999] flex items-center justify-center">
+              <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 m-4 relative">
+                {/* Close Button */}
+                <button
+                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+                  type="button"
+                  onClick={resetCsvModal}
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+
+                {/* Modal Header */}
+                <div className="mb-5">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Import Survey Questions</h3>
+                  <p className="text-xs text-gray-500 mb-3">
+                    Upload a CSV file to bulk import survey questions. Select the question type and optionally a category.
+                  </p>
+
+                  <button
+                    className="text-xs text-[#3FBDFF] font-medium hover:underline flex items-center gap-1"
+                    type="button"
+                    onClick={handleDownloadTemplate}
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    Download Template
+                  </button>
+                </div>
+
+                {/* Question Type Selection */}
+                <div className="mb-4">
+                  <label className="text-xs font-medium text-gray-700 mb-1 block">
+                    Question Type <span className="text-red-500">*</span>
+                  </label>
+                  <Select
+                    aria-label="Question type for import"
+                    classNames={{
+                      base: "w-full",
+                      trigger: "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300",
+                      value: "text-sm",
+                    }}
+                    selectedKeys={[csvQuesTypeId]}
+                    onSelectionChange={(keys) => {
+                      const v = Array.from(keys as Set<string>)[0];
+                      if (v) setCsvQuesTypeId(v);
+                    }}
+                  >
+                    <SelectItem key="1">True/False</SelectItem>
+                    <SelectItem key="2">Single Choice</SelectItem>
+                    <SelectItem key="3">Multiple Answers</SelectItem>
+                  </Select>
+                </div>
+
+                {/* Category Selection */}
+                <div className="mb-4">
+                  <label className="text-xs font-medium text-gray-700 mb-1 block">
+                    Category (optional)
+                  </label>
+                  <Select
+                    aria-label="Category for import"
+                    classNames={{
+                      base: "w-full",
+                      trigger: "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300",
+                      value: "text-sm",
+                    }}
+                    placeholder="Select a category"
+                    selectedKeys={csvCategoryId ? [csvCategoryId] : []}
+                    onSelectionChange={(keys) => {
+                      const v = Array.from(keys as Set<string>)[0] ?? "";
+                      setCsvCategoryId(v);
+                    }}
+                  >
+                    {(categories as any[]).map((cat: any) => (
+                      <SelectItem key={String(cat.id)} textValue={cat.name}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
+                </div>
+
+                {/* Upload Area */}
+                <div className="mb-4">
+                  <label className="block w-full cursor-pointer">
+                    <input
+                      ref={fileInputRef}
+                      accept=".csv,.xlsx,.xls"
+                      className="hidden"
+                      type="file"
+                      onChange={handleCsvFileChange}
+                    />
+                    <div
+                      className={clsx(
+                        "border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-[#3FBDFF] hover:bg-[#F0F9FF] transition",
+                        csvFile && "border-[#3FBDFF] bg-[#F0F9FF]"
+                      )}
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-10 h-10 rounded-full bg-[#E8F5FF] flex items-center justify-center">
+                          <Upload className="w-5 h-5 text-[#3FBDFF]" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 mb-0.5">
+                            {csvFile ? csvFile.name : "Click to upload"}
+                          </p>
+                          <p className="text-xs text-gray-500">CSV or Excel files only</p>
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+
+                {/* Status Messages */}
+                {csvStatus === "error" && (
+                  <p className="text-xs text-red-500 mb-4">{csvMessage}</p>
+                )}
+                {csvStatus === "success" && (
+                  <p className="text-xs text-green-600 mb-4">{csvMessage}</p>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-2 justify-end mt-4">
+                  <button
+                    className="px-4 py-2 rounded-full border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50 transition"
+                    type="button"
+                    onClick={resetCsvModal}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-4 py-2 rounded-full bg-[#3FBDFF] text-white text-xs font-medium hover:bg-[#29AAE8] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!csvFile || csvStatus === "uploading"}
+                    type="button"
+                    onClick={handleUploadCsv}
+                  >
+                    {csvStatus === "uploading" ? "Uploading..." : "Import Questions"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </DashboardLayout>
     </ProtectedRoute>
