@@ -144,24 +144,24 @@
             <div class="bg-white p-6 rounded-xl  ">
                 <h2 class="text-lg font-semibold text-gray-800 mb-6"><%= __('nfc_campaign.campaignDetails') %></h2>
                 <div class="space-y-4">
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500"><%= __('nfc_campaign.senderAddress') %></span>
-                        <span class="text-gray-800 font-medium">asharniazi@gmail.com</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500"><%= __('nfc_campaign.url') %></span>
-                        <span class="text-gray-800 font-medium">www.kkk.com</span>
-                    </div>
+                    
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-500"><%= __('nfc_campaign.templateName') %></span>
                         <span class="text-gray-800 font-medium">
                             <%=templateDetails.name%>
                         </span>
                     </div>
-                    <div class="flex justify-between text-sm">
-                        <span class="text-gray-500"><%= __('nfc_campaign.phishingPage') %></span>
-                        <span class="text-gray-800 font-medium">kkk/10</span>
+                    <% if (nfcDevices && nfcDevices.length > 0 && nfcDevices[0].download_url) { %>
+                    <div class="flex justify-between items-center text-sm gap-2">
+                        <span class="text-gray-500 flex-shrink-0"><%= __('nfc_campaign.phishingPage') %></span>
+                        <button
+                            class="copyUrlButton flex items-center gap-1 text-teal-500 hover:text-white hover:bg-teal-500 border border-teal-500 px-2 py-1 rounded-lg transition text-xs"
+                            data-url="<%= nfcDevices[0].download_url.replace(/([?&]ifc=)[^&]+/, '$1test') %>" title="Copy URL">
+                            <%= __('nfc_campaign.copyUrl') %>
+                            <img src="/securemagnus_2025/images/copy.svg" class="svg w-3.5 h-3.5" alt="">
+                        </button>
                     </div>
+                    <% } %>
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-500"><%= __('nfc_campaign.launchDate') %></span>
                         <span class="text-gray-800 font-medium">
@@ -363,7 +363,7 @@
 
 
 <script>
-    $('table').on('click', '.copyUrlButton', function () {
+    $(document).on('click', '.copyUrlButton', function () {
         // alert('Copy URL button clicked');
         const url = $(this).data('url');
         navigator.clipboard.writeText(url)

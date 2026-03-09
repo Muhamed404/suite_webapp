@@ -43,6 +43,7 @@ exports.viewQRCampaignDetails = async (req, res) => {
     const downloadSegmentStats = apiResponseCampaignReport?.data?.message.downloadSegmentStats || {};
     const formSubmittedSegmentStats = apiResponseCampaignReport?.data?.message.submittedSegmentStats || {};
     const formInteractionSegmentStats = apiResponseCampaignReport?.data?.message.interactedSegmentStats || {};
+    const uniqueIpCount = apiResponseCampaignReport?.data?.message.uniqueIpCount || 0;
 
     let qrImageUrls = apiResponseQRImagesData?.data?.message || [];
     logger.info(`Parsed qrImageUrls: ${JSON.stringify(qrImageUrls, null, 2)}`);
@@ -67,7 +68,8 @@ exports.viewQRCampaignDetails = async (req, res) => {
       formSubmittedSegmentStats,
       formInteractionSegmentStats,
       qrImageUrls,
-
+      tvbs_backend_url: config.BACKEND_TVBS_URL || '',
+      uniqueIpCount
     });
 
 

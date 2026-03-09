@@ -4,7 +4,7 @@ const { logger } = require("../../../../logger/logger");
 const fs = require('fs');
 const path = require('path');
 const archiver = require('archiver');
-const os = require('os'); 
+const os = require('os');
 const getApiClient = require('../../../../utility/api-client')
 
 
@@ -25,19 +25,23 @@ exports.createAndDownloadUSBCampaignZipFile = async (req, res) => {
         const response = await apiClient.get(url);
         const data = response.data.message;
 
-        logger.info('USB PHISHING DOWNLOADING METHOD ::: RESPONSE ' + JSON.stringify(data));
+        logger.info('USB PHISHING DOWNLOADING METHOD ::: RESPONSE ' + JSON.stringify(data, null, 2));
 
         // Extract values
-        const folderPath      = data.usbPhishingCampaignFolderPath;
-        const exeSourcePath   = data.exeSourcePath;
-        const exeFileName     = data.exeFileName;
-        const fileContent     = data.fileContent;
-        const fileName        = data.fileName;
-        const zipFileName     = `${data.usbCampaignName}_${fileName}.zip`;
+        const folderPath = data.usbPhishingCampaignFolderPath;
+        const exeSourcePath = data.exeSourcePath;
+        const exeFileName = data.exeFileName;
+        const tvbsBaseUrl = (config.BACKEND_TVBS_URL || '').replace(/\/$/, '');
+        const fileContent = data.fileContent.replace(
+            /^(url=)(?!https?:\/\/)(.+)$/m,
+            (_, prefix, rest) => `${prefix}${tvbsBaseUrl}/${rest.replace(/^\//, '')}`
+        );
+        const timestamp = Date.now();
+        const zipFileName = `${data.usbCampaignName}_${usbCode}_${timestamp}.zip`;
 
-        const exeDestPath  = path.join(folderPath, exeFileName);
+        const exeDestPath = path.join(folderPath, exeFileName);
         const textFilePath = path.join(folderPath, 'data.txt');
-        const zipFilePath  = path.join(folderPath, zipFileName);
+        const zipFilePath = path.join(folderPath, zipFileName);
 
         // Ensure directory exists
         if (!fs.existsSync(folderPath)) {
@@ -71,15 +75,15 @@ exports.createAndDownloadUSBCampaignZipFile = async (req, res) => {
 
                 // Delay cleanup → prevents deleting ZIP too early
                 setTimeout(() => {
-                    try { fs.unlinkSync(exeDestPath); } catch {}
-                    try { fs.unlinkSync(textFilePath); } catch {}
-                    try { fs.unlinkSync(zipFilePath); } catch {}
+                    try { fs.unlinkSync(exeDestPath); } catch { }
+                    try { fs.unlinkSync(textFilePath); } catch { }
+                    try { fs.unlinkSync(zipFilePath); } catch { }
                 }, 3000);
             });
         });
 
         archive.pipe(output);
-        archive.file(exeDestPath,  { name: exeFileName });
+        archive.file(exeDestPath, { name: exeFileName });
         archive.file(textFilePath, { name: "data.txt" });
         archive.finalize();
 

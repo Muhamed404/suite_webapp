@@ -16,7 +16,8 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { certificateService, type CertificateTemplate } from "@/services/certificateService";
 import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
 import { AuthImage } from "@/components/ui/auth-image";
-import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS, getLanguageFlag } from "@/utils/supportedLanguages";
+import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS, getLanguageFlag, getLanguageCountryCode } from "@/utils/supportedLanguages";
+import ReactCountryFlag from "react-country-flag";
 import { generateCertificateHtml } from "@/utils/certificateHtmlGenerator";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { isPlatformAdmin, isOrgAdmin } from "@/utils/roles";
@@ -164,11 +165,121 @@ export function CertificateManagementListPage() {
             </Link>
           </div>
 
-          {/* Main Card */}
-          <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-h-[500px]">
-            {/* Filters */}
-            <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-              <span className="text-[13px] font-medium text-gray-700">All Certificate</span>
+                        {/* Table */}
+                        <div className="pb-2">
+                            <div className="overflow-x-auto relative" style={{ minHeight: '420px' }}>
+                                <table className="w-full text-xs">
+                                    <thead className="bg-gray-50 text-gray-600 border-b sticky top-0 z-10">
+                                        <tr>
+                                            <th className="px-4 py-3.5 text-left font-semibold">
+                                                <div className="flex items-center gap-2">
+                                                    <span>Certificate Name</span>
+                                                    <ChevronsUpDown size={14} className="text-gray-400" />
+                                                </div>
+                                            </th>
+                                            <th className="px-4 py-3.5 text-left font-semibold">
+                                                <div className="flex items-center gap-2">
+                                                    <span>Language</span>
+                                                    <ChevronsUpDown size={14} className="text-gray-400" />
+                                                </div>
+                                            </th>
+                                            <th className="px-4 py-3.5 text-left font-semibold">Top Logo</th>
+                                            <th className="px-4 py-3.5 text-left font-semibold">Watermark</th>
+                                            <th className="px-4 py-3.5 text-left font-semibold">Border</th>
+                                            <th className="px-4 py-3.5 text-left font-semibold">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100">
+                                        {isLoading ? (
+                                            <tr>
+                                                <td colSpan={6} className="h-[400px]">
+                                                    <div className="flex items-center justify-center">
+                                                        <Spinner color="primary" label="Loading certificates..." />
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ) : items.length > 0 ? items.map((cert) => (
+                                            <tr key={cert.id} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-4 py-3.5 text-gray-900 font-medium">Certificate - {cert.language?.name || 'Unknown'}</td>
+                                                <td className="px-4 py-3.5 text-gray-600">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="flex items-center justify-center w-5 h-5 overflow-hidden rounded-full border border-gray-100">
+                                                            <ReactCountryFlag
+                                                                countryCode={getLanguageCountryCode(cert.lang_id)}
+                                                                svg
+                                                                style={{ fontSize: "1.5em", lineHeight: "1.5em" }}
+                                                                title={cert.language?.name || 'Unknown'}
+                                                            />
+                                                        </span>
+                                                        <span>{cert.language?.name || 'Unknown'}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3.5">
+                                                    <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+                                                        {cert.top_logo_url ? (
+                                                            <AuthImage src={getCertificateAssetUrl(cert.top_logo_url)} alt="Logo" className="object-contain" fill resolveUrl={false} />
+                                                        ) : (
+                                                            <ImageIcon size={18} className="text-gray-300" />
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3.5">
+                                                    <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+                                                        {cert.bg_watermark_url ? (
+                                                            <AuthImage src={getCertificateAssetUrl(cert.bg_watermark_url)} alt="Watermark" className="object-contain" fill resolveUrl={false} />
+                                                        ) : (
+                                                            <ImageIcon size={18} className="text-gray-300" />
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3.5">
+                                                    <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+                                                        {cert.border_image_url ? (
+                                                            <AuthImage src={getCertificateAssetUrl(cert.border_image_url)} alt="Border" className="object-contain" fill resolveUrl={false} />
+                                                        ) : (
+                                                            <ImageIcon size={18} className="text-gray-300" />
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-3.5 text-sky-500 font-semibold cursor-pointer">
+                                                    <div className="flex items-center gap-3">
+                                                        <Link href={`/dashboard/system-branding/certificate/${cert.id}/edit`} className="hover:text-sky-700">
+                                                            Edit
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => handleDownload(cert)}
+                                                            className="text-sky-500 hover:text-sky-700 transition"
+                                                            title="Download Certificate"
+                                                        >
+                                                            <Download size={16} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => cert.id && handleDelete(cert.id)}
+                                                            className="text-rose-500 hover:text-rose-700 transition"
+                                                            title="Delete Certificate"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )) : (
+                                            <tr>
+                                                <td colSpan={6} className="h-[400px]">
+                                                    <div className="flex flex-col items-center justify-center text-center">
+                                                        <div className="bg-gray-100 p-4 rounded-full inline-block mb-4">
+                                                            <SearchX size={40} className="text-gray-400" />
+                                                        </div>
+                                                        <h3 className="text-lg font-semibold text-gray-700 mb-2">No Certificates Found</h3>
+                                                        <p className="text-sm text-gray-500">Try adjusting your filters or search query</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
               <div className="flex gap-3">
                 <div className="relative w-64">

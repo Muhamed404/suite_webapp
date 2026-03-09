@@ -6,7 +6,7 @@ const campMetricsData = window.CampaignMetrics || {};
 
 var barOptions = {
   series: [{
-    data: [campMetricsData.totalQRImages, campMetricsData.totalScans, campMetricsData.openedLink, campMetricsData.interactForm, campMetricsData.submitForm,
+    data: [campMetricsData.totalQRImages, campMetricsData.totalScans, campMetricsData.interactForm, campMetricsData.submitForm,
     campMetricsData.attachmentDownloaded]
   }],
   chart: {
@@ -28,7 +28,6 @@ var barOptions = {
     categories: [
       localizedLabels.qrCodes,
       localizedLabels.totalScans,
-      localizedLabels.openedLink,
       localizedLabels.interactForm,
       localizedLabels.submitForm,
       localizedLabels.attachmentDownloaded
@@ -58,7 +57,7 @@ var barOptions = {
       lines: { show: false }
     }
   },
-  colors: ['#38bdf8', '#a3e635', '#f87171', '#fbbf24', '#a78bfa', '#6366f1'],
+  colors: ['#38bdf8', '#a3e635', '#fbbf24', '#a78bfa', '#6366f1'],
   tooltip: {
     theme: 'light'
   }
@@ -66,64 +65,69 @@ var barOptions = {
 
 new ApexCharts(document.querySelector("#barChart"), barOptions).render();
 
-// Sucess chart 
-// Data
-const openLink =  campMetricsData.openedLink || 0;
-const targetCompromised = campMetricsData.totalQRImages - campMetricsData.totalNotScans || 0;
-const reportedToAdmin = campMetricsData?.reportedToAdmin || 0
+// Success chart
+const total = campMetricsData.totalQRImages || 1;
 
-
-// Update left labels dynamically
-document.getElementById('scanText').innerText = `${campMetricsData.openedLink} ${localizedLabels.people}`;
-document.getElementById('notScanText').innerText = `${campMetricsData.totalNotScans} ${localizedLabels.people}`;
-document.getElementById('formInteractionText').innerText = `${campMetricsData.interactForm} ${localizedLabels.people}`;
-document.getElementById('targetCompromisedText').innerText = `${targetCompromised} ${localizedLabels.people}`;
-document.getElementById('attachmentDownloadedText').innerText = `${campMetricsData.attachmentDownloaded} ${localizedLabels.people}`;
-
-// ApexCharts Configuration
 var successOptions = {
-  series: [campMetricsData.openedLink, campMetricsData.interactForm, campMetricsData.attachmentDownloaded, targetCompromised,campMetricsData.totalNotScans],
-  chart: {
-    type: 'donut',
-    height: '100%'
-  },
-  labels: [localizedLabels.scanned, localizedLabels.interaction, localizedLabels.fileDownloaded, localizedLabels.targetCompromised, localizedLabels.notScanned],
-  colors: ['#3b82f6', '#fb923c', '#34d399', '#ef4444', '#9ca3af'],
+  series: [{
+    data: [
+      campMetricsData.totalQRImages,
+      campMetricsData.uniqueScans,
+      campMetricsData.uniqueInteractedCount,
+      campMetricsData.uniqueFormSubmittedCount,
+      campMetricsData.uniqueDownloadedCount
+    ]
 
-  dataLabels: { enabled: false },
+    
+  }],
+  chart: {
+    type: 'bar',
+    height: 300,
+    toolbar: { show: false }
+  },
   plotOptions: {
-    pie: {
-      donut: {
-        size: '80%',
-        labels: {
-          show: true,
-          name: { show: false },
-          value: {
-            show: true,
-            fontSize: '28px',
-            fontWeight: 'bold',
-            color: '#111827',
-            formatter: () => successRate
-          },
-          total: {
-            show: true,
-            label: 'Success Rate',
-            fontSize: '14px',
-            color: '#6b7280',
-            fontWeight: 'normal',
-            formatter: () => '' // Only show label above percentage
-          }
-        }
-      }
+    bar: {
+      borderRadius: 6,
+      horizontal: true,
+      distributed: true,
+      barHeight: '60%'
     }
   },
-  legend: { show: false },
-  stroke: { width: 0 },
-  tooltip: {
+  dataLabels: {
     enabled: true,
+    formatter: function (val) {
+      return Math.round((val / total) * 100) + '%';
+    },
+    style: { fontSize: '12px', colors: ['#fff'] }
+  },
+  xaxis: {
+    categories: [
+      localizedLabels.qrCodes,
+      localizedLabels.totalScans,
+      localizedLabels.interactForm,
+      localizedLabels.submitForm,
+      localizedLabels.attachmentDownloaded
+    ],
+    labels: { show: false },
+    axisBorder: { show: false },
+    axisTicks: { show: false }
+  },
+  yaxis: {
+    labels: {
+      style: { colors: '#6b7280', fontSize: '13px', fontWeight: 500 }
+    }
+  },
+  colors: ['#38bdf8', '#a3e635', '#fbbf24', '#a78bfa', '#6366f1'],
+  legend: { show: false },
+  grid: {
+    borderColor: '#f3f4f6',
+    xaxis: { lines: { show: false } }
+  },
+  tooltip: {
+    theme: 'light',
     y: {
       formatter: function (val) {
-        return val + ' ' + localizedLabels.people;
+        return val + ' ' + localizedLabels.people + ' (' + Math.round((val / total) * 100) + '%)';
       }
     }
   }
