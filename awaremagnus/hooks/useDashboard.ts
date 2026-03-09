@@ -47,7 +47,12 @@ export const DASHBOARD_KEYS = {
       "list",
       params,
     ],
-    assignments: (params?: { language_id?: number }) => ["dashboard", "user", "assignments", params],
+    assignments: (params?: { language_id?: number }) => [
+      "dashboard",
+      "user",
+      "assignments",
+      params,
+    ],
     gameAchievements: ["dashboard", "user", "gameAchievements"],
   },
   gamification: {
@@ -81,10 +86,7 @@ export const useSystemOverview = (options?: { enabled?: boolean }) => {
   });
 };
 
-export const useSystemMonthlyCompletion = (
-  orgId?: number,
-  options?: { enabled?: boolean }
-) => {
+export const useSystemMonthlyCompletion = (orgId?: number, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.system.monthlyCompletion(orgId),
     queryFn: () => dashboardService.getSystemMonthlyCompletion({ orgId }),

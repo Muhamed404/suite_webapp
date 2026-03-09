@@ -4,8 +4,9 @@ import type { QuizAnswer } from "./quiz-answer-row";
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import clsx from "clsx";
+import ReactCountryFlag from "react-country-flag";
+import { Textarea } from "@heroui/input";
 
 import { QuizAnswerRow } from "./quiz-answer-row";
 
@@ -14,8 +15,6 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { getLanguageName, getLanguageCountryCode } from "@/utils/supportedLanguages";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
-import ReactCountryFlag from "react-country-flag";
-import { Textarea } from "@heroui/input";
 
 export type QuizLocale = "en" | "ar";
 
@@ -85,7 +84,6 @@ export function QuizLanguageCard({
   const langLabel =
     form.langId != null ? getLanguageName(form.langId) : meta ? t(meta.labelKey) : "";
 
-
   const singleCorrect = quizType === "single" || quizType === "truefalse";
   const isMultiple = quizType === "multiple";
 
@@ -125,8 +123,7 @@ export function QuizLanguageCard({
           // Content-Type is set automatically by browser for FormData
         },
         body: formData,
-      }
-      );
+      });
 
       const result = await res.json();
 
@@ -137,9 +134,11 @@ export function QuizLanguageCard({
           setShowCsvModal(false);
           // Redirect to module details page if we have moduleId
           if (moduleId) {
-            const path = user?.role_id && (user.role_id === 1 || user.role_id === 2)
-              ? `/dashboard/training-library/system/${moduleId}`
-              : `/dashboard/training-library/my/${moduleId}`;
+            const path =
+              user?.role_id && (user.role_id === 1 || user.role_id === 2)
+                ? `/dashboard/training-library/system/${moduleId}`
+                : `/dashboard/training-library/my/${moduleId}`;
+
             router.push(path);
           }
         }, 2000);
@@ -159,8 +158,7 @@ export function QuizLanguageCard({
     let exampleRow = "";
 
     if (quizType === "truefalse") {
-      headers =
-        "Question,Answer_1,Validity_1,Feedback_1,Answer_2,Validity_2,Feedback_2,Difficulty";
+      headers = "Question,Answer_1,Validity_1,Feedback_1,Answer_2,Validity_2,Feedback_2,Difficulty";
       exampleRow =
         "An email address is considered PII.,TRUE,TRUE,Correct – contact details like email address are classified as PII.,FALSE,FALSE,Incorrect – emails are identifiers.,1";
     } else {
@@ -171,8 +169,10 @@ export function QuizLanguageCard({
         "Select examples of PII.,Name,TRUE,Correct – identifier.,Email,TRUE,Correct – contact info.,Office floor number,FALSE,Not unique to a person.,Passport number,TRUE,Highly sensitive PII.,1";
     }
 
-    const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(headers + "\n" + exampleRow);
+    const csvContent =
+      "data:text/csv;charset=utf-8," + encodeURIComponent(headers + "\n" + exampleRow);
     const link = document.createElement("a");
+
     link.setAttribute("href", csvContent);
     link.setAttribute("download", `${quizType}_quiz_template.csv`);
     document.body.appendChild(link);
@@ -213,6 +213,7 @@ export function QuizLanguageCard({
           <div className="flex flex-row items-center gap-1.5">
             <span className="lang-icon w-5 h-5 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center border border-gray-100">
               <ReactCountryFlag
+                svg
                 className="w-full h-full object-cover"
                 countryCode={
                   form.langId != null
@@ -225,7 +226,6 @@ export function QuizLanguageCard({
                   fontSize: "1.5em",
                   lineHeight: "1.5em",
                 }}
-                svg
                 title={langLabel}
               />
             </span>

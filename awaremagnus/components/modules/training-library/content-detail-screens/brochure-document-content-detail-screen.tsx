@@ -85,14 +85,23 @@ export function BrochureDocumentContentDetailScreen({
   const isRtl = dir === "rtl";
   const token = useAuthStore((s) => s.token);
 
-  console.log("📄 BrochureDocumentContentDetailScreen - breadcrumbContext:", breadcrumbContext, "campaignId:", campaignId, "libraryType:", libraryType);
+  console.log(
+    "📄 BrochureDocumentContentDetailScreen - breadcrumbContext:",
+    breadcrumbContext,
+    "campaignId:",
+    campaignId,
+    "libraryType:",
+    libraryType
+  );
 
-  const basePath = breadcrumbContext === "campaign" 
-    ? `/dashboard/campaign-assignments/${campaignId}` 
-    : `/dashboard/training-library/${libraryType}`;
-  const listHref = breadcrumbContext === "campaign"
-    ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
-    : `${basePath}/${moduleId}/content/${contentTypeId}`;
+  const basePath =
+    breadcrumbContext === "campaign"
+      ? `/dashboard/campaign-assignments/${campaignId}`
+      : `/dashboard/training-library/${libraryType}`;
+  const listHref =
+    breadcrumbContext === "campaign"
+      ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
+      : `${basePath}/${moduleId}/content/${contentTypeId}`;
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
@@ -190,7 +199,11 @@ export function BrochureDocumentContentDetailScreen({
                   </Link>
                   <span className="text-gray-400">›</span>
                   <span className="font-semibold text-gray-900">
-                    {content ? contentTitle(content) : isBrochure ? "Brochure Training" : "Document"}
+                    {content
+                      ? contentTitle(content)
+                      : isBrochure
+                        ? "Brochure Training"
+                        : "Document"}
                   </span>
                 </>
               ) : breadcrumbContext === "my-assignments" ? (
@@ -228,7 +241,9 @@ export function BrochureDocumentContentDetailScreen({
                     className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
                     href={basePath}
                   >
-                    {libraryType === "system" ? t("moduleDetails.coreModules") : t("moduleDetails.breadcrumbMyLibrary")}
+                    {libraryType === "system"
+                      ? t("moduleDetails.coreModules")
+                      : t("moduleDetails.breadcrumbMyLibrary")}
                   </Link>
                   <span className="text-gray-400">›</span>
                   <Link
@@ -246,7 +261,11 @@ export function BrochureDocumentContentDetailScreen({
                   </Link>
                   <span className="text-gray-400">›</span>
                   <span className="font-semibold text-gray-900">
-                    {content ? contentTitle(content) : isBrochure ? "Brochure Training" : "Document"}
+                    {content
+                      ? contentTitle(content)
+                      : isBrochure
+                        ? "Brochure Training"
+                        : "Document"}
                   </span>
                 </>
               )}

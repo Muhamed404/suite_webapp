@@ -1,7 +1,18 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { X, Users, Search, UserCheck, UserPlus, ChevronRight, ChevronsRight, ChevronLeft, ChevronsLeft, Check } from "lucide-react";
+import {
+  X,
+  Users,
+  Search,
+  UserCheck,
+  UserPlus,
+  ChevronRight,
+  ChevronsRight,
+  ChevronLeft,
+  ChevronsLeft,
+  Check,
+} from "lucide-react";
 
 import { suiteSuiteService, type User } from "@/services/suiteSuiteService";
 import { useAuthStore } from "@/hooks/useAuthStore";
@@ -49,10 +60,12 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
 
     const fetchUsers = async () => {
       const orgId = user?.organization_id ?? user?.org_id;
+
       if (orgId === undefined || orgId === null) return;
       try {
         setLoading(true);
         const fetched = await suiteSuiteService.getUnassignedUsers(orgId);
+
         setAllUsers(fetched || []);
       } catch (err) {
         console.error("Failed to fetch users:", err);
@@ -70,6 +83,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
         .filter((u) => !selectedIds.includes(u.id))
         .filter((u) => {
           const name = `${u.firstName} ${u.lastName}`.toLowerCase();
+
           return name.includes(searchQuery.toLowerCase());
         }),
     [allUsers, selectedIds, searchQuery]
@@ -119,6 +133,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
 
   const handleSave = () => {
     const selectedUserObjects = allUsers.filter((u) => selectedIds.includes(u.id));
+
     onSave(selectedUserObjects);
     onClose();
   };
@@ -128,7 +143,6 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
-
         {/* Header */}
         <div className="bg-blue-500 p-4">
           <div className="flex items-center justify-between">
@@ -142,9 +156,9 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
               </div>
             </div>
             <button
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
               type="button"
               onClick={onClose}
-              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
             >
               <X className="w-5 h-5 text-white" />
             </button>
@@ -156,11 +170,11 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
-              type="text"
+              className="w-full pl-10 pr-4 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Search users..."
+              type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -168,7 +182,6 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
         {/* Users Lists */}
         <div className="p-4">
           <div className="flex items-stretch gap-4">
-
             {/* Available Users */}
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
@@ -193,13 +206,16 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
                   availableUsers.map((u, idx) => (
                     <div
                       key={u.id}
-                      onClick={() => toggleAvailableHighlight(u.id)}
-                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-all select-none ${availableHighlighted.includes(u.id)
+                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-all select-none ${
+                        availableHighlighted.includes(u.id)
                           ? "border-blue-400 bg-blue-50 shadow-sm"
                           : "bg-white border-gray-100 hover:border-blue-200 hover:shadow-sm"
-                        }`}
+                      }`}
+                      onClick={() => toggleAvailableHighlight(u.id)}
                     >
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold flex-shrink-0 ${getAvatarColor(idx)}`}>
+                      <div
+                        className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold flex-shrink-0 ${getAvatarColor(idx)}`}
+                      >
                         {getInitials(u.firstName, u.lastName)}
                       </div>
                       <span className="text-xs text-gray-700 flex-1 truncate">
@@ -214,38 +230,38 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
             {/* Action Buttons */}
             <div className="flex flex-col justify-center gap-2">
               <button
-                type="button"
-                onClick={handleAdd}
+                className="p-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
                 disabled={availableHighlighted.length === 0}
                 title="Add Selected"
-                className="p-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
+                type="button"
+                onClick={handleAdd}
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
               <button
-                type="button"
-                onClick={handleAddAll}
+                className="p-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
                 disabled={availableUsers.length === 0}
                 title="Add All"
-                className="p-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
+                type="button"
+                onClick={handleAddAll}
               >
                 <ChevronsRight className="w-4 h-4" />
               </button>
               <button
-                type="button"
-                onClick={handleRemove}
+                className="p-2.5 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 disabled={selectedHighlighted.length === 0}
                 title="Remove Selected"
-                className="p-2.5 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                type="button"
+                onClick={handleRemove}
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
-                type="button"
-                onClick={handleRemoveAll}
+                className="p-2.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 disabled={selectedUsers.length === 0}
                 title="Remove All"
-                className="p-2.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                type="button"
+                onClick={handleRemoveAll}
               >
                 <ChevronsLeft className="w-4 h-4" />
               </button>
@@ -272,22 +288,28 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
                   selectedUsers.map((u, idx) => (
                     <div
                       key={u.id}
-                      onClick={() => toggleSelectedHighlight(u.id)}
-                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-all select-none ${selectedHighlighted.includes(u.id)
+                      className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-all select-none ${
+                        selectedHighlighted.includes(u.id)
                           ? "border-sky-400 bg-sky-100"
                           : "bg-sky-50 border-sky-200 hover:border-sky-300"
-                        }`}
+                      }`}
+                      onClick={() => toggleSelectedHighlight(u.id)}
                     >
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold flex-shrink-0 ${getAvatarColor(idx)}`}>
+                      <div
+                        className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-semibold flex-shrink-0 ${getAvatarColor(idx)}`}
+                      >
                         {getInitials(u.firstName, u.lastName)}
                       </div>
                       <span className="text-xs text-gray-700 flex-1 truncate">
                         {u.firstName} {u.lastName}
                       </span>
                       <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); handleRemoveSingle(u.id); }}
                         className="p-0.5 rounded hover:bg-red-100 hover:text-red-500 text-gray-400 transition-colors flex-shrink-0"
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveSingle(u.id);
+                        }}
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -296,7 +318,6 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
                 )}
               </div>
             </div>
-
           </div>
         </div>
 
@@ -307,23 +328,22 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
           </p>
           <div className="flex gap-2">
             <button
+              className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-50 transition-all"
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-full text-xs font-medium hover:bg-gray-50 transition-all"
             >
               Cancel
             </button>
             <button
+              className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all shadow-sm"
               type="button"
               onClick={handleSave}
-              className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all shadow-sm"
             >
               <Check className="w-3 h-3" />
               Confirm Selection
             </button>
           </div>
         </div>
-
       </div>
     </div>
   );

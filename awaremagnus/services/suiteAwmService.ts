@@ -162,8 +162,7 @@ export const suiteAwmService = {
   createCampaign: (payload: any) => awmPost<any>(`${API_BASE}/campaign`, payload),
 
   /** PUT /api/awm/campaign/:id (AWM Backend) - Update campaign */
-  updateCampaign: (id: number, payload: any) =>
-    awmPut<any>(`${API_BASE}/campaign/${id}`, payload),
+  updateCampaign: (id: number, payload: any) => awmPut<any>(`${API_BASE}/campaign/${id}`, payload),
 
   /** DELETE /api/awm/campaign/:id (AWM Backend) - Delete campaign */
   deleteCampaign: (id: number) => awmDel<any>(`${API_BASE}/campaign/${id}`),
@@ -197,7 +196,8 @@ export const suiteAwmService = {
     }>;
   }) => awmPost<any>(`${API_BASE}/useraction/report-actions/submit-quiz`, payload),
 
- 
   getQuizAttemptDetail: (campaignId: number, moduleId: number, contentId: number) =>
-    awmGet<any>(`${API_BASE}/report/quiz-attempt-detail?campaign_id=${campaignId}&module_id=${moduleId}&content_id=${contentId}`),
+    awmGet<any>(
+      `${API_BASE}/report/quiz-attempt-detail?campaign_id=${campaignId}&module_id=${moduleId}&content_id=${contentId}`
+    ),
 };

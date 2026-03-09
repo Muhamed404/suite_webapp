@@ -1,10 +1,21 @@
 "use client";
 
+import type { User } from "@/services/suiteSuiteService";
+
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@heroui/button";
-import { ArrowLeft, Info, Users, BookOpen, Award, BarChart, Calendar, CheckCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  Info,
+  Users,
+  BookOpen,
+  Award,
+  BarChart,
+  Calendar,
+  CheckCircle,
+} from "lucide-react";
 import clsx from "clsx";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -15,8 +26,6 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useModules } from "@/hooks/useQuiz";
 import { CAMPAIGN_KEYS } from "@/hooks/useCampaigns";
 import { suiteAwmService } from "@/services/suiteAwmService";
-import type { User } from "@/services/suiteSuiteService";
-
 import { WizardStep1 } from "@/components/campaigns/wizard/WizardStep1";
 import { WizardStep2 } from "@/components/campaigns/wizard/WizardStep2";
 import { WizardStep3 } from "@/components/campaigns/wizard/WizardStep3";
@@ -161,7 +170,11 @@ export default function CreateCampaignPage() {
         }
         break;
       case 2:
-        if (formData.departments.length === 0 && formData.groups.length === 0 && formData.manualUsers.length === 0) {
+        if (
+          formData.departments.length === 0 &&
+          formData.groups.length === 0 &&
+          formData.manualUsers.length === 0
+        ) {
           newErrors.targets = t("form.atleastOneTarget");
         }
         break;
@@ -179,6 +192,7 @@ export default function CreateCampaignPage() {
     }
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -195,6 +209,7 @@ export default function CreateCampaignPage() {
     } else {
       // show a visible validation banner instead of logging to console
       const msg = t("form.validationError");
+
       setFormErrorMessage(msg);
       // auto-hide after 4s
       window.setTimeout(() => setFormErrorMessage(null), 4000);
@@ -259,12 +274,16 @@ export default function CreateCampaignPage() {
   const generateSchedule = () => {
     if (!formData.startDate || !formData.endDate || formData.modules.length === 0) {
       console.error("Please set dates and select modules first");
+
       return;
     }
 
     const start = new Date(formData.startDate);
     const end = new Date(formData.endDate);
-    const days = Math.max(1, Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+    const days = Math.max(
+      1,
+      Math.floor((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+    );
     const interval = Math.floor(days / formData.modules.length);
 
     const schedules = formData.modules.map((moduleId, i) => {
@@ -294,15 +313,21 @@ export default function CreateCampaignPage() {
       <DashboardLayout>
         <div className={clsx("p-3", isRtl && "text-right")}>
           <div className="flex items-center gap-2 mb-3">
-            <Button isIconOnly variant="light" size="sm" onClick={() => router.back()}>
+            <Button isIconOnly size="sm" variant="light" onClick={() => router.back()}>
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <nav aria-label="Breadcrumb" className="flex items-center text-xs text-gray-500 mb-6 gap-1.5">
+            <nav
+              aria-label="Breadcrumb"
+              className="flex items-center text-xs text-gray-500 mb-6 gap-1.5"
+            >
               <Link className="hover:text-gray-700 transition" href="/dashboard/launch-awareness">
                 {tDashboard("menu.launchAwareness")}
               </Link>
               <span className="text-gray-400">›</span>
-              <Link className="hover:text-gray-700 transition" href="/dashboard/launch-awareness/campaigns">
+              <Link
+                className="hover:text-gray-700 transition"
+                href="/dashboard/launch-awareness/campaigns"
+              >
                 {t("title")}
               </Link>
               <span className="text-gray-400">›</span>
@@ -317,7 +342,7 @@ export default function CreateCampaignPage() {
                 {steps.map((step, index) => {
                   const isActive = currentStep === step.id;
                   const isDone = currentStep > step.id;
-                  
+
                   return (
                     <div
                       key={step.id}
@@ -352,24 +377,30 @@ export default function CreateCampaignPage() {
                 </div>
               )}
               <div className="min-h-[500px] mb-8">
-                {currentStep === 1 && <WizardStep1 formData={formData} onChange={handleChange} errors={errors} />}
+                {currentStep === 1 && (
+                  <WizardStep1 errors={errors} formData={formData} onChange={handleChange} />
+                )}
                 {currentStep === 2 && (
                   <WizardStep2
+                    errors={errors}
                     formData={formData}
                     onChange={handleChange}
-                    errors={errors}
                     onOpenUserModal={() => setShowUserModal(true)}
                   />
                 )}
-                {currentStep === 3 && <WizardStep3 formData={formData} onChange={handleChange} errors={errors} />}
+                {currentStep === 3 && (
+                  <WizardStep3 errors={errors} formData={formData} onChange={handleChange} />
+                )}
                 {currentStep === 4 && <WizardStep4 formData={formData} onChange={handleChange} />}
-                {currentStep === 5 && <WizardStep5 formData={formData} onChange={handleChange} errors={errors} />}
+                {currentStep === 5 && (
+                  <WizardStep5 errors={errors} formData={formData} onChange={handleChange} />
+                )}
                 {currentStep === 6 && (
                   <WizardStep6
                     formData={formData}
+                    modulesList={modules}
                     onChange={handleChange}
                     onGenerateSchedule={generateSchedule}
-                    modulesList={modules}
                   />
                 )}
                 {currentStep === 7 && <WizardStep7 formData={formData} modulesList={modules} />}
@@ -378,20 +409,20 @@ export default function CreateCampaignPage() {
               {/* Navigation Buttons */}
               <div className="mt-4 pt-3 border-t border-gray-100 flex gap-2 justify-end">
                 <button
-                  type="button"
-                  onClick={handlePrevious}
-                  disabled={currentStep === 1}
                   className={clsx(
                     "flex items-center gap-1.5 px-12 py-2 bg-gray-100 text-gray-700 rounded-full text-xs font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-200"
                   )}
+                  disabled={currentStep === 1}
+                  type="button"
+                  onClick={handlePrevious}
                 >
                   Back
                 </button>
                 <button
+                  className="flex items-center gap-1.5 px-12 py-2 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={createMutation.isPending && currentStep === totalSteps}
                   type="button"
                   onClick={handleNext}
-                  disabled={createMutation.isPending && currentStep === totalSteps}
-                  className="flex items-center gap-1.5 px-12 py-2 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {currentStep === totalSteps ? (
                     <>
@@ -408,9 +439,9 @@ export default function CreateCampaignPage() {
 
           <UserModal
             isOpen={showUserModal}
+            selectedUserIds={formData.manualUsers.map((u) => u.id)}
             onClose={() => setShowUserModal(false)}
             onSave={(users) => handleChange("manualUsers", users)}
-            selectedUserIds={formData.manualUsers.map((u) => u.id)}
           />
         </div>
       </DashboardLayout>

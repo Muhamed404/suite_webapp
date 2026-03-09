@@ -11,7 +11,6 @@ import { loadMessages } from "@/i18n/messages";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { LayoutWrapper } from "@/components/layout-wrapper";
-
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 export const metadata: Metadata = {

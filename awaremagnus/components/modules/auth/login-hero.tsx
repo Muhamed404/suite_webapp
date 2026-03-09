@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 export const LoginHero = () => {

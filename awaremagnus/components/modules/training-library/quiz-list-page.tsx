@@ -14,12 +14,13 @@ import { useState, useMemo, useCallback } from "react";
 import clsx from "clsx";
 import { Search, ChevronsUpDown, Pencil, Trash2, SearchX, Plus } from "lucide-react";
 
+import { breadcrumbLinkClassName } from "./shared-styles";
+
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useModule, useQuizzesByModule, useQuizTypes, useDeleteQuiz } from "@/hooks/useQuiz";
-import { breadcrumbLinkClassName } from "./shared-styles";
 
 // API answer structure from the backend
 interface ApiAnswer {
@@ -71,6 +72,7 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
   const getAnswerText = useCallback((answers: ApiAnswer[] | undefined, index: number): string => {
     if (!answers || !answers[index]) return "—";
     const answer = answers[index];
+
     return answer.answer || answer.answer_text || "—";
   }, []);
 
@@ -78,17 +80,24 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
   const getCorrectAnswer = useCallback((answers: ApiAnswer[] | undefined): string => {
     if (!answers || answers.length === 0) return "—";
     const correctAnswer = answers.find((a) => a.validity === true || a.is_correct === true);
+
     return correctAnswer?.answer || correctAnswer?.answer_text || "—";
   }, []);
 
   // Get content name for category
-  const getContentName = useCallback((quiz: Quiz): string => {
-    const contentId = (quiz as unknown as { con_id?: number }).con_id ?? quiz.mod_content_id ?? quiz.content_id;
-    if (contentId && contentMap[contentId]) {
-      return contentMap[contentId];
-    }
-    return "—";
-  }, [contentMap]);
+  const getContentName = useCallback(
+    (quiz: Quiz): string => {
+      const contentId =
+        (quiz as unknown as { con_id?: number }).con_id ?? quiz.mod_content_id ?? quiz.content_id;
+
+      if (contentId && contentMap[contentId]) {
+        return contentMap[contentId];
+      }
+
+      return "—";
+    },
+    [contentMap]
+  );
 
   // Filtered & sorted quizzes
   const filteredQuizzes = useMemo(() => {
@@ -97,6 +106,7 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
     // Search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
+
       result = result.filter(
         (q) =>
           q.question?.toLowerCase().includes(query) ||
@@ -175,9 +185,9 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
   // Sortable column header component
   const SortableHeader = ({ field, label }: { field: SortField; label: string }) => (
     <div
+      className="flex items-center gap-2 cursor-pointer select-none outline-none focus:text-blue-600"
       role="button"
       tabIndex={0}
-      className="flex items-center gap-2 cursor-pointer select-none outline-none focus:text-blue-600"
       onClick={() => handleSort(field)}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -211,11 +221,15 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
             </Link>
             <span className="text-gray-400">›</span>
             <Link className={breadcrumbLinkClassName} href={basePath}>
-              {libraryType === "system" ? t("moduleDetails.coreModules") : t("moduleDetails.breadcrumbMyLibrary")}
+              {libraryType === "system"
+                ? t("moduleDetails.coreModules")
+                : t("moduleDetails.breadcrumbMyLibrary")}
             </Link>
             <span className="text-gray-400">›</span>
             <Link className={breadcrumbLinkClassName} href={`${basePath}/${moduleId}`}>
-              {moduleData ? (moduleData.title ?? moduleData.translations?.[0]?.name ?? `Module ${moduleId}`) : `Module ${moduleId}`}
+              {moduleData
+                ? (moduleData.title ?? moduleData.translations?.[0]?.name ?? `Module ${moduleId}`)
+                : `Module ${moduleId}`}
             </Link>
             <span className="text-gray-400">›</span>
             <span className="font-semibold text-gray-900">{t("moduleDetails.quizzes")}</span>
@@ -227,10 +241,10 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
             <div className="flex items-center gap-3">
               <Button
                 as={Link}
+                className="flex items-center gap-2 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition"
                 href={createPath}
                 radius="full"
                 size="md"
-                className="flex items-center gap-2 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition"
                 startContent={<Plus className="w-4 h-4" />}
               >
                 New Quiz
@@ -249,35 +263,38 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                 {/* Search Input */}
                 <div className="flex flex-wrap gap-2 items-center">
                   <Input
-                    type="text"
+                    classNames={{
+                      base: "w-64",
+                      inputWrapper:
+                        "h-10 bg-white border border-gray-200 rounded-full hover:border-gray-300 focus-within:!border-blue-500 focus-within:!ring-2 focus-within:!ring-blue-500/20",
+                      input: "text-xs",
+                    }}
                     placeholder="Search Campaign..."
+                    startContent={<Search className="text-gray-400 w-4 h-4" />}
+                    type="text"
                     value={searchQuery}
                     onValueChange={(value) => {
                       setSearchQuery(value);
                       setCurrentPage(1);
-                    }}
-                    startContent={<Search className="text-gray-400 w-4 h-4" />}
-                    classNames={{
-                      base: "w-64",
-                      inputWrapper: "h-10 bg-white border border-gray-200 rounded-full hover:border-gray-300 focus-within:!border-blue-500 focus-within:!ring-2 focus-within:!ring-blue-500/20",
-                      input: "text-xs",
                     }}
                   />
                 </div>
                 {/* Language Filter */}
                 <div className="flex items-center gap-2">
                   <Select
+                    aria-label="Language filter"
+                    classNames={{
+                      base: "w-40",
+                      trigger:
+                        "h-10 bg-white border border-gray-200 rounded-full hover:border-gray-300 data-[focus=true]:border-blue-500",
+                      value: "text-xs",
+                    }}
                     selectedKeys={[languageFilter]}
                     onSelectionChange={(keys) => {
                       const value = Array.from(keys as Set<string>)[0];
+
                       if (value) setLanguageFilter(value);
                     }}
-                    classNames={{
-                      base: "w-40",
-                      trigger: "h-10 bg-white border border-gray-200 rounded-full hover:border-gray-300 data-[focus=true]:border-blue-500",
-                      value: "text-xs",
-                    }}
-                    aria-label="Language filter"
                   >
                     <SelectItem key="en">English</SelectItem>
                     <SelectItem key="ar">عربي</SelectItem>
@@ -290,7 +307,7 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
             <div className="bg-white rounded-b-xl overflow-hidden shadow-sm border border-gray-100 border-t-0">
               {isLoading ? (
                 <div className="flex items-center justify-center py-20">
-                  <Spinner size="lg" color="primary" />
+                  <Spinner color="primary" size="lg" />
                 </div>
               ) : paginatedQuizzes.length === 0 ? (
                 /* Empty State */
@@ -300,13 +317,18 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                       <SearchX className="w-10 h-10 text-gray-400" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">No Content Found</h3>
-                    <p className="text-sm text-gray-500">Try adjusting your filters or search query</p>
+                    <p className="text-sm text-gray-500">
+                      Try adjusting your filters or search query
+                    </p>
                   </div>
                 </div>
               ) : (
                 <>
                   {/* Table with fixed height and scroll */}
-                  <div className="overflow-x-auto overflow-y-auto" style={{ height: '55vh', minHeight: '400px' }}>
+                  <div
+                    className="overflow-x-auto overflow-y-auto"
+                    style={{ height: "55vh", minHeight: "400px" }}
+                  >
                     <Table
                       removeWrapper
                       aria-label="Quiz table"
@@ -344,9 +366,7 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                       <TableBody items={paginatedQuizzes}>
                         {(quiz) => (
                           <TableRow key={quiz.id}>
-                            <TableCell className="text-gray-600">
-                              {getContentName(quiz)}
-                            </TableCell>
+                            <TableCell className="text-gray-600">{getContentName(quiz)}</TableCell>
                             <TableCell className="text-gray-900 max-w-xs">
                               <span className="truncate block">{quiz.question || "—"}</span>
                             </TableCell>
@@ -374,24 +394,24 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                             <TableCell>
                               <div className="flex items-center gap-2">
                                 <Button
+                                  isIconOnly
                                   as={Link}
+                                  className="min-w-0 h-8 w-8 p-0 bg-blue-50 text-blue-600 hover:bg-blue-100"
                                   href={`${basePath}/${moduleId}/quizzes/${quiz.id}/edit`}
+                                  radius="full"
                                   size="sm"
                                   variant="flat"
-                                  radius="full"
-                                  isIconOnly
-                                  className="min-w-0 h-8 w-8 p-0 bg-blue-50 text-blue-600 hover:bg-blue-100"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
                                 </Button>
                                 <Button
-                                  size="sm"
-                                  variant="flat"
-                                  radius="full"
                                   isIconOnly
                                   className="min-w-0 h-8 w-8 p-0 bg-red-50 text-red-600 hover:bg-red-100"
-                                  onPress={() => handleDelete(quiz.id)}
                                   isLoading={deleteQuizMutation.isPending}
+                                  radius="full"
+                                  size="sm"
+                                  variant="flat"
+                                  onPress={() => handleDelete(quiz.id)}
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </Button>
@@ -406,15 +426,13 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                   {/* Pagination */}
                   <div className="flex flex-col md:flex-row justify-between items-center px-4 py-3.5 border-t bg-gray-50 gap-3">
                     <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
-                      <span>Showing {totalItems > 0 ? startIndex + 1 : 0}–{endIndex} out of {totalItems} Entries</span>
+                      <span>
+                        Showing {totalItems > 0 ? startIndex + 1 : 0}–{endIndex} out of {totalItems}{" "}
+                        Entries
+                      </span>
                     </div>
                     <Pagination
-                      total={totalPages}
-                      page={currentPage}
-                      onChange={setCurrentPage}
                       showControls
-                      size="sm"
-                      radius="sm"
                       classNames={{
                         wrapper: "gap-1.5",
                         item: "min-w-8 h-8 text-xs font-medium bg-white border border-gray-200 hover:bg-gray-100",
@@ -422,6 +440,11 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                         prev: "min-w-8 h-8 bg-white border border-gray-200 hover:bg-gray-100",
                         next: "min-w-8 h-8 bg-white border border-gray-200 hover:bg-gray-100",
                       }}
+                      page={currentPage}
+                      radius="sm"
+                      size="sm"
+                      total={totalPages}
+                      onChange={setCurrentPage}
                     />
                   </div>
                 </>

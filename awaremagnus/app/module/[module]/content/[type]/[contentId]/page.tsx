@@ -21,9 +21,7 @@ export default function ModuleContentDetailPage() {
   const contentTypeId = searchParams?.get("contype_id")
     ? Number(searchParams.get("contype_id"))
     : 0;
-  const campaignId = searchParams?.get("campaign_id")
-    ? Number(searchParams.get("campaign_id"))
-    : 0;
+  const campaignId = searchParams?.get("campaign_id") ? Number(searchParams.get("campaign_id")) : 0;
 
   if (!contentId || Number.isNaN(contentId)) return null;
   if (!moduleId || Number.isNaN(moduleId)) return null;
@@ -34,7 +32,10 @@ export default function ModuleContentDetailPage() {
   // Org user viewing a poster/brochure/document/screen-saver (types 3,4,5,6,7)
   if (
     isOrgUserCheck &&
-    (isPosterContentType(contentTypeId) || isBrochureDocumentContentType(contentTypeId) || contentTypeId === 5 || contentTypeId === 6)
+    (isPosterContentType(contentTypeId) ||
+      isBrochureDocumentContentType(contentTypeId) ||
+      contentTypeId === 5 ||
+      contentTypeId === 6)
   ) {
     return (
       <OrgUserPosterBrochureDetailScreen

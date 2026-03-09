@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import clsx from "clsx";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
@@ -24,7 +24,9 @@ function moduleName(m: Module): string {
 }
 
 function contentTitle(c: ModuleContent): string {
-  return c.title ?? c.translations?.[0]?.title ?? (c as { name?: string }).name ?? `Content ${c.id}`;
+  return (
+    c.title ?? c.translations?.[0]?.title ?? (c as { name?: string }).name ?? `Content ${c.id}`
+  );
 }
 
 function getIconBgClass(typeName: string): string {
@@ -90,7 +92,9 @@ export function CampaignModuleContentsPage({
     return (
       <ProtectedRoute>
         <DashboardLayout>
-          <div className={clsx("p-4 sm:p-6 max-w-5xl mx-auto w-full min-w-0", isRtl && "text-right")}>
+          <div
+            className={clsx("p-4 sm:p-6 max-w-5xl mx-auto w-full min-w-0", isRtl && "text-right")}
+          >
             <ModuleDetailsSkeleton />
           </div>
         </DashboardLayout>
@@ -143,8 +147,6 @@ export function CampaignModuleContentsPage({
           {/* Empty */}
           {contents.length === 0 && (
             <EmptyState
-              description={t("emptyContentsDescription")}
-              title={t("emptyContentsTitle")}
               action={
                 <Button
                   as={Link}
@@ -155,6 +157,8 @@ export function CampaignModuleContentsPage({
                   {t("backToModules")}
                 </Button>
               }
+              description={t("emptyContentsDescription")}
+              title={t("emptyContentsTitle")}
             />
           )}
 
@@ -171,7 +175,12 @@ export function CampaignModuleContentsPage({
                     key={content.id}
                     className="rounded-2xl border border-[var(--strokeGray)] bg-white shadow-none hover:shadow-md transition-shadow"
                   >
-                    <CardBody className={clsx("p-4 flex flex-row items-center gap-3", isRtl && "flex-row-reverse")}>
+                    <CardBody
+                      className={clsx(
+                        "p-4 flex flex-row items-center gap-3",
+                        isRtl && "flex-row-reverse"
+                      )}
+                    >
                       {/* Icon */}
                       <div
                         className={clsx(

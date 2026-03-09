@@ -46,7 +46,7 @@ export function CampaignFilters({
   // Update indicator position when active tab changes
   useEffect(() => {
     if (tabsContainerRef.current) {
-      const tabButtons = tabsContainerRef.current.querySelectorAll('.tab-btn');
+      const tabButtons = tabsContainerRef.current.querySelectorAll(".tab-btn");
       const activeTab = tabButtons[activeTabIndex] as HTMLElement;
 
       if (activeTab) {
@@ -63,8 +63,9 @@ export function CampaignFilters({
 
   return (
     <div className="flex flex-col md:flex-row justify-between gap-3 mb-4">
-      <style dangerouslySetInnerHTML={{
-        __html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
           .campaign-filters .tab-btn {
             background: transparent !important;
           }
@@ -75,11 +76,15 @@ export function CampaignFilters({
           .campaign-filters .tab-btn:hover:not(.active) {
             background: #f3f4f6 !important;
           }
-        `
-      }} />
+        `,
+        }}
+      />
 
       {/* Tabs with Sliding Indicator */}
-      <div ref={tabsContainerRef} className="campaign-filters flex gap-0 bg-white p-0.5 rounded-full relative">
+      <div
+        ref={tabsContainerRef}
+        className="campaign-filters flex gap-0 bg-white p-0.5 rounded-full relative"
+      >
         {/* Sliding background indicator */}
         <div
           className="absolute bg-[#051226] rounded-full transition-all duration-300"
@@ -97,13 +102,13 @@ export function CampaignFilters({
           return (
             <button
               key={tab.id}
-              onClick={() => onStatusChange(tab.status)}
               className={clsx(
-                `tab-btn ${isActive ? 'active' : ''} px-3 py-0.5 text-xs font-semibold rounded-full transition-colors duration-200`,
+                `tab-btn ${isActive ? "active" : ""} px-3 py-0.5 text-xs font-semibold rounded-full transition-colors duration-200`,
                 "inline-flex items-center gap-2 relative z-10 whitespace-nowrap",
                 isActive ? "text-white" : "bg-transparent text-gray-700 hover:bg-gray-100"
               )}
               type="button"
+              onClick={() => onStatusChange(tab.status)}
             >
               <span>{tab.label}</span>
               <span
@@ -134,19 +139,19 @@ export function CampaignFilters({
             }}
           />
           <input
-            type="text"
+            className="w-full pl-10 pr-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder={t("filters.searchPlaceholder")}
+            type="text"
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {/* Date Filter */}
         <select
+          className="px-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-40"
           value={dateFilter}
           onChange={(e) => onDateChange(e.target.value)}
-          className="px-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-40"
         >
           <option value="all">{t("filters.allTime")}</option>
           <option value="7">{t("filters.last7Days")}</option>

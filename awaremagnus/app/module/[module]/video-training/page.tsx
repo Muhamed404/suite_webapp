@@ -1,11 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo, use } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@heroui/button";
-import { Search, ChevronRight, ChevronLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -20,7 +17,7 @@ const SERVICE_AWM_URL = process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://local
 
 export default function VideoTrainingPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
-  const moduleName = module.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Convert slug to title
+  const moduleName = module.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()); // Convert slug to title
   const t = useTranslations("module");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
@@ -31,18 +28,27 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   const [contents, setContents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [videoProgress, setVideoProgress] = useState<{ [key: number]: { currentTime: number; duration: number; watchedPercentage: number } }>({});
-  const [sentProgressMilestones, setSentProgressMilestones] = useState<{ [key: number]: { lastReported: number } }>({});
+  const [videoProgress, setVideoProgress] = useState<{
+    [key: number]: { currentTime: number; duration: number; watchedPercentage: number };
+  }>({});
+  const [sentProgressMilestones, setSentProgressMilestones] = useState<{
+    [key: number]: { lastReported: number };
+  }>({});
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
   const lastSentPercentRef = useRef<{ [key: number]: number }>({});
   const videoIntervals = useRef<{ [key: number]: ReturnType<typeof setInterval> | null }>({});
   const moduleIdRef = useRef<number | null>(null);
   const campaignIdRef = useRef<number>(
-    (() => { const v = searchParams?.get('campaign_id'); return v ? parseInt(v, 10) : 1; })()
+    (() => {
+      const v = searchParams?.get("campaign_id");
+
+      return v ? parseInt(v, 10) : 1;
+    })()
   );
 
   const contentIdFromUrl = useMemo(() => {
-    const id = searchParams?.get('content_id');
+    const id = searchParams?.get("content_id");
+
     return id ? parseInt(id, 10) : null;
   }, [searchParams]);
 
@@ -54,59 +60,79 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     if (contentIdFromUrl && contentDerivedModuleId != null) return contentDerivedModuleId;
     // Fallback: derive from the modules list (used when no content_id is in the URL)
     if (modulesRes?.success && modulesRes.data) {
-      const found = modulesRes.data.find(m => {
+      const found = modulesRes.data.find((m) => {
         const codeMatch = m.code?.toLowerCase() === module.toLowerCase();
         const titleMatch = m.title?.toLowerCase() === moduleName.toLowerCase();
-        const translationMatch = m.translations?.some(t => t.name.toLowerCase() === moduleName.toLowerCase());
+        const translationMatch = m.translations?.some(
+          (t) => t.name.toLowerCase() === moduleName.toLowerCase()
+        );
+
         return codeMatch || titleMatch || translationMatch;
       });
+
       return found?.id ?? null;
     }
+
     return null;
   }, [contentIdFromUrl, contentDerivedModuleId, modulesRes, module, moduleName]);
 
   const roleId = user?.role_id;
   const isOrgUserView = isOrgUser(roleId);
 
-  useEffect(() => { moduleIdRef.current = moduleId; }, [moduleId]);
+  useEffect(() => {
+    moduleIdRef.current = moduleId;
+  }, [moduleId]);
 
-  const { data: contentReportData } = useContentReportByContentId(contentIdFromUrl ?? 0, !!contentIdFromUrl);
+  const { data: contentReportData } = useContentReportByContentId(
+    contentIdFromUrl ?? 0,
+    !!contentIdFromUrl
+  );
 
   const savedProgressMap = useMemo(() => {
     const map = new Map<number, number>();
+
     if (!contentReportData) return map;
     const currentCampaignId = campaignIdRef.current;
     const items: any[] =
       contentReportData?.object?.reportContents ??
       (Array.isArray(contentReportData?.object) ? contentReportData.object : []);
+
     items.forEach((rc: any) => {
       const itemCampaignId = rc.reportModule?.report_campaign_id;
+
       if (itemCampaignId != null && itemCampaignId !== currentCampaignId) return;
       const cid = rc.content_id ?? rc.id;
+
       if (cid != null && rc.progress_percentage != null) {
         const pct = parseFloat(rc.progress_percentage);
+
         if (!map.has(cid) || pct > map.get(cid)!) {
           map.set(cid, pct);
         }
       }
     });
+
     return map;
   }, [contentReportData]);
 
   useEffect(() => {
     if (savedProgressMap.size === 0) return;
-    setSentProgressMilestones(prev => {
+    setSentProgressMilestones((prev) => {
       const next = { ...prev };
+
       savedProgressMap.forEach((savedPct, contentId) => {
         const currentLastReported = prev[contentId]?.lastReported ?? 0;
+
         if (savedPct > currentLastReported) {
           next[contentId] = { lastReported: savedPct };
         }
       });
+
       return next;
     });
     savedProgressMap.forEach((savedPct, contentId) => {
       const current = lastSentPercentRef.current[contentId] ?? 0;
+
       if (savedPct > current) {
         lastSentPercentRef.current[contentId] = savedPct;
       }
@@ -117,29 +143,32 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     savedProgressMap.forEach((savedPct, contentId) => {
       if (savedPct <= 0 || savedPct >= 100) return;
       const video = videoRefs.current[contentId];
+
       if (video && video.readyState >= 1 && isFinite(video.duration)) {
         video.currentTime = (savedPct / 100) * video.duration;
       }
     });
   }, [savedProgressMap]);
 
-  
   const handleVideoLoadedMetadata = (contentId: number, video: HTMLVideoElement) => {
     const duration = video.duration;
-    setVideoProgress(prev => ({
+
+    setVideoProgress((prev) => ({
       ...prev,
       [contentId]: {
         ...prev[contentId],
         duration,
         currentTime: prev[contentId]?.currentTime || 0,
-        watchedPercentage: prev[contentId]?.watchedPercentage || 0
-      }
+        watchedPercentage: prev[contentId]?.watchedPercentage || 0,
+      },
     }));
 
     // Seek to saved position (only when partially watched, not completed)
     const savedPct = savedProgressMap.get(contentId);
+
     if (savedPct != null && savedPct > 0 && savedPct < 100) {
       const seekTime = (savedPct / 100) * duration;
+
       if (isFinite(seekTime)) {
         video.currentTime = seekTime;
       }
@@ -151,14 +180,14 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     const duration = video.duration;
     const watchedPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-    setVideoProgress(prev => ({
+    setVideoProgress((prev) => ({
       ...prev,
       [contentId]: {
         ...prev[contentId],
         currentTime,
         duration,
-        watchedPercentage
-      }
+        watchedPercentage,
+      },
     }));
 
     // Send progress update every 25%
@@ -167,57 +196,59 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
 
     if (currentProgress > lastReported && currentProgress <= 100 && currentProgress > 0) {
       updateVideoProgress(contentId, currentProgress);
-      setSentProgressMilestones(prev => ({
+      setSentProgressMilestones((prev) => ({
         ...prev,
         [contentId]: {
           ...prev[contentId],
-          lastReported: currentProgress
-        }
+          lastReported: currentProgress,
+        },
       }));
     }
   };
 
   const handleVideoEnded = (contentId: number) => {
     // Mark as completed when video ends
-    setVideoProgress(prev => ({
+    setVideoProgress((prev) => ({
       ...prev,
       [contentId]: {
         ...prev[contentId],
-        watchedPercentage: 100
-      }
+        watchedPercentage: 100,
+      },
     }));
 
     // Send 100% completion
     if ((sentProgressMilestones[contentId]?.lastReported || 0) < 100) {
       updateVideoProgress(contentId, 100);
-      setSentProgressMilestones(prev => ({
+      setSentProgressMilestones((prev) => ({
         ...prev,
         [contentId]: {
           ...prev[contentId],
-          lastReported: 100
-        }
+          lastReported: 100,
+        },
       }));
     }
   };
 
-  
   const formatTime = (secs: number) => {
-    if (!isFinite(secs) || isNaN(secs)) return '0:00';
+    if (!isFinite(secs) || isNaN(secs)) return "0:00";
     const m = Math.floor(secs / 60);
     const s = Math.floor(secs % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
+
+    return `${m}:${s.toString().padStart(2, "0")}`;
   };
 
-   
   const startVideoInterval = (contentId: number) => {
     if (videoIntervals.current[contentId]) return;
     videoIntervals.current[contentId] = setInterval(() => {
       const video = videoRefs.current[contentId];
+
       if (!video || video.paused || video.ended) return;
       const dur = video.duration;
+
       if (!dur || isNaN(dur) || dur <= 0) return;
       const pct = Math.round((video.currentTime / dur) * 100);
       const last = lastSentPercentRef.current[contentId] ?? 0;
+
       if (pct > last) {
         lastSentPercentRef.current[contentId] = pct;
         updateVideoProgress(contentId, pct);
@@ -232,12 +263,16 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     }
   };
 
-   
   const updateVideoProgress = async (contentId: number, progressPercentage: number) => {
     const mid = moduleIdRef.current;
     const cid = campaignIdRef.current;
+
     if (!mid || !cid) {
-      console.warn('[video] updateVideoProgress skipped — moduleId or campaignId not yet resolved', { mid, cid });
+      console.warn(
+        "[video] updateVideoProgress skipped — moduleId or campaignId not yet resolved",
+        { mid, cid }
+      );
+
       return;
     }
     try {
@@ -245,29 +280,32 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
         campaign_id: cid,
         module_id: mid,
         content_id: contentId,
-        progress_percentage: progressPercentage
+        progress_percentage: progressPercentage,
       };
+
       await quizService.updateContentProgress(payload);
       console.log(`Progress updated: ${progressPercentage}% for content ${contentId}`);
     } catch (error) {
-      console.error('Failed to update video progress:', error);
+      console.error("Failed to update video progress:", error);
     }
   };
 
-  
   const campaignId = useMemo(() => {
-    const campaignIdFromUrl = searchParams?.get('campaign_id');
+    const campaignIdFromUrl = searchParams?.get("campaign_id");
+
     if (campaignIdFromUrl) {
       return parseInt(campaignIdFromUrl, 10);
     }
+
     return 1; // Default campaign ID
   }, [searchParams]);
-  useEffect(() => { campaignIdRef.current = campaignId; }, [campaignId]);
 
-  
+  useEffect(() => {
+    campaignIdRef.current = campaignId;
+  }, [campaignId]);
+
   const contentId = contentIdFromUrl;
 
-  
   useEffect(() => {
     if (!contentId) return;
     setLoading(true);
@@ -278,17 +316,17 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
           setContents([res.data]);
           // Derive moduleId from the content response so we don't need /module?filter=...
           const modId = (res.data as any).mod_id as number | undefined;
+
           if (modId) setContentDerivedModuleId(modId);
         }
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Error fetching video content by id:', err);
+        console.error("Error fetching video content by id:", err);
         setLoading(false);
       });
   }, [contentId]);
 
-  
   useEffect(() => {
     if (contentId || !moduleId) return;
     setLoading(true);
@@ -301,32 +339,38 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
         setLoading(false);
       })
       .catch((err) => {
-        console.error('Error fetching video training contents:', err);
+        console.error("Error fetching video training contents:", err);
         setLoading(false);
       });
   }, [moduleId, contentId]);
 
-  useEffect(() => {
-     
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flag-icons@6.7.0/css/flag-icons.min.css" />
-        <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+        <link
+          href="https://cdn.jsdelivr.net/npm/flag-icons@6.7.0/css/flag-icons.min.css"
+          rel="stylesheet"
+        />
+        <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" />
         <div className="flex-1 flex flex-col h-screen bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-r-3xl">
-
           <main className="flex-1 overflow-y-auto">
             <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
               {isOrgUser(user?.role_id) ? (
                 <>
-                  <Link href="/dashboard/campaign-assignments" className="hover:text-gray-700 transition">
+                  <Link
+                    className="hover:text-gray-700 transition"
+                    href="/dashboard/campaign-assignments"
+                  >
                     {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
                   </Link>
                   <span className="text-gray-400">›</span>
-                  {searchParams?.get('campaign_id') ? (
-                    <Link href={`/module/${module}?campaign_id=${searchParams.get('campaign_id')}`} className="hover:text-gray-700 transition">
+                  {searchParams?.get("campaign_id") ? (
+                    <Link
+                      className="hover:text-gray-700 transition"
+                      href={`/module/${module}?campaign_id=${searchParams.get("campaign_id")}`}
+                    >
                       {moduleName}
                     </Link>
                   ) : (
@@ -337,11 +381,17 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                 </>
               ) : (
                 <>
-                  <a href="#" className="hover:text-gray-700 transition">Awareness Library</a>
+                  <a className="hover:text-gray-700 transition" href="#">
+                    Awareness Library
+                  </a>
                   <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">System Library</a>
+                  <a className="hover:text-gray-700 transition" href="#">
+                    System Library
+                  </a>
                   <span className="text-gray-400">›</span>
-                  <a href="#" className="hover:text-gray-700 transition">{moduleName}</a>
+                  <a className="hover:text-gray-700 transition" href="#">
+                    {moduleName}
+                  </a>
                   <span className="text-gray-400">›</span>
                   <span className="font-semibold text-gray-900">Motion Videos</span>
                 </>
@@ -351,28 +401,32 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
             <div className="flex flex-col px-3 gap-2">
               {loading ? (
                 <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
                 </div>
               ) : contents.length > 0 ? (
                 contents.map((content, index) => (
-                  <div key={content.id || index} className="bg-white rounded-xl overflow-hidden mb-4">
-                    <div className="relative bg-black" style={{ height: '60vh' }}>
+                  <div
+                    key={content.id || index}
+                    className="bg-white rounded-xl overflow-hidden mb-4"
+                  >
+                    <div className="relative bg-black" style={{ height: "60vh" }}>
                       <video
-                        ref={(el) => { videoRefs.current[content.id] = el; }}
+                        ref={(el) => {
+                          videoRefs.current[content.id] = el;
+                        }}
                         className="w-full h-full object-contain"
+                        poster={content.logo_url}
                         src={
                           !content.source_url
                             ? undefined
-                            : content.source_url.startsWith("http://") || content.source_url.startsWith("https://")
-                            ? content.source_url
-                            : `${SERVICE_AWM_URL}${content.source_url}`
+                            : content.source_url.startsWith("http://") ||
+                                content.source_url.startsWith("https://")
+                              ? content.source_url
+                              : `${SERVICE_AWM_URL}${content.source_url}`
                         }
-                        poster={content.logo_url}
-                        onLoadedMetadata={(e) => handleVideoLoadedMetadata(content.id, e.target as HTMLVideoElement)}
-                        onTimeUpdate={(e) => handleVideoTimeUpdate(content.id, e.target as HTMLVideoElement)}
                         onEnded={() => handleVideoEnded(content.id)}
-                        onPlay={() => startVideoInterval(content.id)}
                         onPause={() => stopVideoInterval(content.id)}
+                        onPlay={() => startVideoInterval(content.id)}
                       >
                         Your browser does not support the video tag.
                       </video>
@@ -382,70 +436,105 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                     <div className="px-4 pt-3 pb-2 bg-white border-b border-gray-100">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                           onClick={() => videoRefs.current[content.id]?.play()}
-                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
-                        >Play</button>
+                        >
+                          Play
+                        </button>
                         <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                           onClick={() => videoRefs.current[content.id]?.pause()}
-                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
-                        >Pause</button>
+                        >
+                          Pause
+                        </button>
                         <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                           onClick={() => {
                             const v = videoRefs.current[content.id];
+
                             if (v) v.currentTime = Math.max(0, v.currentTime - 10);
                           }}
-                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
-                        >Back 10s</button>
+                        >
+                          Back 10s
+                        </button>
                         <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                           onClick={() => {
                             const v = videoRefs.current[content.id];
-                            if (v && isFinite(v.duration)) v.currentTime = Math.min(v.duration, v.currentTime + 10);
+
+                            if (v && isFinite(v.duration))
+                              v.currentTime = Math.min(v.duration, v.currentTime + 10);
                           }}
-                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
-                        >Forward 10s</button>
+                        >
+                          Forward 10s
+                        </button>
                         <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                           onClick={() => {
                             const v = videoRefs.current[content.id];
-                            if (v) { v.currentTime = 0; v.play(); }
+
+                            if (v) {
+                              v.currentTime = 0;
+                              v.play();
+                            }
                           }}
-                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
-                        >Restart</button>
+                        >
+                          Restart
+                        </button>
                         <span className="ml-1 text-sm text-gray-700">
-                          {formatTime(videoProgress[content.id]?.currentTime ?? 0)} / {formatTime(videoProgress[content.id]?.duration ?? 0)}
+                          {formatTime(videoProgress[content.id]?.currentTime ?? 0)} /{" "}
+                          {formatTime(videoProgress[content.id]?.duration ?? 0)}
                         </span>
                       </div>
                       <p className="mt-2 text-sm text-gray-700">
-                        Progress: {Math.round(videoProgress[content.id]?.watchedPercentage ?? 0)}% ({Math.floor(videoProgress[content.id]?.currentTime ?? 0)} / {Math.floor(videoProgress[content.id]?.duration ?? 0)} seconds)
+                        Progress: {Math.round(videoProgress[content.id]?.watchedPercentage ?? 0)}% (
+                        {Math.floor(videoProgress[content.id]?.currentTime ?? 0)} /{" "}
+                        {Math.floor(videoProgress[content.id]?.duration ?? 0)} seconds)
                       </p>
                       <div className="mt-2">
                         <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                           onClick={() => {
                             const v = videoRefs.current[content.id];
+
                             if (!v || !v.duration || isNaN(v.duration)) return;
                             const pct = Math.round((v.currentTime / v.duration) * 100);
-                            const lastReported = sentProgressMilestones[content.id]?.lastReported ?? 0;
+                            const lastReported =
+                              sentProgressMilestones[content.id]?.lastReported ?? 0;
+
                             // Only send if current progress is strictly higher than what was already saved
                             if (pct <= lastReported) return;
                             updateVideoProgress(content.id, pct);
-                            setSentProgressMilestones(prev => ({
+                            setSentProgressMilestones((prev) => ({
                               ...prev,
                               [content.id]: { lastReported: pct },
                             }));
                             lastSentPercentRef.current[content.id] = pct;
                           }}
-                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
-                        >Send Progress Now</button>
+                        >
+                          Send Progress Now
+                        </button>
                       </div>
                     </div>
 
                     <div className="p-4 border-b border-gray-100">
-                      <h4 className="text-base font-semibold mb-1">{content.name || `${moduleName} Motion Video ${index + 1}`}</h4>
-                      <p className="text-xs text-gray-500">{content.description || `Learn about ${moduleName.toLowerCase()} best practices and protocols`}</p>
-
+                      <h4 className="text-base font-semibold mb-1">
+                        {content.name || `${moduleName} Motion Video ${index + 1}`}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {content.description ||
+                          `Learn about ${moduleName.toLowerCase()} best practices and protocols`}
+                      </p>
                     </div>
 
                     {(() => {
-                      const fullUrl = !content.source_url ? undefined : content.source_url.startsWith("http://") || content.source_url.startsWith("https://") ? content.source_url : `${SERVICE_AWM_URL}${content.source_url}`;
+                      const fullUrl = !content.source_url
+                        ? undefined
+                        : content.source_url.startsWith("http://") ||
+                            content.source_url.startsWith("https://")
+                          ? content.source_url
+                          : `${SERVICE_AWM_URL}${content.source_url}`;
+
                       return fullUrl ? (
                         <div className="p-4 flex items-center gap-3 flex-wrap">
                           <a
@@ -454,13 +543,23 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                             rel="noopener noreferrer"
                             target="_blank"
                           >
-                            <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                            <svg
+                              fill="none"
+                              height="14"
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              viewBox="0 0 24 24"
+                              width="14"
+                            >
+                              <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
                             Open Full Screen
                           </a>
                         </div>
                       ) : null;
                     })()}
-
                   </div>
                 ))
               ) : (
@@ -471,13 +570,15 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
             </div>
           </main>
         </div>
-        <script dangerouslySetInnerHTML={{
-          __html: `
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
             if (window.lucide) {
               lucide.createIcons();
             }
-          `
-        }} />
+          `,
+          }}
+        />
       </DashboardLayout>
     </ProtectedRoute>
   );

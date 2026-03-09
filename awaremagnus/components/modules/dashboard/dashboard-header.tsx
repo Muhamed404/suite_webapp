@@ -25,10 +25,7 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
 
   // Decode JWT to extract user details
   const jwtPayload = useMemo(() => decodeJwt(token), [token]);
-  const userDisplayName = useMemo(
-    () => extractUserDisplayName(jwtPayload),
-    [jwtPayload]
-  );
+  const userDisplayName = useMemo(() => extractUserDisplayName(jwtPayload), [jwtPayload]);
   const userEmail = useMemo(
     () => user?.email || extractUserEmail(jwtPayload),
     [user?.email, jwtPayload]
@@ -79,7 +76,13 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[var(--strokeGray)] bg-white hover:bg-[var(--gray)]"
           variant="light"
         >
-          <Image alt="" className="size-4" height={16} src={getContentAssetUrl("/images/img/mail.svg")} width={16} />
+          <Image
+            alt=""
+            className="size-4"
+            height={16}
+            src={getContentAssetUrl("/images/img/mail.svg")}
+            width={16}
+          />
         </Button>
         <Button
           isIconOnly
@@ -87,7 +90,13 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
           className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[var(--strokeGray)] bg-white hover:bg-[var(--gray)]"
           variant="light"
         >
-          <Image alt="" className="size-4" height={16} src={getContentAssetUrl("/images/img/bell.svg")} width={16} />
+          <Image
+            alt=""
+            className="size-4"
+            height={16}
+            src={getContentAssetUrl("/images/img/bell.svg")}
+            width={16}
+          />
         </Button>
         <LanguageSwitcher />
         <div

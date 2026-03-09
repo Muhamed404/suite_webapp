@@ -145,7 +145,9 @@ export function ContentListPage({ moduleId, contentTypeId, libraryType }: Conten
             </Link>
             <span className="text-[var(--darkgray)]">›</span>
             <Link className={breadcrumbLinkClassName} href={basePath}>
-              {libraryType === "system" ? t("moduleDetails.coreModules") : t("moduleDetails.breadcrumbMyLibrary")}
+              {libraryType === "system"
+                ? t("moduleDetails.coreModules")
+                : t("moduleDetails.breadcrumbMyLibrary")}
             </Link>
             <span className="text-[var(--darkgray)]">›</span>
             <Link className={breadcrumbLinkClassName} href={`${basePath}/${moduleId}`}>

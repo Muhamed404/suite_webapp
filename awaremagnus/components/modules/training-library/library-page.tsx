@@ -70,6 +70,7 @@ function getModuleLogoUrl(module: Module, selectedLanguageId: string | number | 
 
   if (!selectedLanguageId) {
     const url = module.translations?.[0]?.logo_banner_url;
+
     return url ? getModuleAssetUrl(url) : defaultLogo;
   }
 
@@ -119,11 +120,11 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
   const filteredModules = useMemo(() => {
     let list = searchQuery.trim()
       ? modules.filter(
-        (m) =>
-          moduleCode(m).toLowerCase().includes(searchQuery.toLowerCase()) ||
-          moduleName(m).toLowerCase().includes(searchQuery.toLowerCase()) ||
-          moduleDescription(m).toLowerCase().includes(searchQuery.toLowerCase())
-      )
+          (m) =>
+            moduleCode(m).toLowerCase().includes(searchQuery.toLowerCase()) ||
+            moduleName(m).toLowerCase().includes(searchQuery.toLowerCase()) ||
+            moduleDescription(m).toLowerCase().includes(searchQuery.toLowerCase())
+        )
       : modules;
 
     if (sortField) {
@@ -138,8 +139,6 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
 
     return list;
   }, [modules, searchQuery, sortField, sortDir]);
-
-
 
   const totalItems = filteredModules.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));

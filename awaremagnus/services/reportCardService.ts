@@ -8,6 +8,7 @@ import { awmClient, API_BASE } from "./httpClient";
 async function request<T>(fn: () => Promise<{ data: AWMResponseBody }>): Promise<ApiResponse<T>> {
   const { data } = await fn();
   const normalized = normalizeAWMResponse<T>(data);
+
   return {
     success: normalized.success,
     data: normalized.data,

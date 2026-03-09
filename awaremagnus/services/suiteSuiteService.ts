@@ -1,6 +1,3 @@
-import type { AWMResponseBody } from "./awmResponse";
-
-import { normalizeAWMResponse } from "./awmResponse";
 import { suiteClient } from "./httpClient";
 
 /** Department interface matching service_suite response */
@@ -87,7 +84,7 @@ function normalizeUser(apiUser: any): User {
 /**
  * Service Suite API client for departments, groups, and users
  * These endpoints are from service_suite (used by phishmagnus)
- * 
+ *
  * Routes are mounted at the root level:
  * - protectedRouter.use("/department", DepartmentRoute)
  * - protectedRouter.use("/group", GroupRoutes)
@@ -137,9 +134,7 @@ export const suiteSuiteService = {
    * Get all departments for an organization
    */
   getDepartments: async (orgId?: number) => {
-    const url = orgId
-      ? `/department/list/${orgId}`
-      : `/department/list`;
+    const url = orgId ? `/department/list/${orgId}` : `/department/list`;
 
     return request<Department[]>(() => suiteClient.get(url));
   },
@@ -149,9 +144,7 @@ export const suiteSuiteService = {
    * Get all groups for an organization
    */
   getGroups: async (organizationId: number) => {
-    return request<Group[]>(() =>
-      suiteClient.get(`/group/findByOrganization/${organizationId}`)
-    );
+    return request<Group[]>(() => suiteClient.get(`/group/findByOrganization/${organizationId}`));
   },
 
   /**
@@ -162,6 +155,7 @@ export const suiteSuiteService = {
     const users = await request<any[]>(() =>
       suiteClient.get(`/external/department/${departmentId}/users`)
     );
+
     return users?.map(normalizeUser) || [];
   },
 
@@ -170,9 +164,8 @@ export const suiteSuiteService = {
    * Get all users in a group (external API)
    */
   getGroupUsers: async (groupId: number) => {
-    const users = await request<any[]>(() =>
-      suiteClient.get(`/external/group/${groupId}/users`)
-    );
+    const users = await request<any[]>(() => suiteClient.get(`/external/group/${groupId}/users`));
+
     return users?.map(normalizeUser) || [];
   },
 
@@ -186,6 +179,7 @@ export const suiteSuiteService = {
       : `/department/unassigned-users`;
 
     const users = await request<any[]>(() => suiteClient.get(url));
+
     // Normalize user data from API format to interface format
     return users?.map(normalizeUser) || [];
   },

@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import Image from "next/image";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { Select, SelectItem } from "@heroui/select";
@@ -16,7 +15,6 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useCreateModule } from "@/hooks/useQuiz";
 import { useCategories } from "@/hooks/useSuiteAwm";
 import { getApiErrorMessage } from "@/utils/apiError";
-import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 function createEmptyTranslation(languageId: number): ModuleTranslation {
   return {
@@ -225,8 +223,6 @@ export function CreateModuleForm() {
                 onValueChange={setModuleName}
               />
             </div>
-
-
 
             {/* Category */}
             <div className={inputGroupClass}>

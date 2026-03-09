@@ -6,6 +6,7 @@ import { CampaignContentDetailPage } from "@/components/modules/campaign";
 
 export default function CampaignContentDetailRoute() {
   const params = useParams();
+
   if (!params) return null; // guard for possible null
   const campaignId = Number(params.campaignId);
   const moduleId = Number(params.moduleId);
@@ -16,10 +17,6 @@ export default function CampaignContentDetailRoute() {
   if (!contentId || Number.isNaN(contentId)) return null;
 
   return (
-    <CampaignContentDetailPage
-      campaignId={campaignId}
-      contentId={contentId}
-      moduleId={moduleId}
-    />
+    <CampaignContentDetailPage campaignId={campaignId} contentId={contentId} moduleId={moduleId} />
   );
 }
