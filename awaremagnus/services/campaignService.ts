@@ -95,14 +95,36 @@ export const campaignService = {
 
     const response = await awmClient.get(`${API_BASE}/certificate/download`, {
       params,
-      responseType: "blob",
+      responseType: "arraybuffer",
+      headers: {
+        Accept: "application/pdf",
+      },
     });
 
-    // Create a download link
+    const contentType: string =
+      (response.headers && (response.headers["content-type"] as string)) || "";
+      
+    if (contentType.includes("application/json")) {
+      const text = new TextDecoder().decode(response.data as ArrayBuffer);
+      let body: any;
+      try {
+        body = JSON.parse(text);
+      } catch {
+        body = { message: text };
+      }
+      throw new Error(
+        `certificate download failed: ${body?.message || "unknown error"}`
+      );
+    }
+
+    // create a proper PDF blob so the OS knows how to handle it
+    const blob = new Blob([response.data], { type: "application/pdf" });
+
+    // build the filename the same way we did before
     const filename = moduleId
       ? `certificate_${certificateId}_module_${moduleId}.pdf`
       : `certificate_${certificateId}.pdf`;
-    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const url = window.URL.createObjectURL(blob);
     const link = document.createElement("a");
 
     link.href = url;

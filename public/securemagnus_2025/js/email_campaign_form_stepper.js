@@ -860,6 +860,17 @@ class EmailCampaignStepper {
                             this.currentTemplateData.file_attachment) &&
                           !!(this.currentTemplateData.inv && this.currentTemplateData.cid);
 
+   
+    const path = window.location.pathname || '';
+    let linkText;
+    if (path.includes('/nfc/')) {
+      linkText = window.i18n?.generic_label?.nfcScanned || 'NFC Scanned';
+    } else if (path.includes('/qr/')) {
+      linkText = window.i18n?.generic_label?.qrScanned || 'QR Scanned';
+    } else {
+      linkText = window.i18n?.generic_label?.linkClicked || 'Track phishing simulation link clicked';
+    }
+
     const trackingItems = [
       {
         text: window.i18n?.generic_label?.emailOpened || 'Track email opened',
@@ -868,7 +879,7 @@ class EmailCampaignStepper {
         color: hasEmailContent ? 'green' : 'blue'
       },
       {
-        text: window.i18n?.generic_label?.linkClicked || 'Track phishing simulation link clicked',
+        text: linkText,
         available: hasLandingPage || hasRedirectPage,
         icon: (hasLandingPage || hasRedirectPage) ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
         color: (hasLandingPage || hasRedirectPage) ? 'green' : 'blue'
@@ -887,12 +898,6 @@ class EmailCampaignStepper {
       },
       {
         text: window.i18n?.generic_label?.formInteraction || 'Track user interaction with the phishing simulation form',
-        available: hasLandingPage,
-        icon: hasLandingPage ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
-        color: hasLandingPage ? 'green' : 'blue'
-      },
-      {
-        text: window.i18n?.generic_label?.formSubmitted || 'Track data submitted through the phishing simulation form',
         available: hasLandingPage,
         icon: hasLandingPage ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
         color: hasLandingPage ? 'green' : 'blue'
@@ -963,7 +968,7 @@ class EmailCampaignStepper {
       console.log('Raw API response:', data);
       
       this.currentTemplateData = data.message || data.data || data;
-      this.currentPreviewTab = 'email';
+      // currentPreviewTab will be set once we know which tabs have content
 
       console.log('Template Preview Loaded:', this.currentTemplateData);
 
@@ -971,14 +976,18 @@ class EmailCampaignStepper {
       if (previewLoading) previewLoading.classList.add('hidden');
       if (previewContent) previewContent.classList.remove('hidden');
 
-      // Setup navigation buttons
-      this.setupPreviewNavigation();
+      // Setup navigation buttons and determine which tab to show first
+      const firstTab = this.setupPreviewNavigation();
       
       // Update tracking information based on template
       this.updateTrackingInfo();
       
-      // Show first available content
-      this.showPreviewTab('email');
+      // Show initial tab (fall back to email for backwards compatibility)
+      if (firstTab) {
+        this.showPreviewTab(firstTab);
+      } else {
+        this.showPreviewTab('email');
+      }
 
     } catch (error) {
       console.error('Error loading template preview:', error);
@@ -998,12 +1007,13 @@ class EmailCampaignStepper {
   setupPreviewNavigation() {
     if (!this.currentTemplateData) {
       console.warn('setupPreviewNavigation: No template data available');
-      return;
+      return null;
     }
 
     console.log('Setting up preview navigation with data:', this.currentTemplateData);
     const buttons = document.querySelectorAll('.preview-nav-btn');
     console.log('Found preview navigation buttons:', buttons.length);
+    let firstVisibleTab = null;
     
     buttons.forEach(btn => {
       const tab = btn.getAttribute('data-preview-tab');
@@ -1046,11 +1056,15 @@ class EmailCampaignStepper {
           break;
       }
 
-      // Always show email button, hide others if no content
-      const shouldShow = tab === 'email' ? true : hasContent;
+      // show button only if content exists
+      const shouldShow = hasContent;
       btn.disabled = !hasContent;
       btn.classList.toggle('hidden', !shouldShow);
-      
+
+      if (hasContent && firstVisibleTab === null) {
+        firstVisibleTab = tab;
+      }
+
       if (hasContent) {
         // Remove any existing listeners by cloning
         const newBtn = btn.cloneNode(true);
@@ -1063,6 +1077,8 @@ class EmailCampaignStepper {
         console.log(`Added click handler for ${tab} tab`);
       }
     });
+
+    return firstVisibleTab;
   }
 
   showPreviewTab(tab) {
