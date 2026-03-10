@@ -116,8 +116,8 @@
 		"show": "عرض",
 		"select_template_to_preview": "اختر قالبًا للمعاينة",
 		"emailOpened": "تتبع فتح البريد الإلكتروني",
-		"fileDownloaded": "generic_label.fileDownloaded",
-		"qrScanned": "generic_label.qrScanned"
+		"fileDownloaded": "تم تنزيل الملف",
+		"qrScanned": "تم مسح QR"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
