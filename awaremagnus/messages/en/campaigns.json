@@ -141,7 +141,7 @@
     "atleastOneVisual": "Please select at least one visual learning option",
     "atleastOneTarget": "Please select at least one department, group, or add users manually",
     "atleastOneModule": "Please select at least one module for your campaign",
-    "weightMustEqual100": "Total weights must equal 100. Current total: {{total}}",
+    "weightMustEqual100": "Total weights must equal 100. Current total: {total}",
     "done": "Done",
     "saveSuccess": "Campaign created successfully!",
     "saveError": "Failed to create campaign",

@@ -111,7 +111,7 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
           <label className="flex items-center gap-1.5 cursor-pointer group">
             <div
               className={clsx(
-                "w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all",
+                "w-4 h-4 rounded border-2 flex items-center justify-center transition-all",
                 formData.gamified
                   ? "bg-blue-500 border-blue-500"
                   : "border-gray-300 group-hover:border-blue-400"

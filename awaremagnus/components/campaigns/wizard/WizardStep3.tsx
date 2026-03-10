@@ -83,6 +83,14 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
     getModuleName(m).toLowerCase().includes(moduleSearch.toLowerCase())
   );
 
+  // Separate into Core Modules (global) and My Modules (org-specific)
+  const coreModules = filteredModules.filter(
+    (m: any) => m.is_global === true || m.org_id === 0 || m.org_id === null
+  );
+  const myModules = filteredModules.filter(
+    (m: any) => m.is_global !== true && m.org_id !== 0 && m.org_id !== null
+  );
+
   return (
     <div>
       <div className="flex items-center gap-1.5 mb-4">
@@ -161,7 +169,7 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
                     onClick={(e) => e.stopPropagation()}
                   />
                 </div>
-                <div className="max-h-48 overflow-y-auto">
+                <div className="max-h-64 overflow-y-auto">
                   {isLoading ? (
                     <p className="text-gray-400 text-xs text-center py-4">Loading modules...</p>
                   ) : error ? (
@@ -169,39 +177,92 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
                   ) : filteredModules.length === 0 ? (
                     <p className="text-gray-400 text-xs text-center py-4">No modules found</p>
                   ) : (
-                    filteredModules.map((module: any) => (
-                      <label
-                        key={module.id}
-                        className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
-                        onClick={() => toggleModule(module.id)}
-                      >
-                        <div
-                          className={clsx(
-                            "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
-                            formData.modules.includes(module.id)
-                              ? "bg-blue-500 border-blue-500"
-                              : "border-gray-300"
-                          )}
-                        >
-                          {formData.modules.includes(module.id) && (
-                            <svg
-                              className="w-2.5 h-2.5 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth={3}
-                              viewBox="0 0 24 24"
+                    <>
+                      {myModules.length > 0 && (
+                        <>
+                          <div className="px-3 py-1.5 bg-blue-50 border-b border-blue-100 sticky top-0">
+                            <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide">
+                              My Modules
+                            </span>
+                          </div>
+                          {myModules.map((module: any) => (
+                            <label
+                              key={module.id}
+                              className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                              onClick={() => toggleModule(module.id)}
                             >
-                              <path
-                                d="M5 13l4 4L19 7"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          )}
-                        </div>
-                        <span className="text-sm">{getModuleName(module)}</span>
-                      </label>
-                    ))
+                              <div
+                                className={clsx(
+                                  "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                                  formData.modules.includes(module.id)
+                                    ? "bg-blue-500 border-blue-500"
+                                    : "border-gray-300"
+                                )}
+                              >
+                                {formData.modules.includes(module.id) && (
+                                  <svg
+                                    className="w-2.5 h-2.5 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={3}
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      d="M5 13l4 4L19 7"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                )}
+                              </div>
+                              <span className="text-sm">{getModuleName(module)}</span>
+                            </label>
+                          ))}
+                        </>
+                      )}
+                      {coreModules.length > 0 && (
+                        <>
+                          <div className="px-3 py-1.5 bg-gray-50 border-b border-gray-200 sticky top-0">
+                            <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
+                              Core Modules
+                            </span>
+                          </div>
+                          {coreModules.map((module: any) => (
+                            <label
+                              key={module.id}
+                              className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                              onClick={() => toggleModule(module.id)}
+                            >
+                              <div
+                                className={clsx(
+                                  "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                                  formData.modules.includes(module.id)
+                                    ? "bg-blue-500 border-blue-500"
+                                    : "border-gray-300"
+                                )}
+                              >
+                                {formData.modules.includes(module.id) && (
+                                  <svg
+                                    className="w-2.5 h-2.5 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={3}
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      d="M5 13l4 4L19 7"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                )}
+                              </div>
+                              <span className="text-sm">{getModuleName(module)}</span>
+                            </label>
+                          ))}
+                        </>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -222,7 +283,7 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
             >
               <div
                 className={clsx(
-                  "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                  "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
                   formData.visualShortVideos
                     ? "bg-blue-500 border-blue-500"
                     : "border-gray-300 group-hover:border-blue-400"
@@ -249,7 +310,7 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
             >
               <div
                 className={clsx(
-                  "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                  "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
                   formData.visualInteractive
                     ? "bg-blue-500 border-blue-500"
                     : "border-gray-300 group-hover:border-blue-400"
@@ -276,7 +337,7 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
             >
               <div
                 className={clsx(
-                  "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                  "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
                   formData.visualOthers
                     ? "bg-blue-500 border-blue-500"
                     : "border-gray-300 group-hover:border-blue-400"

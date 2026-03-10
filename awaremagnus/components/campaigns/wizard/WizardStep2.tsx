@@ -71,7 +71,7 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
         const [depts, grps, fetchedUsers] = await Promise.all([
           suiteSuiteService.getDepartments(orgId),
           suiteSuiteService.getGroups(orgId),
-          suiteSuiteService.getUnassignedUsers(orgId),
+          suiteSuiteService.getAllOrgUsers(orgId),
         ]);
 
         console.log("Departments response:", depts);

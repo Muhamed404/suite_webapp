@@ -64,7 +64,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
       if (orgId === undefined || orgId === null) return;
       try {
         setLoading(true);
-        const fetched = await suiteSuiteService.getUnassignedUsers(orgId);
+        const fetched = await suiteSuiteService.getAllOrgUsers(orgId);
 
         setAllUsers(fetched || []);
       } catch (err) {

@@ -54,11 +54,19 @@ export function WizardStep6({
     e.preventDefault();
     if (draggedIndex === null || draggedIndex === index) return;
 
-    const newSchedules = [...formData.schedules];
-    const draggedItem = newSchedules[draggedIndex];
+    // Keep dates at their positional slots; only reorder module IDs.
+    const dates = formData.schedules.map((s) => s.start_date);
+    const moduleIds = formData.schedules.map((s) => s.module_id);
 
-    newSchedules.splice(draggedIndex, 1);
-    newSchedules.splice(index, 0, draggedItem);
+    const draggedModuleId = moduleIds[draggedIndex];
+
+    moduleIds.splice(draggedIndex, 1);
+    moduleIds.splice(index, 0, draggedModuleId);
+
+    const newSchedules = dates.map((date, i) => ({
+      module_id: moduleIds[i],
+      start_date: date,
+    }));
 
     onChange("schedules", newSchedules);
     setDraggedIndex(index);
@@ -105,11 +113,12 @@ export function WizardStep6({
                 <li
                   key={index}
                   draggable
-                  className={`flex items-center justify-between px-3 py-2 border rounded-lg text-xs text-gray-700 transition-all ${
+                  className={`flex items-center justify-between px-3 py-2 border rounded-lg text-xs text-gray-700 transition-all cursor-grab select-none ${
                     draggedIndex === index
                       ? "opacity-40 bg-blue-50 border-blue-300"
                       : "bg-white border-gray-200 hover:border-blue-400 hover:bg-blue-50/30"
-                  } cursor-grab active:cursor-grabbing`}
+                  }`}
+                  style={{ cursor: 'grab' }}
                   onDragEnd={handleDragEnd}
                   onDragOver={(e) => handleDragOver(e, index)}
                   onDragStart={() => handleDragStart(index)}
