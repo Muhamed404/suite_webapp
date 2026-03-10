@@ -183,4 +183,30 @@ export const suiteSuiteService = {
     // Normalize user data from API format to interface format
     return users?.map(normalizeUser) || [];
   },
+
+  /**
+   * GET /user/licensed-users/1
+   * Get ALL AWM-licensed users for the organization (regardless of dept/group assignment).
+   * Uses AwareMagnus product ID = 1.
+   */
+  getAllOrgUsers: async (organizationId?: number) => {
+    try {
+      const { data } = await suiteClient.get<any>(`/user/licensed-users/1`, {
+        params: { page: 1, pageSize: 10000 },
+      });
+
+      const rows: any[] = data?.data || [];
+
+      return rows.map((row: any): User => {
+        const profile = row.UserProfile || row;
+
+        return normalizeUser({
+          ...profile,
+          organization_id: profile.organization_id ?? organizationId,
+        });
+      });
+    } catch {
+      return [];
+    }
+  },
 };

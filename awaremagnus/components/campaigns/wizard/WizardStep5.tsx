@@ -2,7 +2,7 @@
 
 import { Layout } from "lucide-react";
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 
 import { useTranslations } from "@/i18n/useTranslations";
 
@@ -31,6 +31,37 @@ interface WizardStep5Props {
 
 export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
   const t = useTranslations("campaigns");
+  const prevFieldsKey = useRef<string>("");
+
+  // Auto-distribute weights equally only for the 3 main content types.
+  useEffect(() => {
+    const activeMainFields: Array<{ key: string; value: boolean }> = [
+      { key: "motionVideoWeight", value: formData.visualShortVideos },
+      { key: "interactiveContentWeight", value: formData.visualInteractive },
+      { key: "quizProgressWeight", value: formData.enableQuiz },
+    ];
+
+    const selectedFields = activeMainFields.filter((f) => f.value);
+    const fieldsKey = selectedFields.map((f) => f.key).join(",");
+
+    if (fieldsKey === prevFieldsKey.current || selectedFields.length === 0) return;
+    prevFieldsKey.current = fieldsKey;
+
+    const count = selectedFields.length;
+    let weights: number[] = [];
+
+    if (count === 1) {
+      weights = [100];
+    } else if (count === 2) {
+      weights = [50, 50];
+    } else if (count === 3) {
+      weights = [30, 30, 40];
+    }
+
+    selectedFields.forEach((field, idx) => {
+      onChange(field.key, weights[idx]);
+    });
+  }, [formData.visualShortVideos, formData.visualInteractive, formData.enableQuiz]);
 
   const totalWeight = useMemo(() => {
     let total = 0;
@@ -97,7 +128,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
               <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all">
                 <div
                   className={clsx(
-                    "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
+                    "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
                     formData.enableDocuments
                       ? "bg-blue-500 border-blue-500"
                       : "border-gray-300 group-hover:border-blue-400"
@@ -122,7 +153,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
               <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all">
                 <div
                   className={clsx(
-                    "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
+                    "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
                     formData.enableGames
                       ? "bg-blue-500 border-blue-500"
                       : "border-gray-300 group-hover:border-blue-400"
@@ -147,7 +178,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
               <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all">
                 <div
                   className={clsx(
-                    "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
+                    "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all cursor-pointer",
                     formData.enableMiscItems
                       ? "bg-blue-500 border-blue-500"
                       : "border-gray-300 group-hover:border-blue-400"

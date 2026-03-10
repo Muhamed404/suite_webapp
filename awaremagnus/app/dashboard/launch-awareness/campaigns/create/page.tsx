@@ -184,6 +184,19 @@ export default function CreateCampaignPage() {
           newErrors.visualLearning = t("form.atleastOneVisual");
         }
         break;
+      case 4:
+        if (formData.enableQuiz) {
+          if (!formData.totalQuizzesPerModule || formData.totalQuizzesPerModule <= 0) {
+            newErrors.totalQuizzesPerModule = "Required";
+          }
+          if (!formData.quizPassingThreshold || formData.quizPassingThreshold <= 0) {
+            newErrors.quizPassingThreshold = "Required";
+          }
+          if (!formData.quizRetryThreshold || formData.quizRetryThreshold <= 0) {
+            newErrors.quizRetryThreshold = "Required";
+          }
+        }
+        break;
       case 5:
         if (totalWeight !== 100) {
           newErrors.weights = t("form.weightMustEqual100", { total: totalWeight });
@@ -391,7 +404,9 @@ export default function CreateCampaignPage() {
                 {currentStep === 3 && (
                   <WizardStep3 errors={errors} formData={formData} onChange={handleChange} />
                 )}
-                {currentStep === 4 && <WizardStep4 formData={formData} onChange={handleChange} />}
+                {currentStep === 4 && (
+                  <WizardStep4 errors={errors} formData={formData} onChange={handleChange} />
+                )}
                 {currentStep === 5 && (
                   <WizardStep5 errors={errors} formData={formData} onChange={handleChange} />
                 )}
