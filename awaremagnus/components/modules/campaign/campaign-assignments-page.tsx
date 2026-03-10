@@ -28,7 +28,9 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useAssignedCampaigns } from "@/hooks/useCampaign";
 import { campaignService } from "@/services/campaignService";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { isOrgUser } from "@/utils/roles"; // helper to detect organization user (learner view) 
 import { useUserDashboards } from "@/hooks/useDashboard";
+import { Spinner } from "@heroui/spinner"; // used for loading state in tables
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return "—";
@@ -72,21 +74,32 @@ function getCampaignStatus(campaign: CampaignAssignment): "active" | "pending" |
   const now = new Date();
   const start = campaign.start_date ? new Date(campaign.start_date) : null;
   const end = campaign.end_date ? new Date(campaign.end_date) : null;
-  const progress = campaign.progress_percent ?? 0;
+  // coerce progress to numeric value in case it's a string
+  const progress = Number(campaign.progress_percent) || 0;
 
   if (progress === 100) return "completed";
   if (end && now > end) return "completed";
   if (start && now < start) return "pending";
 
   return "active";
-}
+} 
 
-function getStatusBadge(status: "active" | "pending" | "completed") {
-  const badges = {
+// add "inprogress" type for org users only
+function getStatusBadge(status: "active" | "pending" | "completed" | "inprogress") {
+  const badges: Record<
+    typeof status,
+    { class: string; icon: string; text: string }
+  > = {
     active: {
       class: "bg-green-100 text-green-700 border border-green-200",
       icon: "play-circle",
       text: "Active",
+    },
+    inprogress: {
+      // visually similar to active but with different label
+      class: "bg-green-100 text-green-700 border border-green-200",
+      icon: "play-circle",
+      text: "In Progress",
     },
     pending: {
       class: "bg-amber-100 text-amber-700 border border-amber-200",
@@ -109,7 +122,7 @@ function getStatusBadge(status: "active" | "pending" | "completed") {
       <span>{badge.text}</span>
     </span>
   );
-}
+} 
 
 function getActionButton(
   status: "active" | "pending" | "completed",
@@ -217,6 +230,7 @@ export function CampaignAssignmentsPage() {
   // Do not show static/mock data when API returns no data
   const displayCampaigns = campaigns;
   const { user } = useAuthStore();
+  const isOrgUserView = isOrgUser(user?.role_id); // only learners should see progress-based labels
   const [sortColumn, setSortColumn] = useState<"name" | "start" | "end" | "status">("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
@@ -783,9 +797,29 @@ export function CampaignAssignmentsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {paginatedCampaigns.length > 0 ? (
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={6} className="h-[400px]">
+                        <div className="flex items-center justify-center">
+                          <Spinner color="primary" label="Loading campaigns..." />
+                        </div>
+                      </td>
+                    </tr>
+                  ) : paginatedCampaigns.length > 0 ? (
                     paginatedCampaigns.map((campaign: CampaignAssignment, index: number) => {
                       const status = getCampaignStatus(campaign);
+
+                      // determine badge text specifically for org users based on numeric progress
+                      let displayStatus: "active" | "pending" | "completed" | "inprogress" = status;
+                      if (isOrgUserView) {
+                        const p = Number(campaign.progress_percent) || 0;
+                        if (p === 100) {
+                          displayStatus = "completed";
+                        } else if (p > 0 && p < 100) {
+                          displayStatus = "inprogress";
+                        }
+                      }
+
                       // use a composite key in case module IDs repeat across campaigns
                       const rowKey =
                         campaign.campaign_id != null
@@ -818,7 +852,7 @@ export function CampaignAssignmentsPage() {
                               <span>{formatDate(campaign.end_date)}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3.5">{getStatusBadge(status)}</td>
+                          <td className="px-4 py-3.5">{getStatusBadge(displayStatus)}</td>
                           <td className="px-4 py-3.5">
                             {getActionButton(status, campaign, handleStartModule)}
                           </td>
