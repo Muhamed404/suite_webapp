@@ -28,4 +28,14 @@ export const reportCardService = {
       awmClient.get<AWMResponseBody>(`${API_BASE}/useraction/result/me`)
     );
   },
+
+  /**
+   * Get a specific user's report card by user ID (Admin only).
+   * API: GET /api/awm/useraction/result?userId={userId}
+   */
+  getUserReportCard: async (userId: number): Promise<ApiResponse<ReportCardResult>> => {
+    return request<ReportCardResult>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/useraction/result?userId=${userId}`)
+    );
+  },
 };
