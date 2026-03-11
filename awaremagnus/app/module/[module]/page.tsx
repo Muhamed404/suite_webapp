@@ -39,6 +39,12 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
 
+  // report API data - added per user request
+  const [reportCampaignId, setReportCampaignId] = useState<number | null>(null);
+  const [reportCampaignData, setReportCampaignData] = useState<any>(null);
+  const [reportModuleData, setReportModuleData] = useState<any>(null);
+  const [reportContentsData, setReportContentsData] = useState<any>(null);
+
   const tabIndicatorRef = useRef<HTMLDivElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
@@ -88,6 +94,54 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
     return 1; // Default campaign ID
   }, [searchParams, isOrgUserView, assignedModulesRes, moduleId]);
+
+  // when we have both campaignId & moduleId we need to fetch the reportCampaign
+  // and then the corresponding reportModule; response isn't directly rendered yet
+  useEffect(() => {
+    if (!campaignId || !moduleId) return;
+
+    // first call: get report campaign entry
+    quizService
+      .getReportCampaign(campaignId, user?.id ?? undefined)
+      .then((res) => {
+        if (res?.success && res?.data?.reportCampaigns?.length) {
+          const entry = res.data.reportCampaigns[0];
+          setReportCampaignData(entry);
+          setReportCampaignId(entry.id);
+          console.log("reportCampaign entry", entry);
+
+          // second call depends on reportCampaignId
+          return quizService.getReportModuleByParams(entry.id, moduleId);
+        }
+        return null;
+      })
+      .then((res2) => {
+        if (res2 && res2.success) {
+          setReportModuleData(res2.data);
+          console.log("reportModule response", res2.data);
+
+          // now that we have the report module entry, call contents endpoint
+          const firstModule = res2.data?.reportModules?.[0];
+          const reportModuleId = firstModule?.id;
+          if (reportModuleId) {
+            quizService
+              .getContentsReport(reportModuleId)
+              .then((res3) => {
+                if (res3 && res3.success) {
+                  setReportContentsData(res3.data);
+                  console.log("report contents response", res3.data);
+                }
+              })
+              .catch((err3) => {
+                console.error("error fetching contents report", err3);
+              });
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("error fetching report data", err);
+      });
+  }, [campaignId, moduleId]);
 
   // fetch list of modules that belong to this campaign so we can wire up "next module" navigation
   const { data: campaignModulesRes } = useCampaignModules(campaignId, !!campaignId);
@@ -197,20 +251,34 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
       });
 
       // push a single card for each gallery type collected above
+      // type IDs for which status is driven by reportContentsData
+      const REPORT_DRIVEN_TYPE_IDS = [3, 4, 5, 8];
+
       galleryGroups.forEach((items, ctypeId) => {
         const first = items[0];
         const contentTypeName: string = first.content_type ?? "Documents";
         const count = items.length;
 
-        // Determine aggregated status: completed if all completed, else in progress
+        // Determine aggregated status
         let aggStatus = "in progress";
-        const allCompleted = items.every((c: any) => {
-          const sv = c.user_completion_status ?? c.status ?? "";
-
-          return String(sv).toLowerCase() === "completed";
-        });
-
-        if (allCompleted) aggStatus = "completed";
+        if (REPORT_DRIVEN_TYPE_IDS.includes(ctypeId) && reportContentsData?.reportContents) {
+          const matching = (reportContentsData.reportContents as any[]).filter(
+            (rc: any) => rc.content?.contype_id === ctypeId
+          );
+          if (matching.length > 0) {
+            const allCompleted = matching.every((rc: any) => rc.status?.name === "COMPLETED");
+            const allNotStarted = matching.every((rc: any) => rc.status?.name === "NOT_STARTED");
+            if (allCompleted) aggStatus = "completed";
+            else if (allNotStarted) aggStatus = "not started";
+            else aggStatus = "in progress";
+          }
+        } else {
+          const allCompleted = items.every((c: any) => {
+            const sv = c.user_completion_status ?? c.status ?? "";
+            return String(sv).toLowerCase() === "completed";
+          });
+          if (allCompleted) aggStatus = "completed";
+        }
         const aggLabel = aggStatus.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
         // Latest date across all items in the group
@@ -256,16 +324,31 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     }
 
     // Add aggregated contents (Posters, Brochures, etc.)
+    const REPORT_DRIVEN_TYPE_IDS_AGG = [3, 4, 5, 8];
     if (data.aggregated_contents) {
       Object.values(data.aggregated_contents).forEach((agg: any) => {
         if (agg.total_count > 0) {
-          // determine status based on report entries matching this content type
+          // determine status — for types 3,4,5,8 use reportContentsData, else fallback
           let aggStatus: string | undefined;
 
-          aggStatus = agg.statuses?.some((s: any) => s.status === 2) ? "completed" : "pending";
-          // Change pending to in progress for consistency
-          if (aggStatus === "pending") {
-            aggStatus = "in progress";
+          if (REPORT_DRIVEN_TYPE_IDS_AGG.includes(agg.content_type_id) && reportContentsData?.reportContents) {
+            const matching = (reportContentsData.reportContents as any[]).filter(
+              (rc: any) => rc.content?.contype_id === agg.content_type_id
+            );
+            if (matching.length > 0) {
+              const allCompleted = matching.every((rc: any) => rc.status?.name === "COMPLETED");
+              const allNotStarted = matching.every((rc: any) => rc.status?.name === "NOT_STARTED");
+              if (allCompleted) aggStatus = "completed";
+              else if (allNotStarted) aggStatus = "not started";
+              else aggStatus = "in progress";
+            } else {
+              aggStatus = "in progress";
+            }
+          } else {
+            aggStatus = agg.statuses?.some((s: any) => s.status === 2) ? "completed" : "pending";
+            if (aggStatus === "pending") {
+              aggStatus = "in progress";
+            }
           }
           const aggLabel = aggStatus.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
@@ -337,7 +420,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     }
 
     return transformedItems;
-  }, [contentsWithProgressRes, moduleRes]);
+  }, [contentsWithProgressRes, moduleRes, reportContentsData]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
@@ -859,11 +942,12 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                             );
                           });
 
-                          // format status for display (e.g. "not_started" -> "Not Started")
+                          // format status for display (e.g. "not_started" / "in progress" -> "Not Started" / "In Progress")
                           const displayStatus = item.status
                             ? item.status
-                                .split("_")
-                                .map((s: string) => s[0].toUpperCase() + s.slice(1))
+                                .replace(/_/g, " ")
+                                .split(" ")
+                                .map((s: string) => s ? s[0].toUpperCase() + s.slice(1) : s)
                                 .join(" ")
                             : "";
 
@@ -924,11 +1008,12 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                       typeof item.id
                                     );
 
-                                    // notify backend that user began this content (skip if already completed or in progress)
+                                    // notify backend that user began this content (skip if already completed or in progress, or aggregated)
                                     if (
                                       campaignId != null &&
                                       moduleId != null &&
                                       typeof item.id === "number" &&
+                                      !item.isAggregated &&
                                       item.status !== "completed" &&
                                       item.status !== "passed" &&
                                       item.status !== "failed" &&
@@ -947,8 +1032,8 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                       }
                                     }
 
-                                    // Call the report-actions/begin-content API
-                                    if (moduleId != null) {
+                                    // Call the report-actions/begin-content API (skip for aggregated content)
+                                    if (moduleId != null && !item.isAggregated) {
                                       let contentId: number | null = null;
 
                                       if (typeof item.id === "number") {

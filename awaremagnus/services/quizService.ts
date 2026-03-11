@@ -469,10 +469,10 @@ export const quizService = {
    * GET /report/campaigns?campaignId={id}
    * Returns the report campaign entry (contains id = report_campaign_id)
    */
-  getReportCampaign: async (campaignId: number) => {
+  getReportCampaign: async (campaignId: number, userId?: number) => {
     return request<any>(() =>
       awmClient.get<AWMResponseBody>(`${API_BASE}/report/campaigns`, {
-        params: { campaignId },
+        params: { campaignId, ...(userId != null ? { userId } : {}) },
       })
     );
   },
@@ -486,6 +486,16 @@ export const quizService = {
       awmClient.get<AWMResponseBody>(`${API_BASE}/report/modules`, {
         params: { reportCampaignId, moduleId },
       })
+    );
+  },
+
+  /**
+   * GET /report/contents/:id
+   * Returns single report content entry by its id
+   */
+  getReportContentById: async (id: number) => {
+    return request<any>(() =>
+      awmClient.get<AWMResponseBody>(`${API_BASE}/report/contents/${id}`)
     );
   },
 
