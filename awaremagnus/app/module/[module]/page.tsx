@@ -17,6 +17,7 @@ import { campaignService } from "@/services/campaignService";
 import { awmClient, API_BASE } from "@/services/httpClient";
 import { isOrgUser } from "@/utils/roles";
 import { quizService } from "@/services/quizService";
+import { SUPPORTED_LANGUAGES, LANGUAGE_COUNTRY_CODES } from "@/utils/supportedLanguages";
 
 export default function PhysicalSecurityPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -30,7 +31,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "completed">("all");
-  const [language, setLanguage] = useState("en");
+  // track selected language by supported language id (see utils/supportedLanguages)
+  const [language, setLanguage] = useState<number>(
+    SUPPORTED_LANGUAGES.find((l) => l.name.toLowerCase() === "english")?.id || 1
+  );
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
@@ -117,6 +121,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     moduleId ?? 1,
     campaignId,
     {
+      lang_id: language,
       enabled: !!moduleId && !!campaignId,
     }
   );
@@ -411,37 +416,6 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     };
   }, [contentsWithProgressRes, moduleName, moduleRes]);
 
-  useEffect(() => {
-    // Animate progress bar with real data
-    const progressBar = document.querySelector(".progress-bar") as HTMLElement;
-
-    if (progressBar) {
-      setTimeout(() => {
-        const targetWidth = overallProgress; // Use real progress from API
-        const duration = 2500; // 2.5 seconds
-        const startTime = Date.now();
-
-        function easeOutCubic(t: number) {
-          return 1 - Math.pow(1 - t, 3);
-        }
-
-        function animate() {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const eased = easeOutCubic(progress);
-          const currentWidth = eased * targetWidth;
-
-          progressBar.style.width = currentWidth + "%";
-
-          if (progress < 1) {
-            requestAnimationFrame(animate);
-          }
-        }
-
-        animate();
-      }, 100);
-    }
-  }, [overallProgress]);
 
   const updateTabIndicator = () => {
     if (!tabIndicatorRef.current || !tabsContainerRef.current) return;
@@ -499,22 +473,13 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
             }
           }
 
-          @keyframes progressFill {
-            from {
-              width: 0%;
-            }
-            to {
-              width: var(--progress-width, 50%);
-            }
-          }
 
           .item {
             animation: slideIn 0.3s ease-out;
           }
 
           .progress-bar {
-            width: 0%;
-            will-change: width;
+            height: 100%;
           }
 
           /* Modern Dropdown Styles */
@@ -745,10 +710,22 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
                       <div className="relative w-40 modern-dropdown-wrapper small rounded-full language-dropdown-container">
                         <button
-                          className="modern-dropdown-button"
+                          className="modern-dropdown-button flex items-center justify-between"
                           onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
                         >
-                          <span>{language === "en" ? "English" : "Arabic"}</span>
+                          {/* selected language name + flag */}
+                          {(() => {
+                            const sel = SUPPORTED_LANGUAGES.find((l) => l.id === language);
+                            const code = sel ? LANGUAGE_COUNTRY_CODES[sel.id].toLowerCase() : "us";
+                            return (
+                              <>
+                                <span className="flex items-center gap-1">
+                                  <span className={`fi fi-${code} rounded-full`} />
+                                  <span>{sel?.name || "Language"}</span>
+                                </span>
+                              </>
+                            );
+                          })()}
                           <div className="modern-dropdown-arrow">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path
@@ -763,24 +740,22 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
                         {showLanguageDropdown && (
                           <div className="modern-dropdown-menu open">
-                            <button
-                              className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                              onClick={() => {
-                                setLanguage("en");
-                                setShowLanguageDropdown(false);
-                              }}
-                            >
-                              English
-                            </button>
-                            <button
-                              className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                              onClick={() => {
-                                setLanguage("ar");
-                                setShowLanguageDropdown(false);
-                              }}
-                            >
-                              Arabic
-                            </button>
+                            {SUPPORTED_LANGUAGES.map((lang) => {
+                              const code = LANGUAGE_COUNTRY_CODES[lang.id].toLowerCase();
+                              return (
+                                <button
+                                  key={lang.id}
+                                  className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                                  onClick={() => {
+                                    setLanguage(lang.id);
+                                    setShowLanguageDropdown(false);
+                                  }}
+                                >
+                                  <span className={`fi fi-${code} rounded-full`} />
+                                  <span>{lang.name}</span>
+                                </button>
+                              );
+                            })}
                           </div>
                         )}
                       </div>
@@ -799,12 +774,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                           <div className="flex items-center gap-2 mb-2">
                             <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
-                                className="progress-bar h-full bg-green-500 rounded-full"
-                                style={
-                                  {
-                                    "--progress-width": `${overallProgress}%`,
-                                  } as React.CSSProperties
-                                }
+                                className="progress-bar h-full bg-green-500 rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${overallProgress}%`,
+                                }}
                               />
                             </div>
                           </div>
