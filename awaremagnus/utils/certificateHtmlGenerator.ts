@@ -15,6 +15,7 @@ export interface CertificateTemplateData {
   lastName?: string;
   courseName?: string;
   completionDate?: string;
+  issueDate?: string;
 }
 
 export const getProcessedText = (
@@ -48,6 +49,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
     lastName = "Doe",
     courseName = "Cybersecurity Awareness on Physical Security",
     completionDate = "1/27/2026",
+    issueDate = "",
   } = data;
 
   const logo = assets.logo || "";
@@ -305,6 +307,8 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
         
         <div class="certificate-sign">
           <!-- secondary signature if needed -->
+          <!-- show issue date above the date label when provided -->
+          ${issueDate ? `<div class="certificate-issue-date" style="font-size:14px;margin-bottom:4px;">${issueDate}</div>` : ""}
           <div class="certificate-sign-line"></div>
           <small>Date</small>
         </div>

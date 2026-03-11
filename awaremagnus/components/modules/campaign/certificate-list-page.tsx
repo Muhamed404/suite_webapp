@@ -11,7 +11,11 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useUserCertificates } from "@/hooks/useCampaign";
 import { campaignService } from "@/services/campaignService";
+import { certificateService } from "@/services/certificateService";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { decodeJwt, extractUserDisplayName } from "@/utils/jwt";
+import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
+import { generateCertificateHtml } from "@/utils/certificateHtmlGenerator";
 
 function formatDate(dateStr?: string): string {
   if (!dateStr) return "—";
@@ -131,9 +135,83 @@ export function CertificateListPage() {
         const moduleId = original?.module_id ?? undefined;
 
         await campaignService.downloadCertificate(cert.id, moduleId);
-      } catch (error) {
+      } catch (error: any) {
+        const message =
+          error?.message ||
+          "An unknown error occurred while downloading the certificate.";
+
+       
+        if (message.includes("certificate download failed")) {
+          const original = certificates.find((c) => c.id === cert.id) as any | undefined;
+          const moduleId = original?.module_id ?? undefined;
+          if (moduleId) {
+            try {
+              // fetch the template so we can render our own PDF
+              const tplResponse = await certificateService.downloadTemplate?.(moduleId);
+              const template = tplResponse?.data;
+              const templateText = template?.template_text || "";
+              const bgColor = template?.bg_color || "#ffffff";
+              const assets = {
+                logo: template?.top_logo_url ? getCertificateAssetUrl(template.top_logo_url) : null,
+                bottomLogo: template?.bottom_logo_url ? getCertificateAssetUrl(template.bottom_logo_url) : null,
+                border: template?.border_image_url ? getCertificateAssetUrl(template.border_image_url) : null,
+                watermark: template?.bg_watermark_url ? getCertificateAssetUrl(template.bg_watermark_url) : null,
+                stamp: template?.stamp_logo_url ? getCertificateAssetUrl(template.stamp_logo_url) : null,
+                signature: template?.sign_image_url ? getCertificateAssetUrl(template.sign_image_url) : null,
+              };
+
+              // determine user display name from JWT token stored in auth
+              const token = useAuthStore.getState().token;
+              const fullName = extractUserDisplayName(decodeJwt(token));
+              const [firstName, ...rest] = fullName.split(" ");
+              const lastName = rest.join(" ");
+
+              // format the ISO timestamp into a human‑readable date for the
+              // placeholder; the server returns an ISO string, which would show up
+              // verbatim in the template otherwise.
+              const rawDate = original?.certificate_issue_date || original?.created_at || "";
+              const formattedDate = rawDate
+                ? new Date(rawDate).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })
+                : "";
+
+              const htmlContent = generateCertificateHtml({
+                templateText,
+                bgColor,
+                assets,
+                firstName,
+                lastName,
+                courseName: original?.module_name || "",
+                completionDate: formattedDate,
+                // also send issue date so it can be rendered above the bottom-right label
+                issueDate: formattedDate,
+              });
+
+              const preview = window.open("", "_blank");
+              if (preview) {
+                preview.document.open();
+                preview.document.write(htmlContent);
+                preview.document.close();
+                preview.onload = () => preview.print();
+              } else {
+                window.alert("Unable to open preview window; please allow pop-ups.");
+              }
+
+              // fallback handled – no error to log or display
+              return;
+            } catch (fallbackErr) {
+              console.error("Fallback certificate generation failed", fallbackErr);
+              // fall through to show original message below
+            }
+          }
+        }
+
+        // log and alert for anything not handled above
         console.error("Failed to download certificate:", error);
-        // You might want to show a toast or alert here
+        window.alert(message);
       }
     };
 

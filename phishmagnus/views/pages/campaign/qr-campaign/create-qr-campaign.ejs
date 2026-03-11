@@ -84,9 +84,23 @@
   window._systemTemplates = <%- JSON.stringify(systemTemplate || []) %>;
   window.i18n = {
     labels: {
+      select_template: "<%= __('qr_campaign.select_template') %>",
+      selectTemplate: "<%= __('qr_campaign.select_template') %>",
       next: "<%= __('generic_label.next') %>",
-      finish: "<%= __('generic_label.Finish') %>",
-      select_template: "<%= __('qr_campaign.select_template') %>"
+      back: "<%= __('generic_label.back') %>",
+      finish: "<%= __('generic_label.Finish') %>"
+    },
+    generic_label: {
+      emailOpened: "<%= __('generic_label.emailOpened') %>",
+      linkClicked: "<%= __('generic_label.linkClicked') %>",
+      qrScanned: "<%= __('generic_label.qrScanned') %>",
+      nfcScanned: "<%= __('generic_label.nfcScanned') %>",
+      attachmentOpened: "<%= __('generic_label.attachmentOpened') %>",
+      formInteraction: "<%= __('generic_label.formInteraction') %>",
+      formSubmitted: "<%= __('generic_label.formSubmitted') %>"
+    },
+    template: {
+      tracking_header: "<%= __('template.tracking_header') %>"
     },
     validation: {
       campaign_name_required: "<%= __('validation_messages.campaign_name_required') %>",
@@ -102,4 +116,5 @@
 <script src="/securemagnus_2025/js/form_stepper.js"></script>
 <script src="/securemagnus_2025/js/time-validation.js"></script>
 <script src="/securemagnus_2025/js/custom_script/qr_create_campaign_validation.js"></script>
+<script src="/securemagnus_2025/js/email_campaign_form_stepper.js"></script>
 
