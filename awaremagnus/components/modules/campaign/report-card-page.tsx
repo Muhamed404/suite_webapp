@@ -9,7 +9,7 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useMyReportCard } from "@/hooks/useReportCard";
+import { useMyReportCard, useUserReportCard } from "@/hooks/useReportCard";
 import { useAuthStore } from "@/hooks/useAuthStore";
 
 /* ─── Helpers ─── */
@@ -110,11 +110,11 @@ function AreaChart({ data, labels }: AreaChartProps) {
 
 /* ─── Timeline Item ─── */
 function TimelineItem({ module: m, isLast }: { module: ReportCardModuleResult; isLast: boolean }) {
-  const title = m.achievements_unlocked_in_module > 0 ? "Achievement Unlocked!" : "Achievement";
+  const title = m.module_name || "Module";
   const badge =
     m.quiz_percentage !== undefined
       ? m.quiz_percentage >= 90
-        ? "Perfect Score"
+        ? null
         : m.quiz_percentage >= 70
           ? "Good Score"
           : null
@@ -158,8 +158,7 @@ function TimelineItem({ module: m, isLast }: { module: ReportCardModuleResult; i
           </span>
         )}
         <div className="flex items-center gap-3 text-[10px] text-gray-500 mb-1 flex-wrap">
-          <span className="text-orange-500">⭐ +{m.achieved_xp_tokens} XP</span>
-          {m.quiz_percentage !== undefined && (
+          <span className="text-orange-500">⭐ +{m.achieved_xp_tokens} XP</span>          <span className="text-purple-500">🏆 {m.achieved_compliance_score} pts</span>          {m.quiz_percentage !== undefined && (
             <span>📘 {m.quiz_percentage.toFixed(0)}% Quiz Score</span>
           )}
           {m.duration_minutes && <span>⏱ {m.duration_minutes} minutes</span>}
@@ -229,9 +228,10 @@ function buildPrintHTML(args: {
   xpTokens: number;
   studyTime: number;
   riskBadge: { text: string; bg: string };
-  allModules: Array<{ module: ReportCardModuleResult }>;
+  campaigns: Array<{ campaign_name: string; completed_modules: ReportCardModuleResult[] }>;
   chartData: number[];
   chartLabels: string[];
+  totalComplianceScore: number;
 }): string {
   const {
     userName,
@@ -242,21 +242,29 @@ function buildPrintHTML(args: {
     xpTokens,
     studyTime,
     riskBadge,
-    allModules,
+    campaigns,
     chartData,
     chartLabels,
+    totalComplianceScore,
   } = args;
   const today = formatToday();
   const studyStr = formatStudyTime(studyTime);
 
   /* Timeline HTML */
-  const timelineHTML = allModules
-    .map(({ module: m }, i) => {
-      const title = m.achievements_unlocked_in_module > 0 ? "Achievement Unlocked!" : "Achievement";
+  const timelineHTML = campaigns
+    .flatMap((campaign) =>
+      campaign.completed_modules.map((m, idx) => ({
+        module: m,
+        campaign: campaign.campaign_name,
+        isLastInCampaign: idx === campaign.completed_modules.length - 1,
+      }))
+    )
+    .map(({ module: m, campaign: campName }, i) => {
+      const title = m.module_name || "Module";
       const badge =
         m.quiz_percentage !== undefined
           ? m.quiz_percentage >= 90
-            ? "Perfect Score"
+            ? null
             : m.quiz_percentage >= 70
               ? "Good Score"
               : null
@@ -271,13 +279,12 @@ function buildPrintHTML(args: {
         m.quiz_percentage !== undefined
           ? `Scored ${m.quiz_percentage.toFixed(0)}% on the module quiz assessment`
           : "Completed and achieved full module progress";
-      const isLast = i === allModules.length - 1;
       const rarityBg = rarity === "Rare" ? "#ffedd5" : "#e0f2fe";
       const rarityFg = rarity === "Rare" ? "#ea580c" : "#0284c7";
 
       return `
       <div style="position:relative;margin-bottom:16px;">
-        ${!isLast ? `<span style="position:absolute;left:-19px;top:24px;height:100%;width:1.5px;background:#34d399;display:block;"></span>` : ""}
+        ${!m.module_completion_date ? `<span style="position:absolute;left:-19px;top:24px;height:100%;width:1.5px;background:#34d399;display:block;"></span>` : ""}
         <span style="position:absolute;left:-28px;top:4px;width:20px;height:20px;border-radius:50%;background:#10b981;color:white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">✓</span>
         <div style="border:1px solid #e5e7eb;border-radius:12px;padding:12px;">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
@@ -290,6 +297,7 @@ function buildPrintHTML(args: {
           ${badge ? `<span style="display:inline-block;margin-bottom:6px;padding:2px 10px;font-size:10px;border-radius:9999px;border:1px solid #34d399;color:#10b981;">${badge}</span>` : ""}
           <div style="display:flex;align-items:center;gap:12px;font-size:10px;color:#6b7280;margin-bottom:4px;flex-wrap:wrap;">
             <span style="color:#f97316;">⭐ +${m.achieved_xp_tokens} XP</span>
+            <span style="color:#a855f7;">🏆 ${m.achieved_compliance_score} pts</span>
             ${m.quiz_percentage !== undefined ? `<span>📘 ${m.quiz_percentage.toFixed(0)}% Quiz Score</span>` : ""}
             ${m.duration_minutes ? `<span>⏱ ${m.duration_minutes} minutes</span>` : ""}
           </div>
@@ -472,11 +480,53 @@ function buildPrintHTML(args: {
       <div class="tl-header">
         <div style="display:flex;align-items:center;gap:8px;">
           <h2 style="font-size:14px;font-weight:600;">Learning Journey Timeline</h2>
-          <span class="badge-pill">${allModules.length} Task</span>
+          <span class="badge-pill">${campaigns.reduce((sum, c) => sum + c.completed_modules.length, 0)} Task</span>
         </div>
       </div>
       <div class="timeline-inner">
-        ${timelineHTML || `<p style="font-size:13px;color:#6b7280;text-align:center;padding:32px 0;">No completed modules yet</p>`}
+        ${campaigns.length === 0 ? `<p style="font-size:13px;color:#6b7280;text-align:center;padding:32px 0;">No completed modules yet</p>` : campaigns.map(campaign => `
+          <div style="margin-bottom:24px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+              <span style="font-size:11px;color:#166534;background:#d1fae5;padding:2px 10px;border-radius:9999px;border:1px solid #a7f3d0;">${campaign.campaign_name}</span>
+              <span style="font-size:10px;color:#9ca3af;">${campaign.completed_modules.length} Module</span>
+            </div>
+            <div style="position:relative;padding-left:32px;">
+              ${campaign.completed_modules.map((m, idx) => {
+                const t = m.module_name || "Module";
+                const b = m.quiz_percentage !== undefined ? m.quiz_percentage >= 90 ? null : m.quiz_percentage >= 70 ? "Good Score" : null : null;
+                const r = m.achievements_unlocked_in_module >= 3 ? "Rare" : m.achievements_unlocked_in_module >= 1 ? "Common" : null;
+                const rBg = r === "Rare" ? "#ffedd5" : "#e0f2fe";
+                const rFg = r === "Rare" ? "#ea580c" : "#0284c7";
+                const d = m.quiz_percentage !== undefined ? `Scored ${m.quiz_percentage.toFixed(0)}% on the module quiz assessment` : "Completed and achieved full module progress";
+                return `
+              <div style="position:relative;margin-bottom:16px;">
+                ${idx < campaign.completed_modules.length - 1 ? `<span style="position:absolute;left:-19px;top:24px;height:100%;width:1.5px;background:#34d399;display:block;"></span>` : ""}
+                <span style="position:absolute;left:-28px;top:4px;width:20px;height:20px;border-radius:50%;background:#10b981;color:white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">✓</span>
+                <div style="border:1px solid #e5e7eb;border-radius:12px;padding:12px;">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
+                    <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                      <span style="font-weight:500;font-size:12px;">${t}</span>
+                      ${r ? `<span style="padding:2px 8px;font-size:10px;border-radius:9999px;background:${rBg};color:${rFg};">${r}</span>` : ""}
+                    </div>
+                    ${m.module_completion_date ? `<span style="font-size:10px;color:#9ca3af;">📅 ${m.module_completion_date}</span>` : ""}
+                  </div>
+                  ${b ? `<span style="display:inline-block;margin-bottom:6px;padding:2px 10px;font-size:10px;border-radius:9999px;border:1px solid #34d399;color:#10b981;">${b}</span>` : ""}
+                  <div style="display:flex;align-items:center;gap:12px;font-size:10px;color:#6b7280;margin-bottom:4px;flex-wrap:wrap;">
+                    <span style="color:#f97316;">⭐ +${m.achieved_xp_tokens} XP</span>
+                    <span style="color:#a855f7;">🏆 ${m.achieved_compliance_score} pts</span>
+                    ${m.quiz_percentage !== undefined ? `<span>📘 ${m.quiz_percentage.toFixed(0)}% Quiz Score</span>` : ""}
+                    ${m.duration_minutes ? `<span>⏱ ${m.duration_minutes} minutes</span>` : ""}
+                  </div>
+                  <p style="font-size:11px;color:#6b7280;">${d}</p>
+                  <div style="margin-top:6px;">
+                    <span style="padding:2px 10px;font-size:10px;border-radius:9999px;background:#d1fae5;color:#059669;">Completed</span>
+                  </div>
+                </div>
+              </div>`;
+              }).join("")}
+            </div>
+          </div>
+        `).join("")}
       </div>
     </div>
     <div class="right-col">
@@ -484,15 +534,27 @@ function buildPrintHTML(args: {
       <div class="stats-panel">
         <div class="stat-item">
           <div style="display:flex;align-items:center;">
-            <div class="stat-icon" style="background:#fee2e2;">
-              <svg width="16" height="16" fill="none" stroke="#f87171" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            <div class="stat-icon" style="background:#fed7aa;">
+              <svg width="16" height="16" fill="none" stroke="#f97316" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
             <div>
-              <p style="font-size:12px;font-weight:500;color:#111827;">XP Level</p>
-              <p style="font-size:11px;color:#6b7280;">${xpTokens} total XP learned</p>
+              <p style="font-size:12px;font-weight:500;color:#111827;">XP Tokens Earned</p>
+              <p style="font-size:11px;color:#6b7280;">Total across all campaigns</p>
             </div>
           </div>
-          <span class="stat-val" style="color:#f87171;">${xpLevel}</span>
+          <span class="stat-val" style="color:#f97316;">${xpTokens.toFixed(2)}</span>
+        </div>
+        <div class="stat-item">
+          <div style="display:flex;align-items:center;">
+            <div class="stat-icon" style="background:#e9d5ff;">
+              <svg width="16" height="16" fill="none" stroke="#a855f7" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m7.228-4.228A10 10 0 1121.213 21.213a10 10 0 01-12.485-14.228z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <p style="font-size:12px;font-weight:500;color:#111827;">Compliance Score</p>
+              <p style="font-size:11px;color:#6b7280;">Total points earned</p>
+            </div>
+          </div>
+          <span class="stat-val" style="color:#a855f7;">${totalComplianceScore}</span>
         </div>
         <div class="stat-item">
           <div style="display:flex;align-items:center;">
@@ -506,25 +568,13 @@ function buildPrintHTML(args: {
           </div>
           <span class="stat-val" style="color:#2dd4bf;">${quizAccuracy.toFixed(0)}%</span>
         </div>
-        <div class="stat-item">
-          <div style="display:flex;align-items:center;">
-            <div class="stat-icon" style="background:#dbeafe;">
-              <svg width="16" height="16" fill="none" stroke="#60a5fa" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-            </div>
-            <div>
-              <p style="font-size:12px;font-weight:500;color:#111827;">Total Learning Time</p>
-              <p style="font-size:11px;color:#6b7280;">${xpTokens} total XP learned</p>
-            </div>
-          </div>
-          <span class="stat-val" style="color:#60a5fa;">${studyStr}</span>
-        </div>
       </div>
       <!-- Module Chart -->
       <div class="chart-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3 style="font-size:14px;font-weight:600;color:#1f2937;">Module Chart</h3>
+          <h3 style="font-size:14px;font-weight:600;color:#1f2937;">XP Progress Chart</h3>
         </div>
-        ${chartData.length > 0 ? svgChart : `<p style="font-size:10px;color:#9ca3af;text-align:center;padding:24px 0;">XP chart will appear after completing your first module</p>`}
+        ${chartData.length > 0 ? svgChart : `<p style="font-size:10px;color:#9ca3af;text-align:center;padding:24px 0;">Chart will appear after completing your first module</p>`}
       </div>
     </div>
   </div>
@@ -533,11 +583,15 @@ function buildPrintHTML(args: {
 }
 
 /* ─── Main Page ─── */
-export function ReportCardPage() {
+export function ReportCardPage({ userId }: { userId?: number } = {}) {
   useTranslations("dashboard");
   useI18n();
   const { user } = useAuthStore();
-  const { data: response, isLoading, isError } = useMyReportCard();
+  
+  // Use useUserReportCard if userId is provided, otherwise use useMyReportCard
+  const { data: response, isLoading, isError } = userId
+    ? useUserReportCard(userId)
+    : useMyReportCard();
 
   const result: any = response?.success ? response.data : undefined;
   const meta = result?.meta_statistics as Record<string, unknown> | undefined;
@@ -569,6 +623,11 @@ export function ReportCardPage() {
   const studyTime = (meta?.total_study_time as number | undefined) ?? 0;
   const riskLevel = (meta?.user_risk_level as string | null | undefined) ?? null;
   const riskBadge = getRiskBadge(riskLevel);
+
+  const totalComplianceScore = useMemo(
+    () => allModules.reduce((s, { module: m }) => s + (m.achieved_compliance_score || 0), 0),
+    [allModules]
+  );
 
   const chartData = allModules.slice(-6).map(({ module: m }) => m.achieved_xp_tokens);
   const chartLabels = allModules.slice(-6).map(({ module: m }) => {
@@ -608,9 +667,10 @@ export function ReportCardPage() {
       xpTokens,
       studyTime,
       riskBadge,
-      allModules,
+      campaigns,
       chartData,
       chartLabels,
+      totalComplianceScore,
     });
     const win = window.open("", "_blank", "width=1000,height=800");
 
@@ -859,16 +919,34 @@ export function ReportCardPage() {
                   </div>
                   <button className="text-xs text-sky-500 hover:underline">View All</button>
                 </div>
-                {allModules.length === 0 ? (
+                {campaigns.length === 0 ? (
                   <NoCompletedModules />
                 ) : (
-                  <div className="relative pl-8">
-                    {allModules.map(({ module }, i) => (
-                      <TimelineItem
-                        key={`${module.module_id}-${i}`}
-                        isLast={i === allModules.length - 1}
-                        module={module}
-                      />
+                  <div className="space-y-4">
+                    {campaigns.map((campaign) => (
+                      <div key={campaign.campaign_name}>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-xs text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-100">
+                            {campaign.campaign_name}
+                          </span>
+                          <span className="text-[10px] text-gray-400">
+                            {campaign.completed_modules.length} Task
+                          </span>
+                        </div>
+                        <div className="relative pl-8">
+                          {campaign.completed_modules.length === 0 ? (
+                            <NoCompletedModules />
+                          ) : (
+                            campaign.completed_modules.map((module, i) => (
+                              <TimelineItem
+                                key={`${module.module_id}-${i}`}
+                                isLast={i === campaign.completed_modules.length - 1}
+                                module={module}
+                              />
+                            ))
+                          )}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -881,23 +959,31 @@ export function ReportCardPage() {
                 <div className="space-y-2.5">
                   <div className="flex items-center justify-between bg-[#F5F8FB] rounded-xl p-3">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-                        <svg
-                          className="w-4 h-4 text-red-400"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                      <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-gray-900">XP Level</p>
-                        <p className="text-[11px] text-gray-500">{xpTokens} total XP learned</p>
+                        <p className="text-xs font-medium text-gray-900">XP Tokens Earned</p>
+                        <p className="text-[11px] text-gray-500">Total across all campaigns</p>
                       </div>
                     </div>
-                    <span className="text-lg font-semibold text-red-400">{xpLevel}</span>
+                    <span className="text-lg font-semibold text-orange-400">{xpTokens.toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-[#F5F8FB] rounded-xl p-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+                        <svg className="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                          <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-gray-900">Compliance Score</p>
+                        <p className="text-[11px] text-gray-500">Total points earned</p>
+                      </div>
+                    </div>
+                    <span className="text-lg font-semibold text-purple-400">{totalComplianceScore}</span>
                   </div>
                   <div className="flex items-center justify-between bg-[#F5F8FB] rounded-xl p-3">
                     <div className="flex items-center gap-2.5">

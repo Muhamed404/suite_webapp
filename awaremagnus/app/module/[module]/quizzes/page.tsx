@@ -120,6 +120,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [quizResults, setQuizResults] = useState<any[]>([]);
   const [moduleProgress, setModuleProgress] = useState<number | null>(null);
+  const [resultSummary, setResultSummary] = useState<any>(null);
 
   useEffect(() => {
     setCurrentQuestion(0);
@@ -130,6 +131,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     setIsSubmitting(false);
     setQuizResults([]);
     setModuleProgress(null);
+    setResultSummary(null);
   }, [quizData.length]);
 
   const quiz = quizData[currentQuestion];
@@ -285,6 +287,10 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
       if (response?.moduleProgress) {
         console.log("Module Progress:", response.moduleProgress);
         setModuleProgress(parseFloat(response.moduleProgress));
+      }
+      if (response?.result_summary) {
+        console.log("Result Summary:", response.result_summary);
+        setResultSummary(response.result_summary);
       }
       setShowCompletion(true);
     } catch (error) {
@@ -700,50 +706,50 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                       className="transition-all duration-500 ease-out opacity-100 translate-y-0 text-center"
                       id="completionText"
                     >
-                      <h2 className="text-2xl font-bold text-gray-900 mb-1">Congratulations!</h2>
-                      <p className="text-xs text-gray-600 mb-4">
-                        You have passed the quiz test successfully
-                      </p>
+                      {resultSummary?.final_result === "Passed" ? (
+                        <>
+                          <h2 className="text-2xl font-bold text-gray-900 mb-1">Congratulations!</h2>
+                          <p className="text-xs text-gray-600 mb-4">You have passed the quiz test successfully</p>
+                        </>
+                      ) : (
+                        <>
+                          <h2 className="text-2xl font-bold text-red-600 mb-1">Quiz Failed</h2>
+                          <p className="text-xs text-gray-600 mb-4">You did not meet the passing threshold. Please review and try again.</p>
+                        </>
+                      )}
                     </div>
 
                     {/* Quiz Results Summary */}
                     {quizResults.length > 0 && (
                       <div className="w-full mb-6 max-w-lg">
-                        {/* Module Progress Header */}
-                        {moduleProgress !== null && (
-                          <div className="mb-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3 border border-green-200">
-                            <div className="flex items-center justify-between mb-2">
-                              <span className="text-xs font-semibold text-gray-700">
-                                Module Progress
-                              </span>
-                              <span className="text-sm font-bold text-green-600">
-                                {moduleProgress.toFixed(2)}%
+                        {/* Accuracy Percentage Display */}
+                        {resultSummary && (
+                          <div className={`mb-4 rounded-lg p-4 border ${resultSummary.result_percentage >= resultSummary.passing_threshold_percentage ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'}`}>
+                            <p className="text-xs font-semibold text-gray-700 mb-1">Your Accuracy Percentage</p>
+                            <div className="flex items-center justify-between">
+                              <span className={`text-3xl font-bold ${resultSummary.result_percentage >= resultSummary.passing_threshold_percentage ? 'text-green-600' : 'text-red-600'}`}>{resultSummary.result_percentage.toFixed(2)}%</span>
+                              <span className={`text-xs font-semibold ${resultSummary.result_percentage >= resultSummary.passing_threshold_percentage ? 'text-green-600' : 'text-red-600'}`}>
+                                Threshold: {resultSummary.passing_threshold_percentage}%
                               </span>
                             </div>
-                            <div className="w-full h-3 bg-green-100 rounded-full overflow-hidden">
+                            <div className={`w-full h-2 rounded-full overflow-hidden mt-2 ${resultSummary.result_percentage >= resultSummary.passing_threshold_percentage ? 'bg-green-100' : 'bg-red-100'}`}>
                               <div
-                                className="h-full bg-gradient-to-r from-green-400 to-emerald-500"
-                                style={{ width: `${Math.min(100, moduleProgress)}%` }}
+                                className={`h-full ${resultSummary.result_percentage >= resultSummary.passing_threshold_percentage ? 'bg-gradient-to-r from-green-400 to-emerald-500' : 'bg-gradient-to-r from-red-400 to-red-500'}`}
+                                style={{
+                                  width: `${Math.min(100, resultSummary.result_percentage)}%`,
+                                }}
                               />
                             </div>
+                            {resultSummary.retries_left > 0 && resultSummary.final_result === "Failed" && (
+                              <p className="text-xs text-gray-600 mt-2 font-semibold">Retries left: <span className="text-orange-600">{resultSummary.retries_left}</span></p>
+                            )}
                           </div>
                         )}
 
+
                         {/* Performance Summary Header */}
                         <div className="flex items-center justify-between mb-3">
-                          <h3 className="text-sm font-semibold text-gray-900">
-                            Quiz Performance Summary
-                          </h3>
-                          <div className="text-xs text-gray-500">
-                            Overall Score
-                            <span className="ml-2 font-semibold text-gray-900">
-                              {Math.round(
-                                quizResults.reduce((s, r) => s + (Number(r.score) || 0), 0) /
-                                  quizResults.length || 0
-                              )}
-                              %
-                            </span>
-                          </div>
+                          <h3 className="text-sm font-semibold text-gray-900">Quiz Performance Summary</h3>
                         </div>
 
                         <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">

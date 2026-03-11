@@ -169,46 +169,35 @@ export default function CampaignLeaderboardPage() {
     return `/awm/images/avatars/${imageNumber}.png`;
   };
 
-  const getRiskLevelColor = (riskLevel: number) => {
-    if (riskLevel <= 10) return "bg-green-100";
-    if (riskLevel <= 25) return "bg-yellow-100";
-    if (riskLevel <= 50) return "bg-orange-100";
-
-    return "bg-red-100";
-  };
-
-  const getRiskLevelTextColor = (riskLevel: number) => {
-    if (riskLevel <= 10) return "text-green-700";
-    if (riskLevel <= 25) return "text-yellow-700";
-    if (riskLevel <= 50) return "text-orange-700";
-
-    return "text-red-700";
-  };
-
-  const getRiskLevelProgressBar = (riskLevel?: string | number) => {
+  const getRiskLevelBadge = (riskLevel?: string | number) => {
     if (!riskLevel) return <span className="text-gray-500">-</span>;
 
-    const level = typeof riskLevel === "number" ? riskLevel : parseInt(riskLevel);
-    const percentage = Math.min(100, Math.max(0, level));
+    const level = typeof riskLevel === "string" ? riskLevel : String(riskLevel);
+    
+    let bgColor = "bg-green-100";
+    let textColor = "text-green-700";
 
-    let bgColor = "bg-green-500";
-
-    if (level > 50) bgColor = "bg-orange-500";
-    else if (level > 25) bgColor = "bg-yellow-500";
-    else if (level > 10) bgColor = "bg-blue-500";
+    if (level.toLowerCase().includes("very high") || level.toLowerCase().includes("very_high")) {
+      bgColor = "bg-red-100";
+      textColor = "text-red-700";
+    } else if (level.toLowerCase().includes("high")) {
+      bgColor = "bg-orange-100";
+      textColor = "text-orange-700";
+    } else if (level.toLowerCase().includes("medium")) {
+      bgColor = "bg-yellow-100";
+      textColor = "text-yellow-700";
+    } else if (level.toLowerCase().includes("low") && !level.toLowerCase().includes("very")) {
+      bgColor = "bg-blue-100";
+      textColor = "text-blue-700";
+    } else if (level.toLowerCase().includes("very low") || level.toLowerCase().includes("very_low")) {
+      bgColor = "bg-green-100";
+      textColor = "text-green-700";
+    }
 
     return (
-      <div className="flex items-center gap-2">
-        <div className="w-20 h-2 bg-gray-200 rounded-full">
-          <div
-            className={`${bgColor} h-2 rounded-full transition-all duration-300`}
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
-        <span className={`text-xs font-semibold ${getRiskLevelTextColor(level)}`}>
-          {percentage}%
-        </span>
-      </div>
+      <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${bgColor} ${textColor}`}>
+        {level}
+      </span>
     );
   };
 
@@ -478,7 +467,7 @@ export default function CampaignLeaderboardPage() {
                           <span>{formatDate(user.last_login)}</span>
                         </td>
                         <td className="px-4 py-3.5 whitespace-nowrap">
-                          {getRiskLevelProgressBar(user.risk_level)}
+                          {getRiskLevelBadge(user.risk_level)}
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           <span className="font-semibold text-gray-700">
@@ -521,7 +510,7 @@ export default function CampaignLeaderboardPage() {
                           <span
                             className={clsx(
                               "inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold",
-                              `${getRiskLevelColor(user.risk_level || 0)} ${getRiskLevelTextColor(user.risk_level || 0)}`
+                              "bg-purple-100 text-purple-700"
                             )}
                           >
                             {user.unlocked_achievements || 0}
@@ -561,8 +550,15 @@ export default function CampaignLeaderboardPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3.5 whitespace-nowrap">
-                          <button className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-full transition-colors">
-                            Launch
+                          <button
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-full transition-colors"
+                            onClick={() =>
+                              router.push(
+                                `/dashboard/launch-awareness/campaigns/${campaignId}/user/${user.user_id}/report`
+                              )
+                            }
+                          >
+                            View Report
                           </button>
                         </td>
                       </tr>
