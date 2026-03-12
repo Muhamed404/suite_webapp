@@ -33,7 +33,7 @@ import {
   useOrganizationStrugglingModules,
   useOrganizationMonthlyCompletion,
   useUserAssignments,
-  useUserGameAchievements,
+  useAchievementStatistics,
 } from "@/hooks/useDashboard";
 import { useLicenseInfo } from "@/hooks/useSuiteAwm";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
@@ -112,8 +112,8 @@ export default function DashboardPage() {
   const { data: orgDataResponse } = useOrganizationDashboards();
   const { data: userDataResponse } = useUserDashboards({ userId: user?.id });
   const { data: assignmentsData } = useUserAssignments({ language_id: 1 });
-  // include the current user id so that org users get their own data
-  const { data: userGameAchievementsData } = useUserGameAchievements(user?.id);
+  // Fetch achievement statistics for the org
+  const { data: achievementStatsData } = useAchievementStatistics();
 
   const { data: systemStrugglingRaw } = useSystemStrugglingModules({ enabled: isPlatformAdmin });
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
@@ -371,38 +371,44 @@ export default function DashboardPage() {
     }
   }, [compliancePercent]);
 
-  // Unlocked achievements for user
+  // Achievement statistics from the new API
+  const achievementStatsList = useMemo(() => {
+    if (
+      achievementStatsData?.statusCode === 200 &&
+      achievementStatsData.object?.achievement_statistics
+    ) {
+      return achievementStatsData.object.achievement_statistics;
+    }
+
+    return [];
+  }, [achievementStatsData]);
+
+  // Unlocked achievements (employee_count > 0)
   const unlockedAchievementIds = useMemo(() => {
     const set = new Set<number>();
 
-    if (
-      userGameAchievementsData?.statusCode === 200 &&
-      userGameAchievementsData.object?.userGameAchievements
-    ) {
-      for (const achievement of userGameAchievementsData.object.userGameAchievements) {
+    for (const achievement of achievementStatsList) {
+      if (achievement.employee_count > 0) {
         set.add(achievement.achievement_id);
       }
     }
 
     return set;
-  }, [userGameAchievementsData]);
+  }, [achievementStatsList]);
 
-  // Category stats for user achievements
+  // Category stats for achievements
   const categoryStats = useMemo(() => {
     const stats: Record<string, number> = {};
 
-    if (
-      userGameAchievementsData?.statusCode === 200 &&
-      userGameAchievementsData.object?.userGameAchievements
-    ) {
-      for (const achievement of userGameAchievementsData.object.userGameAchievements) {
-        stats[achievement.category_name] =
-          (stats[achievement.category_name] || 0) + achievement.count;
+    for (const achievement of achievementStatsList) {
+      if (achievement.employee_count > 0) {
+        stats[achievement.achievement_category] =
+          (stats[achievement.achievement_category] || 0) + achievement.employee_count;
       }
     }
 
     return stats;
-  }, [userGameAchievementsData]);
+  }, [achievementStatsList]);
 
   // Define total for each category (static for now)
   const categoryTotals: Record<string, number> = {
@@ -745,16 +751,16 @@ export default function DashboardPage() {
                       <span className="text-gray-700 text-[10px] font-medium">Achievements</span>
                       <div>
                         <span className="text-gray-900 text-sm font-bold">
-                          {userGameAchievementsData?.object?.count || 0}
+                          {achievementStatsData?.object?.total_unique_achievements_unlocked || 0}
                         </span>
-                        <span className="text-gray-400 text-[10px]">/16</span>
+                        <span className="text-gray-400 text-[10px]">/50</span>
                       </div>
                     </div>
                     <div className="w-full bg-purple-100 rounded-full h-1.5">
                       <div
                         className="bg-gradient-to-r from-purple-500 to-purple-600 h-1.5 rounded-full transition-all duration-300"
                         style={{
-                          width: `${((userGameAchievementsData?.object?.count || 0) / 16) * 100}%`,
+                          width: `${((achievementStatsData?.object?.total_unique_achievements_unlocked || 0) / 50) * 100}%`,
                         }}
                       />
                     </div>

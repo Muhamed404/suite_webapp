@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { Tooltip } from "@heroui/tooltip";
 import { useMemo } from "react";
 
 import { useTranslations } from "@/i18n/useTranslations";
@@ -149,6 +150,36 @@ export const GamificationStats = () => {
     return set;
   }, [stats]);
 
+  // Map: achievement number → full stats object (for tooltip data)
+  const achievementByNumber = useMemo(() => {
+    const map = new Map<number, any>();
+    const items = stats?.achievement_statistics ?? [];
+
+    for (const a of items) {
+      const img = a?.image_small_url ?? "";
+      const m = img.trim().match(/^(\d{1,2})/);
+
+      if (!m) continue;
+      const n = Number(m[1]);
+
+      if (n >= 1 && n <= 16) map.set(n, a);
+    }
+
+    return map;
+  }, [stats]);
+
+  // Display order: unlocked achievements first, then locked — capped at 16
+  const achievementDisplayOrder = useMemo(() => {
+    const all = Array.from({ length: 16 }, (_, i) => i + 1);
+
+    return all.sort((a, b) => {
+      const aUnlocked = unlockedAchievementNumbers.has(a) ? 0 : 1;
+      const bUnlocked = unlockedAchievementNumbers.has(b) ? 0 : 1;
+
+      return aUnlocked - bUnlocked;
+    });
+  }, [unlockedAchievementNumbers]);
+
   const _totalAchievements = stats?.total_achievements || 0;
   const unlockedAchievements = stats?.total_unique_achievements_unlocked || 0;
   const totalUniqueAchievements =
@@ -253,28 +284,54 @@ export const GamificationStats = () => {
 
           {/* Badges - Always show 16 local achievement icons (1..16). If the
               backend response contains an item whose `image_small_url` starts
-              with that number, show the `achived.svg` overlay. */}
+              with that number, show the `achived.svg` overlay. Unlocked badges
+              are shown first; tooltip shows name, description, count & status. */}
           <div className="grid grid-cols-8 gap-4 gap-y-5 mt-10">
-            {Array.from({ length: 16 }).map((_, idx) => {
-              const num = idx + 1;
+            {achievementDisplayOrder.map((num) => {
               const isUnlocked = unlockedAchievementNumbers.has(num);
+              const meta = achievementByNumber.get(num);
+
+              const tooltipContent = (
+                <div className="flex flex-col gap-1 max-w-[200px] p-1">
+                  <p className="font-semibold text-sm text-gray-900">
+                    {meta?.achievement_name ?? `Achievement #${num}`}
+                  </p>
+                  {meta?.achievement_description && (
+                    <p className="text-xs text-gray-600 leading-tight">
+                      {meta.achievement_description}
+                    </p>
+                  )}
+                  <div className="flex items-center justify-between mt-1 gap-2">
+                    <span
+                      className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
+                    >
+                      {isUnlocked ? "Unlocked" : "Locked"}
+                    </span>
+                    {isUnlocked && meta?.employee_count != null && (
+                      <span className="text-xs text-gray-500">
+                        {meta.employee_count}x
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
 
               return (
-                <div
-                  key={num}
-                  aria-disabled={!isUnlocked}
-                  className={`w-14 h-14 rounded-full flex items-center justify-center relative ${isUnlocked ? "" : "opacity-40"}`}
-                  title={isUnlocked ? `Unlocked (#${num})` : `Locked (#${num})`}
-                >
-                  <Image
-                    unoptimized
-                    alt={`Achievement ${num}`}
-                    className="w-14 h-14"
-                    height={56}
-                    src={getContentAssetUrl(`/images/achivement/${num}.png`)}
-                    width={56}
-                  />
-                </div>
+                <Tooltip key={num} content={tooltipContent} placement="top">
+                  <div
+                    aria-disabled={!isUnlocked}
+                    className={`w-14 h-14 rounded-full flex items-center justify-center relative cursor-default ${isUnlocked ? "" : "opacity-40"}`}
+                  >
+                    <Image
+                      unoptimized
+                      alt={meta?.achievement_name ?? `Achievement ${num}`}
+                      className="w-14 h-14"
+                      height={56}
+                      src={getContentAssetUrl(`/images/achivement/${num}.png`)}
+                      width={56}
+                    />
+                  </div>
+                </Tooltip>
               );
             })}
           </div>
