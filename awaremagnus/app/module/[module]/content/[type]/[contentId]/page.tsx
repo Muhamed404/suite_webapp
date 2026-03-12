@@ -29,13 +29,14 @@ export default function ModuleContentDetailPage() {
 
   const isOrgUserCheck = isOrgUser(user?.role_id);
 
-  // Org user viewing a poster/brochure/document/screen-saver (types 3,4,5,6,7)
+  // Org user viewing a poster/brochure/document/screen-saver/misc (types 3,4,5,6,7,8)
   if (
     isOrgUserCheck &&
     (isPosterContentType(contentTypeId) ||
       isBrochureDocumentContentType(contentTypeId) ||
       contentTypeId === 5 ||
-      contentTypeId === 6)
+      contentTypeId === 6 ||
+      contentTypeId === 8)
   ) {
     return (
       <OrgUserPosterBrochureDetailScreen

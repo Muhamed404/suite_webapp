@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { ArrowLeft, Play, Trophy } from "lucide-react";
@@ -13,7 +12,6 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import {
   useOrganizationLeaderboard,
-  useAvatarStatistics,
   useAchievementStatistics,
 } from "@/hooks/useDashboard";
 
@@ -24,26 +22,20 @@ export default function CampaignDetailsPage() {
   const isRtl = dir === "rtl";
   const t = useTranslations("dashboard");
 
-  const [isActive, setIsActive] = useState(true);
 
   const campaignId = params?.id ? Number(params.id) : 0;
   const updateCampaign = useUpdateCampaign();
 
-  // Fetch all campaign data from dashboard API
   const { data: campaignDashboard, isLoading } = useCampaignDashboard(campaignId);
 
-  // Fetch gamification and leaderboard data
   const { data: leaderboardData } = useOrganizationLeaderboard({
     campaignId,
     count: 10,
   });
-  const { data: avatarData } = useAvatarStatistics();
   const { data: achievementData } = useAchievementStatistics();
 
-  // Achievement display values: total uses design default (50) when API is missing/zero,
-  // unlocked comes directly from API (0 is a valid value).
-  const achievementUnlocked = achievementData?.data?.total_unique_achievements_unlocked ?? 0;
-  const achievementTotal = achievementData?.data?.total_achievements || 50;
+  const achievementUnlocked = achievementData?.object?.total_unique_achievements_unlocked ?? 0;
+  const achievementTotal = achievementData?.object?.total_achievements || 50;
   const achievementPercent =
     achievementTotal > 0 ? Math.round((achievementUnlocked / achievementTotal) * 100) : 0;
 
@@ -98,13 +90,6 @@ export default function CampaignDetailsPage() {
 
   const progress = calculateProgress();
 
-  // Log campaign dashboard for debugging
-  // Note: duplicated "Campaign Performance Metrics" block was removed to match HTML design
-  useEffect(() => {
-    if (campaignDashboard) {
-      console.log("Campaign Dashboard:", campaignDashboard);
-    }
-  }, [campaignDashboard]);
 
   if (isLoading) {
     return (
@@ -122,7 +107,6 @@ export default function CampaignDetailsPage() {
     <ProtectedRoute>
       <DashboardLayout>
         <div className={clsx("p-3", isRtl && "text-right")}>
-          {/* Header */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Button
@@ -139,7 +123,6 @@ export default function CampaignDetailsPage() {
               </div>
             </div>
 
-            {/* Launch Button - Show for In Progress campaigns */}
             {campaignDashboard?.status_id === 20 && (
               <Button
                 className="text-white"
@@ -153,7 +136,6 @@ export default function CampaignDetailsPage() {
               </Button>
             )}
 
-            {/* Leaderboard Button */}
             <Button
               className="border-gray-300"
               size="sm"
@@ -169,11 +151,8 @@ export default function CampaignDetailsPage() {
             </Button>
           </div>
 
-          {/* First Section - Campaign Details Grid */}
           <div className="grid grid-cols-12 gap-2 mb-2">
-            {/* Campaign Details Card */}
             <div className="bg-white p-5 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-6 col-span-8 row-span-5">
-              {/* Left Section - Campaign Info */}
               <div className="space-y-3 text-gray-700">
                 <h2 className="text-lg font-semibold mb-4">
                   {campaignDashboard?.name || "Campaign"}
@@ -203,9 +182,7 @@ export default function CampaignDetailsPage() {
                 </div>
               </div>
 
-              {/* Right Section - Topics Schedule & Settings */}
               <div className="bg-gray-50 p-4 rounded-xl space-y-4">
-                {/* Topics Schedule */}
                 <div>
                   <div className="flex items-center gap-1.5 mb-2">
                     <span className="w-4 h-4">
@@ -228,7 +205,6 @@ export default function CampaignDetailsPage() {
                     )}
                   </div>
 
-                  {/* Campaign Status (matches design) */}
                   <div className="space-y-1.5 pt-3 border-t border-gray-200">
                     <label className="flex items-center gap-1.5 text-gray-700 font-medium text-xs">
                       <input
@@ -246,7 +222,6 @@ export default function CampaignDetailsPage() {
                       </span>
 
                       <label className="relative inline-flex items-center">
-                        {/* Static toggle (visual only) */}
                         <input
                           readOnly
                           checked={campaignDashboard?.status_id === 2}
@@ -336,7 +311,6 @@ export default function CampaignDetailsPage() {
                   campaignDashboard.top_struggling_topics
                     .slice(0, 3)
                     .map((topic: any, idx: number) => {
-                      // Map topic names to icon paths and colors
                       const iconMap: Record<
                         string,
                         { icon: string; color: string; textColor: string }
@@ -623,9 +597,7 @@ export default function CampaignDetailsPage() {
                   </a>
                 </div>
                 <div className="grid grid-cols-8 gap-3 gap-y-4 mt-8">
-                  {/* Achievement badges - Static 16 badges */}
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((idx) => {
-                    // First 7 badges are unlocked
                     const isUnlocked = idx <= 7;
 
                     return (

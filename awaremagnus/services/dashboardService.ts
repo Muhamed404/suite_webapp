@@ -180,9 +180,13 @@ export const dashboardService = {
   },
 
   // --- User Game Achievements ---
-  getUserGameAchievements: async () => {
+  // `userId` is optional: org users should pass it explicitly so the backend
+  // can return achievements for the correct user. Platform/admin calls may
+  // omit it since the token determines the user.
+  getUserGameAchievements: async (params?: { userId?: number }) => {
     const { data } = await awmClient.get<UserGameAchievementsResponse>(
-      `${API_BASE}/usergame/achievements`
+      `${API_BASE}/usergame/achievements`,
+      { params }
     );
 
     return data;

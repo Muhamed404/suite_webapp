@@ -232,7 +232,7 @@ export interface AchievementStatisticsResponse {
   message: string;
   statusCode: number;
   alertType: string;
-  data: {
+  object: {
     total_achievements: number;
     total_unique_achievements_unlocked: number;
     total_unique_achievements_locked: number;
