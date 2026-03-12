@@ -79,7 +79,7 @@ exports.createEmailCampaign = async (req, res) => {
 
 
     } else if (req.method === "POST") {
-      logger.info(`Campaign IncomingBody Request: \n ${JSON.stringify(req.body, null, 2)}`);
+      logger.info(`Email Campaign Create IncomingBody Request: \n ${JSON.stringify(req.body, null, 2)}`);
       // return res.redirect('/phm/Campaign/email');
       let payload = req.body;
 
