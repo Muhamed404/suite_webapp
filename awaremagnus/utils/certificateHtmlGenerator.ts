@@ -15,6 +15,7 @@ export interface CertificateTemplateData {
   lastName?: string;
   courseName?: string;
   completionDate?: string;
+  issueDate?: string;
 }
 
 export const getProcessedText = (
@@ -24,7 +25,8 @@ export const getProcessedText = (
   courseName: string,
   completionDate: string
 ) => {
-  const defaultTemplate = 'This is to certify that <%first_name%> <%last_name%> has successfully completed <%content_name%> on <%completion_date%>';
+  const defaultTemplate =
+    "This is to certify that <%first_name%> <%last_name%> has successfully completed <%content_name%> on <%completion_date%>";
   const templateHtml = templateText?.trim() || defaultTemplate;
 
   return templateHtml
@@ -41,22 +43,29 @@ export const getProcessedText = (
 export const generateCertificateHtml = (data: CertificateTemplateData) => {
   const {
     templateText,
-    bgColor = '#ffffff',
+    bgColor = "#ffffff",
     assets,
     firstName = "John",
     lastName = "Doe",
     courseName = "Cybersecurity Awareness on Physical Security",
-    completionDate = "1/27/2026"
+    completionDate = "1/27/2026",
+    issueDate = "",
   } = data;
 
-  const logo = assets.logo || '';
-  const bottomLogo = assets.bottomLogo || '';
-  const stampLogo = assets.stamp || '';
-  const signImage = assets.signature || '';
-  const borderImage = assets.border || '';
-  const watermarkImage = assets.watermark || '';
+  const logo = assets.logo || "";
+  const bottomLogo = assets.bottomLogo || "";
+  const stampLogo = assets.stamp || "";
+  const signImage = assets.signature || "";
+  const borderImage = assets.border || "";
+  const watermarkImage = assets.watermark || "";
 
-  const certificateText = getProcessedText(templateText, firstName, lastName, courseName, completionDate);
+  const certificateText = getProcessedText(
+    templateText,
+    firstName,
+    lastName,
+    courseName,
+    completionDate
+  );
 
   return `
 <!DOCTYPE html>
@@ -142,12 +151,16 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
 
     /* Proper border image */
     .certificate-container {
-      ${borderImage ? `
+      ${
+        borderImage
+          ? `
       border-image-slice: 30;
       border-image-repeat: round;
       border-image-width: 20px;
       border-image-source: url('${borderImage}');
-      ` : `border: 2px solid #ccc;`}
+      `
+          : `border: 2px solid #ccc;`
+      }
     }
 
     /* Background watermark */
@@ -157,7 +170,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
       left: 0;
       width: 100%;
       height: 100%;
-      ${watermarkImage ? `background-image: url('${watermarkImage}');` : ''}
+      ${watermarkImage ? `background-image: url('${watermarkImage}');` : ""}
       background-repeat: no-repeat;
       background-position: center;
       background-size: 60%;
@@ -271,10 +284,10 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
       <div class="certificate-watermark"></div>
 
       <!-- Top Logo -->
-      ${logo ? `<img class="certificate-top-logo" src="${logo}" alt="Logo">` : ''}
+      ${logo ? `<img class="certificate-top-logo" src="${logo}" alt="Logo">` : ""}
 
       <!-- Bottom Logo -->
-      ${bottomLogo ? `<img class="certificate-bottom-logo" src="${bottomLogo}" alt="Bottom Logo">` : ''}
+      ${bottomLogo ? `<img class="certificate-bottom-logo" src="${bottomLogo}" alt="Bottom Logo">` : ""}
 
       <!-- Content -->
       <div class="certificate-content">
@@ -294,13 +307,15 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
         
         <div class="certificate-sign">
           <!-- secondary signature if needed -->
+          <!-- show issue date above the date label when provided -->
+          ${issueDate ? `<div class="certificate-issue-date" style="font-size:14px;margin-bottom:4px;">${issueDate}</div>` : ""}
           <div class="certificate-sign-line"></div>
           <small>Date</small>
         </div>
       </div>
       
       <!-- Stamp in the middle -->
-      ${stampLogo ? `<img src="${stampLogo}" alt="Stamp" class="certificate-stamp">` : ''}
+      ${stampLogo ? `<img src="${stampLogo}" alt="Stamp" class="certificate-stamp">` : ""}
 
     </div>
   </div>

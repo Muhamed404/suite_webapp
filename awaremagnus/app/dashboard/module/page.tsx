@@ -179,7 +179,10 @@ export default function ModuleListPage() {
                             </TableCell>
                             <TableCell>
                               <span className="text-sm text-gray-600">
-                                {item.difficulty != null ? (DIFFICULTY_LABELS[item.difficulty] ?? `Level ${item.difficulty}`) : "—"}
+                                {item.difficulty != null
+                                  ? (DIFFICULTY_LABELS[item.difficulty] ??
+                                    `Level ${item.difficulty}`)
+                                  : "—"}
                               </span>
                             </TableCell>
                             <TableCell>

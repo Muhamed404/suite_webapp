@@ -29,6 +29,7 @@
 		"formSubmitted": "Submitted",
 		"attachmentOpened": "Attachment Opened",
 		"linkClicked": "Track phishing simulation link clicked",
+		"nfcScanned": "NFC Scanned",
 		"targetCompromised": "Target Compromised",
 		"search_here": "Search here...",
 		"sort_by": "Sort by",
@@ -102,7 +103,8 @@
 		"show": "Show",
 		"select_template_to_preview": "Select a template to preview",
 		"emailOpened": "Track email opened",
-		"fileDownloaded": "generic_label.fileDownloaded"
+		"fileDownloaded": "generic_label.fileDownloaded",
+		"qrScanned": "generic_label.qrScanned"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",

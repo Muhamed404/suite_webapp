@@ -6,6 +6,7 @@ import { useState, useMemo } from "react";
 import { ChevronsUpDown, SearchX } from "lucide-react";
 
 import { CampaignTableRow } from "./campaign-table-row";
+
 import { useTranslations } from "@/i18n/useTranslations";
 
 interface CampaignListProps {
@@ -166,7 +167,8 @@ export function CampaignList({ campaigns, isLoading, searchQuery }: CampaignList
       <div className="flex flex-col md:flex-row justify-between items-center px-4 py-3.5 border-t bg-gray-50 gap-3">
         <div className="text-[10px] text-gray-400 font-medium">
           <span>
-            Showing {sortedCampaigns.length > 0 ? 1 : 0}–{Math.min(sortedCampaigns.length, 10)} out of {sortedCampaigns.length} Entries
+            Showing {sortedCampaigns.length > 0 ? 1 : 0}–{Math.min(sortedCampaigns.length, 10)} out
+            of {sortedCampaigns.length} Entries
           </span>
         </div>
         <div className="flex gap-1.5">{/* Pagination buttons can be added here */}</div>

@@ -8,6 +8,7 @@ import Image from "next/image";
 import { Button } from "@heroui/button";
 import { Select, SelectItem } from "@heroui/select";
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 
 import {
   ContentTypeSelector,
@@ -17,7 +18,6 @@ import {
 } from "./content-type-selector";
 import { ContentForm, type ContentTranslation } from "./content-form";
 
-import { useRouter } from "next/navigation";
 import { CONTENT_TYPES } from "@/constants/content-types";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -144,16 +144,18 @@ export function CreateContentForm({
   const isQuizType =
     useApiContentTypes && selectedContentTypeId != null
       ? (apiContentTypes
-        .find((ct) => ct.id === selectedContentTypeId)
-        ?.name?.toLowerCase()
-        .includes("quiz") ?? false)
+          .find((ct) => ct.id === selectedContentTypeId)
+          ?.name?.toLowerCase()
+          .includes("quiz") ?? false)
       : contentType === "Quiz";
 
   const { data: modulesRes } = useModules();
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
   const createContent = useCreateContent();
 
-  const backHref = returnHref ?? (moduleId ? `/dashboard/training-library/system/${moduleId}` : "/dashboard/module");
+  const backHref =
+    returnHref ??
+    (moduleId ? `/dashboard/training-library/system/${moduleId}` : "/dashboard/module");
 
   const handleModuleChange = (keys: unknown) => {
     const v =
@@ -270,8 +272,8 @@ export function CreateContentForm({
     const requiresFileOrUrl = useApiContentTypes
       ? true
       : ["iSpring", "PDF", "Video", "Brochure", "Screen Saver", "Poster", "Game"].includes(
-        contentType!
-      );
+          contentType!
+        );
 
     if (!isQuizType && requiresFileOrUrl) {
       if (!allowsFileUpload) {
@@ -393,19 +395,18 @@ export function CreateContentForm({
       ? true
       : contentType
         ? [
-          "iSpring",
-          "PDF",
-          "Video",
-          "Brochure",
-          "Screen Saver",
-          "Poster",
-          "Game",
-          "Misc",
-        ].includes(contentType)
+            "iSpring",
+            "PDF",
+            "Video",
+            "Brochure",
+            "Screen Saver",
+            "Poster",
+            "Game",
+            "Misc",
+          ].includes(contentType)
         : false;
   const showUrlOnly = requiresFileOrUrlForDisplay && !allowsFileUpload;
   const showFileOrUrlChoice = requiresFileOrUrlForDisplay && allowsFileUpload;
-
 
   const quizFormHref =
     returnHref && moduleId
@@ -517,7 +518,12 @@ export function CreateContentForm({
               radius="full"
               size="md"
             >
-              <Image alt="" height={12} src={getContentAssetUrl("/images/img/add.svg")} width={12} />
+              <Image
+                alt=""
+                height={12}
+                src={getContentAssetUrl("/images/img/add.svg")}
+                width={12}
+              />
               <span className="md:flex hidden text-xs">{t("addNew")}</span>
             </Button>
           </div>

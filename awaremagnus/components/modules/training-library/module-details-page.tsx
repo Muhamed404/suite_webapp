@@ -11,6 +11,7 @@ import { Select, SelectItem } from "@heroui/select";
 import { Input } from "@heroui/input";
 import { useState, useMemo, useRef, useEffect } from "react";
 import clsx from "clsx";
+import ReactCountryFlag from "react-country-flag";
 
 import {
   selectClassNames,
@@ -23,15 +24,23 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useModule, useContentsByModule, useQuizzesByModule, useModules, useContentsWithQuizzes, useContentsWithProgress } from "@/hooks/useQuiz";
+import {
+  useModule,
+  useModules,
+  useContentsWithQuizzes,
+  useContentsWithProgress,
+} from "@/hooks/useQuiz";
 // import { useContentTypes } from "@/hooks/useSuiteAwm";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { SUPPORTED_LANGUAGES, getLanguageName, getLanguageCountryCode } from "@/utils/supportedLanguages";
+import {
+  SUPPORTED_LANGUAGES,
+  getLanguageName,
+  getLanguageCountryCode,
+} from "@/utils/supportedLanguages";
 import { getContentTypeIconFor } from "@/utils/contentTypeIcons";
 import { isPlatformAdmin, isOrgAdmin, isOrgUser } from "@/utils/roles";
 import { SearchIcon } from "@/components/icons";
 import { ModuleDetailsSkeleton } from "@/components/ui/skeletons";
-import ReactCountryFlag from "react-country-flag";
 
 /** Normalized type name is "interactive lesson" / "ispring" / "interactive content(s)" → do not group (one card per item) */
 function isInteractiveLessonType(typeName: string): boolean {
@@ -73,7 +82,6 @@ function contentTitle(c: ModuleContent): string {
   );
 }
 
-
 function languageId(c: ModuleContent): number | undefined {
   return c.language?.id ?? c.translations?.[0]?.language_id;
 }
@@ -96,18 +104,18 @@ function getIconBgClass(typeName: string): string {
 
 type ContentTypeCardItem =
   | {
-    kind: "interactive";
-    item: ModuleContent;
-    typeId: number;
-    typeName: string;
-  }
+      kind: "interactive";
+      item: ModuleContent;
+      typeId: number;
+      typeName: string;
+    }
   | {
-    kind: "grouped";
-    typeId: number;
-    typeName: string;
-    count: number;
-    items: ModuleContent[];
-  }
+      kind: "grouped";
+      typeId: number;
+      typeName: string;
+      count: number;
+      items: ModuleContent[];
+    }
   | { kind: "quizzes"; count: number };
 
 type StatusFilter = "all" | "pending" | "completed";
@@ -153,11 +161,13 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     if (!isOrgUserView || !assignedModulesRes?.success) return undefined;
     const modules = assignedModulesRes.data ?? [];
     const currentModule = modules.find((m) => m.id === Number(moduleId));
+
     // Use the first active assignment's campaign ID
     if (currentModule && currentModule.assignments && currentModule.assignments.length > 0) {
       // prioritizing IN_PROGRESS or NOT_STARTED
       return currentModule.assignments[0].campaign_id;
     }
+
     return undefined;
   }, [isOrgUserView, assignedModulesRes, moduleId]);
 
@@ -166,7 +176,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     moduleId,
     {
       lang_id: languageFilter ? Number(languageFilter) : undefined,
-      enabled: isAdminView || (isOrgUserView && !campaignId) // Fallback for Org User if no campaign
+      enabled: isAdminView || (isOrgUserView && !campaignId), // Fallback for Org User if no campaign
     }
   );
 
@@ -175,42 +185,45 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     campaignId!,
     {
       lang_id: languageFilter ? Number(languageFilter) : undefined,
-      enabled: isOrgUserView && !!campaignId
+      enabled: isOrgUserView && !!campaignId,
     }
   );
 
   // Unified Data extraction
-  const {
-    nonAggregatedContents,
-    aggregatedContents,
-    userProgress,
-    quizzesData
-  } = useMemo(() => {
+  const { nonAggregatedContents, aggregatedContents, userProgress, quizzesData } = useMemo(() => {
     if (isOrgUserView && campaignId && contentsWithProgressRes?.success) {
       const data = contentsWithProgressRes.data;
+
       return {
         nonAggregatedContents: data.non_aggregated_contents || [],
         aggregatedContents: data.aggregated_contents || {},
         userProgress: data.user_progress_summary,
-        quizzesData: null // Quizzes often embedded in non-aggregated or separate
+        quizzesData: null, // Quizzes often embedded in non-aggregated or separate
       };
     } else if (contentsWithQuizzesRes?.success) {
       const data = contentsWithQuizzesRes.data;
+
       return {
         nonAggregatedContents: data.non_aggregated_contents || [],
         aggregatedContents: data.aggregated_contents || {},
         userProgress: null,
-        quizzesData: null
+        quizzesData: null,
       };
     }
-    return { nonAggregatedContents: [], aggregatedContents: {}, userProgress: null, quizzesData: null };
-  }, [isOrgUserView, campaignId, contentsWithProgressRes, contentsWithQuizzesRes]);
 
+    return {
+      nonAggregatedContents: [],
+      aggregatedContents: {},
+      userProgress: null,
+      quizzesData: null,
+    };
+  }, [isOrgUserView, campaignId, contentsWithProgressRes, contentsWithQuizzesRes]);
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
 
   const getContentTypeDisplayName = (name: string) => {
     const n = (name ?? "").toLowerCase().trim();
+
     // Simple mapping or translation key lookup
     if (n.includes("interactive")) return tContent("contentTypes.interactiveContents");
     if (n.includes("video")) return tContent("contentTypes.motionVideos");
@@ -220,6 +233,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     if (n.includes("game") && !n.includes("vr")) return tContent("contentTypes.games");
     if (n.includes("vr")) return tContent("contentTypes.vrGames");
     if (n.includes("document")) return tContent("contentTypes.documents");
+
     return name;
   };
 
@@ -232,7 +246,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
         kind: "interactive", // Using 'interactive' kind for all individual cards for now
         item: item,
         typeId: item.content_type_id,
-        typeName: item.content_type
+        typeName: item.content_type,
       });
     });
 
@@ -246,7 +260,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
           typeName: agg.content_type,
           count: agg.total_count,
           // We don't have individual items here, just the summary
-          items: []
+          items: [],
         });
       }
     });
@@ -256,10 +270,10 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     if (userProgress?.quizzes) {
       cards.push({ kind: "quizzes", count: userProgress.quizzes.total });
     }
-    // If Admin view, we might need to rely on what the API returns. 
+    // If Admin view, we might need to rely on what the API returns.
     // The current API response for contents-with-quizzes doesn't explicitly give a global quiz count in root,
-    // but individual items have quiz data. 
-    // Assuming for now Quizzes are treated as a separate card if we want to list them all, 
+    // but individual items have quiz data.
+    // Assuming for now Quizzes are treated as a separate card if we want to list them all,
     // OR they are attached to content. The requirement said "render quiz card next to that... content".
     // AND "In case of the non aggregated content... render quiz card next to...".
 
@@ -267,7 +281,6 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     // We can keep it if there are quizzes associated with the module globally.
 
     return cards;
-
   }, [nonAggregatedContents, aggregatedContents, userProgress]);
 
   const filteredContentCards = useMemo(() => {
@@ -284,6 +297,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
       if (card.kind === "quizzes") {
         return t("moduleDetails.quizzes").toLowerCase().includes(q);
       }
+
       return false;
     });
   }, [contentCards, searchQuery, t, tContent]);
@@ -326,7 +340,9 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
 
   const moduleTitle = moduleName(moduleData);
   const moduleDesc =
-    moduleData.description ?? moduleData.translations?.[0]?.description ?? t("moduleDetails.description");
+    moduleData.description ??
+    moduleData.translations?.[0]?.description ??
+    t("moduleDetails.description");
 
   const breadcrumbFirst = isOrgUserView
     ? t("moduleDetails.breadcrumbAwarenessCampaign")
@@ -338,12 +354,9 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
       : t("moduleDetails.breadcrumbMyLibrary");
 
   // Different base paths for different user types
-  const breadcrumbFirstHref = isOrgUserView
-    ? "/dashboard/campaign-assignments"
-    : basePath;
-  const breadcrumbMiddleHref = isOrgUserView && campaignId
-    ? `/dashboard/campaign-assignments/${campaignId}`
-    : basePath;
+  const breadcrumbFirstHref = isOrgUserView ? "/dashboard/campaign-assignments" : basePath;
+  const breadcrumbMiddleHref =
+    isOrgUserView && campaignId ? `/dashboard/campaign-assignments/${campaignId}` : basePath;
 
   const progressPercent = userProgress?.overall_progress_percent || 0;
 
@@ -358,7 +371,10 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                 isRtl && "flex-row-reverse"
               )}
             >
-              <Link className="hover:text-gray-700 transition text-inherit" href={breadcrumbFirstHref}>
+              <Link
+                className="hover:text-gray-700 transition text-inherit"
+                href={breadcrumbFirstHref}
+              >
                 {breadcrumbFirst}
               </Link>
               <span className="text-gray-400">›</span>
@@ -535,12 +551,17 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     selectedKeys={languageFilter ? [languageFilter] : ["all"]}
                     onSelectionChange={(keys) => {
                       const v = Array.from(keys as Set<string>)[0] ?? "";
+
                       setLanguageFilter(v === "all" ? "" : v);
                     }}
                   >
                     {[
                       { id: "all" as const, name: t("moduleDetails.allLanguages"), icon: "🌐" },
-                      ...SUPPORTED_LANGUAGES.map(lang => ({ id: String(lang.id), name: lang.name, flag: lang.id }))
+                      ...SUPPORTED_LANGUAGES.map((lang) => ({
+                        id: String(lang.id),
+                        name: lang.name,
+                        flag: lang.id,
+                      })),
                     ].map((item: any) => (
                       <SelectItem key={item.id} textValue={item.name}>
                         <div className="flex items-center gap-2 whitespace-nowrap">
@@ -548,12 +569,12 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                             <span>{item.icon}</span>
                           ) : item.flag ? (
                             <ReactCountryFlag
+                              svg
                               countryCode={getLanguageCountryCode(item.flag)}
                               style={{
                                 fontSize: "1em",
                                 lineHeight: "1em",
                               }}
-                              svg
                             />
                           ) : null}
                           <span className="whitespace-nowrap">{item.name}</span>
@@ -649,7 +670,10 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                       const itemQuizzes = item.quizzes; // { total_count, ... }
 
                       return (
-                        <div key={`interactive-${item.content_id ?? item.id}-${_idx}`} className="flex flex-col gap-2">
+                        <div
+                          key={`interactive-${item.content_id ?? item.id}-${_idx}`}
+                          className="flex flex-col gap-2"
+                        >
                           {/* Main Content Card */}
                           <Card className={cardClassName}>
                             <CardBody className="p-4 flex flex-row items-center gap-3">
@@ -676,19 +700,24 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                 </p>
                                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                                   {lid != null && (
-                                    <div className="flex items-center gap-1" title={getLanguageName(lid)}>
+                                    <div
+                                      className="flex items-center gap-1"
+                                      title={getLanguageName(lid)}
+                                    >
                                       <ReactCountryFlag
+                                        svg
                                         countryCode={getLanguageCountryCode(lid)}
                                         style={{ fontSize: "1em", lineHeight: "1em" }}
-                                        svg
                                       />
-                                      <span className="text-xs text-gray-600">{getLanguageName(lid)}</span>
+                                      <span className="text-xs text-gray-600">
+                                        {getLanguageName(lid)}
+                                      </span>
                                     </div>
                                   )}
                                   <span className="text-xs text-gray-600">
                                     1 {displayName.toLowerCase()}
                                   </span>
-                                  {item.user_completion_status === 'completed' && (
+                                  {item.user_completion_status === "completed" && (
                                     <span className="pill-btn green text-xs">
                                       {t("moduleDetails.completed")}
                                     </span>
@@ -708,10 +737,17 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
 
                           {/* Linked Quiz Card (if quizzes exist for this content) */}
                           {itemQuizzes && itemQuizzes.total_count > 0 && (
-                            <Card className={clsx(cardClassName, "ml-8 border-l-4 border-l-amber-300")}>
+                            <Card
+                              className={clsx(cardClassName, "ml-8 border-l-4 border-l-amber-300")}
+                            >
                               <CardBody className="p-3 flex flex-row items-center gap-3 bg-amber-50/30">
                                 <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
-                                  <Image alt="Quiz" height={16} src={getContentTypeIconFor(3, "Quiz")} width={16} />
+                                  <Image
+                                    alt="Quiz"
+                                    height={16}
+                                    src={getContentTypeIconFor(3, "Quiz")}
+                                    width={16}
+                                  />
                                 </div>
                                 <div className="flex-1">
                                   <p className="font-medium text-xs text-gray-900">
@@ -859,6 +895,6 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
           </div>
         </div>
       </DashboardLayout>
-    </ProtectedRoute >
+    </ProtectedRoute>
   );
 }

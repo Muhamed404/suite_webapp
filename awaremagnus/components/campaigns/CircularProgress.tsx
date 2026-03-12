@@ -28,28 +28,28 @@ export function CircularProgress({
   return (
     <div className="flex flex-col items-center">
       <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="transform -rotate-90">
+        <svg className="transform -rotate-90" height={size} width={size}>
           {/* Background circle */}
           <circle
             cx={size / 2}
             cy={size / 2}
-            r={radius}
             fill="none"
+            r={radius}
             stroke={backgroundColor}
             strokeWidth={strokeWidth}
           />
           {/* Progress circle */}
           <circle
+            className="transition-all duration-500"
             cx={size / 2}
             cy={size / 2}
-            r={radius}
             fill="none"
+            r={radius}
             stroke={color}
-            strokeWidth={strokeWidth}
             strokeDasharray={circumference}
             strokeDashoffset={offset}
             strokeLinecap="round"
-            className="transition-all duration-500"
+            strokeWidth={strokeWidth}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -65,9 +65,7 @@ export function CircularProgress({
           )}
         </div>
       </div>
-      {sublabel && (
-        <span className="text-sm text-gray-600 mt-2 font-medium">{sublabel}</span>
-      )}
+      {sublabel && <span className="text-sm text-gray-600 mt-2 font-medium">{sublabel}</span>}
     </div>
   );
 }

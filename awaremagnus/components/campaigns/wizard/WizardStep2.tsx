@@ -5,7 +5,12 @@ import { Users, ChevronDown, X } from "lucide-react";
 import clsx from "clsx";
 
 import { useTranslations } from "@/i18n/useTranslations";
-import { suiteSuiteService, type Department, type Group, type User } from "@/services/suiteSuiteService";
+import {
+  suiteSuiteService,
+  type Department,
+  type Group,
+  type User,
+} from "@/services/suiteSuiteService";
 import { useAuthStore } from "@/hooks/useAuthStore";
 
 interface WizardStep2Props {
@@ -48,6 +53,7 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
 
     if (deptDropdownOpen || groupDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
+
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [deptDropdownOpen, groupDropdownOpen]);
@@ -55,6 +61,7 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
   useEffect(() => {
     const fetchData = async () => {
       const orgId = user?.organization_id ?? user?.org_id;
+
       if (orgId === undefined || orgId === null) return;
 
       try {
@@ -64,18 +71,19 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
         const [depts, grps, fetchedUsers] = await Promise.all([
           suiteSuiteService.getDepartments(orgId),
           suiteSuiteService.getGroups(orgId),
-          suiteSuiteService.getUnassignedUsers(orgId),
+          suiteSuiteService.getAllOrgUsers(orgId),
         ]);
 
-        console.log('Departments response:', depts);
-        console.log('Groups response:', grps);
-        console.log('Users response:', fetchedUsers);
+        console.log("Departments response:", depts);
+        console.log("Groups response:", grps);
+        console.log("Users response:", fetchedUsers);
 
         setDepartments(depts || []);
         setGroups(grps || []);
 
         // Build user map for display
         const userMap: Record<number, string> = {};
+
         if (fetchedUsers && Array.isArray(fetchedUsers)) {
           fetchedUsers.forEach((u: any) => {
             userMap[u.id] = `${u.firstName} ${u.lastName}`.trim();
@@ -102,7 +110,10 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
   };
 
   const removeDepartment = (id: number) => {
-    onChange("departments", formData.departments.filter((d) => d !== id));
+    onChange(
+      "departments",
+      formData.departments.filter((d) => d !== id)
+    );
   };
 
   const toggleGroup = (id: number) => {
@@ -114,7 +125,10 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
   };
 
   const removeGroup = (id: number) => {
-    onChange("groups", formData.groups.filter((g) => g !== id));
+    onChange(
+      "groups",
+      formData.groups.filter((g) => g !== id)
+    );
   };
 
   const getDepartmentName = (id: number) => {
@@ -125,8 +139,12 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
     return groups.find((g) => g.id === id)?.name || `Group ${id}`;
   };
 
-  const activeDepartments = departments.filter((dept) => dept.is_Active !== false && dept.is_Deleted !== true);
-  const activeGroups = groups.filter((group) => group.is_Active !== false && group.is_Deleted !== true);
+  const activeDepartments = departments.filter(
+    (dept) => dept.is_Active !== false && dept.is_Deleted !== true
+  );
+  const activeGroups = groups.filter(
+    (group) => group.is_Active !== false && group.is_Deleted !== true
+  );
 
   return (
     <div>
@@ -150,18 +168,22 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
       )}
 
       {loading ? (
-        <div className="text-center py-8 text-gray-400 text-xs">Loading departments and groups...</div>
+        <div className="text-center py-8 text-gray-400 text-xs">
+          Loading departments and groups...
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 gap-3">
             {/* Departments */}
             <div className="input-group">
-              <label className="block font-medium text-gray-600 mb-3 text-sm">{t("form.selectDepartments")}</label>
+              <label className="block font-medium text-gray-600 mb-3 text-sm">
+                {t("form.selectDepartments")}
+              </label>
 
-              <div className="relative" ref={deptDropdownRef}>
+              <div ref={deptDropdownRef} className="relative">
                 <button
-                  onClick={() => setDeptDropdownOpen(!deptDropdownOpen)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
+                  onClick={() => setDeptDropdownOpen(!deptDropdownOpen)}
                 >
                   <div className="flex flex-wrap gap-2 flex-1">
                     {formData.departments.length === 0 ? (
@@ -174,15 +196,15 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                         >
                           {getDepartmentName(deptId)}
                           <div
+                            className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
                             onClick={(e) => {
                               e.stopPropagation();
                               removeDepartment(deptId);
                             }}
-                            className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
-                            role="button"
-                            tabIndex={0}
                             onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
+                              if (e.key === "Enter" || e.key === " ") {
                                 e.stopPropagation();
                                 removeDepartment(deptId);
                               }
@@ -194,52 +216,63 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                       ))
                     )}
                   </div>
-                  <ChevronDown className={clsx("w-4 h-4 transition-transform flex-shrink-0", deptDropdownOpen && "rotate-180")} />
+                  <ChevronDown
+                    className={clsx(
+                      "w-4 h-4 transition-transform flex-shrink-0",
+                      deptDropdownOpen && "rotate-180"
+                    )}
+                  />
                 </button>
 
                 {deptDropdownOpen && activeDepartments.length > 0 && (
                   <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
                     <div className="p-2 border-b border-gray-100">
                       <input
+                        autoFocus
+                        className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        placeholder="Search departments..."
                         type="text"
                         value={deptSearch}
                         onChange={(e) => setDeptSearch(e.target.value)}
                         onClick={(e) => e.stopPropagation()}
-                        placeholder="Search departments..."
-                        className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                        autoFocus
                       />
                     </div>
                     <div className="max-h-48 overflow-y-auto">
-                      {activeDepartments.filter((d) => d.name.toLowerCase().includes(deptSearch.toLowerCase())).map((dept) => (
-                        <label
-                          key={dept.id}
-                          className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={formData.departments.includes(dept.id)}
-                            onChange={() => toggleDepartment(dept.id)}
-                            className="w-4 h-4 text-blue-500 rounded"
-                          />
-                          <span className="text-sm">{dept.name}</span>
-                        </label>
-                      ))}
+                      {activeDepartments
+                        .filter((d) => d.name.toLowerCase().includes(deptSearch.toLowerCase()))
+                        .map((dept) => (
+                          <label
+                            key={dept.id}
+                            className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                          >
+                            <input
+                              checked={formData.departments.includes(dept.id)}
+                              className="w-4 h-4 text-blue-500 rounded"
+                              type="checkbox"
+                              onChange={() => toggleDepartment(dept.id)}
+                            />
+                            <span className="text-sm">{dept.name}</span>
+                          </label>
+                        ))}
                     </div>
                   </div>
                 )}
               </div>
-              <small className="text-gray-500 mt-1 block text-[10px]">{t("form.departmentsPlaceholder")}</small>
+              <small className="text-gray-500 mt-1 block text-[10px]">
+                {t("form.departmentsPlaceholder")}
+              </small>
             </div>
 
             {/* Groups */}
             <div className="input-group">
-              <label className="block font-medium text-gray-600 mb-3 text-sm">{t("form.selectGroups")}</label>
+              <label className="block font-medium text-gray-600 mb-3 text-sm">
+                {t("form.selectGroups")}
+              </label>
 
-              <div className="relative" ref={groupDropdownRef}>
+              <div ref={groupDropdownRef} className="relative">
                 <button
-                  onClick={() => setGroupDropdownOpen(!groupDropdownOpen)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
+                  onClick={() => setGroupDropdownOpen(!groupDropdownOpen)}
                 >
                   <div className="flex flex-wrap gap-2 flex-1">
                     {formData.groups.length === 0 ? (
@@ -252,15 +285,15 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                         >
                           {getGroupName(groupId)}
                           <div
+                            className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
+                            role="button"
+                            tabIndex={0}
                             onClick={(e) => {
                               e.stopPropagation();
                               removeGroup(groupId);
                             }}
-                            className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
-                            role="button"
-                            tabIndex={0}
                             onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
+                              if (e.key === "Enter" || e.key === " ") {
                                 e.stopPropagation();
                                 removeGroup(groupId);
                               }
@@ -272,42 +305,51 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                       ))
                     )}
                   </div>
-                  <ChevronDown className={clsx("w-4 h-4 transition-transform flex-shrink-0", groupDropdownOpen && "rotate-180")} />
+                  <ChevronDown
+                    className={clsx(
+                      "w-4 h-4 transition-transform flex-shrink-0",
+                      groupDropdownOpen && "rotate-180"
+                    )}
+                  />
                 </button>
 
                 {groupDropdownOpen && activeGroups.length > 0 && (
                   <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
                     <div className="p-2 border-b border-gray-100">
                       <input
+                        autoFocus
+                        className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        placeholder="Search groups..."
                         type="text"
                         value={groupSearch}
                         onChange={(e) => setGroupSearch(e.target.value)}
                         onClick={(e) => e.stopPropagation()}
-                        placeholder="Search groups..."
-                        className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                        autoFocus
                       />
                     </div>
                     <div className="max-h-48 overflow-y-auto">
-                      {activeGroups.filter((g) => g.name.toLowerCase().includes(groupSearch.toLowerCase())).map((group) => (
-                        <label
-                          key={group.id}
-                          className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={formData.groups.includes(group.id)}
-                            onChange={() => toggleGroup(group.id)}
-                            className="w-4 h-4 text-blue-500 rounded"
-                          />
-                          <span className="text-sm">{group.name}</span>
-                        </label>
-                      ))}
+                      {activeGroups
+                        .filter((g) => g.name.toLowerCase().includes(groupSearch.toLowerCase()))
+                        .map((group) => (
+                          <label
+                            key={group.id}
+                            className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                          >
+                            <input
+                              checked={formData.groups.includes(group.id)}
+                              className="w-4 h-4 text-blue-500 rounded"
+                              type="checkbox"
+                              onChange={() => toggleGroup(group.id)}
+                            />
+                            <span className="text-sm">{group.name}</span>
+                          </label>
+                        ))}
                     </div>
                   </div>
                 )}
               </div>
-              <small className="text-gray-500 mt-1 block text-[10px]">{t("form.groupsPlaceholder")}</small>
+              <small className="text-gray-500 mt-1 block text-[10px]">
+                {t("form.groupsPlaceholder")}
+              </small>
             </div>
           </div>
         </>
@@ -316,15 +358,28 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
       {/* Manual Users */}
       <div>
         <button
+          className="flex items-center gap-1.5 px-3 py-1.5 border border-blue-500 text-blue-500 rounded-full text-xs font-medium hover:bg-blue-500 hover:text-white transition-all"
           type="button"
           onClick={onOpenUserModal}
-          className="flex items-center gap-1.5 px-3 py-1.5 border border-blue-500 text-blue-500 rounded-full text-xs font-medium hover:bg-blue-500 hover:text-white transition-all"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+          <svg
+            className="w-3 h-3"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
           <span>Add Users</span>
         </button>
         {formData.manualUsers.length > 0 && (
-          <div id="manualUsersList" className="mt-3">
+          <div className="mt-3" id="manualUsersList">
             <h4 className="text-xs font-medium text-gray-700 mb-1">Manually Added:</h4>
             <ul className="space-y-1">
               {formData.manualUsers.map((user) => (
@@ -336,13 +391,21 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                     {user.firstName} {user.lastName}
                   </span>
                   <div
-                    onClick={() => onChange("manualUsers", formData.manualUsers.filter((u) => u.id !== user.id))}
                     className="text-gray-400 hover:text-red-500 cursor-pointer transition-colors"
                     role="button"
                     tabIndex={0}
+                    onClick={() =>
+                      onChange(
+                        "manualUsers",
+                        formData.manualUsers.filter((u) => u.id !== user.id)
+                      )
+                    }
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        onChange("manualUsers", formData.manualUsers.filter((u) => u.id !== user.id));
+                      if (e.key === "Enter" || e.key === " ") {
+                        onChange(
+                          "manualUsers",
+                          formData.manualUsers.filter((u) => u.id !== user.id)
+                        );
                       }
                     }}
                   >

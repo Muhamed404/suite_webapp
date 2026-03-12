@@ -34,12 +34,14 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
 
     if (moduleDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
+
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [moduleDropdownOpen]);
 
   // Handle different possible data structures
   let modules: any[] = [];
+
   if (modulesData?.data && Array.isArray(modulesData.data)) {
     modules = modulesData.data;
   } else if ((modulesData as any)?.object && Array.isArray((modulesData as any).object)) {
@@ -48,10 +50,10 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
     modules = modulesData;
   }
 
-  console.log('Modules data:', modulesData);
-  console.log('Modules array:', modules);
-  console.log('Is loading:', isLoading);
-  console.log('Error:', error);
+  console.log("Modules data:", modulesData);
+  console.log("Modules array:", modules);
+  console.log("Is loading:", isLoading);
+  console.log("Error:", error);
 
   const toggleModule = (id: number) => {
     const newModules = formData.modules.includes(id)
@@ -62,16 +64,31 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
   };
 
   const getModuleName = (module: any): string => {
-    return module.title || module.name || module.translations?.[0]?.name || module.code || `Module ${module.id}`;
+    return (
+      module.title ||
+      module.name ||
+      module.translations?.[0]?.name ||
+      module.code ||
+      `Module ${module.id}`
+    );
   };
 
   const getSelectedModuleName = (id: number): string => {
     const m = modules.find((mod: any) => mod.id === id);
+
     return m ? getModuleName(m) : `Module ${id}`;
   };
 
   const filteredModules = modules.filter((m: any) =>
     getModuleName(m).toLowerCase().includes(moduleSearch.toLowerCase())
+  );
+
+  // Separate into Core Modules (global) and My Modules (org-specific)
+  const coreModules = filteredModules.filter(
+    (m: any) => m.is_global === true || m.org_id === 0 || m.org_id === null
+  );
+  const myModules = filteredModules.filter(
+    (m: any) => m.is_global !== true && m.org_id !== 0 && m.org_id !== null
   );
 
   return (
@@ -90,12 +107,12 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
             {t("form.selectModules")} <span className="text-red-500">*</span>
           </label>
 
-          <div className="relative" ref={moduleDropdownRef}>
+          <div ref={moduleDropdownRef} className="relative">
             {/* Trigger button showing selected chips */}
             <button
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
               type="button"
               onClick={() => setModuleDropdownOpen(!moduleDropdownOpen)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
             >
               <div className="flex flex-wrap gap-2 flex-1">
                 {isLoading ? (
@@ -110,13 +127,13 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
                     >
                       {getSelectedModuleName(id)}
                       <div
+                        className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
+                        role="button"
+                        tabIndex={0}
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleModule(id);
                         }}
-                        className="hover:text-blue-900 transition-colors flex-shrink-0 cursor-pointer"
-                        role="button"
-                        tabIndex={0}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" || e.key === " ") {
                             e.stopPropagation();
@@ -130,7 +147,12 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
                   ))
                 )}
               </div>
-              <ChevronDown className={clsx("w-4 h-4 transition-transform flex-shrink-0", moduleDropdownOpen && "rotate-180")} />
+              <ChevronDown
+                className={clsx(
+                  "w-4 h-4 transition-transform flex-shrink-0",
+                  moduleDropdownOpen && "rotate-180"
+                )}
+              />
             </button>
 
             {/* Dropdown panel */}
@@ -138,16 +160,16 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
               <div className="absolute top-full left-0 right-0 mt-1 border border-gray-300 rounded-lg bg-white shadow-lg z-10">
                 <div className="p-2 border-b border-gray-100">
                   <input
+                    autoFocus
+                    className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    placeholder="Search modules..."
                     type="text"
                     value={moduleSearch}
                     onChange={(e) => setModuleSearch(e.target.value)}
                     onClick={(e) => e.stopPropagation()}
-                    placeholder="Search modules..."
-                    className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                    autoFocus
                   />
                 </div>
-                <div className="max-h-48 overflow-y-auto">
+                <div className="max-h-64 overflow-y-auto">
                   {isLoading ? (
                     <p className="text-gray-400 text-xs text-center py-4">Loading modules...</p>
                   ) : error ? (
@@ -155,29 +177,92 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
                   ) : filteredModules.length === 0 ? (
                     <p className="text-gray-400 text-xs text-center py-4">No modules found</p>
                   ) : (
-                    filteredModules.map((module: any) => (
-                      <label
-                        key={module.id}
-                        className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
-                        onClick={() => toggleModule(module.id)}
-                      >
-                        <div
-                          className={clsx(
-                            "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
-                            formData.modules.includes(module.id)
-                              ? "bg-blue-500 border-blue-500"
-                              : "border-gray-300"
-                          )}
-                        >
-                          {formData.modules.includes(module.id) && (
-                            <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                            </svg>
-                          )}
-                        </div>
-                        <span className="text-sm">{getModuleName(module)}</span>
-                      </label>
-                    ))
+                    <>
+                      {myModules.length > 0 && (
+                        <>
+                          <div className="px-3 py-1.5 bg-blue-50 border-b border-blue-100 sticky top-0">
+                            <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide">
+                              My Modules
+                            </span>
+                          </div>
+                          {myModules.map((module: any) => (
+                            <label
+                              key={module.id}
+                              className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                              onClick={() => toggleModule(module.id)}
+                            >
+                              <div
+                                className={clsx(
+                                  "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                                  formData.modules.includes(module.id)
+                                    ? "bg-blue-500 border-blue-500"
+                                    : "border-gray-300"
+                                )}
+                              >
+                                {formData.modules.includes(module.id) && (
+                                  <svg
+                                    className="w-2.5 h-2.5 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={3}
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      d="M5 13l4 4L19 7"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                )}
+                              </div>
+                              <span className="text-sm">{getModuleName(module)}</span>
+                            </label>
+                          ))}
+                        </>
+                      )}
+                      {coreModules.length > 0 && (
+                        <>
+                          <div className="px-3 py-1.5 bg-gray-50 border-b border-gray-200 sticky top-0">
+                            <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
+                              Core Modules
+                            </span>
+                          </div>
+                          {coreModules.map((module: any) => (
+                            <label
+                              key={module.id}
+                              className="flex items-center gap-3 px-4 py-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                              onClick={() => toggleModule(module.id)}
+                            >
+                              <div
+                                className={clsx(
+                                  "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                                  formData.modules.includes(module.id)
+                                    ? "bg-blue-500 border-blue-500"
+                                    : "border-gray-300"
+                                )}
+                              >
+                                {formData.modules.includes(module.id) && (
+                                  <svg
+                                    className="w-2.5 h-2.5 text-white"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={3}
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      d="M5 13l4 4L19 7"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                )}
+                              </div>
+                              <span className="text-sm">{getModuleName(module)}</span>
+                            </label>
+                          ))}
+                        </>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
@@ -192,54 +277,81 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
             {t("form.enableVisualLearning")} <span className="text-red-500">*</span>
           </label>
           <div className="flex flex-col gap-2">
-            <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all" onClick={() => onChange("visualShortVideos", !formData.visualShortVideos)}>
+            <label
+              className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all"
+              onClick={() => onChange("visualShortVideos", !formData.visualShortVideos)}
+            >
               <div
                 className={clsx(
-                  "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                  "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
                   formData.visualShortVideos
                     ? "bg-blue-500 border-blue-500"
                     : "border-gray-300 group-hover:border-blue-400"
                 )}
               >
                 {formData.visualShortVideos && (
-                  <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-2.5 h-2.5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </div>
               <span className="text-xs text-gray-700">{t("form.shortVideos")}</span>
             </label>
 
-            <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all" onClick={() => onChange("visualInteractive", !formData.visualInteractive)}>
+            <label
+              className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all"
+              onClick={() => onChange("visualInteractive", !formData.visualInteractive)}
+            >
               <div
                 className={clsx(
-                  "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                  "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
                   formData.visualInteractive
                     ? "bg-blue-500 border-blue-500"
                     : "border-gray-300 group-hover:border-blue-400"
                 )}
               >
                 {formData.visualInteractive && (
-                  <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-2.5 h-2.5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </div>
               <span className="text-xs text-gray-700">{t("form.interactiveContent")}</span>
             </label>
 
-            <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all" onClick={() => onChange("visualOthers", !formData.visualOthers)}>
+            <label
+              className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all"
+              onClick={() => onChange("visualOthers", !formData.visualOthers)}
+            >
               <div
                 className={clsx(
-                  "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                  "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
                   formData.visualOthers
                     ? "bg-blue-500 border-blue-500"
                     : "border-gray-300 group-hover:border-blue-400"
                 )}
               >
                 {formData.visualOthers && (
-                  <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  <svg
+                    className="w-2.5 h-2.5 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 )}
               </div>

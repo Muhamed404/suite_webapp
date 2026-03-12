@@ -61,11 +61,11 @@ export function PdfViewer({
     () =>
       authToken && !useFallback
         ? {
-          httpHeaders: {
-            Authorization: `Bearer ${authToken}`,
-            "ngrok-skip-browser-warning": "true",
-          },
-        }
+            httpHeaders: {
+              Authorization: `Bearer ${authToken}`,
+              "ngrok-skip-browser-warning": "true",
+            },
+          }
         : undefined,
     [authToken, useFallback]
   );
@@ -334,8 +334,8 @@ export function PdfViewer({
                 width={
                   fitMode === "width"
                     ? (typeof window !== "undefined"
-                      ? Math.min(window.innerWidth - 80, 900)
-                      : effectiveWidth) - 48
+                        ? Math.min(window.innerWidth - 80, 900)
+                        : effectiveWidth) - 48
                     : undefined
                 }
               />

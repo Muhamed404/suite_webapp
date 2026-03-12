@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Play, FileText } from "lucide-react";
 
 import { CampaignStatusBadge } from "./campaign-status-badge";
+
 import { useTranslations } from "@/i18n/useTranslations";
 import { useUpdateCampaign } from "@/hooks/useCampaigns";
 
@@ -21,6 +22,7 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
 
   const formatDate = (date?: string) => {
     if (!date) return "-";
+
     return new Date(date).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -35,7 +37,7 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
     try {
       await updateCampaign.mutateAsync({
         id: campaign.id,
-        payload: { campaign: { status_id: 2 } } // ACTIVE status (2, not 1)
+        payload: { campaign: { status_id: 2 } }, // ACTIVE status (2, not 1)
       });
     } catch (error) {
       console.error("Failed to launch campaign:", error);
@@ -49,9 +51,7 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
     <tr className="hover:bg-gray-50 transition-colors">
       <td className="px-4 py-3 text-gray-800 font-medium">{campaign.name}</td>
       <td className="px-4 py-3 text-gray-600">{formatDate(campaign.start_date)}</td>
-      <td className="px-4 py-3 text-gray-600">
-        {campaign.statistics?.total_enrolled_users || 0}
-      </td>
+      <td className="px-4 py-3 text-gray-600">{campaign.statistics?.total_enrolled_users || 0}</td>
       <td className="px-4 py-3 text-gray-600">
         {campaign.statistics?.total_completed_certifications || 0}
       </td>
@@ -82,10 +82,10 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
           {/* Show Launch button for In Progress (20) campaigns - with launch functionality */}
           {campaign.status_id === 20 && (
             <button
-              onClick={handleLaunchCampaign}
-              disabled={isLaunching || updateCampaign.isPending}
               className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 w-32 text-xs font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLaunching || updateCampaign.isPending}
               title={t("launch")}
+              onClick={handleLaunchCampaign}
             >
               <Play className="w-3.5 h-3.5" />
               {isLaunching ? "Launching..." : t("launch")}
@@ -95,8 +95,8 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
           {/* Show View Reports button for Active (2) campaigns - redirects to details page */}
           {campaign.status_id === 2 && (
             <Link
-              href={`/dashboard/launch-awareness/campaigns/${campaign.id}`}
               className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 w-32 text-xs font-medium text-white bg-gray-500 hover:bg-gray-600 rounded-full transition-colors"
+              href={`/dashboard/launch-awareness/campaigns/${campaign.id}`}
               title={t("viewReport")}
             >
               <FileText className="w-3.5 h-3.5" />
@@ -107,8 +107,8 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
           {/* Show View Report button for Completed (5) campaigns */}
           {campaign.status_id === 5 && (
             <Link
-              href={`/dashboard/launch-awareness/campaigns/${campaign.id}`}
               className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 w-32 text-xs font-medium text-white bg-gray-500 hover:bg-gray-600 rounded-full transition-colors"
+              href={`/dashboard/launch-awareness/campaigns/${campaign.id}`}
               title={t("viewReport")}
             >
               <FileText className="w-3.5 h-3.5" />
@@ -119,8 +119,8 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
           {/* For Cancelled (3), show View Details link */}
           {campaign.status_id === 3 && (
             <Link
-              href={`/dashboard/launch-awareness/campaigns/${campaign.id}`}
               className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 w-32 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+              href={`/dashboard/launch-awareness/campaigns/${campaign.id}`}
               title={t("viewDetails")}
             >
               <FileText className="w-3.5 h-3.5" />

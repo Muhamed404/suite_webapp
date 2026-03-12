@@ -18,9 +18,9 @@ export default function CampaignLeaderboardPage() {
   const isRtl = dir === "rtl";
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   if (!searchParams) return null;
-  
+
   const campaignId = searchParams.get("campaign");
 
   const [sortConfig, setSortConfig] = useState<{
@@ -84,6 +84,7 @@ export default function CampaignLeaderboardPage() {
     if (statusFilter !== "all") {
       filtered = filtered.filter((user: any) => {
         const userStatus = user.status?.toLowerCase() || "active";
+
         return userStatus === statusFilter.toLowerCase();
       });
     }
@@ -92,10 +93,12 @@ export default function CampaignLeaderboardPage() {
     if (!searchQuery.trim()) return filtered;
 
     const query = searchQuery.toLowerCase();
-    return filtered.filter((user: any) =>
-      user.firstname?.toLowerCase().includes(query) ||
-      user.lastname?.toLowerCase().includes(query) ||
-      user.email?.toLowerCase().includes(query)
+
+    return filtered.filter(
+      (user: any) =>
+        user.firstname?.toLowerCase().includes(query) ||
+        user.lastname?.toLowerCase().includes(query) ||
+        user.email?.toLowerCase().includes(query)
     );
   }, [leaderboardData, searchQuery, statusFilter]);
 
@@ -124,6 +127,7 @@ export default function CampaignLeaderboardPage() {
   // Paginate
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
+
     return sortedData.slice(start, start + itemsPerPage);
   }, [sortedData, currentPage]);
 
@@ -134,6 +138,7 @@ export default function CampaignLeaderboardPage() {
       if (prev?.key === key) {
         return { key, direction: prev.direction === "asc" ? "desc" : "asc" };
       }
+
       return { key, direction: "asc" };
     });
   };
@@ -142,11 +147,12 @@ export default function CampaignLeaderboardPage() {
     if (!date) return "-";
     try {
       const d = new Date(date);
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
       const year = d.getFullYear();
-      const hours = String(d.getHours()).padStart(2, '0');
-      const minutes = String(d.getMinutes()).padStart(2, '0');
+      const hours = String(d.getHours()).padStart(2, "0");
+      const minutes = String(d.getMinutes()).padStart(2, "0");
+
       return `${day}/${month}/${year} ${hours}:${minutes}`;
     } catch {
       return "-";
@@ -159,46 +165,39 @@ export default function CampaignLeaderboardPage() {
     // Level 1 = image 2 (Alert Apprentice)
     // ... Level 8 = image 9 (Expert Enforcer)
     const imageNumber = Math.min(9, Math.max(1, (avatarLevel || 0) + 1));
+
     return `/awm/images/avatars/${imageNumber}.png`;
   };
 
-  const getRiskLevelColor = (riskLevel: number) => {
-    if (riskLevel <= 10) return "bg-green-100";
-    if (riskLevel <= 25) return "bg-yellow-100";
-    if (riskLevel <= 50) return "bg-orange-100";
-    return "bg-red-100";
-  };
-
-  const getRiskLevelTextColor = (riskLevel: number) => {
-    if (riskLevel <= 10) return "text-green-700";
-    if (riskLevel <= 25) return "text-yellow-700";
-    if (riskLevel <= 50) return "text-orange-700";
-    return "text-red-700";
-  };
-
-  const getRiskLevelProgressBar = (riskLevel?: string | number) => {
+  const getRiskLevelBadge = (riskLevel?: string | number) => {
     if (!riskLevel) return <span className="text-gray-500">-</span>;
 
-    const level = typeof riskLevel === "number" ? riskLevel : parseInt(riskLevel);
-    const percentage = Math.min(100, Math.max(0, level));
+    const level = typeof riskLevel === "string" ? riskLevel : String(riskLevel);
+    
+    let bgColor = "bg-green-100";
+    let textColor = "text-green-700";
 
-    let bgColor = "bg-green-500";
-    if (level > 50) bgColor = "bg-orange-500";
-    else if (level > 25) bgColor = "bg-yellow-500";
-    else if (level > 10) bgColor = "bg-blue-500";
+    if (level.toLowerCase().includes("very high") || level.toLowerCase().includes("very_high")) {
+      bgColor = "bg-red-100";
+      textColor = "text-red-700";
+    } else if (level.toLowerCase().includes("high")) {
+      bgColor = "bg-orange-100";
+      textColor = "text-orange-700";
+    } else if (level.toLowerCase().includes("medium")) {
+      bgColor = "bg-yellow-100";
+      textColor = "text-yellow-700";
+    } else if (level.toLowerCase().includes("low") && !level.toLowerCase().includes("very")) {
+      bgColor = "bg-blue-100";
+      textColor = "text-blue-700";
+    } else if (level.toLowerCase().includes("very low") || level.toLowerCase().includes("very_low")) {
+      bgColor = "bg-green-100";
+      textColor = "text-green-700";
+    }
 
     return (
-      <div className="flex items-center gap-2">
-        <div className="w-20 h-2 bg-gray-200 rounded-full">
-          <div
-            className={`${bgColor} h-2 rounded-full transition-all duration-300`}
-            style={{ width: `${percentage}%` }}
-          />
-        </div>
-        <span className={`text-xs font-semibold ${getRiskLevelTextColor(level)}`}>
-          {percentage}%
-        </span>
-      </div>
+      <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${bgColor} ${textColor}`}>
+        {level}
+      </span>
     );
   };
 
@@ -209,12 +208,10 @@ export default function CampaignLeaderboardPage() {
           {/* Header */}
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h1 className="text-lg font-semibold text-gray-800">
-                Campaign User Leaderboard
-              </h1>
+              <h1 className="text-lg font-semibold text-gray-800">Campaign User Leaderboard</h1>
               <Link
-                href={`/dashboard/launch-awareness/campaigns/${campaignId}`}
                 className="text-xs text-blue-600 hover:text-blue-700 mt-1 inline-block"
+                href={`/dashboard/launch-awareness/campaigns/${campaignId}`}
               >
                 ← Back to Campaign
               </Link>
@@ -226,36 +223,30 @@ export default function CampaignLeaderboardPage() {
             <div className="bg-white rounded-2xl p-3 flex justify-between">
               <div>
                 <p className="text-xs text-gray-500">Campaign Name</p>
-                <p className="text-lg font-semibold">
-                  {campaignStats.campaign_name || "-"}
-                </p>
+                <p className="text-lg font-semibold">{campaignStats.campaign_name || "-"}</p>
               </div>
               <div className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center">
-                <img src="/awm/images/assing/assingment.svg" alt="" />
+                <img alt="" src="/awm/images/assing/assingment.svg" />
               </div>
             </div>
 
             <div className="bg-white rounded-2xl p-3 flex justify-between">
               <div>
                 <p className="text-xs text-gray-500">Total Assigned Modules</p>
-                <p className="text-lg font-semibold">
-                  {campaignStats.total_modules || 0}
-                </p>
+                <p className="text-lg font-semibold">{campaignStats.total_modules || 0}</p>
               </div>
               <div className="w-7 h-7 bg-green-100 rounded-full flex items-center justify-center">
-                <img src="/awm/images/assing/assingment.svg" alt="" />
+                <img alt="" src="/awm/images/assing/assingment.svg" />
               </div>
             </div>
 
             <div className="bg-white rounded-2xl p-3 flex justify-between">
               <div>
                 <p className="text-xs text-gray-500">Total Campaign Quizzes</p>
-                <p className="text-lg font-semibold">
-                  {campaignStats.total_quizzes || 0}
-                </p>
+                <p className="text-lg font-semibold">{campaignStats.total_quizzes || 0}</p>
               </div>
               <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center">
-                <img src="/awm/images/assing/pending.svg" alt="" />
+                <img alt="" src="/awm/images/assing/pending.svg" />
               </div>
             </div>
 
@@ -267,7 +258,7 @@ export default function CampaignLeaderboardPage() {
                 </p>
               </div>
               <div className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center">
-                <img src="/awm/images/assing/res-rate.svg" alt="" />
+                <img alt="" src="/awm/images/assing/res-rate.svg" />
               </div>
             </div>
           </div>
@@ -276,28 +267,47 @@ export default function CampaignLeaderboardPage() {
           <div className="flex gap-2 mb-4 bg-white p-1.5 rounded-full w-fit">
             {[
               { value: "all", label: "All", count: leaderboardData.length },
-              { value: "active", label: "Active", count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "active").length },
-              { value: "pending", label: "Pending", count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "pending").length },
-              { value: "completed", label: "Completed", count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "completed").length },
+              {
+                value: "active",
+                label: "Active",
+                count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "active")
+                  .length,
+              },
+              {
+                value: "pending",
+                label: "Pending",
+                count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "pending")
+                  .length,
+              },
+              {
+                value: "completed",
+                label: "Completed",
+                count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "completed")
+                  .length,
+              },
             ].map((tab) => (
               <button
                 key={tab.value}
-                onClick={() => {
-                  setStatusFilter(tab.value);
-                  setCurrentPage(1);
-                }}
                 className={clsx(
                   "px-4 py-2 text-xs font-medium rounded-full transition-all",
                   statusFilter === tab.value
                     ? "bg-[#051226] text-white"
                     : "bg-transparent text-gray-700 hover:bg-gray-100"
                 )}
+                onClick={() => {
+                  setStatusFilter(tab.value);
+                  setCurrentPage(1);
+                }}
               >
                 <span>{tab.label}</span>
-                <span className={clsx(
-                  "ml-1 inline-flex items-center justify-center min-w-5 h-5 rounded-full text-[10px]",
-                  statusFilter === tab.value ? "bg-white/30 text-white" : "bg-gray-100 text-gray-600"
-                )}>
+                <span
+                  className={clsx(
+                    "ml-1 inline-flex items-center justify-center min-w-5 h-5 rounded-full text-[10px]",
+                    statusFilter === tab.value
+                      ? "bg-white/30 text-white"
+                      : "bg-gray-100 text-gray-600"
+                  )}
+                >
                   {tab.count}
                 </span>
               </button>
@@ -307,7 +317,8 @@ export default function CampaignLeaderboardPage() {
           {/* Search & Filter */}
           <div className="flex flex-col md:flex-row justify-between gap-3 mb-4">
             <div className="relative w-64">
-              <SearchX className="absolute text-gray-400 pointer-events-none z-10" 
+              <SearchX
+                className="absolute text-gray-400 pointer-events-none z-10"
                 style={{
                   width: 16,
                   height: 16,
@@ -317,25 +328,25 @@ export default function CampaignLeaderboardPage() {
                 }}
               />
               <input
-                type="text"
+                className="w-full pl-10 pr-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Search Campaign..."
+                type="text"
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="w-full pl-10 pr-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             {/* Date Filter */}
             <select
+              className="px-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-40"
               value={dateFilter}
               onChange={(e) => {
                 setDateFilter(e.target.value);
                 setCurrentPage(1);
               }}
-              className="px-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 w-40"
             >
               <option value="all">All Time</option>
               <option value="7">Last 7 Days</option>
@@ -456,10 +467,12 @@ export default function CampaignLeaderboardPage() {
                           <span>{formatDate(user.last_login)}</span>
                         </td>
                         <td className="px-4 py-3.5 whitespace-nowrap">
-                          {getRiskLevelProgressBar(user.risk_level)}
+                          {getRiskLevelBadge(user.risk_level)}
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                          <span className="font-semibold text-gray-700">{user.compliance_score || 0}</span>
+                          <span className="font-semibold text-gray-700">
+                            {user.compliance_score || 0}
+                          </span>
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           <span className="text-gray-600">{user.completed_modules || 0}</span>
@@ -470,10 +483,13 @@ export default function CampaignLeaderboardPage() {
                               <div
                                 className={clsx(
                                   "h-2 rounded-full transition-all duration-300",
-                                  (user.progress_percentage || 0) >= 90 ? "bg-green-500" :
-                                  (user.progress_percentage || 0) >= 70 ? "bg-blue-500" :
-                                  (user.progress_percentage || 0) >= 50 ? "bg-yellow-500" :
-                                  "bg-orange-500"
+                                  (user.progress_percentage || 0) >= 90
+                                    ? "bg-green-500"
+                                    : (user.progress_percentage || 0) >= 70
+                                      ? "bg-blue-500"
+                                      : (user.progress_percentage || 0) >= 50
+                                        ? "bg-yellow-500"
+                                        : "bg-orange-500"
                                 )}
                                 style={{
                                   width: `${user.progress_percentage || 0}%`,
@@ -486,44 +502,63 @@ export default function CampaignLeaderboardPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                          <span className="font-semibold text-gray-700">{user.completed_certificates || 0}</span>
+                          <span className="font-semibold text-gray-700">
+                            {user.completed_certificates || 0}
+                          </span>
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                          <span className={clsx(
-                            "inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold",
-                            `${getRiskLevelColor(user.risk_level || 0)} ${getRiskLevelTextColor(user.risk_level || 0)}`
-                          )}>
+                          <span
+                            className={clsx(
+                              "inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold",
+                              "bg-purple-100 text-purple-700"
+                            )}
+                          >
                             {user.unlocked_achievements || 0}
                           </span>
                         </td>
                         <td className="px-4 py-3.5 whitespace-nowrap">
                           <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
-                            <img 
-                              src={getAvatarImage(user.avatar_level)} 
-                              alt={`Avatar Level ${user.avatar_level}`} 
-                              className="w-full h-full object-cover" 
+                            <img
+                              alt={`Avatar Level ${user.avatar_level}`}
+                              className="w-full h-full object-cover"
+                              src={getAvatarImage(user.avatar_level)}
                             />
                           </div>
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
-                          <span className="text-xs font-semibold text-gray-700">{user.xp_tokens || 0} tokens</span>
+                          <span className="text-xs font-semibold text-gray-700">
+                            {user.xp_tokens || 0} tokens
+                          </span>
                         </td>
                         <td className="px-4 py-3.5 whitespace-nowrap">
-                          <span className={clsx(
-                            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold min-w-[100px] justify-center",
-                            user.status?.toLowerCase() === "active" ? "bg-green-100 text-green-700 border border-green-200" :
-                            user.status?.toLowerCase() === "pending" ? "bg-amber-100 text-amber-700 border border-amber-200" :
-                            user.status?.toLowerCase() === "completed" ? "bg-gray-100 text-gray-700" :
-                            "bg-green-100 text-green-700 border border-green-200"
-                          )}>
-                            <span>{user.status?.charAt(0).toUpperCase() + user.status?.slice(1) || "Active"}</span>
+                          <span
+                            className={clsx(
+                              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-semibold min-w-[100px] justify-center",
+                              user.status?.toLowerCase() === "active"
+                                ? "bg-green-100 text-green-700 border border-green-200"
+                                : user.status?.toLowerCase() === "pending"
+                                  ? "bg-amber-100 text-amber-700 border border-amber-200"
+                                  : user.status?.toLowerCase() === "completed"
+                                    ? "bg-gray-100 text-gray-700"
+                                    : "bg-green-100 text-green-700 border border-green-200"
+                            )}
+                          >
+                            <span>
+                              {user.status?.charAt(0).toUpperCase() + user.status?.slice(1) ||
+                                "Active"}
+                            </span>
                           </span>
                         </td>
                         <td className="px-4 py-3.5 whitespace-nowrap">
                           <button
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-full transition-colors"
+                            onClick={() =>
+                              router.push(
+                                `/dashboard/launch-awareness/campaigns/${campaignId}/user/${user.user_id}/report`
+                              )
+                            }
                           >
-                            Launch
+                            View Report
                           </button>
                         </td>
                       </tr>
@@ -536,12 +571,8 @@ export default function CampaignLeaderboardPage() {
                     <div className="bg-gray-100 p-4 rounded-full inline-block mb-4">
                       <SearchX className="w-10 h-10 text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                      No Users Found
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      Try adjusting your search query
-                    </p>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">No Users Found</h3>
+                    <p className="text-sm text-gray-500">Try adjusting your search query</p>
                   </div>
                 </div>
               )}
@@ -552,36 +583,36 @@ export default function CampaignLeaderboardPage() {
               <div className="text-[10px] text-gray-400 font-medium">
                 <span>
                   Showing {(currentPage - 1) * itemsPerPage + 1}–
-                  {Math.min(currentPage * itemsPerPage, sortedData.length)} of{" "}
-                  {sortedData.length} Entries
+                  {Math.min(currentPage * itemsPerPage, sortedData.length)} of {sortedData.length}{" "}
+                  Entries
                 </span>
               </div>
               <div className="flex gap-1.5">
                 <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
                   className="w-7 h-7 flex items-center justify-center rounded-full border border-gray-300 text-[10px] hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 >
                   ‹
                 </button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <button
                     key={page}
-                    onClick={() => setCurrentPage(page)}
                     className={clsx(
                       "w-7 h-7 flex items-center justify-center rounded-full text-[10px] font-medium",
                       currentPage === page
                         ? "bg-[#051226] text-white"
                         : "border border-gray-300 hover:bg-gray-100"
                     )}
+                    onClick={() => setCurrentPage(page)}
                   >
                     {page}
                   </button>
                 ))}
                 <button
-                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                  disabled={currentPage === totalPages}
                   className="w-7 h-7 flex items-center justify-center rounded-full border border-gray-300 text-[10px] hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 >
                   ›
                 </button>

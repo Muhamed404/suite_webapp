@@ -68,60 +68,60 @@ export function CampaignContentDetailPage({
     if (isVideo) {
       return (
         <VideoContentDetailScreen
+          breadcrumbContext="campaign"
+          campaignId={campaignId}
           contentId={contentId}
           contentTypeId={contentTypeId}
           libraryType={libraryType}
           moduleId={moduleId}
-          breadcrumbContext="campaign"
-          campaignId={campaignId}
         />
       );
     }
     if (isPoster) {
       return (
         <PosterContentDetailScreen
+          breadcrumbContext="campaign"
+          campaignId={campaignId}
           contentId={contentId}
           contentTypeId={contentTypeId}
           libraryType={libraryType}
           moduleId={moduleId}
-          breadcrumbContext="campaign"
-          campaignId={campaignId}
         />
       );
     }
     if (isBrochureDoc) {
       return (
         <BrochureDocumentContentDetailScreen
+          breadcrumbContext="campaign"
+          campaignId={campaignId}
           contentId={contentId}
           contentTypeId={contentTypeId}
           libraryType={libraryType}
           moduleId={moduleId}
-          breadcrumbContext="campaign"
-          campaignId={campaignId}
         />
       );
     }
     if (isInteractive) {
       return (
         <InteractiveContentDetailScreen
+          breadcrumbContext="campaign"
+          campaignId={campaignId}
           contentId={contentId}
           contentTypeId={contentTypeId}
           libraryType={libraryType}
           moduleId={moduleId}
-          breadcrumbContext="campaign"
-          campaignId={campaignId}
         />
       );
     }
 
     return (
       <DefaultContentDetailScreen
+        breadcrumbContext="campaign"
+        campaignId={campaignId}
         contentId={contentId}
         contentTypeId={contentTypeId}
         libraryType={libraryType}
         moduleId={moduleId}
-        breadcrumbContext="campaign"
-        campaignId={campaignId}
       />
     );
   };

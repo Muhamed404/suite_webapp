@@ -29,6 +29,7 @@
 		"formSubmitted": "تتبع البيانات المرسلة من خلال نموذج التصيد الاحتيالي",
 		"attachmentOpened": "تتبع تحميل ملف التصيد الاحتيالي (من البريد الإلكتروني أو صفحة الهبوط)",
 		"linkClicked": "تتبع النقر على رابط التصيد الاحتيالي",
+		"nfcScanned": "تم مسح NFC",
 		"targetCompromised": "تم اختراق الهدف",
 		"search_here": "ابحث هنا...",
 		"sort_by": "رتّب حسب",
@@ -115,7 +116,8 @@
 		"show": "عرض",
 		"select_template_to_preview": "اختر قالبًا للمعاينة",
 		"emailOpened": "تتبع فتح البريد الإلكتروني",
-		"fileDownloaded": "generic_label.fileDownloaded"
+		"fileDownloaded": "تم تنزيل الملف",
+		"qrScanned": "تم مسح QR"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -170,7 +172,6 @@
 		"fix_validation_errors_before_testing": "يرجى إصلاح جميع أخطاء التحقق قبل اختبار الاتصال.",
 		"smtp_test_connection_successful": "اختبار SMTP: الاتصال ناجح.",
 		"smtp_test_connection_failed": "اختبار SMTP: فشل الاتصال.",
-		
 		"enter_valid_format": "يرجى إدخال تنسيق صالح.",
 		"ensure_correct_smtp_port": "تأكد من أن هذا هو منفذ SMTP الصحيح.",
 		"organization_name_required": "اسم المؤسسة مطلوب",
@@ -303,7 +304,8 @@
 			"campaignNFC": "NFC",
 			"campaignUSB": "USB",
 			"campaignSMS": "SMS",
-			"campaignWhatsapp": "واتساب"
+			"campaignWhatsapp": "واتساب",
+			"simulatorEmails": "menu.phishmagnus.simulatorEmails"
 		},
 		"suite": {
 			"suiteManagement": "إدارة المجموعة",

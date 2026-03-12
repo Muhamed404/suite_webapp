@@ -9,7 +9,7 @@ import { isOrgUser } from "@/utils/roles";
 export default function MyLibraryModuleContentDetailPage() {
   const params = useParams();
   const { user } = useAuthStore();
-  
+
   const moduleId = params?.moduleId ? Number(params.moduleId) : 0;
   const contentTypeId = params?.contentTypeId ? Number(params.contentTypeId) : 0;
   const contentId = params?.contentId ? Number(params.contentId) : 0;

@@ -152,7 +152,10 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
           />
         )}
       </div>
-      <nav aria-label="Dashboard navigation" className="py-3 overflow-y-auto overflow-x-visible flex-1">
+      <nav
+        aria-label="Dashboard navigation"
+        className="py-3 overflow-y-auto overflow-x-visible flex-1"
+      >
         <ul className={cn("space-y-0.5 text-xs", isCollapsed ? "px-1" : "px-2")}>
           {items.map((item) => {
             const hasChildren = item.children && item.children.length > 0;
@@ -342,17 +345,14 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
 
       {/* Logout Button at Bottom */}
       {onLogout && (
-        <div className={cn("border-t border-[var(--strokeGray)] py-3", isCollapsed ? "px-1" : "px-2")}>
+        <div
+          className={cn("border-t border-[var(--strokeGray)] py-3", isCollapsed ? "px-1" : "px-2")}
+        >
           <button
-            className={cn(
-              navItemBase,
-              navItemPadding,
-              navItemDefault,
-              "hover:bg-red-500/20"
-            )}
-            onClick={onLogout}
+            className={cn(navItemBase, navItemPadding, navItemDefault, "hover:bg-red-500/20")}
             title="Logout"
             type="button"
+            onClick={onLogout}
           >
             <svg
               aria-hidden

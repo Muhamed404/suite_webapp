@@ -73,14 +73,23 @@ export function PosterContentDetailScreen({
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
-  console.log("🖼️ PosterContentDetailScreen - breadcrumbContext:", breadcrumbContext, "campaignId:", campaignId, "libraryType:", libraryType);
+  console.log(
+    "🖼️ PosterContentDetailScreen - breadcrumbContext:",
+    breadcrumbContext,
+    "campaignId:",
+    campaignId,
+    "libraryType:",
+    libraryType
+  );
 
-  const basePath = breadcrumbContext === "campaign" 
-    ? `/dashboard/campaign-assignments/${campaignId}` 
-    : `/dashboard/training-library/${libraryType}`;
-  const listHref = breadcrumbContext === "campaign"
-    ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
-    : `${basePath}/${moduleId}/content/${contentTypeId}`;
+  const basePath =
+    breadcrumbContext === "campaign"
+      ? `/dashboard/campaign-assignments/${campaignId}`
+      : `/dashboard/training-library/${libraryType}`;
+  const listHref =
+    breadcrumbContext === "campaign"
+      ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
+      : `${basePath}/${moduleId}/content/${contentTypeId}`;
   const POSTER_FALLBACK = getContentAssetUrl("/posters.png");
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
@@ -118,7 +127,11 @@ export function PosterContentDetailScreen({
       : sourceUrl.startsWith("/contents/")
         ? `/awm${sourceUrl}`
         : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
-    : content ? (content.logo_url ?? content.logo_path ? getContentAssetUrl(content.logo_url ?? content.logo_path) : null) : null;
+    : content
+      ? (content.logo_url ?? content.logo_path)
+        ? getContentAssetUrl(content.logo_url ?? content.logo_path)
+        : null
+      : null;
 
   const logoUrl = content?.logo_url || (content as any)?.logo_path;
   const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
@@ -211,7 +224,9 @@ export function PosterContentDetailScreen({
                     className={clsx("hover:text-gray-700 transition", breadcrumbLinkClassName)}
                     href={basePath}
                   >
-                    {libraryType === "system" ? t("moduleDetails.coreModules") : t("moduleDetails.breadcrumbMyLibrary")}
+                    {libraryType === "system"
+                      ? t("moduleDetails.coreModules")
+                      : t("moduleDetails.breadcrumbMyLibrary")}
                   </Link>
                   <span className="text-gray-400">›</span>
                   <Link

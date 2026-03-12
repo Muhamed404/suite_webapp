@@ -5,24 +5,29 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import { useMutation } from "@tanstack/react-query";
-import { quizService } from "@/services/quizService";
 
+import { quizService } from "@/services/quizService";
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { useContent, useModule, useModules, useContentsByModule, useContentReportByContentId } from "@/hooks/useQuiz";
+import {
+  useContent,
+  useModule,
+  useModules,
+  useContentsByModule,
+  useContentReportByContentId,
+} from "@/hooks/useQuiz";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
-
 import { isOrgUser } from "@/utils/roles";
-
 
 function formatDuration(minutes: number | undefined): string {
   if (minutes == null || minutes <= 0) return "20 to 60 minutes";
   if (minutes < 60) return `${minutes} minutes`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
+
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
@@ -30,52 +35,52 @@ function formatDate(dateStr: string | undefined): string {
   if (!dateStr) return "—";
   try {
     const d = new Date(dateStr);
+
     if (Number.isNaN(d.getTime())) return "—";
+
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   } catch {
     return "—";
   }
 }
 
-
-
 const CONNECTOR_SCRIPT = [
-  '(function() {',
-  '  window.ispringPresentationConnector = {};',
-  '  window.ispringPresentationConnector.register = function(player) {',
-  '    try {',
-  '      var controller = (player.view && player.view().playbackController) ? player.view().playbackController() : (player.getPlaybackController && player.getPlaybackController());',
-  '      var presentation = (player.presentation && player.presentation()) || (player.getPresentation && player.getPresentation());',
+  "(function() {",
+  "  window.ispringPresentationConnector = {};",
+  "  window.ispringPresentationConnector.register = function(player) {",
+  "    try {",
+  "      var controller = (player.view && player.view().playbackController) ? player.view().playbackController() : (player.getPlaybackController && player.getPlaybackController());",
+  "      var presentation = (player.presentation && player.presentation()) || (player.getPresentation && player.getPresentation());",
   '      if (!controller || !presentation) { console.error("[ispring] player API mismatch"); return; }',
-  '      var slides = presentation.slides ? presentation.slides() : (presentation.getSlides && presentation.getSlides());',
-  '      var totalSlides = slides ? (slides.count ? slides.count() : (slides.getSlidesCount ? slides.getSlidesCount() : 0)) : 0;',
-  '      var sendUpdate = function() {',
-  '        try {',
-  '          var currentIndex = controller.currentSlideIndex();',
-  '          var currentSlide = currentIndex + 1;',
-  '          var slidesLeft = totalSlides - currentSlide;',
-  '          var progressPct = totalSlides > 0 ? Math.round((currentSlide / totalSlides) * 100) : 0;',
-  '          window.parent.postMessage({',
+  "      var slides = presentation.slides ? presentation.slides() : (presentation.getSlides && presentation.getSlides());",
+  "      var totalSlides = slides ? (slides.count ? slides.count() : (slides.getSlidesCount ? slides.getSlidesCount() : 0)) : 0;",
+  "      var sendUpdate = function() {",
+  "        try {",
+  "          var currentIndex = controller.currentSlideIndex();",
+  "          var currentSlide = currentIndex + 1;",
+  "          var slidesLeft = totalSlides - currentSlide;",
+  "          var progressPct = totalSlides > 0 ? Math.round((currentSlide / totalSlides) * 100) : 0;",
+  "          window.parent.postMessage({",
   '            type: "ispringProgress",',
-  '            current_slide: currentSlide,',
-  '            total_slides: totalSlides,',
-  '            slides_left: slidesLeft,',
-  '            progress_percentage: progressPct',
+  "            current_slide: currentSlide,",
+  "            total_slides: totalSlides,",
+  "            slides_left: slidesLeft,",
+  "            progress_percentage: progressPct",
   '          }, "*");',
   '        } catch (e) { console.error("[ispring] sendUpdate:", e); }',
-  '      };',
-  '      if (controller.slideChangeEvent && controller.slideChangeEvent().addHandler) {',
-  '        controller.slideChangeEvent().addHandler(sendUpdate, null);',
-  '      } else {',
-  '        setInterval(sendUpdate, 500);',
-  '      }',
-  '      sendUpdate();',
-  '    } catch (e) {',
+  "      };",
+  "      if (controller.slideChangeEvent && controller.slideChangeEvent().addHandler) {",
+  "        controller.slideChangeEvent().addHandler(sendUpdate, null);",
+  "      } else {",
+  "        setInterval(sendUpdate, 500);",
+  "      }",
+  "      sendUpdate();",
+  "    } catch (e) {",
   '      console.error("[ispring] register error:", e);',
-  '    }',
-  '  };',
-  '})();',
-].join('\n');
+  "    }",
+  "  };",
+  "})();",
+].join("\n");
 
 export default function OrgUserInteractiveContentPage({
   params,
@@ -103,8 +108,13 @@ export default function OrgUserInteractiveContentPage({
   const contentIdRef = useRef(contentId);
   const tokenRef = useRef(token);
   const existingProgressRef = useRef<number>(-1);
-  useEffect(() => { campaignIdRef.current = campaignId; }, [campaignId]);
-  useEffect(() => { tokenRef.current = token; }, [token]);
+
+  useEffect(() => {
+    campaignIdRef.current = campaignId;
+  }, [campaignId]);
+  useEffect(() => {
+    tokenRef.current = token;
+  }, [token]);
   const t = useTranslations("module");
   const user = useAuthStore((s) => s.user);
   const isOrgUserCheck = isOrgUser(user?.role_id);
@@ -121,8 +131,10 @@ export default function OrgUserInteractiveContentPage({
           m.title?.toLowerCase() === title.toLowerCase() ||
           m.translations?.some((t) => t.name.toLowerCase() === title.toLowerCase())
       );
+
       return found?.id ?? 0;
     }
+
     return 0;
   }, [moduleIdParam, modulesRes, moduleSlug]);
 
@@ -137,17 +149,19 @@ export default function OrgUserInteractiveContentPage({
       contentReportData?.object?.reportContents ??
       (Array.isArray(contentReportData?.object) ? contentReportData.object : []);
     const match = items.find((rc: any) => rc.content_id === contentId || rc.id === contentId);
+
     if (match != null && match.progress_percentage != null) {
       existingProgressRef.current = parseFloat(match.progress_percentage);
     }
   }, [contentReportData, contentId]);
 
-  const { data: siblingsRes } = useContentsByModule(resolvedModuleId, { enabled: !!resolvedModuleId });
+  const { data: siblingsRes } = useContentsByModule(resolvedModuleId, {
+    enabled: !!resolvedModuleId,
+  });
   const siblings = useMemo(() => {
     if (!siblingsRes?.success) return [];
-    return (siblingsRes.data ?? []).filter(
-      (c) => c.content_type_id === 1 && c.id !== contentId
-    );
+
+    return (siblingsRes.data ?? []).filter((c) => c.content_type_id === 1 && c.id !== contentId);
   }, [siblingsRes, contentId]);
 
   const moduleTitle =
@@ -155,8 +169,12 @@ export default function OrgUserInteractiveContentPage({
     moduleRes?.data?.translations?.[0]?.name ??
     moduleSlug.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
-  useEffect(() => { moduleIdRef.current = resolvedModuleId; }, [resolvedModuleId]);
-  useEffect(() => { contentIdRef.current = contentId; }, [contentId]);
+  useEffect(() => {
+    moduleIdRef.current = resolvedModuleId;
+  }, [resolvedModuleId]);
+  useEffect(() => {
+    contentIdRef.current = contentId;
+  }, [contentId]);
 
   const content = contentRes?.success ? contentRes.data : null;
   const contentName =
@@ -167,8 +185,8 @@ export default function OrgUserInteractiveContentPage({
     ? sourceUrl.startsWith("http")
       ? sourceUrl
       : sourceUrl.startsWith("/contents/")
-      ? `/awm${sourceUrl}`
-      : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
+        ? `/awm${sourceUrl}`
+        : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
     : null;
 
   const logoUrl = content?.logo_url || (content as any)?.logo_path;
@@ -185,20 +203,23 @@ export default function OrgUserInteractiveContentPage({
 
   useEffect(() => {
     const handler = async (event: MessageEvent) => {
-      if (!event.data || event.data.type !== 'ispringProgress') return;
+      if (!event.data || event.data.type !== "ispringProgress") return;
       const d = event.data as {
-        current_slide: number; total_slides: number;
-        slides_left: number; progress_percentage: number;
+        current_slide: number;
+        total_slides: number;
+        slides_left: number;
+        progress_percentage: number;
       };
+
       // Update info span directly — no React re-render needed
       if (infoRef.current) {
-        infoRef.current.innerHTML =
-          `Slide: ${d.current_slide} / ${d.total_slides} &nbsp;|&nbsp; Slides left: ${d.slides_left}`;
+        infoRef.current.innerHTML = `Slide: ${d.current_slide} / ${d.total_slides} &nbsp;|&nbsp; Slides left: ${d.slides_left}`;
       }
       (window as any).__ispringLastProgress = d;
       const cid = campaignIdRef.current;
       const mid = moduleIdRef.current;
       const ctid = contentIdRef.current;
+
       if (!cid || !mid || !ctid) return;
 
       const existing = existingProgressRef.current;
@@ -222,26 +243,31 @@ export default function OrgUserInteractiveContentPage({
         console.error("[updateProgressAPI] error:", e);
       }
     };
-    window.addEventListener('message', handler);
-    return () => window.removeEventListener('message', handler);
+
+    window.addEventListener("message", handler);
+
+    return () => window.removeEventListener("message", handler);
   }, [progressMutation]); // include mutation in deps just to satisfy lint
 
   useEffect(() => {
     if (!interactiveUrl) return;
     let cancelled = false;
+
     (async () => {
       try {
         const res = await fetch(interactiveUrl);
+
         if (!res.ok || cancelled) return;
         let html = await res.text();
         // Compute absolute base URL so all relative assets still resolve
         const absoluteUrl = new URL(interactiveUrl, window.location.href).href;
-        const baseUrl = absoluteUrl.substring(0, absoluteUrl.lastIndexOf('/') + 1);
+        const baseUrl = absoluteUrl.substring(0, absoluteUrl.lastIndexOf("/") + 1);
         const baseTag = `<base href="${baseUrl}">`;
         const connectorTag = `<script>${CONNECTOR_SCRIPT}<\/script>`;
+
         // Inject as early as possible so connector exists before player.js runs
-        if (html.includes('<head>')) {
-          html = html.replace('<head>', `<head>${baseTag}${connectorTag}`);
+        if (html.includes("<head>")) {
+          html = html.replace("<head>", `<head>${baseTag}${connectorTag}`);
         } else if (/<html[^>]*>/i.test(html)) {
           html = html.replace(/<html[^>]*>/i, (m) => `${m}<head>${baseTag}${connectorTag}</head>`);
         } else {
@@ -249,11 +275,13 @@ export default function OrgUserInteractiveContentPage({
         }
         if (!cancelled) setIframeSrcdoc(html);
       } catch (e) {
-        console.error('[ispring] fetch error:', e);
+        console.error("[ispring] fetch error:", e);
       }
     })();
-    return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+    return () => {
+      cancelled = true;
+    };
   }, [interactiveUrl]);
   const backHref = campaignId
     ? `/module/${moduleSlug}?campaign_id=${campaignId}`
@@ -262,7 +290,12 @@ export default function OrgUserInteractiveContentPage({
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className={clsx("flex flex-col p-4 sm:p-6 max-w-6xl mx-auto w-full", isRtl && "text-right")}>
+        <div
+          className={clsx(
+            "flex flex-col p-4 sm:p-6 max-w-6xl mx-auto w-full",
+            isRtl && "text-right"
+          )}
+        >
           {/* Breadcrumb */}
           <nav
             className={clsx(
@@ -272,7 +305,10 @@ export default function OrgUserInteractiveContentPage({
           >
             {isOrgUserCheck ? (
               <>
-                <Link className="hover:text-gray-700 transition-colors" href="/dashboard/campaign-assignments">
+                <Link
+                  className="hover:text-gray-700 transition-colors"
+                  href="/dashboard/campaign-assignments"
+                >
                   {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
                 </Link>
                 <span className="text-gray-400">›</span>
@@ -342,8 +378,15 @@ export default function OrgUserInteractiveContentPage({
               )}
             </div>
 
-            <div className={clsx("flex items-center gap-4 px-4 py-2 bg-gray-50 border-t border-gray-200 text-sm text-gray-700", isRtl && "flex-row-reverse")}>
-              <span ref={infoRef} id="ispring-info" style={{ fontFamily: "Arial, sans-serif" }}>Loading...</span>
+            <div
+              className={clsx(
+                "flex items-center gap-4 px-4 py-2 bg-gray-50 border-t border-gray-200 text-sm text-gray-700",
+                isRtl && "flex-row-reverse"
+              )}
+            >
+              <span ref={infoRef} id="ispring-info" style={{ fontFamily: "Arial, sans-serif" }}>
+                Loading...
+              </span>
             </div>
 
             {content && (
@@ -360,17 +403,48 @@ export default function OrgUserInteractiveContentPage({
                     )}
                   >
                     <span className="flex items-center gap-1">
-                      <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>
+                      <svg
+                        fill="none"
+                        height="14"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        width="14"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
                       {formatDuration(content.duration)}
                     </span>
                     <span className="flex items-center gap-1">
-                      <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><rect height="18" rx="2" ry="2" width="18" x="3" y="4" /><line x1="16" x2="16" y1="2" y2="6" /><line x1="8" x2="8" y1="2" y2="6" /><line x1="3" x2="21" y1="10" y2="10" /></svg>
+                      <svg
+                        fill="none"
+                        height="14"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        width="14"
+                      >
+                        <rect height="18" rx="2" ry="2" width="18" x="3" y="4" />
+                        <line x1="16" x2="16" y1="2" y2="6" />
+                        <line x1="8" x2="8" y1="2" y2="6" />
+                        <line x1="3" x2="21" y1="10" y2="10" />
+                      </svg>
                       {formatDate(content.created_at)}
                     </span>
                   </div>
                 </div>
 
-                <div className={clsx("p-4 flex items-center gap-3 flex-wrap", isRtl && "flex-row-reverse")}>
+                <div
+                  className={clsx(
+                    "p-4 flex items-center gap-3 flex-wrap",
+                    isRtl && "flex-row-reverse"
+                  )}
+                >
                   {interactiveUrl && (
                     <a
                       className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
@@ -378,7 +452,18 @@ export default function OrgUserInteractiveContentPage({
                       rel="noopener noreferrer"
                       target="_blank"
                     >
-                      <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                      <svg
+                        fill="none"
+                        height="14"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        width="14"
+                      >
+                        <polygon points="5 3 19 12 5 21 5 3" />
+                      </svg>
                       Open Full Screen
                     </a>
                   )}
@@ -393,8 +478,6 @@ export default function OrgUserInteractiveContentPage({
               </>
             )}
           </div>
-
-
         </div>
       </DashboardLayout>
     </ProtectedRoute>

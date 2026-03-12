@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Checkbox } from "@heroui/checkbox";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
+import ReactCountryFlag from "react-country-flag";
 
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
@@ -13,7 +14,6 @@ import {
   getLanguageCountryCode,
   type SupportedLanguageId,
 } from "@/utils/supportedLanguages";
-import ReactCountryFlag from "react-country-flag";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 /** @deprecated Use SupportedLanguageId (language id 1–6) for new code. Kept for content forms and languageMapping. */
@@ -112,12 +112,12 @@ export function ModuleLanguageSelector({
               </Checkbox>
               <span aria-hidden className="text-base leading-none">
                 <ReactCountryFlag
+                  svg
                   countryCode={getLanguageCountryCode(id)}
                   style={{
                     fontSize: "1em",
                     lineHeight: "1em",
                   }}
-                  svg
                 />
               </span>
               <span className="lang-label">{name}</span>

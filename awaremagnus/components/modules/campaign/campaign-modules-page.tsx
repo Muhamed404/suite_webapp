@@ -49,14 +49,18 @@ export function CampaignModulesPage({ campaignId }: CampaignModulesPageProps) {
             <Link className="hover:text-gray-700 transition-colors" href="/dashboard">
               {t("breadcrumb.dashboard")}
             </Link>
-            <span aria-hidden className="text-gray-400">›</span>
+            <span aria-hidden className="text-gray-400">
+              ›
+            </span>
             <Link
               className="hover:text-gray-700 transition-colors"
               href="/dashboard/campaign-assignments"
             >
               {t("title")}
             </Link>
-            <span aria-hidden className="text-gray-400">›</span>
+            <span aria-hidden className="text-gray-400">
+              ›
+            </span>
             <span className="font-semibold text-gray-900">{t("modulesTitle")}</span>
           </nav>
 
@@ -101,7 +105,12 @@ export function CampaignModulesPage({ campaignId }: CampaignModulesPageProps) {
                   key={mod.id}
                   className="rounded-2xl border border-[var(--strokeGray)] bg-white shadow-none hover:shadow-md transition-shadow"
                 >
-                  <CardBody className={clsx("p-4 flex flex-row items-center gap-4", isRtl && "flex-row-reverse")}>
+                  <CardBody
+                    className={clsx(
+                      "p-4 flex flex-row items-center gap-4",
+                      isRtl && "flex-row-reverse"
+                    )}
+                  >
                     {/* Icon */}
                     <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
                       <Image

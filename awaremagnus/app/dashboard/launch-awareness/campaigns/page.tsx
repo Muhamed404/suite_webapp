@@ -59,8 +59,8 @@ export default function CampaignsPage() {
             <h1 className="text-lg font-semibold text-gray-800">{t("title")}</h1>
             <Button
               as={Link}
-              href="/dashboard/launch-awareness/campaigns/create"
               className="px-6 py-2 rounded-full bg-[#3FBDFF] text-white text-sm font-medium hover:bg-[#29AAE8]"
+              href="/dashboard/launch-awareness/campaigns/create"
             >
               {t("createNew")}
             </Button>
@@ -71,13 +71,13 @@ export default function CampaignsPage() {
 
           {/* Filters */}
           <CampaignFilters
-            statusFilter={statusFilter}
-            onStatusChange={setStatusFilter}
             dateFilter={dateFilter}
-            onDateChange={setDateFilter}
             searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
             statusCounts={statusCounts}
+            statusFilter={statusFilter}
+            onDateChange={setDateFilter}
+            onSearchChange={setSearchQuery}
+            onStatusChange={setStatusFilter}
           />
 
           {/* Campaign Table */}

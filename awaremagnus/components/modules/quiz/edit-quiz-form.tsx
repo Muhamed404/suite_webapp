@@ -9,6 +9,8 @@ import Link from "next/link";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
 
+import { breadcrumbLinkClassName } from "../training-library/shared-styles";
+
 import { QuizTypeSelectorApi, apiQuizTypeIdToCardType } from "./quiz-type-selector-api";
 import {
   QuizLanguageCard,
@@ -17,7 +19,6 @@ import {
   type QuizLanguageForm,
   type QuizQuestion,
 } from "./quiz-language-card";
-import { breadcrumbLinkClassName } from "../training-library/shared-styles";
 
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
@@ -45,6 +46,7 @@ function mapApiAnswersToForm(
 
 function moduleName(m?: Module | null): string {
   if (!m) return "";
+
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
@@ -143,9 +145,11 @@ export function EditQuizForm({
 
       // Redirect after success
       setTimeout(() => {
-        const path = user?.role_id && (user.role_id === 1 || user.role_id === 2)
-          ? `/dashboard/training-library/system/${initialModuleId}`
-          : `/dashboard/training-library/my/${initialModuleId}`;
+        const path =
+          user?.role_id && (user.role_id === 1 || user.role_id === 2)
+            ? `/dashboard/training-library/system/${initialModuleId}`
+            : `/dashboard/training-library/my/${initialModuleId}`;
+
         router.push(path);
       }, 2000);
     } catch (err) {
@@ -245,31 +249,52 @@ export function EditQuizForm({
               {tModule("moduleDetails.breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}
             </Link>
             <span className="text-[var(--darkgray)]">›</span>
-            <Link className={breadcrumbLinkClassName} href={`/dashboard/campaign-assignments/${campaignId}`}>
+            <Link
+              className={breadcrumbLinkClassName}
+              href={`/dashboard/campaign-assignments/${campaignId}`}
+            >
               {tModule("moduleDetails.breadcrumbCampaign") ?? "Campaign"}
             </Link>
             <span className="text-[var(--darkgray)]">›</span>
-            <Link className={breadcrumbLinkClassName} href={`/dashboard/campaign-assignments/${campaignId}/modules/${initialModuleId}`}>
+            <Link
+              className={breadcrumbLinkClassName}
+              href={`/dashboard/campaign-assignments/${campaignId}/modules/${initialModuleId}`}
+            >
               {module ? moduleName(module) : "Loading..."}
             </Link>
             <span className="text-[var(--darkgray)]">›</span>
-            <span className="font-medium text-[var(--mainblue)]">{t("editQuiz") ?? "Edit Quiz"}</span>
+            <span className="font-medium text-[var(--mainblue)]">
+              {t("editQuiz") ?? "Edit Quiz"}
+            </span>
           </>
         ) : (
           <>
-            <Link className={breadcrumbLinkClassName} href={`/dashboard/training-library/${libraryType}`}>
+            <Link
+              className={breadcrumbLinkClassName}
+              href={`/dashboard/training-library/${libraryType}`}
+            >
               {tModule("moduleDetails.breadcrumbTrainingLibrary") ?? "Awareness Library"}
             </Link>
             <span className="text-[var(--darkgray)]">›</span>
-            <Link className={breadcrumbLinkClassName} href={`/dashboard/training-library/${libraryType}`}>
-              {libraryType === "system" ? (tModule("moduleDetails.coreModules") ?? "Core Modules") : (tModule("moduleDetails.breadcrumbMyLibrary") ?? "My Modules")}
+            <Link
+              className={breadcrumbLinkClassName}
+              href={`/dashboard/training-library/${libraryType}`}
+            >
+              {libraryType === "system"
+                ? (tModule("moduleDetails.coreModules") ?? "Core Modules")
+                : (tModule("moduleDetails.breadcrumbMyLibrary") ?? "My Modules")}
             </Link>
             <span className="text-[var(--darkgray)]">›</span>
-            <Link className={breadcrumbLinkClassName} href={`/dashboard/training-library/${libraryType}/${initialModuleId}`}>
+            <Link
+              className={breadcrumbLinkClassName}
+              href={`/dashboard/training-library/${libraryType}/${initialModuleId}`}
+            >
               {module ? moduleName(module) : "Loading..."}
             </Link>
             <span className="text-[var(--darkgray)]">›</span>
-            <span className="font-medium text-[var(--mainblue)]">{t("editQuiz") ?? "Edit Quiz"}</span>
+            <span className="font-medium text-[var(--mainblue)]">
+              {t("editQuiz") ?? "Edit Quiz"}
+            </span>
           </>
         )}
       </nav>
@@ -321,7 +346,7 @@ export function EditQuizForm({
                   questions: f.questions.map((q, i) => (i === qIndex ? { ...q, question } : q)),
                 }))
               }
-              onRemove={languageForms.length > 1 ? () => removeForm(formIndex) : () => { }}
+              onRemove={languageForms.length > 1 ? () => removeForm(formIndex) : () => {}}
               onRemoveQuestion={(qIndex) => removeQuestion(formIndex, qIndex)}
             />
           ))}

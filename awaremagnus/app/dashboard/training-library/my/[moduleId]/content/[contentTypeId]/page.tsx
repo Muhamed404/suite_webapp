@@ -6,9 +6,9 @@ import { ContentListPage } from "@/components/modules/training-library/content-l
 
 export default function MyLibraryModuleContentListPage() {
   const params = useParams();
-  
+
   if (!params) return null;
-  
+
   const moduleId = Number(params.moduleId);
   const contentTypeId = Number(params.contentTypeId);
 

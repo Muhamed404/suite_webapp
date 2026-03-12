@@ -1,4 +1,4 @@
-import type { CampaignAssignment, CampaignModule, Certificate } from "@/types/campaign";
+import type { CampaignAssignment, Certificate } from "@/types/campaign";
 import type { Module } from "@/types/quiz";
 import type { AWMResponseBody } from "./awmResponse";
 import type { ApiResponse } from "@/types/quiz";
@@ -28,13 +28,15 @@ export const campaignService = {
    */
   getAssignedCampaigns: async (userId: number, campaignId?: string) => {
     const params: Record<string, any> = {};
-    if (campaignId && campaignId !== 'all') {
+
+    if (campaignId && campaignId !== "all") {
       params.campaign_id = campaignId;
     }
     const response = await request<any>(() =>
       awmClient.get<AWMResponseBody>(`${API_BASE}/campaign/assignments`, { params })
     );
     const raw = response.data as any;
+
     if (response.success && raw?.assignments) {
       const campaigns: CampaignAssignment[] = raw.assignments.map((item: any) => ({
         id: item.module_id,
@@ -47,6 +49,7 @@ export const campaignService = {
         end_date: item.end_date,
         progress_percent: item.progress_percentage,
       }));
+
       // preserve user_summary from the original payload so callers can access metrics
       return {
         ...response,
@@ -54,6 +57,7 @@ export const campaignService = {
         user_summary: raw.user_summary ?? undefined,
       } as any;
     }
+
     return response as ApiResponse<CampaignAssignment[]>;
   },
 
@@ -86,19 +90,45 @@ export const campaignService = {
    */
   downloadCertificate: async (certificateId: number, moduleId?: number | null) => {
     const params: Record<string, any> = { id: certificateId };
+
     if (moduleId != null) params.module_id = moduleId;
 
     const response = await awmClient.get(`${API_BASE}/certificate/download`, {
       params,
-      responseType: 'blob',
+      responseType: "arraybuffer",
+      headers: {
+        Accept: "application/pdf",
+      },
     });
 
-    // Create a download link
-    const filename = moduleId ? `certificate_${certificateId}_module_${moduleId}.pdf` : `certificate_${certificateId}.pdf`;
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
+    const contentType: string =
+      (response.headers && (response.headers["content-type"] as string)) || "";
+      
+    if (contentType.includes("application/json")) {
+      const text = new TextDecoder().decode(response.data as ArrayBuffer);
+      let body: any;
+      try {
+        body = JSON.parse(text);
+      } catch {
+        body = { message: text };
+      }
+      throw new Error(
+        `certificate download failed: ${body?.message || "unknown error"}`
+      );
+    }
+
+    // create a proper PDF blob so the OS knows how to handle it
+    const blob = new Blob([response.data], { type: "application/pdf" });
+
+    // build the filename the same way we did before
+    const filename = moduleId
+      ? `certificate_${certificateId}_module_${moduleId}.pdf`
+      : `certificate_${certificateId}.pdf`;
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
     link.href = url;
-    link.setAttribute('download', filename);
+    link.setAttribute("download", filename);
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -134,17 +164,16 @@ export const campaignService = {
    * Begin a specific content item within a module/campaign for the current user.
    * API: POST /api/awm/useraction/report-actions/begin-content
    */
-  beginContent: async (
-    campaignId: number,
-    moduleId: number,
-    contentId: number
-  ) => {
+  beginContent: async (campaignId: number, moduleId: number, contentId: number) => {
     return request<unknown>(() =>
-      awmClient.post<AWMResponseBody>(`${SERVICE_AWM_URL}/api/awm/useraction/report-actions/begin-content`, {
-        campaign_id: campaignId,
-        module_id: moduleId,
-        content_id: contentId,
-      })
+      awmClient.post<AWMResponseBody>(
+        `${SERVICE_AWM_URL}/api/awm/useraction/report-actions/begin-content`,
+        {
+          campaign_id: campaignId,
+          module_id: moduleId,
+          content_id: contentId,
+        }
+      )
     );
   },
 

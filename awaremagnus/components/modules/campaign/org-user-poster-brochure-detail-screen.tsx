@@ -47,7 +47,9 @@ function formatDate(dateStr: string | undefined): string {
   if (!dateStr) return "—";
   try {
     const d = new Date(dateStr);
+
     if (Number.isNaN(d.getTime())) return "—";
+
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   } catch {
     return "—";
@@ -59,14 +61,17 @@ function formatDuration(minutes: number | undefined): string {
   if (minutes < 60) return `${minutes} min`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
+
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
 function resolveSourceUrl(raw: string | null | undefined): string | null {
   if (!raw?.trim()) return null;
   const s = raw.trim();
+
   if (s.startsWith("http")) return s;
   if (s.startsWith("/contents/")) return `/awm${s}`;
+
   return `/awm/contents/${s.startsWith("/") ? s.slice(1) : s}`;
 }
 
@@ -126,7 +131,8 @@ export function OrgUserPosterBrochureDetailScreen({
   const completeContentMutation = useCompleteContent();
 
   const docReportContents = docReportRes?.data?.reportContents ?? [];
-  const docReportEntry = docReportContents.find((rc: any) => rc.content_id === contentId) ?? docReportContents[0];
+  const docReportEntry =
+    docReportContents.find((rc: any) => rc.content_id === contentId) ?? docReportContents[0];
   const docStatusName: string = (docReportEntry?.status?.name ?? "").toUpperCase();
   const isCompleted = docStatusName === "COMPLETED";
   const showMarkAsCompleted = isDocument && !!docReportEntry && !isCompleted;
@@ -134,7 +140,11 @@ export function OrgUserPosterBrochureDetailScreen({
   function handleMarkAsCompleted() {
     completeContentMutation.mutate(
       { campaign_id: campaignId, module_id: moduleId, content_id: contentId },
-      { onSuccess: () => { void refetchDocReport(); } }
+      {
+        onSuccess: () => {
+          void refetchDocReport();
+        },
+      }
     );
   }
 
@@ -189,7 +199,7 @@ export function OrgUserPosterBrochureDetailScreen({
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className={clsx("flex flex-col", isRtl && "text-right")}>          
+        <div className={clsx("flex flex-col", isRtl && "text-right")}>
           {/* ── Breadcrumb ── */}
           <nav
             className={clsx(
@@ -197,21 +207,25 @@ export function OrgUserPosterBrochureDetailScreen({
               isRtl && "flex-row-reverse"
             )}
           >
-            <Link className="hover:text-gray-700 transition-colors" href="/dashboard/campaign-assignments">
+            <Link
+              className="hover:text-gray-700 transition-colors"
+              href="/dashboard/campaign-assignments"
+            >
               {t("moduleDetails.breadcrumbMyAssignments") ?? "My Assignments"}
             </Link>
             <span className="text-gray-400">›</span>
             {campaignId ? (
-              <Link className="hover:text-gray-700 transition-colors" href={`/module/${moduleData?.code ?? moduleId}?campaign_id=${campaignId}`}>
+              <Link
+                className="hover:text-gray-700 transition-colors"
+                href={`/module/${moduleData?.code ?? moduleId}?campaign_id=${campaignId}`}
+              >
                 {moduleTitle}
               </Link>
             ) : (
               <span>{moduleTitle}</span>
             )}
             <span className="text-gray-400">›</span>
-            <span className="font-semibold text-gray-900">
-              {typeLabel}
-            </span>
+            <span className="font-semibold text-gray-900">{typeLabel}</span>
           </nav>
 
           <div className="flex flex-col px-3 gap-4">
@@ -255,9 +269,7 @@ export function OrgUserPosterBrochureDetailScreen({
                             src={POSTER_FALLBACK_IMG}
                           />
                         }
-                        loadingContent={
-                          <div className="w-full h-full animate-pulse bg-gray-200" />
-                        }
+                        loadingContent={<div className="w-full h-full animate-pulse bg-gray-200" />}
                         sizes="(max-width: 896px) 100vw, 896px"
                         src={posterDisplayUrl}
                       />
@@ -293,10 +305,7 @@ export function OrgUserPosterBrochureDetailScreen({
               {content && (
                 <>
                   <div
-                    className={clsx(
-                      "px-5 py-4 border-t border-gray-100",
-                      isRtl && "text-right"
-                    )}
+                    className={clsx("px-5 py-4 border-t border-gray-100", isRtl && "text-right")}
                   >
                     <h3 className="text-sm font-semibold text-gray-900">
                       {getContentTitle(content)}
@@ -313,7 +322,16 @@ export function OrgUserPosterBrochureDetailScreen({
                     >
                       {/* Duration */}
                       <span className="flex items-center gap-1.5">
-                        <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
+                        <svg
+                          fill="none"
+                          height="14"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          width="14"
+                        >
                           <circle cx="12" cy="12" r="10" />
                           <polyline points="12 6 12 12 16 14" />
                         </svg>
@@ -322,7 +340,16 @@ export function OrgUserPosterBrochureDetailScreen({
 
                       {/* Date */}
                       <span className="flex items-center gap-1.5">
-                        <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
+                        <svg
+                          fill="none"
+                          height="14"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          width="14"
+                        >
                           <rect height="18" rx="2" ry="2" width="18" x="3" y="4" />
                           <line x1="16" x2="16" y1="2" y2="6" />
                           <line x1="8" x2="8" y1="2" y2="6" />
@@ -350,7 +377,16 @@ export function OrgUserPosterBrochureDetailScreen({
                         rel="noopener noreferrer"
                         target="_blank"
                       >
-                        <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
+                        <svg
+                          fill="none"
+                          height="14"
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          viewBox="0 0 24 24"
+                          width="14"
+                        >
                           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                           <polyline points="7 10 12 15 17 10" />
                           <line x1="12" x2="12" y1="15" y2="3" />
@@ -358,10 +394,10 @@ export function OrgUserPosterBrochureDetailScreen({
                         {contentTypeId === 4
                           ? (t("library.downloadPoster") ?? "Download Poster")
                           : contentTypeId === 5
-                          ? (t("library.downloadScreenSaver") ?? "Download Screen Saver")
-                          : (contentTypeId === 6 || contentTypeId === 7)
-                          ? (t("library.downloadDocument") ?? "Download Document")
-                          : (t("library.downloadBrochure") ?? "Download Brochure")}
+                            ? (t("library.downloadScreenSaver") ?? "Download Screen Saver")
+                            : contentTypeId === 6 || contentTypeId === 7
+                              ? (t("library.downloadDocument") ?? "Download Document")
+                              : (t("library.downloadBrochure") ?? "Download Brochure")}
                       </a>
 
                       {/* Next item */}
@@ -370,14 +406,32 @@ export function OrgUserPosterBrochureDetailScreen({
                           className="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-full text-xs font-medium transition-colors"
                           href={nextItemHref}
                         >
-                          <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
+                          <svg
+                            fill="none"
+                            height="14"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            width="14"
+                          >
                             <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                           </svg>
                           {t("library.next") ?? "Next"}
                         </Link>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-300 rounded-full text-xs font-medium cursor-not-allowed select-none">
-                          <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
+                          <svg
+                            fill="none"
+                            height="14"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            width="14"
+                          >
                             <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                           </svg>
                           {t("library.next") ?? "Next"}
@@ -395,7 +449,16 @@ export function OrgUserPosterBrochureDetailScreen({
                           type="button"
                           onClick={handleMarkAsCompleted}
                         >
-                          <svg fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
+                          <svg
+                            fill="none"
+                            height="14"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            width="14"
+                          >
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
                           {completeContentMutation.isPending
@@ -416,12 +479,12 @@ export function OrgUserPosterBrochureDetailScreen({
                   {contentTypeId === 4
                     ? (t("library.nextPosterTraining") ?? "More Posters")
                     : contentTypeId === 5
-                    ? (t("library.nextScreenSaverTraining") ?? "More Screen Savers")
-                    : contentTypeId === 6
-                    ? (t("library.nextDocumentTraining") ?? "More Documents")
-                    : contentTypeId === 7
-                    ? (t("library.nextDocumentTraining") ?? "More Documents")
-                    : (t("library.nextBrochureTraining") ?? "More Brochures")}
+                      ? (t("library.nextScreenSaverTraining") ?? "More Screen Savers")
+                      : contentTypeId === 6
+                        ? (t("library.nextDocumentTraining") ?? "More Documents")
+                        : contentTypeId === 7
+                          ? (t("library.nextDocumentTraining") ?? "More Documents")
+                          : (t("library.nextBrochureTraining") ?? "More Brochures")}
                 </h4>
                 <div className="space-y-2">
                   {siblings
@@ -429,9 +492,10 @@ export function OrgUserPosterBrochureDetailScreen({
                     .slice(0, 8)
                     .map((sibling) => {
                       const siblingHref = `/module/${moduleData?.code ?? moduleId}/content/${encodeURIComponent(typeLabel.toLowerCase())}/${sibling.id}?mod_id=${moduleId}&contype_id=${contentTypeId}&campaign_id=${campaignId}`;
-                      const thumbUrl = sibling.logo_url || (sibling as any).logo_path
-                        ? getContentAssetUrl(sibling.logo_url ?? (sibling as any).logo_path)
-                        : null;
+                      const thumbUrl =
+                        sibling.logo_url || (sibling as any).logo_path
+                          ? getContentAssetUrl(sibling.logo_url ?? (sibling as any).logo_path)
+                          : null;
 
                       return (
                         <Link
@@ -454,11 +518,28 @@ export function OrgUserPosterBrochureDetailScreen({
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                                <svg className="text-gray-400" fill="none" height="18" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="18">
+                                <svg
+                                  className="text-gray-400"
+                                  fill="none"
+                                  height="18"
+                                  stroke="currentColor"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  viewBox="0 0 24 24"
+                                  width="18"
+                                >
                                   {isPoster ? (
-                                    <><rect height="18" rx="2" ry="2" width="18" x="3" y="3" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" /></>
+                                    <>
+                                      <rect height="18" rx="2" ry="2" width="18" x="3" y="3" />
+                                      <circle cx="8.5" cy="8.5" r="1.5" />
+                                      <polyline points="21 15 16 10 5 21" />
+                                    </>
                                   ) : (
-                                    <><path d="M14 2H6a2 a2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></>
+                                    <>
+                                      <path d="M14 2H6a2 a2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                      <polyline points="14 2 14 8 20 8" />
+                                    </>
                                   )}
                                 </svg>
                               </div>
@@ -476,7 +557,17 @@ export function OrgUserPosterBrochureDetailScreen({
                           </div>
 
                           {/* Arrow */}
-                          <svg className="flex-shrink-0 text-gray-300" fill="none" height="14" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="14">
+                          <svg
+                            className="flex-shrink-0 text-gray-300"
+                            fill="none"
+                            height="14"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            width="14"
+                          >
                             <polyline points={isRtl ? "15 18 9 12 15 6" : "9 18 15 12 9 6"} />
                           </svg>
                         </Link>

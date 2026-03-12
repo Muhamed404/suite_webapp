@@ -83,14 +83,23 @@ export function VideoContentDetailScreen({
   console.log("   moduleId:", moduleId);
   console.log("   contentTypeId:", contentTypeId);
   console.log("   Breadcrumb condition check - campaignId check:", !!campaignId);
-  console.log("   Breadcrumb will render:", breadcrumbContext === "campaign" ? "CAMPAIGN" : breadcrumbContext === "my-assignments" ? "MY-ASSIGNMENTS" : "TRAINING-LIBRARY");
+  console.log(
+    "   Breadcrumb will render:",
+    breadcrumbContext === "campaign"
+      ? "CAMPAIGN"
+      : breadcrumbContext === "my-assignments"
+        ? "MY-ASSIGNMENTS"
+        : "TRAINING-LIBRARY"
+  );
 
-  const basePath = breadcrumbContext === "campaign" 
-    ? `/dashboard/campaign-assignments/${campaignId}` 
-    : `/dashboard/training-library/${libraryType}`;
-  const listHref = breadcrumbContext === "campaign"
-    ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
-    : `${basePath}/${moduleId}/content/${contentTypeId}`;
+  const basePath =
+    breadcrumbContext === "campaign"
+      ? `/dashboard/campaign-assignments/${campaignId}`
+      : `/dashboard/training-library/${libraryType}`;
+  const listHref =
+    breadcrumbContext === "campaign"
+      ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
+      : `${basePath}/${moduleId}/content/${contentTypeId}`;
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
@@ -145,7 +154,10 @@ export function VideoContentDetailScreen({
             >
               {breadcrumbContext === "campaign" ? (
                 <>
-                  <Link className="hover:text-gray-700 transition" href="/dashboard/campaign-assignments">
+                  <Link
+                    className="hover:text-gray-700 transition"
+                    href="/dashboard/campaign-assignments"
+                  >
                     {t("moduleDetails.breadcrumbAwarenessCampaign")}
                   </Link>
                   <span className="text-gray-400">›</span>
@@ -153,7 +165,10 @@ export function VideoContentDetailScreen({
                     {t("moduleDetails.breadcrumbCampaign")}
                   </Link>
                   <span className="text-gray-400">›</span>
-                  <Link className="hover:text-gray-700 transition" href={`${basePath}/modules/${moduleId}`}>
+                  <Link
+                    className="hover:text-gray-700 transition"
+                    href={`${basePath}/modules/${moduleId}`}
+                  >
                     {moduleTitle}
                   </Link>
                   <span className="text-gray-400">›</span>
@@ -161,12 +176,18 @@ export function VideoContentDetailScreen({
                 </>
               ) : breadcrumbContext === "my-assignments" ? (
                 <>
-                  <Link className="hover:text-gray-700 transition" href="/dashboard/campaign-assignments">
+                  <Link
+                    className="hover:text-gray-700 transition"
+                    href="/dashboard/campaign-assignments"
+                  >
                     {t("moduleDetails.breadcrumbMyAssignments")}
                   </Link>
                   <span className="text-gray-400">›</span>
                   {campaignId ? (
-                    <Link className="hover:text-gray-700 transition" href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}>
+                    <Link
+                      className="hover:text-gray-700 transition"
+                      href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}
+                    >
                       {moduleTitle}
                     </Link>
                   ) : (
@@ -182,7 +203,9 @@ export function VideoContentDetailScreen({
                   </Link>
                   <span className="text-gray-400">›</span>
                   <Link className="hover:text-gray-700 transition" href={basePath}>
-                    {libraryType === "system" ? t("moduleDetails.coreModules") : t("moduleDetails.breadcrumbMyLibrary")}
+                    {libraryType === "system"
+                      ? t("moduleDetails.coreModules")
+                      : t("moduleDetails.breadcrumbMyLibrary")}
                   </Link>
                   <span className="text-gray-400">›</span>
                   <Link className="hover:text-gray-700 transition" href={`${basePath}/${moduleId}`}>

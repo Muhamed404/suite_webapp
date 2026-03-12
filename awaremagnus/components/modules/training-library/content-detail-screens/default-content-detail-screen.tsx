@@ -79,14 +79,23 @@ export function DefaultContentDetailScreen({
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
-  console.log("📋 DefaultContentDetailScreen - breadcrumbContext:", breadcrumbContext, "campaignId:", campaignId, "libraryType:", libraryType);
+  console.log(
+    "📋 DefaultContentDetailScreen - breadcrumbContext:",
+    breadcrumbContext,
+    "campaignId:",
+    campaignId,
+    "libraryType:",
+    libraryType
+  );
 
-  const basePath = breadcrumbContext === "campaign" 
-    ? `/dashboard/campaign-assignments/${campaignId}` 
-    : `/dashboard/training-library/${libraryType}`;
-  const listHref = breadcrumbContext === "campaign"
-    ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
-    : `${basePath}/${moduleId}/content/${contentTypeId}`;
+  const basePath =
+    breadcrumbContext === "campaign"
+      ? `/dashboard/campaign-assignments/${campaignId}`
+      : `/dashboard/training-library/${libraryType}`;
+  const listHref =
+    breadcrumbContext === "campaign"
+      ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
+      : `${basePath}/${moduleId}/content/${contentTypeId}`;
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
@@ -162,7 +171,10 @@ export function DefaultContentDetailScreen({
                 </Link>
                 <span className="text-[var(--darkgray)]">›</span>
                 {campaignId ? (
-                  <Link className={breadcrumbLinkClassName} href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}>
+                  <Link
+                    className={breadcrumbLinkClassName}
+                    href={`/dashboard/campaign-assignments/${campaignId}/modules/${moduleId}`}
+                  >
                     {moduleTitle}
                   </Link>
                 ) : (
@@ -178,7 +190,9 @@ export function DefaultContentDetailScreen({
                 </Link>
                 <span className="text-[var(--darkgray)]">›</span>
                 <Link className={breadcrumbLinkClassName} href={basePath}>
-                  {libraryType === "system" ? t("moduleDetails.coreModules") : t("moduleDetails.breadcrumbMyLibrary")}
+                  {libraryType === "system"
+                    ? t("moduleDetails.coreModules")
+                    : t("moduleDetails.breadcrumbMyLibrary")}
                 </Link>
                 <span className="text-[var(--darkgray)]">›</span>
                 <Link className={breadcrumbLinkClassName} href={`${basePath}/${moduleId}`}>

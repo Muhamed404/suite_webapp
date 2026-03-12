@@ -7,6 +7,8 @@ export { CertificateManagementListPage } from "./certificate-management-list-pag
 export { CertificateBrandingForm } from "./certificate-branding-form";
 export { SurveyManagementListPage } from "./survey-management-list-page";
 export { SurveyStatsPage } from "./survey-stats-page";
+export { SurveyUserListPage } from "./survey-user-list-page";
+export { SurveyUserAnswersPage } from "./survey-user-answers-page";
 export { NewSurveyForm } from "./new-survey-form";
 export { SurveyQuestionsPage } from "./survey-questions-page";
 export { CreateSurveyQuestionForm } from "./create-survey-question-form";

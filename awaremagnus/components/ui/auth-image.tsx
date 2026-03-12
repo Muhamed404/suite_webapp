@@ -136,16 +136,25 @@ export function AuthImage({
   }
 
   if (fill) {
-    return <Image fill unoptimized={unoptimized} alt={alt} className={className} sizes={sizes} src={objectUrl} />;
+    return (
+      <Image
+        fill
+        alt={alt}
+        className={className}
+        sizes={sizes}
+        src={objectUrl}
+        unoptimized={unoptimized}
+      />
+    );
   }
 
   return (
     <Image
-      unoptimized={unoptimized}
       alt={alt}
       className={className}
       height={height ?? 48}
       src={objectUrl}
+      unoptimized={unoptimized}
       width={width ?? 48}
     />
   );
