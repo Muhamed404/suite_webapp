@@ -20,6 +20,7 @@ import {
   isUser as getIsUser,
 } from "@/utils/roles";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { AvatarStat } from "@/types/dashboard";
 
 export const GamificationStats = () => {
   const t = useTranslations("dashboard");
@@ -82,54 +83,8 @@ export const GamificationStats = () => {
   const stats = (achievementData as any)?.object ?? (achievementData as any)?.data;
   const avatars = (avatarData as any)?.object ?? (avatarData as any)?.data;
 
-  // Avatar numbers (1-9) present in backend and a lookup map by number.
-  // We parse the leading digit from `image_small_url` (e.g. "3-...png").
-  const unlockedAvatarNumbers = useMemo(() => {
-    const set = new Set<number>();
-    const items = avatars?.avatar_statistics ?? [];
 
-    for (const a of items) {
-      const img = a?.image_small_url ?? "";
-      const m = img.trim().match(/^(\d)/);
 
-      if (!m) continue;
-      const n = Number(m[1]);
-
-      if (n >= 1 && n <= 9) set.add(n);
-    }
-
-    return set;
-  }, [avatars]);
-
-  const avatarByNumber = useMemo(() => {
-    const map = new Map<number, any>();
-
-    for (const a of avatars?.avatar_statistics ?? []) {
-      const img = a?.image_small_url ?? "";
-      const m = img.trim().match(/^(\d)/);
-
-      if (!m) continue;
-      const n = Number(m[1]);
-
-      map.set(n, a);
-    }
-
-    return map;
-  }, [avatars]);
-
-  // whether Level 1 avatar is present in the backend response
-  const isMainUnlocked = avatarByNumber.has(1);
-
-  const AVATAR_LABEL_OVERRIDES: Record<number, string> = {
-    2: "Alert\nApprentice",
-    3: "Cautious\nLearner",
-    4: "Informed\nDefender",
-    5: "Vigilant\nGuardian",
-    6: "Skilled\nSentinel",
-    7: "Resilient\nProtector",
-    8: "Advanced\nWatchman",
-    9: "Expert\nEnforcer",
-  };
 
   // Set of achievement numbers (1-16) present in the backend response. We
   // parse the leading number from `image_small_url` (e.g. "1-quick-learner.png").
@@ -180,7 +135,6 @@ export const GamificationStats = () => {
     });
   }, [unlockedAchievementNumbers]);
 
-  const _totalAchievements = stats?.total_achievements || 0;
   const unlockedAchievements = stats?.total_unique_achievements_unlocked || 0;
   const totalUniqueAchievements =
     (stats?.total_unique_achievements_unlocked || 0) +
@@ -191,19 +145,40 @@ export const GamificationStats = () => {
       ? Math.round((unlockedAchievements / totalUniqueAchievements) * 100)
       : 0;
 
-  // For avatar, we want to show the one with highest employee count? Or just the distribution?
-  // The UI shows ONE big avatar "Vulnerable Newbie" and then a grid.
-  // I will pick the level with the highest employee count to display as "Main" or just the first one.
-
+  // Find the unlocked avatar with the highest level to show in the main slot
   const mainAvatar = useMemo(() => {
-    if (!avatars?.avatar_statistics || avatars.avatar_statistics.length === 0) return null;
+    if (!avatars?.avatar_statistics || avatars.avatar_statistics.length === 0) {
+      // Fallback when API returns empty array - show Level 1 (locked)
+      return {
+        level_number: 10,
+        level_name: "Vulnerable Newbie",
+        min_score_or_percentage: 0,
+        max_score_or_percentage: 6,
+        image_small_url: "Vulnerablenewbe_Level1_Robot.png",
+        employee_count: 0
+      };
+    }
 
-    // Find highest count? Or just first "unlocked"?
-    // Let's Sort by employee_count desc
-    return [...avatars.avatar_statistics].sort((a, b) => b.employee_count - a.employee_count)[0];
+    // First filter avatars with employee_count > 0 (unlocked), then sort by level_number desc
+    const unlockedAvatars = (avatars.avatar_statistics as AvatarStat[]).filter(
+      (a) => (a.employee_count ?? 0) > 0
+    );
+
+    if (unlockedAvatars.length === 0) {
+      // If no unlocked avatars, return the first one as fallback (locked)
+      return avatars.avatar_statistics[0];
+    }
+
+    return unlockedAvatars.sort((a, b) => b.level_number - a.level_number)[0];
   }, [avatars]);
 
-  const mainAvatarCount = avatarByNumber.get(1)?.employee_count ?? mainAvatar?.employee_count;
+  // Check if main avatar is unlocked (has employee_count > 0)
+  const isMainAvatarUnlocked = (mainAvatar?.employee_count ?? 0) > 0;
+  
+  // Get the actual image filename for the main avatar from API response
+  const mainAvatarImageName = useMemo(() => {
+    return mainAvatar?.image_small_url ?? "1.png";
+  }, [mainAvatar]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -366,74 +341,148 @@ export const GamificationStats = () => {
           </div>
 
           <div className="flex mt-5 gap-8">
-            {/* Main Avatar — always show Level 1 in the large area; use backend metadata when available */}
+            {/* Main Avatar — show the highest level avatar from backend response */}
             <div className="flex flex-col items-center justify-center">
-              <div
-                aria-disabled={!isMainUnlocked}
-                className={`w-24 h-24 bg-gray-200 rounded-full ${!isMainUnlocked ? "opacity-40" : ""}`}
+              <Tooltip 
+                content={
+                  <div className="flex flex-col gap-1 max-w-[200px] p-1">
+                    <p className="font-semibold text-sm text-gray-900">
+                      Level {mainAvatar?.level_number ?? 1}
+                    </p>
+                    <p className="text-xs text-gray-600 leading-tight">
+                      {mainAvatar?.level_name ?? "Vulnerable Newbie"}
+                    </p>
+                    <div className="flex items-center justify-between mt-1 gap-2">
+                      <span
+                        className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                          isMainAvatarUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                        }`}
+                      >
+                        {isMainAvatarUnlocked ? "Unlocked" : "Locked"}
+                      </span>
+                      {mainAvatar?.employee_count != null && (
+                        <span className="text-xs text-gray-500">
+                          {mainAvatar.employee_count}x
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                }
+                placement="top"
               >
-                <Image
-                  unoptimized
-                  alt="Avatar 1"
-                  className="w-24 h-24 rounded-full"
-                  height={96}
-                  src={getContentAssetUrl(`/images/avatars/1.png`)}
-                  width={96}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src =
-                      getContentAssetUrl("/images/avatars/1.png");
-                  }}
-                />
-              </div>
+                <div
+                  aria-disabled={!isMainAvatarUnlocked}
+                  className={`w-24 h-24 bg-gray-200 rounded-full ${!isMainAvatarUnlocked ? "opacity-40" : ""} cursor-default`}
+                >
+                  <Image
+                    unoptimized
+                    alt={`Level ${mainAvatar?.level_number ?? 1}`}
+                    className="w-24 h-24 rounded-full object-cover object-top"
+                    height={96}
+                    src={getContentAssetUrl(`/images/avatars/${mainAvatarImageName}`)}
+                    width={96}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        getContentAssetUrl("/images/avatars/1.png");
+                    }}
+                  />
+                </div>
+              </Tooltip>
 
               <p className="mt-5 text-gray-700 text-sm text-center leading-tight whitespace-pre-line">
-                {"Vulnerable\nNewbie"}
+                {mainAvatar?.level_name ?? "Vulnerable\nNewbie"}
               </p>
             </div>
 
-            {/* Levels Grid — show avatars 2..9 (Level 1 is the main slot); overlay `achived.svg` when unlocked */}
+            {/* Levels Grid — show 8 remaining avatars excluding the one in main slot */}
             <div className="grid grid-cols-4 gap-5 flex-1 pl-5 border-l border-[#E6E6E6]">
-              {Array.from({ length: 8 }).map((_, i) => {
-                const num = i + 2; // start from 2 because Level 1 is shown above
-                const isUnlocked = unlockedAvatarNumbers.has(num);
-                const meta = avatarByNumber.get(num);
-                // DO NOT use backend-provided labels; use local overrides or fall back to `Level X`
-                const displayLabel = AVATAR_LABEL_OVERRIDES[num] ?? `Level ${num}`;
+              {(() => {
+                let availableAvatars;
+                
+                // Handle empty avatar_statistics array
+                if (!avatars?.avatar_statistics || avatars.avatar_statistics.length === 0) {
+                  // Create fallback locked avatars (levels 2-9)
+                  const fallbackAvatars = [
+                    { level_number: 11, level_name: "Alert Apprentice", image_small_url: "AlertApprentice_Level2_Robot.png", employee_count: 0 },
+                    { level_number: 12, level_name: "Cautious Learner", image_small_url: "CautiousLearner_Level3_Robot.png", employee_count: 0 },
+                    { level_number: 13, level_name: "Informed Defender", image_small_url: "InformedDefender_Level4_Robot.png", employee_count: 0 },
+                    { level_number: 14, level_name: "Vigilant Guardian", image_small_url: "VigilantGuardian_Level5_Robot.png", employee_count: 0 },
+                    { level_number: 15, level_name: "Skilled Sentinel", image_small_url: "SkilledSentinel._Level6_Robot.png", employee_count: 0 },
+                    { level_number: 16, level_name: "Resilient Protector", image_small_url: "ResilientProtector_Level7_Robot.png", employee_count: 0 },
+                    { level_number: 17, level_name: "Advanced Watchman", image_small_url: "AdvancedWatchman_Level8_Robot.png", employee_count: 0 },
+                    { level_number: 18, level_name: "Expert Enforcer", image_small_url: "ExpertEnforcer_Level9_Robot.png", employee_count: 0 }
+                  ];
+                  availableAvatars = fallbackAvatars;
+                } else {
+                  // Get all available avatar statistics except the main one
+                  availableAvatars = (avatars.avatar_statistics as AvatarStat[])
+                    .filter((avatar) => avatar.level_number !== mainAvatar?.level_number)
+                    .slice(0, 8); // Show only 8 avatars in the grid
+                }
 
-                return (
-                  <div
-                    key={num}
-                    aria-disabled={!isUnlocked}
-                    className={`col-span-1 text-center px-1 py-2.5 transform duration-300 rounded-lg flex flex-col items-center group relative ${isUnlocked ? "hover:bg-[#EFFAFF]" : "opacity-40"}`}
-                    title={
-                      meta?.employee_count
-                        ? `${meta.employee_count} employees`
-                        : (meta?.level_name ?? `Level ${num}`)
-                    }
-                  >
-                    <div className="w-10 h-10 bg-gray-200 rounded-full mx-auto relative">
-                      <Image
-                        unoptimized
-                        alt={`Avatar ${num}`}
-                        className="w-10 h-10 rounded-full"
-                        height={40}
-                        src={getContentAssetUrl(`/images/avatars/${num}.png`)}
-                        width={40}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            getContentAssetUrl("/images/avatars/1.png");
-                        }}
-                      />
+                return (availableAvatars as AvatarStat[]).map((avatar) => {
+                  const isUnlocked = avatar.employee_count > 0;
+                  // Use the actual image filename from API response
+                  const avatarImageName = avatar.image_small_url;
+
+                  const tooltipContent = (
+                    <div className="flex flex-col gap-1 max-w-[200px] p-1">
+                      <p className="font-semibold text-sm text-gray-900">
+                        Level {avatar.level_number}
+                      </p>
+                      <p className="text-xs text-gray-600 leading-tight">
+                        {avatar.level_name}
+                      </p>
+                      <div className="flex items-center justify-between mt-1 gap-2">
+                        <span
+                          className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                            isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                          }`}
+                        >
+                          {isUnlocked ? "Unlocked" : "Locked"}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {avatar.employee_count}x
+                        </span>
+                      </div>
                     </div>
+                  );
 
-                    <p
-                      className={`text-xs leading-tight mt-2 w-[90%] whitespace-pre-line ${isUnlocked ? "text-gray-700" : "text-gray-400"}`}
-                    >
-                      {displayLabel}
-                    </p>
-                  </div>
-                );
-              })}
+                  return (
+                    <Tooltip key={avatar.level_number} content={tooltipContent} placement="top">
+                      <div
+                        aria-disabled={!isUnlocked}
+                        className={`col-span-1 text-center px-1 py-2.5 transform duration-300 rounded-lg flex flex-col items-center group relative cursor-default ${
+                          isUnlocked ? "hover:bg-[#EFFAFF]" : "opacity-40"
+                        }`}
+                      >
+                        <div className="w-10 h-10 bg-gray-200 rounded-full mx-auto relative">
+                          <Image
+                            unoptimized
+                            alt={`Level ${avatar.level_number}`}
+                            className="w-10 h-10 rounded-full"
+                            height={40}
+                            src={getContentAssetUrl(`/images/avatars/${avatarImageName}`)}
+                            width={40}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                getContentAssetUrl("/images/avatars/1.png");
+                            }}
+                          />
+                        </div>
+
+                        <p
+                          className={`text-xs leading-tight mt-2 w-[90%] whitespace-pre-wrap ${
+                            isUnlocked ? "text-gray-700" : "text-gray-400"
+                          }`}
+                        >
+                          {avatar.level_name}
+                        </p>
+                      </div>
+                    </Tooltip>
+                  );
+                });
+              })()}
             </div>
           </div>
         </div>
