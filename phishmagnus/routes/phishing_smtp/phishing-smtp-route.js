@@ -11,16 +11,16 @@ const enums = require('../../../contants/enum');
 const checkPermission = require("../../../utility/check-permission");
 
 
-router.get("/list", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_ALL, enums.Access_Types.RWD_O, enums.Access_Types.RW_O]), listOfPhishingSMTPController);
-router.get("/name", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_ALL, enums.Access_Types.RWD_O, enums.Access_Types.RW_O]), listOfPhishingSMTPNameController);
-router.get("/create/:organizationId?", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_ALL, enums.Access_Types.RWD_O, enums.Access_Types.RW_O]), createSMTP);
-router.post("/create/:organizationId?", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_ALL, enums.Access_Types.RWD_O, enums.Access_Types.RW_O]), createSMTP);
+router.get("/list", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_O]), listOfPhishingSMTPController);
+router.get("/name", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_O, ]), listOfPhishingSMTPNameController);
+router.get("/create/:organizationId?", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL]), createSMTP);
+router.post("/create/:organizationId?", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL ]), createSMTP);
 
-router.get("/edit/:smtpId", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.RWD_O, enums.Access_Types.RW_O]), editPhishingSMTP);
-router.post("/edit/:smtpId", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.RWD_O, enums.Access_Types.RW_O]), editPhishingSMTP);
+router.get("/edit/:smtpId", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL ]), editPhishingSMTP);
+router.post("/edit/:smtpId", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL ]), editPhishingSMTP);
 
-router.get("/delete/:smtpId", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.RWD_O]), deletePhishingSMTP);
+router.get("/delete/:smtpId", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL]), deletePhishingSMTP);
 
-router.get("/test-connection/:smtpId", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_ALL, enums.Access_Types.RWD_O, enums.Access_Types.RW_O]), testPhishingSMTP);
+router.get("/test-connection/:smtpId", checkPermission(enums.ModuleNames.SMTP, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_O ]), testPhishingSMTP);
 
 module.exports = router;

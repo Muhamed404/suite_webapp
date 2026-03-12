@@ -49,6 +49,7 @@ exports.createSMTP = async (req, res) => {
       });
   } else if (req.method === "POST") {
     logger.info(`Create Phishing SMTP Controller: POST:- Calling post method of create smtp`);
+    logger.info(`Create Phishing SMTP Controller: POST:- Incoming request body ${JSON.stringify(req.body, null, 2)}`);
     const { host, port, smtp_account, smtp_password, sender_email, selected_org, details, use_tls, use_ssl, encrypt_password = false } = req.body;
     // logger.info(`Incoming param body ${JSON.stringify(req.body, null, 2)}`);
     // let orgId = Number(selected_org) || req.session?.user?.organization_id || 0;

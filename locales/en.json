@@ -1714,7 +1714,9 @@
 			"btn_testing": "Testing...",
 			"confirm_delete": "Are you sure you want to delete this SMTP configuration?",
 			"no_records": "No SMTP configurations found.",
-			"default_org": "Default"
+			"default_org": "Default",
+			"delete_modal_title": "Delete SMTP Configuration",
+			"delete_modal_subtitle": "This action cannot be undone"
 		},
 		"modal": {
 			"title": "SMTP Configuration Details",
