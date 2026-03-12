@@ -17,6 +17,7 @@ import { campaignService } from "@/services/campaignService";
 import { awmClient, API_BASE } from "@/services/httpClient";
 import { isOrgUser } from "@/utils/roles";
 import { quizService } from "@/services/quizService";
+import { SUPPORTED_LANGUAGES, LANGUAGE_COUNTRY_CODES } from "@/utils/supportedLanguages";
 
 export default function PhysicalSecurityPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -30,10 +31,19 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "completed">("all");
-  const [language, setLanguage] = useState("en");
+  // track selected language by supported language id (see utils/supportedLanguages)
+  const [language, setLanguage] = useState<number>(
+    SUPPORTED_LANGUAGES.find((l) => l.name.toLowerCase() === "english")?.id || 1
+  );
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
+
+  // report API data - added per user request
+  const [reportCampaignId, setReportCampaignId] = useState<number | null>(null);
+  const [reportCampaignData, setReportCampaignData] = useState<any>(null);
+  const [reportModuleData, setReportModuleData] = useState<any>(null);
+  const [reportContentsData, setReportContentsData] = useState<any>(null);
 
   const tabIndicatorRef = useRef<HTMLDivElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -85,6 +95,54 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     return 1; // Default campaign ID
   }, [searchParams, isOrgUserView, assignedModulesRes, moduleId]);
 
+  // when we have both campaignId & moduleId we need to fetch the reportCampaign
+  // and then the corresponding reportModule; response isn't directly rendered yet
+  useEffect(() => {
+    if (!campaignId || !moduleId) return;
+
+    // first call: get report campaign entry
+    quizService
+      .getReportCampaign(campaignId, user?.id ?? undefined)
+      .then((res) => {
+        if (res?.success && res?.data?.reportCampaigns?.length) {
+          const entry = res.data.reportCampaigns[0];
+          setReportCampaignData(entry);
+          setReportCampaignId(entry.id);
+          console.log("reportCampaign entry", entry);
+
+          // second call depends on reportCampaignId
+          return quizService.getReportModuleByParams(entry.id, moduleId);
+        }
+        return null;
+      })
+      .then((res2) => {
+        if (res2 && res2.success) {
+          setReportModuleData(res2.data);
+          console.log("reportModule response", res2.data);
+
+          // now that we have the report module entry, call contents endpoint
+          const firstModule = res2.data?.reportModules?.[0];
+          const reportModuleId = firstModule?.id;
+          if (reportModuleId) {
+            quizService
+              .getContentsReport(reportModuleId)
+              .then((res3) => {
+                if (res3 && res3.success) {
+                  setReportContentsData(res3.data);
+                  console.log("report contents response", res3.data);
+                }
+              })
+              .catch((err3) => {
+                console.error("error fetching contents report", err3);
+              });
+          }
+        }
+      })
+      .catch((err) => {
+        console.error("error fetching report data", err);
+      });
+  }, [campaignId, moduleId]);
+
   // fetch list of modules that belong to this campaign so we can wire up "next module" navigation
   const { data: campaignModulesRes } = useCampaignModules(campaignId, !!campaignId);
 
@@ -117,6 +175,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     moduleId ?? 1,
     campaignId,
     {
+      lang_id: language,
       enabled: !!moduleId && !!campaignId,
     }
   );
@@ -192,20 +251,34 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
       });
 
       // push a single card for each gallery type collected above
+      // type IDs for which status is driven by reportContentsData
+      const REPORT_DRIVEN_TYPE_IDS = [3, 4, 5, 8];
+
       galleryGroups.forEach((items, ctypeId) => {
         const first = items[0];
         const contentTypeName: string = first.content_type ?? "Documents";
         const count = items.length;
 
-        // Determine aggregated status: completed if all completed, else in progress
+        // Determine aggregated status
         let aggStatus = "in progress";
-        const allCompleted = items.every((c: any) => {
-          const sv = c.user_completion_status ?? c.status ?? "";
-
-          return String(sv).toLowerCase() === "completed";
-        });
-
-        if (allCompleted) aggStatus = "completed";
+        if (REPORT_DRIVEN_TYPE_IDS.includes(ctypeId) && reportContentsData?.reportContents) {
+          const matching = (reportContentsData.reportContents as any[]).filter(
+            (rc: any) => rc.content?.contype_id === ctypeId
+          );
+          if (matching.length > 0) {
+            const allCompleted = matching.every((rc: any) => rc.status?.name === "COMPLETED");
+            const allNotStarted = matching.every((rc: any) => rc.status?.name === "NOT_STARTED");
+            if (allCompleted) aggStatus = "completed";
+            else if (allNotStarted) aggStatus = "not started";
+            else aggStatus = "in progress";
+          }
+        } else {
+          const allCompleted = items.every((c: any) => {
+            const sv = c.user_completion_status ?? c.status ?? "";
+            return String(sv).toLowerCase() === "completed";
+          });
+          if (allCompleted) aggStatus = "completed";
+        }
         const aggLabel = aggStatus.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
         // Latest date across all items in the group
@@ -251,16 +324,31 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     }
 
     // Add aggregated contents (Posters, Brochures, etc.)
+    const REPORT_DRIVEN_TYPE_IDS_AGG = [3, 4, 5, 8];
     if (data.aggregated_contents) {
       Object.values(data.aggregated_contents).forEach((agg: any) => {
         if (agg.total_count > 0) {
-          // determine status based on report entries matching this content type
+          // determine status — for types 3,4,5,8 use reportContentsData, else fallback
           let aggStatus: string | undefined;
 
-          aggStatus = agg.statuses?.some((s: any) => s.status === 2) ? "completed" : "pending";
-          // Change pending to in progress for consistency
-          if (aggStatus === "pending") {
-            aggStatus = "in progress";
+          if (REPORT_DRIVEN_TYPE_IDS_AGG.includes(agg.content_type_id) && reportContentsData?.reportContents) {
+            const matching = (reportContentsData.reportContents as any[]).filter(
+              (rc: any) => rc.content?.contype_id === agg.content_type_id
+            );
+            if (matching.length > 0) {
+              const allCompleted = matching.every((rc: any) => rc.status?.name === "COMPLETED");
+              const allNotStarted = matching.every((rc: any) => rc.status?.name === "NOT_STARTED");
+              if (allCompleted) aggStatus = "completed";
+              else if (allNotStarted) aggStatus = "not started";
+              else aggStatus = "in progress";
+            } else {
+              aggStatus = "in progress";
+            }
+          } else {
+            aggStatus = agg.statuses?.some((s: any) => s.status === 2) ? "completed" : "pending";
+            if (aggStatus === "pending") {
+              aggStatus = "in progress";
+            }
           }
           const aggLabel = aggStatus.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
@@ -332,7 +420,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     }
 
     return transformedItems;
-  }, [contentsWithProgressRes, moduleRes]);
+  }, [contentsWithProgressRes, moduleRes, reportContentsData]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
@@ -411,37 +499,6 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     };
   }, [contentsWithProgressRes, moduleName, moduleRes]);
 
-  useEffect(() => {
-    // Animate progress bar with real data
-    const progressBar = document.querySelector(".progress-bar") as HTMLElement;
-
-    if (progressBar) {
-      setTimeout(() => {
-        const targetWidth = overallProgress; // Use real progress from API
-        const duration = 2500; // 2.5 seconds
-        const startTime = Date.now();
-
-        function easeOutCubic(t: number) {
-          return 1 - Math.pow(1 - t, 3);
-        }
-
-        function animate() {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const eased = easeOutCubic(progress);
-          const currentWidth = eased * targetWidth;
-
-          progressBar.style.width = currentWidth + "%";
-
-          if (progress < 1) {
-            requestAnimationFrame(animate);
-          }
-        }
-
-        animate();
-      }, 100);
-    }
-  }, [overallProgress]);
 
   const updateTabIndicator = () => {
     if (!tabIndicatorRef.current || !tabsContainerRef.current) return;
@@ -499,22 +556,13 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
             }
           }
 
-          @keyframes progressFill {
-            from {
-              width: 0%;
-            }
-            to {
-              width: var(--progress-width, 50%);
-            }
-          }
 
           .item {
             animation: slideIn 0.3s ease-out;
           }
 
           .progress-bar {
-            width: 0%;
-            will-change: width;
+            height: 100%;
           }
 
           /* Modern Dropdown Styles */
@@ -745,10 +793,22 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
                       <div className="relative w-40 modern-dropdown-wrapper small rounded-full language-dropdown-container">
                         <button
-                          className="modern-dropdown-button"
+                          className="modern-dropdown-button flex items-center justify-between"
                           onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
                         >
-                          <span>{language === "en" ? "English" : "Arabic"}</span>
+                          {/* selected language name + flag */}
+                          {(() => {
+                            const sel = SUPPORTED_LANGUAGES.find((l) => l.id === language);
+                            const code = sel ? LANGUAGE_COUNTRY_CODES[sel.id].toLowerCase() : "us";
+                            return (
+                              <>
+                                <span className="flex items-center gap-1">
+                                  <span className={`fi fi-${code} rounded-full`} />
+                                  <span>{sel?.name || "Language"}</span>
+                                </span>
+                              </>
+                            );
+                          })()}
                           <div className="modern-dropdown-arrow">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path
@@ -763,24 +823,22 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
                         {showLanguageDropdown && (
                           <div className="modern-dropdown-menu open">
-                            <button
-                              className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                              onClick={() => {
-                                setLanguage("en");
-                                setShowLanguageDropdown(false);
-                              }}
-                            >
-                              English
-                            </button>
-                            <button
-                              className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                              onClick={() => {
-                                setLanguage("ar");
-                                setShowLanguageDropdown(false);
-                              }}
-                            >
-                              Arabic
-                            </button>
+                            {SUPPORTED_LANGUAGES.map((lang) => {
+                              const code = LANGUAGE_COUNTRY_CODES[lang.id].toLowerCase();
+                              return (
+                                <button
+                                  key={lang.id}
+                                  className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                                  onClick={() => {
+                                    setLanguage(lang.id);
+                                    setShowLanguageDropdown(false);
+                                  }}
+                                >
+                                  <span className={`fi fi-${code} rounded-full`} />
+                                  <span>{lang.name}</span>
+                                </button>
+                              );
+                            })}
                           </div>
                         )}
                       </div>
@@ -799,12 +857,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                           <div className="flex items-center gap-2 mb-2">
                             <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                               <div
-                                className="progress-bar h-full bg-green-500 rounded-full"
-                                style={
-                                  {
-                                    "--progress-width": `${overallProgress}%`,
-                                  } as React.CSSProperties
-                                }
+                                className="progress-bar h-full bg-green-500 rounded-full transition-all duration-300"
+                                style={{
+                                  width: `${overallProgress}%`,
+                                }}
                               />
                             </div>
                           </div>
@@ -886,11 +942,12 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                             );
                           });
 
-                          // format status for display (e.g. "not_started" -> "Not Started")
+                          // format status for display (e.g. "not_started" / "in progress" -> "Not Started" / "In Progress")
                           const displayStatus = item.status
                             ? item.status
-                                .split("_")
-                                .map((s: string) => s[0].toUpperCase() + s.slice(1))
+                                .replace(/_/g, " ")
+                                .split(" ")
+                                .map((s: string) => s ? s[0].toUpperCase() + s.slice(1) : s)
                                 .join(" ")
                             : "";
 
@@ -951,11 +1008,12 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                       typeof item.id
                                     );
 
-                                    // notify backend that user began this content (skip if already completed or in progress)
+                                    // notify backend that user began this content (skip if already completed or in progress, or aggregated)
                                     if (
                                       campaignId != null &&
                                       moduleId != null &&
                                       typeof item.id === "number" &&
+                                      !item.isAggregated &&
                                       item.status !== "completed" &&
                                       item.status !== "passed" &&
                                       item.status !== "failed" &&
@@ -974,8 +1032,8 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                       }
                                     }
 
-                                    // Call the report-actions/begin-content API
-                                    if (moduleId != null) {
+                                    // Call the report-actions/begin-content API (skip for aggregated content)
+                                    if (moduleId != null && !item.isAggregated) {
                                       let contentId: number | null = null;
 
                                       if (typeof item.id === "number") {
