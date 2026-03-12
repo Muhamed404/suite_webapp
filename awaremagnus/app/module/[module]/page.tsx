@@ -31,10 +31,8 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "completed">("all");
-  // track selected language by supported language id (see utils/supportedLanguages)
-  const [language, setLanguage] = useState<number>(
-    SUPPORTED_LANGUAGES.find((l) => l.name.toLowerCase() === "english")?.id || 1
-  );
+  // track selected language by supported language id (see utils/supportedLanguages); null = All Languages
+  const [language, setLanguage] = useState<number | null>(null);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
@@ -44,6 +42,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const [reportCampaignData, setReportCampaignData] = useState<any>(null);
   const [reportModuleData, setReportModuleData] = useState<any>(null);
   const [reportContentsData, setReportContentsData] = useState<any>(null);
+  const [reportContentsLoading, setReportContentsLoading] = useState(false);
 
   const tabIndicatorRef = useRef<HTMLDivElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
@@ -62,7 +61,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         return codeMatch || titleMatch || translationMatch;
       });
 
-      return found?.id ?? 1;
+      return found?.id ?? null;
     }
 
     return null; // Not yet resolved — prevents premature API calls with wrong default ID
@@ -84,7 +83,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
       return parseInt(campaignIdFromUrl, 10);
     }
 
-    if (!isOrgUserView || !assignedModulesRes?.success) return 1; // Default to 1
+    if (!isOrgUserView || !assignedModulesRes?.success) return null; // Not yet resolved
     const modules = assignedModulesRes.data ?? [];
     const currentModule = modules.find((m) => m.id === Number(moduleId));
 
@@ -92,7 +91,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
       return currentModule.assignments[0].campaign_id;
     }
 
-    return 1; // Default campaign ID
+    return null; // Campaign not found
   }, [searchParams, isOrgUserView, assignedModulesRes, moduleId]);
 
   // when we have both campaignId & moduleId we need to fetch the reportCampaign
@@ -100,6 +99,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   useEffect(() => {
     if (!campaignId || !moduleId) return;
 
+    setReportContentsLoading(true);
     // first call: get report campaign entry
     quizService
       .getReportCampaign(campaignId, user?.id ?? undefined)
@@ -134,17 +134,21 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
               })
               .catch((err3) => {
                 console.error("error fetching contents report", err3);
-              });
+              })
+              .finally(() => setReportContentsLoading(false));
+          } else {
+            setReportContentsLoading(false);
           }
         }
       })
       .catch((err) => {
         console.error("error fetching report data", err);
+        setReportContentsLoading(false);
       });
   }, [campaignId, moduleId]);
 
   // fetch list of modules that belong to this campaign so we can wire up "next module" navigation
-  const { data: campaignModulesRes } = useCampaignModules(campaignId, !!campaignId);
+  const { data: campaignModulesRes } = useCampaignModules(campaignId ?? 0, !!campaignId);
 
   // helper for slugs (same as dashboard and campaign assignments)
   const generateModuleSlug = useCallback(
@@ -172,10 +176,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   // Fetch content with progress data
   const { data: contentsWithProgressRes, isLoading } = useContentsWithProgress(
-    moduleId ?? 1,
-    campaignId,
+    moduleId ?? 0,
+    campaignId ?? 0,
     {
-      lang_id: language,
+      lang_id: language ?? undefined,
       enabled: !!moduleId && !!campaignId,
     }
   );
@@ -331,7 +335,9 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
           // determine status — for types 3,4,5,8 use reportContentsData, else fallback
           let aggStatus: string | undefined;
 
-          if (REPORT_DRIVEN_TYPE_IDS_AGG.includes(agg.content_type_id) && reportContentsData?.reportContents) {
+          if (REPORT_DRIVEN_TYPE_IDS_AGG.includes(agg.content_type_id) && reportContentsLoading) {
+            aggStatus = "loading";
+          } else if (REPORT_DRIVEN_TYPE_IDS_AGG.includes(agg.content_type_id) && reportContentsData?.reportContents) {
             const matching = (reportContentsData.reportContents as any[]).filter(
               (rc: any) => rc.content?.contype_id === agg.content_type_id
             );
@@ -350,7 +356,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
               aggStatus = "in progress";
             }
           }
-          const aggLabel = aggStatus.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+          const aggLabel = aggStatus === "loading" ? "Loading..." : aggStatus.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
 
           transformedItems.push({
             id: `agg_${agg.content_type_id}`,
@@ -420,7 +426,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     }
 
     return transformedItems;
-  }, [contentsWithProgressRes, moduleRes, reportContentsData]);
+  }, [contentsWithProgressRes, moduleRes, reportContentsData, reportContentsLoading]);
 
   const filteredItems = useMemo(() => {
     let filtered = items;
@@ -482,9 +488,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     if (!contentsWithProgressRes?.success) {
       return {
         name: moduleName,
-        description:
-          moduleRes?.data?.description ||
-          "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise.",
+        description: moduleRes?.data?.description || "",
       };
     }
 
@@ -492,10 +496,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
     return {
       name: data.module_name || moduleName,
-      description:
-        data.module_description ||
-        moduleRes?.data?.description ||
-        "Physical security involves protecting personnel, hardware, software, networks, and data from physical actions and events such as theft, vandalism, terrorism, and natural disasters—that could cause loss or damage to an enterprise.",
+      description: data.module_description || moduleRes?.data?.description || "",
     };
   }, [contentsWithProgressRes, moduleName, moduleRes]);
 
@@ -798,6 +799,13 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                         >
                           {/* selected language name + flag */}
                           {(() => {
+                            if (language === null) {
+                              return (
+                                <span className="flex items-center gap-1">
+                                  <span>All Languages</span>
+                                </span>
+                              );
+                            }
                             const sel = SUPPORTED_LANGUAGES.find((l) => l.id === language);
                             const code = sel ? LANGUAGE_COUNTRY_CODES[sel.id].toLowerCase() : "us";
                             return (
@@ -823,6 +831,15 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
                         {showLanguageDropdown && (
                           <div className="modern-dropdown-menu open">
+                            <button
+                              className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                              onClick={() => {
+                                setLanguage(null);
+                                setShowLanguageDropdown(false);
+                              }}
+                            >
+                              <span>All Languages</span>
+                            </button>
                             {SUPPORTED_LANGUAGES.map((lang) => {
                               const code = LANGUAGE_COUNTRY_CODES[lang.id].toLowerCase();
                               return (
@@ -883,9 +900,17 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                       <div>
                         <div className="bg-gray-50 rounded-lg p-3 mb-6">
                           <h4 className="text-xs font-bold text-gray-900 mb-3">About The Module</h4>
-                          <p className="text-xs text-gray-600 leading-relaxed">
-                            {moduleInfo.description}
-                          </p>
+                          {moduleInfo.description ? (
+                            <p className="text-xs text-gray-600 leading-relaxed">
+                              {moduleInfo.description}
+                            </p>
+                          ) : (
+                            <div className="space-y-2">
+                              <div className="h-3 bg-gray-200 rounded animate-pulse w-full" />
+                              <div className="h-3 bg-gray-200 rounded animate-pulse w-5/6" />
+                              <div className="h-3 bg-gray-200 rounded animate-pulse w-4/6" />
+                            </div>
+                          )}
                         </div>
 
                         <Button
@@ -952,7 +977,11 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                             : "";
 
                           const statusBadge =
-                            displayStatus === "Completed" || displayStatus === "Passed" ? (
+                            item.status === "loading" ? (
+                              <span className="text-[11px] text-gray-500 bg-gray-100 px-3 py-1 rounded-full animate-pulse">
+                                Loading...
+                              </span>
+                            ) : displayStatus === "Completed" || displayStatus === "Passed" ? (
                               <span className="text-[11px] text-green-600 bg-green-100 px-3 py-1 rounded-full">
                                 {displayStatus}
                               </span>
@@ -1144,6 +1173,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                         "Documents",
                                         "Screen Savers",
                                         "Screen savers",
+                                        "Misc",
                                       ];
 
                                       if (

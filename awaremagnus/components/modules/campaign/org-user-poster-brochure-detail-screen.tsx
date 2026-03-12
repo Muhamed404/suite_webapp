@@ -27,6 +27,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { CONTENT_TYPES } from "@/constants/content-types";
+import { VideoPlayerWithFallback } from "@/components/modules/training-library/content-detail-screens/video-player-with-fallback";
 
 const PdfViewer = dynamic(
   () => import("@/components/document-viewer/pdf-viewer").then((m) => ({ default: m.PdfViewer })),
@@ -104,7 +105,7 @@ export function OrgUserPosterBrochureDetailScreen({
   const AGGREGATED_REPORT_TYPE_IDS = [3, 4, 5, 8];
   const isTargetAggregatedType = AGGREGATED_REPORT_TYPE_IDS.includes(contentTypeId);
 
-  const isBrochure = contentTypeId === 3 || contentTypeId === 6 || contentTypeId === 7;
+  const isBrochure = contentTypeId === 3 || contentTypeId === 6 || contentTypeId === 7 || contentTypeId === 8;
   const isPoster = contentTypeId === 4 || contentTypeId === 5;
   const isDocument = contentTypeId === 6 || contentTypeId === 7;
   // Screen saver (5) and poster (4) — all types handled here; also include Misc (8)
@@ -234,6 +235,10 @@ export function OrgUserPosterBrochureDetailScreen({
     content?.source_url ?? (content as { source_path?: string } | null)?.source_path ?? null;
   const resolvedUrl = resolveSourceUrl(rawSourceUrl);
 
+  // Detect if Misc content is a video file
+  const isVideoSource = !!(rawSourceUrl?.match(/\.(mp4|webm|mov|ogg|avi|m3u8)(\?|$)/i));
+  const isMiscVideo = contentTypeId === 8 && isVideoSource;
+
   // Poster thumbnail (logo_url as fallback for posters)
   const posterDisplayUrl =
     resolvedUrl ??
@@ -349,6 +354,15 @@ export function OrgUserPosterBrochureDetailScreen({
                     )}
                   </div>
                 </div>
+              ) : isMiscVideo ? (
+                /* ── Misc video player ── */
+                <div className="w-full bg-black" style={{ minHeight: 480 }}>
+                  <VideoPlayerWithFallback
+                    height="480px"
+                    url={resolvedUrl ?? ""}
+                    width="100%"
+                  />
+                </div>
               ) : isBrochure ? (
                 /* ── PDF viewer ── */
                 <div style={{ minHeight: 800 }}>
@@ -462,7 +476,9 @@ export function OrgUserPosterBrochureDetailScreen({
                             ? (t("library.downloadScreenSaver") ?? "Download Screen Saver")
                             : contentTypeId === 6 || contentTypeId === 7
                               ? (t("library.downloadDocument") ?? "Download Document")
-                              : (t("library.downloadBrochure") ?? "Download Brochure")}
+                              : contentTypeId === 8
+                                ? (isMiscVideo ? "Download Video" : "Download File")
+                                : (t("library.downloadBrochure") ?? "Download Brochure")}
                       </a>
                     </div>
 

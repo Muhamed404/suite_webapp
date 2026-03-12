@@ -34,6 +34,7 @@ const CONTENT_TYPE_ID: Record<string, number> = {
   posters: 4,
   "screen-savers": 5,
   documents: 6,
+  misc: 8,
 };
 
 // Maps language name → ISO code
@@ -676,17 +677,9 @@ export default function ContentPage() {
                             .replace(/-/g, " ")
                             .replace(/\b\w/g, (l) => l.toUpperCase())}
                         </h3>
-                        <p className="text-xs text-gray-500 mt-1">Physical security description</p>
+
                       </div>
-                      {!isPostersPage && (
-                        <a
-                          className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs"
-                          href="add-new-module-content.html"
-                        >
-                          <img alt="" className="size-3" src="./images/img/add.svg" />
-                          <span className="hidden md:inline">Add New</span>
-                        </a>
-                      )}
+
                     </div>
 
                     {/* Filters row */}
