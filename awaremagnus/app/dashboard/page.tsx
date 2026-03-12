@@ -112,7 +112,8 @@ export default function DashboardPage() {
   const { data: orgDataResponse } = useOrganizationDashboards();
   const { data: userDataResponse } = useUserDashboards({ userId: user?.id });
   const { data: assignmentsData } = useUserAssignments({ language_id: 1 });
-  const { data: userGameAchievementsData } = useUserGameAchievements();
+  // include the current user id so that org users get their own data
+  const { data: userGameAchievementsData } = useUserGameAchievements(user?.id);
 
   const { data: systemStrugglingRaw } = useSystemStrugglingModules({ enabled: isPlatformAdmin });
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
