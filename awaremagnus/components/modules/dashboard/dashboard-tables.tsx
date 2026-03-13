@@ -87,7 +87,7 @@ export const DashboardTables = () => {
       <Card className="rounded-2xl shadow-none">
         <CardBody className="p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-[var(--mainblue)] whitespace-nowrap">
+            <h2 className="text-sm font-semibold text-[var(--mainblue)] whitespace-nowrap">
               {t("tables.topHighRisk")}
             </h2>
             <Select
@@ -125,7 +125,7 @@ export const DashboardTables = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <p className="text-gray-500 text-sm whitespace-nowrap">
+            <p className="text-gray-500 text-xs whitespace-nowrap">
               {t("tables.showingOf", {
                 shown: highRiskPaginated.length,
                 total: highRiskData.length,
@@ -162,7 +162,7 @@ export const DashboardTables = () => {
       <Card className="rounded-2xl shadow-none">
         <CardBody className="p-5 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-semibold text-[var(--mainblue)] whitespace-nowrap">
+            <h2 className="text-sm font-semibold text-[var(--mainblue)] whitespace-nowrap">
               {t("tables.topLowRisk")}
             </h2>
             <Select
@@ -200,7 +200,7 @@ export const DashboardTables = () => {
           </div>
 
           <div className="flex items-center justify-between">
-            <p className="text-gray-500 text-sm whitespace-nowrap">
+            <p className="text-gray-500 text-xs whitespace-nowrap">
               {t("tables.showingOf", {
                 shown: lowRiskPaginated.length,
                 total: lowRiskData.length,

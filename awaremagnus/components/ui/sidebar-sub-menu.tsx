@@ -9,6 +9,7 @@ import { Tooltip } from "@heroui/tooltip";
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 const HOVER_OPEN_DELAY_MS = 120;
@@ -55,6 +56,7 @@ function ChevronIcon({ open }: { open: boolean }) {
 export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) => {
   const pathname = usePathname();
   const { dir } = useI18n();
+  const t = useTranslations("common");
   const isRtl = dir === "rtl";
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
@@ -350,7 +352,7 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
         >
           <button
             className={cn(navItemBase, navItemPadding, navItemDefault, "hover:bg-red-500/20")}
-            title="Logout"
+            title={t("suitePrimaryMenu.logout", { defaultValue: "Logout" })}
             type="button"
             onClick={onLogout}
           >
@@ -362,7 +364,11 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
             >
               <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z" />
             </svg>
-            {!isCollapsed && <span className="text-xs font-normal">Logout</span>}
+            {!isCollapsed && (
+              <span className="text-xs font-normal">
+                {t("suitePrimaryMenu.logout", { defaultValue: "Logout" })}
+              </span>
+            )}
           </button>
         </div>
       )}

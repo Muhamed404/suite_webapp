@@ -4,6 +4,18 @@
     "switchToArabic": "عربي",
     "switchToEnglish": "EN"
   },
+  "suitePrimaryMenu": {
+    "suiteManagement": "إدارة الدعاوى",
+    "organization": "المنظمة",
+    "users": "المستخدمون",
+    "department": "القسم",
+    "group": "المجموعة",
+    "subscriptionLog": "سجل الاشتراكات",
+    "products": "المنتجات",
+    "settings": "الإعدادات",
+    "serviceRegistry": "سجل الخدمة",
+    "logout": "تسجيل الخروج"
+  },
   "save": "حفظ",
   "cancel": "إلغاء",
   "close": "إغلاق",

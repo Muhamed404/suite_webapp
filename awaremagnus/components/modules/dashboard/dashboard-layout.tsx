@@ -19,7 +19,9 @@ interface DashboardLayoutProps {
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const { dir } = useI18n();
   const pathname = usePathname();
-  const isRtl = dir === "rtl";
+  const isRtl =
+    dir === "rtl" ||
+    (typeof document !== "undefined" && document.documentElement.dir === "rtl");
   const { user } = useAuthStore();
   /** Org User (role 5) = end-user / learner: no primary sidebar, limited AWM sub-menu */
   const isEndUser = isOrgUser(user?.role_id);
@@ -35,12 +37,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const handleBackdropClick = () => setSidebarOpen(false);
 
   return (
-    <div
-      className={clsx(
-        "relative flex h-screen bg-black overflow-hidden",
-        isRtl && "flex-row-reverse"
-      )}
-    >
+    <div className="relative flex h-screen bg-black overflow-hidden">
       {/* Sidebar Backdrop for mobile - visible when sidebar open */}
       <button
         aria-label="Close menu"
@@ -72,8 +69,10 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
       <div
         className={clsx(
           "flex-1 flex flex-col h-[98vh] max-sm:h-full min-h-0 bg-[#F1F5F8] overflow-hidden",
-          "lg:m-2 lg:ml-0 lg:rounded-r-3xl",
-          isRtl && "lg:rounded-r-none lg:rounded-l-3xl"
+          "lg:m-2",
+          isRtl
+            ? "lg:mr-0 lg:rounded-l-3xl"
+            : "lg:ml-0 lg:rounded-r-3xl"
         )}
       >
         <DashboardHeader onMenuClick={() => setSidebarOpen((v) => !v)} />

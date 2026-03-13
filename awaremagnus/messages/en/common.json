@@ -4,6 +4,18 @@
     "switchToArabic": "عربي",
     "switchToEnglish": "EN"
   },
+  "suitePrimaryMenu": {
+    "suiteManagement": "Suite Management",
+    "organization": "Organization",
+    "users": "Users",
+    "department": "Department",
+    "group": "Group",
+    "subscriptionLog": "Subscription Log",
+    "products": "Products",
+    "settings": "Settings",
+    "serviceRegistry": "Service Registry",
+    "logout": "Logout"
+  },
   "save": "Save",
   "cancel": "Cancel",
   "close": "Close",

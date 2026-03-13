@@ -34,8 +34,8 @@ export const CertificationChart = ({
             value: {
               show: true,
               fontSize: "28px",
-              fontWeight: 700,
-              color: "#111827",
+              fontWeight: 200,
+              color: "#192030",
               formatter: (val: number) => `${val}%`,
               offsetY: 0,
             },

@@ -40,6 +40,11 @@ export function I18nProvider({
 }) {
   const dir = getLocaleDir(locale);
 
+  React.useEffect(() => {
+    document.documentElement.lang = locale;
+    document.documentElement.dir = dir;
+  }, [dir, locale]);
+
   const t = React.useCallback<I18nContextValue["t"]>(
     (namespace, key, values) => {
       const msg = getValueAtPath(messages[namespace], key);
