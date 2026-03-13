@@ -29,9 +29,9 @@ export const CircularProgressChart = ({ value, color, size = 128 }: CircularProg
             },
             value: {
               show: true,
-              fontSize: "20px",
-              fontWeight: 600,
-              color: "#111827",
+              fontSize: "14px",
+              fontWeight: 500,
+              color: "#474646",
               formatter: (val: number) => `${val}%`,
               offsetY: 8,
             },

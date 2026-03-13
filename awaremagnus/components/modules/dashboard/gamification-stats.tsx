@@ -194,7 +194,7 @@ export const GamificationStats = () => {
             I will leave it static or 0 for now as per instructions "leave it static".
         */}
         <div className="col-span-3 row-span-1 bg-white rounded-xl p-4 flex flex-col justify-between">
-          <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
+          <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
             <Image
               alt=""
               className="text-lg"
@@ -219,7 +219,7 @@ export const GamificationStats = () => {
 
         {/* Study Time */}
         <div className="col-span-3 col-start-4 row-span-1 bg-white rounded-xl p-4 flex flex-col justify-start">
-          <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
+          <div className="flex items-center gap-2 text-xs text-gray-500 font-medium">
             <Image
               alt=""
               className="text-lg"
@@ -238,7 +238,7 @@ export const GamificationStats = () => {
         <div className="col-span-6 col-start-7 row-span-3 bg-[linear-gradient(114.67deg,#FFFEFC_5.61%,#FDECE0_98.45%)] rounded-xl p-5">
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="font-semibold text-gray-900 text-lg flex items-center gap-2">
+              <h2 className="font-semibold text-gray-900 text-md flex items-center gap-2">
                 <Image
                   alt=""
                   className="text-lg"
@@ -248,11 +248,11 @@ export const GamificationStats = () => {
                 />
                 {t("gamification.achievementGallery")}
               </h2>
-              <p className="text-gray-500 text-sm mt-1.5">
+              <p className="text-gray-500 text-xs mt-1.5">
                 {t("gamification.achievementSubtitle")}
               </p>
             </div>
-            <Link className="text-blue-600 text-sm font-medium" href="#">
+            <Link className="text-blue-600 text-xs font-medium" href="#">
               {t("cards.viewAll")}
             </Link>
           </div>
@@ -313,7 +313,7 @@ export const GamificationStats = () => {
 
           {/* Achievement Progress */}
           <div className="mt-12 p-5 bg-white rounded-lg">
-            <div className="flex justify-between text-gray-500 text-sm font-medium mb-2">
+            <div className="flex justify-between text-gray-500 text-xs font-medium mb-2">
               <span>{t("gamification.achievements")}</span>
               <div>
                 <span className="text-gray-700 text-base font-semibold">
@@ -334,8 +334,8 @@ export const GamificationStats = () => {
         {/* Employee Avatar Level */}
         <div className="col-span-6 row-span-2 row-start-2 bg-white rounded-xl p-5">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">{t("gamification.employeeAvatarLevel")}</h2>
-            <Link className="text-blue-600 text-sm font-medium" href="#">
+            <h2 className="text-md font-semibold">{t("gamification.employeeAvatarLevel")}</h2>
+            <Link className="text-blue-600 text-xs font-medium" href="#">
               {t("cards.viewAll")}
             </Link>
           </div>
