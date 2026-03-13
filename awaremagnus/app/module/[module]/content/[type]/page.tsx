@@ -23,6 +23,7 @@ import {
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { quizService } from "@/services/quizService";
+import { awmClient, API_BASE } from "@/services/httpClient";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useTranslations } from "@/i18n/useTranslations";
 import { isOrgUser } from "@/utils/roles";
@@ -33,6 +34,7 @@ const CONTENT_TYPE_ID: Record<string, number> = {
   posters: 4,
   "screen-savers": 5,
   documents: 6,
+  misc: 8,
 };
 
 // Maps language name → ISO code
@@ -70,6 +72,7 @@ export default function ContentPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [apiItems, setApiItems] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [reportContentsData, setReportContentsData] = useState<any>(null);
   const itemsPerPage = 10;
 
   // Read mod_id and contype_id directly from URL query params
@@ -192,6 +195,37 @@ export default function ContentPage() {
     setCurrentPage(1);
   };
 
+  // Fetch report contents chain: reportCampaign → reportModule → reportContents
+  useEffect(() => {
+    const campaignId = searchParams?.get("campaign_id");
+    if (!campaignId || !moduleId || !user?.id) return;
+
+    quizService
+      .getReportCampaign(Number(campaignId), user.id)
+      .then((res) => {
+        if (res?.success && res?.data?.reportCampaigns?.length) {
+          const entry = res.data.reportCampaigns[0];
+          return quizService.getReportModuleByParams(entry.id, moduleId);
+        }
+        return null;
+      })
+      .then((res2) => {
+        if (res2?.success) {
+          const firstModule = res2.data?.reportModules?.[0];
+          if (firstModule?.id) {
+            return quizService.getContentsReport(firstModule.id);
+          }
+        }
+        return null;
+      })
+      .then((res3) => {
+        if (res3?.success) {
+          setReportContentsData(res3.data);
+        }
+      })
+      .catch((err) => console.error("[content page] report contents chain error", err));
+  }, [searchParams, moduleId, user?.id]);
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const day = String(date.getDate()).padStart(2, "0");
@@ -201,7 +235,7 @@ export default function ContentPage() {
     return `${day}/${month}/${year}`;
   };
 
-  const handleView = (action: string, item: any) => {
+  const handleView = async (action: string, item: any) => {
     if (action === "view") {
       const moduleSlug = Array.isArray(module) ? module[0] : (module ?? "");
       const contype_id = contypeIdFromUrl ?? CONTENT_TYPE_ID[slug];
@@ -212,6 +246,32 @@ export default function ContentPage() {
       const campaignId = searchParams?.get("campaign_id");
 
       if (campaignId) detailParams.set("campaign_id", campaignId);
+
+      // call begin-content only for aggregated types (3,4,5,8) and only when NOT_STARTED
+      const AGGREGATED_TYPE_IDS = [3, 4, 5, 8];
+      const currentContypeId = contypeIdFromUrl ?? CONTENT_TYPE_ID[slug];
+      const isAggregatedType =
+        currentContypeId != null && AGGREGATED_TYPE_IDS.includes(currentContypeId);
+
+      const reportEntry = reportContentsData?.reportContents?.find(
+        (rc: any) => rc.content_id === item.id
+      );
+      const isNotStarted =
+        !reportEntry || reportEntry.status?.name === "NOT_STARTED";
+
+      if (isAggregatedType && isNotStarted && moduleId && campaignId) {
+        try {
+          await awmClient.post(`${API_BASE}/useraction/report-actions/begin-content`, {
+            content_id: item.id,
+            module_id: moduleId,
+            campaign_id: Number(campaignId),
+          });
+          console.log("[content page] begin-content success for content", item.id);
+        } catch (err) {
+          console.error("[content page] begin-content error", err);
+        }
+      }
+
       router.push(`/module/${moduleSlug}/content/${slug}/${item.id}?${detailParams.toString()}`);
     } else if (action === "edit") {
       // editing is not supported on posters page
@@ -617,17 +677,9 @@ export default function ContentPage() {
                             .replace(/-/g, " ")
                             .replace(/\b\w/g, (l) => l.toUpperCase())}
                         </h3>
-                        <p className="text-xs text-gray-500 mt-1">Physical security description</p>
+
                       </div>
-                      {!isPostersPage && (
-                        <a
-                          className="flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs"
-                          href="add-new-module-content.html"
-                        >
-                          <img alt="" className="size-3" src="./images/img/add.svg" />
-                          <span className="hidden md:inline">Add New</span>
-                        </a>
-                      )}
+
                     </div>
 
                     {/* Filters row */}

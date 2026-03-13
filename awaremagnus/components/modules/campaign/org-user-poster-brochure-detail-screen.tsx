@@ -1,5 +1,7 @@
 "use client";
 
+import { useState, useEffect } from "react";
+
 import type { Module, ModuleContent } from "@/types/quiz";
 
 import Link from "next/link";
@@ -20,10 +22,12 @@ import {
   useCompleteContent,
 } from "@/hooks/useQuiz";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { quizService } from "@/services/quizService";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { CONTENT_TYPES } from "@/constants/content-types";
+import { VideoPlayerWithFallback } from "@/components/modules/training-library/content-detail-screens/video-player-with-fallback";
 
 const PdfViewer = dynamic(
   () => import("@/components/document-viewer/pdf-viewer").then((m) => ({ default: m.PdfViewer })),
@@ -95,10 +99,17 @@ export function OrgUserPosterBrochureDetailScreen({
   const tc = useTranslations("campaigns");
   const isRtl = dir === "rtl";
   const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((s) => s.user);
 
-  const isBrochure = contentTypeId === 3 || contentTypeId === 6 || contentTypeId === 7;
+  // types for which we fetch live report status (Brochures=3, Posters=4, ScreenSavers=5, Misc=8)
+  const AGGREGATED_REPORT_TYPE_IDS = [3, 4, 5, 8];
+  const isTargetAggregatedType = AGGREGATED_REPORT_TYPE_IDS.includes(contentTypeId);
+
+  const isBrochure = contentTypeId === 3 || contentTypeId === 6 || contentTypeId === 7 || contentTypeId === 8;
   const isPoster = contentTypeId === 4 || contentTypeId === 5;
   const isDocument = contentTypeId === 6 || contentTypeId === 7;
+  // Screen saver (5) and poster (4) — all types handled here; also include Misc (8)
+  const isAggregatedContent = isPoster || isBrochure || contentTypeId === 8;
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
@@ -130,19 +141,74 @@ export function OrgUserPosterBrochureDetailScreen({
   );
   const completeContentMutation = useCompleteContent();
 
+  // Document-based completion tracking (types 6 & 7)
   const docReportContents = docReportRes?.data?.reportContents ?? [];
   const docReportEntry =
     docReportContents.find((rc: any) => rc.content_id === contentId) ?? docReportContents[0];
   const docStatusName: string = (docReportEntry?.status?.name ?? "").toUpperCase();
-  const isCompleted = docStatusName === "COMPLETED";
-  const showMarkAsCompleted = isDocument && !!docReportEntry && !isCompleted;
+  const isDocCompleted = docStatusName === "COMPLETED";
+
+  // Local state for poster / screen-saver completion (types 4 & 5)
+  const [isPosterDone, setIsPosterDone] = useState(false);
+
+  // Live report content for aggregated types (3, 4, 5, 8)
+  const [aggregatedReportContent, setAggregatedReportContent] = useState<any>(null);
+
+  useEffect(() => {
+    if (!isTargetAggregatedType || !campaignId || !moduleId || !contentId || !user?.id) return;
+
+    quizService
+      .getReportCampaign(campaignId, user.id)
+      .then((res) => {
+        const entry = res?.data?.reportCampaigns?.[0];
+        if (!entry?.id) return null;
+        return quizService.getReportModuleByParams(entry.id, moduleId);
+      })
+      .then((res2) => {
+        const mod = res2?.data?.reportModules?.[0];
+        if (!mod?.id) return null;
+        return quizService.getContentsReport(mod.id);
+      })
+      .then((res3) => {
+        const match = (res3?.data?.reportContents as any[])?.find(
+          (rc: any) => rc.content_id === contentId
+        );
+        if (!match?.id) return null;
+        return quizService.getReportContentById(match.id);
+      })
+      .then((res4) => {
+        if (res4?.success) {
+          setAggregatedReportContent(res4.data);
+        }
+      })
+      .catch((err) => console.error("[poster-detail] report content chain error", err));
+  }, [isTargetAggregatedType, campaignId, moduleId, contentId, user?.id]);
+
+  const aggregatedStatusName = (aggregatedReportContent?.status?.name ?? "").toUpperCase();
+  const isAggregatedInProgress = aggregatedStatusName === "IN_PROGRESS";
+  const isAggregatedCompleted = aggregatedStatusName === "COMPLETED";
+
+  // Unified completed flag
+  const isCompleted = isDocument
+    ? isDocCompleted
+    : isTargetAggregatedType
+      ? isAggregatedCompleted || isPosterDone
+      : isPosterDone;
+
+  // Show Mark as Done only for aggregated types when IN_PROGRESS; for others when not completed
+  const showMarkAsCompleted = isAggregatedContent && !isCompleted &&
+    (isTargetAggregatedType ? isAggregatedInProgress : true);
 
   function handleMarkAsCompleted() {
     completeContentMutation.mutate(
       { campaign_id: campaignId, module_id: moduleId, content_id: contentId },
       {
         onSuccess: () => {
-          void refetchDocReport();
+          if (isDocument) {
+            void refetchDocReport();
+          } else {
+            setIsPosterDone(true);
+          }
         },
       }
     );
@@ -168,6 +234,10 @@ export function OrgUserPosterBrochureDetailScreen({
   const rawSourceUrl =
     content?.source_url ?? (content as { source_path?: string } | null)?.source_path ?? null;
   const resolvedUrl = resolveSourceUrl(rawSourceUrl);
+
+  // Detect if Misc content is a video file
+  const isVideoSource = !!(rawSourceUrl?.match(/\.(mp4|webm|mov|ogg|avi|m3u8)(\?|$)/i));
+  const isMiscVideo = contentTypeId === 8 && isVideoSource;
 
   // Poster thumbnail (logo_url as fallback for posters)
   const posterDisplayUrl =
@@ -284,6 +354,15 @@ export function OrgUserPosterBrochureDetailScreen({
                     )}
                   </div>
                 </div>
+              ) : isMiscVideo ? (
+                /* ── Misc video player ── */
+                <div className="w-full bg-black" style={{ minHeight: 480 }}>
+                  <VideoPlayerWithFallback
+                    height="480px"
+                    url={resolvedUrl ?? ""}
+                    width="100%"
+                  />
+                </div>
               ) : isBrochure ? (
                 /* ── PDF viewer ── */
                 <div style={{ minHeight: 800 }}>
@@ -397,51 +476,33 @@ export function OrgUserPosterBrochureDetailScreen({
                             ? (t("library.downloadScreenSaver") ?? "Download Screen Saver")
                             : contentTypeId === 6 || contentTypeId === 7
                               ? (t("library.downloadDocument") ?? "Download Document")
-                              : (t("library.downloadBrochure") ?? "Download Brochure")}
+                              : contentTypeId === 8
+                                ? (isMiscVideo ? "Download Video" : "Download File")
+                                : (t("library.downloadBrochure") ?? "Download Brochure")}
                       </a>
-
-                      {/* Next item */}
-                      {nextItemHref ? (
-                        <Link
-                          className="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-full text-xs font-medium transition-colors"
-                          href={nextItemHref}
-                        >
-                          <svg
-                            fill="none"
-                            height="14"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            width="14"
-                          >
-                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                          </svg>
-                          {t("library.next") ?? "Next"}
-                        </Link>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-4 py-2 border border-gray-200 text-gray-300 rounded-full text-xs font-medium cursor-not-allowed select-none">
-                          <svg
-                            fill="none"
-                            height="14"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            width="14"
-                          >
-                            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-                          </svg>
-                          {t("library.next") ?? "Next"}
-                        </span>
-                      )}
                     </div>
 
                     {/* Right: icon actions */}
                     <div className={clsx("flex items-center gap-2", isRtl && "flex-row-reverse")}>
-                      {/* Mark as Completed button (documents only, shown when not yet completed) */}
+                      {/* Completed badge */}
+                      {isCompleted && (
+                        <span className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                          <svg
+                            fill="none"
+                            height="14"
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            viewBox="0 0 24 24"
+                            width="14"
+                          >
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                          Completed
+                        </span>
+                      )}
+                      {/* Mark as Done button — shown for all aggregated content types when not yet completed */}
                       {showMarkAsCompleted && (
                         <button
                           className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-500 hover:bg-green-600 active:bg-green-700 disabled:opacity-60 text-white rounded-full text-xs font-medium transition-colors"
@@ -461,9 +522,7 @@ export function OrgUserPosterBrochureDetailScreen({
                           >
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
-                          {completeContentMutation.isPending
-                            ? t("library.markingAsCompleted")
-                            : t("library.markAsCompleted")}
+                          {completeContentMutation.isPending ? "Marking..." : "Mark as Done"}
                         </button>
                       )}
                     </div>
@@ -471,111 +530,6 @@ export function OrgUserPosterBrochureDetailScreen({
                 </>
               )}
             </div>
-
-            {/* ── Siblings list (other items in same type) ── */}
-            {siblings.filter((s) => s.id !== contentId).length > 0 && (
-              <div className="bg-white rounded-2xl p-5 shadow-sm">
-                <h4 className="text-sm font-semibold text-gray-900 mb-3">
-                  {contentTypeId === 4
-                    ? (t("library.nextPosterTraining") ?? "More Posters")
-                    : contentTypeId === 5
-                      ? (t("library.nextScreenSaverTraining") ?? "More Screen Savers")
-                      : contentTypeId === 6
-                        ? (t("library.nextDocumentTraining") ?? "More Documents")
-                        : contentTypeId === 7
-                          ? (t("library.nextDocumentTraining") ?? "More Documents")
-                          : (t("library.nextBrochureTraining") ?? "More Brochures")}
-                </h4>
-                <div className="space-y-2">
-                  {siblings
-                    .filter((s) => s.id !== contentId)
-                    .slice(0, 8)
-                    .map((sibling) => {
-                      const siblingHref = `/module/${moduleData?.code ?? moduleId}/content/${encodeURIComponent(typeLabel.toLowerCase())}/${sibling.id}?mod_id=${moduleId}&contype_id=${contentTypeId}&campaign_id=${campaignId}`;
-                      const thumbUrl =
-                        sibling.logo_url || (sibling as any).logo_path
-                          ? getContentAssetUrl(sibling.logo_url ?? (sibling as any).logo_path)
-                          : null;
-
-                      return (
-                        <Link
-                          key={sibling.id}
-                          className={clsx(
-                            "flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors",
-                            isRtl && "flex-row-reverse"
-                          )}
-                          href={siblingHref}
-                        >
-                          {/* Thumbnail */}
-                          <div className="relative flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden bg-gray-100">
-                            {thumbUrl ? (
-                              <AuthImage
-                                fill
-                                alt=""
-                                className="object-cover"
-                                sizes="48px"
-                                src={thumbUrl}
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                                <svg
-                                  className="text-gray-400"
-                                  fill="none"
-                                  height="18"
-                                  stroke="currentColor"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth="2"
-                                  viewBox="0 0 24 24"
-                                  width="18"
-                                >
-                                  {isPoster ? (
-                                    <>
-                                      <rect height="18" rx="2" ry="2" width="18" x="3" y="3" />
-                                      <circle cx="8.5" cy="8.5" r="1.5" />
-                                      <polyline points="21 15 16 10 5 21" />
-                                    </>
-                                  ) : (
-                                    <>
-                                      <path d="M14 2H6a2 a2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                      <polyline points="14 2 14 8 20 8" />
-                                    </>
-                                  )}
-                                </svg>
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Info */}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-gray-900 line-clamp-2">
-                              {getContentTitle(sibling)}
-                            </p>
-                            <p className="text-[10px] text-gray-400 mt-0.5">
-                              {typeLabel} · {formatDate(sibling.created_at)}
-                            </p>
-                          </div>
-
-                          {/* Arrow */}
-                          <svg
-                            className="flex-shrink-0 text-gray-300"
-                            fill="none"
-                            height="14"
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            width="14"
-                          >
-                            <polyline points={isRtl ? "15 18 9 12 15 6" : "9 18 15 12 9 6"} />
-                          </svg>
-                        </Link>
-                      );
-                    })}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </DashboardLayout>

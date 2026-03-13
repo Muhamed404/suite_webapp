@@ -890,18 +890,21 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                 {/* Trivia Card */}
                 <div className="bg-white rounded-2xl p-4">
                   <h4 className="text-sm font-semibold text-gray-900 mb-4">{triviaTitle}</h4>
-                  <img
-                    alt={triviaTitle}
-                    className="w-full rounded-lg mb-4"
-                    onError={(e) => {
-                      const img = e.currentTarget as HTMLImageElement;
+                  {triviaBannerUrl && (
+                    <img
+                      alt={triviaTitle}
+                      className="w-full rounded-lg mb-4"
+                      src={triviaBannerUrl}
+                      onError={(e) => {
+                        const img = e.currentTarget as HTMLImageElement;
 
-                      if (!img.src.includes("data:image")) {
-                        img.src =
-                          'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23e5e7eb" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-family="sans-serif" font-size="18" fill="%239ca3af"%3EImage Not Available%3C/text%3E%3C/svg%3E';
-                      }
-                    }}
-                  />
+                        if (!img.src.includes("data:image")) {
+                          img.src =
+                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23e5e7eb" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-family="sans-serif" font-size="18" fill="%239ca3af"%3EImage Not Available%3C/text%3E%3C/svg%3E';
+                        }
+                      }}
+                    />
+                  )}
                   {triviaDescription && (
                     <p className="text-[10px] text-gray-600 leading-relaxed">{triviaDescription}</p>
                   )}

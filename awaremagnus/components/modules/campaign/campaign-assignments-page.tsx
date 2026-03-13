@@ -61,27 +61,27 @@ function generateModuleSlug(campaign: CampaignAssignment): string {
 }
 
 function getCampaignStatus(campaign: CampaignAssignment): "active" | "pending" | "completed" {
-  if (campaign.status) {
-    // make sure status is string before calling toLowerCase
-    const statusString =
-      typeof campaign.status === "string" ? campaign.status : String(campaign.status);
-    const status = statusString.toLowerCase();
+  // priority: numeric progress percentage is the source of truth for determining
+  // whether a module is active/completed. the `status` string from the API has
+  // proven unreliable (e.g. "completed" even when progress is 66.67%), so we
+  // avoid using it for filtering.
 
-    if (status.includes("progress") || status.includes("in_progress")) return "active";
-    if (status.includes("complete") || status.includes("completed")) return "completed";
-    if (status.includes("pending")) return "pending";
+  // coerce progress to numeric value in case it's a string or missing
+  // some API responses still use the original field name `progress_percentage`,
+  // so we fallback to it if the normalized `progress_percent` is undefined.
+  const progress = Number(campaign.progress_percent ?? campaign.progress_percentage) || 0;
+
+  if (progress >= 100) {
+    return "completed";
   }
-  const now = new Date();
-  const start = campaign.start_date ? new Date(campaign.start_date) : null;
-  const end = campaign.end_date ? new Date(campaign.end_date) : null;
-  // coerce progress to numeric value in case it's a string
-  const progress = Number(campaign.progress_percent) || 0;
 
-  if (progress === 100) return "completed";
-  if (end && now > end) return "completed";
-  if (start && now < start) return "pending";
+  // Active: progress == 0 (not started)
+  if (progress === 0) {
+    return "active";
+  }
 
-  return "active";
+  // Pending: progress > 0 and < 100 (in progress)
+  return "pending";
 } 
 
 // add "inprogress" type for org users only
@@ -133,55 +133,39 @@ function getActionButton(
     "inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-full transition-all duration-200";
   const moduleSlug = generateModuleSlug(campaign);
 
-  if (status === "active") {
-    if (campaign.progress_percent === null && onStart) {
-      return (
-        <button
-          className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
-          onClick={() => onStart(campaign)}
-        >
-          <span>Start Module</span>
-        </button>
-      );
-    } else {
-      return (
-        <Link href={`/module/${moduleSlug}?campaign_id=${campaign.campaign_id}`}>
-          <button
-            className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
-            onClick={() => {
-              // simply hit report endpoint; ignore response for now
-              campaignService
-                .getModuleReport(campaign.id)
-                .then((res) => {
-                  console.log("[campaign-assignments] getModuleReport", res);
-                })
-                .catch((err) => {
-                  console.error("[campaign-assignments] getModuleReport error", err);
-                });
-            }}
-          >
-            <span>View</span>
-          </button>
-        </Link>
-      );
-    }
-  } else if (status === "pending") {
+  // If progress is null, show Start Module button
+  if (campaign.progress_percent === null && onStart) {
     return (
-      <button className={`${baseClasses} bg-amber-500 text-white hover:bg-amber-600`}>
-        <Clock className="w-4 h-4" />
-        <span>Schedule</span>
+      <button
+        className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
+        onClick={() => onStart(campaign)}
+      >
+        <span>Start Module</span>
       </button>
     );
-  } else {
-    return (
-      <Link href={`/dashboard/campaign-assignments/${campaign.id}/modules`}>
-        <button className={`${baseClasses} bg-gray-500 text-white hover:bg-gray-600`}>
-          <BarChart3 className="w-4 h-4" />
-          <span>View Report</span>
-        </button>
-      </Link>
-    );
   }
+
+  // Otherwise, always show View button
+  return (
+    <Link href={`/module/${moduleSlug}?campaign_id=${campaign.campaign_id}`}>
+      <button
+        className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
+        onClick={() => {
+          // simply hit report endpoint; ignore response for now
+          campaignService
+            .getModuleReport(campaign.id)
+            .then((res) => {
+              console.log("[campaign-assignments] getModuleReport", res);
+            })
+            .catch((err) => {
+              console.error("[campaign-assignments] getModuleReport error", err);
+            });
+        }}
+      >
+        <span>View</span>
+      </button>
+    </Link>
+  );
 }
 
 export function CampaignAssignmentsPage() {
@@ -812,8 +796,10 @@ export function CampaignAssignmentsPage() {
                       // determine badge text specifically for org users based on numeric progress
                       let displayStatus: "active" | "pending" | "completed" | "inprogress" = status;
                       if (isOrgUserView) {
-                        const p = Number(campaign.progress_percent) || 0;
-                        if (p === 100) {
+                        const p = Number(
+                          campaign.progress_percent ?? campaign.progress_percentage
+                        ) || 0;
+                        if (p >= 100) {
                           displayStatus = "completed";
                         } else if (p > 0 && p < 100) {
                           displayStatus = "inprogress";

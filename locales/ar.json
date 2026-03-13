@@ -29,7 +29,6 @@
 		"formSubmitted": "تتبع البيانات المرسلة من خلال نموذج التصيد الاحتيالي",
 		"attachmentOpened": "تتبع تحميل ملف التصيد الاحتيالي (من البريد الإلكتروني أو صفحة الهبوط)",
 		"linkClicked": "تتبع النقر على رابط التصيد الاحتيالي",
-		"nfcScanned": "تم مسح NFC",
 		"targetCompromised": "تم اختراق الهدف",
 		"search_here": "ابحث هنا...",
 		"sort_by": "رتّب حسب",
@@ -116,8 +115,7 @@
 		"show": "عرض",
 		"select_template_to_preview": "اختر قالبًا للمعاينة",
 		"emailOpened": "تتبع فتح البريد الإلكتروني",
-		"fileDownloaded": "تم تنزيل الملف",
-		"qrScanned": "تم مسح QR"
+		"fileDownloaded": "generic_label.fileDownloaded"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -304,8 +302,7 @@
 			"campaignNFC": "NFC",
 			"campaignUSB": "USB",
 			"campaignSMS": "SMS",
-			"campaignWhatsapp": "واتساب",
-			"simulatorEmails": "menu.phishmagnus.simulatorEmails"
+			"campaignWhatsapp": "واتساب"
 		},
 		"suite": {
 			"suiteManagement": "إدارة المجموعة",
@@ -2022,7 +2019,9 @@
 			"btn_testing": "جارٍ الاختبار...",
 			"confirm_delete": "هل أنت متأكد أنك تريد حذف إعداد SMTP هذا؟",
 			"no_records": "لم يتم العثور على إعدادات SMTP.",
-			"default_org": "افتراضي"
+			"default_org": "افتراضي",
+			"delete_modal_title": "حذف إعداد SMTP",
+			"delete_modal_subtitle": "لا يمكن التراجع عن هذا الإجراء"
 		},
 		"modal": {
 			"title": "تفاصيل إعداد SMTP",

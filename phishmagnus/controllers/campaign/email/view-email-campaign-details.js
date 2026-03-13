@@ -31,7 +31,7 @@ exports.viewCampaignDetails = async (req, res) => {
     ]);
 
     logger.info('Email Campaign Detail: FETCH CAMPAIGN STATISTICS AND PHISHING USER DETAILS API CALL COMPLETED');
-    logger.info(`Email Campaign Detail: respStatistics ${JSON.stringify(campaignReportDetails?.data, null, 2)}`);
+    logger.debug(`Email Campaign Detail: respStatistics ${JSON.stringify(campaignReportDetails?.data, null, 2)}`);
     const campaignDetails = campaignReportDetails?.data?.message.campaign || {};
     // const campaignInvitees = campaignReportDetails?.data?.message.invitees || [];
     const sentUnSentStats = campaignReportDetails?.data?.message.sentUnSentStats || {};
@@ -51,9 +51,9 @@ exports.viewCampaignDetails = async (req, res) => {
     }
 
     const usersDetail = respPhishingUserDetails?.data?.message || [];
-    logger.info('respPhishingUserDetails: user Details ' + JSON.stringify(usersDetail, null, 2));
+    logger.debug('respPhishingUserDetails: user Details ' + JSON.stringify(usersDetail, null, 2));
 
-    logger.info('Email Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));
+    logger.debug('Email Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));
     return res.render(render_ejs_urls.PhishMagnus.Campaign.Email.VIEW_CAMPAIGN, {
       campaignStats,
       campaignDetails,

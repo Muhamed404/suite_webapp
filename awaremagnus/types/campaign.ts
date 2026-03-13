@@ -73,7 +73,17 @@ export interface CampaignAssignment {
   status?: string;
   start_date?: string;
   end_date?: string;
+  /**
+   * Normalised property used throughout the UI. This is populated by
+   * `campaignService.getAssignedCampaigns` which copies `progress_percentage`
+   * from the API payload.
+   */
   progress_percent?: number;
+  /**
+   * Original field name returned by the backend. Some legacy consumers still
+   * reference this directly, and we use it as a fallback when computing status.
+   */
+  progress_percentage?: number;
 }
 
 export interface Certificate {
