@@ -111,7 +111,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
 
   const { data: modulesRes, isLoading } = useModules({
     category_id: categoryFilter ? Number(categoryFilter) : undefined,
-    lang_id: languageFilter ? Number(languageFilter) : undefined,
+    language_id: languageFilter ? Number(languageFilter) : undefined,
     filter,
   });
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
@@ -358,15 +358,21 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                       value: "text-xs",
                     }}
                     placeholder={t("library.allLanguages")}
-                    selectedKeys={languageFilter ? [languageFilter] : []}
+                    selectedKeys={languageFilter ? [languageFilter] : ["all"]}
                     onSelectionChange={(keys) => {
-                      const v = Array.from(keys as Set<string>)[0] ?? "";
+                      const v = Array.from(keys as Set<string>)[0] ?? "all";
 
-                      setLanguageFilter(v);
+                      setLanguageFilter(v === "all" ? "" : v);
                     }}
                   >
-                    {SUPPORTED_LANGUAGES.map((lang) => (
-                      <SelectItem key={String(lang.id)} textValue={lang.name}>
+                    {[
+                      { id: "all", name: t("library.allLanguages") ?? "All Languages" },
+                      ...SUPPORTED_LANGUAGES.map((lang) => ({
+                        id: String(lang.id),
+                        name: lang.name,
+                      })),
+                    ].map((lang) => (
+                      <SelectItem key={lang.id} textValue={lang.name}>
                         {lang.name}
                       </SelectItem>
                     ))}
@@ -410,7 +416,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                   </div>
                 </div>
               ) : viewMode === "grid" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 p-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-4">
                   {paginatedModules.map((item: Module) => (
                     <Card key={item.id} className={cardClassName} shadow="sm">
                       <CardBody className="p-3 flex flex-col bg-white">
