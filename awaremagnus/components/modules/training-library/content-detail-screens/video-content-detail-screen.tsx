@@ -17,6 +17,8 @@ import { useModule, useContent, useContentsByModule } from "@/hooks/useQuiz";
 import { CONTENT_TYPES } from "@/constants/content-types";
 import { AuthImage } from "@/components/ui/auth-image";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { isPlatformAdmin, isOrgAdmin, isOrgUser } from "@/utils/roles";
 
 /** Card asset used as fallback thumbnail when logo is invalid */
 const CARD_ASSET = getContentAssetUrl("/images/Card.png");
@@ -100,6 +102,10 @@ export function VideoContentDetailScreen({
     breadcrumbContext === "campaign"
       ? `${basePath}/modules/${moduleId}/content/${contentTypeId}`
       : `${basePath}/${moduleId}/content/${contentTypeId}`;
+
+  const { user } = useAuthStore();
+  const roleId = user?.role_id;
+  const isAdminView = isPlatformAdmin(roleId) || isOrgAdmin(roleId);
 
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
   const { data: contentRes, isLoading } = useContent(contentId, !!contentId);
@@ -347,6 +353,7 @@ export function VideoContentDetailScreen({
                         <div
                           className={clsx("flex items-center gap-2", isRtl && "flex-row-reverse")}
                         >
+                          {isOrgUser(roleId) && (
                           <button
                             className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
                             type="button"
@@ -366,6 +373,7 @@ export function VideoContentDetailScreen({
                             </svg>
                             Begin Training
                           </button>
+                          )}
                           <button
                             className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-full text-xs font-medium transition"
                             type="button"

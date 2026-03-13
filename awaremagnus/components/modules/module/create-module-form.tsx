@@ -233,6 +233,8 @@ export function CreateModuleForm() {
                 classNames={{
                   trigger:
                     "h-10 min-h-10 rounded-lg bg-white border border-[#e5e7eb] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 text-xs px-4",
+                  listboxWrapper:
+                    "max-h-64 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-transparent",
                 }}
                 id="category"
                 placeholder={
@@ -265,6 +267,8 @@ export function CreateModuleForm() {
                 classNames={{
                   trigger:
                     "h-10 min-h-10 rounded-lg bg-white border border-[#e5e7eb] focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 text-xs px-4",
+                  listboxWrapper:
+                    "max-h-64 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-transparent",
                 }}
                 id="difficulty"
                 selectedKeys={difficulty ? [difficulty] : []}

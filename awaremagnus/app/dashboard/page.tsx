@@ -1325,17 +1325,18 @@ export default function DashboardPage() {
                         {Math.round(compliancePercent / 10)}
                       </div>
                       <div className="mt-1 flex-1">
-                        <div className="w-full h-2 bg-gray-200 rounded-full">
+                        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className="h-2 bg-green-500 rounded-full"
-                            style={{ width: `${compliancePercent}%` }}
+                            style={{ width: `${Math.min(compliancePercent, 100)}%` }}
                           />
                         </div>
                         <div
                           className={clsx(
-                            "text-base text-gray-500 font-medium mt-1.5",
+                            "text-base text-gray-500 font-medium mt-1.5 truncate",
                             isRtl ? "text-left" : "text-right"
                           )}
+                          style={{ maxWidth: "100%" }}
                         >
                           {compliancePercent}%
                         </div>
