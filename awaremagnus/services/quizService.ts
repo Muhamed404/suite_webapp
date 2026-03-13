@@ -37,7 +37,8 @@ export const quizService = {
   /** Modules - API: GET /module returns object.modules, object.count */
   getModules: async (params?: {
     category_id?: number;
-    lang_id?: number;
+    language_id?: number; // backend filter name for modules
+    lang_id?: number; // legacy alias
     status_id?: number;
     status?: number;
     org_id?: number;
@@ -49,7 +50,13 @@ export const quizService = {
     limit?: number;
     offset?: number;
   }) => {
-    const p = { ...params };
+    const p: Record<string, unknown> = { ...params };
+
+    // normalize language param
+    if (p.lang_id != null && p.language_id == null) {
+      p.language_id = p.lang_id;
+    }
+    delete p.lang_id;
 
     return request<Module[]>(() =>
       awmClient.get<AWMResponseBody>(`${API_BASE}/module`, { params: p })

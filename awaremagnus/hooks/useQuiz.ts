@@ -26,7 +26,8 @@ export const QUIZ_KEYS = {
 export function useModules(
   params?: {
     category_id?: number;
-    lang_id?: number;
+    language_id?: number; // preferred name for module listing
+    lang_id?: number; // legacy alias, will be mapped
     status?: number;
     org_id?: number;
     assigned_only?: boolean;
@@ -34,9 +35,17 @@ export function useModules(
   },
   enabled = true
 ) {
+  // normalize parameters: prefer language_id
+  const normalized = params ? { ...params } : {};
+  if (normalized.lang_id != null && normalized.language_id == null) {
+    normalized.language_id = normalized.lang_id;
+  }
+  // remove legacy key to keep queryKey stable
+  delete normalized.lang_id;
+
   return useQuery({
-    queryKey: [...QUIZ_KEYS.modules, params],
-    queryFn: () => quizService.getModules(params),
+    queryKey: [...QUIZ_KEYS.modules, normalized],
+    queryFn: () => quizService.getModules(normalized),
     enabled,
   });
 }
