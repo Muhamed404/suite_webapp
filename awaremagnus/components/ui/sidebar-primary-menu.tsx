@@ -10,6 +10,7 @@ import {
   type SuitePrimaryMenuItem,
 } from "@/config/suite-links";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 interface SidebarPrimaryMenuProps {
@@ -19,10 +20,33 @@ interface SidebarPrimaryMenuProps {
   onToggle: () => void;
 }
 
+const PRIMARY_MENU_LABEL_KEY_MAP: Record<string, string> = {
+  "Suite Management": "suiteManagement",
+  Package: "group",
+  Group: "group",
+  Services: "subscriptionLog",
+  "Subscription Log": "subscriptionLog",
+  Organization: "organization",
+  User: "users",
+  Users: "users",
+  Categories: "department",
+  Department: "department",
+  Settings: "settings",
+  Products: "products",
+  "Service Registry": "serviceRegistry",
+};
+
 export function SidebarPrimaryMenu({ isCollapsed, onToggle }: SidebarPrimaryMenuProps) {
   const { dir } = useI18n();
+  const t = useTranslations("common");
   const isRtl = dir === "rtl";
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  const getTranslatedMenuLabel = (label: string) => {
+    const key = PRIMARY_MENU_LABEL_KEY_MAP[label];
+
+    return key ? t(`suitePrimaryMenu.${key}`, { defaultValue: label }) : label;
+  };
 
   const toggleSubmenu = (id: string) => {
     setOpenMenuId((prev) => (prev === id ? null : id));
@@ -40,6 +64,7 @@ export function SidebarPrimaryMenu({ isCollapsed, onToggle }: SidebarPrimaryMenu
       <a
         className={clsx(
           "sidebar-logo absolute left-0 flex items-center gap-2 px-2 py-2 transition mt-5 group hover:bg-white/10 rounded whitespace-nowrap",
+          isRtl && "left-auto right-0",
           isCollapsed && "justify-center px-0"
         )}
         href={suiteUrl("/home")}
@@ -101,10 +126,16 @@ export function SidebarPrimaryMenu({ isCollapsed, onToggle }: SidebarPrimaryMenu
                     isCollapsed={isCollapsed}
                     isOpen={openMenuId === item.label}
                     item={item}
+                    translateLabel={getTranslatedMenuLabel}
                     onToggle={() => toggleSubmenu(item.label)}
                   />
                 ) : (
-                  <SuitePrimaryLink key={item.label} isCollapsed={isCollapsed} item={item} />
+                  <SuitePrimaryLink
+                    key={item.label}
+                    isCollapsed={isCollapsed}
+                    item={item}
+                    translateLabel={getTranslatedMenuLabel}
+                  />
                 )
               )}
             </div>
@@ -123,7 +154,9 @@ export function SidebarPrimaryMenu({ isCollapsed, onToggle }: SidebarPrimaryMenu
                   src={getContentAssetUrl("/images/icons/logout.svg")}
                   width={16}
                 />
-                <span className={clsx("text-sm font-normal", isCollapsed && "hidden")}>Logout</span>
+                <span className={clsx("text-sm font-normal", isCollapsed && "hidden")}>
+                  {t("suitePrimaryMenu.logout", { defaultValue: "Logout" })}
+                </span>
               </a>
             </div>
           </div>
@@ -136,9 +169,11 @@ export function SidebarPrimaryMenu({ isCollapsed, onToggle }: SidebarPrimaryMenu
 function SuitePrimaryLink({
   item,
   isCollapsed,
+  translateLabel,
 }: {
   item: SuitePrimaryMenuItem;
   isCollapsed: boolean;
+  translateLabel: (label: string) => string;
 }) {
   if (!item.link) return null;
 
@@ -151,7 +186,9 @@ function SuitePrimaryLink({
       href={suiteUrl(item.link)}
     >
       <Image alt="" className="size-4 shrink-0" height={16} src={item.imgPath} width={16} />
-      <span className={clsx("text-sm font-normal", isCollapsed && "hidden")}>{item.label}</span>
+      <span className={clsx("text-sm font-normal", isCollapsed && "hidden")}>
+        {translateLabel(item.label)}
+      </span>
     </a>
   );
 }
@@ -160,11 +197,13 @@ function SuitePrimaryItemWithChildren({
   item,
   isCollapsed,
   isOpen,
+  translateLabel,
   onToggle,
 }: {
   item: SuitePrimaryMenuItem;
   isCollapsed: boolean;
   isOpen: boolean;
+  translateLabel: (label: string) => string;
   onToggle: () => void;
 }) {
   const children = item.children ?? [];
@@ -181,7 +220,9 @@ function SuitePrimaryItemWithChildren({
       >
         <div className={clsx("flex items-center gap-2", isCollapsed && "gap-0")}>
           <Image alt="" className="size-4 shrink-0" height={16} src={item.imgPath} width={16} />
-          <span className={clsx("text-sm font-normal", isCollapsed && "hidden")}>{item.label}</span>
+          <span className={clsx("text-sm font-normal", isCollapsed && "hidden")}>
+            {translateLabel(item.label)}
+          </span>
         </div>
         <span
           className={clsx(
@@ -201,7 +242,7 @@ function SuitePrimaryItemWithChildren({
               className="block px-4 py-2 rounded hover:bg-white/10 text-sm"
               href={suiteUrl(child.link)}
             >
-              {child.label}
+              {translateLabel(child.label)}
             </a>
           ))}
         </div>
