@@ -409,7 +409,7 @@ export const GamificationStats = () => {
                 </div>
               </Tooltip>
 
-              <p className="mt-5 text-gray-700 text-sm text-center leading-tight whitespace-pre-line">
+              <p className="mt-5 text-gray-700 text-xs text-center leading-tight whitespace-pre-line break-words max-w-[11rem]">
                 {mainAvatar?.level_name ?? "Vulnerable\nNewbie"}
               </p>
             </div>
@@ -472,7 +472,7 @@ export const GamificationStats = () => {
                         </div>
 
                         <p
-                          className={`text-xs leading-tight mt-2 w-[90%] whitespace-pre-wrap ${
+                          className={`text-[10px] leading-tight mt-2 w-[90%] whitespace-pre-wrap break-words max-w-full ${
                             isUnlocked ? "text-gray-700" : "text-gray-400"
                           }`}
                         >

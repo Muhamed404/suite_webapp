@@ -115,7 +115,7 @@ export const dashboardService = {
   },
 
   // --- Gamification ---
-  getAchievementStatistics: async (params?: { orgId?: number }) => {
+  getAchievementStatistics: async (params?: { orgId?: number; campaignId?: number }) => {
     const { data } = await awmClient.get<AchievementStatisticsResponse>(
       `${API_BASE}/gamification/achievements/statistics`,
       { params }
@@ -146,7 +146,7 @@ export const dashboardService = {
     return data;
   },
 
-  getAvatarStatistics: async (params?: { orgId?: number }) => {
+  getAvatarStatistics: async (params?: { orgId?: number; campaignId?: number }) => {
     const { data } = await awmClient.get<AvatarStatisticsResponse>(
       `${API_BASE}/gamification/avatar/statistics`,
       { params }

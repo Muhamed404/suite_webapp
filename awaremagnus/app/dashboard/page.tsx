@@ -1262,7 +1262,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            <div className="flex flex-col p-4 sm:p-6 pt-0 gap-4 sm:gap-5 overflow-x-hidden">
+            <div className="flex flex-col p-4 sm:p-4 pt-0 gap-4 sm:gap-5 overflow-x-hidden">
               {/* Main Grid Layout - 1 col mobile, 12 col desktop */}
               <div
                 className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-2"

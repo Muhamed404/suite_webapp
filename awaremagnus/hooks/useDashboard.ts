@@ -65,6 +65,7 @@ export const DASHBOARD_KEYS = {
       sortOrder?: string;
     }) => ["gamification", "achievements", "list", params],
     avatarStats: (orgId?: number) => ["gamification", "avatar", "statistics", { orgId }],
+    avatarStatsByCampaign: (campaignId: number) => ["gamification", "avatar", "statistics", { campaignId }],
     scoreTypes: ["gamification", "scoreTypes"],
     scoreLevels: ["gamification", "scoreLevels"],
     scoreLevelsByType: (scoreTypeId: number) => [
@@ -200,6 +201,14 @@ export const useAchievementStatisticsByCampaign = (campaignId: number) => {
   });
 };
 
+export const useAchievementStatisticsWithCampaign = (campaignId: number) => {
+  return useQuery({
+    queryKey: DASHBOARD_KEYS.gamification.achievementStats(campaignId),
+    queryFn: () => dashboardService.getAchievementStatistics({ campaignId }),
+    enabled: !!campaignId,
+  });
+};
+
 export const useAchievements = (params?: {
   limit?: number;
   offset?: number;
@@ -216,6 +225,14 @@ export const useAvatarStatistics = (orgId?: number) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.gamification.avatarStats(orgId),
     queryFn: () => dashboardService.getAvatarStatistics({ orgId }),
+  });
+};
+
+export const useAvatarStatisticsByCampaign = (campaignId: number) => {
+  return useQuery({
+    queryKey: DASHBOARD_KEYS.gamification.avatarStatsByCampaign(campaignId),
+    queryFn: () => dashboardService.getAvatarStatistics({ campaignId }),
+    enabled: !!campaignId,
   });
 };
 
