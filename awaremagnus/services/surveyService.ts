@@ -8,6 +8,10 @@ import type {
   SurveyQuestion,
   SurveyQuestionCreatePayload,
   SurveyQuestionUpdatePayload,
+  PublicSurveyData,
+  PublicSurveyStatusResponse,
+  PublicSurveySubmissionPayload,
+  PublicSurveySubmissionResponse,
 } from "@/types/survey";
 import type { AWMResponseBody } from "./awmResponse";
 
@@ -75,6 +79,20 @@ async function rawGet<T>(path: string): Promise<T> {
   const { data } = await awmClient.get<any>(path);
 
   // The lists endpoint returns { success, data: { meta_statistics, surveys } }
+  if (data?.success && data?.data) return data.data as T;
+  if (data?.object) return data.object as T;
+  if (data?.data) return data.data as T;
+
+  return data as T;
+}
+
+/** Raw POST without normalizing – used for public endpoints that return { success, data } */
+async function rawPost<T>(path: string, body: unknown): Promise<T> {
+  const { data } = await awmClient.post<any>(path, body);
+
+  if (data?.success === false) {
+    throw new Error(data?.message ?? "Request failed");
+  }
   if (data?.success && data?.data) return data.data as T;
   if (data?.object) return data.object as T;
   if (data?.data) return data.data as T;
@@ -217,7 +235,35 @@ export const surveyService = {
     });
   },
 
-  /** POST /api/awm/survey/:id/submit - Submit survey answers */
+  /** POST /api/awm/survey/:id/submit - Submit survey answers (legacy authenticated) */
   submitSurveyAnswers: (id: number, payload: any) =>
     awmPost<any>(`${API_BASE}/survey/${id}/submit`, payload),
+
+  // ─── Public Survey Endpoints (no auth required) ───────────
+
+  /** GET /api/awm/public/surveys/:surveyId/invitations/:invitationId?survey_code=CODE */
+  getPublicSurvey: (surveyId: number, invitationId: number, surveyCode: string) =>
+    rawGet<PublicSurveyData>(
+      `${API_BASE}/public/surveys/${surveyId}/invitations/${invitationId}?survey_code=${encodeURIComponent(surveyCode)}`
+    ),
+
+  /** GET /api/awm/public/surveys/:surveyId/invitations/:invitationId/status?survey_code=CODE */
+  getPublicSurveyStatus: (surveyId: number, invitationId: number, surveyCode?: string) => {
+    const query = surveyCode ? `?survey_code=${encodeURIComponent(surveyCode)}` : "";
+    return rawGet<PublicSurveyStatusResponse>(
+      `${API_BASE}/public/surveys/${surveyId}/invitations/${invitationId}/status${query}`
+    );
+  },
+
+  /** POST /api/awm/public/surveys/:surveyId/invitations/:invitationId/submissions?survey_code=CODE */
+  submitPublicSurvey: (
+    surveyId: number,
+    invitationId: number,
+    surveyCode: string,
+    payload: PublicSurveySubmissionPayload
+  ) =>
+    rawPost<PublicSurveySubmissionResponse>(
+      `${API_BASE}/public/surveys/${surveyId}/invitations/${invitationId}/submissions?survey_code=${encodeURIComponent(surveyCode)}`,
+      payload
+    ),
 };

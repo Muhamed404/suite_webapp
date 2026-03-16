@@ -2,6 +2,7 @@ import type {
   SurveyCreatePayload,
   SurveyQuestionCreatePayload,
   SurveyQuestionUpdatePayload,
+  PublicSurveySubmissionPayload,
 } from "@/types/survey";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -219,6 +220,72 @@ export function useImportSurveyQuestions() {
     mutationFn: (formData: FormData) => surveyService.importSurveyQuestions(formData),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["survey-questions"] });
+    },
+  });
+}
+
+// ─── Public Survey Hooks (no auth required) ─────────────────
+
+export const PUBLIC_SURVEY_KEYS = {
+  detail: (surveyId: number, invitationId: number) =>
+    ["public-survey", surveyId, invitationId] as const,
+  status: (surveyId: number, invitationId: number) =>
+    ["public-survey-status", surveyId, invitationId] as const,
+};
+
+/** Fetch public survey details (no auth) */
+export function usePublicSurvey(
+  surveyId: number,
+  invitationId: number,
+  surveyCode: string,
+  enabled = true
+) {
+  return useQuery({
+    queryKey: PUBLIC_SURVEY_KEYS.detail(surveyId, invitationId),
+    queryFn: () => surveyService.getPublicSurvey(surveyId, invitationId, surveyCode),
+    enabled: enabled && !!surveyId && !!invitationId && !!surveyCode,
+    retry: false,
+  });
+}
+
+/** Check public survey status (no auth) */
+export function usePublicSurveyStatus(
+  surveyId: number,
+  invitationId: number,
+  surveyCode?: string,
+  enabled = true
+) {
+  return useQuery({
+    queryKey: PUBLIC_SURVEY_KEYS.status(surveyId, invitationId),
+    queryFn: () => surveyService.getPublicSurveyStatus(surveyId, invitationId, surveyCode),
+    enabled: enabled && !!surveyId && !!invitationId,
+    retry: false,
+  });
+}
+
+/** Submit public survey answers (no auth) */
+export function useSubmitPublicSurvey() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      surveyId,
+      invitationId,
+      surveyCode,
+      payload,
+    }: {
+      surveyId: number;
+      invitationId: number;
+      surveyCode: string;
+      payload: PublicSurveySubmissionPayload;
+    }) => surveyService.submitPublicSurvey(surveyId, invitationId, surveyCode, payload),
+    onSuccess: (_, { surveyId, invitationId }) => {
+      qc.invalidateQueries({
+        queryKey: PUBLIC_SURVEY_KEYS.detail(surveyId, invitationId),
+      });
+      qc.invalidateQueries({
+        queryKey: PUBLIC_SURVEY_KEYS.status(surveyId, invitationId),
+      });
     },
   });
 }

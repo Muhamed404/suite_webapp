@@ -298,3 +298,64 @@ export interface SurveyQuestionUpdatePayload {
     validity: boolean;
   }>;
 }
+
+// ─── Public Survey Types ─────────────────────────────────────
+
+export interface PublicSurveyQuestion {
+  question_id: number;
+  question_text: string;
+  question_type: string;
+  answers: Array<{
+    answer_id: number;
+    answer_text: string;
+  }>;
+}
+
+export interface PublicSurveyData {
+  survey: {
+    id: number;
+    title: string;
+    description?: string;
+    status: "active" | "expired" | "closed" | "not_started";
+    total_questions: number;
+  };
+  completion_status: "filled" | "not_filled";
+  questions: PublicSurveyQuestion[];
+}
+
+export type PublicSurveyStatusValue =
+  | "completed"
+  | "active"
+  | "expired"
+  | "closed"
+  | "not_started"
+  | "invalid_link";
+
+export interface PublicSurveyStatusResponse {
+  status: PublicSurveyStatusValue;
+}
+
+export interface PublicSurveySubmissionAnswer {
+  question_id: number;
+  selected_answer_id?: number;
+  selected_answer_ids?: number[];
+}
+
+export interface PublicSurveySubmissionPayload {
+  survey_id: number;
+  user_type: "public" | "org_user";
+  answers: PublicSurveySubmissionAnswer[];
+}
+
+export interface PublicSurveySubmissionResponse {
+  survey_id: number;
+  invitation_id: number;
+  user_type: string;
+  user_identifier?: string;
+  statistics: {
+    correct_answers: number;
+    incorrect_answers: number;
+    skipped_answers: number;
+    accuracy: number;
+  };
+}

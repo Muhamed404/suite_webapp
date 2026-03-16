@@ -23,12 +23,13 @@ import {
   ShieldAlert,
   ShieldCheck,
   AlertTriangle,
+  Link as LinkIcon,
 } from "lucide-react";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useSurvey, useSurveyUsers } from "@/hooks/useSurvey";
+import { useSurvey, useSurveyUsers, useRetrySurveyUserFetch } from "@/hooks/useSurvey";
 
 type SortField = "name" | "submission_date" | "risk_level";
 type SortDirection = "asc" | "desc";
@@ -107,6 +108,8 @@ export function SurveyUserListPage() {
   const [departmentFilter, setDepartmentFilter] = useState<string>("");
   const [groupFilter, setGroupFilter] = useState<string>("");
   const [submissionFilter, setSubmissionFilter] = useState<string>("");
+
+  const retryFetchMutation = useRetrySurveyUserFetch();
 
   // Fetch users
   const { data: usersData, isLoading: usersLoading } = useSurveyUsers(
@@ -461,9 +464,46 @@ export function SurveyUserListPage() {
                         <Users className="w-10 h-10 text-gray-400" />
                       </div>
                       <h3 className="text-lg font-semibold text-gray-700 mb-2">No Users Found</h3>
-                      <p className="text-sm text-gray-500">
-                        Try adjusting your filters or search query
-                      </p>
+                      {searchQuery ||
+                      riskLevelFilter ||
+                      departmentFilter ||
+                      groupFilter ||
+                      submissionFilter ? (
+                        <p className="text-sm text-gray-500">
+                          Try adjusting your filters or search query.
+                        </p>
+                      ) : (
+                        <>
+                          <p className="text-sm text-gray-500 mb-4">
+                            No invitations have been loaded for this survey yet. You can trigger a
+                            retry to fetch users from groups and departments for testing.
+                          </p>
+                          <Button
+                            radius="full"
+                            size="sm"
+                            color="primary"
+                            isLoading={retryFetchMutation.isPending}
+                            className="px-6 text-xs font-medium"
+                            onPress={() => {
+                              if (!surveyId) return;
+                              retryFetchMutation.mutate(surveyId);
+                            }}
+                          >
+                            Retry user fetch
+                          </Button>
+                          {retryFetchMutation.isError && (
+                            <p className="mt-2 text-xs text-red-500">
+                              Failed to retry user fetch. Please try again.
+                            </p>
+                          )}
+                          {retryFetchMutation.isSuccess && (
+                            <p className="mt-2 text-xs text-green-600">
+                              Retry triggered. Users will appear once the background fetch
+                              completes.
+                            </p>
+                          )}
+                        </>
+                      )}
                     </div>
                   </div>
                 ) : (
@@ -540,23 +580,47 @@ export function SurveyUserListPage() {
                               {user.department_name ?? "—"}
                             </td>
                             <td className="px-4 py-3.5 text-center">
-                              {user.submission_date ? (
-                                <Button
-                                  as={Link}
-                                  className="text-[10px] h-7 px-3 bg-blue-50 text-blue-600"
-                                  href={`/dashboard/survey/users/answers?surveyId=${surveyId}&userId=${user.user_id}`}
-                                  radius="full"
-                                  size="sm"
-                                  startContent={<Eye className="w-3 h-3" />}
-                                  variant="flat"
-                                >
-                                  View
-                                </Button>
-                              ) : (
-                                <span className="text-[10px] text-gray-400 italic">
-                                  No submission
-                                </span>
-                              )}
+                              <div className="flex flex-col items-center gap-1">
+                                {user.submission_date ? (
+                                  <Button
+                                    as={Link}
+                                    className="text-[10px] h-7 px-3 bg-blue-50 text-blue-600"
+                                    href={`/dashboard/survey/users/answers?surveyId=${surveyId}&userId=${user.user_id}`}
+                                    radius="full"
+                                    size="sm"
+                                    startContent={<Eye className="w-3 h-3" />}
+                                    variant="flat"
+                                  >
+                                    View
+                                  </Button>
+                                ) : (
+                                  <span className="text-[10px] text-gray-400 italic">
+                                    No submission
+                                  </span>
+                                )}
+                                {survey?.survey_unique_code && (
+                                  <button
+                                    type="button"
+                                    className="inline-flex items-center gap-1 text-[10px] text-blue-600 hover:text-blue-700"
+                                    onClick={() => {
+                                      const origin =
+                                        typeof window !== "undefined"
+                                          ? window.location.origin
+                                          : "";
+                                      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+                                      const url = `${origin}${basePath}/survey/${surveyId}?invitation_id=${user.invite_id}&survey_code=${encodeURIComponent(
+                                        survey.survey_unique_code!,
+                                      )}`;
+                                      if (navigator.clipboard?.writeText) {
+                                        navigator.clipboard.writeText(url);
+                                      }
+                                    }}
+                                  >
+                                    <LinkIcon className="w-3 h-3" />
+                                    Copy link
+                                  </button>
+                                )}
+                              </div>
                             </td>
                           </tr>
                         );
