@@ -28,7 +28,12 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { DonutChart } from "@/components/modules/dashboard/charts/donut-chart";
 import { AreaChart } from "@/components/modules/dashboard/charts/area-chart";
 import { SemiCircleChart } from "@/components/modules/dashboard/charts/semi-circle-chart";
-import { useSurvey, useSurveyStatistics, useSurveyUsers } from "@/hooks/useSurvey";
+import {
+  useSurvey,
+  useSurveyStatistics,
+  useSurveyUsers,
+  useRetrySurveyUserFetch,
+} from "@/hooks/useSurvey";
 
 function LegendDot({ color, label }: { color: string; label: string }) {
   return (
@@ -128,6 +133,8 @@ export function SurveyStatsPage() {
     !!surveyId
   );
 
+  const retryFetchMutation = useRetrySurveyUserFetch();
+
   const isLoading = surveyLoading || statsLoading;
 
   // Chart data
@@ -152,13 +159,11 @@ export function SurveyStatsPage() {
 
   const overall = stats?.overall_risk_level;
 
-  const surveyLink = survey?.id
-    ? `${typeof window !== "undefined" ? window.location.origin : ""}/awm/survey/${survey.id}`
-    : "";
+  const surveyCode = survey?.survey_unique_code ?? "";
 
   const handleCopyLink = () => {
-    if (surveyLink) {
-      navigator.clipboard.writeText(surveyLink);
+    if (surveyCode) {
+      navigator.clipboard.writeText(surveyCode);
     }
   };
 
@@ -192,37 +197,68 @@ export function SurveyStatsPage() {
       <DashboardLayout>
         <div className={clsx("p-3", isRtl && "text-right")}>
           {/* Back Button & Title */}
-          <div className="flex items-center gap-3 mb-4">
-            <Button
-              isIconOnly
-              as={Link}
-              className="bg-white border border-gray-200"
-              href="/dashboard/survey"
-              radius="full"
-              size="sm"
-              variant="flat"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div>
-              <h2 className="text-xl font-semibold">
-                {isLoading ? "Loading..." : (survey?.name ?? "Survey Details")}
-              </h2>
-              {surveyLink && (
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="text-xs text-gray-500">Survey Link:</span>
-                  <code className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
-                    {surveyLink}
-                  </code>
-                  <button
-                    className="text-gray-400 hover:text-blue-500 transition"
-                    onClick={handleCopyLink}
-                  >
-                    <Copy className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              )}
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div className="flex items-center gap-3">
+              <Button
+                isIconOnly
+                as={Link}
+                className="bg-white border border-gray-200"
+                href="/dashboard/survey"
+                radius="full"
+                size="sm"
+                variant="flat"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <div>
+                <h2 className="text-xl font-semibold">
+                  {isLoading ? "Loading..." : (survey?.name ?? "Survey Details")}
+                </h2>
+                {surveyCode && (
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs text-gray-500">Survey Code:</span>
+                    <code className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                      {surveyCode}
+                    </code>
+                    <button
+                      className="text-gray-400 hover:text-blue-500 transition"
+                      title="Copy survey code"
+                      onClick={handleCopyLink}
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
+            {!isLoading && (usersData?.survey?.id === surveyId) && (usersData?.pagination?.total_items ?? 0) === 0 && (
+              <div className="flex flex-col items-end gap-1">
+                <Button
+                  radius="full"
+                  size="sm"
+                  color="primary"
+                  variant="flat"
+                  isLoading={retryFetchMutation.isPending}
+                  className="px-4 text-xs font-medium"
+                  onPress={() => {
+                    if (!surveyId) return;
+                    retryFetchMutation.mutate(surveyId);
+                  }}
+                >
+                  Retry user fetch
+                </Button>
+                {retryFetchMutation.isError && (
+                  <span className="text-[10px] text-red-500">
+                    Failed to retry user fetch. Please try again.
+                  </span>
+                )}
+                {retryFetchMutation.isSuccess && (
+                  <span className="text-[10px] text-green-600">
+                    Retry triggered. Users will appear once the background fetch completes.
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {isLoading ? (
