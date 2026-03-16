@@ -276,6 +276,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
           typeId: agg.content_type_id,
           typeName: agg.content_type,
           count: agg.total_count,
+          dateRange: agg.date_range,
           // We don't have individual items here, just the summary
           items: [],
         });
@@ -799,10 +800,11 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
 
                     // --- 2. AGGREGATED CONTENT CARD (Posters, etc.) ---
                     if (card.kind === "grouped") {
-                      const { typeId, typeName, count } = card;
+                      const { typeId, typeName, count, dateRange } = card;
                       // For aggregated, click takes us to LIST page for that type
                       const listHref = `${basePath}/${moduleId}/content/${typeId}`;
                       const displayName = getContentTypeDisplayName(typeName);
+                      const createdStr = formatCreatedDate(dateRange?.earliest_created);
 
                       return (
                         <Card
@@ -823,8 +825,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                 {displayName}
                               </p>
                               <p className="text-[10px] text-gray-500 mt-1">
-                                {/* Date range could go here if we extracted it */}
-                                {t("moduleDetails.created")} —
+                                {t("moduleDetails.created")} {createdStr}
                               </p>
                               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                                 <span className="text-[10px] text-gray-600">
