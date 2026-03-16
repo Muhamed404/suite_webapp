@@ -158,83 +158,113 @@ export default function CampaignDetailsPage() {
                   {campaignDashboard?.name || "Campaign"}
                 </h2>
 
-                <div className="grid grid-cols-3 text-xs gap-y-2">
-                  <span className="font-medium">Name:</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Name</span>
                   <span className="col-span-2">{campaignDashboard?.name || "-"}</span>
+                </div>
 
-                  <span className="font-medium">Description:</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Description</span>
                   <span className="col-span-2">{campaignDashboard?.description || "-"}</span>
+                </div>
 
-                  <span className="font-medium">Departments:</span>
-                  <span className="col-span-2">{campaignDashboard?.departments?.total || 0}</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Department</span>
+                  <span className="col-span-2">
+                    {campaignDashboard?.departments?.list && campaignDashboard.departments.list.length > 0 ? (
+                      campaignDashboard.departments.list
+                        .map((d: any) => d.name || d.department_name || `Dept ${d.id}`)
+                        .join(', ')
+                    ) : (
+                      campaignDashboard?.departments?.total ?? 0
+                    )}
+                  </span>
+                </div>
 
-                  <span className="font-medium">Groups:</span>
-                  <span className="col-span-2">{campaignDashboard?.groups?.total || 0}</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Group</span>
+                  <div className="col-span-2 flex items-center gap-1">
+                    {campaignDashboard?.groups?.list && campaignDashboard.groups.list.length > 0 ? (
+                      campaignDashboard.groups.list.map((g: any, idx: number) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-[2px] border border-red-300 rounded-full text-red-400 text-[10px]"
+                        >
+                          {g.name || g.group_name || `Group ${g.id}`}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="px-2 py-[2px] border border-red-300 rounded-full text-red-400 text-[10px]">
+                        {campaignDashboard?.groups?.total ?? 0} Group(s)
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-                  <span className="font-medium">Users:</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Users</span>
                   <span className="col-span-2">{campaignDashboard?.total_users_enrolled || 0}</span>
+                </div>
 
-                  <span className="font-medium">Start Date:</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Start Date</span>
                   <span className="col-span-2">{formatDate(campaignDashboard?.start_date)}</span>
+                </div>
 
-                  <span className="font-medium">End Date:</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">End Date</span>
                   <span className="col-span-2">{formatDate(campaignDashboard?.end_date)}</span>
                 </div>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-xl space-y-4">
-                <div>
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <span className="w-4 h-4">
-                      <img alt="" className="w-full h-full" src="/awm/images/img/calendar.svg" />
+                <div className="flex items-center gap-1.5">
+                  <span className="w-4 h-4">
+                    <img alt="" className="w-full h-full" src="/awm/images/img/calendar.svg" />
+                  </span>
+                  <h3 className="font-semibold text-gray-800 text-sm">Topics Schedule</h3>
+                </div>
+
+                <div className="space-y-2 text-gray-700 text-xs">
+                  {campaignDashboard?.upcoming_topics && campaignDashboard.upcoming_topics.length > 0 ? (
+                    campaignDashboard.upcoming_topics.map((topic: any, idx: number) => (
+                      <p key={idx}>
+                        {topic.module_name || `Module ${topic.module_id}`} {formatDate(topic.start_date)}
+                      </p>
+                    ))
+                  ) : (
+                    <p className="text-gray-400">No schedule available</p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5 pt-3 border-t border-gray-200">
+                  <label className="flex items-center gap-1.5 text-gray-700 font-medium text-xs">
+                    <input
+                      readOnly
+                      checked={campaignDashboard?.status_id === 2}
+                      className="w-3.5 h-3.5 rounded border-gray-400"
+                      type="checkbox"
+                    />
+                    Campaign Status
+                  </label>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600 text-xs">
+                      {campaignDashboard?.status_id === 2 ? "Active" : "Inactive"}
                     </span>
-                    <h3 className="font-semibold text-gray-800 text-sm">Topics Schedule</h3>
-                  </div>
 
-                  <div className="space-y-2 text-gray-700 text-xs">
-                    {campaignDashboard?.upcoming_topics &&
-                    campaignDashboard.upcoming_topics.length > 0 ? (
-                      campaignDashboard.upcoming_topics.map((topic: any, idx: number) => (
-                        <p key={idx}>
-                          {topic.module_name || `Module ${topic.module_id}`} -{" "}
-                          {formatDate(topic.start_date)}
-                        </p>
-                      ))
-                    ) : (
-                      <p className="text-gray-400">No schedule available</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-1.5 pt-3 border-t border-gray-200">
-                    <label className="flex items-center gap-1.5 text-gray-700 font-medium text-xs">
+                    <label className="relative inline-flex items-center">
                       <input
                         readOnly
                         checked={campaignDashboard?.status_id === 2}
-                        className="w-3.5 h-3.5 rounded border-gray-400"
+                        className="sr-only peer"
                         type="checkbox"
                       />
-                      Campaign Status
+                      <div className="w-6 h-3 bg-gray-400 peer-checked:bg-blue-500 rounded-full transition" />
+                      <div className="absolute left-[0px] top-[1.2px] bg-white w-2.5 h-2.5 rounded-full peer-checked:translate-x-3 transition" />
                     </label>
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-600 text-xs">
-                        {campaignDashboard?.status_id === 2 ? "Active" : "Inactive"}
-                      </span>
-
-                      <label className="relative inline-flex items-center">
-                        <input
-                          readOnly
-                          checked={campaignDashboard?.status_id === 2}
-                          className="sr-only peer"
-                          type="checkbox"
-                        />
-                        <div className="w-6 h-3 bg-gray-400 peer-checked:bg-blue-500 rounded-full transition" />
-                        <div className="absolute left-[0px] top-[1.2px] bg-white w-2.5 h-2.5 rounded-full peer-checked:translate-x-3 transition" />
-                      </label>
-                    </div>
                   </div>
                 </div>
-
                 {/* Enabled Features */}
                 <div className="pt-3 border-t border-gray-200">
                   <h4 className="text-gray-700 font-medium text-xs mb-2">Enabled Features</h4>
@@ -262,7 +292,7 @@ export default function CampaignDetailsPage() {
                 <div className="flex justify-between items-start">
                   <p className="text-gray-600 text-xs">Remaining days</p>
                   <div className="w-6 h-6">
-                    <img alt="" className="w-full h-full" src="/awm/images/img/calendar.svg" />
+                    <img alt="" className="w-full h-full" src="/awm/images/profile.svg" />
                   </div>
                 </div>
 
