@@ -57,6 +57,7 @@ export const DASHBOARD_KEYS = {
   },
   gamification: {
     achievementStats: (orgId?: number) => ["gamification", "achievements", "statistics", { orgId }],
+    achievementStatsByCampaign: (campaignId: number) => ["gamification", "achievements", "statistics", { campaignId }],
     achievements: (params?: {
       limit?: number;
       offset?: number;
@@ -188,6 +189,14 @@ export const useAchievementStatistics = (orgId?: number) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.gamification.achievementStats(orgId),
     queryFn: () => dashboardService.getAchievementStatistics({ orgId }),
+  });
+};
+
+export const useAchievementStatisticsByCampaign = (campaignId: number) => {
+  return useQuery({
+    queryKey: DASHBOARD_KEYS.gamification.achievementStatsByCampaign(campaignId),
+    queryFn: () => dashboardService.getAchievementStatisticsByCampaign(campaignId),
+    enabled: !!campaignId,
   });
 };
 

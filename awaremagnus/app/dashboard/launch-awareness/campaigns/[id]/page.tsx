@@ -4,6 +4,8 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { ArrowLeft, Play, Trophy } from "lucide-react";
 import clsx from "clsx";
+import { useMemo } from "react";
+import { Tooltip } from "@heroui/tooltip";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -12,7 +14,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import {
   useOrganizationLeaderboard,
-  useAchievementStatistics,
+  useAchievementStatisticsByCampaign,
 } from "@/hooks/useDashboard";
 
 export default function CampaignDetailsPage() {
@@ -32,12 +34,61 @@ export default function CampaignDetailsPage() {
     campaignId,
     count: 10,
   });
-  const { data: achievementData } = useAchievementStatistics();
+  const { data: achievementData } = useAchievementStatisticsByCampaign(campaignId);
 
   const achievementUnlocked = achievementData?.object?.total_unique_achievements_unlocked ?? 0;
   const achievementTotal = achievementData?.object?.total_achievements || 50;
   const achievementPercent =
     achievementTotal > 0 ? Math.round((achievementUnlocked / achievementTotal) * 100) : 0;
+
+  // Set of achievement numbers (1-16) present in the backend response. We
+  // parse the leading number from `image_small_url` (e.g. "1-quick-learner.png").
+  const unlockedAchievementNumbers = useMemo(() => {
+    const set = new Set<number>();
+    const items = achievementData?.object?.achievement_statistics ?? [];
+
+    for (const a of items) {
+      const img = a?.image_small_url ?? "";
+      const m = img.trim().match(/^(\d{1,2})/);
+
+      if (!m) continue;
+      const n = Number(m[1]);
+
+      if (n >= 1 && n <= 16) set.add(n);
+    }
+
+    return set;
+  }, [achievementData]);
+
+  // Map: achievement number → full stats object (for tooltip data)
+  const achievementByNumber = useMemo(() => {
+    const map = new Map<number, any>();
+    const items = achievementData?.object?.achievement_statistics ?? [];
+
+    for (const a of items) {
+      const img = a?.image_small_url ?? "";
+      const m = img.trim().match(/^(\d{1,2})/);
+
+      if (!m) continue;
+      const n = Number(m[1]);
+
+      if (n >= 1 && n <= 16) map.set(n, a);
+    }
+
+    return map;
+  }, [achievementData]);
+
+  // Display order: unlocked achievements first, then locked — capped at 16
+  const achievementDisplayOrder = useMemo(() => {
+    const all = Array.from({ length: 16 }, (_, i) => i + 1);
+
+    return all.sort((a, b) => {
+      const aUnlocked = unlockedAchievementNumbers.has(a) ? 0 : 1;
+      const bUnlocked = unlockedAchievementNumbers.has(b) ? 0 : 1;
+
+      return aUnlocked - bUnlocked;
+    });
+  }, [unlockedAchievementNumbers]);
 
   const handleLaunchCampaign = async () => {
     if (!campaignDashboard) return;
@@ -597,29 +648,52 @@ export default function CampaignDetailsPage() {
                   </a>
                 </div>
                 <div className="grid grid-cols-8 gap-3 gap-y-4 mt-8">
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((idx) => {
-                    const isUnlocked = idx <= 7;
+                  {achievementDisplayOrder.map((num) => {
+                    const isUnlocked = unlockedAchievementNumbers.has(num);
+                    const meta = achievementByNumber.get(num);
+
+                    const tooltipContent = (
+                      <div className="flex flex-col gap-1 max-w-[200px] p-1">
+                        <p className="font-semibold text-sm text-gray-900">
+                          {meta?.achievement_name ?? `Achievement #${num}`}
+                        </p>
+                        {meta?.achievement_description && (
+                          <p className="text-xs text-gray-600 leading-tight">
+                            {meta.achievement_description}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between mt-1 gap-2">
+                          <span
+                            className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                              isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                            }`}
+                          >
+                            {isUnlocked ? "Unlocked" : "Locked"}
+                          </span>
+                          {isUnlocked && meta?.employee_count != null && (
+                            <span className="text-xs text-gray-500">
+                              {meta.employee_count}x
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
 
                     return (
-                      <div
-                        key={idx}
-                        className="w-12 h-12 rounded-full flex items-center justify-center relative"
-                      >
-                        <img
-                          alt=""
-                          className="w-full h-full"
-                          src={`/awm/images/achivement/${idx}.png`}
-                        />
-                        {isUnlocked && (
-                          <span className="absolute top-0 -right-1 w-4 h-4">
-                            <img
-                              alt=""
-                              className="w-full h-full"
-                              src="/awm/images/achivement/achived.svg"
-                            />
-                          </span>
-                        )}
-                      </div>
+                      <Tooltip key={num} content={tooltipContent} placement="top">
+                        <div
+                          aria-disabled={!isUnlocked}
+                          className={`w-12 h-12 rounded-full flex items-center justify-center relative cursor-default ${
+                            isUnlocked ? "" : "opacity-40"
+                          }`}
+                        >
+                          <img
+                            alt={meta?.achievement_name ?? `Achievement ${num}`}
+                            className="w-full h-full"
+                            src={`/awm/images/achivement/${num}.png`}
+                          />
+                        </div>
+                      </Tooltip>
                     );
                   })}
                 </div>

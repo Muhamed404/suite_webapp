@@ -124,6 +124,14 @@ export const dashboardService = {
     return data;
   },
 
+  getAchievementStatisticsByCampaign: async (campaignId: number) => {
+    const { data } = await awmClient.get<AchievementStatisticsResponse>(
+      `${API_BASE}/gamification/achievements/statistics?campaignId=${campaignId}`
+    );
+
+    return data;
+  },
+
   getAchievements: async (params?: {
     limit?: number;
     offset?: number;
