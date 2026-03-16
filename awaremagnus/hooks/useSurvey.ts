@@ -19,6 +19,7 @@ export const SURVEY_KEYS = {
     ["surveys", surveyId, "users", userId, "answers"] as const,
   questions: (params?: Record<string, any>) => ["survey-questions", params] as const,
   question: (id: number) => ["survey-questions", id] as const,
+  userPending: (userId: number) => ["surveys", "user", userId, "pending"] as const,
 };
 
 // ─── Survey List with Stats ──────────────────────────────────
@@ -92,6 +93,17 @@ export function useRetrySurveyUserFetch() {
     onSuccess: (_, id) => {
       qc.invalidateQueries({ queryKey: SURVEY_KEYS.detail(id) });
     },
+  });
+}
+
+// ─── Org User Pending Surveys ─────────────────────────────────
+
+/** Get pending surveys for an authenticated org user (by userId) */
+export function useUserPendingSurveys(userId?: number) {
+  return useQuery({
+    queryKey: userId ? SURVEY_KEYS.userPending(userId) : ["surveys", "user", "pending", "disabled"],
+    queryFn: () => surveyService.getUserPendingSurveys(userId!),
+    enabled: !!userId,
   });
 }
 

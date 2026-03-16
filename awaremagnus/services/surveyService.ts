@@ -12,6 +12,7 @@ import type {
   PublicSurveyStatusResponse,
   PublicSurveySubmissionPayload,
   PublicSurveySubmissionResponse,
+  PendingUserSurvey,
 } from "@/types/survey";
 import type { AWMResponseBody } from "./awmResponse";
 
@@ -132,6 +133,10 @@ export const surveyService = {
       `${API_BASE}/survey/${id}/retry-user-fetch`,
       {}
     ),
+
+  /** GET /api/awm/survey/user/:userId/pending – Pending surveys for an org user */
+  getUserPendingSurveys: (userId: number) =>
+    awmGet<PendingUserSurvey[]>(`${API_BASE}/survey/user/${userId}/pending`),
 
   // ─── Survey Statistics ──────────────────────────────────────
 

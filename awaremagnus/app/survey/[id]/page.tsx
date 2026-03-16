@@ -280,6 +280,113 @@ function PublicSurveyPage({
   const renderContent = () => {
     if (!isClient) return null;
 
+    // If the user just submitted in this session, always show the local completion
+    // screen, even though the backend status has already switched to "completed".
+    if (showCompletion) {
+      return (
+        <div
+          className={clsx(
+            "flex items-center justify-center bg-gradient-to-br from-slate-100 via-slate-50 to-sky-50",
+            user ? "min-h-[calc(100vh-64px)]" : "min-h-screen",
+          )}
+        >
+          <div className="w-full max-w-3xl px-4">
+            <div className="relative bg-white rounded-3xl shadow-xl border border-slate-100/80 px-8 py-8 md:px-10 md:py-10 overflow-hidden">
+              <div className="pointer-events-none absolute -right-24 -top-24 h-48 w-48 rounded-full bg-emerald-100 blur-3xl" />
+              <div className="pointer-events-none absolute -left-24 -bottom-24 h-56 w-56 rounded-full bg-sky-100 blur-3xl" />
+
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className="h-14 w-14 rounded-full bg-emerald-500/10 border border-emerald-400/60 flex items-center justify-center">
+                      <CheckCircle2 className="w-7 h-7 text-emerald-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold tracking-[0.18em] uppercase text-emerald-500">
+                      Survey submitted
+                    </p>
+                    <h2 className="text-2xl md:text-3xl font-bold text-slate-900 leading-snug mt-1">
+                      Thank you for completing this survey
+                    </h2>
+                  </div>
+                </div>
+                <div className="hidden md:flex flex-col items-end gap-1">
+                  {surveyData?.survey?.title && (
+                    <span className="text-xs text-slate-500 max-w-xs text-right line-clamp-1">
+                      Survey:{" "}
+                      <span className="text-slate-900 font-medium">
+                        {surveyData.survey.title}
+                      </span>
+                    </span>
+                  )}
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-3 py-1 text-[11px] text-slate-500 border border-slate-200">
+                    <Clock className="w-3.5 h-3.5" />
+                    Completed just now
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-sm text-slate-600 mb-6 max-w-2xl">
+                Your responses have been recorded and will be included in your
+                organization&apos;s reporting.
+              </p>
+
+              {submissionResult && (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+                  <div className="rounded-2xl bg-emerald-50 px-4 py-3 flex flex-col items-center gap-1">
+                    <span className="text-[11px] text-emerald-700/80 font-medium uppercase tracking-wide">
+                      Correct
+                    </span>
+                    <span className="text-xl font-semibold text-emerald-600">
+                      {submissionResult.correct_answers}
+                    </span>
+                  </div>
+                  <div className="rounded-2xl bg-rose-50 px-4 py-3 flex flex-col items-center gap-1">
+                    <span className="text-[11px] text-rose-700/80 font-medium uppercase tracking-wide">
+                      Incorrect
+                    </span>
+                    <span className="text-xl font-semibold text-rose-500">
+                      {submissionResult.incorrect_answers}
+                    </span>
+                  </div>
+                  <div className="rounded-2xl bg-slate-50 px-4 py-3 flex flex-col items-center gap-1">
+                    <span className="text-[11px] text-slate-600 font-medium uppercase tracking-wide">
+                      Skipped
+                    </span>
+                    <span className="text-xl font-semibold text-slate-500">
+                      {submissionResult.skipped_answers}
+                    </span>
+                  </div>
+                  <div className="rounded-2xl bg-sky-50 px-4 py-3 flex flex-col items-center gap-1">
+                    <span className="text-[11px] text-sky-700 font-medium uppercase tracking-wide">
+                      Accuracy
+                    </span>
+                    <span className="text-xl font-bold text-sky-600">
+                      {submissionResult.accuracy}%
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <span className="text-xs text-slate-500">
+                  You can safely close this window or return to your dashboard.
+                </span>
+                <Button
+                  color="primary"
+                  className="px-6 py-2.5 text-sm font-semibold rounded-full shadow-sm"
+                  onClick={() => router.push("/")}
+                >
+                  Return to Home
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     // Missing parameters
     if (!hasValidParams) {
       return (
@@ -447,7 +554,8 @@ function PublicSurveyPage({
       );
     }
 
-    // Already submitted
+    // Already submitted (prior visit). For the current session's fresh submission
+    // we short-circuit above with showCompletion.
     if (isAlreadyFilled || statusValue === "completed") {
       return (
         <div

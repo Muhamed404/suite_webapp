@@ -607,7 +607,8 @@ export function SurveyUserListPage() {
                                         typeof window !== "undefined"
                                           ? window.location.origin
                                           : "";
-                                      const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+                                      const basePath =
+                                        process.env.NEXT_PUBLIC_BASE_PATH || "/awm";
                                       const url = `${origin}${basePath}/survey/${surveyId}?invitation_id=${user.invite_id}&survey_code=${encodeURIComponent(
                                         survey.survey_unique_code!,
                                       )}`;

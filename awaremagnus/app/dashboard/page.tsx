@@ -36,6 +36,7 @@ import {
   useAchievementStatistics,
 } from "@/hooks/useDashboard";
 import { useLicenseInfo } from "@/hooks/useSuiteAwm";
+import { useUserPendingSurveys } from "@/hooks/useSurvey";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { decodeJwt, extractUserDisplayName, extractUserEmail } from "@/utils/jwt";
 import { campaignService } from "@/services/campaignService";
@@ -105,6 +106,10 @@ export default function DashboardPage() {
   const isPlatformAdmin = getIsPlatformAdmin(user?.role_id);
   const isOrgAdmin = getIsOrgAdmin(user?.role_id);
   const isUser = getIsUser(user?.role_id);
+
+  const { data: pendingSurveys = [], isLoading: pendingSurveysLoading } = useUserPendingSurveys(
+    isUser ? user?.id : undefined
+  );
 
   // --- Data Fetching ---
   // query fetching is disabled for non-platform users to avoid unnecessary system endpoints
@@ -1184,19 +1189,42 @@ export default function DashboardPage() {
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                              {surveyAssignments.length === 0 ? (
+                              {pendingSurveysLoading ? (
+                                <tr>
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
+                                    Loading pending assessments or surveys...
+                                  </td>
+                                </tr>
+                              ) : pendingSurveys.length === 0 ? (
                                 <tr>
                                   <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
                                     No pending assessments or surveys
                                   </td>
                                 </tr>
                               ) : (
-                                surveyAssignments.map((assignment: any, index: number) => {
+                                pendingSurveys.map((item: any, index: number) => {
                                   const isFirst = index === 0;
+                                  const start =
+                                    item.start_date ?? item.start_date === null
+                                      ? item.start_date
+                                      : item.deadline_date;
+                                  const end = item.deadline_date ?? null;
+
+                                  const startDate = start ? new Date(start) : null;
+                                  const endDate = end ? new Date(end) : null;
+
+                                  const formatDateSafe = (d: Date | null) =>
+                                    d && Number.isFinite(d.getTime())
+                                      ? d.toLocaleDateString("en-GB", {
+                                          day: "2-digit",
+                                          month: "short",
+                                          year: "numeric",
+                                        })
+                                      : "—";
 
                                   return (
                                     <tr
-                                      key={`survey-${assignment.campaign_id}-${index}`}
+                                      key={`${item.survey_id}-${item.invite_id}`}
                                       className={
                                         isFirst
                                           ? "bg-blue-50 border-l-4 border-blue-500 font-semibold"
@@ -1206,28 +1234,30 @@ export default function DashboardPage() {
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-700"}`}
                                       >
-                                        {assignment.assessment_name ||
-                                          assignment.module_name ||
-                                          "—"}
+                                        {item.survey_name}
                                       </td>
                                       <td className="px-4 py-2.5">
-                                        {statusBadge(assignment.status?.name || "")}
+                                        <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-50 text-green-600 border border-green-300 whitespace-nowrap">
+                                          Active
+                                        </span>
                                       </td>
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
                                       >
-                                        {formatDate(assignment.start_date)}
+                                        {formatDateSafe(startDate)}
                                       </td>
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
                                       >
-                                        {formatDate(assignment.end_date)}
+                                        {formatDateSafe(endDate)}
                                       </td>
                                       <td className="px-4 py-2.5">
                                         <button
                                           className="px-3 py-1 rounded-full text-[10px] font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors whitespace-nowrap"
                                           onClick={() =>
-                                            (window.location.href = `/dashboard/campaign-assignments`)
+                                            (window.location.href = `/awm/survey/${item.survey_id}?invitation_id=${item.invite_id}&survey_code=${encodeURIComponent(
+                                              item.survey_unique_code
+                                            )}`)
                                           }
                                         >
                                           Start
@@ -1244,7 +1274,7 @@ export default function DashboardPage() {
 
                       <div className="flex items-center justify-between">
                         <p className="text-gray-500 text-[10px] whitespace-nowrap">
-                          Showing 1–{surveyAssignments.length} Entries
+                          Showing 1–{pendingSurveys.length} Entries
                         </p>
                       </div>
                     </div>

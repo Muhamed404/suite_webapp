@@ -359,3 +359,16 @@ export interface PublicSurveySubmissionResponse {
     accuracy: number;
   };
 }
+
+// ─── Org User Pending Surveys ─────────────────────────────────
+
+/** Pending survey item for an org user, derived from user invitations */
+export interface PendingUserSurvey {
+  survey_id: number;
+  survey_name: string;
+  invite_id: number;
+  survey_unique_code: string;
+  start_date?: string | null;
+  deadline_date?: string | null;
+  status: "active" | "expired" | "closed" | "not_started" | "completed";
+}
