@@ -3,7 +3,6 @@
 import type { Module, ModuleContent } from "@/types/quiz";
 import type { LibraryType } from "./library-page";
 
-import Image from "next/image";
 import Link from "next/link";
 import { Card, CardBody } from "@heroui/card";
 import { Button } from "@heroui/button";
@@ -37,7 +36,6 @@ import {
   getLanguageName,
   getLanguageCountryCode,
 } from "@/utils/supportedLanguages";
-import { getContentTypeIconFor } from "@/utils/contentTypeIcons";
 import { isPlatformAdmin, isOrgAdmin, isOrgUser } from "@/utils/roles";
 import { SearchIcon } from "@/components/icons";
 import { ModuleDetailsSkeleton } from "@/components/ui/skeletons";
@@ -86,20 +84,37 @@ function languageId(c: ModuleContent): number | undefined {
   return c.language?.id ?? c.translations?.[0]?.language_id;
 }
 
+/** Get emoji icon for content type (match reference design) */
+function getContentTypeEmoji(typeName: string): string {
+  const n = (typeName ?? "").toLowerCase();
+
+  if (n.includes("interactive") || n === "ispring") return "📘";
+  if (n.includes("quiz")) return "💡";
+  if (n.includes("poster")) return "🖼";
+  if (n.includes("survey")) return "📊";
+  if (n.includes("video") || n.includes("motion")) return "🎬";
+  if (n.includes("game") && !n.includes("vr")) return "🎮";
+  if (n.includes("vr")) return "🥽";
+  if (n.includes("document") || n.includes("pdf") || n.includes("brochure")) return "📄";
+  if (n.includes("screen saver")) return "💻";
+
+  return "📎";
+}
+
 /** Icon box background by content type (match reference design) */
 function getIconBgClass(typeName: string): string {
   const n = (typeName ?? "").toLowerCase();
 
-  if (n.includes("interactive") || n === "ispring") return "bg-sky-100";
-  if (n.includes("quiz")) return "bg-amber-100";
-  if (n.includes("poster")) return "bg-orange-100";
-  if (n.includes("video") || n.includes("motion")) return "bg-blue-100";
-  if (n.includes("survey")) return "bg-violet-100";
-  if (n.includes("game") || n.includes("vr")) return "bg-emerald-100";
-  if (n.includes("document") || n.includes("pdf") || n.includes("brochure")) return "bg-gray-100";
-  if (n.includes("screen saver")) return "bg-slate-100";
+  if (n.includes("interactive") || n === "ispring") return "bg-cyan-100 text-cyan-600";
+  if (n.includes("quiz")) return "bg-blue-100 text-blue-600";
+  if (n.includes("poster")) return "bg-orange-100 text-orange-600";
+  if (n.includes("survey")) return "bg-purple-100 text-purple-600";
+  if (n.includes("video") || n.includes("motion")) return "bg-blue-100 text-blue-600";
+  if (n.includes("game") || n.includes("vr")) return "bg-emerald-100 text-emerald-600";
+  if (n.includes("document") || n.includes("pdf") || n.includes("brochure")) return "bg-gray-100 text-gray-600";
+  if (n.includes("screen saver")) return "bg-slate-100 text-slate-600";
 
-  return "bg-gray-100";
+  return "bg-gray-100 text-gray-600";
 }
 
 type ContentTypeCardItem =
@@ -146,8 +161,10 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
   const [languageFilter, setLanguageFilter] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const tabGroupRef = useRef<HTMLDivElement>(null);
   const tabIndicatorRef = useRef<HTMLSpanElement>(null);
+  const rowsPerPage = 5;
 
   const { data: moduleRes, isLoading: moduleLoading } = useModule(moduleId, !!moduleId);
 
@@ -303,9 +320,29 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
   }, [contentCards, searchQuery, t, tContent]);
 
   const allCount = filteredContentCards.length;
+  const totalPages = Math.max(1, Math.ceil(allCount / rowsPerPage));
+  const paginatedContentCards = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return filteredContentCards.slice(start, end);
+  }, [filteredContentCards, currentPage]);
+
+  const pageFrom = allCount === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+  const pageTo = Math.min(currentPage * rowsPerPage, allCount);
   // Progress calculations could be derived from userProgress if available
   const pendingCount = 0;
   const completedCount = 0;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, languageFilter, statusFilter]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   useEffect(() => {
     const group = tabGroupRef.current;
@@ -653,14 +690,13 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
               {/* Right Side Content List */}
               <div className="col-span-12 lg:col-span-9 flex flex-col justify-between min-h-0">
                 <div className="space-y-2 w-full overflow-y-auto flex-1 min-h-0" id="items">
-                  {filteredContentCards.map((card, _idx) => {
+                  {paginatedContentCards.map((card, _idx) => {
                     // --- 1. NON-AGGREGATED CONTENT CARD (Interactive, etc.) ---
                     if (card.kind === "interactive") {
                       const { item, typeId, typeName } = card;
 
                       // For non-aggregated, we go directly to the DETAIL page
                       const detailHref = `${basePath}/${moduleId}/content/${typeId}/${item.content_id ?? item.id}`;
-                      const iconPath = getContentTypeIconFor(typeId, typeName);
                       // Use item.language_id or item.language as per new API structure
                       const lid = item.language_id ?? item.language?.id;
                       const createdStr = formatCreatedDate(item.created_date ?? item.created_at);
@@ -675,27 +711,21 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                           className="flex flex-col gap-2"
                         >
                           {/* Main Content Card */}
-                          <Card className={cardClassName}>
+                          <Card className="rounded-2xl border border-gray-100 bg-white hover:border-blue-200 hover:shadow-sm transition-all">
                             <CardBody className="p-4 flex flex-row items-center gap-3">
                               <div
                                 className={clsx(
-                                  "w-12 h-12 rounded-xl flex items-center justify-center shrink-0 overflow-hidden",
+                                  "w-16 h-16 rounded-xl flex items-center justify-center shrink-0 overflow-hidden text-2xl font-bold",
                                   getIconBgClass(typeName)
                                 )}
                               >
-                                <Image
-                                  alt=""
-                                  className="object-contain"
-                                  height={24}
-                                  src={iconPath}
-                                  width={24}
-                                />
+                                {getContentTypeEmoji(typeName)}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="font-medium text-sm text-gray-900">
+                                <p className="font-semibold text-base text-gray-900 leading-5">
                                   {contentTitle(item)}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-0.5">
+                                <p className="text-[10px] text-gray-500 mt-1">
                                   {t("moduleDetails.created")} {createdStr}
                                 </p>
                                 <div className="flex items-center gap-2 mt-1.5 flex-wrap">
@@ -709,16 +739,16 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                         countryCode={getLanguageCountryCode(lid)}
                                         style={{ fontSize: "1em", lineHeight: "1em" }}
                                       />
-                                      <span className="text-xs text-gray-600">
+                                      <span className="text-[10px] text-gray-600">
                                         {getLanguageName(lid)}
                                       </span>
                                     </div>
                                   )}
-                                  <span className="text-xs text-gray-600">
+                                  <span className="text-[10px] text-gray-600">
                                     1 {displayName.toLowerCase()}
                                   </span>
                                   {item.user_completion_status === "completed" && (
-                                    <span className="pill-btn green text-xs">
+                                    <span className="text-[10px] text-green-600 bg-green-100 px-3 py-1 rounded-full">
                                       {t("moduleDetails.completed")}
                                     </span>
                                   )}
@@ -726,7 +756,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                               </div>
                               <Button
                                 as={Link}
-                                className="bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-semibold min-w-[88px] px-5"
+                                className="bg-[#3FB6F7] hover:bg-[#33A7E6] text-white rounded-full text-[10px] font-semibold min-w-[82px] px-4 h-7"
                                 href={detailHref}
                                 size="sm"
                               >
@@ -737,23 +767,16 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
 
                           {/* Linked Quiz Card (if quizzes exist for this content) */}
                           {itemQuizzes && itemQuizzes.total_count > 0 && (
-                            <Card
-                              className={clsx(cardClassName, "ml-8 border-l-4 border-l-amber-300")}
-                            >
-                              <CardBody className="p-3 flex flex-row items-center gap-3 bg-amber-50/30">
-                                <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
-                                  <Image
-                                    alt="Quiz"
-                                    height={16}
-                                    src={getContentTypeIconFor(3, "Quiz")}
-                                    width={16}
-                                  />
+                            <Card className="rounded-2xl border border-gray-100 bg-white hover:border-blue-200 hover:shadow-sm transition-all">
+                              <CardBody className="p-4 flex flex-row items-center gap-3">
+                                <div className="w-16 h-16 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 overflow-hidden text-2xl font-bold">
+                                  💡
                                 </div>
                                 <div className="flex-1">
-                                  <p className="font-medium text-xs text-gray-900">
+                                  <p className="font-semibold text-base text-gray-900 leading-5">
                                     {t("moduleDetails.quizzes")}
                                   </p>
-                                  <p className="text-[10px] text-gray-500">
+                                  <p className="text-[10px] text-gray-500 mt-1">
                                     {itemQuizzes.total_count} {t("moduleDetails.quizzesCount")}
                                   </p>
                                 </div>
@@ -761,7 +784,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                   as={Link}
                                   // TODO: Make sure we have a proper route for quizzes specific to a content item
                                   // Usually /quizzes?content_id=...
-                                  className="bg-amber-500 hover:bg-amber-600 text-white rounded-full text-[10px] font-medium min-w-[70px] px-3 h-7"
+                                  className="bg-[#3FB6F7] hover:bg-[#33A7E6] text-white rounded-full text-[10px] font-semibold min-w-[82px] px-4 h-7"
                                   href={`${basePath}/${moduleId}/quizzes?content_id=${item.content_id ?? item.id}`}
                                   size="sm"
                                 >
@@ -779,41 +802,39 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                       const { typeId, typeName, count } = card;
                       // For aggregated, click takes us to LIST page for that type
                       const listHref = `${basePath}/${moduleId}/content/${typeId}`;
-                      const iconPath = getContentTypeIconFor(typeId, typeName);
                       const displayName = getContentTypeDisplayName(typeName);
 
                       return (
-                        <Card key={`grouped-${typeId}`} className={cardClassName}>
+                        <Card
+                          key={`grouped-${typeId}`}
+                          className="rounded-2xl border border-gray-100 bg-white hover:border-blue-200 hover:shadow-sm transition-all"
+                        >
                           <CardBody className="p-4 flex flex-row items-center gap-3">
                             <div
                               className={clsx(
-                                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0 overflow-hidden",
+                                "w-16 h-16 rounded-xl flex items-center justify-center shrink-0 overflow-hidden text-2xl font-bold",
                                 getIconBgClass(typeName)
                               )}
                             >
-                              <Image
-                                alt=""
-                                className="object-contain"
-                                height={24}
-                                src={iconPath}
-                                width={24}
-                              />
+                              {getContentTypeEmoji(typeName)}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm text-gray-900">{displayName}</p>
-                              <p className="text-xs text-gray-500 mt-0.5">
+                              <p className="font-semibold text-base text-gray-900 leading-5">
+                                {displayName}
+                              </p>
+                              <p className="text-[10px] text-gray-500 mt-1">
                                 {/* Date range could go here if we extracted it */}
                                 {t("moduleDetails.created")} —
                               </p>
                               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                <span className="text-xs text-gray-600">
+                                <span className="text-[10px] text-gray-600">
                                   {count} {displayName}
                                 </span>
                               </div>
                             </div>
                             <Button
                               as={Link}
-                              className="bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-semibold min-w-[88px] px-5"
+                              className="bg-[#3FB6F7] hover:bg-[#33A7E6] text-white rounded-full text-[10px] font-semibold min-w-[82px] px-4 h-7"
                               href={listHref}
                               size="sm"
                             >
@@ -827,41 +848,34 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     // --- 3. GENERAL QUIZZES CARD ---
                     if (card.kind === "quizzes") {
                       const quizzesHref = `${basePath}/${moduleId}/quizzes`;
-                      const iconPath = getContentTypeIconFor(3, "Quiz");
 
                       return (
-                        <Card key="quizzes-row" className={cardClassName}>
+                        <Card key="quizzes-row" className="rounded-2xl border border-gray-100 bg-white hover:border-blue-200 hover:shadow-sm transition-all">
                           <CardBody className="p-4 flex flex-row items-center gap-3">
                             <div
                               className={clsx(
-                                "w-12 h-12 rounded-xl flex items-center justify-center shrink-0 overflow-hidden",
+                                "w-16 h-16 rounded-xl flex items-center justify-center shrink-0 overflow-hidden text-2xl font-bold",
                                 getIconBgClass("Quiz")
                               )}
                             >
-                              <Image
-                                alt=""
-                                className="object-contain"
-                                height={24}
-                                src={iconPath}
-                                width={24}
-                              />
+                              💡
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-sm text-gray-900">
+                              <p className="font-semibold text-base text-gray-900 leading-5">
                                 {t("moduleDetails.quizzes")}
                               </p>
-                              <p className="text-xs text-gray-500 mt-0.5">
+                              <p className="text-[10px] text-gray-500 mt-1">
                                 {t("moduleDetails.created")} —
                               </p>
                               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                <span className="text-xs text-gray-600">
+                                <span className="text-[10px] text-gray-600">
                                   {card.count} {t("moduleDetails.quizzesCount")}
                                 </span>
                               </div>
                             </div>
                             <Button
                               as={Link}
-                              className="bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-semibold min-w-[88px] px-5"
+                              className="bg-[#3FB6F7] hover:bg-[#33A7E6] text-white rounded-full text-[10px] font-semibold min-w-[82px] px-4 h-7"
                               href={quizzesHref}
                               size="sm"
                             >
@@ -883,12 +897,49 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                   )}
                 </div>
                 {filteredContentCards.length > 0 && (
-                  <p className="text-xs text-gray-600 mt-4">
-                    {t("library.paginationShowing")
-                      .replace("{from}", "1")
-                      .replace("{to}", String(filteredContentCards.length))
-                      .replace("{total}", String(filteredContentCards.length))}
-                  </p>
+                  <div className="mt-4 flex items-center justify-between">
+                    <p className="text-xs text-gray-600">
+                      {t("library.paginationShowing")
+                        .replace("{from}", String(pageFrom))
+                        .replace("{to}", String(pageTo))
+                        .replace("{total}", String(filteredContentCards.length))}
+                    </p>
+                    {totalPages > 1 && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          className="min-w-[32px] h-8 px-2 border border-gray-300 rounded-full text-xs bg-white text-gray-700 hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={currentPage === 1}
+                          type="button"
+                          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                        >
+                          ‹
+                        </button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                          <button
+                            key={page}
+                            className={clsx(
+                              "min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all",
+                              page === currentPage
+                                ? "bg-blue-50 text-blue-600 border-blue-500 font-semibold"
+                                : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                            )}
+                            type="button"
+                            onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </button>
+                        ))}
+                        <button
+                          className="min-w-[32px] h-8 px-2 border border-gray-300 rounded-full text-xs bg-white text-gray-700 hover:bg-gray-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={currentPage === totalPages}
+                          type="button"
+                          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                        >
+                          ›
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

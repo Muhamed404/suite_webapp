@@ -34,6 +34,8 @@ const CONTENT_TYPE_ICON_MAP: Record<string, string> = {
   documents: "/images/Icon_Pdf.svg",
   document: "/images/Icon_Pdf.svg",
   misc: "/images/Icon_Music.svg",
+  "surveys": "/images/Icon_Music.svg",
+  "survey": "/images/Icon_Music.svg",
   "vr games": "/images/Icon_Game.svg",
   pdf: "/images/Icon_Pdf.svg",
   video: "/images/Icon_video.svg",
