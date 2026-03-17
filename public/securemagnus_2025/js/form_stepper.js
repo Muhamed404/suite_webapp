@@ -242,7 +242,6 @@ nextBtn.addEventListener("click", (e) => {
     // On last step, validate entire form before submit
     if (mainForm && window.jQuery && typeof jQuery === "function" && typeof jQuery(mainForm).valid === "function") {
       if ($(mainForm).valid()) {
-        convertDatetimesToUTC(mainForm);
         mainForm.submit();
       } else {
         // Focus first invalid field
@@ -250,7 +249,6 @@ nextBtn.addEventListener("click", (e) => {
         if ($firstErr && $firstErr.length) $firstErr.focus();
       }
     } else {
-      convertDatetimesToUTC(mainForm);
       mainForm.submit();
     }
   }
@@ -262,38 +260,3 @@ backBtn.addEventListener("click", () => {
     updateStep(currentStep - 1);
   }
 });
-
-// Convert datetime-local values (naive local strings) to UTC ISO 8601 before submit.
-// Cannot overwrite the datetime-local input value with an ISO string ("...Z") because
-// the browser silently clears it — the format isn't accepted by datetime-local inputs.
-// Instead: strip the name so the original input doesn't submit, then inject a hidden
-// input with the correctly converted UTC ISO value.
-function convertDatetimesToUTC(form) {
-  ['startTime', 'endTime'].forEach(function(id) {
-    var input = form.querySelector('#' + id);
-    if (input && input.value) {
-      var localValue = input.value; // e.g. "2026-03-12T14:50" (user's local time)
-      var d = new Date(localValue);
-      if (!isNaN(d)) {
-        input.removeAttribute('name');
-
-        // UTC ISO value — what the backend stores and schedules against
-        var utcHidden = document.createElement('input');
-        utcHidden.type  = 'hidden';
-        utcHidden.name  = id;
-        utcHidden.value = d.toISOString();
-        form.appendChild(utcHidden);
-
-        // Original local value + browser offset — for troubleshooting/logging only
-        var offset = d.getTimezoneOffset();
-        var localHidden = document.createElement('input');
-        localHidden.type  = 'hidden';
-        localHidden.name  = id + 'Local';
-        localHidden.value = localValue + ' (UTC' + (offset <= 0 ? '+' : '-') +
-          String(Math.abs(Math.floor(-offset / 60))).padStart(2, '0') + ':' +
-          String(Math.abs(offset % 60)).padStart(2, '0') + ')';
-        form.appendChild(localHidden);
-      }
-    }
-  });
-}

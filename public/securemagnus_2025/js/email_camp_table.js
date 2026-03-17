@@ -4,24 +4,39 @@
 const serverData = window.campaignsData || {};
 const originalCampaigns = serverData.campaigns || [];
 // console.log("Original Campaigns:", originalCampaigns);
-// console.log("Server Data:", serverData);
+// console.log("Server Data:", JSON.stringify(serverData,null,2));
+// Split "DD-MMM-YYYY hh:mm AM" → { date: "DD-MMM-YYYY", time: "hh:mm AM" }
+function splitDateTime(datetimeStr) {
+  if (!datetimeStr) return { date: '', time: '' };
+  const parts = datetimeStr.split(' ');
+  return {
+    date: parts[0] || '',
+    time: parts.length >= 3 ? `${parts[1]} ${parts[2]}` : parts[1] || ''
+  };
+}
+
 // Transform server data for table display
-const data = originalCampaigns.map(campaign => ({
-  id: campaign.id,
-  name: campaign.name,
-  campaign_identifier: campaign.campaign_identifier,
-  template_name: campaign.template_name,
-  start_date: campaign.start_datetime ? campaign.start_datetime.split(' ')[0] : '',
-  end_date: campaign.end_datetime ? campaign.end_datetime.split(' ')[0] : '',
-  start_time: campaign.start_datetime ? campaign.start_datetime.split(' ')[1] + ' ' + campaign.start_datetime.split(' ')[2] : '',
-  end_time: campaign.end_datetime ? campaign.end_datetime.split(' ')[1] + ' ' + campaign.end_datetime.split(' ')[2] : '',
-  status: campaign.status,
-  totalInvitees: campaign.totalInvitees,
-  sentCount: campaign.sentCount || 0,
-  unsentCount: (campaign.totalInvitees || 0) - (campaign.sentCount || 0),
-  difficulty: campaign.difficulty,
-  creation_date: new Date(campaign.creation_date).toLocaleDateString()
-}));
+const data = originalCampaigns.map(campaign => {
+  const start   = splitDateTime(campaign.start_datetime);
+  const end     = splitDateTime(campaign.end_datetime);
+  const created = splitDateTime(campaign.creation_date);
+  return {
+    id: campaign.id,
+    name: campaign.name,
+    campaign_identifier: campaign.campaign_identifier,
+    template_name: campaign.template_name,
+    start_date: start.date,
+    end_date:   end.date,
+    start_time: start.time,
+    end_time:   end.time,
+    status: campaign.status,
+    totalInvitees: campaign.totalInvitees,
+    sentCount: campaign.sentCount || 0,
+    unsentCount: (campaign.totalInvitees || 0) - (campaign.sentCount || 0),
+    difficulty: campaign.difficulty,
+    creation_date: created.date,
+  };
+});
 
 // ===============================
 // State variables

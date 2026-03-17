@@ -83,6 +83,28 @@ export const GamificationStats = () => {
   const stats = (achievementData as any)?.object ?? (achievementData as any)?.data;
   const avatars = (avatarData as any)?.object ?? (avatarData as any)?.data;
 
+  const avatarImageByLevel: Record<number, string> = {
+    1: "Vulnerablenewbe_Level1_Robot.png",
+    2: "AlertApprentice_Level2_Robot.png",
+    3: "CautiousLearner_Level3_Robot.png",
+    4: "InformedDefender_Level4_Robot.png",
+    5: "VigilantGuardian_Level5_Robot.png",
+    6: "SkilledSentinel._Level6_Robot.png",
+    7: "ResilientProtector_Level7_Robot.png",
+    8: "AdvancedWatchman_Level8_Robot.png",
+    9: "ExpertEnforcer_Level9_Robot.png",
+    10: "MasterStrategist_Level10_Robot.png",
+    11: "EliteVanguard_Level11_Robot.png",
+    12: "LegendaryShieldbearer_Level12_Robot.png",
+    13: "SupremeCyberKnight_Level13_Robot.png",
+    14: "UltimateCyberSentinel_Level14_Robot.png",
+  };
+
+  const resolveAvatarImage = (avatar?: AvatarStat) => {
+    if (!avatar) return "1.png";
+    return avatarImageByLevel[avatar.level_number] ?? avatar.image_small_url ?? "1.png";
+  };
+
 
 
 
@@ -146,39 +168,37 @@ export const GamificationStats = () => {
       : 0;
 
   // Find the unlocked avatar with the highest level to show in the main slot
+  const avatarStats = useMemo(() => {
+    const items = (avatars?.avatar_statistics ?? []) as AvatarStat[];
+    return [...items].sort((a, b) => {
+      const aUnlocked = (a.employee_count ?? 0) > 0 ? 0 : 1;
+      const bUnlocked = (b.employee_count ?? 0) > 0 ? 0 : 1;
+
+      if (aUnlocked !== bUnlocked) return aUnlocked - bUnlocked;
+      return b.level_number - a.level_number;
+    });
+  }, [avatars]);
+
   const mainAvatar = useMemo(() => {
-    if (!avatars?.avatar_statistics || avatars.avatar_statistics.length === 0) {
-      // Fallback when API returns empty array - show Level 1 (locked)
+    if (avatarStats.length === 0) {
       return {
-        level_number: 10,
+        level_number: 1,
         level_name: "Vulnerable Newbie",
         min_score_or_percentage: 0,
         max_score_or_percentage: 6,
         image_small_url: "Vulnerablenewbe_Level1_Robot.png",
-        employee_count: 0
-      };
+        employee_count: 0,
+      } as AvatarStat;
     }
 
-    // First filter avatars with employee_count > 0 (unlocked), then sort by level_number desc
-    const unlockedAvatars = (avatars.avatar_statistics as AvatarStat[]).filter(
-      (a) => (a.employee_count ?? 0) > 0
-    );
-
-    if (unlockedAvatars.length === 0) {
-      // If no unlocked avatars, return the first one as fallback (locked)
-      return avatars.avatar_statistics[0];
-    }
-
-    return unlockedAvatars.sort((a, b) => b.level_number - a.level_number)[0];
-  }, [avatars]);
+    return avatarStats[0];
+  }, [avatarStats]);
 
   // Check if main avatar is unlocked (has employee_count > 0)
   const isMainAvatarUnlocked = (mainAvatar?.employee_count ?? 0) > 0;
   
   // Get the actual image filename for the main avatar from API response
-  const mainAvatarImageName = useMemo(() => {
-    return mainAvatar?.image_small_url ?? "1.png";
-  }, [mainAvatar]);
+  const mainAvatarImageName = useMemo(() => resolveAvatarImage(mainAvatar), [mainAvatar]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -389,7 +409,7 @@ export const GamificationStats = () => {
                 </div>
               </Tooltip>
 
-              <p className="mt-5 text-gray-700 text-sm text-center leading-tight whitespace-pre-line">
+              <p className="mt-5 text-gray-700 text-xs text-center leading-tight whitespace-pre-line break-words max-w-[11rem]">
                 {mainAvatar?.level_name ?? "Vulnerable\nNewbie"}
               </p>
             </div>
@@ -397,33 +417,13 @@ export const GamificationStats = () => {
             {/* Levels Grid — show 8 remaining avatars excluding the one in main slot */}
             <div className="grid grid-cols-4 gap-5 flex-1 pl-5 border-l border-[#E6E6E6]">
               {(() => {
-                let availableAvatars;
-                
-                // Handle empty avatar_statistics array
-                if (!avatars?.avatar_statistics || avatars.avatar_statistics.length === 0) {
-                  // Create fallback locked avatars (levels 2-9)
-                  const fallbackAvatars = [
-                    { level_number: 11, level_name: "Alert Apprentice", image_small_url: "AlertApprentice_Level2_Robot.png", employee_count: 0 },
-                    { level_number: 12, level_name: "Cautious Learner", image_small_url: "CautiousLearner_Level3_Robot.png", employee_count: 0 },
-                    { level_number: 13, level_name: "Informed Defender", image_small_url: "InformedDefender_Level4_Robot.png", employee_count: 0 },
-                    { level_number: 14, level_name: "Vigilant Guardian", image_small_url: "VigilantGuardian_Level5_Robot.png", employee_count: 0 },
-                    { level_number: 15, level_name: "Skilled Sentinel", image_small_url: "SkilledSentinel._Level6_Robot.png", employee_count: 0 },
-                    { level_number: 16, level_name: "Resilient Protector", image_small_url: "ResilientProtector_Level7_Robot.png", employee_count: 0 },
-                    { level_number: 17, level_name: "Advanced Watchman", image_small_url: "AdvancedWatchman_Level8_Robot.png", employee_count: 0 },
-                    { level_number: 18, level_name: "Expert Enforcer", image_small_url: "ExpertEnforcer_Level9_Robot.png", employee_count: 0 }
-                  ];
-                  availableAvatars = fallbackAvatars;
-                } else {
-                  // Get all available avatar statistics except the main one
-                  availableAvatars = (avatars.avatar_statistics as AvatarStat[])
-                    .filter((avatar) => avatar.level_number !== mainAvatar?.level_number)
-                    .slice(0, 8); // Show only 8 avatars in the grid
-                }
+                const availableAvatars = avatarStats
+                  .filter((avatar) => avatar.level_number !== mainAvatar?.level_number)
+                  .slice(0, 8);
 
                 return (availableAvatars as AvatarStat[]).map((avatar) => {
                   const isUnlocked = avatar.employee_count > 0;
-                  // Use the actual image filename from API response
-                  const avatarImageName = avatar.image_small_url;
+                  const avatarImageName = resolveAvatarImage(avatar);
 
                   const tooltipContent = (
                     <div className="flex flex-col gap-1 max-w-[200px] p-1">
@@ -472,7 +472,7 @@ export const GamificationStats = () => {
                         </div>
 
                         <p
-                          className={`text-xs leading-tight mt-2 w-[90%] whitespace-pre-wrap ${
+                          className={`text-[10px] leading-tight mt-2 w-[90%] whitespace-pre-wrap break-words max-w-full ${
                             isUnlocked ? "text-gray-700" : "text-gray-400"
                           }`}
                         >

@@ -1359,35 +1359,6 @@ class EmailCampaignStepper {
     showCustomConfirm(message, () => {
       this.isSubmitting = true;
       this.updateButtons();
-
-      // Convert datetime-local values (naive local strings) to UTC ISO 8601.
-      ['startTime', 'endTime'].forEach((fieldId) => {
-        const input = this.form.querySelector('#' + fieldId);
-        if (input && input.value) {
-          const localValue = input.value; // e.g. "2026-03-12T14:50" (user's local time)
-          const d = new Date(localValue);
-          if (!isNaN(d)) {
-            input.removeAttribute('name');
-
-            // UTC ISO value — what the backend stores and schedules against
-            const utcHidden = document.createElement('input');
-            utcHidden.type  = 'hidden';
-            utcHidden.name  = fieldId;
-            utcHidden.value = d.toISOString();
-            this.form.appendChild(utcHidden);
-
-            // Original local value + browser offset — for troubleshooting/logging only
-            const localHidden = document.createElement('input');
-            localHidden.type  = 'hidden';
-            localHidden.name  = fieldId + 'Local';
-            localHidden.value = localValue + ' (UTC' + (d.getTimezoneOffset() <= 0 ? '+' : '-') +
-              String(Math.abs(Math.floor(-d.getTimezoneOffset() / 60))).padStart(2, '0') + ':' +
-              String(Math.abs(d.getTimezoneOffset() % 60)).padStart(2, '0') + ')';
-            this.form.appendChild(localHidden);
-          }
-        }
-      });
-
       this.form.submit();
     });
   }
