@@ -136,10 +136,10 @@ export function WizardStep6({
                       selectorButton: "h-7 min-w-7",
                     }}
                     granularity="day"
-                    maxValue={formData.endDate ? parseDate(formData.endDate) : undefined}
-                    minValue={formData.startDate ? parseDate(formData.startDate) : undefined}
+                    maxValue={formData.endDate ? (parseDate(formData.endDate) as any) : undefined}
+                    minValue={formData.startDate ? (parseDate(formData.startDate) as any) : undefined}
                     size="sm"
-                    value={schedule.start_date ? parseDate(schedule.start_date) : null}
+                    value={schedule.start_date ? (parseDate(schedule.start_date) as any) : null}
                     onChange={(date) => {
                       const newSchedules = [...formData.schedules];
 

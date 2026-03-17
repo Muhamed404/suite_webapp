@@ -387,9 +387,9 @@ export function NewSurveyForm() {
                         selectorButton: "h-8 min-w-8",
                       }}
                       granularity="day"
-                      minValue={today(getLocalTimeZone())}
-                      value={startDate}
-                      onChange={setStartDate}
+                      minValue={today(getLocalTimeZone()) as any}
+                      value={startDate as any}
+                      onChange={setStartDate as any}
                     />
                   </div>
                   <div>
@@ -403,9 +403,9 @@ export function NewSurveyForm() {
                         selectorButton: "h-8 min-w-8",
                       }}
                       granularity="day"
-                      minValue={startDate || today(getLocalTimeZone())}
-                      value={deadline}
-                      onChange={setDeadline}
+                      minValue={(startDate || today(getLocalTimeZone())) as any}
+                      value={deadline as any}
+                      onChange={setDeadline as any}
                     />
                   </div>
                   <div>

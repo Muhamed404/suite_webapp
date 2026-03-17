@@ -12,6 +12,7 @@ interface SemiCircleChartProps {
   color1: string;
   color2: string;
   color3: string;
+  labels?: string[];
 }
 
 export const SemiCircleChart = ({
@@ -21,6 +22,7 @@ export const SemiCircleChart = ({
   color1,
   color2,
   color3,
+  labels = ["Sent", "Opened", "Admin"],
 }: SemiCircleChartProps) => {
   const total = sent + opened + admin;
   const sentPercent = (sent / total) * 100;
@@ -42,20 +44,14 @@ export const SemiCircleChart = ({
           endAngle: 90,
         },
       },
-      labels: ["Sent", "Opened", "Admin"],
+      labels: labels,
       colors: [color1, color2, color3],
       legend: {
         show: true,
         position: "bottom" as const,
         formatter: function (seriesName: string, opts: any) {
           const _value = opts.w.globals.series[opts.seriesIndex];
-          const label =
-            seriesName === "Sent"
-              ? `Sent (${sent})`
-              : seriesName === "Opened"
-                ? `Opened (${opened})`
-                : `Admin (${admin})`;
-
+          const label = `${labels[opts.seriesIndex]} (${opts.w.globals.series[opts.seriesIndex].toFixed(2)})`;
           return label;
         },
       },
@@ -68,10 +64,10 @@ export const SemiCircleChart = ({
         },
       },
     }),
-    [sent, opened, admin, color1, color2, color3]
+    [sent, opened, admin, color1, color2, color3, labels]
   );
 
   const series = [sentPercent, openedPercent, adminPercent];
 
-  return <Chart height={200} options={chartOptions} series={series} type="donut" />;
+  return <Chart options={chartOptions} series={series} type="donut" />;
 };

@@ -77,8 +77,8 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
                 selectorButton: "h-8 min-w-8",
               }}
               granularity="day"
-              minValue={today(getLocalTimeZone())}
-              value={formData.startDate ? parseDate(formData.startDate) : null}
+              minValue={today(getLocalTimeZone()) as any}
+              value={formData.startDate ? (parseDate(formData.startDate) as any) : null}
               onChange={(date) => onChange("startDate", date ? date.toString() : "")}
             />
             {errors.startDate && (
@@ -97,9 +97,9 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
               }}
               granularity="day"
               minValue={
-                formData.startDate ? parseDate(formData.startDate) : today(getLocalTimeZone())
+                (formData.startDate ? parseDate(formData.startDate) : today(getLocalTimeZone())) as any
               }
-              value={formData.endDate ? parseDate(formData.endDate) : null}
+              value={formData.endDate ? (parseDate(formData.endDate) as any) : null}
               onChange={(date) => onChange("endDate", date ? date.toString() : "")}
             />
             {errors.endDate && <p className="text-[10px] text-red-500 mt-0.5">{errors.endDate}</p>}

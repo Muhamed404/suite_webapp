@@ -32,7 +32,7 @@ import type { PublicSurveySubmissionAnswer } from "@/types/survey";
 export default function PublicSurveyPageWrapper({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ surveyId: string }>;
 }) {
   return (
     <Suspense
@@ -53,9 +53,9 @@ export default function PublicSurveyPageWrapper({
 function PublicSurveyPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ surveyId: string }>;
 }) {
-  const { id: rawSurveyId } = use(params);
+  const { surveyId: rawSurveyId } = use(params);
   const surveyId = parseInt(rawSurveyId, 10);
 
   const searchParams = useSearchParams();
@@ -314,7 +314,7 @@ function PublicSurveyPage({
                 <div className="hidden md:flex flex-col items-end gap-1">
                   {surveyData?.survey?.title && (
                     <span className="text-xs text-slate-500 max-w-xs text-right line-clamp-1">
-                      Survey:{" "}
+                      Survey: {" "}
                       <span className="text-slate-900 font-medium">
                         {surveyData.survey.title}
                       </span>
@@ -407,7 +407,7 @@ function PublicSurveyPage({
               This survey link is invalid or incomplete. Please check the link
               and try again.
             </p>
-            <Button color="primary" onClick={() => router.push("/")}>
+            <Button color="primary" onClick={() => router.push("/")}> 
               Go to Home
             </Button>
           </div>
@@ -452,7 +452,7 @@ function PublicSurveyPage({
               The survey you are looking for does not exist, has been removed,
               or the link is invalid.
             </p>
-            <Button color="primary" onClick={() => router.push("/")}>
+            <Button color="primary" onClick={() => router.push("/")}> 
               Go to Home
             </Button>
           </div>
@@ -917,7 +917,7 @@ function PublicSurveyPage({
                     </span>
                   </p>
                   <p className="text-xs text-gray-500 mt-3 font-medium">
-                    Question{" "}
+                    Question {" "}
                     <span className="text-gray-800 font-bold">
                       {currentQuestion + 1}
                     </span>{" "}
