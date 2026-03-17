@@ -13,6 +13,8 @@ export const selectClassNames = {
   trigger:
     "rounded-full bg-white border border-[var(--strokeGray)] focus-within:border-[var(--blue)] transition-colors duration-300 h-11 min-h-11 data-[hover=true]:border-[var(--blue)]",
   value: "text-sm",
+  listboxWrapper:
+    "max-h-64 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-track]:bg-transparent",
 };
 
 export const primaryButtonClassName =

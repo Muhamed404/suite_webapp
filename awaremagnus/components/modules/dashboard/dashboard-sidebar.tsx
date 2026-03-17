@@ -31,7 +31,9 @@ export const DashboardSidebar = ({
   const router = useRouter();
   const { dir } = useI18n();
   const t = useTranslations("dashboard");
-  const isRtl = dir === "rtl";
+  const isRtl =
+    dir === "rtl" ||
+    (typeof document !== "undefined" && document.documentElement.dir === "rtl");
   const resetAuth = useAuthStore((state) => state.reset);
 
   const handleLogout = async () => {

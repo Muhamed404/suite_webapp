@@ -176,15 +176,21 @@ export function ContentListPage({ moduleId, contentTypeId, libraryType }: Conten
               className="w-full min-w-0 sm:max-w-44"
               classNames={selectClassNames}
               placeholder={t("library.allLanguages")}
-              selectedKeys={languageFilter ? [languageFilter] : []}
+              selectedKeys={languageFilter ? [languageFilter] : ["all"]}
               onSelectionChange={(keys) => {
-                const v = Array.from(keys as Set<string>)[0] ?? "";
+                const v = Array.from(keys as Set<string>)[0] ?? "all";
 
-                setLanguageFilter(v);
+                setLanguageFilter(v === "all" ? "" : v);
               }}
             >
-              {SUPPORTED_LANGUAGES.map((lang) => (
-                <SelectItem key={String(lang.id)} textValue={lang.name}>
+              {[
+                { id: "all", name: t("library.allLanguages") ?? "All Languages" },
+                ...SUPPORTED_LANGUAGES.map((lang) => ({
+                  id: String(lang.id),
+                  name: lang.name,
+                })),
+              ].map((lang) => (
+                <SelectItem key={lang.id} textValue={lang.name}>
                   {lang.name}
                 </SelectItem>
               ))}

@@ -53,10 +53,11 @@ export const DASHBOARD_KEYS = {
       "assignments",
       params,
     ],
-    gameAchievements: ["dashboard", "user", "gameAchievements"],
+    gameAchievements: (userId?: number) => ["dashboard", "user", "gameAchievements", { userId }],
   },
   gamification: {
     achievementStats: (orgId?: number) => ["gamification", "achievements", "statistics", { orgId }],
+    achievementStatsByCampaign: (campaignId: number) => ["gamification", "achievements", "statistics", { campaignId }],
     achievements: (params?: {
       limit?: number;
       offset?: number;
@@ -64,6 +65,7 @@ export const DASHBOARD_KEYS = {
       sortOrder?: string;
     }) => ["gamification", "achievements", "list", params],
     avatarStats: (orgId?: number) => ["gamification", "avatar", "statistics", { orgId }],
+    avatarStatsByCampaign: (campaignId: number) => ["gamification", "avatar", "statistics", { campaignId }],
     scoreTypes: ["gamification", "scoreTypes"],
     scoreLevels: ["gamification", "scoreLevels"],
     scoreLevelsByType: (scoreTypeId: number) => [
@@ -175,10 +177,10 @@ export const useUserAssignments = (params?: { language_id?: number }) => {
   });
 };
 
-export const useUserGameAchievements = () => {
+export const useUserGameAchievements = (userId?: number) => {
   return useQuery({
-    queryKey: DASHBOARD_KEYS.user.gameAchievements,
-    queryFn: dashboardService.getUserGameAchievements,
+    queryKey: DASHBOARD_KEYS.user.gameAchievements(userId),
+    queryFn: () => dashboardService.getUserGameAchievements({ userId }),
   });
 };
 
@@ -188,6 +190,22 @@ export const useAchievementStatistics = (orgId?: number) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.gamification.achievementStats(orgId),
     queryFn: () => dashboardService.getAchievementStatistics({ orgId }),
+  });
+};
+
+export const useAchievementStatisticsByCampaign = (campaignId: number) => {
+  return useQuery({
+    queryKey: DASHBOARD_KEYS.gamification.achievementStatsByCampaign(campaignId),
+    queryFn: () => dashboardService.getAchievementStatisticsByCampaign(campaignId),
+    enabled: !!campaignId,
+  });
+};
+
+export const useAchievementStatisticsWithCampaign = (campaignId: number) => {
+  return useQuery({
+    queryKey: DASHBOARD_KEYS.gamification.achievementStats(campaignId),
+    queryFn: () => dashboardService.getAchievementStatistics({ campaignId }),
+    enabled: !!campaignId,
   });
 };
 
@@ -207,6 +225,14 @@ export const useAvatarStatistics = (orgId?: number) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.gamification.avatarStats(orgId),
     queryFn: () => dashboardService.getAvatarStatistics({ orgId }),
+  });
+};
+
+export const useAvatarStatisticsByCampaign = (campaignId: number) => {
+  return useQuery({
+    queryKey: DASHBOARD_KEYS.gamification.avatarStatsByCampaign(campaignId),
+    queryFn: () => dashboardService.getAvatarStatistics({ campaignId }),
+    enabled: !!campaignId,
   });
 };
 

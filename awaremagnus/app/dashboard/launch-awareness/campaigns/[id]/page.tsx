@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { ArrowLeft, Play, Trophy } from "lucide-react";
 import clsx from "clsx";
+import { useMemo } from "react";
+import { Tooltip } from "@heroui/tooltip";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -13,8 +14,9 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import {
   useOrganizationLeaderboard,
-  useAvatarStatistics,
-  useAchievementStatistics,
+  useAchievementStatisticsByCampaign,
+  useAchievementStatisticsWithCampaign,
+  useAvatarStatisticsByCampaign,
 } from "@/hooks/useDashboard";
 
 export default function CampaignDetailsPage() {
@@ -24,28 +26,125 @@ export default function CampaignDetailsPage() {
   const isRtl = dir === "rtl";
   const t = useTranslations("dashboard");
 
-  const [isActive, setIsActive] = useState(true);
 
   const campaignId = params?.id ? Number(params.id) : 0;
   const updateCampaign = useUpdateCampaign();
 
-  // Fetch all campaign data from dashboard API
   const { data: campaignDashboard, isLoading } = useCampaignDashboard(campaignId);
 
-  // Fetch gamification and leaderboard data
   const { data: leaderboardData } = useOrganizationLeaderboard({
     campaignId,
     count: 10,
   });
-  const { data: avatarData } = useAvatarStatistics();
-  const { data: achievementData } = useAchievementStatistics();
+  const { data: achievementData } = useAchievementStatisticsByCampaign(campaignId);
+  const { data: generalAchievementData } = useAchievementStatisticsWithCampaign(campaignId);
+  const { data: avatarData } = useAvatarStatisticsByCampaign(campaignId);
 
-  // Achievement display values: total uses design default (50) when API is missing/zero,
-  // unlocked comes directly from API (0 is a valid value).
-  const achievementUnlocked = achievementData?.data?.total_unique_achievements_unlocked ?? 0;
-  const achievementTotal = achievementData?.data?.total_achievements || 50;
+  const achievementUnlocked = achievementData?.object?.total_unique_achievements_unlocked ?? 0;
+  const achievementTotal = achievementData?.object?.total_achievements || 50;
   const achievementPercent =
     achievementTotal > 0 ? Math.round((achievementUnlocked / achievementTotal) * 100) : 0;
+
+  // Set of achievement numbers (1-16) present in the backend response. We
+  // parse the leading number from `image_small_url` (e.g. "1-quick-learner.png").
+  const unlockedAchievementNumbers = useMemo(() => {
+    const set = new Set<number>();
+    const items = achievementData?.object?.achievement_statistics ?? [];
+
+    for (const a of items) {
+      const img = a?.image_small_url ?? "";
+      const m = img.trim().match(/^(\d{1,2})/);
+
+      if (!m) continue;
+      const n = Number(m[1]);
+
+      if (n >= 1 && n <= 16) set.add(n);
+    }
+
+    return set;
+  }, [achievementData]);
+
+  // Map: achievement number → full stats object (for tooltip data)
+  const achievementByNumber = useMemo(() => {
+    const map = new Map<number, any>();
+    const items = achievementData?.object?.achievement_statistics ?? [];
+
+    for (const a of items) {
+      const img = a?.image_small_url ?? "";
+      const m = img.trim().match(/^(\d{1,2})/);
+
+      if (!m) continue;
+      const n = Number(m[1]);
+
+      if (n >= 1 && n <= 16) map.set(n, a);
+    }
+
+    return map;
+  }, [achievementData]);
+
+  // Display order: unlocked achievements first, then locked — capped at 16
+  const achievementDisplayOrder = useMemo(() => {
+    const all = Array.from({ length: 16 }, (_, i) => i + 1);
+
+    return all.sort((a, b) => {
+      const aUnlocked = unlockedAchievementNumbers.has(a) ? 0 : 1;
+      const bUnlocked = unlockedAchievementNumbers.has(b) ? 0 : 1;
+
+      return aUnlocked - bUnlocked;
+    });
+  }, [unlockedAchievementNumbers]);
+
+  const avatarImageByLevel: Record<number, string> = {
+    1: "Vulnerablenewbe_Level1_Robot.png",
+    2: "AlertApprentice_Level2_Robot.png",
+    3: "CautiousLearner_Level3_Robot.png",
+    4: "InformedDefender_Level4_Robot.png",
+    5: "VigilantGuardian_Level5_Robot.png",
+    6: "SkilledSentinel._Level6_Robot.png",
+    7: "ResilientProtector_Level7_Robot.png",
+    8: "AdvancedWatchman_Level8_Robot.png",
+    9: "ExpertEnforcer_Level9_Robot.png",
+    10: "MasterStrategist_Level10_Robot.png",
+    11: "EliteVanguard_Level11_Robot.png",
+    12: "LegendaryShieldbearer_Level12_Robot.png",
+    13: "SupremeCyberKnight_Level13_Robot.png",
+    14: "UltimateCyberSentinel_Level14_Robot.png",
+  };
+
+  const resolveAvatarImage = (avatar?: any) => {
+    if (!avatar) return "1.png";
+    return avatarImageByLevel[avatar.level_number] ?? avatar.image_small_url ?? "1.png";
+  };
+
+  // Find the unlocked avatar with the highest level to show in the main slot
+  const avatarStats = useMemo(() => {
+    const items = (avatarData?.object?.avatar_statistics ?? []) as any[];
+    return [...items].sort((a, b) => {
+      const aUnlocked = (a.employee_count ?? 0) > 0 ? 0 : 1;
+      const bUnlocked = (b.employee_count ?? 0) > 0 ? 0 : 1;
+
+      if (aUnlocked !== bUnlocked) return aUnlocked - bUnlocked;
+      return b.level_number - a.level_number;
+    });
+  }, [avatarData]);
+
+  const mainAvatar = useMemo(() => {
+    if (avatarStats.length === 0) {
+      return {
+        level_number: 1,
+        level_name: "Vulnerable Newbie",
+        min_score_or_percentage: 0,
+        max_score_or_percentage: 6,
+        image_small_url: "Vulnerablenewbe_Level1_Robot.png",
+        employee_count: 0,
+      };
+    }
+
+    return avatarStats[0];
+  }, [avatarStats]);
+
+  // Check if main avatar is unlocked (has employee_count > 0)
+  const isMainAvatarUnlocked = (mainAvatar?.employee_count ?? 0) > 0;
 
   const handleLaunchCampaign = async () => {
     if (!campaignDashboard) return;
@@ -98,13 +197,6 @@ export default function CampaignDetailsPage() {
 
   const progress = calculateProgress();
 
-  // Log campaign dashboard for debugging
-  // Note: duplicated "Campaign Performance Metrics" block was removed to match HTML design
-  useEffect(() => {
-    if (campaignDashboard) {
-      console.log("Campaign Dashboard:", campaignDashboard);
-    }
-  }, [campaignDashboard]);
 
   if (isLoading) {
     return (
@@ -122,7 +214,6 @@ export default function CampaignDetailsPage() {
     <ProtectedRoute>
       <DashboardLayout>
         <div className={clsx("p-3", isRtl && "text-right")}>
-          {/* Header */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Button
@@ -139,7 +230,6 @@ export default function CampaignDetailsPage() {
               </div>
             </div>
 
-            {/* Launch Button - Show for In Progress campaigns */}
             {campaignDashboard?.status_id === 20 && (
               <Button
                 className="text-white"
@@ -153,7 +243,6 @@ export default function CampaignDetailsPage() {
               </Button>
             )}
 
-            {/* Leaderboard Button */}
             <Button
               className="border-gray-300"
               size="sm"
@@ -169,11 +258,8 @@ export default function CampaignDetailsPage() {
             </Button>
           </div>
 
-          {/* First Section - Campaign Details Grid */}
           <div className="grid grid-cols-12 gap-2 mb-2">
-            {/* Campaign Details Card */}
             <div className="bg-white p-5 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-6 col-span-8 row-span-5">
-              {/* Left Section - Campaign Info */}
               <div className="space-y-3 text-gray-700">
                 <h2 className="text-lg font-semibold mb-4">
                   {campaignDashboard?.name || "Campaign"}
@@ -203,9 +289,7 @@ export default function CampaignDetailsPage() {
                 </div>
               </div>
 
-              {/* Right Section - Topics Schedule & Settings */}
               <div className="bg-gray-50 p-4 rounded-xl space-y-4">
-                {/* Topics Schedule */}
                 <div>
                   <div className="flex items-center gap-1.5 mb-2">
                     <span className="w-4 h-4">
@@ -228,7 +312,6 @@ export default function CampaignDetailsPage() {
                     )}
                   </div>
 
-                  {/* Campaign Status (matches design) */}
                   <div className="space-y-1.5 pt-3 border-t border-gray-200">
                     <label className="flex items-center gap-1.5 text-gray-700 font-medium text-xs">
                       <input
@@ -246,7 +329,6 @@ export default function CampaignDetailsPage() {
                       </span>
 
                       <label className="relative inline-flex items-center">
-                        {/* Static toggle (visual only) */}
                         <input
                           readOnly
                           checked={campaignDashboard?.status_id === 2}
@@ -336,7 +418,6 @@ export default function CampaignDetailsPage() {
                   campaignDashboard.top_struggling_topics
                     .slice(0, 3)
                     .map((topic: any, idx: number) => {
-                      // Map topic names to icon paths and colors
                       const iconMap: Record<
                         string,
                         { icon: string; color: string; textColor: string }
@@ -623,31 +704,52 @@ export default function CampaignDetailsPage() {
                   </a>
                 </div>
                 <div className="grid grid-cols-8 gap-3 gap-y-4 mt-8">
-                  {/* Achievement badges - Static 16 badges */}
-                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16].map((idx) => {
-                    // First 7 badges are unlocked
-                    const isUnlocked = idx <= 7;
+                  {achievementDisplayOrder.map((num) => {
+                    const isUnlocked = unlockedAchievementNumbers.has(num);
+                    const meta = achievementByNumber.get(num);
+
+                    const tooltipContent = (
+                      <div className="flex flex-col gap-1 max-w-[200px] p-1">
+                        <p className="font-semibold text-sm text-gray-900">
+                          {meta?.achievement_name ?? `Achievement #${num}`}
+                        </p>
+                        {meta?.achievement_description && (
+                          <p className="text-xs text-gray-600 leading-tight">
+                            {meta.achievement_description}
+                          </p>
+                        )}
+                        <div className="flex items-center justify-between mt-1 gap-2">
+                          <span
+                            className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                              isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                            }`}
+                          >
+                            {isUnlocked ? "Unlocked" : "Locked"}
+                          </span>
+                          {isUnlocked && meta?.employee_count != null && (
+                            <span className="text-xs text-gray-500">
+                              {meta.employee_count}x
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
 
                     return (
-                      <div
-                        key={idx}
-                        className="w-12 h-12 rounded-full flex items-center justify-center relative"
-                      >
-                        <img
-                          alt=""
-                          className="w-full h-full"
-                          src={`/awm/images/achivement/${idx}.png`}
-                        />
-                        {isUnlocked && (
-                          <span className="absolute top-0 -right-1 w-4 h-4">
-                            <img
-                              alt=""
-                              className="w-full h-full"
-                              src="/awm/images/achivement/achived.svg"
-                            />
-                          </span>
-                        )}
-                      </div>
+                      <Tooltip key={num} content={tooltipContent} placement="top">
+                        <div
+                          aria-disabled={!isUnlocked}
+                          className={`w-12 h-12 rounded-full flex items-center justify-center relative cursor-default ${
+                            isUnlocked ? "" : "opacity-40"
+                          }`}
+                        >
+                          <img
+                            alt={meta?.achievement_name ?? `Achievement ${num}`}
+                            className="w-full h-full"
+                            src={`/awm/images/achivement/${num}.png`}
+                          />
+                        </div>
+                      </Tooltip>
                     );
                   })}
                 </div>
@@ -671,24 +773,55 @@ export default function CampaignDetailsPage() {
               {/* Employee Avatar Level */}
               <div className="col-span-6 row-span-2 row-start-2 bg-white rounded-xl p-4">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-base font-semibold">Employee Avatar Level</h2>
+                  <h2 className="text-base font-semibold">{t("gamification.employeeAvatarLevel")}</h2>
                   <a className="text-blue-600 text-xs font-medium" href="#">
                     View All
                   </a>
                 </div>
 
                 <div className="mt-4 flex gap-6 items-start">
-                  {/* Large left avatar */}
-                  <div className="flex-shrink-0 w-28 flex flex-col items-center">
-                    <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center border border-gray-200">
-                      <img
-                        alt="Vulnerable Newbie"
-                        className="w-full h-full object-cover"
-                        src={`/awm/images/avatars/1.png`}
-                      />
-                    </div>
-                    <p className="text-[12px] leading-tight text-gray-700 mt-4 whitespace-pre-line text-center">
-                      Vulnerable\nNewbie
+                  {/* Main Avatar — show the highest level avatar from backend response */}
+                  <div className="flex flex-col items-center justify-center">
+                    <Tooltip
+                      content={
+                        <div className="flex flex-col gap-1 max-w-[200px] p-1">
+                          <p className="font-semibold text-sm text-gray-900">
+                            Level {mainAvatar?.level_number ?? 1}
+                          </p>
+                          <p className="text-xs text-gray-600 leading-tight">
+                            {mainAvatar?.level_name ?? "Vulnerable Newbie"}
+                          </p>
+                          <div className="flex items-center justify-between mt-1 gap-2">
+                            <span
+                              className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                                isMainAvatarUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                              }`}
+                            >
+                              {isMainAvatarUnlocked ? "Unlocked" : "Locked"}
+                            </span>
+                            {mainAvatar?.employee_count != null && (
+                              <span className="text-xs text-gray-500">
+                                {mainAvatar.employee_count}x
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      }
+                      placement="top"
+                    >
+                      <div
+                        aria-disabled={!isMainAvatarUnlocked}
+                        className={`w-24 h-24 bg-gray-200 rounded-full ${!isMainAvatarUnlocked ? "opacity-40" : ""} cursor-default`}
+                      >
+                        <img
+                          alt={`Level ${mainAvatar?.level_number ?? 1}`}
+                          className="w-24 h-24 rounded-full object-contain object-center"
+                          src={`/awm/images/avatars/${resolveAvatarImage(mainAvatar)}`}
+                        />
+                      </div>
+                    </Tooltip>
+                    <p className="text-[12px] leading-tight text-gray-700 mt-4 w-full max-w-[120px] whitespace-normal break-words text-center">
+                      {mainAvatar?.level_name ?? "Vulnerable Newbie"}
                     </p>
                   </div>
 
@@ -697,35 +830,66 @@ export default function CampaignDetailsPage() {
 
                   {/* Grid of smaller avatars (4 cols x 2 rows) */}
                   <div className="grid grid-cols-4 gap-6 flex-1">
-                    {[
-                      { name: "Alert\nApprentice", img: 2 },
-                      { name: "Cautious\nLearner", img: 3 },
-                      { name: "Informed\nDefender", img: 4 },
-                      { name: "Vigilant\nGuardian", img: 5 },
-                      { name: "Skilled\nSentinel", img: 6 },
-                      { name: "Resilient\nProtector", img: 7 },
-                      { name: "Advanced\nWatchman", img: 8 },
-                      { name: "Expert\nEnforcer", img: 9 },
-                    ].map((avatar, idx) => (
-                      <div
-                        key={idx}
-                        className={clsx(
-                          "flex flex-col items-center",
-                          avatar.img === 9 ? "rounded-xl bg-[#F1FAFF] p-3" : ""
-                        )}
-                      >
-                        <div className="w-10 h-10 rounded-full bg-[#E6FFFB] flex items-center justify-center overflow-hidden border border-gray-200">
-                          <img
-                            alt=""
-                            className="w-full h-full object-cover"
-                            src={`/awm/images/avatars/${avatar.img}.png`}
-                          />
-                        </div>
-                        <p className="text-[10px] leading-tight text-gray-700 mt-2 whitespace-pre-line text-center">
-                          {avatar.name}
-                        </p>
-                      </div>
-                    ))}
+                    {avatarStats
+                      .filter((avatar) => avatar.level_number !== mainAvatar?.level_number)
+                      .slice(0, 8)
+                      .map((avatar, idx) => {
+                        const isUnlocked = (avatar.employee_count ?? 0) > 0;
+                        const avatarImage = resolveAvatarImage(avatar);
+
+                      return (
+                        <Tooltip
+                          key={avatar.level_number || idx}
+                          content={
+                            <div className="flex flex-col gap-1 max-w-[200px] p-1">
+                              <p className="font-semibold text-sm text-gray-900">
+                                Level {avatar.level_number}
+                              </p>
+                              <p className="text-xs text-gray-600 leading-tight">
+                                {avatar.level_name}
+                              </p>
+                              <div className="flex items-center justify-between mt-1 gap-2">
+                                <span
+                                  className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                                    isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                                  }`}
+                                >
+                                  {isUnlocked ? "Unlocked" : "Locked"}
+                                </span>
+                                {avatar.employee_count != null && (
+                                  <span className="text-xs text-gray-500">
+                                    {avatar.employee_count}x
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          }
+                          placement="top"
+                        >
+                          <div
+                            className={clsx(
+                              "flex flex-col items-center",
+                              avatar.level_number === 9 ? "rounded-xl bg-[#F1FAFF] p-3" : ""
+                            )}
+                          >
+                            <div
+                              className={`w-10 h-10 rounded-full bg-[#E6FFFB] flex items-center justify-center overflow-hidden border border-gray-200 ${
+                                !isUnlocked ? "opacity-40" : ""
+                              } cursor-default`}
+                            >
+                              <img
+                                alt=""
+                                className="w-full h-full object-contain"
+                                src={`/awm/images/avatars/${avatarImage}`}
+                              />
+                            </div>
+                            <p className="text-[10px] leading-tight text-gray-700 mt-2 w-full max-w-[70px] whitespace-normal break-words text-center">
+                              {avatar.level_name}
+                            </p>
+                          </div>
+                        </Tooltip>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

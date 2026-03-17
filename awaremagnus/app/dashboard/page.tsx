@@ -33,9 +33,10 @@ import {
   useOrganizationStrugglingModules,
   useOrganizationMonthlyCompletion,
   useUserAssignments,
-  useUserGameAchievements,
+  useAchievementStatistics,
 } from "@/hooks/useDashboard";
 import { useLicenseInfo } from "@/hooks/useSuiteAwm";
+import { useUserPendingSurveys } from "@/hooks/useSurvey";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { decodeJwt, extractUserDisplayName, extractUserEmail } from "@/utils/jwt";
 import { campaignService } from "@/services/campaignService";
@@ -106,13 +107,18 @@ export default function DashboardPage() {
   const isOrgAdmin = getIsOrgAdmin(user?.role_id);
   const isUser = getIsUser(user?.role_id);
 
+  const { data: pendingSurveys = [], isLoading: pendingSurveysLoading } = useUserPendingSurveys(
+    isUser ? user?.id : undefined
+  );
+
   // --- Data Fetching ---
   // query fetching is disabled for non-platform users to avoid unnecessary system endpoints
   const { data: systemData } = useSystemOverview({ enabled: isPlatformAdmin });
   const { data: orgDataResponse } = useOrganizationDashboards();
   const { data: userDataResponse } = useUserDashboards({ userId: user?.id });
   const { data: assignmentsData } = useUserAssignments({ language_id: 1 });
-  const { data: userGameAchievementsData } = useUserGameAchievements();
+  // Fetch achievement statistics for the org
+  const { data: achievementStatsData } = useAchievementStatistics();
 
   const { data: systemStrugglingRaw } = useSystemStrugglingModules({ enabled: isPlatformAdmin });
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
@@ -253,9 +259,9 @@ export default function DashboardPage() {
   // organization_risk_level may be `null` from API — treat null/empty as unknown/not-set
   const orgRiskLabel =
     dashboardData &&
-    "organization_risk_level" in dashboardData &&
-    (dashboardData as any).organization_risk_level != null &&
-    String((dashboardData as any).organization_risk_level).trim() !== ""
+      "organization_risk_level" in dashboardData &&
+      (dashboardData as any).organization_risk_level != null &&
+      String((dashboardData as any).organization_risk_level).trim() !== ""
       ? (dashboardData as any).organization_risk_level
       : "-"; // show neutral fallback when not provided
 
@@ -370,38 +376,44 @@ export default function DashboardPage() {
     }
   }, [compliancePercent]);
 
-  // Unlocked achievements for user
+  // Achievement statistics from the new API
+  const achievementStatsList = useMemo(() => {
+    if (
+      achievementStatsData?.statusCode === 200 &&
+      achievementStatsData.object?.achievement_statistics
+    ) {
+      return achievementStatsData.object.achievement_statistics;
+    }
+
+    return [];
+  }, [achievementStatsData]);
+
+  // Unlocked achievements (employee_count > 0)
   const unlockedAchievementIds = useMemo(() => {
     const set = new Set<number>();
 
-    if (
-      userGameAchievementsData?.statusCode === 200 &&
-      userGameAchievementsData.object?.userGameAchievements
-    ) {
-      for (const achievement of userGameAchievementsData.object.userGameAchievements) {
+    for (const achievement of achievementStatsList) {
+      if (achievement.employee_count > 0) {
         set.add(achievement.achievement_id);
       }
     }
 
     return set;
-  }, [userGameAchievementsData]);
+  }, [achievementStatsList]);
 
-  // Category stats for user achievements
+  // Category stats for achievements
   const categoryStats = useMemo(() => {
     const stats: Record<string, number> = {};
 
-    if (
-      userGameAchievementsData?.statusCode === 200 &&
-      userGameAchievementsData.object?.userGameAchievements
-    ) {
-      for (const achievement of userGameAchievementsData.object.userGameAchievements) {
-        stats[achievement.category_name] =
-          (stats[achievement.category_name] || 0) + achievement.count;
+    for (const achievement of achievementStatsList) {
+      if (achievement.employee_count > 0) {
+        stats[achievement.achievement_category] =
+          (stats[achievement.achievement_category] || 0) + achievement.employee_count;
       }
     }
 
     return stats;
-  }, [userGameAchievementsData]);
+  }, [achievementStatsList]);
 
   // Define total for each category (static for now)
   const categoryTotals: Record<string, number> = {
@@ -744,16 +756,16 @@ export default function DashboardPage() {
                       <span className="text-gray-700 text-[10px] font-medium">Achievements</span>
                       <div>
                         <span className="text-gray-900 text-sm font-bold">
-                          {userGameAchievementsData?.object?.count || 0}
+                          {achievementStatsData?.object?.total_unique_achievements_unlocked || 0}
                         </span>
-                        <span className="text-gray-400 text-[10px]">/16</span>
+                        <span className="text-gray-400 text-[10px]">/50</span>
                       </div>
                     </div>
                     <div className="w-full bg-purple-100 rounded-full h-1.5">
                       <div
                         className="bg-gradient-to-r from-purple-500 to-purple-600 h-1.5 rounded-full transition-all duration-300"
                         style={{
-                          width: `${((userGameAchievementsData?.object?.count || 0) / 16) * 100}%`,
+                          width: `${((achievementStatsData?.object?.total_unique_achievements_unlocked || 0) / 50) * 100}%`,
                         }}
                       />
                     </div>
@@ -1002,10 +1014,10 @@ export default function DashboardPage() {
 
                   return Number.isFinite(d.getTime())
                     ? d.toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric",
-                      })
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })
                     : "—";
                 };
 
@@ -1177,19 +1189,42 @@ export default function DashboardPage() {
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                              {surveyAssignments.length === 0 ? (
+                              {pendingSurveysLoading ? (
+                                <tr>
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
+                                    Loading pending assessments or surveys...
+                                  </td>
+                                </tr>
+                              ) : pendingSurveys.length === 0 ? (
                                 <tr>
                                   <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
                                     No pending assessments or surveys
                                   </td>
                                 </tr>
                               ) : (
-                                surveyAssignments.map((assignment: any, index: number) => {
+                                pendingSurveys.map((item: any, index: number) => {
                                   const isFirst = index === 0;
+                                  const start =
+                                    item.start_date ?? item.start_date === null
+                                      ? item.start_date
+                                      : item.deadline_date;
+                                  const end = item.deadline_date ?? null;
+
+                                  const startDate = start ? new Date(start) : null;
+                                  const endDate = end ? new Date(end) : null;
+
+                                  const formatDateSafe = (d: Date | null) =>
+                                    d && Number.isFinite(d.getTime())
+                                      ? d.toLocaleDateString("en-GB", {
+                                          day: "2-digit",
+                                          month: "short",
+                                          year: "numeric",
+                                        })
+                                      : "—";
 
                                   return (
                                     <tr
-                                      key={`survey-${assignment.campaign_id}-${index}`}
+                                      key={`${item.survey_id}-${item.invite_id}`}
                                       className={
                                         isFirst
                                           ? "bg-blue-50 border-l-4 border-blue-500 font-semibold"
@@ -1199,28 +1234,30 @@ export default function DashboardPage() {
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-700"}`}
                                       >
-                                        {assignment.assessment_name ||
-                                          assignment.module_name ||
-                                          "—"}
+                                        {item.survey_name}
                                       </td>
                                       <td className="px-4 py-2.5">
-                                        {statusBadge(assignment.status?.name || "")}
+                                        <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-50 text-green-600 border border-green-300 whitespace-nowrap">
+                                          Active
+                                        </span>
                                       </td>
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
                                       >
-                                        {formatDate(assignment.start_date)}
+                                        {formatDateSafe(startDate)}
                                       </td>
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
                                       >
-                                        {formatDate(assignment.end_date)}
+                                        {formatDateSafe(endDate)}
                                       </td>
                                       <td className="px-4 py-2.5">
                                         <button
                                           className="px-3 py-1 rounded-full text-[10px] font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-colors whitespace-nowrap"
                                           onClick={() =>
-                                            (window.location.href = `/dashboard/campaign-assignments`)
+                                            (window.location.href = `/awm/survey/${item.survey_id}?invitation_id=${item.invite_id}&survey_code=${encodeURIComponent(
+                                              item.survey_unique_code
+                                            )}`)
                                           }
                                         >
                                           Start
@@ -1237,7 +1274,7 @@ export default function DashboardPage() {
 
                       <div className="flex items-center justify-between">
                         <p className="text-gray-500 text-[10px] whitespace-nowrap">
-                          Showing 1–{surveyAssignments.length} Entries
+                          Showing 1–{pendingSurveys.length} Entries
                         </p>
                       </div>
                     </div>
@@ -1249,86 +1286,190 @@ export default function DashboardPage() {
         ) : (
           // Admin Dashboard
           <>
-            <div className="flex flex-col p-4 sm:p-6 gap-4 sm:gap-5">
-              <div className="flex items-center justify-between min-w-0">
-                <h3 className="text-xl sm:text-2xl font-medium truncate">{t("page.title")}</h3>
+            <div className="flex flex-col p-1 gap-0">
+              <div className="flex items-center justify-between min-w-0 pl-2">
+                <h3 className="text-lg font-medium truncate">{t("page.title")}</h3>
               </div>
             </div>
 
-            <div className="flex flex-col p-4 sm:p-6 pt-0 gap-4 sm:gap-5 overflow-x-hidden">
+            <div className="flex flex-col p-4 sm:p-4 pt-0 gap-4 sm:gap-5 overflow-x-hidden">
               {/* Main Grid Layout - 1 col mobile, 12 col desktop */}
               <div
                 className="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-2"
                 style={{ gridAutoRows: "minmax(80px, auto)" }}
               >
-                {/* Row 1: Total User Licenses (cols 1-4) */}
-                <div className="col-span-1 md:col-span-4 row-start-1">
-                  <div
-                    className={clsx(
-                      "bg-[linear-gradient(305deg,#4BABDC_0%,#5DB1FC_94.2%)] text-white rounded-xl p-4 flex gap-3 items-start h-full",
-                      isRtl && "flex-row-reverse"
-                    )}
-                  >
-                    <Image
-                      alt=""
-                      className="w-12 h-12"
-                      height={48}
-                      src={getContentAssetUrl("/images/img/users-profile.svg")}
-                      width={48}
-                    />
-                    <div className="flex flex-col">
-                      <h3 className="text-base">{t("cards.totalUserLicenses")}</h3>
-                      <p className="text-2xl">{totalLicenses}</p>
+                {/* Row 1: Left Column wrapper for Stats and Security Posture (cols 1-8) */}
+                <div className="col-span-1 md:col-span-8 row-start-1 md:row-start-1 md:row-span-1 flex flex-col gap-3 md:gap-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-2">
+                    {/* Total User Licenses */}
+                    <div className="col-span-1">
+                      <div
+                        className={clsx(
+                          "bg-[linear-gradient(305deg,#4BABDC_0%,#5DB1FC_94.2%)] text-white rounded-xl p-2 flex gap-2 items-center h-20",
+                          isRtl && "flex-row-reverse"
+                        )}
+                      >
+                        <Image
+                          alt=""
+                          className="w-9 h-9"
+                          height={36}
+                          src={getContentAssetUrl("/images/img/users-profile.svg")}
+                          width={36}
+                        />
+                        <div className="flex flex-col">
+                          <h3 className="text-xs">{t("cards.totalUserLicenses")}</h3>
+                          <p className="text-xl">{totalLicenses}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Consumed Licenses */}
+                    <div className="col-span-1">
+                      <div
+                        className={clsx(
+                          "bg-white text-black rounded-xl p-2 flex gap-2 items-center h-20",
+                          isRtl && "flex-row-reverse"
+                        )}
+                      >
+                        <Image
+                          alt=""
+                          className="w-9 h-9"
+                          height={36}
+                          src={getContentAssetUrl("/images/img/users-licanse.svg")}
+                          width={36}
+                        />
+                        <div className="flex flex-col">
+                          <h3 className="text-xs">{t("cards.totalConsumedLicenses")}</h3>
+                          <p className="text-xl">{consumedLicenses}</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Row 1: Consumed Licenses (cols 5-8) */}
-                <div className="col-span-1 md:col-span-4 md:col-start-5 row-start-2 md:row-start-1">
-                  <div
-                    className={clsx(
-                      "bg-white text-black rounded-xl p-4 flex gap-3 items-start h-full",
-                      isRtl && "flex-row-reverse"
-                    )}
-                  >
-                    <Image
-                      alt=""
-                      className="w-12 h-12"
-                      height={48}
-                      src={getContentAssetUrl("/images/img/users-licanse.svg")}
-                      width={48}
-                    />
-                    <div className="flex flex-col">
-                      <h3 className="text-base">{t("cards.totalConsumedLicenses")}</h3>
-                      <p className="text-2xl">{consumedLicenses}</p>
+                  {/* Security Posture */}
+                  <div className="flex-1 min-h-0">
+                    <div className="bg-white rounded-xl py-3 px-4 flex items-center gap-5 w-full">
+                      <div
+                        className={clsx(
+                          "relative flex gap-3 items-center",
+                          isRtl && "flex-row-reverse"
+                        )}
+                      >
+                        <Image
+                          alt=""
+                          className="w-3 h-3"
+                          height={12}
+                          src={getContentAssetUrl("/images/shield-check.svg")}
+                          width={12}
+                        />
+                        <h3 className="text-sm whitespace-nowrap">{t("cards.securityPosture")}</h3>
+
+                        <Popover placement="bottom">
+                          <PopoverTrigger>
+                            <Button
+                              isIconOnly
+                              aria-label="Info"
+                              className="min-w-4 w-4 h-4 p-0"
+                              variant="light"
+                            >
+                              <Image
+                                alt=""
+                                className="w-4 h-4 cursor-pointer"
+                                height={16}
+                                src={getContentAssetUrl("/images/info-information.svg")}
+                                width={16}
+                              />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent>
+                            <div className="p-5 text-sm bg-white border border-gray-300 rounded-xl w-80">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex items-center">
+                                  <svg
+                                    className="w-5 h-5 me-2 shrink-0"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                      stroke="currentColor"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth="2"
+                                    />
+                                  </svg>
+                                  <h3 className="font-medium text-base">{t("cards.infoTitle")}</h3>
+                                </div>
+                              </div>
+                              <div className="mt-2 mb-4 leading-relaxed text-sm">
+                                {t("cards.infoBody")}
+                              </div>
+                              <Button className="text-white bg-blue-600 rounded-2xl text-sm px-3 py-1.5">
+                                {t("cards.viewMore")}
+                              </Button>
+                            </div>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      <div className="flex-1">
+                        <div
+                          className="flex overflow-hidden rounded-lg w-full h-2"
+                          data-level={Math.ceil(compliancePercent / 14.3)}
+                          id="segBar"
+                        >
+                          {[
+                            "#9EC232",
+                            "#C1C625",
+                            "#EACB16",
+                            "#FFCD0F",
+                            "#EBA75C",
+                            "#E4590F",
+                            "#D1132A",
+                          ].map((color, i) => (
+                            <div
+                              key={i}
+                              className="h-4 w-full transition-all duration-300 opacity-0"
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <p
+                        className={`${riskBadgeClass} text-white px-2 py-0.5 rounded-full text-xs whitespace-nowrap`}
+                      >
+                        {orgRiskLabel}
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 {/* Row 1-2: Organization Score (cols 9-12, spans 2 rows) */}
-                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-3 md:row-start-1 md:row-span-2">
+                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-2 md:row-start-1 md:row-span-2">
                   <div className="bg-white rounded-xl p-5 space-y-3 h-full flex flex-col">
-                    <h2 className="text-xl font-semibold text-gray-900">
+                    <h2 className="text-lg font-semibold text-gray-900">
                       {isUser ? t("cards.myScore") : t("cards.organizationScore")}
                     </h2>
-                    <h2 className="text-base text-gray-900">{t("cards.totalComplianceScore")}</h2>
+                    <h2 className="text-xs text-gray-900">{t("cards.totalComplianceScore")}</h2>
 
                     <div className="flex w-full items-center">
-                      <div className={clsx("text-6xl text-gray-900", isRtl ? "ml-4" : "mr-4")}>
+                      <div className={clsx("text-5xl text-gray-900", isRtl ? "ml-4" : "mr-4")}>
                         {Math.round(compliancePercent / 10)}
                       </div>
                       <div className="mt-1 flex-1">
-                        <div className="w-full h-2 bg-gray-200 rounded-full">
+                        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className="h-2 bg-green-500 rounded-full"
-                            style={{ width: `${compliancePercent}%` }}
+                            style={{ width: `${Math.min(compliancePercent, 100)}%` }}
                           />
                         </div>
                         <div
                           className={clsx(
-                            "text-base text-gray-500 font-medium mt-1.5",
+                            "text-sm text-gray-500 font-medium mt-1.5 truncate",
                             isRtl ? "text-left" : "text-right"
                           )}
+                          style={{ maxWidth: "100%" }}
                         >
                           {compliancePercent}%
                         </div>
@@ -1345,10 +1486,10 @@ export default function DashboardPage() {
                           width={24}
                         />
                         <div>
-                          <div className="text-2xl font-semibold text-gray-900">
+                          <div className="text-lg font-semibold text-gray-900">
                             {globalProgress}%
                           </div>
-                          <p className="text-gray-500 text-base">{t("cards.globalProgress")}</p>
+                          <p className="text-gray-500 text-xs">{t("cards.globalProgress")}</p>
                         </div>
                       </div>
 
@@ -1361,8 +1502,8 @@ export default function DashboardPage() {
                           width={24}
                         />
                         <div>
-                          <div className="text-2xl font-semibold text-gray-900">{xpTokens}</div>
-                          <p className="text-gray-500 text-base">{t("cards.totalXpTokens")}</p>
+                          <div className="text-lg font-semibold text-gray-900">{xpTokens}</div>
+                          <p className="text-gray-500 text-xs">{t("cards.totalXpTokens")}</p>
                         </div>
                       </div>
                     </div>
@@ -1370,125 +1511,27 @@ export default function DashboardPage() {
                     <div className="flex items-center justify-between mt-auto">
                       <div className={clsx("flex items-center gap-3", isRtl && "flex-row-reverse")}>
                         <div className="w-2 h-8 bg-orange-400 rounded-full" />
-                        <p className="text-gray-600 text-base leading-tight">
+                        <p className="text-gray-600 text-[12px] leading-tight whitespace-pre-line">
                           {t("cards.totalAwarenessCampaigns")}
                         </p>
                       </div>
-                      <div className="text-2xl font-semibold text-gray-900">{totalCampaigns}</div>
+                      <div className="text-lg font-semibold text-gray-900">{totalCampaigns}</div>
                     </div>
                   </div>
                 </div>
 
-                {/* Row 2: Security Posture (cols 1-8) */}
-                <div className="col-span-1 md:col-span-8 row-start-4 md:row-start-2">
-                  <div className="bg-white rounded-xl p-4 flex items-center gap-5 w-full h-full">
-                    <div
-                      className={clsx(
-                        "relative flex gap-3 items-center",
-                        isRtl && "flex-row-reverse"
-                      )}
-                    >
-                      <Image
-                        alt=""
-                        className="w-4 h-4"
-                        height={16}
-                        src={getContentAssetUrl("/images/shield-check.svg")}
-                        width={16}
-                      />
-                      <h3 className="text-base whitespace-nowrap">{t("cards.securityPosture")}</h3>
-
-                      <Popover placement="bottom">
-                        <PopoverTrigger>
-                          <Button
-                            isIconOnly
-                            aria-label="Info"
-                            className="min-w-4 w-4 h-4 p-0"
-                            variant="light"
-                          >
-                            <Image
-                              alt=""
-                              className="w-4 h-4 cursor-pointer"
-                              height={16}
-                              src={getContentAssetUrl("/images/info-information.svg")}
-                              width={16}
-                            />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent>
-                          <div className="p-5 text-sm bg-white border border-gray-300 rounded-xl w-80">
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center">
-                                <svg
-                                  className="w-5 h-5 me-2 shrink-0"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                    stroke="currentColor"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                  />
-                                </svg>
-                                <h3 className="font-medium text-base">{t("cards.infoTitle")}</h3>
-                              </div>
-                            </div>
-                            <div className="mt-2 mb-4 leading-relaxed text-sm">
-                              {t("cards.infoBody")}
-                            </div>
-                            <Button className="text-white bg-blue-600 rounded-2xl text-sm px-3 py-1.5">
-                              {t("cards.viewMore")}
-                            </Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-
-                    <div className="flex-1">
-                      <div
-                        className="flex overflow-hidden rounded-lg w-full h-4"
-                        data-level={Math.ceil(compliancePercent / 14.3)}
-                        id="segBar"
-                      >
-                        {[
-                          "#9EC232",
-                          "#C1C625",
-                          "#EACB16",
-                          "#FFCD0F",
-                          "#EBA75C",
-                          "#E4590F",
-                          "#D1132A",
-                        ].map((color, i) => (
-                          <div
-                            key={i}
-                            className="h-4 w-full transition-all duration-300 opacity-0"
-                            style={{ backgroundColor: color }}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    <p
-                      className={`${riskBadgeClass} text-white px-3 py-1 rounded-full text-base whitespace-nowrap`}
-                    >
-                      {orgRiskLabel}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Row 3-5: Security Awareness Campaign (cols 1-8, spans 3 rows) */}
-                <div className="col-span-1 md:col-span-8 row-start-5 md:row-start-3 md:row-span-3">
+                {/* Row 2-5: Security Awareness Campaign (cols 1-8, spans 4 rows) */}
+                <div className="col-span-1 md:col-span-8 row-start-3 md:row-start-2 md:row-span-4">
                   <div className="bg-white rounded-xl p-5 flex flex-col h-full">
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="text-lg font-semibold text-gray-800">
+                    <div className="flex justify-between items-center mb-1">
+                      <h3 className="text-[16px] font-semibold text-gray-800">
                         {t("cards.securityAwarenessCampaign")}
                       </h3>
-                      <Link className="text-blue-600 text-base font-medium" href="#">
+                      <Link className="text-blue-600 text-sm font-medium" href="#">
                         {t("cards.viewAll")}
                       </Link>
                     </div>
-                    <p className="text-sm text-gray-400 mb-3">
+                    <p className="text-xs text-gray-400 mb-0">
                       {t("cards.lastCampaignDate", { date: "1/23/05" })}
                     </p>
                     <div className="flex-1 min-h-0">
@@ -1518,22 +1561,22 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Row 3-4: Weekly Progress & Quiz Accuracy (cols 9-12, spans 2 rows) */}
-                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-6 md:row-start-3 md:row-span-2">
+                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-4 md:row-start-3 md:row-span-2">
                   <div className="grid grid-cols-1 sm:grid-cols-2 p-3 rounded-xl bg-white gap-3 h-full">
                     <div className="bg-[#F1F5F8] rounded-xl p-4 flex flex-col items-center justify-center">
-                      <h3 className="text-base font-semibold mb-3">{t("cards.weeklyProgress")}</h3>
+                      <h3 className="text-sm font-semibold mb-3">{t("cards.weeklyProgress")}</h3>
                       <CircularProgressChart color="#00CCC4" size={120} value={weeklyProgress} />
                     </div>
 
                     <div className="bg-[#F1F5F8] rounded-xl p-4 flex flex-col items-center justify-center">
-                      <h3 className="text-base font-semibold mb-3">{t("cards.quizAccuracy")}</h3>
+                      <h3 className="text-sm font-semibold mb-3">{t("cards.quizAccuracy")}</h3>
                       <CircularProgressChart color="#7CC5FA" size={120} value={quizAccuracy} />
                     </div>
                   </div>
                 </div>
 
                 {/* Row 5: Security Awareness Score (cols 9-12) */}
-                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-8 md:row-start-5">
+                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-5 md:row-start-5">
                   <div className="bg-white rounded-xl p-5 flex flex-col h-full justify-center">
                     <div className="flex justify-between items-center">
                       <div className={clsx("flex items-center gap-4", isRtl && "flex-row-reverse")}>
@@ -1545,11 +1588,11 @@ export default function DashboardPage() {
                           width={48}
                         />
                         <div>
-                          <h3 className="text-base font-semibold text-gray-800">
+                          <h3 className="text-sm font-semibold text-gray-800">
                             {t("cards.securityAwarenessScore")}
                           </h3>
                           <div className="flex items-center gap-1.5">
-                            <p className="text-2xl text-gray-800">
+                            <p className="text-base text-gray-800">
                               {Number(securityAwarenessScore).toFixed(0)}
                             </p>
                             <p className="text-gray-400 text-base font-medium">
@@ -1559,7 +1602,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <span
-                        className={`${complianceBadgeClass} text-white text-lg font-medium px-3 py-1 rounded-full`}
+                        className={`${complianceBadgeClass} text-white text-sm font-medium px-3 py-1 rounded-full`}
                       >
                         {complianceGrade || "N/A"}
                       </span>
@@ -1568,9 +1611,9 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Row 6: Employee Risk States (cols 1-4) */}
-                <div className="col-span-1 md:col-span-4 row-start-9 md:row-start-6">
+                <div className="col-span-1 md:col-span-4 row-start-6 md:row-start-6">
                   <div className="bg-white rounded-xl p-5 flex flex-col items-center justify-between h-full">
-                    <h3 className="text-base font-semibold text-gray-800 mb-3">
+                    <h3 className="text-sm font-semibold text-gray-800 mb-3">
                       {t("cards.employeeRiskStates")}
                     </h3>
                     <SemiCircleChart
@@ -1585,9 +1628,9 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Row 6: Employee Certification (cols 5-8) */}
-                <div className="col-span-1 md:col-span-4 md:col-start-5 row-start-10 md:row-start-6">
+                <div className="col-span-1 md:col-span-4 md:col-start-5 row-start-7 md:row-start-6">
                   <div className="bg-white rounded-xl p-5 flex flex-col items-center justify-between h-full">
-                    <h3 className="text-base font-semibold text-gray-800 mb-3">
+                    <h3 className="text-sm font-semibold text-gray-800 mb-3">
                       {t("cards.employeeCertification")}
                     </h3>
                     <CertificationChart
@@ -1595,11 +1638,11 @@ export default function DashboardPage() {
                       color2="#FB5050"
                       value={Math.round(
                         (certStats.certified / (certStats.certified + certStats.uncertified || 1)) *
-                          100
+                        100
                       )}
                     />
 
-                    <div className="flex justify-center gap-4 text-sm text-gray-600">
+                    <div className="flex justify-center gap-4 text-xs text-gray-600">
                       <span className="flex items-center gap-1.5">
                         <span className="w-2 h-2 bg-green-400 rounded-full" />
                         {t("cards.certified", { count: certStats.certified })}
@@ -1613,7 +1656,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Row 6: Right Column - All three widgets stacked (cols 9-12) */}
-                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-11 md:row-start-6">
+                <div className="col-span-1 md:col-span-4 md:col-start-9 row-start-8 md:row-start-6">
                   <div className="flex flex-col gap-2 h-full">
                     {/* Top 3 Struggling Topics - Very compact */}
                     <div className="bg-white rounded-xl p-3 flex flex-col flex-1 min-h-0">
@@ -1674,7 +1717,7 @@ export default function DashboardPage() {
                     {/* Active Learners - Compact */}
                     <div className="bg-[#10B981] text-white rounded-xl p-3 flex justify-between items-center flex-shrink-0">
                       <div>
-                        <h3 className="text-sm font-medium opacity-90">
+                        <h3 className="text-xs font-medium opacity-90">
                           {t("cards.activeLearnersThisMonth")}
                         </h3>
                         <p className="text-xl">{activeLearners}</p>
@@ -1693,7 +1736,7 @@ export default function DashboardPage() {
                     {/* Training Completion Rate - Compact */}
                     <div className="bg-[#A78BFA] text-white rounded-xl p-3 flex justify-between items-center flex-shrink-0">
                       <div>
-                        <h3 className="text-sm font-medium opacity-90">
+                        <h3 className="text-xs font-medium opacity-90">
                           {t("cards.trainingCompletionRate")}
                         </h3>
                         <p className="text-xl">{trainingCompletionRate}%</p>

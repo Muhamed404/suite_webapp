@@ -115,10 +115,18 @@ export const dashboardService = {
   },
 
   // --- Gamification ---
-  getAchievementStatistics: async (params?: { orgId?: number }) => {
+  getAchievementStatistics: async (params?: { orgId?: number; campaignId?: number }) => {
     const { data } = await awmClient.get<AchievementStatisticsResponse>(
       `${API_BASE}/gamification/achievements/statistics`,
       { params }
+    );
+
+    return data;
+  },
+
+  getAchievementStatisticsByCampaign: async (campaignId: number) => {
+    const { data } = await awmClient.get<AchievementStatisticsResponse>(
+      `${API_BASE}/gamification/achievements/statistics?campaignId=${campaignId}`
     );
 
     return data;
@@ -138,7 +146,7 @@ export const dashboardService = {
     return data;
   },
 
-  getAvatarStatistics: async (params?: { orgId?: number }) => {
+  getAvatarStatistics: async (params?: { orgId?: number; campaignId?: number }) => {
     const { data } = await awmClient.get<AvatarStatisticsResponse>(
       `${API_BASE}/gamification/avatar/statistics`,
       { params }
@@ -180,9 +188,13 @@ export const dashboardService = {
   },
 
   // --- User Game Achievements ---
-  getUserGameAchievements: async () => {
+  // `userId` is optional: org users should pass it explicitly so the backend
+  // can return achievements for the correct user. Platform/admin calls may
+  // omit it since the token determines the user.
+  getUserGameAchievements: async (params?: { userId?: number }) => {
     const { data } = await awmClient.get<UserGameAchievementsResponse>(
-      `${API_BASE}/usergame/achievements`
+      `${API_BASE}/usergame/achievements`,
+      { params }
     );
 
     return data;
