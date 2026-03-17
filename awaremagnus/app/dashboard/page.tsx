@@ -1623,6 +1623,7 @@ export default function DashboardPage() {
                       color3="#FB5050"
                       opened={riskStats.medium}
                       sent={riskStats.low}
+                      labels={[t("cards.lowRisk"), t("cards.mediumRisk"), t("cards.highRisk")]}
                     />
                   </div>
                 </div>
