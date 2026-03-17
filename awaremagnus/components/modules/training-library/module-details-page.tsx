@@ -36,6 +36,7 @@ import {
   getLanguageName,
   getLanguageCountryCode,
 } from "@/utils/supportedLanguages";
+import { getModuleAssetUrl } from "@/utils/contentAssetUrl";
 import { isPlatformAdmin, isOrgAdmin, isOrgUser } from "@/utils/roles";
 import { SearchIcon } from "@/components/icons";
 import { ModuleDetailsSkeleton } from "@/components/ui/skeletons";
@@ -129,6 +130,10 @@ type ContentTypeCardItem =
       typeId: number;
       typeName: string;
       count: number;
+      dateRange?: {
+        earliest_created?: string;
+        latest_created?: string;
+      } | null;
       items: ModuleContent[];
     }
   | { kind: "quizzes"; count: number };
@@ -381,6 +386,16 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     moduleData.description ??
     moduleData.translations?.[0]?.description ??
     t("moduleDetails.description");
+  const moduleLogoUrl = (() => {
+    const activeLanguageId = languageFilter ? Number(languageFilter) : null;
+    const translation =
+      activeLanguageId != null
+        ? moduleData.translations?.find((tr: any) => tr.language_id === activeLanguageId)
+        : moduleData.translations?.[0];
+    const logoPath = translation?.logo_banner_url ?? moduleData.translations?.[0]?.logo_banner_url;
+
+    return logoPath ? getModuleAssetUrl(logoPath) : "";
+  })();
 
   const breadcrumbFirst = isOrgUserView
     ? t("moduleDetails.breadcrumbAwarenessCampaign")
@@ -631,7 +646,31 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                   <h2 className="text-sm font-semibold text-gray-900 mb-3">
                     🎉 {t("moduleDetails.welcomeText")}
                   </h2>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6">{moduleTitle}</h3>
+                  <div className="bg-gray-50 rounded-lg p-3 mb-6">
+                    <h4 className="text-xs font-bold text-gray-900 mb-3">
+                      {t("moduleDetails.aboutModule")}
+                    </h4>
+                    <div className="flex flex-col items-start gap-3">
+                      <div 
+                        className="w-50 h-50 overflow-hidden shrink-0"
+                        style={{ borderRadius: 12 }}
+                      >
+                        {moduleLogoUrl ? (
+                          <img
+                            alt={moduleTitle}
+                            className="w-full h-full object-cover"
+                            src={moduleLogoUrl}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-white/70" style={{ borderRadius: 12 }} />
+                        )}
+                      </div>
+                      <div className="min-w-0 w-full">
+                        <h3 className="text-base font-bold text-gray-900 leading-5">{moduleTitle}</h3>
+                        <p className="text-xs text-gray-600 leading-relaxed mt-1">{moduleDesc}</p>
+                      </div>
+                    </div>
+                  </div>
 
                   {isOrgUserView && (
                     <div className="mb-6">
@@ -658,12 +697,6 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     </div>
                   )}
 
-                  <div className="bg-gray-50 rounded-lg p-3 mb-6">
-                    <h4 className="text-xs font-bold text-gray-900 mb-3">
-                      {t("moduleDetails.aboutModule")}
-                    </h4>
-                    <p className="text-xs text-gray-600 leading-relaxed">{moduleDesc}</p>
-                  </div>
                 </div>
 
                 <div>

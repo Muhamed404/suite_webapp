@@ -15,6 +15,7 @@ export interface Campaign {
   enable_games: boolean;
   enable_misc_items: boolean;
   enable_motion_videos: boolean;
+  allow_skipping_videos?: boolean;
   enable_interactive_ispring: boolean;
   enable_documents: boolean;
   // Weight configuration
@@ -161,6 +162,7 @@ export interface CampaignCreatePayload {
     enable_games?: boolean;
     enable_misc_items?: boolean;
     enable_motion_videos?: boolean;
+    allow_skipping_videos?: boolean;
     enable_interactive_ispring?: boolean;
     enable_documents?: boolean;
     interactive_content_weight?: number;
@@ -201,6 +203,7 @@ export interface CampaignUpdatePayload {
     enable_games?: boolean;
     enable_misc_items?: boolean;
     enable_motion_videos?: boolean;
+    allow_skipping_videos?: boolean;
     enable_interactive_ispring?: boolean;
     enable_documents?: boolean;
     interactive_content_weight?: number;

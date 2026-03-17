@@ -421,10 +421,13 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                     <Card key={item.id} className={cardClassName} shadow="sm">
                       <CardBody className="p-3 flex flex-col bg-white">
                         {/* Thumbnail: language-specific logo or default */}
-                        <div className="rounded-xl h-40 overflow-hidden mb-3 w-full bg-gray-100 flex items-center justify-center shrink-0 relative">
+                        <div 
+                          className="w-full h-48 mb-3 shrink-0 relative overflow-hidden"
+                          style={{ borderRadius: 12 }}
+                        >
                           <img
                             alt=""
-                            className="w-full h-full object-cover object-center"
+                            className="w-full h-full object-cover"
                             src={getModuleLogoUrl(item, languageFilter)}
                             onError={(e) => {
                               const el = e.target as HTMLImageElement;
@@ -543,7 +546,10 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                     {(item: Module) => (
                       <TableRow key={item.id}>
                         <TableCell className="w-16 align-middle">
-                          <div className="relative w-10 h-10 rounded-lg flex items-center justify-center overflow-hidden shrink-0 bg-gray-100">
+                          <div 
+                            className="relative w-12 h-12 overflow-hidden shrink-0"
+                            style={{ borderRadius: 8 }}
+                          >
                             <img
                               alt=""
                               className="w-full h-full object-cover"

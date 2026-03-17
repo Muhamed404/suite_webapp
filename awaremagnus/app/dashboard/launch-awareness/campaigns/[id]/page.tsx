@@ -89,6 +89,75 @@ export default function CampaignDetailsPage() {
   };
 
   const progress = calculateProgress();
+  const remainingDays = campaignDashboard?.remaining_days ?? calculateRemainingDays();
+  const totalCampaignDays =
+    campaignDashboard?.start_date && campaignDashboard?.end_date
+      ? Math.max(
+          1,
+          Math.ceil(
+            (new Date(campaignDashboard.end_date).getTime() -
+              new Date(campaignDashboard.start_date).getTime()) /
+              (1000 * 60 * 60 * 24)
+          )
+        )
+      : 0;
+  const remainingDaysPercent =
+    totalCampaignDays > 0
+      ? Math.max(0, Math.min(100, Math.round((remainingDays / totalCampaignDays) * 100)))
+      : 0;
+  const remainingDaysRadius = 34;
+  const remainingDaysCircumference = 2 * Math.PI * remainingDaysRadius;
+
+  const moduleCompletionSource =
+    campaignDashboard?.module_completion_data ||
+    campaignDashboard?.module_progress ||
+    campaignDashboard?.modules_completion ||
+    campaignDashboard?.top_struggling_topics ||
+    [];
+
+  const moduleCompletionData = Array.isArray(moduleCompletionSource)
+    ? moduleCompletionSource
+        .map((module: any, index: number) => {
+          const rawCompletion =
+            module.completion_percent ??
+            module.progress_percent ??
+            module.module_progress_percent ??
+            module.average_completion_percent ??
+            module.average_quiz_score ??
+            module.completion ??
+            0;
+          const completion = Math.max(0, Math.min(100, Number(rawCompletion) || 0));
+
+          return {
+            id: module.module_id ?? module.id ?? index,
+            moduleName: module.module_name ?? module.name ?? `Module ${index + 1}`,
+            completion,
+          };
+        })
+        .slice(0, 10)
+    : [];
+
+  const moduleGraphPoints = moduleCompletionData.map((module, index) => {
+    const x =
+      moduleCompletionData.length === 1
+        ? 52
+        : 8 + (index / (moduleCompletionData.length - 1)) * 84;
+    const y = 92 - (module.completion / 100) * 76;
+
+    return { ...module, x, y };
+  });
+
+  const moduleLinePath = moduleGraphPoints
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
+    .join(" ");
+
+  const orgLeaderboard = (leaderboardData as any)?.object || (leaderboardData as any)?.data || {};
+  const topHighRiskEmployees = Array.isArray(orgLeaderboard?.top_high_risk_employees)
+    ? orgLeaderboard.top_high_risk_employees
+    : [];
+  const topLowRiskEmployees = Array.isArray(orgLeaderboard?.top_low_risk_employees)
+    ? orgLeaderboard.top_low_risk_employees
+    : [];
 
 
   if (isLoading) {
@@ -288,7 +357,7 @@ export default function CampaignDetailsPage() {
 
             {/* Remaining Days Card */}
             <div className="col-span-4 row-span-2 col-start-9">
-              <div className="bg-white rounded-xl p-4 flex flex-col justify-between h-full">
+              <div className="bg-white rounded-xl p-4 h-full">
                 <div className="flex justify-between items-start">
                   <p className="text-gray-600 text-xs">Remaining days</p>
                   <div className="w-6 h-6">
@@ -296,11 +365,41 @@ export default function CampaignDetailsPage() {
                   </div>
                 </div>
 
-                <div className="mt-2 flex items-center gap-1">
-                  <span className="text-3xl text-[#3FBDFF] font-bold">
-                    {campaignDashboard?.remaining_days || calculateRemainingDays()}
-                  </span>
-                  <span className="text-sm text-gray-800 font-semibold">Days</span>
+                <div className="mt-3 flex items-center justify-between gap-4">
+                  <div className="relative w-24 h-24">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                      <circle
+                        className="text-gray-200"
+                        cx="50"
+                        cy="50"
+                        fill="none"
+                        r={remainingDaysRadius}
+                        stroke="currentColor"
+                        strokeWidth="8"
+                      />
+                      <circle
+                        className="text-sky-500"
+                        cx="50"
+                        cy="50"
+                        fill="none"
+                        r={remainingDaysRadius}
+                        stroke="currentColor"
+                        strokeDasharray={`${(remainingDaysPercent / 100) * remainingDaysCircumference} ${remainingDaysCircumference}`}
+                        strokeLinecap="round"
+                        strokeWidth="8"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-2xl font-bold text-sky-500">{remainingDays}</span>
+                      <span className="text-[10px] font-medium text-gray-600">Days</span>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-600 leading-5">
+                    <p className="font-medium text-gray-800">Timeline</p>
+                    <p>{remainingDaysPercent}% remaining</p>
+                    <p>Total {totalCampaignDays || 0} days</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -308,6 +407,66 @@ export default function CampaignDetailsPage() {
             {/* Campaign Progress */}
             <div className="col-span-8 row-span-2 col-start-1 row-start-6">
               <div className="bg-white rounded-xl p-4">
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-700 text-xs font-medium">Module Completion Graph</span>
+                    <span className="text-gray-500 text-xs">{moduleCompletionData.length} modules</span>
+                  </div>
+
+                  {moduleGraphPoints.length > 0 ? (
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <div className="flex gap-2">
+                        <div className="w-8 text-[10px] text-gray-400 leading-[32px] pt-1">
+                          <div>100%</div>
+                          <div>50%</div>
+                          <div>0%</div>
+                        </div>
+
+                        <div className="flex-1">
+                          <svg aria-label="Module completion graph" className="w-full h-24" viewBox="0 0 100 100">
+                            <g className="text-gray-200">
+                              <line stroke="currentColor" strokeWidth="0.6" x1="8" x2="92" y1="16" y2="16" />
+                              <line stroke="currentColor" strokeWidth="0.6" x1="8" x2="92" y1="54" y2="54" />
+                              <line stroke="currentColor" strokeWidth="0.6" x1="8" x2="92" y1="92" y2="92" />
+                            </g>
+
+                            {moduleGraphPoints.length > 1 && (
+                              <path
+                                className="text-blue-300"
+                                d={moduleLinePath}
+                                fill="none"
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="1.2"
+                              />
+                            )}
+
+                            {moduleGraphPoints.map((point) => (
+                              <g key={point.id}>
+                                <circle className="text-white" cx={point.x} cy={point.y} fill="currentColor" r="3.1" />
+                                <circle className="text-blue-500" cx={point.x} cy={point.y} fill="currentColor" r="2" />
+                              </g>
+                            ))}
+                          </svg>
+
+                          <div className="mt-1 grid grid-cols-3 gap-1 text-[10px] text-gray-600">
+                            {moduleCompletionData.slice(0, 6).map((module) => (
+                              <div key={module.id} className="truncate" title={`${module.moduleName} (${module.completion}%)`}>
+                                {module.moduleName}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-400">
+                      No module completion data available
+                    </div>
+                  )}
+                </div>
+
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-gray-600 text-xs">Campaign Progress</span>
                   <span className="text-gray-700 font-medium text-xs">
@@ -341,6 +500,8 @@ export default function CampaignDetailsPage() {
                   campaignDashboard.top_struggling_topics
                     .slice(0, 3)
                     .map((topic: any, idx: number) => {
+                      const topicDisplayName =
+                        topic.module_name || topic.topic_name || topic.name || "Unknown Topic";
                       const iconMap: Record<
                         string,
                         { icon: string; color: string; textColor: string }
@@ -361,7 +522,7 @@ export default function CampaignDetailsPage() {
                           textColor: "#DC2626",
                         },
                       };
-                      const config = iconMap[topic.topic_name || ""] || {
+                      const config = iconMap[topicDisplayName] || {
                         icon: "/awm/images/icons/default.svg",
                         color: "#F0F0F0",
                         textColor: "#666",
@@ -380,7 +541,7 @@ export default function CampaignDetailsPage() {
                               <img alt="" className="w-2 h-2" src={config.icon} />
                             </div>
                             <span className="text-[10px] font-medium text-gray-800">
-                              {topic.topic_name || "Unknown Topic"}
+                              {topicDisplayName}
                             </span>
                           </div>
                           <svg
@@ -754,7 +915,7 @@ export default function CampaignDetailsPage() {
                 </Button>
               </div>
 
-              {(leaderboardData?.data?.top_high_risk_employees ?? []).length > 0 ? (
+              {topHighRiskEmployees.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead className="border-b border-gray-200">
@@ -772,7 +933,7 @@ export default function CampaignDetailsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(leaderboardData?.data?.top_high_risk_employees ?? [])
+                      {topHighRiskEmployees
                         .slice(0, 10)
                         .map((employee: any, idx: number) => (
                           <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
@@ -816,7 +977,7 @@ export default function CampaignDetailsPage() {
                 </Button>
               </div>
 
-              {(leaderboardData?.data?.top_low_risk_employees ?? []).length > 0 ? (
+              {topLowRiskEmployees.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead className="border-b border-gray-200">
@@ -834,7 +995,7 @@ export default function CampaignDetailsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(leaderboardData?.data?.top_low_risk_employees ?? [])
+                      {topLowRiskEmployees
                         .slice(0, 10)
                         .map((employee: any, idx: number) => (
                           <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
