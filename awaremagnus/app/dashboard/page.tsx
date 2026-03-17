@@ -31,6 +31,7 @@ import {
   useUserDashboards,
   useSystemStrugglingModules,
   useOrganizationStrugglingModules,
+  useOrganizationCampaignCompletions,
   useOrganizationMonthlyCompletion,
   useUserAssignments,
   useAchievementStatistics,
@@ -123,6 +124,10 @@ export default function DashboardPage() {
   const { data: systemStrugglingRaw } = useSystemStrugglingModules({ enabled: isPlatformAdmin });
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
   const { data: licenseData } = useLicenseInfo(!isUser);
+  const { data: orgCampaignCompletions } = useOrganizationCampaignCompletions(
+    isUser && user?.id ? { user_id: Number(user.id) } : undefined,
+    { enabled: isOrgAdmin || isUser }
+  );
 
   // Organization monthly completion (used by org-admin Security Awareness Campaign graph)
   const { data: orgMonthlyCompletion } = useOrganizationMonthlyCompletion();
@@ -164,6 +169,48 @@ export default function DashboardPage() {
 
   // Map monthly completion -> chart data for Security Awareness Campaign (Org Admin)
   const campaignMonthly = useMemo(() => {
+    const completionsPayload =
+      (orgCampaignCompletions as any)?.object || (orgCampaignCompletions as any)?.data || {};
+    const completionCampaigns = Array.isArray(completionsPayload?.campaigns)
+      ? completionsPayload.campaigns
+      : [];
+
+    const completionRows = completionCampaigns.flatMap((campaign: any) =>
+      Array.isArray(campaign?.completed_modules) ? campaign.completed_modules : []
+    );
+
+    if (completionRows.length > 0) {
+      const monthMap = new Map<string, { label: string; value: number; sortDate: number }>();
+
+      completionRows.forEach((row: any) => {
+        const rawDate = row?.module_completion_date;
+        const date = rawDate ? new Date(rawDate) : null;
+
+        if (!date || Number.isNaN(date.getTime())) return;
+
+        const key = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+        const label = date.toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        });
+
+        const existing = monthMap.get(key);
+
+        monthMap.set(key, {
+          label,
+          value: (existing?.value ?? 0) + 1,
+          sortDate: Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1),
+        });
+      });
+
+      const sorted = Array.from(monthMap.values()).sort((a, b) => a.sortDate - b.sortDate);
+
+      return {
+        labels: sorted.map((item) => item.label),
+        data: sorted.map((item) => item.value),
+      };
+    }
+
     const monthly =
       isOrgAdmin && orgMonthlyCompletion ? orgMonthlyCompletion.object?.monthly_data : [];
 
@@ -173,7 +220,7 @@ export default function DashboardPage() {
     const data = monthly.map((m: any) => Number(m.modules_completed || 0));
 
     return { labels, data };
-  }, [isOrgAdmin, orgMonthlyCompletion]);
+  }, [isOrgAdmin, orgMonthlyCompletion, orgCampaignCompletions]);
 
   // Modules for Module Details chart
   const modules = useMemo(() => {

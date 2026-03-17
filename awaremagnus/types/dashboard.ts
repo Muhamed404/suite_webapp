@@ -179,6 +179,32 @@ export interface OrganizationLeaderboardResponse {
   };
 }
 
+export interface CampaignCompletedModule {
+  module_id: number;
+  module_name: string;
+  user_id: number;
+  user_name: string;
+  module_completion_date: string;
+}
+
+export interface CampaignCompletionGroup {
+  campaign_id: number;
+  campaign_name: string;
+  completed_modules: CampaignCompletedModule[];
+}
+
+export interface OrganizationCampaignCompletionsResponse {
+  message: string;
+  statusCode: number;
+  alertType: string;
+  object?: {
+    campaigns: CampaignCompletionGroup[];
+  };
+  data?: {
+    campaigns: CampaignCompletionGroup[];
+  };
+}
+
 export interface UserDashboardMetrics {
   id: number;
   org_id: number;

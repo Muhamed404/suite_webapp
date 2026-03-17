@@ -14,6 +14,7 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import {
   useOrganizationLeaderboard,
+  useOrganizationCampaignCompletions,
   useAchievementStatisticsByCampaign,
   useAchievementStatisticsWithCampaign,
   useAvatarStatisticsByCampaign,
@@ -35,6 +36,9 @@ export default function CampaignDetailsPage() {
   const { data: leaderboardData } = useOrganizationLeaderboard({
     campaignId,
     count: 10,
+  });
+  const { data: campaignCompletionsData } = useOrganizationCampaignCompletions({
+    campaign_id: campaignId,
   });
   const { data: achievementData } = useAchievementStatisticsByCampaign(campaignId);
   const { data: generalAchievementData } = useAchievementStatisticsWithCampaign(campaignId);
@@ -214,6 +218,67 @@ export default function CampaignDetailsPage() {
       : 0;
   const remainingDaysRadius = 34;
   const remainingDaysCircumference = 2 * Math.PI * remainingDaysRadius;
+  type ModuleGraphDatum = {
+    id: number;
+    moduleName: string;
+    completion: number;
+  };
+
+  const completionsPayload =
+    (campaignCompletionsData as any)?.object || (campaignCompletionsData as any)?.data || {};
+  const completionCampaigns = Array.isArray(completionsPayload?.campaigns)
+    ? completionsPayload.campaigns
+    : [];
+  const selectedCompletionCampaign = completionCampaigns.find(
+    (campaign: any) => Number(campaign?.campaign_id) === campaignId
+  );
+  const completedModuleRows = selectedCompletionCampaign?.completed_modules;
+
+  const graphDataFromCompletions: ModuleGraphDatum[] = Array.isArray(completedModuleRows)
+    ? Array.from(
+        completedModuleRows
+          .reduce(
+            (
+              map: Map<number, { id: number; moduleName: string; userIds: Set<number> }>,
+              row: any,
+              index: number
+            ) => {
+          const id = Number(row?.module_id ?? index);
+          const userId = Number(row?.user_id ?? 0);
+
+          if (!map.has(id)) {
+            map.set(id, {
+              id,
+              moduleName: row?.module_name ?? `Module ${map.size + 1}`,
+              userIds: new Set<number>(),
+            });
+          }
+
+          if (userId > 0) {
+            map.get(id)!.userIds.add(userId);
+          }
+
+          return map;
+            },
+            new Map<number, { id: number; moduleName: string; userIds: Set<number> }>()
+          )
+          .values()
+      )
+        .map((module) => {
+          const totalEnrolledUsers = Number(campaignDashboard?.total_users_enrolled || 0);
+          const completion =
+            totalEnrolledUsers > 0
+              ? Math.round((module.userIds.size / totalEnrolledUsers) * 100)
+              : 100;
+
+          return {
+            id: module.id,
+            moduleName: module.moduleName,
+            completion: Math.max(0, Math.min(100, completion)),
+          };
+        })
+        .slice(0, 10)
+    : [];
 
   const moduleCompletionSource =
     campaignDashboard?.module_completion_data ||
@@ -222,7 +287,7 @@ export default function CampaignDetailsPage() {
     campaignDashboard?.top_struggling_topics ||
     [];
 
-  const moduleCompletionData = Array.isArray(moduleCompletionSource)
+  const fallbackModuleCompletionData: ModuleGraphDatum[] = Array.isArray(moduleCompletionSource)
     ? moduleCompletionSource
         .map((module: any, index: number) => {
           const rawCompletion =
@@ -243,6 +308,9 @@ export default function CampaignDetailsPage() {
         })
         .slice(0, 10)
     : [];
+
+  const moduleCompletionData =
+    graphDataFromCompletions.length > 0 ? graphDataFromCompletions : fallbackModuleCompletionData;
 
   const moduleGraphPoints = moduleCompletionData.map((module, index) => {
     const x =
