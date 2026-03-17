@@ -302,7 +302,9 @@
 			"campaignNFC": "NFC",
 			"campaignUSB": "USB",
 			"campaignSMS": "SMS",
-			"campaignWhatsapp": "واتساب"
+			"campaignWhatsapp": "واتساب",
+			"simulatorEmails": "رسائل المحاكاة"
+	
 		},
 		"suite": {
 			"suiteManagement": "إدارة المجموعة",
@@ -319,7 +321,8 @@
 			"groups": "المجموعات",
 			"subscriptionHistory": "سجل الاشتراكات",
 			"products": "المنتجات",
-			"logout": "تسجيل الخروج"
+			"logout": "تسجيل الخروج",
+			"smtpNotifications": "menu.suite.smtpNotifications"
 		}
 	},
 	"organization": {

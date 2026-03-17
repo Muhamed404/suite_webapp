@@ -247,6 +247,7 @@ function toggleMenus() {
 
   const isPrimaryCollapsed = primaryMenu.classList.contains('w-16');
   const isSubCollapsed = subMenu.classList.contains('w-16');
+  const isRtl = document.documentElement.dir === 'rtl';
 
   if (isPrimaryCollapsed) {
     primaryMenu.classList.remove('w-16');
@@ -257,7 +258,7 @@ function toggleMenus() {
     primaryText.forEach(el => el.classList.remove('hidden'));
     subText.forEach(el => el.classList.add('hidden'));
 
-    icon.classList.add('scale-x-[-1]');
+    icon.innerHTML = isRtl ? '‹' : '›';
   } else {
     primaryMenu.classList.remove('w-48');
     primaryMenu.classList.add('w-16');
@@ -267,7 +268,7 @@ function toggleMenus() {
     primaryText.forEach(el => el.classList.add('hidden'));
     subText.forEach(el => el.classList.remove('hidden'));
 
-    icon.classList.remove('scale-x-[-1]');
+    icon.innerHTML = isRtl ? '›' : '‹';
   }
 }
 
@@ -275,8 +276,8 @@ function toggleMenus() {
 document.addEventListener('DOMContentLoaded', () => {
   const icon = document.getElementById('flip');
   if (icon) {
-    icon.classList.add('rotated');
-    icon.style.transform = 'rotate(180deg)';
+    const isRtl = document.documentElement.dir === 'rtl';
+    icon.innerHTML = isRtl ? '‹' : '›';
   }
 });
 
