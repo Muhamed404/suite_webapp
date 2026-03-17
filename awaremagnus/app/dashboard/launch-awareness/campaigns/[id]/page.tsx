@@ -9,6 +9,8 @@ import { Tooltip } from "@heroui/tooltip";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { CertificationChart } from "@/components/modules/dashboard/charts/certification-chart";
+import { SemiCircleChart } from "@/components/modules/dashboard/charts/semi-circle-chart";
 import { useUpdateCampaign, useCampaignDashboard } from "@/hooks/useCampaigns";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
@@ -486,58 +488,48 @@ export default function CampaignDetailsPage() {
               </p>
             </div>
 
-            {/* Employee Risk States - Placeholder for chart */}
+            {/* Employee Risk Rates */}
             <div className="col-span-4 row-span-4 col-start-1 row-start-8 bg-white rounded-xl p-4 flex flex-col items-center justify-center">
-              <h3 className="text-xs font-semibold text-gray-800 mb-2">Employee Risk States</h3>
-              <div className="flex gap-6 text-xs mb-4">
-                <div className="flex flex-col items-center">
-                  <div className="text-lg font-bold text-green-600">
-                    {campaignDashboard?.metrics?.total_low_risk_employees || 0}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span>Low Risk</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="text-lg font-bold text-yellow-600">
-                    {campaignDashboard?.metrics?.total_medium_risk_employees || 0}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <span>Medium Risk</span>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="text-lg font-bold text-red-600">
-                    {campaignDashboard?.metrics?.total_high_risk_employees || 0}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <span>High Risk</span>
-                  </div>
-                </div>
+              <h3 className="text-xs font-semibold text-gray-800 mb-2">Employee Risk Rates</h3>
+              <div className="w-72 h-72 flex items-center justify-center">
+                <SemiCircleChart
+                  sent={campaignDashboard?.metrics?.total_low_risk_employees ?? 0}
+                  opened={campaignDashboard?.metrics?.total_medium_risk_employees ?? 0}
+                  admin={campaignDashboard?.metrics?.total_high_risk_employees ?? 0}
+                  color1="#3ACE89"
+                  color2="#FBBF24"
+                  color3="#FB5050"
+                  labels={["Low Risk", "Medium Risk", "High Risk"]}
+                />
               </div>
             </div>
 
-            {/* Employee Certification - Placeholder for chart */}
+            {/* Employee Certification */}
             <div className="col-span-4 row-span-4 col-start-5 row-start-8 bg-white rounded-xl p-4 flex flex-col items-center justify-center">
               <h3 className="text-xs font-semibold text-gray-800 mb-2">Employee Certification</h3>
-              <div className="flex gap-4 text-xs">
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-green-500" />
-                  <span>
-                    Certified: {campaignDashboard?.metrics?.total_certified_employees || 0}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                  <span>
-                    Pending:{" "}
-                    {(campaignDashboard?.metrics?.total_employees_modules_enrolled || 0) -
-                      (campaignDashboard?.metrics?.total_certified_employees || 0)}
-                  </span>
-                </div>
+              <CertificationChart
+                color="#3ACE89"
+                color2="#FB5050"
+                value={Math.round(
+                  ((campaignDashboard?.metrics?.total_certified_employees ?? 0) /
+                    Math.max(
+                      (campaignDashboard?.metrics?.total_certified_employees ?? 0) +
+                        (campaignDashboard?.metrics?.total_uncertified_employees ?? 0),
+                      1
+                    )) *
+                    100
+                )}
+              />
+
+              <div className="flex justify-center gap-4 text-xs text-gray-600 mt-3">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-green-400 rounded-full" />
+                  Certified: {campaignDashboard?.metrics?.total_certified_employees || 0}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 bg-red-400 rounded-full" />
+                  Not Certified: {campaignDashboard?.metrics?.total_uncertified_employees || 0}
+                </span>
               </div>
             </div>
 
