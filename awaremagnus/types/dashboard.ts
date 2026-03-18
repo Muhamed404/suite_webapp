@@ -183,7 +183,9 @@ export interface CampaignCompletedModule {
   module_id: number;
   module_name: string;
   user_id: number;
-  user_name: string;
+  user_name?: string;
+  first_name?: string | null;
+  last_name?: string | null;
   module_completion_date: string;
 }
 

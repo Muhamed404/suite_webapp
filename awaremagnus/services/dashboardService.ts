@@ -104,6 +104,7 @@ export const dashboardService = {
   getOrganizationCampaignCompletions: async (params?: {
     campaign_id?: number;
     user_id?: number;
+    language_id?: number;
   }) => {
     const { data } = await awmClient.get<OrganizationCampaignCompletionsResponse>(
       `${API_BASE}/dashboard/organizations/campaign/completions`,

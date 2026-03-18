@@ -4,8 +4,9 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { ArrowLeft, Play, Trophy } from "lucide-react";
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Tooltip } from "@heroui/tooltip";
+import Chart from "react-apexcharts";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -19,11 +20,12 @@ import {
   useAchievementStatisticsWithCampaign,
   useAvatarStatisticsByCampaign,
 } from "@/hooks/useDashboard";
+import { getLanguageId } from "@/utils/languageMapping";
 
 export default function CampaignDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
   const t = useTranslations("dashboard");
 
@@ -37,8 +39,10 @@ export default function CampaignDetailsPage() {
     campaignId,
     count: 10,
   });
+  const currentLanguageId = getLanguageId(locale as "en" | "ar");
   const { data: campaignCompletionsData } = useOrganizationCampaignCompletions({
     campaign_id: campaignId,
+    language_id: currentLanguageId,
   });
   const { data: achievementData } = useAchievementStatisticsByCampaign(campaignId);
   const { data: generalAchievementData } = useAchievementStatisticsWithCampaign(campaignId);
@@ -218,113 +222,115 @@ export default function CampaignDetailsPage() {
       : 0;
   const remainingDaysRadius = 34;
   const remainingDaysCircumference = 2 * Math.PI * remainingDaysRadius;
-  type ModuleGraphDatum = {
-    id: number;
-    moduleName: string;
-    completion: number;
-  };
 
-  const completionsPayload =
-    (campaignCompletionsData as any)?.object || (campaignCompletionsData as any)?.data || {};
+  const completionsPayload = ((campaignCompletionsData as any)?.object || (campaignCompletionsData as any)?.data || {});
   const completionCampaigns = Array.isArray(completionsPayload?.campaigns)
     ? completionsPayload.campaigns
     : [];
   const selectedCompletionCampaign = completionCampaigns.find(
     (campaign: any) => Number(campaign?.campaign_id) === campaignId
   );
-  const completedModuleRows = selectedCompletionCampaign?.completed_modules;
-
-  const graphDataFromCompletions: ModuleGraphDatum[] = Array.isArray(completedModuleRows)
-    ? Array.from(
-        completedModuleRows
-          .reduce(
-            (
-              map: Map<number, { id: number; moduleName: string; userIds: Set<number> }>,
-              row: any,
-              index: number
-            ) => {
-          const id = Number(row?.module_id ?? index);
-          const userId = Number(row?.user_id ?? 0);
-
-          if (!map.has(id)) {
-            map.set(id, {
-              id,
-              moduleName: row?.module_name ?? `Module ${map.size + 1}`,
-              userIds: new Set<number>(),
-            });
-          }
-
-          if (userId > 0) {
-            map.get(id)!.userIds.add(userId);
-          }
-
-          return map;
-            },
-            new Map<number, { id: number; moduleName: string; userIds: Set<number> }>()
-          )
-          .values()
-      )
-        .map((module) => {
-          const totalEnrolledUsers = Number(campaignDashboard?.total_users_enrolled || 0);
-          const completion =
-            totalEnrolledUsers > 0
-              ? Math.round((module.userIds.size / totalEnrolledUsers) * 100)
-              : 100;
-
-          return {
-            id: module.id,
-            moduleName: module.moduleName,
-            completion: Math.max(0, Math.min(100, completion)),
-          };
-        })
-        .slice(0, 10)
+  const completedModuleRows = Array.isArray(selectedCompletionCampaign?.completed_modules)
+    ? selectedCompletionCampaign.completed_modules
     : [];
 
-  const moduleCompletionSource =
-    campaignDashboard?.module_completion_data ||
-    campaignDashboard?.module_progress ||
-    campaignDashboard?.modules_completion ||
-    campaignDashboard?.top_struggling_topics ||
-    [];
+  const modules = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const row of completedModuleRows) {
+      const moduleId = Number(row?.module_id || 0);
+      if (!moduleId) continue;
+      const moduleName = row?.module_name || `Module ${moduleId}`;
+      if (!map.has(moduleId)) map.set(moduleId, moduleName);
+    }
 
-  const fallbackModuleCompletionData: ModuleGraphDatum[] = Array.isArray(moduleCompletionSource)
-    ? moduleCompletionSource
-        .map((module: any, index: number) => {
-          const rawCompletion =
-            module.completion_percent ??
-            module.progress_percent ??
-            module.module_progress_percent ??
-            module.average_completion_percent ??
-            module.average_quiz_score ??
-            module.completion ??
-            0;
-          const completion = Math.max(0, Math.min(100, Number(rawCompletion) || 0));
+    const items = Array.from(map.entries()).map(([moduleId, moduleName]) => ({
+      moduleId,
+      moduleName,
+    }));
 
-          return {
-            id: module.module_id ?? module.id ?? index,
-            moduleName: module.module_name ?? module.name ?? `Module ${index + 1}`,
-            completion,
-          };
-        })
-        .slice(0, 10)
-    : [];
+    return items.sort((a, b) => {
+      const nameCompare = a.moduleName.localeCompare(b.moduleName);
+      return nameCompare !== 0 ? nameCompare : a.moduleId - b.moduleId;
+    });
+  }, [completedModuleRows]);
 
-  const moduleCompletionData =
-    graphDataFromCompletions.length > 0 ? graphDataFromCompletions : fallbackModuleCompletionData;
+  const parseYmdDate = (value?: string | null): Date | null => {
+    if (!value) return null;
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
 
-  const moduleGraphPoints = moduleCompletionData.map((module, index) => {
-    const x =
-      moduleCompletionData.length === 1
-        ? 52
-        : 8 + (index / (moduleCompletionData.length - 1)) * 84;
-    const y = 92 - (module.completion / 100) * 76;
+  // Extract min/max dates for chart x-axis range
+  const completionDates = completedModuleRows
+    .map((row: any) => {
+      const date = parseYmdDate(row?.module_completion_date);
+      return date ? date.getTime() : null;
+    })
+    .filter((time: number | null): time is number => time !== null);
 
-    return { ...module, x, y };
-  });
+  const minDate = completionDates.length > 0 ? Math.min(...completionDates) : null;
+  const maxDate = completionDates.length > 0 ? Math.max(...completionDates) : null;
+  const hasSingleDate = minDate !== null && maxDate !== null && minDate === maxDate;
+  const oneDayMs = 24 * 60 * 60 * 1000;
+  const xAxisMin = hasSingleDate
+    ? ((minDate ?? 0) - oneDayMs)
+    : (minDate ?? undefined);
+  const xAxisMax = hasSingleDate
+    ? ((maxDate ?? 0) + oneDayMs)
+    : (maxDate ?? undefined);
 
-  const moduleLinePath = moduleGraphPoints
-    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
-    .join(" ");
+  // multi-day ranges compute number of days and cap ticks to 7 to avoid clutter.
+  const _xMin = xAxisMin as number | undefined;
+  const _xMax = xAxisMax as number | undefined;
+  const dateSpanMs = _xMin !== undefined && _xMax !== undefined ? Math.max(0, _xMax - _xMin) : 0;
+  const spanDays = dateSpanMs > 0 ? Math.ceil(dateSpanMs / oneDayMs) : 0;
+  const xAxisTickAmount = hasSingleDate ? 3 : spanDays > 0 ? Math.min(7, spanDays + 1) : undefined;
+
+  // Transform completion data for ApexCharts
+  const completionGraphPoints: Array<{
+    x: number;
+    y: number;
+    moduleId: number;
+    moduleName: string;
+    userName: string;
+    formattedDate: string;
+  }> = completedModuleRows
+    .map((row: any) => {
+      const moduleId = Number(row?.module_id || 0);
+      const completionDate = parseYmdDate(row?.module_completion_date);
+      if (!moduleId || !completionDate) return null;
+
+      const moduleName = row?.module_name || modules.find((m) => m.moduleId === moduleId)?.moduleName || `Module ${moduleId}`;
+      const fullName = `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
+      const formattedDate = completionDate.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+
+      return {
+        x: completionDate.getTime(),
+        y: modules.findIndex((m) => m.moduleId === moduleId) + 1,
+        moduleId,
+        moduleName,
+        userName: fullName || `User ${row?.user_id || "-"}`,
+        formattedDate,
+      };
+    })
+    .filter((item: any): item is {
+      x: number;
+      y: number;
+      moduleId: number;
+      moduleName: string;
+      userName: string;
+      formattedDate: string;
+    } => item !== null);
+  // Chart data (only x and y for ApexCharts)
+  const completionGraphData = completionGraphPoints.map(
+    (point: { x: number; y: number }) => ({ x: point.x, y: point.y })
+  );
+
+
 
   const orgLeaderboard = (leaderboardData as any)?.object || (leaderboardData as any)?.data || {};
   const topHighRiskEmployees = Array.isArray(orgLeaderboard?.top_high_risk_employees)
@@ -583,71 +589,182 @@ export default function CampaignDetailsPage() {
             <div className="col-span-8 row-span-2 col-start-1 row-start-6">
               <div className="bg-white rounded-xl p-4">
                 <div className="mb-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-700 text-xs font-medium">Module Completion Graph</span>
-                    <span className="text-gray-500 text-xs">{moduleCompletionData.length} modules</span>
+                  <div className="flex justify-between items-center mb-3">
+                    <div>
+                      <h3 className="text-gray-800 text-sm font-bold">Module Completion Timeline</h3>
+                      <p className="text-gray-500 text-xs mt-0.5">{completionGraphPoints.length} completions • {modules.length} modules</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                        <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-400/40" />
+                        <span>Completion</span>
+                      </div>
+                    </div>
                   </div>
 
-                  {moduleGraphPoints.length > 0 ? (
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <div className="flex gap-2">
-                        <div className="w-8 text-[10px] text-gray-400 leading-[32px] pt-1">
-                          <div>100%</div>
-                          <div>50%</div>
-                          <div>0%</div>
-                        </div>
+                  {completionGraphPoints.length > 0 ? (
+                    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 rounded-lg p-4 border border-blue-100/50 shadow-sm w-full">
+                      <Chart
+                        options={{
+                          chart: {
+                            type: "scatter",
+                            sparkline: { enabled: false },
+                            toolbar: {
+                              show: false,
+                            },
+                            zoom: {
+                              enabled: false,
+                            },
+                            parentHeightOffset: 0,
+                          },
+                          colors: ["#3B82F6"],
+                          plotOptions: {
+                            bubble: {
+                              minBubbleRadius: 3,
+                              maxBubbleRadius: 8,
+                            },
+                          } as any,
+                          xaxis: {
+                            type: "datetime",
+                            min: xAxisMin,
+                            max: xAxisMax,
+                            title: {
+                              text: "Date",
+                              style: {
+                                fontSize: "12px",
+                                fontWeight: 600,
+                                color: "#475569",
+                              },
+                            },
+                            labels: {
+                              format: "dd MMM",
+                              datetimeUTC: false,
+                              showDuplicates: false,
+                              style: {
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                colors: "#64748B",
+                              },
+                            },
+                            axisBorder: {
+                              show: true,
+                              color: "#94A3B8",
+                              height: 1,
+                            },
+                            axisTicks: {
+                              show: false,
+                            },
+                            crosshairs: {
+                              show: true,
+                              position: "back",
+                              stroke: {
+                                color: "#3B82F6",
+                                width: 0.5,
+                                dashArray: 3,
+                              },
+                            },
+                          },
+                          yaxis: {
+                            min: 0,
+                            max: Math.max(1, modules.length) + 1,
+                            tickAmount: Math.max(1, modules.length) + 1,
+                            decimalsInFloat: 0,
+                            title: {
+                              text: "Modules",
+                              style: {
+                                fontSize: "12px",
+                                fontWeight: 600,
+                                color: "#475569",
+                              },
+                              offsetX: +5,
+                            },
+                            labels: {
+                              formatter: (value: number) => {
+                                const rounded = Math.round(value);
+                                return Number.isInteger(rounded) && rounded >= 0 ? String(rounded) : "";
+                              },
+                              style: {
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                colors: "#64748B",
+                              },
+                              offsetX: -10,
+                            },
+                            axisBorder: {
+                              show: true,
+                              color: "#94A3B8",
+                              width: 1,
+                            },
+                            axisTicks: {
+                              show: false,
+                            },
+                          } as any,
+                          grid: {
+                            borderColor: "#E2E8F0",
+                            strokeDashArray: 2,
+                            xaxis: {
+                              lines: {
+                                show: true,
+                              },
+                            },
+                            yaxis: {
+                              lines: {
+                                show: true,
+                              },
+                            },
+                            padding: {
+                              left: 20,
+                              right: 20,
+                            },
+                          },
+                          tooltip: {
+                            theme: "dark",
+                            custom: function ({ dataPointIndex }: any) {
+                              const point = completionGraphPoints[dataPointIndex];
+                              if (!point) return "";
+                              return `
+                                <div style="background: linear-gradient(to bottom right, #1e40af, #1e3a8a); color: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(147, 197, 253, 0.3);">
+                                  <div style="font-size: 13px; font-weight: bold; color: #dbeafe;">${point.moduleName}</div>
+                                  <div style="color: #bfdbfe; margin-top: 6px; font-weight: 500; font-size: 12px;">${point.userName}</div>
+                                  <div style="color: #93c5fd; font-size: 11px; margin-top: 4px;">${point.formattedDate}</div>
+                                </div>
+                              `;
+                            },
+                          },
+                        }}
+                        series={[
+                          {
+                            name: "Module Completions",
+                            data: completionGraphData,
+                          },
+                        ]}
+                        type="scatter"
+                        height={Math.max(300, 200 + modules.length * 30)}
+                      />
 
-                        <div className="flex-1">
-                          <svg aria-label="Module completion graph" className="w-full h-24" viewBox="0 0 100 100">
-                            <g className="text-gray-200">
-                              <line stroke="currentColor" strokeWidth="0.6" x1="8" x2="92" y1="16" y2="16" />
-                              <line stroke="currentColor" strokeWidth="0.6" x1="8" x2="92" y1="54" y2="54" />
-                              <line stroke="currentColor" strokeWidth="0.6" x1="8" x2="92" y1="92" y2="92" />
-                            </g>
-
-                            {moduleGraphPoints.length > 1 && (
-                              <path
-                                className="text-blue-300"
-                                d={moduleLinePath}
-                                fill="none"
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="1.2"
-                              />
-                            )}
-
-                            {moduleGraphPoints.map((point) => (
-                              <g key={point.id}>
-                                <circle className="text-white" cx={point.x} cy={point.y} fill="currentColor" r="3.1" />
-                                <circle className="text-blue-500" cx={point.x} cy={point.y} fill="currentColor" r="2" />
-                              </g>
-                            ))}
-                          </svg>
-
-                          <div className="mt-1 grid grid-cols-3 gap-1 text-[10px] text-gray-600">
-                            {moduleCompletionData.slice(0, 6).map((module) => (
-                              <div key={module.id} className="truncate" title={`${module.moduleName} (${module.completion}%)`}>
-                                {module.moduleName}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                      <div className="mt-3 pt-3 border-t border-blue-100 flex items-center gap-2 text-[10px] text-gray-600">
+                        <svg className="w-3 h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
+                        </svg>
+                        <span>Hover over any point to view completion details</span>
                       </div>
                     </div>
                   ) : (
-                    <div className="bg-gray-50 rounded-lg p-3 text-xs text-gray-400">
-                      No module completion data available
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-8 text-center border border-gray-200 flex flex-col items-center justify-center min-h-[200px]">
+                      <svg className="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} />
+                      </svg>
+                      <p className="text-gray-400 text-sm font-medium">No module completion data available</p>
+                      <p className="text-gray-300 text-xs mt-1">Completions will appear here as users finish modules</p>
                     </div>
                   )}
-                </div>
 
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-gray-600 text-xs">Campaign Progress</span>
-                  <span className="text-gray-700 font-medium text-xs">
-                    {campaignDashboard?.metrics?.campaign_progress_percent ?? progress}%
-                  </span>
-                </div>
+                  <div className="flex justify-between items-center mb-1 mt-3">
+                    <span className="text-gray-600 text-xs">Campaign Progress</span>
+                    <span className="text-gray-700 font-medium text-xs">
+                      {campaignDashboard?.metrics?.campaign_progress_percent ?? progress}%
+                    </span>
+                  </div>
 
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div
@@ -656,6 +773,7 @@ export default function CampaignDetailsPage() {
                       width: `${campaignDashboard?.metrics?.campaign_progress_percent ?? progress}%`,
                     }}
                   />
+                </div>
                 </div>
               </div>
             </div>

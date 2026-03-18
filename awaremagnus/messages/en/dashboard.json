@@ -25,6 +25,8 @@
     "viewMore": "View more",
     "inRisk": "In Risk",
     "securityAwarenessCampaign": "Security Awareness Campaign",
+    "campaignCompletionTimeline": "Campaign Completion Timeline",
+    "completionsByDateAcrossCampaigns": "Module completions by date across all campaigns",
     "viewAll": "View All",
     "lastCampaignDate": "Last Campaign Date: {date}",
     "weeklyProgress": "Weekly Progress",

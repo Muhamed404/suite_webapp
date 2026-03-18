@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
+import Chart from "react-apexcharts";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { AreaChart } from "@/components/modules/dashboard/charts/area-chart";
@@ -41,11 +42,13 @@ import { useUserPendingSurveys } from "@/hooks/useSurvey";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { decodeJwt, extractUserDisplayName, extractUserEmail } from "@/utils/jwt";
 import { campaignService } from "@/services/campaignService";
+import { getLanguageId } from "@/utils/languageMapping";
 
 export default function DashboardPage() {
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
+  const languageId = getLanguageId(locale as "en" | "ar");
   const queryClient = useQueryClient();
   const { user, token } = useAuthStore();
 
@@ -117,7 +120,7 @@ export default function DashboardPage() {
   const { data: systemData } = useSystemOverview({ enabled: isPlatformAdmin });
   const { data: orgDataResponse } = useOrganizationDashboards();
   const { data: userDataResponse } = useUserDashboards({ userId: user?.id });
-  const { data: assignmentsData } = useUserAssignments({ language_id: 1 });
+  const { data: assignmentsData } = useUserAssignments({ language_id: languageId });
   // Fetch achievement statistics for the org
   const { data: achievementStatsData } = useAchievementStatistics();
 
@@ -125,7 +128,9 @@ export default function DashboardPage() {
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
   const { data: licenseData } = useLicenseInfo(!isUser);
   const { data: orgCampaignCompletions } = useOrganizationCampaignCompletions(
-    isUser && user?.id ? { user_id: Number(user.id) } : undefined,
+    isUser && user?.id
+      ? { user_id: Number(user.id), language_id: languageId }
+      : { language_id: languageId },
     { enabled: isOrgAdmin || isUser }
   );
 
@@ -222,7 +227,102 @@ export default function DashboardPage() {
     return { labels, data };
   }, [isOrgAdmin, orgMonthlyCompletion, orgCampaignCompletions]);
 
-  // Modules for Module Details chart
+  // Campaign Timeline Scatter Chart data (org-admin: all campaigns aggregated)
+  const campaignTimelineData = useMemo(() => {
+    const completionsPayload =
+      (orgCampaignCompletions as any)?.object || (orgCampaignCompletions as any)?.data || {};
+    const completionCampaigns = Array.isArray(completionsPayload?.campaigns)
+      ? completionsPayload.campaigns
+      : [];
+
+    const campaignMap = new Map<number, string>();
+    const points: Array<{
+      x: number;
+      y: number;
+      campaignId: number;
+      campaignName: string;
+      moduleName: string;
+      userName: string;
+      formattedDate: string;
+    }> = [];
+
+    // Extract campaigns and completions
+    completionCampaigns.forEach((campaign: any, campaignIndex: number) => {
+      const campaignId = Number(campaign?.campaign_id || 0);
+      const campaignName = campaign?.campaign_name || `Campaign ${campaignId}`;
+      if (!campaignMap.has(campaignId)) {
+        campaignMap.set(campaignId, campaignName);
+      }
+
+      const completedModules = Array.isArray(campaign?.completed_modules)
+        ? campaign.completed_modules
+        : [];
+      completedModules.forEach((row: any) => {
+        const completionDate = row?.module_completion_date
+          ? new Date(row.module_completion_date)
+          : null;
+        if (!completionDate || Number.isNaN(completionDate.getTime())) return;
+
+        const userName = `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
+        const formattedDate = completionDate.toLocaleDateString(
+          locale === "ar" ? "ar-EG" : "en-US",
+          {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          }
+        );
+
+        points.push({
+          x: completionDate.getTime(),
+          y: campaignIndex + 1, // y = campaign position (1-based)
+          campaignId,
+          campaignName,
+          moduleName: row?.module_name || `Module ${row?.module_id}`,
+          userName: userName || `User ${row?.user_id || "-"}`,
+          formattedDate,
+        });
+      });
+    });
+
+    // Compute axis ranges
+    const xTimes = points.map((p) => p.x);
+    const minDate = xTimes.length > 0 ? Math.min(...xTimes) : null;
+    const maxDate = xTimes.length > 0 ? Math.max(...xTimes) : null;
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    const hasSingleDate = minDate !== null && maxDate !== null && minDate === maxDate;
+    const xAxisMin = hasSingleDate ? (minDate ?? 0) - oneDayMs : minDate ?? undefined;
+    const xAxisMax = hasSingleDate ? (maxDate ?? 0) + oneDayMs : maxDate ?? undefined;
+
+    // Dynamic tick calculation
+    const dateSpanMs =
+      xAxisMin !== undefined && xAxisMax !== undefined
+        ? Math.max(0, (xAxisMax as number) - (xAxisMin as number))
+        : 0;
+    const spanDays = dateSpanMs > 0 ? Math.ceil(dateSpanMs / oneDayMs) : 0;
+    const xAxisTickAmount = hasSingleDate
+      ? 3
+      : spanDays > 0
+        ? Math.min(7, spanDays + 1)
+        : undefined;
+
+    const campaigns = Array.from(campaignMap.values());
+
+    return {
+      points,
+      series: [
+        {
+          name: "Campaign Completions",
+          data: points.map((p) => ({ x: p.x, y: p.y })),
+        },
+      ],
+      xAxisMin,
+      xAxisMax,
+      xAxisTickAmount,
+      campaignCount: campaigns.length,
+    };
+  }, [orgCampaignCompletions, locale]);
+
   const modules = useMemo(() => {
     if (assignmentsData?.object?.assignments && assignmentsData.object.assignments.length > 0) {
       const colors = [
@@ -1570,29 +1670,143 @@ export default function DashboardPage() {
                 {/* Row 2-5: Security Awareness Campaign (cols 1-8, spans 4 rows) */}
                 <div className="col-span-1 md:col-span-8 row-start-3 md:row-start-2 md:row-span-4">
                   <div className="bg-white rounded-xl p-5 flex flex-col h-full">
-                    <div className="flex justify-between items-center mb-1">
-                      <h3 className="text-[16px] font-semibold text-gray-800">
-                        {t("cards.securityAwarenessCampaign")}
-                      </h3>
+                    <div className="flex justify-between items-center mb-3">
+                      <div>
+                        <h3 className="text-[16px] font-semibold text-gray-800">
+                          {t("cards.campaignCompletionTimeline")}
+                        </h3>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {t("cards.completionsByDateAcrossCampaigns")}
+                        </p>
+                      </div>
                       <Link className="text-blue-600 text-sm font-medium" href="#">
                         {t("cards.viewAll")}
                       </Link>
                     </div>
-                    <p className="text-xs text-gray-400 mb-0">
-                      {t("cards.lastCampaignDate", { date: "1/23/05" })}
-                    </p>
                     <div className="flex-1 min-h-0">
                       {/*
-                        For Organization Admins: always render chart using API response (may be empty).
-                        Do NOT fall back to static sample data when API returns success with empty monthly_data.
+                        For Organization Admins: render scatter timeline chart using aggregated campaign API response.
+                        Shows completion date (x-axis) vs campaign index (y-axis) across all campaigns.
                       */}
-                      {isOrgAdmin ? (
-                        <AreaChart
-                          data={campaignMonthly.data}
-                          labels={campaignMonthly.labels}
-                          seriesName="Modules Completed"
-                          yLabel="Modules"
-                        />
+                      {isOrgAdmin && campaignTimelineData.points.length > 0 ? (
+                        <div className="w-full h-full">
+                          <Chart
+                            options={{
+                              chart: {
+                                type: "scatter",
+                                sparkline: { enabled: false },
+                                toolbar: { show: false },
+                                zoom: { enabled: false },
+                                parentHeightOffset: 0,
+                              },
+                              colors: ["#3B82F6"],
+                              plotOptions: {
+                                bubble: {
+                                  minBubbleRadius: 3,
+                                  maxBubbleRadius: 8,
+                                },
+                              } as any,
+                              xaxis: {
+                                type: "datetime",
+                                min: campaignTimelineData.xAxisMin,
+                                max: campaignTimelineData.xAxisMax,
+                                title: {
+                                  text: "Date",
+                                  style: {
+                                    fontSize: "12px",
+                                    fontWeight: 600,
+                                    color: "#475569",
+                                  },
+                                },
+                                labels: {
+                                  format: "dd MMM",
+                                  datetimeUTC: false,
+                                  showDuplicates: false,
+                                  style: {
+                                    fontSize: "11px",
+                                    fontWeight: 500,
+                                    colors: "#64748B",
+                                  },
+                                },
+                                axisBorder: {
+                                  show: true,
+                                  color: "#94A3B8",
+                                  height: 1,
+                                },
+                                axisTicks: { show: false },
+                                crosshairs: {
+                                  show: true,
+                                  position: "back",
+                                  stroke: {
+                                    color: "#3B82F6",
+                                    width: 0.5,
+                                    dashArray: 3,
+                                  },
+                                },
+                              },
+                              yaxis: {
+                                min: 0,
+                                max: Math.max(1, campaignTimelineData.campaignCount) + 1,
+                                tickAmount: Math.max(1, campaignTimelineData.campaignCount) + 1,
+                                decimalsInFloat: 0,
+                                title: {
+                                  text: "Campaigns",
+                                  style: {
+                                    fontSize: "12px",
+                                    fontWeight: 600,
+                                    color: "#475569",
+                                  },
+                                  offsetX: +5,
+                                },
+                                labels: {
+                                  formatter: (value: number) => {
+                                    const rounded = Math.round(value);
+                                    return Number.isInteger(rounded) && rounded >= 0
+                                      ? String(rounded)
+                                      : "";
+                                  },
+                                  style: {
+                                    fontSize: "11px",
+                                    fontWeight: 500,
+                                    colors: "#64748B",
+                                  },
+                                  offsetX: -10,
+                                },
+                                axisBorder: {
+                                  show: true,
+                                  color: "#94A3B8",
+                                  width: 1,
+                                },
+                                axisTicks: { show: false },
+                              } as any,
+                              grid: {
+                                borderColor: "#E2E8F0",
+                                strokeDashArray: 2,
+                                xaxis: { lines: { show: true } },
+                                yaxis: { lines: { show: true } },
+                                padding: { left: 20, right: 20 },
+                              },
+                              tooltip: {
+                                theme: "dark",
+                                custom: function ({ dataPointIndex }: any) {
+                                  const point = campaignTimelineData.points[dataPointIndex];
+                                  if (!point) return "";
+                                  return `
+                                    <div style="background: linear-gradient(to bottom right, #1e40af, #1e3a8a); color: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(147, 197, 253, 0.3);">
+                                      <div style="font-size: 13px; font-weight: bold; color: #dbeafe;">${point.campaignName}</div>
+                                      <div style="color: #bfdbfe; font-size: 12px; margin-top: 4px;">${point.moduleName}</div>
+                                      <div style="color: #bfdbfe; margin-top: 6px; font-weight: 500; font-size: 12px;">${point.userName}</div>
+                                      <div style="color: #93c5fd; font-size: 11px; margin-top: 4px;">${point.formattedDate}</div>
+                                    </div>
+                                  `;
+                                },
+                              },
+                            }}
+                            series={campaignTimelineData.series}
+                            type="scatter"
+                            height={Math.max(300, 200 + campaignTimelineData.campaignCount * 30)}
+                          />
+                        </div>
                       ) : campaignMonthly.data && campaignMonthly.data.length > 0 ? (
                         <AreaChart
                           data={campaignMonthly.data}

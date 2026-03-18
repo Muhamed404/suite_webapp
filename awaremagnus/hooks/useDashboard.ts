@@ -39,7 +39,7 @@ export const DASHBOARD_KEYS = {
       "leaderboard",
       params,
     ],
-    campaignCompletions: (params?: { campaign_id?: number; user_id?: number }) => [
+    campaignCompletions: (params?: { campaign_id?: number; user_id?: number; language_id?: number }) => [
       "dashboard",
       "organization",
       "campaignCompletions",
@@ -165,6 +165,7 @@ export const useOrganizationLeaderboard = (params?: {
 export const useOrganizationCampaignCompletions = (params?: {
   campaign_id?: number;
   user_id?: number;
+  language_id?: number;
 }, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: DASHBOARD_KEYS.organization.campaignCompletions(params),
