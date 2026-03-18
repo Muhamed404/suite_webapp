@@ -306,6 +306,29 @@ export default function DashboardPage() {
     : 0; // Convert minutes to hours
   const levelNumber = userDashboardData?.level_number ?? 1;
   const xpTotalTokens = parseFloat(userDashboardData?.xp_total_tokens ?? "0");
+
+  // Map avatar level → robot image filename (mirrors gamification-stats.tsx)
+  const avatarImageByLevel: Record<number, string> = {
+    1: "Vulnerablenewbe_Level1_Robot.png",
+    2: "AlertApprentice_Level2_Robot.png",
+    3: "CautiousLearner_Level3_Robot.png",
+    4: "InformedDefender_Level4_Robot.png",
+    5: "VigilantGuardian_Level5_Robot.png",
+    6: "SkilledSentinel._Level6_Robot.png",
+    7: "ResilientProtector_Level7_Robot.png",
+    8: "AdvancedWatchman_Level8_Robot.png",
+    9: "ExpertEnforcer_Level9_Robot.png",
+    10: "MasterStrategist_Level10_Robot.png",
+    11: "EliteVanguard_Level11_Robot.png",
+    12: "LegendaryShieldbearer_Level12_Robot.png",
+    13: "SupremeCyberKnight_Level13_Robot.png",
+    14: "UltimateCyberSentinel_Level14_Robot.png",
+  };
+
+  // Resolve the robot image URL from the user's current level
+  const userRobotImageSrc = getContentAssetUrl(
+    `/images/avatars/${avatarImageByLevel[levelNumber] ?? "Vulnerablenewbe_Level1_Robot.png"}`
+  );
   const streakDay = userDashboardData?.streak_day ?? 0;
   const learningVelocity = (() => {
     const raw = userDashboardData?.learning_velocity ?? 0;
@@ -545,11 +568,16 @@ export default function DashboardPage() {
                       <div className="flex-shrink-0">
                         <div className="w-48 h-48 lg:w-56 lg:h-56">
                           <Image
+                            unoptimized
                             alt="Learning Robot"
                             className="w-full h-full object-contain"
                             height={224}
-                            src="/awm/images/avtar.svg"
+                            src={userRobotImageSrc}
                             width={224}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                getContentAssetUrl("/images/avatars/Vulnerablenewbe_Level1_Robot.png");
+                            }}
                           />
                         </div>
                       </div>
@@ -704,17 +732,6 @@ export default function DashboardPage() {
                                 width={40}
                               />
                             </div>
-                            {isUnlocked && (
-                              <span className="absolute top-0 right-0 w-4 h-4 z-10">
-                                <Image
-                                  alt=""
-                                  className="w-full h-full object-contain"
-                                  height={16}
-                                  src={getContentAssetUrl("/images/achivement/achived.svg")}
-                                  width={16}
-                                />
-                              </span>
-                            )}
                           </div>
                         </Tooltip>
                       );
