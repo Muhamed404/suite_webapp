@@ -5,7 +5,7 @@
 <% if (typeof enableSuiteManagementLeftMenu !== 'undefined' && enableSuiteManagementLeftMenu) { %>
     <div class="flex-1 flex flex-col h-[98vh]  max-sm:h-full bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-3xl"> 
 <% } else { %>
-            <div class="flex-1 flex flex-col h-[98vh]  max-sm:h-full bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-r-3xl">
+            <div class="flex-1 flex flex-col h-[98vh]  max-sm:h-full bg-[#F1F5F8] lg:m-2 <%= locale === 'ar' ? 'lg:mr-0 lg:rounded-l-3xl' : 'lg:ml-0 lg:rounded-r-3xl' %> overflow-hidden">
 
 <% } %>
 

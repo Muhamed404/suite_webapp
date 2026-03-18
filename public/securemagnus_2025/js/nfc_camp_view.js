@@ -59,7 +59,7 @@ var barOptions = {
       lines: { show: false }
     }
   },
-  colors: ['#38bdf8', '#a3e635', '#f87171', '#fbbf24', '#a78bfa', '#6366f1'],
+  colors: ['#7CC5FA', '#FB5050', '#3ACE89', '#FBBF24', '#00CCC4', '#8B5CF6', '#FF8F5E'],
   tooltip: {
     theme: 'light'
   }

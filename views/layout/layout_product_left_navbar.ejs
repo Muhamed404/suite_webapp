@@ -1,6 +1,7 @@
 <% 
   // ensure `menu` is always defined to avoid ReferenceError in views
   var menu = (typeof menu !== 'undefined' && menu) ? menu : { suite: [], productMenu: [] }; 
+  var isRtl = locale === 'ar';
 %>
 <!-- Sidebar Backdrop -->
 <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
@@ -18,9 +19,9 @@
       </a>
       <div class="relative  "> <!-- Set height (h-12) as needed for your layout -->
         <button onclick="toggleMenus()"
-          class="absolute right-0 top-7 font-bold py-1 h-14 px-1 bg-[#00CCC440] rounded-l-2xl" style="z-index:20;">
+          class="absolute <%= isRtl ? 'left-0 rounded-r-2xl' : 'right-0 rounded-l-2xl' %> top-7 font-bold py-1 h-14 px-1 bg-[#00CCC440]" style="z-index:20;">
 
-          <span class="text-2xl font-light scale-x-[-1]  inline-block" id="flip">›</span>
+          <span class="text-2xl font-light inline-block" id="flip">›</span>
         </button>
       </div>
 
@@ -71,7 +72,7 @@
 
     <!-- secondry Menu -->
     <div id="subMenu"
-      class="w-48 bg-[var(--bg)] text-gray-800 transition-all duration-300 overflow-hidden mt-2 mb-1.5 rounded-l-3xl">
+      class="w-48 bg-[var(--bg)] text-gray-800 transition-all duration-300 overflow-hidden mt-2 mb-[5px] <%= isRtl ? 'rounded-r-3xl rounded-l-none' : 'rounded-l-3xl rounded-r-none' %>">
       <div class="flex py-8 px-5 gap-3">
         <img src="/securemagnus_2025/images/phys-logo-menu.svg" alt=""> <img
           src="/securemagnus_2025/images/phys-name-menu.svg" class="svg-color menu-text text-[var(--mainblue)]"

@@ -13,6 +13,8 @@ interface SemiCircleChartProps {
   color2: string;
   color3: string;
   labels?: string[];
+  showLegend?: boolean;
+  hideZeroLegendEntries?: boolean;
 }
 
 export const SemiCircleChart = ({
@@ -23,11 +25,13 @@ export const SemiCircleChart = ({
   color2,
   color3,
   labels = ["Sent", "Opened", "Admin"],
+  showLegend = true,
+  hideZeroLegendEntries = false,
 }: SemiCircleChartProps) => {
   const total = sent + opened + admin;
-  const sentPercent = (sent / total) * 100;
-  const openedPercent = (opened / total) * 100;
-  const adminPercent = (admin / total) * 100;
+  const sentPercent = total === 0 ? 0 : (sent / total) * 100;
+  const openedPercent = total === 0 ? 0 : (opened / total) * 100;
+  const adminPercent = total === 0 ? 0 : (admin / total) * 100;
 
   const chartOptions = useMemo(
     () => ({
@@ -47,11 +51,16 @@ export const SemiCircleChart = ({
       labels: labels,
       colors: [color1, color2, color3],
       legend: {
-        show: true,
+        show: showLegend,
         position: "bottom" as const,
         formatter: function (seriesName: string, opts: any) {
-          const _value = opts.w.globals.series[opts.seriesIndex];
-          const label = `${labels[opts.seriesIndex]} (${opts.w.globals.series[opts.seriesIndex].toFixed(2)})`;
+          const value = opts.w.globals.series[opts.seriesIndex];
+          const label = `${labels[opts.seriesIndex]} (${value.toFixed(2)})`;
+
+          if (hideZeroLegendEntries && value === 0) {
+            return "";
+          }
+
           return label;
         },
       },

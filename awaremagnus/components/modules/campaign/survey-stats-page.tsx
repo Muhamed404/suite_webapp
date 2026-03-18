@@ -367,18 +367,19 @@ export function SurveyStatsPage() {
                   <p className="font-medium mb-4">Response Rate</p>
                   <div className="w-72 h-72 flex items-center justify-center">
                     <SemiCircleChart
-                      admin={overall?.total_overall_risky_employees ?? 0}
+                      admin={stats?.response_chart?.total_incorrect_answers ?? 0}
                       color1="#3ACE89"
                       color2="#BEC3C7"
                       color3="#FB5050"
-                      opened={overall?.total_overall_non_submitted_employees ?? 0}
-                      sent={overall?.total_overall_nonrisky_employees ?? 0}
+                      opened={stats?.response_chart?.total_not_submitted ?? 0}
+                      sent={stats?.response_chart?.total_correct_answers ?? 0}
+                      labels={["Correct", "Not Submitted", "Incorrect"]}
                     />
                   </div>
                   <div className="flex gap-4 mt-2 text-[10px]">
-                    <LegendDot color="#3ACE89" label="Non-Risky" />
+                    <LegendDot color="#3ACE89" label="Correct" />
                     <LegendDot color="#BEC3C7" label="Not Submitted" />
-                    <LegendDot color="#FB5050" label="Risky" />
+                    <LegendDot color="#FB5050" label="Incorrect" />
                   </div>
                 </div>
               </div>
@@ -415,18 +416,19 @@ export function SurveyStatsPage() {
                     <p className="font-medium mb-6">Employee Risk Rates</p>
                     <div className="w-72 h-72 flex items-center justify-center">
                       <SemiCircleChart
-                        admin={stats?.response_chart?.total_incorrect_answers ?? 0}
+                        admin={overall?.total_overall_risky_employees ?? 0}
                         color1="#3ACE89"
                         color2="#BEC3C7"
                         color3="#FB5050"
-                        opened={stats?.response_chart?.total_not_submitted ?? 0}
-                        sent={stats?.response_chart?.total_correct_answers ?? 0}
+                        opened={overall?.total_overall_non_submitted_employees ?? 0}
+                        sent={overall?.total_overall_nonrisky_employees ?? 0}
+                        labels={["Non-Risky", "Not Submitted", "Risky"]}
                       />
                     </div>
                     <div className="flex gap-4 mt-2 text-[10px]">
-                      <LegendDot color="#3ACE89" label="Correct" />
+                      <LegendDot color="#3ACE89" label="Non-Risky" />
                       <LegendDot color="#BEC3C7" label="Not Submitted" />
-                      <LegendDot color="#FB5050" label="Incorrect" />
+                      <LegendDot color="#FB5050" label="Risky" />
                     </div>
                   </div>
                 </div>
