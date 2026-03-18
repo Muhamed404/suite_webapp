@@ -20,6 +20,13 @@
     "totalXpTokens": "Total XP Tokens",
     "totalAwarenessCampaigns": "Total Awareness\nCampaigns conducted",
     "securityPosture": "Security Posture",
+    "moduleDetails": "Module Details",
+    "totalModules": "Total Module",
+    "dropdownOptions": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
     "infoTitle": "This is an info alert",
     "infoBody": "More info about this info alert goes here. This example text is longer to show spacing inside content.",
     "viewMore": "View more",
@@ -111,5 +118,74 @@
     "reportCard": "Report Card",
     "certificate": "Certification",
     "logoAndImages": "Logo and Images"
+  },
+  "userWelcome": {
+    "welcome": "Welcome back, {name}!",
+    "question": "Ready To Continue Your Learning Journey?",
+    "level": "Level {level}",
+    "xp": "{xp}/10000 XP",
+    "streak": "You're on a {streak} day streak!",
+    "startButton": "Start"
+  },
+  "userCards": {
+    "certificateCompleted": "Certificate Completed",
+    "studyTime": "Study Time"
+  },
+  "thisWeek": {
+    "title": "This Week",
+    "dropdownWeekly": "Weekly",
+    "lessonsCompleted": "Lesson completed",
+    "studyTime": "Study Time",
+    "xpGained": "XP gained",
+    "learningVelocity": {
+      "label": "Lessons/Day",
+      "title": "Learning Velocity"
+    },
+    "bestSubject": {
+      "label": "Lessons/Day",
+      "title": "Best Subject"
+    }
+  },
+  "pendingTasks": {
+    "title": "Pending Assignments",
+    "viewAll": "View All",
+    "assigned": "Assigned {date}",
+    "level": "Level 1/1",
+    "days": "{days} Days",
+    "columnHeaders": {
+      "campaignName": "Campaign Name",
+      "moduleName": "Module Name",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "action": "Action"
+    },
+    "noData": "No pending assignments",
+    "status": {
+      "pending": "Pending",
+      "inProgress": "In Progress"
+    },
+    "actions": {
+      "view": "View",
+      "start": "Start",
+      "starting": "Starting…"
+    },
+    "pagination": {
+      "showing": "Showing {shown}–{total} out of {all} Entries",
+      "showingSimple": "Showing 1–{total} Entries"
+    },
+    "surveyTitle": "Pending Assessment or Surveys",
+    "surveyColumnHeaders": {
+      "assessmentName": "Assessment Name / Survey",
+      "status": "Status",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "action": "Action"
+    },
+    "surveyNoData": "No pending assessments or surveys",
+    "surveyLoading": "Loading pending assessments or surveys...",
+    "surveyStatus": {
+      "active": "Active"
+    }
   }
 }

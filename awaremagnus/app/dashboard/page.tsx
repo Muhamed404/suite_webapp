@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 import { Button } from "@heroui/button";
+import { Tooltip } from "@heroui/tooltip";
 import Link from "next/link";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -401,6 +402,24 @@ export default function DashboardPage() {
     return set;
   }, [achievementStatsList]);
 
+  // Map: achievement number → full stats object (for tooltip data)
+  const achievementByNumber = useMemo(() => {
+    const map = new Map<number, any>();
+    const items = achievementStatsList;
+
+    for (const a of items) {
+      const img = a?.image_small_url ?? "";
+      const m = img.trim().match(/^(\d{1,2})/);
+
+      if (!m) continue;
+      const n = Number(m[1]);
+
+      if (n >= 1 && n <= 16) map.set(n, a);
+    }
+
+    return map;
+  }, [achievementStatsList]);
+
   // Category stats for achievements
   const categoryStats = useMemo(() => {
     const stats: Record<string, number> = {};
@@ -457,9 +476,9 @@ export default function DashboardPage() {
                   >
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-8 h-full">
                       <div className="flex-1">
-                        <p className="text-gray-300 text-xs">Welcome back, {userDisplayName}!</p>
+                        <p className="text-gray-300 text-xs">{t("userWelcome.welcome", { name: userDisplayName })}</p>
                         <h1 className="text-white text-2xl mt-2 leading-tight">
-                          Ready To Continue Your Learning Journey?
+                          {t("userWelcome.question")}
                         </h1>
 
                         <div className="flex items-end gap-7">
@@ -488,26 +507,25 @@ export default function DashboardPage() {
                               </svg>
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="text-center">
-                                  <p className="text-white text-xs">Level {levelNumber}</p>
+                                  <p className="text-white text-xs">{t("userWelcome.level", { level: levelNumber })}</p>
                                 </div>
                               </div>
                             </div>
                             <div>
                               <p className="text-gray-400 text-xs">
-                                {xpTotalTokens.toLocaleString()}/10000 XP
+                                {t("userWelcome.xp", { xp: xpTotalTokens.toLocaleString() })}
                               </p>
                             </div>
                           </div>
 
                           <div className="flex flex-col gap-2">
                             <p className="text-white text-base">
-                              You're on a{" "}
-                              <span className="font-semibold">{streakDay} day streak!</span>
+                              {t("userWelcome.streak", { streak: streakDay })}
                             </p>
                             <button className="bg-[#3FBDFF] hover:bg-[#3FBDFF] justify-center text-white font-semibold text-xs px-2 py-3 rounded-full inline-flex items-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg">
-                              Start
+                              {t("userWelcome.startButton")}
                               <svg
-                                className="w-5 h-5"
+                                className={clsx("w-5 h-5", isRtl && "rotate-180")}
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -574,7 +592,7 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <p className="text-gray-500 text-[10px] font-medium">
-                          Certificate Completed
+                          {t("userCards.certificateCompleted")}
                         </p>
                         <p className="text-gray-900 text-lg font-bold">
                           {totalCompletedCertificates}/{totalCertificatesAvailable}
@@ -593,7 +611,7 @@ export default function DashboardPage() {
                         />
                       </div>
                       <div>
-                        <p className="text-gray-500 text-[10px] font-medium">Study Time</p>
+                        <p className="text-gray-500 text-[10px] font-medium">{t("gamification.studyTime")}</p>
                         <p className="text-gray-900 text-lg font-bold">{totalStudyTimeHours}h</p>
                       </div>
                     </div>
@@ -614,9 +632,9 @@ export default function DashboardPage() {
                         />
                       </div>
                       <div>
-                        <h2 className="text-gray-900 text-xs font-bold">Achievement Gallery</h2>
+                        <h2 className="text-gray-900 text-xs font-bold">{t("gamification.achievementGallery")}</h2>
                         <p className="text-gray-500 text-[9px] mt-0.5">
-                          Organization locked and unlocked badges
+                          {t("gamification.achievementSubtitle")}
                         </p>
                       </div>
                     </div>
@@ -624,9 +642,9 @@ export default function DashboardPage() {
                       className="text-gray-700 text-[9px] font-medium flex items-center gap-0.5 hover:text-gray-900"
                       href="#"
                     >
-                      View All
+                      {t("cards.viewAll")}
                       <svg
-                        className="w-2.5 h-2.5"
+                        className={clsx("w-2.5 h-2.5", isRtl && "rotate-180")}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -645,32 +663,60 @@ export default function DashboardPage() {
                     {Array.from({ length: 16 }, (_, index) => {
                       const achievementId = index + 1;
                       const isUnlocked = unlockedAchievementIds.has(achievementId);
+                      const meta = achievementByNumber.get(achievementId);
+
+                      const tooltipContent = (
+                        <div className="flex flex-col gap-1 max-w-[200px] p-1">
+                          <p className="font-semibold text-sm text-gray-900">
+                            {meta?.achievement_name ?? `Achievement #${achievementId}`}
+                          </p>
+                          {meta?.achievement_description && (
+                            <p className="text-xs text-gray-600 leading-tight">
+                              {meta.achievement_description}
+                            </p>
+                          )}
+                          <div className="flex items-center justify-between mt-1 gap-2">
+                            <span
+                              className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
+                            >
+                              {isUnlocked ? "Unlocked" : "Locked"}
+                            </span>
+                            {isUnlocked && meta?.employee_count != null && (
+                              <span className="text-xs text-gray-500">
+                                {meta.employee_count}x
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
 
                       return (
-                        <div key={index} className="relative">
-                          <div
-                            className={`w-10 h-10 flex items-center justify-center ${isUnlocked ? "" : "opacity-40"}`}
-                          >
-                            <Image
-                              alt=""
-                              className="w-full h-full object-contain"
-                              height={40}
-                              src={getContentAssetUrl(`/images/achivement/${achievementId}.png`)}
-                              width={40}
-                            />
-                          </div>
-                          {isUnlocked && (
-                            <span className="absolute top-0 right-0 w-4 h-4 z-10">
+                        <Tooltip key={index} content={tooltipContent} placement="top" delay={300} closeDelay={0}>
+                          <div className="relative">
+                            <div
+                              className={`w-10 h-10 flex items-center justify-center ${isUnlocked ? "" : "opacity-40"}`}
+                            >
                               <Image
                                 alt=""
                                 className="w-full h-full object-contain"
-                                height={16}
-                                src={getContentAssetUrl("/images/achivement/achived.svg")}
-                                width={16}
+                                height={40}
+                                src={getContentAssetUrl(`/images/achivement/${achievementId}.png`)}
+                                width={40}
                               />
-                            </span>
-                          )}
-                        </div>
+                            </div>
+                            {isUnlocked && (
+                              <span className="absolute top-0 right-0 w-4 h-4 z-10">
+                                <Image
+                                  alt=""
+                                  className="w-full h-full object-contain"
+                                  height={16}
+                                  src={getContentAssetUrl("/images/achivement/achived.svg")}
+                                  width={16}
+                                />
+                              </span>
+                            )}
+                          </div>
+                        </Tooltip>
                       );
                     })}
                   </div>
@@ -753,7 +799,7 @@ export default function DashboardPage() {
 
                   <div className="bg-white rounded-lg p-2.5">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-gray-700 text-[10px] font-medium">Achievements</span>
+                      <span className="text-gray-700 text-[10px] font-medium">{t("gamification.achievements")}</span>
                       <div>
                         <span className="text-gray-900 text-sm font-bold">
                           {achievementStatsData?.object?.total_unique_achievements_unlocked || 0}
@@ -800,11 +846,11 @@ export default function DashboardPage() {
                           <line strokeLinecap="round" strokeWidth="2" x1="8" x2="8" y1="2" y2="6" />
                           <line strokeWidth="2" x1="3" x2="21" y1="10" y2="10" />
                         </svg>
-                        <h2 className="text-gray-900 text-sm font-semibold">This Week</h2>
+                        <h2 className="text-gray-900 text-sm font-semibold">{t("thisWeek.title")}</h2>
                       </div>
                       <div className="relative">
                         <button className="flex items-center gap-1 text-gray-700 text-xs font-medium hover:text-gray-900">
-                          Weekly
+                          {t("thisWeek.dropdownWeekly")}
                           <svg
                             className="w-3 h-3"
                             fill="none"
@@ -824,13 +870,13 @@ export default function DashboardPage() {
 
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-500 text-[10px]">Lesson completed</span>
+                        <span className="text-gray-500 text-[10px]">{t("thisWeek.lessonsCompleted")}</span>
                         <span className="text-gray-900 text-sm font-bold">
                           {(dashboardData as any)?.total_completed_modules || 0}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-500 text-[10px]">Study Time</span>
+                        <span className="text-gray-500 text-[10px]">{t("gamification.studyTime")}</span>
                         <span className="text-gray-900 text-sm font-bold">
                           {(dashboardData as any)?.total_study_time
                             ? ((dashboardData as any).total_study_time / 60).toFixed(1) + "h"
@@ -838,7 +884,7 @@ export default function DashboardPage() {
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-500 text-[10px]">XP gained</span>
+                        <span className="text-gray-500 text-[10px]">{t("thisWeek.xpGained")}</span>
                         <span className="text-purple-600 text-sm font-bold">
                           +{(dashboardData as any)?.xp_total_tokens || 0} XP
                         </span>
@@ -850,15 +896,35 @@ export default function DashboardPage() {
                         <div className="w-7 h-7 bg-red-200 rounded-full flex items-center justify-center flex-shrink-0">
                           <svg
                             className="w-3.5 h-3.5 text-red-500"
-                            fill="currentColor"
-                            viewBox="0 0 20 20"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 25 25"
                           >
-                            <path d="M15 17h5l-5 5v-5zM15 7v5h5l-5-5zM5 17h5l-5 5v-5zM5 7v5H0l5-5z" />
+                            <path
+                              d="M9.80957 19.2354V19.6004C9.80957 20.8654 10.8356 21.8914 12.1016 21.8914C13.3676 21.8914 14.3936 20.8654 14.3936 19.5994V19.2344"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M13.9346 6.6426V5.7246C13.9346 4.7126 13.1146 3.8916 12.1016 3.8916C11.0886 3.8916 10.2686 4.7126 10.2686 5.7246V6.6426"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              fillRule="evenodd"
+                              clipRule="evenodd"
+                              d="M6.66456 11.0798C6.66456 8.57683 8.69356 6.54883 11.1956 6.54883H13.0086C15.5116 6.54883 17.5396 8.57783 17.5396 11.0798V13.8768C17.5396 14.4068 17.7506 14.9158 18.1256 15.2908L18.7666 15.9318C19.1416 16.3068 19.3526 16.8158 19.3526 17.3458C19.3526 18.3898 18.5066 19.2358 17.4626 19.2358H6.74156C5.69756 19.2358 4.85156 18.3898 4.85156 17.3458C4.85156 16.8158 5.06256 16.3068 5.43756 15.9318L6.07856 15.2908C6.45356 14.9158 6.66456 14.4068 6.66456 13.8768V11.0798Z"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </div>
                         <div>
-                          <p className="text-gray-500 text-[9px]">Lessons/Day</p>
-                          <p className="text-gray-900 text-xs font-semibold">Learning Velocity</p>
+                          <p className="text-gray-500 text-[9px]">{t("thisWeek.learningVelocity.label")}</p>
+                          <p className="text-gray-900 text-xs font-semibold">{t("thisWeek.learningVelocity.title")}</p>
                         </div>
                       </div>
                       <span className="text-red-400 text-lg font-bold">
@@ -878,8 +944,8 @@ export default function DashboardPage() {
                           </svg>
                         </div>
                         <div>
-                          <p className="text-gray-500 text-[9px]">Lessons/Day</p>
-                          <p className="text-gray-900 text-xs font-semibold">Best Subject</p>
+                          <p className="text-gray-500 text-[9px]">{t("thisWeek.bestSubject.label")}</p>
+                          <p className="text-gray-900 text-xs font-semibold">{t("thisWeek.bestSubject.title")}</p>
                         </div>
                       </div>
                       <span className="text-purple-400 text-base font-bold">
@@ -893,12 +959,12 @@ export default function DashboardPage() {
                 <div className="col-span-8 row-span-5 row-start-10">
                   <div className="bg-white rounded-2xl p-4 h-full">
                     <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-sm font-semibold text-gray-900">Pending Assignments</h2>
+                      <h2 className="text-sm font-semibold text-gray-900">{t("pendingTasks.title")}</h2>
                       <a
                         className="text-xs text-gray-500 flex items-center gap-1 hover:text-gray-700"
                         href="#"
                       >
-                        View All
+                        {t("pendingTasks.viewAll")}
                         <span className="text-sm">›</span>
                       </a>
                     </div>
@@ -945,10 +1011,10 @@ export default function DashboardPage() {
                                 <h3 className="text-sm font-semibold text-gray-900">
                                   {assignment.module_name}
                                 </h3>
-                                <p className="text-[11px] text-gray-400">Assigned {assigned}</p>
+                                <p className="text-[11px] text-gray-400">{t("pendingTasks.assigned", { date: assigned })}</p>
                                 <div className="flex items-center gap-3 text-[11px] text-gray-500">
-                                  <span>Level 1/1</span>
-                                  <span className="flex items-center gap-1">⏱ {days} Days</span>
+                                  <span>{t("pendingTasks.level")}</span>
+                                  <span className="flex items-center gap-1">⏱ {t("pendingTasks.days", { days })}</span>
                                 </div>
                                 <div className="w-36 h-1 bg-gray-200 rounded-full overflow-hidden">
                                   <div
@@ -970,7 +1036,7 @@ export default function DashboardPage() {
                 <div className="col-span-4 row-span-4 col-start-9 row-start-11">
                   <div className="grid grid-cols-4 p-2 rounded-xl bg-white gap-2 h-full">
                     <div className="bg-[#F1F5F8] rounded-xl p-3 flex flex-col items-center justify-between col-span-2 h-full">
-                      <h3 className="text-xs font-semibold mb-1">Weekly Progress</h3>
+                      <h3 className="text-xs font-semibold mb-1">{t("cards.weeklyProgress")}</h3>
                       <CircularProgressChart
                         color="#00CCC4"
                         size={128}
@@ -978,7 +1044,7 @@ export default function DashboardPage() {
                       />
                     </div>
                     <div className="bg-[#F1F5F8] rounded-xl p-3 flex flex-col items-center justify-between col-span-2 h-full">
-                      <h3 className="text-xs font-semibold mb-1">Quiz Accuracy</h3>
+                      <h3 className="text-xs font-semibold mb-1">{t("cards.quizAccuracy")}</h3>
                       <CircularProgressChart
                         color="#7CC5FA"
                         size={128}
@@ -1025,13 +1091,13 @@ export default function DashboardPage() {
                   if (statusName === "PENDING")
                     return (
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-yellow-50 text-yellow-600 border border-yellow-300 whitespace-nowrap">
-                        Pending
+                        {t("pendingTasks.status.pending")}
                       </span>
                     );
                   if (statusName === "IN_PROGRESS")
                     return (
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-blue-50 text-blue-600 border border-blue-300 whitespace-nowrap">
-                        In Progress
+                        {t("pendingTasks.status.inProgress")}
                       </span>
                     );
 
@@ -1048,7 +1114,7 @@ export default function DashboardPage() {
                     <div className="bg-white rounded-2xl p-4 flex flex-col gap-3">
                       <div className="flex items-center justify-between">
                         <h2 className="text-sm font-semibold whitespace-nowrap">
-                          Pending Assignments
+                          {t("pendingTasks.title")}
                         </h2>
                       </div>
 
@@ -1057,19 +1123,19 @@ export default function DashboardPage() {
                           <table className="min-w-full text-left text-[10px] whitespace-nowrap">
                             <thead className="sticky top-0 bg-gray-50 z-10">
                               <tr className="text-gray-500 font-semibold">
-                                <th className="px-4 py-2">Campaign Name</th>
-                                <th className="px-4 py-2">Module Name</th>
-                                <th className="px-4 py-2">Status</th>
-                                <th className="px-4 py-2">Start Date</th>
-                                <th className="px-4 py-2">End Date</th>
-                                <th className="px-4 py-2">Action</th>
+                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.campaignName")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.moduleName")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.status")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.startDate")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.endDate")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.action")}</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                               {moduleAssignments.length === 0 ? (
                                 <tr>
                                   <td className="px-4 py-4 text-center text-gray-400" colSpan={6}>
-                                    No pending assignments
+                                    {t("pendingTasks.noData")}
                                   </td>
                                 </tr>
                               ) : (
@@ -1128,7 +1194,7 @@ export default function DashboardPage() {
                                                 className="px-3 py-1 rounded-full text-[10px] font-semibold bg-[#3FBDFF] text-white hover:bg-opacity-90 transition-colors whitespace-nowrap inline-block"
                                                 href={`/awm/module/${slug}?campaign_id=${assignment.campaign_id}`}
                                               >
-                                                View
+                                                {t("pendingTasks.actions.view")}
                                               </a>
                                             );
                                           }
@@ -1156,14 +1222,13 @@ export default function DashboardPage() {
 
                       <div className="flex items-center justify-between">
                         <p className="text-gray-500 text-[10px] whitespace-nowrap">
-                          Showing 1–{moduleAssignments.length} out of{" "}
-                          {assignmentsData?.object?.count || 0} Entries
+                          {t("pendingTasks.pagination.showing", { shown: 1, total: moduleAssignments.length, all: assignmentsData?.object?.count || 0 })}
                         </p>
                         <a
                           className="text-[10px] text-blue-600 hover:underline"
                           href="/dashboard/campaign-assignments"
                         >
-                          View All
+                          {t("pendingTasks.viewAll")}
                         </a>
                       </div>
                     </div>
@@ -1172,7 +1237,7 @@ export default function DashboardPage() {
                     <div className="bg-white rounded-2xl p-4 flex flex-col gap-3">
                       <div className="flex items-center justify-between">
                         <h2 className="text-sm font-semibold whitespace-nowrap">
-                          Pending Assessment or Surveys
+                          {t("pendingTasks.surveyTitle")}
                         </h2>
                       </div>
 
@@ -1181,24 +1246,24 @@ export default function DashboardPage() {
                           <table className="min-w-full text-left text-[10px] whitespace-nowrap">
                             <thead className="sticky top-0 bg-gray-50 z-10">
                               <tr className="text-gray-500 font-semibold">
-                                <th className="px-4 py-2">Assessment Name / Survey</th>
-                                <th className="px-4 py-2">Status</th>
-                                <th className="px-4 py-2">Start Date</th>
-                                <th className="px-4 py-2">End Date</th>
-                                <th className="px-4 py-2">Action</th>
+                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.assessmentName")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.status")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.startDate")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.endDate")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.action")}</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                               {pendingSurveysLoading ? (
                                 <tr>
                                   <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
-                                    Loading pending assessments or surveys...
+                                    {t("pendingTasks.surveyLoading")}
                                   </td>
                                 </tr>
                               ) : pendingSurveys.length === 0 ? (
                                 <tr>
                                   <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
-                                    No pending assessments or surveys
+                                    {t("pendingTasks.surveyNoData")}
                                   </td>
                                 </tr>
                               ) : (
@@ -1238,7 +1303,7 @@ export default function DashboardPage() {
                                       </td>
                                       <td className="px-4 py-2.5">
                                         <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-50 text-green-600 border border-green-300 whitespace-nowrap">
-                                          Active
+                                          {t("pendingTasks.surveyStatus.active")}
                                         </span>
                                       </td>
                                       <td
@@ -1260,7 +1325,7 @@ export default function DashboardPage() {
                                             )}`)
                                           }
                                         >
-                                          Start
+                                          {t("pendingTasks.actions.start")}
                                         </button>
                                       </td>
                                     </tr>
@@ -1274,8 +1339,10 @@ export default function DashboardPage() {
 
                       <div className="flex items-center justify-between">
                         <p className="text-gray-500 text-[10px] whitespace-nowrap">
-                          Showing 1–{pendingSurveys.length} Entries
-                        </p>
+                        {t("pendingTasks.pagination.showingSimple", {
+                          total: pendingSurveys.length,
+                        })}
+                      </p>
                       </div>
                     </div>
                   </div>

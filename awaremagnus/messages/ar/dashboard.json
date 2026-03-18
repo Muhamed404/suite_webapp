@@ -20,6 +20,13 @@
     "totalXpTokens": "إجمالي نقاط الخبرة",
     "totalAwarenessCampaigns": "إجمالي حملات التوعية المنفّذة",
     "securityPosture": "الوضع الأمني",
+    "moduleDetails": "تفاصيل الوحدة",
+    "totalModules": "إجمالي الوحدات",
+    "dropdownOptions": {
+      "weekly": "أسبوعي",
+      "monthly": "شهري",
+      "yearly": "سنوي"
+    },
     "infoTitle": "تنبيه معلوماتي",
     "infoBody": "مزيد من المعلومات حول هذا التنبيه تظهر هنا. هذا نص أطول لعرض المسافات داخل المحتوى.",
     "viewMore": "عرض المزيد",
@@ -111,5 +118,74 @@
     "reportCard": "كرت الدرجات",
     "certificate": "الشهادة",
     "logoAndImages": "الشعار والصور"
+  },
+  "userWelcome": {
+    "welcome": "مرحباً بعودتك، {name}!",
+    "question": "هل أنت مستعد لمواصلة رحلة التعلم الخاصة بك؟",
+    "level": "المستوى {level}",
+    "xp": "{xp}/10000 XP",
+    "streak": "أنت على سلسلة {streak} يوم!",
+    "startButton": "ابدأ"
+  },
+  "userCards": {
+    "certificateCompleted": "الشهادة المكتملة",
+    "studyTime": "وقت الدراسة"
+  },
+  "thisWeek": {
+    "title": "هذا الأسبوع",
+    "dropdownWeekly": "أسبوعي",
+    "lessonsCompleted": "الدرس المكتمل",
+    "studyTime": "وقت الدراسة",
+    "xpGained": "نقاط الخبرة المكتسبة",
+    "learningVelocity": {
+      "label": "الدروس/اليوم",
+      "title": "سرعة التعلم"
+    },
+    "bestSubject": {
+      "label": "الدروس/اليوم",
+      "title": "أفضل موضوع"
+    }
+  },
+  "pendingTasks": {
+    "title": "المهام المعلقة",
+    "viewAll": "عرض الكل",
+    "assigned": "مُسند {date}",
+    "level": "المستوى 1/1",
+    "days": "{days} أيام",
+    "columnHeaders": {
+      "campaignName": "اسم الحملة",
+      "moduleName": "اسم الوحدة",
+      "status": "الحالة",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "action": "الإجراء"
+    },
+    "noData": "لا توجد مهام معلقة",
+    "status": {
+      "pending": "معلق",
+      "inProgress": "قيد التقدم"
+    },
+    "actions": {
+      "view": "عرض",
+      "start": "ابدأ",
+      "starting": "يبدأ…"
+    },
+    "pagination": {
+      "showing": "عرض {shown}–{total} من أصل {all} إدخالات",
+      "showingSimple": "عرض 1–{total} إدخالات"
+    },
+    "surveyTitle": "التقييمات أو الاستطلاعات المعلقة",
+    "surveyColumnHeaders": {
+      "assessmentName": "اسم التقييم / الاستطلاع",
+      "status": "الحالة",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "action": "الإجراء"
+    },
+    "surveyNoData": "لا توجد تقييمات أو استطلاعات معلقة",
+    "surveyLoading": "جارٍ تحميل التقييمات أو الاستطلاعات المعلقة…",
+    "surveyStatus": {
+      "active": "نشط"
+    }
   }
 }
