@@ -159,6 +159,10 @@ module.exports = {
             UNASSIGNED_USERS_BY_ORGANIZATION: (orgId) => `/department/unassigned-users/${orgId}`,
             EnrolUserToDepartment: (departmentId, hasRequestedToUnenroll) => `/department/enrolUserToDepartment/${departmentId}/${hasRequestedToUnenroll}`,
         }, 
+        THREAT_REPORTER: {
+            LIST_BY_ORGANIZATION: (orgId) => `/phm/threat-reporter/${orgId}/organization`,
+            REPORT_DETAIL: (reportId) => `/phm/threat-reporter/${reportId}/report`,
+        },
         PHISHING_SMTP: {
             LIST: (orgId) => `/phm/phishing-smtp/organization/${orgId}`,
             CREATE: (orgId) => `/phm/phishing-smtp/create/${orgId}`,

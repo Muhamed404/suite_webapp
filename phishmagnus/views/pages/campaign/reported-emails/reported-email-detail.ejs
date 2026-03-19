@@ -1,0 +1,221 @@
+<style>
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .anim-card {
+    animation: fadeInUp 0.4s ease both;
+  }
+  .anim-card:nth-child(1) { animation-delay: 0.05s; }
+  .anim-card:nth-child(2) { animation-delay: 0.10s; }
+  .anim-card:nth-child(3) { animation-delay: 0.15s; }
+  .anim-card:nth-child(4) { animation-delay: 0.20s; }
+  .anim-card:nth-child(5) { animation-delay: 0.25s; }
+  .anim-card:nth-child(6) { animation-delay: 0.30s; }
+  .email-body-pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: inherit;
+    font-size: 0.875rem;
+    line-height: 1.75;
+    color: #374151;
+  }
+</style>
+
+<!-- Breadcrumb + Title -->
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __('breadcrumbs.home') %></a>
+      <span class="text-gray-400">›</span>
+      <a href="/phm/reported-emails/list" class="hover:text-gray-700 transition"><%= __('breadcrumbs.reportedEmails') %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900 truncate max-w-xs"><%= report.email_subject || __('threat_reporter.detail.title') %></span>
+    </nav>
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+      <h3 class="text-3xl font-medium text-gray-900"><%= __('threat_reporter.detail.title') %></h3>
+      <a href="/phm/reported-emails/list"
+         class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition self-start lg:self-auto">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        <%= __('threat_reporter.detail.back_to_list') %>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="flex flex-col p-6 pt-0 gap-4">
+
+  <!-- Subject hero card -->
+  <div class="anim-card flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm p-6 gap-3" style="border-left: 4px solid #2563eb;">
+    <div class="flex items-center gap-2 text-blue-600 text-xs font-semibold uppercase tracking-wider">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+      <%= __('threat_reporter.detail.reported_phishing_email') %>
+    </div>
+    <h2 class="text-2xl font-bold text-gray-900 leading-snug"><%= report.email_subject || '—' %></h2>
+    <div class="flex flex-wrap gap-3">
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">
+        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block"></span>
+        <%= __('threat_reporter.detail.report_number') %><%= report.id %>
+      </span>
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <%= report.reported_time
+            ? new Date(report.reported_time).toLocaleString([], {
+                year: 'numeric', month: 'short', day: '2-digit',
+                hour: '2-digit', minute: '2-digit'
+              })
+            : '—' %>
+      </span>
+    </div>
+  </div>
+
+  <!-- Info grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+
+    <!-- Reporter card -->
+    <div class="anim-card flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm p-5 gap-3">
+      <div class="flex items-center gap-2 text-gray-400 text-xs font-semibold uppercase tracking-wider">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+        <%= __('threat_reporter.detail.reporter') %>
+      </div>
+      <% const profile = report.User && report.User.UserProfile; %>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-11 h-11 rounded-full bg-blue-100 text-blue-600 font-bold text-lg shrink-0">
+          <%= profile ? profile.first_name.charAt(0).toUpperCase() : '?' %>
+        </div>
+        <div class="flex flex-col min-w-0">
+          <span class="font-semibold text-gray-800 truncate">
+            <%= profile ? profile.first_name + ' ' + profile.last_name : '—' %>
+          </span>
+          <span class="text-xs text-gray-400 truncate"><%= profile ? profile.email : (report.user_email || '—') %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Organization card -->
+    <div class="anim-card flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm p-5 gap-3">
+      <div class="flex items-center gap-2 text-gray-400 text-xs font-semibold uppercase tracking-wider">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        <%= __('threat_reporter.detail.organization') %>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="flex items-center justify-center w-11 h-11 rounded-full bg-teal-100 text-teal-600 font-bold text-lg shrink-0">
+          <%= report.Organization ? report.Organization.name.charAt(0).toUpperCase() : '?' %>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-semibold text-gray-800"><%= report.Organization ? report.Organization.name : '—' %></span>
+          <span class="text-xs text-gray-400"><%= __('threat_reporter.detail.org_id') %>: <%= report.organization_id || '—' %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campaign / Invitee card -->
+    <div class="anim-card flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm p-5 gap-3">
+      <div class="flex items-center gap-2 text-gray-400 text-xs font-semibold uppercase tracking-wider">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        <%= __('threat_reporter.detail.campaign_info') %>
+      </div>
+      <% const inv = report.Invitee; %>
+      <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
+        <div>
+          <p class="text-gray-400 text-xs"><%= __('threat_reporter.detail.campaign_id') %></p>
+          <p class="font-semibold text-gray-800"><%= inv ? inv.campaign_id : '—' %></p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-xs"><%= __('threat_reporter.detail.schedule_id') %></p>
+          <p class="font-semibold text-gray-800"><%= inv ? inv.schedule_id : '—' %></p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-xs"><%= __('threat_reporter.detail.phish_sent') %></p>
+          <% if (inv) { %>
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold <%= inv.is_phish_msg_sent ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500' %>">
+              <span class="w-1.5 h-1.5 rounded-full <%= inv.is_phish_msg_sent ? 'bg-teal-500' : 'bg-gray-400' %> inline-block"></span>
+              <%= inv.is_phish_msg_sent ? __('threat_reporter.detail.yes') : __('threat_reporter.detail.no') %>
+            </span>
+          <% } else { %>
+            <span class="text-gray-500">—</span>
+          <% } %>
+        </div>
+        <div>
+          <p class="text-gray-400 text-xs"><%= __('threat_reporter.detail.sent_at') %></p>
+          <p class="font-semibold text-gray-800 text-xs">
+            <%= inv && inv.sent_timestamp
+                ? new Date(inv.sent_timestamp).toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+                : '—' %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Email Origin card -->
+  <div class="anim-card flex flex-col rounded-3xl shadow-sm p-6 gap-4 <%= report.real_phishing_email ? 'bg-red-50 border border-red-200' : 'bg-teal-50 border border-teal-200' %>">
+    <div class="flex items-center gap-3">
+      <% if (report.real_phishing_email) { %>
+        <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-red-100 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-red-400 mb-0.5"><%= __('threat_reporter.detail.email_headers') %></p>
+          <p class="text-lg font-bold text-red-700"><%= __('threat_reporter.detail.real_phishing_email') %></p>
+          <p class="text-xs text-red-500 mt-0.5"><%= __('threat_reporter.detail.real_phishing_email_desc') %></p>
+        </div>
+      <% } else { %>
+        <div class="flex items-center justify-center w-12 h-12 rounded-2xl bg-teal-100 shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wider text-teal-400 mb-0.5"><%= __('threat_reporter.detail.email_headers') %></p>
+          <p class="text-lg font-bold text-teal-700"><%= __('threat_reporter.detail.phishmagnus_simulated_email') %></p>
+          <p class="text-xs text-teal-500 mt-0.5"><%= __('threat_reporter.detail.phishmagnus_simulated_email_desc') %></p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Email Body card -->
+  <div class="anim-card flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm p-5 gap-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-2 text-gray-400 text-xs font-semibold uppercase tracking-wider">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+        <%= __('threat_reporter.detail.email_body') %>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+        </svg>
+        <%= __('threat_reporter.detail.suspicious_content') %>
+      </span>
+    </div>
+    <div class="rounded-2xl bg-gray-50 border border-gray-100 p-4 overflow-auto max-h-96">
+      <pre class="email-body-pre"><%= report.raw_email_body || '—' %></pre>
+    </div>
+  </div>
+
+</div>

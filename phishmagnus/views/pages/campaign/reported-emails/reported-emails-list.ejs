@@ -1,0 +1,120 @@
+
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition"><%= __('breadcrumbs.home') %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900"><%= __('breadcrumbs.reportedEmails') %></span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900"><%= __('threat_reporter.list.title') %></h3>
+  </div>
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex-1">
+      <p class="text-sm text-gray-500"><%= __('threat_reporter.list.subtitle') %></p>
+    </div>
+    <span class="text-sm px-3 py-1 rounded-full font-medium self-start lg:self-auto" style="background:#eff6ff;color:#2563eb">
+      <%= pagination.count %> <%= __('threat_reporter.list.total') %>
+    </span>
+  </div>
+</div>
+
+<div class="flex flex-col p-6 pt-0">
+  <div class="flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm">
+    <div class="p-6">
+      <table class="min-w-full border-none text-sm text-left text-gray-700">
+        <thead class="bg-gray-50 text-gray-600 text-xs">
+          <tr>
+            <th class="px-4 py-3 text-sm font-normal"><%= __('threat_reporter.list.col_organization') %></th>
+            <th class="px-4 py-3 text-sm font-normal"><%= __('threat_reporter.list.col_reporter') %></th>
+            <th class="px-4 py-3 text-sm font-normal"><%= __('threat_reporter.list.col_reported_time') %></th>
+            <th class="px-4 py-3 text-sm font-normal"><%= __('threat_reporter.list.col_email_subject') %></th>
+            <th class="px-4 py-3 text-sm font-normal"><%= __('generic_label.action') %></th>
+          </tr>
+        </thead>
+        <tbody id="reportedEmailsBody">
+          <% if (reportedEmails && reportedEmails.length > 0) { %>
+            <% reportedEmails.forEach(function(row) { %>
+              <tr class="bg-white border-b hover:bg-gray-50 cursor-pointer" onclick="window.location='/phm/reported-emails/<%= row.id %>/detail'">
+                <!-- Organization Name -->
+                <td class="px-4 py-3">
+                  <%= row.Organization ? row.Organization.name : '—' %>
+                </td>
+
+                <!-- Reporter -->
+                <td class="px-4 py-3">
+                  <% if (row.User && row.User.UserProfile) { %>
+                    <div class="flex flex-col gap-0.5">
+                      <span class="font-medium text-gray-800">
+                        <%= row.User.UserProfile.first_name %> <%= row.User.UserProfile.last_name %>
+                      </span>
+                      <span class="text-xs text-gray-400"><%= row.User.UserProfile.email %></span>
+                    </div>
+                  <% } else { %>
+                    <span class="text-gray-500"><%= row.user_email || '—' %></span>
+                  <% } %>
+                </td>
+
+                <!-- Reported Time -->
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <%= row.reported_time
+                      ? new Date(row.reported_time).toLocaleString([], {
+                          year: 'numeric', month: 'short', day: '2-digit',
+                          hour: '2-digit', minute: '2-digit', second: '2-digit'
+                        })
+                      : '—' %>
+                </td>
+
+                <!-- Email Subject -->
+                <td class="px-4 py-3">
+                  <%= row.email_subject || '—' %>
+                </td>
+
+                <!-- View -->
+                <td class="px-4 py-3">
+                  <a href="/phm/reported-emails/<%= row.id %>/detail"
+                     onclick="event.stopPropagation()"
+                     class="text-teal-600 hover:text-teal-800 font-medium transition-colors duration-150">
+                    <%= __('generic_label.view') %>
+                  </a>
+                </td>
+
+              </tr>
+            <% }); %>
+          <% } else { %>
+            <tr>
+              <td colspan="5" class="px-4 py-6 text-center text-gray-400">
+                <svg class="w-10 h-10 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                <p class="text-sm font-medium"><%= __('threat_reporter.list.no_records') %></p>
+              </td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <% if (pagination.totalPages > 1) { %>
+      <div class="flex items-center justify-between px-6 py-3 border-t border-gray-100">
+        <span class="text-xs text-gray-500">
+          <%= __('generic_label.page') %> <%= pagination.currentPage %> <%= __('generic_label.of') %> <%= pagination.totalPages %>
+        </span>
+        <div class="flex gap-2">
+          <% if (pagination.currentPage > 1) { %>
+            <a href="?page=<%= pagination.currentPage - 1 %>&pageSize=<%= pagination.pageSize %>"
+               class="px-3 py-1.5 text-xs rounded-lg font-medium" style="background:#f3f4f6;color:#374151">
+              <%= __('generic_label.previous') %>
+            </a>
+          <% } %>
+          <% if (pagination.currentPage < pagination.totalPages) { %>
+            <a href="?page=<%= pagination.currentPage + 1 %>&pageSize=<%= pagination.pageSize %>"
+               class="px-3 py-1.5 text-xs rounded-lg font-medium" style="background:#2563eb;color:#fff">
+              <%= __('generic_label.next') %>
+            </a>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
