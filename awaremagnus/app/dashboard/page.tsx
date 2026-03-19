@@ -1287,18 +1287,16 @@ export default function DashboardPage() {
                           <table className="min-w-full text-left text-[10px] whitespace-nowrap">
                             <thead className="sticky top-0 bg-gray-50 z-10">
                               <tr className="text-gray-500 font-semibold">
-                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.campaignName")}</th>
                                 <th className="px-4 py-2">{t("pendingTasks.columnHeaders.moduleName")}</th>
                                 <th className="px-4 py-2">{t("pendingTasks.columnHeaders.status")}</th>
-                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.startDate")}</th>
-                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.endDate")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.dueDate")}</th>
                                 <th className="px-4 py-2">{t("pendingTasks.columnHeaders.action")}</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                               {moduleAssignments.length === 0 ? (
                                 <tr>
-                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={6}>
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={4}>
                                     No pending assignments
                                   </td>
                                 </tr>
@@ -1402,21 +1400,20 @@ export default function DashboardPage() {
                               <tr className="text-gray-500 font-semibold">
                                 <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.assessmentName")}</th>
                                 <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.status")}</th>
-                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.startDate")}</th>
-                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.endDate")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.dueDate")}</th>
                                 <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.action")}</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                               {pendingSurveysLoading ? (
                                 <tr>
-                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={4}>
                                     Loading pending assessments or surveys...
                                   </td>
                                 </tr>
                               ) : pendingSurveys.length === 0 ? (
                                 <tr>
-                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={4}>
                                     No pending assessments or surveys
                                   </td>
                                 </tr>

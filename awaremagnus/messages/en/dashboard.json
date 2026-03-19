@@ -159,7 +159,7 @@
       "moduleName": "Module Name",
       "status": "Status",
       "startDate": "Start Date",
-      "endDate": "End Date",
+      "dueDate": "Due Date",
       "action": "Action"
     },
     "noData": "No pending assignments",
@@ -180,8 +180,7 @@
     "surveyColumnHeaders": {
       "assessmentName": "Assessment Name / Survey",
       "status": "Status",
-      "startDate": "Start Date",
-      "endDate": "End Date",
+      "dueDate": "Due Date",
       "action": "Action"
     },
     "surveyNoData": "No pending assessments or surveys",
