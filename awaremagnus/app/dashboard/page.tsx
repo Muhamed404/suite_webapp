@@ -820,7 +820,7 @@ export default function DashboardPage() {
                     </div>
                     <a
                       className="text-gray-700 text-[9px] font-medium flex items-center gap-0.5 hover:text-gray-900"
-                      href="#"
+                      href="dashboard/my-achievements"
                     >
                       {t("cards.viewAll")}
                       <svg

@@ -150,6 +150,11 @@ export const DashboardSidebar = ({
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Report.svg"),
       label: t("menu.reportCard"),
     },
+    {
+      href: "/dashboard/my-achievements",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Achievements_Solid.svg"),
+      label: t("menu.achievements"),
+    },
   ];
 
   const subMenuItems = isEndUser ? endUserMenuItems : adminMenuItems;
