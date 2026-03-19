@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 import { Button } from "@heroui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
@@ -50,6 +51,7 @@ export default function DashboardPage() {
   const isRtl = dir === "rtl";
   const languageId = getLanguageId(locale as "en" | "ar");
   const queryClient = useQueryClient();
+  const router = useRouter();
   const { user, token } = useAuthStore();
 
   // Track which assignments are currently being started (by `campaign_id-module_id` key)
@@ -651,7 +653,10 @@ export default function DashboardPage() {
                               You're on a{" "}
                               <span className="font-semibold">{streakDay} day streak!</span>
                             </p>
-                            <button className="bg-[#3FBDFF] hover:bg-[#3FBDFF] justify-center text-white font-semibold text-xs px-2 py-3 rounded-full inline-flex items-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <button
+                              onClick={() => router.push("/dashboard/campaign-assignments")}
+                              className="bg-[#3FBDFF] hover:bg-[#3FBDFF] justify-center text-white font-semibold text-xs px-2 py-3 rounded-full inline-flex items-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                            >
                               Start
                               <svg
                                 className="w-5 h-5"
