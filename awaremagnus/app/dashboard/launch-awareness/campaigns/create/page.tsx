@@ -46,6 +46,7 @@ interface FormData {
   manualUsers: User[];
   modules: number[];
   visualShortVideos: boolean;
+  allowSkippingVideos: boolean;
   visualInteractive: boolean;
   visualOthers: boolean;
   enableQuiz: boolean;
@@ -95,6 +96,7 @@ export default function CreateCampaignPage() {
     manualUsers: [],
     modules: [],
     visualShortVideos: false,
+    allowSkippingVideos: false,
     visualInteractive: false,
     visualOthers: false,
     enableQuiz: false,
@@ -251,6 +253,7 @@ export default function CreateCampaignPage() {
         enable_games: formData.enableGames,
         enable_misc_items: formData.enableMiscItems,
         enable_motion_videos: formData.visualShortVideos,
+        allow_skipping_videos: formData.allowSkippingVideos,
         enable_interactive_ispring: formData.visualInteractive,
         enable_documents: formData.enableDocuments,
         motion_video_weight: formData.motionVideoWeight,

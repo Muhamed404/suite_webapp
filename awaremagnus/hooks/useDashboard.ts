@@ -39,6 +39,12 @@ export const DASHBOARD_KEYS = {
       "leaderboard",
       params,
     ],
+    campaignCompletions: (params?: { campaign_id?: number; user_id?: number; language_id?: number }) => [
+      "dashboard",
+      "organization",
+      "campaignCompletions",
+      params,
+    ],
   },
   user: {
     list: (params?: { orgId?: number; userId?: number; limit?: number; offset?: number }) => [
@@ -153,6 +159,18 @@ export const useOrganizationLeaderboard = (params?: {
   return useQuery({
     queryKey: DASHBOARD_KEYS.organization.leaderboard(params),
     queryFn: () => dashboardService.getOrganizationLeaderboard(params),
+  });
+};
+
+export const useOrganizationCampaignCompletions = (params?: {
+  campaign_id?: number;
+  user_id?: number;
+  language_id?: number;
+}, options?: { enabled?: boolean }) => {
+  return useQuery({
+    queryKey: DASHBOARD_KEYS.organization.campaignCompletions(params),
+    queryFn: () => dashboardService.getOrganizationCampaignCompletions(params),
+    ...options,
   });
 };
 

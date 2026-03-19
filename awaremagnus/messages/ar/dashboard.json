@@ -25,6 +25,8 @@
     "viewMore": "عرض المزيد",
     "inRisk": "ضمن المخاطر",
     "securityAwarenessCampaign": "حملة التوعية الأمنية",
+    "campaignCompletionTimeline": "الخط الزمني لإكمال الحملات",
+    "completionsByDateAcrossCampaigns": "اكتمالات الوحدات حسب التاريخ عبر جميع الحملات",
     "viewAll": "عرض الكل",
     "lastCampaignDate": "تاريخ آخر حملة: {date}",
     "weeklyProgress": "التقدّم الأسبوعي",

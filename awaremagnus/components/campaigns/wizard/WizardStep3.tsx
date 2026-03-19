@@ -11,6 +11,7 @@ interface WizardStep3Props {
   formData: {
     modules: number[];
     visualShortVideos: boolean;
+    allowSkippingVideos: boolean;
     visualInteractive: boolean;
     visualOthers: boolean;
   };
@@ -82,6 +83,15 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
   const filteredModules = modules.filter((m: any) =>
     getModuleName(m).toLowerCase().includes(moduleSearch.toLowerCase())
   );
+
+  const handleToggleShortVideos = () => {
+    const nextValue = !formData.visualShortVideos;
+
+    onChange("visualShortVideos", nextValue);
+    if (!nextValue) {
+      onChange("allowSkippingVideos", false);
+    }
+  };
 
   // Separate into Core Modules (global) and My Modules (org-specific)
   const coreModules = filteredModules.filter(
@@ -279,7 +289,7 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
           <div className="flex flex-col gap-2">
             <label
               className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all"
-              onClick={() => onChange("visualShortVideos", !formData.visualShortVideos)}
+              onClick={handleToggleShortVideos}
             >
               <div
                 className={clsx(
@@ -303,6 +313,35 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
               </div>
               <span className="text-xs text-gray-700">{t("form.shortVideos")}</span>
             </label>
+
+            {formData.visualShortVideos && (
+              <label
+                className="flex items-center gap-1.5 cursor-pointer group p-2 pl-8 transition-all"
+                onClick={() => onChange("allowSkippingVideos", !formData.allowSkippingVideos)}
+              >
+                <div
+                  className={clsx(
+                    "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
+                    formData.allowSkippingVideos
+                      ? "bg-blue-500 border-blue-500"
+                      : "border-gray-300 group-hover:border-blue-400"
+                  )}
+                >
+                  {formData.allowSkippingVideos && (
+                    <svg
+                      className="w-2.5 h-2.5 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={3}
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </div>
+                <span className="text-xs text-gray-700">{t("form.allowSkippingVideos")}</span>
+              </label>
+            )}
 
             <label
               className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all"

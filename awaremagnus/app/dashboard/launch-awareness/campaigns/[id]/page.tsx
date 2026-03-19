@@ -4,8 +4,9 @@ import { useParams, useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { ArrowLeft, Play, Trophy } from "lucide-react";
 import clsx from "clsx";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Tooltip } from "@heroui/tooltip";
+import Chart from "react-apexcharts";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -16,15 +17,17 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import {
   useOrganizationLeaderboard,
+  useOrganizationCampaignCompletions,
   useAchievementStatisticsByCampaign,
   useAchievementStatisticsWithCampaign,
   useAvatarStatisticsByCampaign,
 } from "@/hooks/useDashboard";
+import { getLanguageId } from "@/utils/languageMapping";
 
 export default function CampaignDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
   const t = useTranslations("dashboard");
 
@@ -37,6 +40,11 @@ export default function CampaignDetailsPage() {
   const { data: leaderboardData } = useOrganizationLeaderboard({
     campaignId,
     count: 10,
+  });
+  const currentLanguageId = getLanguageId(locale as "en" | "ar");
+  const { data: campaignCompletionsData } = useOrganizationCampaignCompletions({
+    campaign_id: campaignId,
+    language_id: currentLanguageId,
   });
   const { data: achievementData } = useAchievementStatisticsByCampaign(campaignId);
   const { data: generalAchievementData } = useAchievementStatisticsWithCampaign(campaignId);
@@ -198,6 +206,141 @@ export default function CampaignDetailsPage() {
   };
 
   const progress = calculateProgress();
+  const remainingDays = campaignDashboard?.remaining_days ?? calculateRemainingDays();
+  const totalCampaignDays =
+    campaignDashboard?.start_date && campaignDashboard?.end_date
+      ? Math.max(
+          1,
+          Math.ceil(
+            (new Date(campaignDashboard.end_date).getTime() -
+              new Date(campaignDashboard.start_date).getTime()) /
+              (1000 * 60 * 60 * 24)
+          )
+        )
+      : 0;
+  const remainingDaysPercent =
+    totalCampaignDays > 0
+      ? Math.max(0, Math.min(100, Math.round((remainingDays / totalCampaignDays) * 100)))
+      : 0;
+  const remainingDaysRadius = 34;
+  const remainingDaysCircumference = 2 * Math.PI * remainingDaysRadius;
+
+  const completionsPayload = ((campaignCompletionsData as any)?.object || (campaignCompletionsData as any)?.data || {});
+  const completionCampaigns = Array.isArray(completionsPayload?.campaigns)
+    ? completionsPayload.campaigns
+    : [];
+  const selectedCompletionCampaign = completionCampaigns.find(
+    (campaign: any) => Number(campaign?.campaign_id) === campaignId
+  );
+  const completedModuleRows = Array.isArray(selectedCompletionCampaign?.completed_modules)
+    ? selectedCompletionCampaign.completed_modules
+    : [];
+
+  const modules = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const row of completedModuleRows) {
+      const moduleId = Number(row?.module_id || 0);
+      if (!moduleId) continue;
+      const moduleName = row?.module_name || `Module ${moduleId}`;
+      if (!map.has(moduleId)) map.set(moduleId, moduleName);
+    }
+
+    const items = Array.from(map.entries()).map(([moduleId, moduleName]) => ({
+      moduleId,
+      moduleName,
+    }));
+
+    return items.sort((a, b) => {
+      const nameCompare = a.moduleName.localeCompare(b.moduleName);
+      return nameCompare !== 0 ? nameCompare : a.moduleId - b.moduleId;
+    });
+  }, [completedModuleRows]);
+
+  const parseYmdDate = (value?: string | null): Date | null => {
+    if (!value) return null;
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  };
+
+  // Extract min/max dates for chart x-axis range
+  const completionDates = completedModuleRows
+    .map((row: any) => {
+      const date = parseYmdDate(row?.module_completion_date);
+      return date ? date.getTime() : null;
+    })
+    .filter((time: number | null): time is number => time !== null);
+
+  const minDate = completionDates.length > 0 ? Math.min(...completionDates) : null;
+  const maxDate = completionDates.length > 0 ? Math.max(...completionDates) : null;
+  const hasSingleDate = minDate !== null && maxDate !== null && minDate === maxDate;
+  const oneDayMs = 24 * 60 * 60 * 1000;
+  const xAxisMin = hasSingleDate
+    ? ((minDate ?? 0) - oneDayMs)
+    : (minDate ?? undefined);
+  const xAxisMax = hasSingleDate
+    ? ((maxDate ?? 0) + oneDayMs)
+    : (maxDate ?? undefined);
+
+  // multi-day ranges compute number of days and cap ticks to 7 to avoid clutter.
+  const _xMin = xAxisMin as number | undefined;
+  const _xMax = xAxisMax as number | undefined;
+  const dateSpanMs = _xMin !== undefined && _xMax !== undefined ? Math.max(0, _xMax - _xMin) : 0;
+  const spanDays = dateSpanMs > 0 ? Math.ceil(dateSpanMs / oneDayMs) : 0;
+  const xAxisTickAmount = hasSingleDate ? 3 : spanDays > 0 ? Math.min(7, spanDays + 1) : undefined;
+
+  // Transform completion data for ApexCharts
+  const completionGraphPoints: Array<{
+    x: number;
+    y: number;
+    moduleId: number;
+    moduleName: string;
+    userName: string;
+    formattedDate: string;
+  }> = completedModuleRows
+    .map((row: any) => {
+      const moduleId = Number(row?.module_id || 0);
+      const completionDate = parseYmdDate(row?.module_completion_date);
+      if (!moduleId || !completionDate) return null;
+
+      const moduleName = row?.module_name || modules.find((m) => m.moduleId === moduleId)?.moduleName || `Module ${moduleId}`;
+      const fullName = `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
+      const formattedDate = completionDate.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+
+      return {
+        x: completionDate.getTime(),
+        y: modules.findIndex((m) => m.moduleId === moduleId) + 1,
+        moduleId,
+        moduleName,
+        userName: fullName || `User ${row?.user_id || "-"}`,
+        formattedDate,
+      };
+    })
+    .filter((item: any): item is {
+      x: number;
+      y: number;
+      moduleId: number;
+      moduleName: string;
+      userName: string;
+      formattedDate: string;
+    } => item !== null);
+  // Chart data (only x and y for ApexCharts)
+  const completionGraphData = completionGraphPoints.map(
+    (point: { x: number; y: number }) => ({ x: point.x, y: point.y })
+  );
+
+
+
+  const orgLeaderboard = (leaderboardData as any)?.object || (leaderboardData as any)?.data || {};
+  const topHighRiskEmployees = Array.isArray(orgLeaderboard?.top_high_risk_employees)
+    ? orgLeaderboard.top_high_risk_employees
+    : [];
+  const topLowRiskEmployees = Array.isArray(orgLeaderboard?.top_low_risk_employees)
+    ? orgLeaderboard.top_low_risk_employees
+    : [];
 
 
   if (isLoading) {
@@ -267,83 +410,113 @@ export default function CampaignDetailsPage() {
                   {campaignDashboard?.name || "Campaign"}
                 </h2>
 
-                <div className="grid grid-cols-3 text-xs gap-y-2">
-                  <span className="font-medium">Name:</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Name</span>
                   <span className="col-span-2">{campaignDashboard?.name || "-"}</span>
+                </div>
 
-                  <span className="font-medium">Description:</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Description</span>
                   <span className="col-span-2">{campaignDashboard?.description || "-"}</span>
+                </div>
 
-                  <span className="font-medium">Departments:</span>
-                  <span className="col-span-2">{campaignDashboard?.departments?.total || 0}</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Department</span>
+                  <span className="col-span-2">
+                    {campaignDashboard?.departments?.list && campaignDashboard.departments.list.length > 0 ? (
+                      campaignDashboard.departments.list
+                        .map((d: any) => d.name || d.department_name || `Dept ${d.id}`)
+                        .join(', ')
+                    ) : (
+                      campaignDashboard?.departments?.total ?? 0
+                    )}
+                  </span>
+                </div>
 
-                  <span className="font-medium">Groups:</span>
-                  <span className="col-span-2">{campaignDashboard?.groups?.total || 0}</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Group</span>
+                  <div className="col-span-2 flex items-center gap-1">
+                    {campaignDashboard?.groups?.list && campaignDashboard.groups.list.length > 0 ? (
+                      campaignDashboard.groups.list.map((g: any, idx: number) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-[2px] border border-red-300 rounded-full text-red-400 text-[10px]"
+                        >
+                          {g.name || g.group_name || `Group ${g.id}`}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="px-2 py-[2px] border border-red-300 rounded-full text-red-400 text-[10px]">
+                        {campaignDashboard?.groups?.total ?? 0} Group(s)
+                      </span>
+                    )}
+                  </div>
+                </div>
 
-                  <span className="font-medium">Users:</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Users</span>
                   <span className="col-span-2">{campaignDashboard?.total_users_enrolled || 0}</span>
+                </div>
 
-                  <span className="font-medium">Start Date:</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">Start Date</span>
                   <span className="col-span-2">{formatDate(campaignDashboard?.start_date)}</span>
+                </div>
 
-                  <span className="font-medium">End Date:</span>
+                <div className="grid grid-cols-3 text-xs">
+                  <span className="font-medium">End Date</span>
                   <span className="col-span-2">{formatDate(campaignDashboard?.end_date)}</span>
                 </div>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-xl space-y-4">
-                <div>
-                  <div className="flex items-center gap-1.5 mb-2">
-                    <span className="w-4 h-4">
-                      <img alt="" className="w-full h-full" src="/awm/images/img/calendar.svg" />
+                <div className="flex items-center gap-1.5">
+                  <span className="w-4 h-4">
+                    <img alt="" className="w-full h-full" src="/awm/images/img/calendar.svg" />
+                  </span>
+                  <h3 className="font-semibold text-gray-800 text-sm">Topics Schedule</h3>
+                </div>
+
+                <div className="space-y-2 text-gray-700 text-xs">
+                  {campaignDashboard?.upcoming_topics && campaignDashboard.upcoming_topics.length > 0 ? (
+                    campaignDashboard.upcoming_topics.map((topic: any, idx: number) => (
+                      <p key={idx}>
+                        {topic.module_name || `Module ${topic.module_id}`} {formatDate(topic.start_date)}
+                      </p>
+                    ))
+                  ) : (
+                    <p className="text-gray-400">No schedule available</p>
+                  )}
+                </div>
+
+                <div className="space-y-1.5 pt-3 border-t border-gray-200">
+                  <label className="flex items-center gap-1.5 text-gray-700 font-medium text-xs">
+                    <input
+                      readOnly
+                      checked={campaignDashboard?.status_id === 2}
+                      className="w-3.5 h-3.5 rounded border-gray-400"
+                      type="checkbox"
+                    />
+                    Campaign Status
+                  </label>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600 text-xs">
+                      {campaignDashboard?.status_id === 2 ? "Active" : "Inactive"}
                     </span>
-                    <h3 className="font-semibold text-gray-800 text-sm">Topics Schedule</h3>
-                  </div>
 
-                  <div className="space-y-2 text-gray-700 text-xs">
-                    {campaignDashboard?.upcoming_topics &&
-                    campaignDashboard.upcoming_topics.length > 0 ? (
-                      campaignDashboard.upcoming_topics.map((topic: any, idx: number) => (
-                        <p key={idx}>
-                          {topic.module_name || `Module ${topic.module_id}`} -{" "}
-                          {formatDate(topic.start_date)}
-                        </p>
-                      ))
-                    ) : (
-                      <p className="text-gray-400">No schedule available</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-1.5 pt-3 border-t border-gray-200">
-                    <label className="flex items-center gap-1.5 text-gray-700 font-medium text-xs">
+                    <label className="relative inline-flex items-center">
                       <input
                         readOnly
                         checked={campaignDashboard?.status_id === 2}
-                        className="w-3.5 h-3.5 rounded border-gray-400"
+                        className="sr-only peer"
                         type="checkbox"
                       />
-                      Campaign Status
+                      <div className="w-6 h-3 bg-gray-400 peer-checked:bg-blue-500 rounded-full transition" />
+                      <div className="absolute left-[0px] top-[1.2px] bg-white w-2.5 h-2.5 rounded-full peer-checked:translate-x-3 transition" />
                     </label>
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-600 text-xs">
-                        {campaignDashboard?.status_id === 2 ? "Active" : "Inactive"}
-                      </span>
-
-                      <label className="relative inline-flex items-center">
-                        <input
-                          readOnly
-                          checked={campaignDashboard?.status_id === 2}
-                          className="sr-only peer"
-                          type="checkbox"
-                        />
-                        <div className="w-6 h-3 bg-gray-400 peer-checked:bg-blue-500 rounded-full transition" />
-                        <div className="absolute left-[0px] top-[1.2px] bg-white w-2.5 h-2.5 rounded-full peer-checked:translate-x-3 transition" />
-                      </label>
-                    </div>
                   </div>
                 </div>
-
                 {/* Enabled Features */}
                 <div className="pt-3 border-t border-gray-200">
                   <h4 className="text-gray-700 font-medium text-xs mb-2">Enabled Features</h4>
@@ -367,19 +540,49 @@ export default function CampaignDetailsPage() {
 
             {/* Remaining Days Card */}
             <div className="col-span-4 row-span-2 col-start-9">
-              <div className="bg-white rounded-xl p-4 flex flex-col justify-between h-full">
+              <div className="bg-white rounded-xl p-4 h-full">
                 <div className="flex justify-between items-start">
                   <p className="text-gray-600 text-xs">Remaining days</p>
                   <div className="w-6 h-6">
-                    <img alt="" className="w-full h-full" src="/awm/images/img/calendar.svg" />
+                    <img alt="" className="w-full h-full" src="/awm/images/profile.svg" />
                   </div>
                 </div>
 
-                <div className="mt-2 flex items-center gap-1">
-                  <span className="text-3xl text-[#3FBDFF] font-bold">
-                    {campaignDashboard?.remaining_days || calculateRemainingDays()}
-                  </span>
-                  <span className="text-sm text-gray-800 font-semibold">Days</span>
+                <div className="mt-3 flex items-center justify-between gap-4">
+                  <div className="relative w-24 h-24">
+                    <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                      <circle
+                        className="text-gray-200"
+                        cx="50"
+                        cy="50"
+                        fill="none"
+                        r={remainingDaysRadius}
+                        stroke="currentColor"
+                        strokeWidth="8"
+                      />
+                      <circle
+                        className="text-sky-500"
+                        cx="50"
+                        cy="50"
+                        fill="none"
+                        r={remainingDaysRadius}
+                        stroke="currentColor"
+                        strokeDasharray={`${(remainingDaysPercent / 100) * remainingDaysCircumference} ${remainingDaysCircumference}`}
+                        strokeLinecap="round"
+                        strokeWidth="8"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-2xl font-bold text-sky-500">{remainingDays}</span>
+                      <span className="text-[10px] font-medium text-gray-600">Days</span>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-600 leading-5">
+                    <p className="font-medium text-gray-800">Timeline</p>
+                    <p>{remainingDaysPercent}% remaining</p>
+                    <p>Total {totalCampaignDays || 0} days</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -387,12 +590,183 @@ export default function CampaignDetailsPage() {
             {/* Campaign Progress */}
             <div className="col-span-8 row-span-2 col-start-1 row-start-6">
               <div className="bg-white rounded-xl p-4">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-gray-600 text-xs">Campaign Progress</span>
-                  <span className="text-gray-700 font-medium text-xs">
-                    {campaignDashboard?.metrics?.campaign_progress_percent ?? progress}%
-                  </span>
-                </div>
+                <div className="mb-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <div>
+                      <h3 className="text-gray-800 text-sm font-bold">Module Completion Timeline</h3>
+                      <p className="text-gray-500 text-xs mt-0.5">{completionGraphPoints.length} completions • {modules.length} modules</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 text-xs text-gray-600">
+                        <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-400/40" />
+                        <span>Completion</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {completionGraphPoints.length > 0 ? (
+                    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 rounded-lg p-4 border border-blue-100/50 shadow-sm w-full">
+                      <Chart
+                        options={{
+                          chart: {
+                            type: "scatter",
+                            sparkline: { enabled: false },
+                            toolbar: {
+                              show: false,
+                            },
+                            zoom: {
+                              enabled: false,
+                            },
+                            parentHeightOffset: 0,
+                          },
+                          colors: ["#3B82F6"],
+                          plotOptions: {
+                            bubble: {
+                              minBubbleRadius: 3,
+                              maxBubbleRadius: 8,
+                            },
+                          } as any,
+                          xaxis: {
+                            type: "datetime",
+                            min: xAxisMin,
+                            max: xAxisMax,
+                            title: {
+                              text: "Date",
+                              style: {
+                                fontSize: "12px",
+                                fontWeight: 600,
+                                color: "#475569",
+                              },
+                            },
+                            labels: {
+                              format: "dd MMM",
+                              datetimeUTC: false,
+                              showDuplicates: false,
+                              style: {
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                colors: "#64748B",
+                              },
+                            },
+                            axisBorder: {
+                              show: true,
+                              color: "#94A3B8",
+                              height: 1,
+                            },
+                            axisTicks: {
+                              show: false,
+                            },
+                            crosshairs: {
+                              show: true,
+                              position: "back",
+                              stroke: {
+                                color: "#3B82F6",
+                                width: 0.5,
+                                dashArray: 3,
+                              },
+                            },
+                          },
+                          yaxis: {
+                            min: 0,
+                            max: Math.max(1, modules.length) + 1,
+                            tickAmount: Math.max(1, modules.length) + 1,
+                            decimalsInFloat: 0,
+                            title: {
+                              text: "Modules",
+                              style: {
+                                fontSize: "12px",
+                                fontWeight: 600,
+                                color: "#475569",
+                              },
+                              offsetX: +5,
+                            },
+                            labels: {
+                              formatter: (value: number) => {
+                                const rounded = Math.round(value);
+                                return Number.isInteger(rounded) && rounded >= 0 ? String(rounded) : "";
+                              },
+                              style: {
+                                fontSize: "11px",
+                                fontWeight: 500,
+                                colors: "#64748B",
+                              },
+                              offsetX: -10,
+                            },
+                            axisBorder: {
+                              show: true,
+                              color: "#94A3B8",
+                              width: 1,
+                            },
+                            axisTicks: {
+                              show: false,
+                            },
+                          } as any,
+                          grid: {
+                            borderColor: "#E2E8F0",
+                            strokeDashArray: 2,
+                            xaxis: {
+                              lines: {
+                                show: true,
+                              },
+                            },
+                            yaxis: {
+                              lines: {
+                                show: true,
+                              },
+                            },
+                            padding: {
+                              left: 20,
+                              right: 20,
+                            },
+                          },
+                          tooltip: {
+                            theme: "dark",
+                            custom: function ({ dataPointIndex }: any) {
+                              const point = completionGraphPoints[dataPointIndex];
+                              if (!point) return "";
+                              return `
+                                <div style="background: linear-gradient(to bottom right, #1e40af, #1e3a8a); color: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(147, 197, 253, 0.3);">
+                                  <div style="font-size: 13px; font-weight: bold; color: #dbeafe;">${point.moduleName}</div>
+                                  <div style="color: #bfdbfe; margin-top: 6px; font-weight: 500; font-size: 12px;">${point.userName}</div>
+                                  <div style="color: #93c5fd; font-size: 11px; margin-top: 4px;">${point.formattedDate}</div>
+                                </div>
+                              `;
+                            },
+                          },
+                        }}
+                        series={[
+                          {
+                            name: "Module Completions",
+                            data: completionGraphData,
+                          },
+                        ]}
+                        type="scatter"
+                        height={Math.max(300, 200 + modules.length * 30)}
+                      />
+
+                      <div className="mt-3 pt-3 border-t border-blue-100 flex items-center gap-2 text-[10px] text-gray-600">
+                        <svg className="w-3 h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
+                        </svg>
+                        <span>Hover over any point to view completion details</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-8 text-center border border-gray-200 flex flex-col items-center justify-center min-h-[200px]">
+                      <svg className="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} />
+                      </svg>
+                      <p className="text-gray-400 text-sm font-medium">No module completion data available</p>
+                      <p className="text-gray-300 text-xs mt-1">Completions will appear here as users finish modules</p>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between items-center mb-1 mt-3">
+                    <span className="text-gray-600 text-xs">Campaign Progress</span>
+                    <span className="text-gray-700 font-medium text-xs">
+                      {campaignDashboard?.metrics?.campaign_progress_percent ?? progress}%
+                    </span>
+                  </div>
 
                 <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
                   <div
@@ -401,6 +775,7 @@ export default function CampaignDetailsPage() {
                       width: `${campaignDashboard?.metrics?.campaign_progress_percent ?? progress}%`,
                     }}
                   />
+                </div>
                 </div>
               </div>
             </div>
@@ -420,6 +795,8 @@ export default function CampaignDetailsPage() {
                   campaignDashboard.top_struggling_topics
                     .slice(0, 3)
                     .map((topic: any, idx: number) => {
+                      const topicDisplayName =
+                        topic.module_name || topic.topic_name || topic.name || "Unknown Topic";
                       const iconMap: Record<
                         string,
                         { icon: string; color: string; textColor: string }
@@ -440,7 +817,7 @@ export default function CampaignDetailsPage() {
                           textColor: "#DC2626",
                         },
                       };
-                      const config = iconMap[topic.topic_name || ""] || {
+                      const config = iconMap[topicDisplayName] || {
                         icon: "/awm/images/icons/default.svg",
                         color: "#F0F0F0",
                         textColor: "#666",
@@ -459,7 +836,7 @@ export default function CampaignDetailsPage() {
                               <img alt="" className="w-2 h-2" src={config.icon} />
                             </div>
                             <span className="text-[10px] font-medium text-gray-800">
-                              {topic.topic_name || "Unknown Topic"}
+                              {topicDisplayName}
                             </span>
                           </div>
                           <svg
@@ -908,7 +1285,7 @@ export default function CampaignDetailsPage() {
                 </Button>
               </div>
 
-              {(leaderboardData?.data?.top_high_risk_employees ?? []).length > 0 ? (
+              {topHighRiskEmployees.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead className="border-b border-gray-200">
@@ -926,7 +1303,7 @@ export default function CampaignDetailsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(leaderboardData?.data?.top_high_risk_employees ?? [])
+                      {topHighRiskEmployees
                         .slice(0, 10)
                         .map((employee: any, idx: number) => (
                           <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
@@ -970,7 +1347,7 @@ export default function CampaignDetailsPage() {
                 </Button>
               </div>
 
-              {(leaderboardData?.data?.top_low_risk_employees ?? []).length > 0 ? (
+              {topLowRiskEmployees.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead className="border-b border-gray-200">
@@ -988,7 +1365,7 @@ export default function CampaignDetailsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {(leaderboardData?.data?.top_low_risk_employees ?? [])
+                      {topLowRiskEmployees
                         .slice(0, 10)
                         .map((employee: any, idx: number) => (
                           <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">

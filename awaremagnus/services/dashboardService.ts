@@ -7,6 +7,7 @@ import type {
   OrganizationMonthlyCompletion,
   OrganizationStrugglingModulesResponse,
   OrganizationLeaderboardResponse,
+  OrganizationCampaignCompletionsResponse,
   UserDashboardsResponse,
   AchievementStatisticsResponse,
   AchievementsResponse,
@@ -94,6 +95,19 @@ export const dashboardService = {
   }) => {
     const { data } = await awmClient.get<OrganizationLeaderboardResponse>(
       `${API_BASE}/dashboard/organizations/leaderboard`,
+      { params }
+    );
+
+    return data;
+  },
+
+  getOrganizationCampaignCompletions: async (params?: {
+    campaign_id?: number;
+    user_id?: number;
+    language_id?: number;
+  }) => {
+    const { data } = await awmClient.get<OrganizationCampaignCompletionsResponse>(
+      `${API_BASE}/dashboard/organizations/campaign/completions`,
       { params }
     );
 
