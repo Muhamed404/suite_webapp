@@ -159,7 +159,7 @@
       "moduleName": "اسم الوحدة",
       "status": "الحالة",
       "startDate": "تاريخ البدء",
-      "endDate": "تاريخ الانتهاء",
+      "dueDate": "تاريخ الاستحقاق",
       "action": "الإجراء"
     },
     "noData": "لا توجد مهام معلقة",
@@ -180,8 +180,7 @@
     "surveyColumnHeaders": {
       "assessmentName": "اسم التقييم / الاستطلاع",
       "status": "الحالة",
-      "startDate": "تاريخ البدء",
-      "endDate": "تاريخ الانتهاء",
+      "dueDate": "تاريخ الاستحقاق",
       "action": "الإجراء"
     },
     "surveyNoData": "لا توجد تقييمات أو استطلاعات معلقة",

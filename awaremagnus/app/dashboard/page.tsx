@@ -1287,19 +1287,17 @@ export default function DashboardPage() {
                           <table className="min-w-full text-left text-[10px] whitespace-nowrap">
                             <thead className="sticky top-0 bg-gray-50 z-10">
                               <tr className="text-gray-500 font-semibold">
-                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.campaignName")}</th>
                                 <th className="px-4 py-2">{t("pendingTasks.columnHeaders.moduleName")}</th>
                                 <th className="px-4 py-2">{t("pendingTasks.columnHeaders.status")}</th>
-                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.startDate")}</th>
-                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.endDate")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.columnHeaders.dueDate")}</th>
                                 <th className="px-4 py-2">{t("pendingTasks.columnHeaders.action")}</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                               {moduleAssignments.length === 0 ? (
                                 <tr>
-                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={6}>
-                                    {t("pendingTasks.noData")}
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={4}>
+                                    No pending assignments
                                   </td>
                                 </tr>
                               ) : (
@@ -1318,20 +1316,10 @@ export default function DashboardPage() {
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-700"}`}
                                       >
-                                        {assignment.campaign_name || "—"}
-                                      </td>
-                                      <td
-                                        className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-700"}`}
-                                      >
                                         {assignment.module_name || "—"}
                                       </td>
                                       <td className="px-4 py-2.5">
                                         {statusBadge(assignment.status?.name || "")}
-                                      </td>
-                                      <td
-                                        className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
-                                      >
-                                        {formatDate(assignment.start_date)}
                                       </td>
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
@@ -1412,22 +1400,21 @@ export default function DashboardPage() {
                               <tr className="text-gray-500 font-semibold">
                                 <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.assessmentName")}</th>
                                 <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.status")}</th>
-                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.startDate")}</th>
-                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.endDate")}</th>
+                                <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.dueDate")}</th>
                                 <th className="px-4 py-2">{t("pendingTasks.surveyColumnHeaders.action")}</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                               {pendingSurveysLoading ? (
                                 <tr>
-                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
-                                    {t("pendingTasks.surveyLoading")}
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={4}>
+                                    Loading pending assessments or surveys...
                                   </td>
                                 </tr>
                               ) : pendingSurveys.length === 0 ? (
                                 <tr>
-                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
-                                    {t("pendingTasks.surveyNoData")}
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={4}>
+                                    No pending assessments or surveys
                                   </td>
                                 </tr>
                               ) : (
@@ -1469,11 +1456,6 @@ export default function DashboardPage() {
                                         <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-50 text-green-600 border border-green-300 whitespace-nowrap">
                                           {t("pendingTasks.surveyStatus.active")}
                                         </span>
-                                      </td>
-                                      <td
-                                        className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
-                                      >
-                                        {formatDateSafe(startDate)}
                                       </td>
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
