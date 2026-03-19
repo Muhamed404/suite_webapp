@@ -91,7 +91,7 @@ export interface SystemLeaderboard {
   message: string;
   statusCode: number;
   alertType: string;
-  data: {
+  object: {
     top_low_risk_employees: EmployeeLeaderboard[];
     top_high_risk_employees: EmployeeLeaderboard[];
   };
@@ -159,6 +159,9 @@ export interface OrganizationStrugglingModulesResponse {
 
 export interface EmployeeLeaderboard {
   user_id: number;
+  first_name: string;
+  last_name: string;
+  last_login_time: string;
   modules_completed: number;
   achievement_count: number;
   avatar_current_level: number;
@@ -173,7 +176,7 @@ export interface OrganizationLeaderboardResponse {
   message: string;
   statusCode: number;
   alertType: string;
-  data: {
+  object: {
     top_low_risk_employees: EmployeeLeaderboard[];
     top_high_risk_employees: EmployeeLeaderboard[];
   };
