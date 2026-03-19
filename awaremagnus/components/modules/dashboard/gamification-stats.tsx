@@ -362,7 +362,7 @@ export const GamificationStats = () => {
 
           <div className="flex mt-5 gap-8">
             {/* Main Avatar — show the highest level avatar from backend response */}
-            <div className="flex flex-col items-center justify-center">
+            <div className="flex flex-col items-center justify-center flex-none w-28">
               <Tooltip 
                 content={
                   <div className="flex flex-col gap-1 max-w-[200px] p-1">
@@ -409,7 +409,7 @@ export const GamificationStats = () => {
                 </div>
               </Tooltip>
 
-              <p className="mt-5 text-gray-700 text-xs text-center leading-tight whitespace-pre-line break-words max-w-[11rem]">
+              <p className="mt-5 text-gray-700 text-xs text-center leading-tight whitespace-pre-line break-keep max-w-[11rem]">
                 {mainAvatar?.level_name ?? "Vulnerable\nNewbie"}
               </p>
             </div>
@@ -472,9 +472,7 @@ export const GamificationStats = () => {
                         </div>
 
                         <p
-                          className={`text-[10px] leading-tight mt-2 w-[90%] whitespace-pre-wrap break-words max-w-full ${
-                            isUnlocked ? "text-gray-700" : "text-gray-400"
-                          }`}
+                          className="text-[10px] leading-tight mt-2 w-[90%] whitespace-pre-wrap break-keep max-w-full text-gray-700"
                         >
                           {avatar.level_name}
                         </p>
