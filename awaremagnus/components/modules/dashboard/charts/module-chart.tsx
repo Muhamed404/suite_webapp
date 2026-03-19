@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import ApexCharts from "apexcharts";
+import { useTranslations } from "@/i18n/useTranslations";
 
 // ModuleDetailsChart Component (adapted from provided JS)
 class ModuleDetailsChart {
@@ -13,6 +14,7 @@ class ModuleDetailsChart {
   dropdownOptions: string[];
   defaultOption: string;
   selectedOption: string;
+  totalLabel: string;
   chart: any;
 
   constructor(element: HTMLElement) {
@@ -31,6 +33,7 @@ class ModuleDetailsChart {
 
     this.chartSize = element.dataset.chartSize || "170px";
     this.title = element.dataset.title || "Module Details";
+    this.totalLabel = element.dataset.totalLabel || "Total Module";
     this.dropdownOptions = this.parseJSON(element.dataset.dropdownOptions, [
       "Weekly",
       "Monthly",
@@ -168,7 +171,7 @@ class ModuleDetailsChart {
               show: true,
               total: {
                 show: true,
-                label: "Total Module",
+                label: this.totalLabel,
                 fontSize: "10px",
                 fontWeight: 400,
                 color: "#9CA3AF",
@@ -261,26 +264,37 @@ export const ModuleChart = ({
     { name: "QR", value: 6, color: "#06B6D4" },
     { name: "Whatsapp", value: 3, color: "#10B981" },
   ],
-  title = "Module Details",
+  title,
   chartSize = "170px",
-  dropdownOptions = ["Weekly", "Monthly", "Yearly"],
-  defaultOption = "Weekly",
+  dropdownOptions,
+  defaultOption,
 }: ModuleChartProps) => {
+  const t = useTranslations("dashboard");
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const titleText = title ?? t("cards.moduleDetails");
+  const totalLabelText = t("cards.totalModules");
+  const dropdownOptionsText = dropdownOptions ?? [
+    t("cards.dropdownOptions.weekly"),
+    t("cards.dropdownOptions.monthly"),
+    t("cards.dropdownOptions.yearly"),
+  ];
+  const defaultOptionText = defaultOption ?? t("cards.dropdownOptions.weekly");
 
   useEffect(() => {
     if (containerRef.current) {
       const element = containerRef.current;
 
       element.dataset.modules = JSON.stringify(modules);
-      element.dataset.title = title;
+      element.dataset.title = titleText;
       element.dataset.chartSize = chartSize;
-      element.dataset.dropdownOptions = JSON.stringify(dropdownOptions);
-      element.dataset.defaultOption = defaultOption;
+      element.dataset.dropdownOptions = JSON.stringify(dropdownOptionsText);
+      element.dataset.defaultOption = defaultOptionText;
+      element.dataset.totalLabel = totalLabelText;
 
       new ModuleDetailsChart(element);
     }
-  }, [modules, title, chartSize, dropdownOptions, defaultOption]);
+  }, [modules, title, chartSize, dropdownOptions, defaultOption, totalLabelText]);
 
   return <div ref={containerRef} className="w-full h-full" />;
 };
