@@ -1204,18 +1204,16 @@ export default function DashboardPage() {
                           <table className="min-w-full text-left text-[10px] whitespace-nowrap">
                             <thead className="sticky top-0 bg-gray-50 z-10">
                               <tr className="text-gray-500 font-semibold">
-                                <th className="px-4 py-2">Campaign Name</th>
                                 <th className="px-4 py-2">Module Name</th>
                                 <th className="px-4 py-2">Status</th>
-                                <th className="px-4 py-2">Start Date</th>
-                                <th className="px-4 py-2">End Date</th>
+                                <th className="px-4 py-2">End Date (Due Date)</th>
                                 <th className="px-4 py-2">Action</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                               {moduleAssignments.length === 0 ? (
                                 <tr>
-                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={6}>
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={4}>
                                     No pending assignments
                                   </td>
                                 </tr>
@@ -1235,20 +1233,10 @@ export default function DashboardPage() {
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-700"}`}
                                       >
-                                        {assignment.campaign_name || "—"}
-                                      </td>
-                                      <td
-                                        className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-700"}`}
-                                      >
                                         {assignment.module_name || "—"}
                                       </td>
                                       <td className="px-4 py-2.5">
                                         {statusBadge(assignment.status?.name || "")}
-                                      </td>
-                                      <td
-                                        className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
-                                      >
-                                        {formatDate(assignment.start_date)}
                                       </td>
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
@@ -1330,21 +1318,20 @@ export default function DashboardPage() {
                               <tr className="text-gray-500 font-semibold">
                                 <th className="px-4 py-2">Assessment Name / Survey</th>
                                 <th className="px-4 py-2">Status</th>
-                                <th className="px-4 py-2">Start Date</th>
-                                <th className="px-4 py-2">End Date</th>
+                                <th className="px-4 py-2">End Date (Due Date)</th>
                                 <th className="px-4 py-2">Action</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                               {pendingSurveysLoading ? (
                                 <tr>
-                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={4}>
                                     Loading pending assessments or surveys...
                                   </td>
                                 </tr>
                               ) : pendingSurveys.length === 0 ? (
                                 <tr>
-                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={5}>
+                                  <td className="px-4 py-4 text-center text-gray-400" colSpan={4}>
                                     No pending assessments or surveys
                                   </td>
                                 </tr>
@@ -1387,11 +1374,6 @@ export default function DashboardPage() {
                                         <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-green-50 text-green-600 border border-green-300 whitespace-nowrap">
                                           Active
                                         </span>
-                                      </td>
-                                      <td
-                                        className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
-                                      >
-                                        {formatDateSafe(startDate)}
                                       </td>
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}

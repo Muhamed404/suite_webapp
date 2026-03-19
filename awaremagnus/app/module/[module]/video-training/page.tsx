@@ -425,8 +425,12 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                               : `${SERVICE_AWM_URL}${content.source_url}`
                         }
                         onEnded={() => handleVideoEnded(content.id)}
+                        onLoadedMetadata={(e) =>
+                          handleVideoLoadedMetadata(content.id, e.currentTarget)
+                        }
                         onPause={() => stopVideoInterval(content.id)}
                         onPlay={() => startVideoInterval(content.id)}
+                        onTimeUpdate={(e) => handleVideoTimeUpdate(content.id, e.currentTarget)}
                       >
                         Your browser does not support the video tag.
                       </video>
