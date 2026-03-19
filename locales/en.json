@@ -830,7 +830,8 @@
 			"labelRedirectionPage": "campaign.email_campaign_detail.labelRedirectionPage",
 			"labelViewRedirectPage": "campaign.email_campaign_detail.labelViewRedirectPage",
 			"labelAttachedFile": "campaign.email_campaign_detail.labelAttachedFile",
-			"labelDownloadAttachment": "campaign.email_campaign_detail.labelDownloadAttachment"
+			"labelDownloadAttachment": "campaign.email_campaign_detail.labelDownloadAttachment",
+			"scheduleTime": "Schedule Time"
 		},
 		"email_create_campaign": {
 			"title": "Create Email Campaign",
@@ -1566,7 +1567,8 @@
 		"totalQRImages": "Total QR Images",
 		"created": "Created",
 		"unsent": "Unsent",
-		"totalCampaigns": "Total Campaigns"
+		"totalCampaigns": "Total Campaigns",
+		"reported_emails": "Reported Emails"
 	},
 	"reports": {
 		"campaignReports": "Campaign Reports",

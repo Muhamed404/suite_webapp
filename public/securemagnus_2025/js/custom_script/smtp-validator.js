@@ -37,7 +37,7 @@ function initSMTPFormValidator(config) {
         host: {
           required: true,
           minlength: 3,
-          maxlength: 255,
+          maxlength: 1000,
           // Validate hostname format (domain or IP)
           
         },
@@ -51,7 +51,7 @@ function initSMTPFormValidator(config) {
         smtp_account: {
           required: true,
           minlength: 3,
-          maxlength: 255
+          maxlength: 1000
         },
         sender_email: {
           required: true,
@@ -61,7 +61,7 @@ function initSMTPFormValidator(config) {
         smtp_password: {
           required: true,
           minlength: 6,
-          maxlength: 255
+          maxlength: 1000
         },
       },
       messages: {
@@ -73,7 +73,7 @@ function initSMTPFormValidator(config) {
         host: {
           required: window.i18n?.validation_messages?.smtp_host_required || "SMTP host name is required",
           minlength: window.i18n?.validation_messages?.host_minlength || "Host name must be at least 3 characters",
-          maxlength: window.i18n?.validation_messages?.host_maxlength || "Host name cannot exceed 255 characters",
+          maxlength: window.i18n?.validation_messages?.host_maxlength || "Host name cannot exceed 1000 characters",
           pattern: window.i18n?.validation_messages?.valid_hostname_ip || "Please enter a valid hostname or IP address"
         },
         port: {
@@ -85,7 +85,7 @@ function initSMTPFormValidator(config) {
         smtp_account: {
           required: window.i18n?.validation_messages?.service_account_required || "Service account is required",
           minlength: window.i18n?.validation_messages?.service_account_minlength || "Service account must be at least 3 characters",
-          maxlength: window.i18n?.validation_messages?.service_account_maxlength || "Service account cannot exceed 255 characters"
+          maxlength: window.i18n?.validation_messages?.service_account_maxlength || "Service account cannot exceed 1000 characters"
         },
         sender_email: {
           required: window.i18n?.validation_messages?.sender_email_required || "Sender email is required",
@@ -95,7 +95,7 @@ function initSMTPFormValidator(config) {
         smtp_password: {
           required: window.i18n?.validation_messages?.password_required || "Password is required",
           minlength: window.i18n?.validation_messages?.password_minlength || "Password must be at least 6 characters",
-          maxlength: window.i18n?.validation_messages?.password_maxlength || "Password cannot exceed 255 characters"
+          maxlength: window.i18n?.validation_messages?.password_maxlength || "Password cannot exceed 1000 characters"
         },
       },
       errorElement: 'span',
