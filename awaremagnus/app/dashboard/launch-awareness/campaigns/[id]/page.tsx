@@ -1189,7 +1189,7 @@ export default function CampaignDetailsPage() {
                         />
                       </div>
                     </Tooltip>
-                    <p className="text-[12px] leading-tight text-gray-700 mt-4 w-full max-w-[120px] whitespace-normal break-words text-center">
+                    <p className="text-[12px] leading-tight text-gray-700 mt-4 w-full max-w-[120px] whitespace-normal break-keep text-center">
                       {mainAvatar?.level_name ?? "Vulnerable Newbie"}
                     </p>
                   </div>
@@ -1235,12 +1235,7 @@ export default function CampaignDetailsPage() {
                           }
                           placement="top"
                         >
-                          <div
-                            className={clsx(
-                              "flex flex-col items-center",
-                              avatar.level_number === 9 ? "rounded-xl bg-[#F1FAFF] p-3" : ""
-                            )}
-                          >
+                          <div className="flex flex-col items-center">
                             <div
                               className={`w-10 h-10 rounded-full bg-[#E6FFFB] flex items-center justify-center overflow-hidden border border-gray-200 ${
                                 !isUnlocked ? "opacity-40" : ""
@@ -1252,7 +1247,11 @@ export default function CampaignDetailsPage() {
                                 src={`/awm/images/avatars/${avatarImage}`}
                               />
                             </div>
-                            <p className="text-[10px] leading-tight text-gray-700 mt-2 w-full max-w-[70px] whitespace-normal break-words text-center">
+                            <p
+                              className={`text-[10px] leading-tight mt-2 w-full max-w-[70px] whitespace-normal break-keep text-center ${
+                                isUnlocked ? "text-gray-700" : "text-gray-400"
+                              }`}
+                            >
                               {avatar.level_name}
                             </p>
                           </div>
