@@ -33,13 +33,13 @@ export const DashboardTables = () => {
 
   if (isPlatformAdmin) {
     if (systemLeaderboard?.statusCode === 200) {
-      highRiskData = systemLeaderboard?.data?.top_high_risk_employees ?? [];
-      lowRiskData = systemLeaderboard?.data?.top_low_risk_employees ?? [];
+      highRiskData = systemLeaderboard?.object?.top_high_risk_employees ?? [];
+      lowRiskData = systemLeaderboard?.object?.top_low_risk_employees ?? [];
     }
   } else {
     if (orgLeaderboard?.statusCode === 200) {
-      highRiskData = orgLeaderboard?.data?.top_high_risk_employees ?? [];
-      lowRiskData = orgLeaderboard?.data?.top_low_risk_employees ?? [];
+      highRiskData = orgLeaderboard?.object?.top_high_risk_employees ?? [];
+      lowRiskData = orgLeaderboard?.object?.top_low_risk_employees ?? [];
     }
   }
 
@@ -65,15 +65,13 @@ export const DashboardTables = () => {
 
     switch (columnKey) {
       case "userId":
-        return <div className="text-sm font-medium">{item.user_id || item.org_id}</div>;
+        return <div className="text-sm font-medium">{item.first_name} {item.last_name}</div>;
       case "modulesCompleted":
         return <div className="text-sm">{item.modules_completed || 0}</div>;
       case "achievementCount":
         return <div className="text-sm">{item.achievement_count || 0}</div>;
       case "avatarLevel":
         return <div className="text-sm">{item.avatar_current_level || 0}</div>;
-      case "streak":
-        return <div className="text-sm">{item.streak_day ?? 0}</div>;
       case "riskLevel":
         return <div className="text-sm">{item.risk_level || "N/A"}</div>;
       default:
@@ -111,7 +109,6 @@ export const DashboardTables = () => {
                 <TableColumn key="modulesCompleted">{t("tables.modulesCompleted")}</TableColumn>
                 <TableColumn key="achievementCount">{t("tables.achievementCount")}</TableColumn>
                 <TableColumn key="avatarLevel">{t("tables.avatarLevel")}</TableColumn>
-                <TableColumn key="streak">Streak</TableColumn>
                 <TableColumn key="riskLevel">{t("tables.riskLevel")}</TableColumn>
               </TableHeader>
               <TableBody items={highRiskPaginated}>
@@ -186,7 +183,6 @@ export const DashboardTables = () => {
                 <TableColumn key="modulesCompleted">{t("tables.modulesCompleted")}</TableColumn>
                 <TableColumn key="achievementCount">{t("tables.achievementCount")}</TableColumn>
                 <TableColumn key="avatarLevel">{t("tables.avatarLevel")}</TableColumn>
-                <TableColumn key="streak">Streak</TableColumn>
                 <TableColumn key="riskLevel">{t("tables.riskLevel")}</TableColumn>
               </TableHeader>
               <TableBody items={lowRiskPaginated}>
