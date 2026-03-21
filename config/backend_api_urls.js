@@ -162,6 +162,7 @@ module.exports = {
         THREAT_REPORTER: {
             LIST_BY_ORGANIZATION: (orgId) => `/phm/threat-reporter/${orgId}/organization`,
             REPORT_DETAIL: (reportId) => `/phm/threat-reporter/${reportId}/report`,
+            REPORT_DETAIL_By_INVTEE: (invId) => `/phm/threat-reporter/${invId}/invitee`,
         },
         PHISHING_SMTP: {
             LIST: (orgId) => `/phm/phishing-smtp/organization/${orgId}`,
