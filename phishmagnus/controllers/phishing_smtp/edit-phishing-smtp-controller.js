@@ -18,7 +18,7 @@ exports.editPhishingSMTP = async (req, res) => {
       .get(url)
       .then((response) => {
         const data = response.data;
-        logger.info(`Edit Phishing SMTP Controller: GET - Response ${JSON.stringify(data, null, 2)}`);
+        logger.debug(`Edit Phishing SMTP Controller: GET - Response ${JSON.stringify(data, null, 2)}`);
 
         // const smtp = data.smtp ?? data;
         const smtp = { ...data.smtp, encrypt_password: data.smtp.is_encrypted ? true : false }; // Ensure encrypt_password is set for the view
@@ -47,7 +47,7 @@ exports.editPhishingSMTP = async (req, res) => {
       .put(url, smtpObj)
       .then((response) => {
         const data = response.data;
-        logger.info(`Edit Phishing SMTP Controller: POST - Response ${JSON.stringify(data, null, 2)}`);
+        logger.debug(`Edit Phishing SMTP Controller: POST - Response ${JSON.stringify(data, null, 2)}`);
 
         req.flash('message', data.message || 'SMTP configuration updated successfully.');
         req.flash('alertType', data.success ? 'success' : 'error');

@@ -14,7 +14,7 @@ exports.createSMTP = async (req, res) => {
       .get(url)
       .then((response) => {
         const data = response.data;
-        logger.info(`data is ${JSON.stringify(data)}`);
+        logger.debug(`data is ${JSON.stringify(data)}`);
 
         logger.info(`${JSON.stringify(data.message)}`);
 
@@ -32,7 +32,7 @@ exports.createSMTP = async (req, res) => {
         }
 
         if (smtp) {
-          logger.info(`SMTP DATA HAS FOUND ${JSON.stringify(smtp)}`);
+          logger.debug(`SMTP DATA HAS FOUND ${JSON.stringify(smtp)}`);
           logger.info(`Organization Name for smtp ${organizationName}`);
           res.render("pages/settings/smtp/create-smtp", {
             enableSuiteManagementLeftMenu: true,
@@ -76,7 +76,7 @@ exports.createSMTP = async (req, res) => {
   } else {
     logger.info(`Calling post method of create smtp`);
     const { host, port, smtp_account, smtp_password, sender_email, use_tls, use_ssl, encrypt_password = true } = req.body;
-    logger.info(`Incoming param body ${JSON.stringify(req.body, null, 2)}`);
+    logger.debug(`Incoming param body ${JSON.stringify(req.body, null, 2)}`);
     let orgId = Number(req.params.orgId);
     const smtpObj = {
       host,
@@ -98,7 +98,7 @@ exports.createSMTP = async (req, res) => {
       .post(url, smtpObj)
       .then((response) => {
         const data = response.data;
-        logger.info(`response data is ${JSON.stringify(data)}`);
+        logger.debug(`response data is ${JSON.stringify(data)}`);
         if (data.alertType) {
           logger.info(`SMTP Account has created for organization` + orgId)
           req.flash('message', data.message);

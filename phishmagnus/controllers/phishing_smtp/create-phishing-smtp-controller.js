@@ -22,7 +22,7 @@ exports.createSMTP = async (req, res) => {
       .get(url)
       .then((response) => {
         const data = response.data;
-        logger.info(`Create Phishing SMTP Controller: response data is ${JSON.stringify(data, null, 2)}`);
+        logger.debug(`Create Phishing SMTP Controller: response data is ${JSON.stringify(data, null, 2)}`);
 
         const organizations = data.success ? data.organizations : [];
 
