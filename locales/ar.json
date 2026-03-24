@@ -761,6 +761,7 @@
 			"sms_content": "محتوى قالب الرسائل النصية",
 			"sms_message": "نص الرسالة القصيرة",
 			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)",
+			"sms_characters": "أحرف",
 			"smsShortMessageTitle": "رسالة قصيرة (المستوى 1)",
 			"smsShortMessageDescription": "إرسال رسالة نصية قصيرة بسيطة.",
 			"whatsappShortMessageTitle": "رسالة قصيرة",
