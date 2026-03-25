@@ -2087,7 +2087,8 @@
 			"phishmagnus_simulated_email": "حملة محاكاة PhishMagnus",
 			"phishmagnus_simulated_email_desc": "تم إرسال هذه الرسالة كجزء من حملة محاكاة PhishMagnus.",
 			"email_body": "محتوى الرسالة",
-			"suspicious_content": "محتوى مشبوه"
+			"suspicious_content": "محتوى مشبوه",
+			"not_found": "لم يتم العثور على البلاغ."
 		}
 	}
 }

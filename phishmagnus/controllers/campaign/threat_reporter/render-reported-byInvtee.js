@@ -23,13 +23,16 @@ exports.renderReportByInvitee = async (req, res) => {
             { headers: { Accept: 'application/json' } }
         );
 
-        const report = response?.data?.data || null;
-
-        if (!report) {
+        const report = response?.data?.data || response?.data || null;
+        const responseFlag = response?.data?.success || false;
+        if (!report || !responseFlag) {
             logger.warn(`[Reported By Invitee]: No data returned for invId=${invId}`);
-            req.flash('message', 'Reported email not found.');
-            req.flash('alertType', 'error');
-            return res.redirect('/phm/reported-emails/list');
+            return res.render(render_ejs_urls.PhishMagnus.Campaign.ReportedEmails.DETAIL, {
+                report: null,
+                emailHeaders: {},
+                user: req.user,
+                locale: req.getLocale ? req.getLocale() : 'en',
+            });
         }
 
         // Parse raw_email_header JSON safely
@@ -58,6 +61,6 @@ exports.renderReportByInvitee = async (req, res) => {
         logger.error(`[Reported By Invitee]: Error: ${error.message}`);
         req.flash('message', 'Failed to load reported email details.');
         req.flash('alertType', 'error');
-        return res.redirect('/phm/reported-emails/list');
+        return res.redirect(frontend_api_urls.PHISHMAGNUS.Campaign.EMAIL.REPORT);
     }
 };
