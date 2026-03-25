@@ -65,23 +65,18 @@ function getApiClient(req) {
                 data: error?.response?.data,
             });
 
-            // If token expired or forbidden, destroy session and redirect to login with flash message
-            if (error?.response?.status === 403 && error?.response?.data?.message?.toLowerCase().includes('token')) {
+            // If token expired or unauthorized due to expired token, clear server session.
+            // Do NOT send redirect here because this function can be reused in many controllers.
+            if ((error?.response?.status === 401 || error?.response?.status === 403)
+                && error?.response?.data?.message?.toLowerCase().includes('token')) {
                 if (req && req.session) {
                     req.session.destroy(() => {
-                        if (req.flash && req.session) {
-                            req.flash('message', 'Session expired. Please log in again.');
-                            req.flash('alertType', 'error');
-                        }
-                        if (req.res) {
-                            req.res.redirect('/login');
-                        }
+                        logger.info('[apiClient] Session destroyed because token expired/invalid');
                     });
-                } else if (req && req.res) {
-                    // If no session, just redirect
-                    req.res.redirect('/login');
                 }
+                error.isAuthExpired = true;
             }
+
             return Promise.reject(error);
         }
     );
