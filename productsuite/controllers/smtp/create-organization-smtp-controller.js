@@ -3,20 +3,17 @@ const getApiClient = require('../../../utility/api-client')
 
 
 exports.createSMTP = async (req, res) => {
-  logger.info(`Calling create smtp method`);
   if (req.method === "GET") {
     let orgId = req.params?.orgId || 0;
-    logger.info(`Create SMTP for org ID: ${orgId}`);
     const url = `/settings/smtp/${orgId}`;
+    logger.info(`[Create Organization SMTP] Calling backend API: ${url}`)
     const apiClient = getApiClient(req);
-    logger.info(`:::::::::::${url}:::::::::::`);
     apiClient
       .get(url)
       .then((response) => {
         const data = response.data;
-        logger.debug(`data is ${JSON.stringify(data)}`);
 
-        logger.info(`${JSON.stringify(data.message)}`);
+        logger.debug(`[Create Organization SMTP] Response data: ${JSON.stringify(data, null, 2)}`);
 
         // Resolve smtp from either payload shape:
         // Payload 1: { message: { name, SMTPConfigurations: [{ host, port, ... }] } }
@@ -32,8 +29,7 @@ exports.createSMTP = async (req, res) => {
         }
 
         if (smtp) {
-          logger.debug(`SMTP DATA HAS FOUND ${JSON.stringify(smtp)}`);
-          logger.info(`Organization Name for smtp ${organizationName}`);
+          logger.info(`[Create Organization SMTP] Rendering page`)
           res.render("pages/settings/smtp/create-smtp", {
             enableSuiteManagementLeftMenu: true,
             Organization: organizationName,
@@ -51,7 +47,7 @@ exports.createSMTP = async (req, res) => {
             encrypt_password: smtp.is_encrypted ? true : false
           });
         } else {
-          logger.info(`NO SMTP DATA HAS FOUND`);
+          logger.info(`[Create Organization SMTP] No Existing SMTP for Org ${orgId}`);
           organizationName = data.message.name;
           res.render("pages/settings/smtp/create-smtp", {
             enableSuiteManagementLeftMenu: true,
@@ -63,7 +59,7 @@ exports.createSMTP = async (req, res) => {
         }
       })
       .catch((error) => {
-        logger.error(`issue in fetching create SMTP smtps`);
+        logger.error(`[Create Organization SMTP] Error in Retrieval`);
         logger.error(error.message);
         if (error.response && error.response.data) {
           logger.error(error.response.data);
@@ -74,9 +70,9 @@ exports.createSMTP = async (req, res) => {
 
       });
   } else {
-    logger.info(`Calling post method of create smtp`);
+    logger.info(`[Create Organization SMTP] POST: Incoming Request`);
     const { host, port, smtp_account, smtp_password, sender_email, use_tls, use_ssl, encrypt_password = true } = req.body;
-    logger.debug(`Incoming param body ${JSON.stringify(req.body, null, 2)}`);
+    logger.debug(`[Create Organization SMTP] POST: Incoming hostname ${JSON.stringify(req.body.host, null, 2)}`);
     let orgId = Number(req.params.orgId);
     const smtpObj = {
       host,
@@ -92,15 +88,14 @@ exports.createSMTP = async (req, res) => {
     };
     const apiClient = getApiClient(req);
     const url = `/settings/smtp/` + orgId;
-    logger.info(`:::::::::::${url}:::::::::::`);
-
+    logger.info(`[Create Organization SMTP] POST: Calling Backend api ${url}`)
     apiClient
       .post(url, smtpObj)
       .then((response) => {
         const data = response.data;
-        logger.debug(`response data is ${JSON.stringify(data)}`);
+        
         if (data.alertType) {
-          logger.info(`SMTP Account has created for organization` + orgId)
+          logger.info(`[Create Organization SMTP] POST: Organization ${orgId} SMTP Account created`)
           req.flash('message', data.message);
           req.flash('alertType', data.alertType);
           if (orgId === 0) {
@@ -114,7 +109,7 @@ exports.createSMTP = async (req, res) => {
         }
       })
       .catch((error) => {
-        logger.error('Error in smtp post')
+        logger.error('[Create Organization SMTP] POST: Error in saving.')
         logger.error(`${error.message}`);
         logger.error(error);
         logger.error(error.stack);

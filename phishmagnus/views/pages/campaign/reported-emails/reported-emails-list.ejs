@@ -20,11 +20,25 @@
 
 <div class="flex flex-col p-6 pt-0">
   <div class="flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm">
+    <div class="px-6 pt-6 pb-0 flex items-center gap-2">
+      <button data-filter="all"
+        class="email-type-filter px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 bg-gray-900 text-white">
+        <%= __('threat_reporter.list.filter_all') %>
+      </button>
+      <button data-filter="real"
+        class="email-type-filter px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200">
+        <%= __('threat_reporter.list.filter_real') %>
+      </button>
+      <button data-filter="simulated"
+        class="email-type-filter px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200">
+        <%= __('threat_reporter.list.filter_simulated') %>
+      </button>
+    </div>
     <div class="p-6">
       <table class="min-w-full border-none text-sm text-left text-gray-700">
         <thead class="bg-gray-50 text-gray-600 text-xs">
           <tr>
-            <th class="px-4 py-3 text-sm font-normal"><%= __('threat_reporter.list.col_organization') %></th>
+            <th class="px-4 py-3 text-sm font-normal"><%= __('threat_reporter.list.col_type') %></th>
             <th class="px-4 py-3 text-sm font-normal"><%= __('threat_reporter.list.col_reporter') %></th>
             <th class="px-4 py-3 text-sm font-normal"><%= __('threat_reporter.list.col_reported_time') %></th>
             <th class="px-4 py-3 text-sm font-normal"><%= __('threat_reporter.list.col_email_subject') %></th>
@@ -34,10 +48,20 @@
         <tbody id="reportedEmailsBody">
           <% if (reportedEmails && reportedEmails.length > 0) { %>
             <% reportedEmails.forEach(function(row) { %>
-              <tr class="bg-white border-b hover:bg-gray-50 cursor-pointer" onclick="window.location='/phm/reported-emails/<%= row.id %>/detail'">
-                <!-- Organization Name -->
+              <tr class="email-type-row bg-white border-b hover:bg-gray-50 cursor-pointer" data-phish-real="<%= row.has_phish_real ? 'true' : 'false' %>" onclick="window.location='/phm/reported-emails/<%= row.id %>/detail'">
+                <!-- Email Type -->
                 <td class="px-4 py-3">
-                  <%= row.Organization ? row.Organization.name : '—' %>
+                  <% if (row.has_phish_real) { %>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
+                      <%= __('threat_reporter.list.type_phishing') %>
+                    </span>
+                  <% } else { %>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-500 inline-block"></span>
+                      <%= __('threat_reporter.list.type_simulated') %>
+                    </span>
+                  <% } %>
                 </td>
 
                 <!-- Reporter -->
@@ -118,3 +142,31 @@
     <% } %>
   </div>
 </div>
+
+<script>
+  $(document).on('click', '.email-type-filter', function () {
+    var filter = $(this).data('filter');
+    // alert(filter)
+    $('.email-type-filter').removeClass('bg-gray-900 text-white bg-red-600 bg-blue-600')
+      .addClass('bg-gray-100 text-gray-600');
+
+    if (filter === 'real') {
+      $(this).removeClass('bg-gray-100 text-gray-600').addClass('bg-red-600 text-white');
+    } else if (filter === 'simulated') {
+      $(this).removeClass('bg-gray-100 text-gray-600').addClass('bg-blue-600 text-white');
+    } else {
+      $(this).removeClass('bg-gray-100 text-gray-600').addClass('bg-gray-900 text-white');
+    }
+
+    $('.email-type-row').each(function () {
+      var isReal = $(this).attr('data-phish-real') === 'true';
+      if (filter === 'all') {
+        $(this).show();
+      } else if (filter === 'real') {
+        if (isReal) { $(this).show(); } else { $(this).hide(); }
+      } else {
+        if (!isReal) { $(this).show(); } else { $(this).hide(); }
+      }
+    });
+  });
+</script>
