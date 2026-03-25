@@ -22,6 +22,10 @@ export const metadata: Metadata = {
   icons: {
     icon: getContentAssetUrl("/favicon.ico"),
   },
+  other: {
+    "google": "notranslate",
+    "googlebot": "notranslate",
+  },
 };
 
 export const viewport: Viewport = {
@@ -34,7 +38,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await loadMessages(locale);
 
   return (
-    <html suppressHydrationWarning className="light" dir={dir} lang={locale}>
+    <html suppressHydrationWarning className="light notranslate" dir={dir} lang={locale} translate="no">
       <head />
       <body
         className={clsx(
