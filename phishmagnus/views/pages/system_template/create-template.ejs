@@ -426,13 +426,13 @@
                 <!-- Radio Buttons -->
 
                 <div class="space-y-4 mb-6">
-                    <label class="flex items-center custom-radio cursor-pointer">
+                    <!-- <label class="flex items-center custom-radio cursor-pointer">
                         <input type="radio" name="landing_option" value="link" id="landing_option_link">
                         <span class="radio-circle"></span>
                         <span class="text-gray-700">
                             <%= __("system_template.create.labelLandingPage_radioOption1") %>
                         </span>
-                    </label>
+                    </label> -->
                     <label class="flex items-center custom-radio cursor-pointer">
                         <input type="radio" name="landing_option" value="custom" id="landing_option_custom">
                         <span class="radio-circle"></span>
@@ -442,7 +442,7 @@
                     </label>
                 </div>
                 <!-- Import field for link option -->
-                <div id="import-html-url-container" class="mb-6" style="display:none;">
+                <!-- <div id="import-html-url-container" class="mb-6" style="display:none;">
                     <label for="import-html-url" class="block text-gray-700 font-medium mb-2">
                         <%= __('system_template.create.labelImportHtmlUrl') || 'Import HTML Template from URL' %>
                     </label>
@@ -454,7 +454,7 @@
                             class="bg-teal-400 text-white px-4 py-2 rounded-lg hover:bg-teal-500 transition">Fetch</button>
                     </div>
                     <div id="import-html-url-error" class="text-red-500 text-sm mt-2" style="display:none;"></div>
-                </div>
+                </div> -->
 
 
                 <!-- Custom Page Setting (hidden initially) -->
@@ -665,8 +665,8 @@
         const customRadio = document.getElementById('landing_option_custom');
         const importContainer = document.getElementById('import-html-url-container');
         const fetchBtn = document.getElementById('fetch-html-template');
-        const urlInput = document.getElementById('import-html-url');
-        const errorDiv = document.getElementById('import-html-url-error');
+        // const urlInput = document.getElementById('import-html-url');
+        // const errorDiv = document.getElementById('import-html-url-error');
         const landingPageContent = document.getElementById('landing_page_content');
 
         function toggleImportField() {
@@ -685,43 +685,43 @@
         }
 
         // Fetch HTML from URL using backend proxy and insert into landing_page_content
-        if (fetchBtn && urlInput && landingPageContent) {
-            fetchBtn.addEventListener('click', async function () {
-                const url = urlInput.value.trim();
-                errorDiv.style.display = 'none';
-                if (!url) {
-                    errorDiv.textContent = window.i18n.validation_messages.validationEnterValidUrl;
-                    errorDiv.style.display = '';
-                    return;
-                }
-                try {
-                    fetchBtn.disabled = true;
-                    fetchBtn.textContent = window.i18n.validation_messages.fetchingButtonText;
-                    const response = await fetch('/template/api/fetch-html', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ url })
-                    });
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || 'Failed to fetch HTML.');
-                    const html = result.html;
-                    // alert(html);
-                    // Set value for textarea
-                    landingPageContent.value = html;
-                    // If CKEditor is used, set data there too
-                    if (window.CKEDITOR && CKEDITOR.instances['landing_page_content']) {
-                        CKEDITOR.instances['landing_page_content'].setData(html);
-                    }
-                    fetchBtn.textContent = window.i18n.validation_messages.fetchButtonText;
-                    fetchBtn.disabled = false;
-                } catch (err) {
-                    errorDiv.textContent = 'Error: ' + err.message;
-                    errorDiv.style.display = '';
-                    fetchBtn.textContent = window.i18n.validation_messages.fetchButtonText;
-                    fetchBtn.disabled = false;
-                }
-            });
-        }
+        // if (fetchBtn && urlInput && landingPageContent) {
+        //     fetchBtn.addEventListener('click', async function () {
+        //         const url = urlInput.value.trim();
+        //         errorDiv.style.display = 'none';
+        //         if (!url) {
+        //             errorDiv.textContent = window.i18n.validation_messages.validationEnterValidUrl;
+        //             errorDiv.style.display = '';
+        //             return;
+        //         }
+        //         try {
+        //             fetchBtn.disabled = true;
+        //             fetchBtn.textContent = window.i18n.validation_messages.fetchingButtonText;
+        //             const response = await fetch('/template/api/fetch-html', {
+        //                 method: 'POST',
+        //                 headers: { 'Content-Type': 'application/json' },
+        //                 body: JSON.stringify({ url })
+        //             });
+        //             const result = await response.json();
+        //             if (!response.ok) throw new Error(result.error || 'Failed to fetch HTML.');
+        //             const html = result.html;
+        //             // alert(html);
+        //             // Set value for textarea
+        //             landingPageContent.value = html;
+        //             // If CKEditor is used, set data there too
+        //             if (window.CKEDITOR && CKEDITOR.instances['landing_page_content']) {
+        //                 CKEDITOR.instances['landing_page_content'].setData(html);
+        //             }
+        //             fetchBtn.textContent = window.i18n.validation_messages.fetchButtonText;
+        //             fetchBtn.disabled = false;
+        //         } catch (err) {
+        //             errorDiv.textContent = 'Error: ' + err.message;
+        //             errorDiv.style.display = '';
+        //             fetchBtn.textContent = window.i18n.validation_messages.fetchButtonText;
+        //             fetchBtn.disabled = false;
+        //         }
+        //     });
+        // }
     });
 </script>
 <script>
