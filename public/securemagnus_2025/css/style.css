@@ -354,7 +354,27 @@
   display: none !important;
 }
 
+.goog-te-banner-frame,
+iframe.goog-te-banner-frame,
+.goog-te-menu-frame,
+iframe.goog-te-menu-frame,
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.VIpgJd-ZVi9od-l4eHX-hSRGPd,
+.VIpgJd-yAWNEb-L7lbkb,
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+.VIpgJd-ZVi9od-aZ2wEe-OiiCO,
+.goog-te-balloon-frame,
+iframe.goog-te-balloon-frame {
+  display: none !important;
+  visibility: hidden !important;
+}
+
 body {
+  top: 0px !important;
+  margin-top: 0px !important;
+}
+
+html {
   top: 0px !important;
 }
 
