@@ -1,6 +1,6 @@
 "use client";
 
-import type { Module } from "@/types/quiz";
+import type { Module, ModuleTranslation } from "@/types/quiz";
 
 import Link from "next/link";
 import { useState, useMemo } from "react";
@@ -45,12 +45,28 @@ function moduleCode(m: Module): string {
   return m.code ?? `Module ${m.id}`;
 }
 
-function moduleName(m: Module): string {
-  return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
+function firstTranslation(m: Module): ModuleTranslation | null {
+  if (!m.translations || m.translations.length === 0) return null;
+
+  return m.translations[0] ?? null;
 }
 
-function moduleDescription(m: Module): string {
-  return m.description ?? m.translations?.[0]?.description ?? "";
+function selectedTranslation(m: Module, selectedLanguageId: string): ModuleTranslation | null {
+  if (!selectedLanguageId) return firstTranslation(m);
+
+  return m.translations?.find((t) => String(t.language_id) === selectedLanguageId) ?? firstTranslation(m);
+}
+
+function moduleName(m: Module, selectedLanguageId: string): string {
+  const translation = selectedTranslation(m, selectedLanguageId);
+
+  return translation?.name ?? m.title ?? m.code ?? `Module ${m.id}`;
+}
+
+function moduleDescription(m: Module, selectedLanguageId: string): string {
+  const translation = selectedTranslation(m, selectedLanguageId);
+
+  return translation?.description ?? m.description ?? "";
 }
 
 function moduleLanguageIds(m: Module): number[] {
@@ -69,7 +85,7 @@ function getModuleLogoUrl(module: Module, selectedLanguageId: string | number | 
   const defaultLogo = getContentAssetUrl("/awm/images/Card.png");
 
   if (!selectedLanguageId) {
-    const url = module.translations?.[0]?.logo_banner_url;
+    const url = firstTranslation(module)?.logo_banner_url;
 
     return url ? getModuleAssetUrl(url) : defaultLogo;
   }
@@ -108,29 +124,44 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
 
   const pathname = usePathname();
   const filter = pathname?.includes("/training-library/my") ? "my_module" : "global_module";
+  const selectedCategoryId = useMemo(() => {
+    if (!categoryFilter) return undefined;
+    const categoryId = Number(categoryFilter);
+
+    return Number.isFinite(categoryId) ? categoryId : undefined;
+  }, [categoryFilter]);
 
   const { data: modulesRes, isLoading } = useModules({
-    category_id: categoryFilter ? Number(categoryFilter) : undefined,
-    language_id: languageFilter ? Number(languageFilter) : undefined,
+    category_id: selectedCategoryId,
     filter,
   });
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
   const { data: categories = [] } = useAwmCategories();
 
   const filteredModules = useMemo(() => {
-    let list = searchQuery.trim()
-      ? modules.filter(
+    let list = modules;
+
+    if (languageFilter) {
+      list = list.filter((m) =>
+        (m.translations ?? []).some((t) => String(t.language_id) === languageFilter)
+      );
+    }
+
+    list = searchQuery.trim()
+      ? list.filter(
           (m) =>
             moduleCode(m).toLowerCase().includes(searchQuery.toLowerCase()) ||
-            moduleName(m).toLowerCase().includes(searchQuery.toLowerCase()) ||
-            moduleDescription(m).toLowerCase().includes(searchQuery.toLowerCase())
+            moduleName(m, languageFilter).toLowerCase().includes(searchQuery.toLowerCase()) ||
+            moduleDescription(m, languageFilter).toLowerCase().includes(searchQuery.toLowerCase())
         )
-      : modules;
+      : list;
 
     if (sortField) {
       list = [...list].sort((a, b) => {
-        const va = sortField === "name" ? moduleName(a) : moduleDescription(a);
-        const vb = sortField === "name" ? moduleName(b) : moduleDescription(b);
+        const va =
+          sortField === "name" ? moduleName(a, languageFilter) : moduleDescription(a, languageFilter);
+        const vb =
+          sortField === "name" ? moduleName(b, languageFilter) : moduleDescription(b, languageFilter);
         const c = va.localeCompare(vb);
 
         return sortDir === "asc" ? c : -c;
@@ -138,7 +169,7 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
     }
 
     return list;
-  }, [modules, searchQuery, sortField, sortDir]);
+  }, [modules, languageFilter, searchQuery, sortField, sortDir]);
 
   const totalItems = filteredModules.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
@@ -332,7 +363,10 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                     placeholder={t("library.allCategories")}
                     selectedKeys={categoryFilter ? [categoryFilter] : []}
                     onSelectionChange={(keys) => {
-                      const v = Array.from(keys as Set<string>)[0] ?? "";
+                      const v =
+                        keys === "all" || !keys
+                          ? ""
+                          : ((Array.from(keys as Iterable<string>)[0] as string) ?? "");
 
                       setCategoryFilter(v);
                     }}
@@ -444,10 +478,10 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                           />
                         </div>
                         <h3 className="font-semibold text-[var(--mainblue)] text-sm truncate">
-                          {moduleName(item)}
+                          {moduleName(item, languageFilter)}
                         </h3>
                         <p className="text-xs text-[var(--darkgray)] mt-1 line-clamp-2 min-h-0 flex-1">
-                          {moduleDescription(item) || "—"}
+                          {moduleDescription(item, languageFilter) || "—"}
                         </p>
                         <div
                           className={clsx("flex justify-start mt-4", isRtl && "flex-row-reverse")}
@@ -571,12 +605,12 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                         </TableCell>
                         <TableCell>
                           <span className="font-medium text-[var(--mainblue)]">
-                            {moduleName(item)}
+                            {moduleName(item, languageFilter)}
                           </span>
                         </TableCell>
                         <TableCell>
                           <span className="text-[var(--darkgray)] line-clamp-2 max-w-xs">
-                            {moduleDescription(item) || "—"}
+                            {moduleDescription(item, languageFilter) || "—"}
                           </span>
                         </TableCell>
                         <TableCell>
