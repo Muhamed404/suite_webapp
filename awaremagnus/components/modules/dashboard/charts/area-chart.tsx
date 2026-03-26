@@ -21,6 +21,19 @@ export const AreaChart = ({
   yLabel = "Topics",
 }: AreaChartProps) => {
   const t = useTranslations("dashboard");
+  const maxDataValue = useMemo(() => Math.max(0, ...data), [data]);
+  const yAxisMax = useMemo(() => {
+    if (maxDataValue <= 1) return 2;
+    if (maxDataValue <= 5) return maxDataValue + 1;
+
+    return Math.ceil(maxDataValue * 1.25);
+  }, [maxDataValue]);
+  const yAxisTickAmount = useMemo(() => {
+    if (yAxisMax <= 5) return yAxisMax;
+    if (yAxisMax <= 10) return 5;
+
+    return 6;
+  }, [yAxisMax]);
 
   if (!data || data.length === 0) {
     return (
@@ -42,6 +55,15 @@ export const AreaChart = ({
         curve: "smooth" as const,
         width: 3,
         colors: ["#4BA6FF"],
+      },
+      markers: {
+        size: 6,
+        colors: ["#4BA6FF"],
+        strokeColors: "#FFFFFF",
+        strokeWidth: 2,
+        hover: {
+          size: 6,
+        },
       },
       fill: {
         type: "gradient",
@@ -89,9 +111,11 @@ export const AreaChart = ({
       },
       yaxis: {
         min: 0,
-        max: 40,
-        tickAmount: 4,
+        max: yAxisMax,
+        tickAmount: yAxisTickAmount,
+        decimalsInFloat: 0,
         labels: {
+          formatter: (val: number) => String(Math.round(val)),
           style: { colors: "#9CA3AF", fontSize: "12px" },
         },
       },
@@ -99,12 +123,12 @@ export const AreaChart = ({
         theme: "light",
         style: { fontSize: "12px" },
         y: {
-          formatter: (val: number) => `${val} ${yLabel}`,
+          formatter: (val: number) => `${Math.round(val)} ${yLabel}`,
         },
       },
       colors: ["#4BA6FF"],
     }),
-    [labels, seriesName, yLabel]
+    [labels, seriesName, yLabel, data, yAxisMax, yAxisTickAmount]
   );
 
   const series = [

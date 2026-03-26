@@ -326,7 +326,8 @@ export default function CampaignDetailsPage() {
       moduleName: string;
       userName: string;
       formattedDate: string;
-    } => item !== null);
+    } => item !== null)
+    .sort((a: { x: number; y: number }, b: { x: number; y: number }) => a.x - b.x); // Sort by date for line chart
   // Chart data (only x and y for ApexCharts)
   const completionGraphData = completionGraphPoints.map(
     (point: { x: number; y: number }) => ({ x: point.x, y: point.y })
@@ -609,7 +610,7 @@ export default function CampaignDetailsPage() {
                       <Chart
                         options={{
                           chart: {
-                            type: "scatter",
+                            type: "line",
                             sparkline: { enabled: false },
                             toolbar: {
                               show: false,
@@ -620,12 +621,17 @@ export default function CampaignDetailsPage() {
                             parentHeightOffset: 0,
                           },
                           colors: ["#3B82F6"],
-                          plotOptions: {
-                            bubble: {
-                              minBubbleRadius: 3,
-                              maxBubbleRadius: 8,
-                            },
-                          } as any,
+                          stroke: {
+                            curve: "smooth",
+                            width: 2,
+                          },
+                          markers: {
+                            size: 5,
+                            colors: ["#3B82F6"],
+                            strokeColors: "#fff",
+                            strokeWidth: 2,
+                            hover: { sizeOffset: 2 },
+                          },
                           xaxis: {
                             type: "datetime",
                             min: xAxisMin,
@@ -740,7 +746,7 @@ export default function CampaignDetailsPage() {
                             data: completionGraphData,
                           },
                         ]}
-                        type="scatter"
+                        type="line"
                         height={Math.max(300, 200 + modules.length * 30)}
                       />
 
