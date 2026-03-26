@@ -1289,7 +1289,7 @@ export default function CampaignDetailsPage() {
                   <table className="w-full text-xs">
                     <thead className="border-b border-gray-200">
                       <tr>
-                        <th className="text-left py-2 px-2 font-semibold text-gray-600">User ID</th>
+                        <th className="text-left py-2 px-2 font-semibold text-gray-600">Name</th>
                         <th className="text-left py-2 px-2 font-semibold text-gray-600">
                           Risk Level
                         </th>
@@ -1306,7 +1306,7 @@ export default function CampaignDetailsPage() {
                         .slice(0, 10)
                         .map((employee: any, idx: number) => (
                           <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
-                            <td className="py-2 px-2 text-gray-700">User {employee.user_id}</td>
+                            <td className="py-2 px-2 text-gray-700">{`${employee.first_name || ""} ${employee.last_name || ""}`.trim() || "-"}</td>
                             <td className="py-2 px-2">
                               <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-[10px] font-medium">
                                 {employee.risk_level}
@@ -1351,7 +1351,7 @@ export default function CampaignDetailsPage() {
                   <table className="w-full text-xs">
                     <thead className="border-b border-gray-200">
                       <tr>
-                        <th className="text-left py-2 px-2 font-semibold text-gray-600">User ID</th>
+                        <th className="text-left py-2 px-2 font-semibold text-gray-600">Name</th>
                         <th className="text-left py-2 px-2 font-semibold text-gray-600">
                           Risk Level
                         </th>
@@ -1368,7 +1368,7 @@ export default function CampaignDetailsPage() {
                         .slice(0, 10)
                         .map((employee: any, idx: number) => (
                           <tr key={idx} className="border-b border-gray-100 hover:bg-gray-50">
-                            <td className="py-2 px-2 text-gray-700">User {employee.user_id}</td>
+                            <td className="py-2 px-2 text-gray-700">{`${employee.first_name || ""} ${employee.last_name || ""}`.trim() || "-"}</td>
                             <td className="py-2 px-2">
                               <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-[10px] font-medium">
                                 {employee.risk_level}
