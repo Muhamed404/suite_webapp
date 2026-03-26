@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
+import { useTranslations } from "@/i18n/useTranslations";
+
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 interface AreaChartProps {
@@ -13,11 +15,21 @@ interface AreaChartProps {
 }
 
 export const AreaChart = ({
-  data = [22, 18, 25, 20, 30, 26],
-  labels = ["7 June", "8 June", "9 June", "10 June", "11 June", "12 June"],
+  data = [],
+  labels = [],
   seriesName = "Campaign A",
   yLabel = "Topics",
 }: AreaChartProps) => {
+  const t = useTranslations("dashboard");
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[300px] text-gray-500">
+        {t("cards.noCompletionData")}
+      </div>
+    );
+  }
+
   const chartOptions = useMemo(
     () => ({
       chart: {
