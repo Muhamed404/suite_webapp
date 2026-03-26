@@ -124,7 +124,6 @@
     </div>
   </div>
 </div>
-
 <!-- SMTP Detail Modal -->
 <div id="smtpDetailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 backdrop-blur-sm">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 overflow-hidden">
@@ -153,7 +152,7 @@
         <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_port') %></p>
         <p id="modal-port" class="font-medium text-gray-800">—</p>
       </div>
-      <div>
+      <div id="modal-account-field">
         <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_account') %></p>
         <p id="modal-account" class="font-medium text-gray-800 break-all">—</p>
       </div>
@@ -161,11 +160,11 @@
         <p class="text-gray-400 text-xs mb-0.5"><%= __('generic_label.status') %></p>
         <p id="modal-status" class="font-medium">—</p>
       </div>
-      <div>
+      <div id="modal-tls-field">
         <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_tls') %></p>
         <p id="modal-tls" class="font-medium text-gray-800">—</p>
       </div>
-      <div>
+      <div id="modal-ssl-field">
         <p class="text-gray-400 text-xs mb-0.5"><%= __('phishing_smtp.modal.label_ssl') %></p>
         <p id="modal-ssl" class="font-medium text-gray-800">—</p>
       </div>
@@ -174,17 +173,7 @@
         <p id="modal-details" class="font-medium text-gray-800">—</p>
       </div>
     </div>
-    <% if (allowEditAndTest) { %>
-    <!-- <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
-      <button id="modalTestSmtpBtn"
-        class="px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold hover:bg-green-600 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
-        <span id="modalTestSmtpBtnLabel"><%= __('phishing_smtp.modal.btn_test_config') %></span>
-      </button>
-    </div> -->
-    <% } %>
+ 
   </div>
 </div>
 
@@ -222,133 +211,15 @@
   </div>
 </div>
 
-<script>
-  var i18n = {
-    btnTesting:        "<%= __('phishing_smtp.list.btn_testing') %>",
-    btnTestConfig:     "<%= __('phishing_smtp.modal.btn_test_config') %>",
-    enabled:           "<%= __('phishing_smtp.modal.enabled') %>",
-    disabled:          "<%= __('phishing_smtp.modal.disabled') %>",
-    active:            "<%= __('generic_label.active') %>",
-    inactive:          "<%= __('generic_label.inactive') %>",
-    toastSuccess:      "<%= __('phishing_smtp.toast.connection_success') %>",
-    toastFailed:       "<%= __('phishing_smtp.toast.connection_failed') %>",
-    toastEndpointErr:  "<%= __('phishing_smtp.toast.endpoint_error') %>"
-  };
-
-  $(document).on('click', '.test-smtp-btn', function() {
-    var $btn = $(this);
-    var smtpId = $btn.data('smtp-id');
-    var originalText = $btn.text();
-
-    $btn.prop('disabled', true).text(i18n.btnTesting);
-
-    $.ajax({
-      url: '/phm/phishing-smtp/test-connection/' + smtpId,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) {
-        if (data.success) {
-          showCustomToast('success', data.message || i18n.toastSuccess);
-        } else {
-          showCustomToast('error', data.message || i18n.toastFailed);
-        }
-      },
-      error: function() {
-        showCustomToast('error', i18n.toastEndpointErr);
-      },
-      complete: function() {
-        $btn.prop('disabled', false).text(originalText);
-      }
-    });
-  });
-
-  // Delete button → open confirmation modal
-  $(document).on('click', '.delete-smtp-btn', function(e) {
-    e.stopPropagation();
-    var url = $(this).data('delete-url');
-    var email = $(this).data('sender-email');
-    $('#deleteSmtpEmail').text(email || '');
-    $('#confirmSmtpDelete').attr('href', url);
-    $('#smtpDeleteModal').removeClass('hidden');
-  });
-
-  $('#cancelSmtpDelete').on('click', function() {
-    $('#smtpDeleteModal').addClass('hidden');
-  });
-
-  $(document).on('click', '#smtpDeleteModal', function(e) {
-    if ($(e.target).is('#smtpDeleteModal')) {
-      $('#smtpDeleteModal').addClass('hidden');
-    }
-  });
-
-  // Row click → open detail modal
-  $(document).on('click', '.smtp-row', function(e) {
-    // Ignore clicks on interactive elements inside the row
-    if ($(e.target).closest('a, button').length) return;
-
-    var $row = $(this);
-    var isActive = $row.data('active');
-
-    $('#modal-sender-email').text($row.data('sender-email') || '—');
-    $('#modal-organization').text($row.data('organization') || '—');
-    $('#modal-host').text($row.data('host') || '—');
-    $('#modal-port').text($row.data('port') || '—');
-    $('#modal-account').text($row.data('account') || '—');
-    $('#modal-tls').text($row.data('use-tls') == 'true' ? i18n.enabled : i18n.disabled);
-    $('#modal-ssl').text($row.data('use-ssl') == 'true' ? i18n.enabled : i18n.disabled);
-    $('#modal-details').text($row.data('details') || '—');
-
-    if (isActive == 'true' || isActive === true) {
-      $('#modal-status').html('<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700"><span class="w-1.5 h-1.5 rounded-full bg-teal-500 inline-block"></span>' + i18n.active + '</span>');
-    } else {
-      $('#modal-status').html('<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500"><span class="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block"></span>' + i18n.inactive + '</span>');
-    }
-
-    $('#smtpDetailModal').data('smtp-id', $row.data('id')).removeClass('hidden');
-  });
-
-  // Close modal
-  $(document).on('click', '#closeSmtpModal', function() {
-    $('#smtpDetailModal').addClass('hidden');
-  });
-
-  // Close on backdrop click
-  $(document).on('click', '#smtpDetailModal', function(e) {
-    if ($(e.target).is('#smtpDetailModal')) {
-      $('#smtpDetailModal').addClass('hidden');
-    }
-  });
-
-  // Modal → Test Configuration button
-  $(document).on('click', '#modalTestSmtpBtn', function() {
-    var $btn = $(this);
-    var $label = $('#modalTestSmtpBtnLabel');
-    var smtpId = $('#smtpDetailModal').data('smtp-id');
-
-    $btn.prop('disabled', true);
-    $label.text(i18n.btnTesting);
-    // alert(smtpId);
-    $.ajax({
-      url: '/phm/phishing-smtp/test-connection/' + smtpId,
-      type: 'GET',
-      dataType: 'json',
-      success: function(data) {
-        if (data.success) {
-          showCustomToast('success', data.message || i18n.toastSuccess);
-        } else {
-          showCustomToast('error', data.message || i18n.toastFailed);
-        }
-      },
-      error: function() {
-        showCustomToast('error', i18n.toastEndpointErr);
-      },
-      complete: function() {
-        $btn.prop('disabled', false);
-        $label.text(i18n.btnTestConfig);
-      }
-    });
-  });
-
-
+<script src="/securemagnus_2025/js/custom_script/phishing-smtp-list.js"
+  data-btn-testing="<%= __('phishing_smtp.list.btn_testing') %>"
+  data-btn-test-config="<%= __('phishing_smtp.modal.btn_test_config') %>"
+  data-enabled="<%= __('phishing_smtp.modal.enabled') %>"
+  data-disabled="<%= __('phishing_smtp.modal.disabled') %>"
+  data-active="<%= __('generic_label.active') %>"
+  data-inactive="<%= __('generic_label.inactive') %>"
+  data-toast-success="<%= __('phishing_smtp.toast.connection_success') %>"
+  data-toast-failed="<%= __('phishing_smtp.toast.connection_failed') %>"
+  data-toast-endpoint-err="<%= __('phishing_smtp.toast.endpoint_error') %>"
+  data-allow-edit-and-test="<%= allowEditAndTest ? 'true' : 'false' %>">
 </script>

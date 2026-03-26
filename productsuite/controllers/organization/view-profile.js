@@ -18,7 +18,7 @@ exports.viewProfile = async (req, res) => {
         let isPermitToCreateInvoice = false
         let hasAllowedCreateOrder = false;
         let hasPermitToUpdateProfile = Boolean(false);
-        logger.info(`[PROFILE VIEW METHOD]: PARAMS ${JSON.stringify(req.params)}`);
+        logger.debug(`[PROFILE VIEW METHOD]: PARAMS ${JSON.stringify(req.params)}`);
         // const hasAccess = hasCreateAccess(req, enums.ModuleNames.Organization, [enums.Access_Types.RWD_ALL]);
         if (hasAccess(req, enums.ModuleNames.Organization, [enums.Access_Types.RWD_ALL])) {
             logger.info(`[PROFILE VIEW METHOD]: USER HAS PERMISSION TO UPDATE INVOICE/CREATE STATUS `);
@@ -30,7 +30,7 @@ exports.viewProfile = async (req, res) => {
             enums.Access_Types.RWD_O,
             enums.Access_Types.RW_O,
             enums.Access_Types.RWD_ALL])) {
-            logger.info(`[PROFILE VIEW METHOD]: USER HAS PERMISSION TO UPDATE ORGANIZATION PROFILE`);
+            logger.info(`[PROFILE VIEW METHOD]: HAS PERMISSION TO UPDATE`);
             hasPermitToUpdateProfile = Boolean(true);
         }
 
@@ -50,7 +50,7 @@ exports.viewProfile = async (req, res) => {
         const paymentTypes = resTypes.data?.paymentMethod;
         const paymentStatus = resStatus.data?.paymentStatus;
         const profile = profileResponse.data?.message;
-        logger.info(`[PROFILE VIEW METHOD]: Profile Data: ${JSON.stringify(profile)}`);
+        logger.info(`[PROFILE VIEW METHOD]: Profile Data: ${JSON.stringify(profile,null,2)}`);
         logger.info(`Payment types: ${JSON.stringify(paymentTypes)}`);
         logger.info(`Payment status: ${JSON.stringify(paymentStatus)}`);
         // Extract payment_status_id

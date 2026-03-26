@@ -8,21 +8,21 @@ const getApiClient = require('../../../utility/api-client')
 
 
 exports.createSMTP = async (req, res) => {
-  logger.info(`Create Phishing SMTP Controller: Calling Incoming request to create phishing smtp method`);
+  logger.info(`[Rendering Phishing SMTP] Incoming Request`);
   const userOrganizationId = req.session?.user?.organization_id || 0;
 
   if (req.method === "GET") {
     let orgId = req.session?.user?.organization_id || 0;
-    logger.info(`Create Phishing SMTP Controller: For organization code:- ${orgId}`);
+    logger.info(`[Rendering Phishing SMTP] For organization code:- ${orgId}`);
     let organizationName = 'SecureMagnus Organization';
     const url = backend_api_urls.PRODUCT_SUITE.ORGANIZATION.Active_Organization_List;
     const apiClient = getApiClient(req);
-    logger.info(`Create Phishing SMTP Controller: Calling API URL:- ${url} `);
+    logger.info(`[Rendering Phishing SMTP] Calling Backend API URL:- ${url} `);
     apiClient
       .get(url)
       .then((response) => {
         const data = response.data;
-        logger.debug(`Create Phishing SMTP Controller: response data is ${JSON.stringify(data, null, 2)}`);
+        logger.info(`[Rendering Phishing SMTP] Response of organization received`);
 
         const organizations = data.success ? data.organizations : [];
 
@@ -36,7 +36,7 @@ exports.createSMTP = async (req, res) => {
         });
       })
       .catch((error) => {
-        logger.error(`Create Phishing SMTP Controller: Error in fetching organization list`);
+        logger.error(`[Rendering Phishing SMTP] Error in fetching backend api response`);
         logger.error(error.message);
         if (error.response && error.response.data) {
           logger.error(error.response.data);
@@ -48,8 +48,7 @@ exports.createSMTP = async (req, res) => {
         return res.redirect(frontend_api_urls.PHISHMAGNUS.SMTP_PHISHING.CREATE);
       });
   } else if (req.method === "POST") {
-    logger.info(`Create Phishing SMTP Controller: POST:- Calling post method of create smtp`);
-    logger.info(`Create Phishing SMTP Controller: POST:- Incoming request body ${JSON.stringify(req.body, null, 2)}`);
+    logger.info(`[Rendering Phishing SMTP] POST:- Calling post method of create smtp`);
     const { host, port, smtp_account, smtp_password, sender_email, selected_org, details, use_tls, use_ssl, encrypt_password = false } = req.body;
     // logger.info(`Incoming param body ${JSON.stringify(req.body, null, 2)}`);
     // let orgId = Number(selected_org) || req.session?.user?.organization_id || 0;
@@ -67,28 +66,28 @@ exports.createSMTP = async (req, res) => {
     };
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PHISHMAGNUS.PHISHING_SMTP.CREATE(selected_org);
-    logger.info(`Create Phishing SMTP Controller: POST:- Calling API URL:- ${url} with body ${smtpObj.smtp_account}`);
+    logger.info(`[Rendering Phishing SMTP] POST:- Calling API URL:- ${url} with body ${smtpObj.smtp_account}`);
 
     apiClient
       .post(url, smtpObj)
       .then((response) => {
         const data = response.data;
-        logger.info(`Create Phishing SMTP Controller: POST:- Response ${JSON.stringify(data)}`);
+        logger.info(`[Rendering Phishing SMTP] POST:- Response ${JSON.stringify(data)}`);
 
         if (data.success) {
-          logger.info(`Create Phishing SMTP Controller: POST:- SMTP Account created successfully for organization ${selected_org}`);
+          logger.info(`[Rendering Phishing SMTP] POST:- SMTP Account created successfully for organization ${selected_org}`);
           req.flash('message', data.message);
           req.flash('alertType', 'success');
           return res.redirect(frontend_api_urls.PHISHMAGNUS.SMTP_PHISHING.LIST);
         } else {
-          logger.warn(`Create Phishing SMTP Controller: POST:- Failed to create SMTP Account for organization ${selected_org}. Response message: ${data.message}`);
+          logger.warn(`[Rendering Phishing SMTP] POST:- Failed to create SMTP Account for organization ${selected_org}. Response message: ${data.message}`);
           req.flash('message', data.message || 'Failed to create SMTP Account');
           req.flash('alertType', 'error');
           return res.redirect(frontend_api_urls.PHISHMAGNUS.SMTP_PHISHING.CREATE);
         }
       })
       .catch((error) => {
-        logger.error('Create Phishing SMTP Controller: POST:- Error in creating SMTP Account');
+        logger.error('[Rendering Phishing SMTP] POST:- Error in creating SMTP Account');
         logger.error(`${error.message}`);
         logger.error(error);
         logger.error(error.stack);

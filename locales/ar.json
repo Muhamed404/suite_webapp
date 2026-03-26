@@ -393,6 +393,7 @@
 				"labelAddress": "عنوان المؤسسة",
 				"labelPostalCode": "الرمز البريدي",
 				"labelContactNumber": "رقم الاتصال",
+				"labelUniqueCode": "الرمز الفريد",
 				"labelAdminInformation": "معلومات المدير",
 				"labelAdminFullName": "الاسم الكامل",
 				"labelAdminLastName": "اسم العائلة",
@@ -2054,11 +2055,16 @@
 			"title": "رسائل البلاغات",
 			"subtitle": "الرسائل التي أبلغ عنها المستخدمون في مؤسستك",
 			"total": "الإجمالي",
-			"col_organization": "المنظمة",
+			"col_type": "النوع",
 			"col_reporter": "المبلِّغ",
 			"col_reported_time": "وقت البلاغ",
 			"col_email_subject": "موضوع الرسالة",
-			"no_records": "لا توجد رسائل بلاغات"
+			"no_records": "لا توجد رسائل بلاغات",
+			"type_phishing": "بريد تصيد احتيالي",
+			"type_simulated": "بريد محاكاة",
+			"filter_all": "الكل",
+			"filter_real": "تصيد حقيقي",
+			"filter_simulated": "محاكاة"
 		},
 		"detail": {
 			"title": "تفاصيل البلاغ",
@@ -2082,7 +2088,8 @@
 			"phishmagnus_simulated_email": "حملة محاكاة PhishMagnus",
 			"phishmagnus_simulated_email_desc": "تم إرسال هذه الرسالة كجزء من حملة محاكاة PhishMagnus.",
 			"email_body": "محتوى الرسالة",
-			"suspicious_content": "محتوى مشبوه"
+			"suspicious_content": "محتوى مشبوه",
+			"not_found": "لم يتم العثور على البلاغ."
 		}
 	}
 }

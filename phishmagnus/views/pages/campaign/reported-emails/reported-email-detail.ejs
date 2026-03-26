@@ -30,7 +30,7 @@
       <span class="text-gray-400">›</span>
       <a href="/phm/reported-emails/list" class="hover:text-gray-700 transition"><%= __('breadcrumbs.reportedEmails') %></a>
       <span class="text-gray-400">›</span>
-      <span class="font-semibold text-gray-900 truncate max-w-xs"><%= report.email_subject || __('threat_reporter.detail.title') %></span>
+      <span class="font-semibold text-gray-900 truncate max-w-xs"><%= report ? (report.email_subject || __('threat_reporter.detail.title')) : __('threat_reporter.detail.title') %></span>
     </nav>
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
       <h3 class="text-3xl font-medium text-gray-900"><%= __('threat_reporter.detail.title') %></h3>
@@ -46,6 +46,15 @@
 </div>
 
 <div class="flex flex-col p-6 pt-0 gap-4">
+<% if (!report) { %>
+  <div class="flex flex-col items-center justify-center rounded-3xl bg-white border border-gray-100 shadow-sm p-12 text-center gap-3">
+    <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+    </svg>
+    <p class="text-gray-500 font-medium"><%= __('threat_reporter.detail.not_found') %></p>
+    <a href="/phm/campaign/email/report" class="text-sm text-teal-600 hover:text-teal-800 font-medium transition-colors"><%= __('threat_reporter.detail.back_to_list') %></a>
+  </div>
+<% } else { %>
 
   <!-- Subject hero card -->
   <div class="anim-card flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm p-6 gap-3" style="border-left: 4px solid #2563eb;">
@@ -218,4 +227,5 @@
     </div>
   </div>
 
+<% } %>
 </div>

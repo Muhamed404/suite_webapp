@@ -381,6 +381,7 @@
 				"labelAddress": "Organization Address",
 				"labelPostalCode": "Postal Code",
 				"labelContactNumber": "Contact Number",
+				"labelUniqueCode": "Unique Code",
 				"labelAdminInformation": "Administrator Information",
 				"labelAdminFullName": "Full Name",
 				"labelAdminLastName": "Last Name",
@@ -1753,11 +1754,16 @@
 			"title": "Reported Emails",
 			"subtitle": "Emails reported by users across your organization",
 			"total": "Total",
-			"col_organization": "Organization",
+			"col_type": "Type",
 			"col_reporter": "Reporter",
 			"col_reported_time": "Reported Time",
 			"col_email_subject": "Email Subject",
-			"no_records": "No reported emails found"
+			"no_records": "No reported emails found",
+			"type_phishing": "Phishing",
+			"type_simulated": "Simulated",
+			"filter_all": "All",
+			"filter_real": "Phishing",
+			"filter_simulated": "Simulated"
 		},
 		"detail": {
 			"title": "Report Detail",
@@ -1781,7 +1787,8 @@
 			"phishmagnus_simulated_email": "PhishMagnus Simulated Campaign",
 			"phishmagnus_simulated_email_desc": "This email was sent as part of a PhishMagnus simulation campaign.",
 			"email_body": "Email Body",
-			"suspicious_content": "Suspicious Content"
+			"suspicious_content": "Suspicious Content",
+			"not_found": "Reported email not found."
 		}
 	}
 }

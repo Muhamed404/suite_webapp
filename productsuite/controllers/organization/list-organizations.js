@@ -13,7 +13,7 @@ exports.listOrganizations = async (req, res) => {
     const apiClient = getApiClient(req); // get the customized Axios instance
     const response = await apiClient.get(url);
     const data = response.data.message;
-    logger.info('[List Organization]: Pringint List Organization: ' + JSON.stringify(data))
+    logger.debug('[List Organization]: Pringint List Organization: ' + JSON.stringify(data))
     const hasPermission = hasAccess(req, enums.ModuleNames.Organization, [enums.Access_Types.RWD_ALL]);
 
     if (data.length > 0) {
