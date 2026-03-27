@@ -27,6 +27,7 @@ import { isPlatformAdmin, isOrgAdmin } from "@/utils/roles";
 import { Image as ImageIcon } from "lucide-react";
 export function CertificateManagementListPage() {
     const tMenu = useTranslations("dashboard");
+    const t = useTranslations("certificateBranding");
     const { dir } = useI18n();
     const isRtl = dir === "rtl";
 
@@ -55,8 +56,8 @@ export function CertificateManagementListPage() {
         } catch (error) {
             console.error("Failed to fetch certificates:", error);
             addToast({
-                title: "Error",
-                description: "Failed to load certificates",
+                title: t("toasts.errorTitle"),
+                description: t("toasts.loadFailed"),
                 color: "danger"
             });
         } finally {
@@ -71,14 +72,14 @@ export function CertificateManagementListPage() {
     }, [user?.role_id]);
 
     const handleDelete = async (id: number) => {
-        if (!window.confirm("Are you sure you want to delete this certificate branding?")) return;
+        if (!window.confirm(t("confirmDelete"))) return;
 
         try {
             const response = await certificateService.deleteCertificate(id);
             if (response.success) {
                 addToast({
-                    title: "Success",
-                    description: "Certificate template deleted successfully",
+                    title: t("toasts.successTitle"),
+                    description: t("toasts.deleteSuccess"),
                     color: "success"
                 });
                 fetchCertificates();
@@ -86,8 +87,8 @@ export function CertificateManagementListPage() {
         } catch (error) {
             console.error("Failed to delete certificate:", error);
             addToast({
-                title: "Error",
-                description: "Failed to delete certificate template",
+                title: t("toasts.errorTitle"),
+                description: t("toasts.deleteFailed"),
                 color: "danger"
             });
         }
@@ -117,15 +118,17 @@ export function CertificateManagementListPage() {
             };
         } else {
             addToast({
-                title: "Error",
-                description: "Pop-up blocked. Please allow pop-ups to download the certificate.",
+                title: t("toasts.errorTitle"),
+                description: t("toasts.popupBlocked"),
                 color: "warning"
             });
         }
     };
 
     const filteredCerts = certificates.filter((cert) => {
-        const name = `Certificate - ${cert.language?.name || 'Unknown'}`;
+        const name = t("certificateNameWithLanguage", {
+            language: cert.language?.name || t("unknownLanguage"),
+        });
         const matchesSearch = name.toLowerCase().includes(search.toLowerCase());
         const matchesLang = language === "all" || cert.language?.name === language;
         return matchesSearch && matchesLang;
@@ -148,15 +151,15 @@ export function CertificateManagementListPage() {
                     {/* Header */}
                     <div className="flex items-center justify-between mb-4">
                         <div>
-                            <h1 className="text-xl font-semibold text-gray-900">Certificates</h1>
-                            <p className="text-xs text-gray-500">Manage certificate templates and assets</p>
+                            <h1 className="text-xl font-semibold text-gray-900">{t("title")}</h1>
+                            <p className="text-xs text-gray-500">{t("description")}</p>
                         </div>
                         <Link href="/dashboard/system-branding/certificate/new">
                             <Button
                                 className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-full text-xs min-w-0 h-auto"
                                 startContent={<Plus size={18} />}
                             >
-                                Add New Certificate
+                                {t("addNew")}
                             </Button>
                         </Link>
                     </div>
@@ -165,7 +168,7 @@ export function CertificateManagementListPage() {
                     <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden min-h-[500px]">
                         {/* Filters */}
                         <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-                            <span className="text-[13px] font-medium text-gray-700">All Certificate</span>
+                            <span className="text-[13px] font-medium text-gray-700">{t("allCertificates")}</span>
 
                             <div className="flex gap-3">
                                 <div className="relative w-64">
@@ -174,7 +177,7 @@ export function CertificateManagementListPage() {
                                     </div>
                                     <input
                                         type="text"
-                                        placeholder="Search certificates..."
+                                        placeholder={t("searchPlaceholder")}
                                         className="w-full pl-9 pr-4 py-2 text-xs border border-gray-200 rounded-full focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all h-9"
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
@@ -187,7 +190,7 @@ export function CertificateManagementListPage() {
                                         value={language}
                                         onChange={(e) => setLanguage(e.target.value)}
                                     >
-                                        <option value="all">All Languages</option>
+                                        <option value="all">{t("allLanguages")}</option>
                                         {SUPPORTED_LANGUAGES.map((lang) => (
                                             <option key={lang.id} value={lang.name}>
                                                 {LANGUAGE_FLAGS[lang.id as keyof typeof LANGUAGE_FLAGS]} {lang.name}
@@ -206,20 +209,20 @@ export function CertificateManagementListPage() {
                                         <tr>
                                             <th className="px-4 py-3.5 text-left font-semibold">
                                                 <div className="flex items-center gap-2">
-                                                    <span>Certificate Name</span>
+                                                    <span>{t("table.certificateName")}</span>
                                                     <ChevronsUpDown size={14} className="text-gray-400" />
                                                 </div>
                                             </th>
                                             <th className="px-4 py-3.5 text-left font-semibold">
                                                 <div className="flex items-center gap-2">
-                                                    <span>Language</span>
+                                                    <span>{t("table.language")}</span>
                                                     <ChevronsUpDown size={14} className="text-gray-400" />
                                                 </div>
                                             </th>
-                                            <th className="px-4 py-3.5 text-left font-semibold">Top Logo</th>
-                                            <th className="px-4 py-3.5 text-left font-semibold">Watermark</th>
-                                            <th className="px-4 py-3.5 text-left font-semibold">Border</th>
-                                            <th className="px-4 py-3.5 text-left font-semibold">Action</th>
+                                            <th className="px-4 py-3.5 text-left font-semibold">{t("table.topLogo")}</th>
+                                            <th className="px-4 py-3.5 text-left font-semibold">{t("table.watermark")}</th>
+                                            <th className="px-4 py-3.5 text-left font-semibold">{t("table.border")}</th>
+                                            <th className="px-4 py-3.5 text-left font-semibold">{t("table.action")}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-100">
@@ -227,13 +230,17 @@ export function CertificateManagementListPage() {
                                             <tr>
                                                 <td colSpan={6} className="h-[400px]">
                                                     <div className="flex items-center justify-center">
-                                                        <Spinner color="primary" label="Loading certificates..." />
+                                                        <Spinner color="primary" label={t("loading")} />
                                                     </div>
                                                 </td>
                                             </tr>
                                         ) : items.length > 0 ? items.map((cert) => (
                                             <tr key={cert.id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-4 py-3.5 text-gray-900 font-medium">Certificate - {cert.language?.name || 'Unknown'}</td>
+                                                <td className="px-4 py-3.5 text-gray-900 font-medium">
+                                                    {t("certificateNameWithLanguage", {
+                                                        language: cert.language?.name || t("unknownLanguage"),
+                                                    })}
+                                                </td>
                                                 <td className="px-4 py-3.5 text-gray-600">
                                                     <div className="flex items-center gap-2">
                                                         <span className="flex items-center justify-center w-5 h-5 overflow-hidden rounded-full border border-gray-100">
@@ -241,55 +248,61 @@ export function CertificateManagementListPage() {
                                                                 countryCode={getLanguageCountryCode(cert.lang_id)}
                                                                 svg
                                                                 style={{ fontSize: "1.5em", lineHeight: "1.5em" }}
-                                                                title={cert.language?.name || 'Unknown'}
+                                                                title={cert.language?.name || t("unknownLanguage")}
                                                             />
                                                         </span>
-                                                        <span>{cert.language?.name || 'Unknown'}</span>
+                                                        <span>{cert.language?.name || t("unknownLanguage")}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3.5">
-                                                    <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
-                                                        {cert.top_logo_url ? (
-                                                            <AuthImage src={getCertificateAssetUrl(cert.top_logo_url)} alt="Logo" className="object-contain" fill resolveUrl={false} />
-                                                        ) : (
-                                                            <ImageIcon size={18} className="text-gray-300" />
-                                                        )}
+                                                    <div className={`flex ${isRtl ? "justify-end pe-2" : "justify-start"}`}>
+                                                        <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+                                                            {cert.top_logo_url ? (
+                                                                <AuthImage src={getCertificateAssetUrl(cert.top_logo_url)} alt="Logo" className="object-contain" fill resolveUrl={false} />
+                                                            ) : (
+                                                                <ImageIcon size={18} className="text-gray-300" />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3.5">
-                                                    <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
-                                                        {cert.bg_watermark_url ? (
-                                                            <AuthImage src={getCertificateAssetUrl(cert.bg_watermark_url)} alt="Watermark" className="object-contain" fill resolveUrl={false} />
-                                                        ) : (
-                                                            <ImageIcon size={18} className="text-gray-300" />
-                                                        )}
+                                                    <div className={`flex ${isRtl ? "justify-end pe-2" : "justify-start"}`}>
+                                                        <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+                                                            {cert.bg_watermark_url ? (
+                                                                <AuthImage src={getCertificateAssetUrl(cert.bg_watermark_url)} alt="Watermark" className="object-contain" fill resolveUrl={false} />
+                                                            ) : (
+                                                                <ImageIcon size={18} className="text-gray-300" />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3.5">
-                                                    <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
-                                                        {cert.border_image_url ? (
-                                                            <AuthImage src={getCertificateAssetUrl(cert.border_image_url)} alt="Border" className="object-contain" fill resolveUrl={false} />
-                                                        ) : (
-                                                            <ImageIcon size={18} className="text-gray-300" />
-                                                        )}
+                                                    <div className={`flex ${isRtl ? "justify-end pe-2" : "justify-start"}`}>
+                                                        <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative overflow-hidden">
+                                                            {cert.border_image_url ? (
+                                                                <AuthImage src={getCertificateAssetUrl(cert.border_image_url)} alt="Border" className="object-contain" fill resolveUrl={false} />
+                                                            ) : (
+                                                                <ImageIcon size={18} className="text-gray-300" />
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3.5 text-sky-500 font-semibold cursor-pointer">
-                                                    <div className="flex items-center gap-3">
+                                                    <div className={`flex items-center gap-3 ${isRtl ? "justify-end" : "justify-start"}`}>
                                                         <Link href={`/dashboard/system-branding/certificate/${cert.id}/edit`} className="hover:text-sky-700">
-                                                            Edit
+                                                            {t("actions.edit")}
                                                         </Link>
                                                         <button
                                                             onClick={() => handleDownload(cert)}
                                                             className="text-sky-500 hover:text-sky-700 transition"
-                                                            title="Download Certificate"
+                                                            title={t("actions.download")}
                                                         >
                                                             <Download size={16} />
                                                         </button>
                                                         <button
                                                             onClick={() => cert.id && handleDelete(cert.id)}
                                                             className="text-rose-500 hover:text-rose-700 transition"
-                                                            title="Delete Certificate"
+                                                            title={t("actions.delete")}
                                                         >
                                                             <Trash2 size={16} />
                                                         </button>
@@ -303,8 +316,8 @@ export function CertificateManagementListPage() {
                                                         <div className="bg-gray-100 p-4 rounded-full inline-block mb-4">
                                                             <SearchX size={40} className="text-gray-400" />
                                                         </div>
-                                                        <h3 className="text-lg font-semibold text-gray-700 mb-2">No Certificates Found</h3>
-                                                        <p className="text-sm text-gray-500">Try adjusting your filters or search query</p>
+                                                        <h3 className="text-lg font-semibold text-gray-700 mb-2">{t("empty.title")}</h3>
+                                                        <p className="text-sm text-gray-500">{t("empty.description")}</p>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -318,7 +331,13 @@ export function CertificateManagementListPage() {
                         <div className="flex flex-col md:flex-row justify-between items-center px-4 py-3.5 border-t bg-gray-50 gap-3">
                             <div className="flex items-center gap-2 text-xs text-gray-600 font-medium">
                                 <FileText size={16} />
-                                <span>Showing {items.length > 0 ? (page - 1) * rowsPerPage + 1 : 0}–{Math.min(page * rowsPerPage, filteredCerts.length)} out of {filteredCerts.length} Entries</span>
+                                <span>
+                                    {t("pagination.showing", {
+                                        start: items.length > 0 ? (page - 1) * rowsPerPage + 1 : 0,
+                                        end: Math.min(page * rowsPerPage, filteredCerts.length),
+                                        total: filteredCerts.length,
+                                    })}
+                                </span>
                             </div>
                             <Pagination
                                 isCompact
@@ -329,6 +348,8 @@ export function CertificateManagementListPage() {
                                 onChange={setPage}
                                 classNames={{
                                     cursor: "bg-sky-500 text-white",
+                                    prev: isRtl ? "rotate-180" : "",
+                                    next: isRtl ? "rotate-180" : "",
                                 }}
                             />
                         </div>

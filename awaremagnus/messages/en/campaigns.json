@@ -51,11 +51,19 @@
   "emptyCertificatesDescription": "Complete campaign modules to earn certifications.",
   "searchCertificates": "Search certifications...",
   "certificateName": "Certification Name",
+  "certificatesContentName": "Content Name",
   "loadingCertificates": "Loading certifications...",
   "campaignLabel": "Campaign",
   "moduleLabel": "Module",
   "issuedDate": "Issued",
   "expiryDate": "Expires",
+  "certificatesPaginationShowing": "Showing {start}–{end} out of {total} Entries",
+  "unknownCampaign": "Unknown Campaign",
+  "unknownModule": "Unknown Module",
+  "errors": {
+    "downloadUnknown": "An unknown error occurred while downloading the certificate.",
+    "popupBlocked": "Unable to open preview window; please allow pop-ups."
+  },
   "downloadCertificate": "Download Certification",
   "breadcrumb": {
     "dashboard": "Dashboard"
