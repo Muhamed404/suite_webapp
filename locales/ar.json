@@ -1052,7 +1052,6 @@
 			"interactForm": "التفاعل مع النموذج",
 			"formSubmitted": "تم إرسال النموذج",
 			"attachmentOpened": "تم فتح المرفق",
-			"interactionReportByEachQrCode": "تقرير التفاعل لكل رمز QR",
 			"tagSequence": "تسلسل الوسم #",
 			"tagCode": "رمز الوسم",
 			"downloadQrCode": "تنزيل رمز QR",
@@ -1646,7 +1645,10 @@
 		"repeatedDownloads": "التحميلات المتكررة",
 		"searchHere": "ابحث هنا...",
 		"clickToTest": "انقر للاختبار",
-		"testUrl": "رابط الاختبار"
+		"testUrl": "رابط الاختبار",
+		"scanned": "تم المسح",
+		"scannedYes": "تم المسح",
+		"scannedNo": "لم يُمسح"
 	},
 	"whatsapp": {
 		"create": {
@@ -1777,6 +1779,10 @@
 		"nfcCode": "رمز NFC",
 		"copyUrl": "نسخ الرابط",
 		"viewReport": "عرض التقرير",
+		"scanned": "تم المسح",
+		"scannedYes": "تم المسح",
+		"scannedNo": "لم يُمسح",
+		"noRecords": "لا توجد سجلات.",
 		"showingEntries": "عرض {start}-{end} من {total} إدخالات",
 		"searchHere": "ابحث هنا...",
 		"sortBy": "ترتيب حسب",

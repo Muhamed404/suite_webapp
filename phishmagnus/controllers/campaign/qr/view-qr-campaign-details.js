@@ -27,9 +27,9 @@ exports.viewQRCampaignDetails = async (req, res) => {
 
     // Function to fetch campaign statistics
     // Fetch statistics and user details in parallel for performance
-    const [apiResponseCampaignReport, apiResponseQRImagesData] = await Promise.all([
+    const [apiResponseCampaignReport
+    ] = await Promise.all([
       generateReport(req, campId),
-      retrieveQRImage(req, campId)
     ]);
 
     logger.info('QR Campaign Detail: FETCHED ALL DATA');
@@ -45,7 +45,7 @@ exports.viewQRCampaignDetails = async (req, res) => {
     const formInteractionSegmentStats = apiResponseCampaignReport?.data?.message.interactedSegmentStats || {};
     const uniqueIpCount = apiResponseCampaignReport?.data?.message.uniqueIpCount || 0;
 
-    let qrImageUrls = apiResponseQRImagesData?.data?.message || [];
+    let qrImageUrls = apiResponseCampaignReport?.data?.message.qrTagScanReport || [];
     logger.info(`Parsed qrImageUrls: ${JSON.stringify(qrImageUrls, null, 2)}`);
 
     if (!qrImageUrls || qrImageUrls.length === 0) {

@@ -1208,7 +1208,6 @@
 		"interactForm": "Interact Form",
 		"formSubmitted": "Form Submitted",
 		"attachmentOpened": "Attachment Opened",
-		"interactionReportByEachQrCode": "Interaction Report By Each QR Code",
 		"tagSequence": "Tag Sequence #",
 		"tagCode": "Tag Code",
 		"downloadQrCode": "Download QR Code",
@@ -1228,7 +1227,10 @@
 		"repeatedSubmitted": "Repeated Submitted",
 		"repeatedDownloads": "Repeated Downloads",
 		"clickToTest": "Click to Test",
-		"testUrl": "Test URL"
+		"testUrl": "Test URL",
+		"scanned": "Scanned",
+		"scannedYes": "Scanned",
+		"scannedNo": "Not Scanned"
 	},
 	"nfc_campaign": {
 		"title": "NFC Campaign",
@@ -1260,6 +1262,10 @@
 		"nfcCode": "NFC Code",
 		"copyUrl": "Copy URL",
 		"viewReport": "View Report",
+		"scanned": "Scanned",
+		"scannedYes": "Scanned",
+		"scannedNo": "Not Scanned",
+		"noRecords": "No records found.",
 		"showingEntries": "Showing {start}-{end} out of {total} Entries",
 		"searchHere": "Search here...",
 		"sortBy": "Sort by",
