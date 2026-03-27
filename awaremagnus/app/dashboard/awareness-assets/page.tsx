@@ -23,34 +23,43 @@ import type { ModuleContent } from "@/types/quiz";
 const AWARENESS_ASSETS = [
   {
     id: 0,
-    name: "All",
+    labelKey: "filters.all",
   },
   {
     id: 4,
-    name: "Posters",
+    labelKey: "filters.posters",
   },
   {
     id: 5,
-    name: "Screen Savers",
+    labelKey: "filters.screenSavers",
   },
   {
     id: 7,
-    name: "Documents",
+    labelKey: "filters.documents",
   },
 ] as const;
 
 type AwarenessAssetType = (typeof AWARENESS_ASSETS)[number]["id"];
 
-function getAssetTitle(asset: ModuleContent): string {
+function getAssetTitle(
+  asset: ModuleContent,
+  tAwarenessAssets: (key: string, values?: Record<string, unknown>) => string
+): string {
   return (
     asset.title ??
     (asset as { name?: string }).name ??
-    `Asset ${asset.id}`
+    tAwarenessAssets("fallback.asset", { id: asset.id })
   );
 }
 
-function getAssetLanguage(asset: ModuleContent): string {
-  return asset.language?.name ?? `Language ${asset.language?.id ?? "-"}`;
+function getAssetLanguage(
+  asset: ModuleContent,
+  tAwarenessAssets: (key: string, values?: Record<string, unknown>) => string
+): string {
+  return (
+    asset.language?.name ??
+    tAwarenessAssets("fallback.language", { id: asset.language?.id ?? "-" })
+  );
 }
 
 function getAssetSourceUrl(asset: ModuleContent): string | null {
@@ -61,7 +70,7 @@ function getAssetSourceUrl(asset: ModuleContent): string | null {
   return source.startsWith("http") ? source : getContentAssetUrl(source);
 }
 
-function getAssetCreatedDate(asset: ModuleContent): string {
+function getAssetCreatedDate(asset: ModuleContent, locale: string): string {
   const raw =
     asset.created_at ??
     (asset as { creation_date?: string }).creation_date ??
@@ -73,7 +82,7 @@ function getAssetCreatedDate(asset: ModuleContent): string {
 
   if (Number.isNaN(date.getTime())) return "-";
 
-  return date.toLocaleDateString();
+  return date.toLocaleDateString(locale);
 }
 
 function isImageAsset(url: string): boolean {
@@ -99,8 +108,9 @@ function getAssetPreviewUrl(asset: ModuleContent): string | null {
 }
 
 export default function AwarenessAssetsPage() {
-  const t = useTranslations("dashboard");
-  const { dir } = useI18n();
+  const tDashboard = useTranslations("dashboard");
+  const tAwarenessAssets = useTranslations("awarenessAssets");
+  const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<AwarenessAssetType>(0);
@@ -150,9 +160,9 @@ export default function AwarenessAssetsPage() {
     if (!query) return assets;
 
     return assets.filter((asset) => {
-      const title = getAssetTitle(asset).toLowerCase();
+      const title = getAssetTitle(asset, tAwarenessAssets).toLowerCase();
       const description = (asset.description ?? "").toLowerCase();
-      const language = getAssetLanguage(asset).toLowerCase();
+      const language = getAssetLanguage(asset, tAwarenessAssets).toLowerCase();
 
       return (
         title.includes(query) ||
@@ -160,7 +170,7 @@ export default function AwarenessAssetsPage() {
         language.includes(query)
       );
     });
-  }, [assets, searchText]);
+  }, [assets, searchText, tAwarenessAssets]);
 
   const totalPages = pagination?.total_pages ?? 1;
   const totalItems = pagination?.total_items ?? assets.length;
@@ -186,15 +196,15 @@ export default function AwarenessAssetsPage() {
     <ProtectedRoute>
       <DashboardLayout>
         <div className={clsx("p-4 sm:p-6", isRtl && "text-right")}>
-          <h1 className="text-lg font-semibold text-[var(--mainblue)]">{t("menu.awarenessAssets")}</h1>
+          <h1 className="text-lg font-semibold text-[var(--mainblue)]">{tDashboard("menu.awarenessAssets")}</h1>
           <p className="mt-1 text-sm text-[var(--darkgray)]">
-            Select a filter and open the required content.
+            {tAwarenessAssets("description")}
           </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <input
               className="flex-1 rounded-full border border-[var(--strokeGray)] bg-white px-4 py-2 text-sm text-[var(--mainblue)] outline-none placeholder:text-[var(--darkgray)] focus:border-[var(--blue)]"
-              placeholder="Search by title, language, or description"
+              placeholder={tAwarenessAssets("searchPlaceholder")}
               type="text"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
@@ -209,8 +219,8 @@ export default function AwarenessAssetsPage() {
                 className="rounded-full border border-[var(--strokeGray)] bg-white text-sm text-[var(--mainblue)]"
               >
                 {AWARENESS_ASSETS.map((asset) => (
-                  <SelectItem key={asset.id} textValue={asset.name}>
-                    {asset.name}
+                  <SelectItem key={asset.id} textValue={tAwarenessAssets(asset.labelKey)}>
+                    {tAwarenessAssets(asset.labelKey)}
                   </SelectItem>
                 ))}
               </Select>
@@ -228,15 +238,23 @@ export default function AwarenessAssetsPage() {
             </div>
           ) : isError ? (
             <div className="mt-5 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              Unable to load awareness assets. {error instanceof Error ? error.message : ""}
+              {tAwarenessAssets("states.loadError", {
+                message: error instanceof Error ? error.message : "",
+              })}
             </div>
           ) : assetsResponse && !assetsResponse.success ? (
             <div className="mt-5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
-              {assetsResponse.message ?? "Could not fetch awareness assets."}
+              {assetsResponse.message ?? tAwarenessAssets("states.fetchError")}
             </div>
           ) : filteredAssets.length === 0 ? (
             <div className="mt-5 rounded-lg border border-[var(--strokeGray)] bg-white p-4 text-sm text-[var(--darkgray)]">
-              No records found for {activeFilterInfo.name}{searchText.trim() ? " with this search." : "."}
+              {searchText.trim()
+                ? tAwarenessAssets("states.noRecordsWithSearch", {
+                    filter: tAwarenessAssets(activeFilterInfo.labelKey),
+                  })
+                : tAwarenessAssets("states.noRecordsFound", {
+                    filter: tAwarenessAssets(activeFilterInfo.labelKey),
+                  })}
             </div>
           ) : (
             <>
@@ -244,7 +262,7 @@ export default function AwarenessAssetsPage() {
                 {pageItems.map((asset) => {
                 const sourceUrl = getAssetSourceUrl(asset);
                 const previewUrl = getAssetPreviewUrl(asset);
-                const title = getAssetTitle(asset);
+                const title = getAssetTitle(asset, tAwarenessAssets);
 
                 return (
                   <article
@@ -264,9 +282,9 @@ export default function AwarenessAssetsPage() {
                         ) : (
                           <div className="flex h-full w-full items-center justify-center">
                             <Image
-                              alt={activeFilterInfo.name}
+                              alt={tAwarenessAssets(activeFilterInfo.labelKey)}
                               height={34}
-                              src={getContentTypeIconFor(activeFilterInfo.id, activeFilterInfo.name)}
+                              src={getContentTypeIconFor(activeFilterInfo.id, tAwarenessAssets(activeFilterInfo.labelKey))}
                               width={34}
                             />
                           </div>
@@ -275,7 +293,7 @@ export default function AwarenessAssetsPage() {
                       <div className="min-w-0">
                         <h2 className="line-clamp-2 text-sm font-semibold text-[var(--mainblue)]">{title}</h2>
                         <p className="mt-0.5 text-xs text-[var(--darkgray)]">
-                          {getAssetLanguage(asset)} • {getAssetCreatedDate(asset)}
+                          {getAssetLanguage(asset, tAwarenessAssets)} • {getAssetCreatedDate(asset, locale)}
                         </p>
                       </div>
                     </div>
@@ -292,11 +310,11 @@ export default function AwarenessAssetsPage() {
                             rel="noopener noreferrer"
                             target="_blank"
                           >
-                            View
+                            {tAwarenessAssets("actions.view")}
                           </a>
                         ) : (
                           <span className="inline-flex items-center rounded-md bg-[var(--gray)] px-3 py-1.5 text-xs text-[var(--darkgray)]">
-                            No Source
+                            {tAwarenessAssets("states.noSource")}
                           </span>
                         )}
                     </div>
@@ -307,7 +325,11 @@ export default function AwarenessAssetsPage() {
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-xs text-[var(--darkgray)]">
-                Showing {((currentPage - 1) * (pagination?.per_page ?? 9)) + 1}–{Math.min(currentPage * (pagination?.per_page ?? 9), totalItems)} of {totalItems} results
+                {tAwarenessAssets("pagination.showingResults", {
+                  from: (currentPage - 1) * (pagination?.per_page ?? 9) + 1,
+                  to: Math.min(currentPage * (pagination?.per_page ?? 9), totalItems),
+                  total: totalItems,
+                })}
               </div>
               <Pagination
                 showControls
@@ -315,8 +337,14 @@ export default function AwarenessAssetsPage() {
                   wrapper: "flex gap-1",
                   item: "min-w-8 h-8 text-xs font-medium bg-white border border-gray-200 hover:bg-gray-100",
                   cursor: "bg-[#0ea5e9] text-white font-medium",
-                  prev: "min-w-8 h-8 bg-white border border-gray-200 hover:bg-gray-100",
-                  next: "min-w-8 h-8 bg-white border border-gray-200 hover:bg-gray-100",
+                  prev: clsx(
+                    "min-w-8 h-8 bg-white border border-gray-200 hover:bg-gray-100",
+                    isRtl && "rotate-180"
+                  ),
+                  next: clsx(
+                    "min-w-8 h-8 bg-white border border-gray-200 hover:bg-gray-100",
+                    isRtl && "rotate-180"
+                  ),
                 }}
                 page={currentPage}
                 radius="sm"

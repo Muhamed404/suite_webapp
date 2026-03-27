@@ -6,6 +6,7 @@ export interface AppMessages {
   common: Messages;
   login: Messages;
   dashboard: Messages;
+  awarenessAssets: Messages;
   quiz: Messages;
   module: Messages;
   content: Messages;
@@ -13,10 +14,11 @@ export interface AppMessages {
 }
 
 export async function loadMessages(locale: Locale): Promise<AppMessages> {
-  const [common, hintLogin, hintDashboard, quiz, module, content, campaigns] = await Promise.all([
+  const [common, hintLogin, hintDashboard, awarenessAssets, quiz, module, content, campaigns] = await Promise.all([
     import(`@/messages/${locale}/common.json`).then((m) => m.default),
     import(`@/messages/${locale}/login.json`).then((m) => m.default),
     import(`@/messages/${locale}/dashboard.json`).then((m) => m.default),
+    import(`@/messages/${locale}/awareness-assets.json`).then((m) => m.default),
     import(`@/messages/${locale}/quiz.json`).then((m) => m.default),
     import(`@/messages/${locale}/module.json`).then((m) => m.default),
     import(`@/messages/${locale}/content.json`).then((m) => m.default),
@@ -27,6 +29,7 @@ export async function loadMessages(locale: Locale): Promise<AppMessages> {
     common,
     login: hintLogin,
     dashboard: hintDashboard,
+    awarenessAssets,
     quiz,
     module,
     content,
