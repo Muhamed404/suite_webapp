@@ -730,6 +730,7 @@
 			"sms_placeholder": "Enter SMS message (max 160 characters)",
 			"sms_message": "SMS Message",
 			"sms_content": "SMS Template Content",
+			"sms_characters": "characters",
 			"smsShortMessageTitle": "Short Message (Level 1)",
 			"smsShortMessageDescription": "Send a simple SMS message.",
 			"labelDetails_level2_Description": "You can enter file extension and name. We will provide you the new file automatically as an attachment in your phishing message to be downloaded.",

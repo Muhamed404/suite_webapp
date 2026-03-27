@@ -10,6 +10,8 @@ import { useI18n } from "@/i18n/I18nProvider";
 import { setLocaleCookie } from "@/i18n/client-locale";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
+const CAMPAIGN_DRAFT_PRESERVE_ONCE_KEY = "awaremagnus:create-campaign:draft:preserve-once";
+
 export function LanguageSwitcher() {
   const { locale, dir } = useI18n();
   const router = useRouter();
@@ -20,6 +22,7 @@ export function LanguageSwitcher() {
 
     if (newLocale === locale) return;
 
+    window.sessionStorage.setItem(CAMPAIGN_DRAFT_PRESERVE_ONCE_KEY, "1");
     setLocaleCookie(newLocale);
     window.location.reload();
   };

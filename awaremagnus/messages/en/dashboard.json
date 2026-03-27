@@ -34,6 +34,8 @@
     "securityAwarenessCampaign": "Security Awareness Campaign",
     "campaignCompletionTimeline": "Campaign Completion Timeline",
     "completionsByDateAcrossCampaigns": "Module completions by date across all campaigns",
+    "noOfModules": "No. of Modules",
+    "date": "Date",
     "viewAll": "View All",
     "lastCampaignDate": "Last Campaign Date: {date}",
     "weeklyProgress": "Weekly Progress",
@@ -50,7 +52,8 @@
     "top3StrugglingTopics": "Top 3 Struggling Topics",
     "employeesNeedAttention": "Your employees need attention on these topics",
     "activeLearnersThisMonth": "Active Learners This Month",
-    "trainingCompletionRate": "Training Completion Rate"
+    "trainingCompletionRate": "Training Completion Rate",
+    "noCompletionData": "No completion data available"
   },
   "topics": {
     "wifiSecurity": "WIFI Security",

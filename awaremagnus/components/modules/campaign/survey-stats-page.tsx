@@ -160,6 +160,8 @@ export function SurveyStatsPage() {
   const overall = stats?.overall_risk_level;
 
   const surveyCode = survey?.survey_unique_code ?? "";
+  const surveyStartDate = survey?.start_date ?? null;
+  const surveyEndDate = survey?.deadline ?? null;
 
   const handleCopyLink = () => {
     if (surveyCode) {
@@ -229,6 +231,17 @@ export function SurveyStatsPage() {
                     </button>
                   </div>
                 )}
+                <div className="flex flex-wrap items-center gap-3 mt-2">
+                  <span className="text-sm text-gray-600 font-medium">Start Date:</span>
+                  <span className="text-sm text-gray-800 bg-gray-100 px-2.5 py-1 rounded font-medium">
+                    {formatDate(surveyStartDate)}
+                  </span>
+                  <span className="text-sm text-gray-400">|</span>
+                  <span className="text-sm text-gray-600 font-medium">End Date:</span>
+                  <span className="text-sm text-gray-800 bg-gray-100 px-2.5 py-1 rounded font-medium">
+                    {formatDate(surveyEndDate)}
+                  </span>
+                </div>
               </div>
             </div>
             {!isLoading && (usersData?.survey?.id === surveyId) && (usersData?.pagination?.total_items ?? 0) === 0 && (

@@ -219,16 +219,9 @@ export default function DashboardPage() {
       };
     }
 
-    const monthly =
-      isOrgAdmin && orgMonthlyCompletion ? orgMonthlyCompletion.object?.monthly_data : [];
-
-    if (!monthly || monthly.length === 0) return { labels: [], data: [] };
-
-    const labels = monthly.map((m: any) => m.month_name || m.month);
-    const data = monthly.map((m: any) => Number(m.modules_completed || 0));
-
-    return { labels, data };
-  }, [isOrgAdmin, orgMonthlyCompletion, orgCampaignCompletions]);
+    // No fallback to monthly completion API - return empty data
+    return { labels: [], data: [] };
+  }, [orgCampaignCompletions]);
 
   // Campaign Timeline Scatter Chart data (org-admin: all campaigns aggregated)
   const campaignTimelineData = useMemo(() => {
@@ -238,24 +231,21 @@ export default function DashboardPage() {
       ? completionsPayload.campaigns
       : [];
 
-    const campaignMap = new Map<number, string>();
+    // Collect all individual completion points (for tooltip details)
     const points: Array<{
       x: number;
       y: number;
-      campaignId: number;
       campaignName: string;
       moduleName: string;
       userName: string;
       formattedDate: string;
     }> = [];
 
-    // Extract campaigns and completions
-    completionCampaigns.forEach((campaign: any, campaignIndex: number) => {
-      const campaignId = Number(campaign?.campaign_id || 0);
-      const campaignName = campaign?.campaign_name || `Campaign ${campaignId}`;
-      if (!campaignMap.has(campaignId)) {
-        campaignMap.set(campaignId, campaignName);
-      }
+    // Count modules completed per date (aggregate by date string)
+    const dateCountMap = new Map<string, { timestamp: number; count: number; items: any[] }>();
+
+    completionCampaigns.forEach((campaign: any) => {
+      const campaignName = campaign?.campaign_name || `Campaign ${campaign?.campaign_id}`;
 
       const completedModules = Array.isArray(campaign?.completed_modules)
         ? campaign.completed_modules
@@ -269,60 +259,64 @@ export default function DashboardPage() {
         const userName = `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
         const formattedDate = completionDate.toLocaleDateString(
           locale === "ar" ? "ar-EG" : "en-US",
-          {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          }
+          { day: "2-digit", month: "short", year: "numeric" }
         );
 
-        points.push({
-          x: completionDate.getTime(),
-          y: campaignIndex + 1, // y = campaign position (1-based)
-          campaignId,
+        // Use date-only key for grouping
+        const dateKey = completionDate.toISOString().split("T")[0];
+        const existing = dateCountMap.get(dateKey);
+        const item = {
           campaignName,
           moduleName: row?.module_name || `Module ${row?.module_id}`,
           userName: userName || `User ${row?.user_id || "-"}`,
           formattedDate,
+        };
+
+        if (existing) {
+          existing.count += 1;
+          existing.items.push(item);
+        } else {
+          // Normalize to start of day for consistent x-axis
+          const dayStart = new Date(completionDate.getFullYear(), completionDate.getMonth(), completionDate.getDate()).getTime();
+          dateCountMap.set(dateKey, { timestamp: dayStart, count: 1, items: [item] });
+        }
+
+        points.push({
+          x: completionDate.getTime(),
+          y: 0, // will not be used directly for chart series
+          ...item
         });
       });
     });
 
+    // Build sorted line data: x = date, y = number of modules completed on that date
+    const lineData = Array.from(dateCountMap.values())
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .map((d) => ({ x: d.timestamp, y: d.count, items: d.items }));
+
     // Compute axis ranges
-    const xTimes = points.map((p) => p.x);
+    const xTimes = lineData.map((p) => p.x);
+    const yValues = lineData.map((p) => p.y);
     const minDate = xTimes.length > 0 ? Math.min(...xTimes) : null;
     const maxDate = xTimes.length > 0 ? Math.max(...xTimes) : null;
+    const maxModules = yValues.length > 0 ? Math.max(...yValues) : 1;
     const oneDayMs = 24 * 60 * 60 * 1000;
     const hasSingleDate = minDate !== null && maxDate !== null && minDate === maxDate;
     const xAxisMin = hasSingleDate ? (minDate ?? 0) - oneDayMs : minDate ?? undefined;
     const xAxisMax = hasSingleDate ? (maxDate ?? 0) + oneDayMs : maxDate ?? undefined;
 
-    // Dynamic tick calculation
-    const dateSpanMs =
-      xAxisMin !== undefined && xAxisMax !== undefined
-        ? Math.max(0, (xAxisMax as number) - (xAxisMin as number))
-        : 0;
-    const spanDays = dateSpanMs > 0 ? Math.ceil(dateSpanMs / oneDayMs) : 0;
-    const xAxisTickAmount = hasSingleDate
-      ? 3
-      : spanDays > 0
-        ? Math.min(7, spanDays + 1)
-        : undefined;
-
-    const campaigns = Array.from(campaignMap.values());
-
     return {
       points,
       series: [
         {
-          name: "Campaign Completions",
-          data: points.map((p) => ({ x: p.x, y: p.y })),
+          name: "Modules Completed",
+          data: lineData,
         },
       ],
       xAxisMin,
       xAxisMax,
-      xAxisTickAmount,
-      campaignCount: campaigns.length,
+      maxModules,
+      hasData: lineData.length > 0,
     };
   }, [orgCampaignCompletions, locale]);
 
@@ -1759,30 +1753,35 @@ export default function DashboardPage() {
                         For Organization Admins: render scatter timeline chart using aggregated campaign API response.
                         Shows completion date (x-axis) vs campaign index (y-axis) across all campaigns.
                       */}
-                      {isOrgAdmin && campaignTimelineData.points.length > 0 ? (
+                      {isOrgAdmin && campaignTimelineData.hasData ? (
                         <div className="w-full h-full">
                           <Chart
                             options={{
                               chart: {
-                                type: "scatter",
+                                type: "line",
                                 sparkline: { enabled: false },
                                 toolbar: { show: false },
                                 zoom: { enabled: false },
                                 parentHeightOffset: 0,
                               },
                               colors: ["#3B82F6"],
-                              plotOptions: {
-                                bubble: {
-                                  minBubbleRadius: 3,
-                                  maxBubbleRadius: 8,
-                                },
-                              } as any,
+                              stroke: {
+                                curve: "smooth",
+                                width: 2,
+                              },
+                              markers: {
+                                size: 5,
+                                colors: ["#3B82F6"],
+                                strokeColors: "#fff",
+                                strokeWidth: 2,
+                                hover: { sizeOffset: 2 },
+                              },
                               xaxis: {
                                 type: "datetime",
                                 min: campaignTimelineData.xAxisMin,
                                 max: campaignTimelineData.xAxisMax,
                                 title: {
-                                  text: "Date",
+                                  text: t("cards.date"),
                                   style: {
                                     fontSize: "12px",
                                     fontWeight: 600,
@@ -1817,11 +1816,11 @@ export default function DashboardPage() {
                               },
                               yaxis: {
                                 min: 0,
-                                max: Math.max(1, campaignTimelineData.campaignCount) + 1,
-                                tickAmount: Math.max(1, campaignTimelineData.campaignCount) + 1,
+                                max: campaignTimelineData.maxModules + 1,
+                                tickAmount: Math.min(campaignTimelineData.maxModules + 1, 8),
                                 decimalsInFloat: 0,
                                 title: {
-                                  text: "Campaigns",
+                                  text: t("cards.noOfModules"),
                                   style: {
                                     fontSize: "12px",
                                     fontWeight: 600,
@@ -1859,23 +1858,31 @@ export default function DashboardPage() {
                               },
                               tooltip: {
                                 theme: "dark",
-                                custom: function ({ dataPointIndex }: any) {
-                                  const point = campaignTimelineData.points[dataPointIndex];
-                                  if (!point) return "";
+                                custom: function ({ series, seriesIndex, dataPointIndex, w }: any) {
+                                  const data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
+                                  const items = data.items || [];
+                                  if (items.length === 0) return "";
+                                  
                                   return `
-                                    <div style="background: linear-gradient(to bottom right, #1e40af, #1e3a8a); color: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(147, 197, 253, 0.3);">
-                                      <div style="font-size: 13px; font-weight: bold; color: #dbeafe;">${point.campaignName}</div>
-                                      <div style="color: #bfdbfe; font-size: 12px; margin-top: 4px;">${point.moduleName}</div>
-                                      <div style="color: #bfdbfe; margin-top: 6px; font-weight: 500; font-size: 12px;">${point.userName}</div>
-                                      <div style="color: #93c5fd; font-size: 11px; margin-top: 4px;">${point.formattedDate}</div>
+                                    <div style="background: linear-gradient(to bottom right, #1e40af, #1e3a8a); color: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(147, 197, 253, 0.3); max-height: 250px; overflow-y: auto;">
+                                      <div style="font-size: 11px; color: #93c5fd; margin-bottom: 8px; border-bottom: 1px solid rgba(147, 197, 253, 0.2); padding-bottom: 4px; font-weight: 600;">
+                                        ${items[0].formattedDate} — ${items.length} Completion${items.length > 1 ? 's' : ''}
+                                      </div>
+                                      ${items.map((item: any) => `
+                                        <div style="margin-bottom: 12px; border-left: 2px solid rgba(147, 197, 253, 0.3); padding-left: 8px;">
+                                          <div style="font-size: 13px; font-weight: bold; color: #dbeafe;">${item.campaignName}</div>
+                                          <div style="color: #bfdbfe; font-size: 12px; margin-top: 2px;">${item.moduleName}</div>
+                                          <div style="color: #bfdbfe; margin-top: 4px; font-weight: 500; font-size: 11px;">${item.userName}</div>
+                                        </div>
+                                      `).join('')}
                                     </div>
                                   `;
                                 },
                               },
                             }}
                             series={campaignTimelineData.series}
-                            type="scatter"
-                            height={Math.max(300, 200 + campaignTimelineData.campaignCount * 30)}
+                            type="line"
+                            height={300}
                           />
                         </div>
                       ) : campaignMonthly.data && campaignMonthly.data.length > 0 ? (

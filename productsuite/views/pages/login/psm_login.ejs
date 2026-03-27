@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= locals.locale || 'en' %>" dir="<%= (locals.locale || 'en') === 'ar' ? 'rtl' : 'ltr' %>" translate="no" class="notranslate">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <meta name="googlebot" content="notranslate">
   <title>Secure Magnus</title>
 
 
@@ -16,12 +18,89 @@
 
   <script src="/securemagnus_2025/js/tailwind_3.js"></script>
 
+  <style>
+    .goog-te-banner-frame,
+    iframe.goog-te-banner-frame,
+    .goog-te-menu-frame,
+    iframe.goog-te-menu-frame,
+    .VIpgJd-ZVi9od-ORHb-OEVmcd,
+    .VIpgJd-ZVi9od-l4eHX-hSRGPd,
+    .VIpgJd-yAWNEb-L7lbkb,
+    .VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+    .VIpgJd-ZVi9od-aZ2wEe-OiiCO,
+    .goog-te-balloon-frame,
+    iframe.goog-te-balloon-frame,
+    #goog-gt-tt,
+    .goog-tooltip,
+    .goog-text-highlight {
+      display: none !important;
+      visibility: hidden !important;
+    }
+
+    html,
+    body {
+      top: 0 !important;
+      margin-top: 0 !important;
+    }
+  </style>
+
+  <script>
+    (function () {
+      function hideTranslateUi() {
+        var selectors = [
+          '.goog-te-banner-frame',
+          'iframe.goog-te-banner-frame',
+          '.goog-te-menu-frame',
+          'iframe.goog-te-menu-frame',
+          '.VIpgJd-ZVi9od-ORHb-OEVmcd',
+          '.VIpgJd-ZVi9od-l4eHX-hSRGPd',
+          '.VIpgJd-yAWNEb-L7lbkb',
+          '.VIpgJd-ZVi9od-aZ2wEe-wOHMyf',
+          '.VIpgJd-ZVi9od-aZ2wEe-OiiCO',
+          '.goog-te-balloon-frame',
+          'iframe.goog-te-balloon-frame',
+          '#goog-gt-tt',
+          '.goog-tooltip',
+          '.goog-text-highlight'
+        ];
+
+        selectors.forEach(function (selector) {
+          document.querySelectorAll(selector).forEach(function (node) {
+            node.style.setProperty('display', 'none', 'important');
+            node.style.setProperty('visibility', 'hidden', 'important');
+          });
+        });
+
+        document.documentElement.setAttribute('translate', 'no');
+        document.documentElement.classList.add('notranslate');
+        document.documentElement.style.setProperty('top', '0px', 'important');
+
+        if (document.body) {
+          document.body.setAttribute('translate', 'no');
+          document.body.classList.add('notranslate');
+          document.body.style.setProperty('top', '0px', 'important');
+        }
+      }
+
+      hideTranslateUi();
+      document.addEventListener('DOMContentLoaded', hideTranslateUi);
+      window.addEventListener('load', hideTranslateUi);
+      if (typeof MutationObserver !== 'undefined' && document.documentElement) {
+        var observer = new MutationObserver(hideTranslateUi);
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+      }
+      setTimeout(hideTranslateUi, 500);
+      setTimeout(hideTranslateUi, 1500);
+      setInterval(hideTranslateUi, 3000);
+    })();
+  </script>
+
   <link rel="stylesheet" href="/securemagnus_2025/css/style.css">
 
 
 </head>
 
-<body class="bg-white">
+<body class="bg-white notranslate" translate="no">
 
 
   <div class="grid grid-cols-12 min-h-screen">

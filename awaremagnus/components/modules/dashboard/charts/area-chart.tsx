@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
+import { useTranslations } from "@/i18n/useTranslations";
+
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 interface AreaChartProps {
@@ -13,11 +15,34 @@ interface AreaChartProps {
 }
 
 export const AreaChart = ({
-  data = [22, 18, 25, 20, 30, 26],
-  labels = ["7 June", "8 June", "9 June", "10 June", "11 June", "12 June"],
+  data = [],
+  labels = [],
   seriesName = "Campaign A",
   yLabel = "Topics",
 }: AreaChartProps) => {
+  const t = useTranslations("dashboard");
+  const maxDataValue = useMemo(() => Math.max(0, ...data), [data]);
+  const yAxisMax = useMemo(() => {
+    if (maxDataValue <= 1) return 2;
+    if (maxDataValue <= 5) return maxDataValue + 1;
+
+    return Math.ceil(maxDataValue * 1.25);
+  }, [maxDataValue]);
+  const yAxisTickAmount = useMemo(() => {
+    if (yAxisMax <= 5) return yAxisMax;
+    if (yAxisMax <= 10) return 5;
+
+    return 6;
+  }, [yAxisMax]);
+
+  if (!data || data.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-[300px] text-gray-500">
+        {t("cards.noCompletionData")}
+      </div>
+    );
+  }
+
   const chartOptions = useMemo(
     () => ({
       chart: {
@@ -30,6 +55,15 @@ export const AreaChart = ({
         curve: "smooth" as const,
         width: 3,
         colors: ["#4BA6FF"],
+      },
+      markers: {
+        size: 6,
+        colors: ["#4BA6FF"],
+        strokeColors: "#FFFFFF",
+        strokeWidth: 2,
+        hover: {
+          size: 6,
+        },
       },
       fill: {
         type: "gradient",
@@ -77,9 +111,11 @@ export const AreaChart = ({
       },
       yaxis: {
         min: 0,
-        max: 40,
-        tickAmount: 4,
+        max: yAxisMax,
+        tickAmount: yAxisTickAmount,
+        decimalsInFloat: 0,
         labels: {
+          formatter: (val: number) => String(Math.round(val)),
           style: { colors: "#9CA3AF", fontSize: "12px" },
         },
       },
@@ -87,12 +123,12 @@ export const AreaChart = ({
         theme: "light",
         style: { fontSize: "12px" },
         y: {
-          formatter: (val: number) => `${val} ${yLabel}`,
+          formatter: (val: number) => `${Math.round(val)} ${yLabel}`,
         },
       },
       colors: ["#4BA6FF"],
     }),
-    [labels, seriesName, yLabel]
+    [labels, seriesName, yLabel, data, yAxisMax, yAxisTickAmount]
   );
 
   const series = [
