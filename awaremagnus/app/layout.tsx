@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   icons: {
-    icon: getContentAssetUrl("/favicon.ico"),
+    icon: getContentAssetUrl("/images/img/aware-icon.svg"),
   },
   other: {
     "google": "notranslate",
