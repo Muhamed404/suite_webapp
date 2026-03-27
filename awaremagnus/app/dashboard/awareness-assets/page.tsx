@@ -22,6 +22,10 @@ import type { ModuleContent } from "@/types/quiz";
 
 const AWARENESS_ASSETS = [
   {
+    id: 0,
+    name: "All",
+  },
+  {
     id: 4,
     name: "Posters",
   },
@@ -99,7 +103,7 @@ export default function AwarenessAssetsPage() {
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
   const router = useRouter();
-  const [activeFilter, setActiveFilter] = useState<AwarenessAssetType>(4);
+  const [activeFilter, setActiveFilter] = useState<AwarenessAssetType>(0);
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 9;
@@ -114,8 +118,11 @@ export default function AwarenessAssetsPage() {
     isError,
     error,
   } = useQuery({
-    queryKey: ["awareness-assets", activeFilter],
-    queryFn: () => quizService.getContents({ contype_id: activeFilter }),
+    queryKey: ["awareness-assets", activeFilter, currentPage],
+    queryFn: () =>
+      activeFilter === 0
+        ? quizService.getContents({ page: currentPage, limit: 9 })
+        : quizService.getContents({ contype_id: activeFilter, page: currentPage, limit: 9 }),
     enabled: isOrgAdminUser,
     staleTime: 60 * 1000,
   });
@@ -126,7 +133,15 @@ export default function AwarenessAssetsPage() {
   const assets = useMemo(() => {
     if (!assetsResponse?.success) return [] as ModuleContent[];
 
-    return Array.isArray(assetsResponse.data) ? assetsResponse.data : [];
+    const data = assetsResponse.data as { contents?: ModuleContent[]; pagination?: any };
+    return Array.isArray(data.contents) ? data.contents : [];
+  }, [assetsResponse]);
+
+  const pagination = useMemo(() => {
+    if (!assetsResponse?.success) return null;
+
+    const data = assetsResponse.data as { contents?: ModuleContent[]; pagination?: any };
+    return data.pagination || null;
   }, [assetsResponse]);
 
   const filteredAssets = useMemo(() => {
@@ -147,12 +162,10 @@ export default function AwarenessAssetsPage() {
     });
   }, [assets, searchText]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredAssets.length / pageSize));
+  const totalPages = pagination?.total_pages ?? 1;
+  const totalItems = pagination?.total_items ?? assets.length;
 
-  const pageItems = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredAssets.slice(start, start + pageSize);
-  }, [filteredAssets, currentPage, pageSize]);
+  const pageItems = filteredAssets;
 
   useEffect(() => {
     setCurrentPage(1);
@@ -294,7 +307,7 @@ export default function AwarenessAssetsPage() {
 
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-xs text-[var(--darkgray)]">
-                Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filteredAssets.length)} of {filteredAssets.length} results
+                Showing {((currentPage - 1) * (pagination?.per_page ?? 9)) + 1}–{Math.min(currentPage * (pagination?.per_page ?? 9), totalItems)} of {totalItems} results
               </div>
               <Pagination
                 showControls

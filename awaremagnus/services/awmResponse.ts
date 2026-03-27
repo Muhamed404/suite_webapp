@@ -59,7 +59,8 @@ export function normalizeAWMResponse<T>(raw: AWMResponseBody<unknown>): Normaliz
       return { success, data: o.modules as T, message, statusCode: raw.statusCode, count };
     }
     if (Array.isArray(o.contents)) {
-      return { success, data: o.contents as T, message, statusCode: raw.statusCode, count };
+      // For contents list responses, return the whole wrapper so we have access to pagination
+      return { success, data: o as T, message, statusCode: raw.statusCode, count };
     }
     if (Array.isArray(o.quizzes)) {
       return { success, data: o.quizzes as T, message, statusCode: raw.statusCode, count };
