@@ -3,7 +3,7 @@
 import type { Module, ModuleTranslation } from "@/types/quiz";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { Card, CardBody } from "@heroui/card";
@@ -104,7 +104,7 @@ interface LibraryPageProps {
 
 export function LibraryPage({ libraryType, title }: LibraryPageProps) {
   const t = useTranslations("module");
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
   const { user } = useAuthStore();
   const isPlatform = isPlatformAdmin(user?.role_id);
@@ -121,6 +121,11 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
   const [sortField, setSortField] = useState<"name" | "description" | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    setLanguageFilter(locale === "ar" ? "2" : "");
+    setCurrentPage(1);
+  }, [locale]);
 
   const pathname = usePathname();
   const filter = pathname?.includes("/training-library/my") ? "my_module" : "global_module";
