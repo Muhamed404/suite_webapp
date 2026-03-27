@@ -6,7 +6,7 @@ module.exports = {
     PRODUCT_SUITE: {
         LICENSE_INFORMATION: '/suite/management/information',
         PRODUCT_SUITE_DASHBOARD: '/phm/dashboard/',
-        ORGANIZATION:{
+        ORGANIZATION: {
             Active_Organization_List: '/organization/active/names',
         },
         SERVICE_REGISTRY: {
@@ -99,7 +99,7 @@ module.exports = {
             FIND_GROUP_BY_ORGANIZATION: (orgId) => `/group/findByOrganization/${orgId}`,
             CREATE: '/group/create',
             ASSIGNED_USERS_BY_GROUP: (groupId) => `/group/assignedUsersByGroup/${groupId}`,
-            UNASSIGNED_USERS_BY_GROUP: `/group/getUnassignedUser`,
+            UNASSIGNED_USERS_BY_GROUP: (groupId) => `/group/getUnassignedUser/${groupId}`,
             EnrolUserToGroup: (groupId, hasRequestedToUnenroll) => `/group/enrolUserToGroup/${groupId}/${hasRequestedToUnenroll}`,
         },
         CAMPAIGN: {
@@ -158,7 +158,7 @@ module.exports = {
             ASSIGNED_USERS_BY_DEPARTMENT: (orgId, deptId) => `/department/assigned-users/${orgId}?department=${deptId}`,
             UNASSIGNED_USERS_BY_ORGANIZATION: (orgId) => `/department/unassigned-users/${orgId}`,
             EnrolUserToDepartment: (departmentId, hasRequestedToUnenroll) => `/department/enrolUserToDepartment/${departmentId}/${hasRequestedToUnenroll}`,
-        }, 
+        },
         THREAT_REPORTER: {
             LIST_BY_ORGANIZATION: (orgId) => `/phm/threat-reporter/${orgId}/organization`,
             REPORT_DETAIL: (reportId) => `/phm/threat-reporter/${reportId}/report`,

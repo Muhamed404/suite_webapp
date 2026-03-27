@@ -22,7 +22,7 @@ checkPermission(enums.ModuleNames.Group_Management, [enums.Access_Types.RWD_O, e
 
 router.get("/getUsersByGroup/:groupId",
     checkPermission(enums.ModuleNames.Group_Management, [enums.Access_Types.RWD_O, enums.Access_Types.RW_ALL]), getUsersByGroup);
-router.get("/getUnassignedUser", checkPermission(enums.ModuleNames.Group_Management,
+router.get("/getUnassignedUser/:groupId", checkPermission(enums.ModuleNames.Group_Management,
     [enums.Access_Types.RWD_O, enums.Access_Types.RW_ALL]), getUnassignedUserByGroup);
 
 

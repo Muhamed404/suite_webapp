@@ -20,7 +20,7 @@ $(document).ready(function () {
 
     Promise.all([
       $.ajax({ url: selectedUsersApi + '/' + groupId, method: 'GET', dataType: 'json' }),
-      $.ajax({ url: unselectedUsersApi, method: 'GET', dataType: 'json' })
+      $.ajax({ url: unselectedUsersApi + '/' + groupId, method: 'GET', dataType: 'json' })
     ])
       .then(([selectedResp, unselectedResp]) => {
         const selectedUsers = (selectedResp && selectedResp.assignedUsers) || [];
