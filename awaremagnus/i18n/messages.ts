@@ -12,10 +12,11 @@ export interface AppMessages {
   content: Messages;
   campaigns: Messages;
   certificateBranding: Messages;
+  surveyManagement: Messages;
 }
 
 export async function loadMessages(locale: Locale): Promise<AppMessages> {
-  const [common, hintLogin, hintDashboard, awarenessAssets, quiz, module, content, campaigns, certificateBranding] = await Promise.all([
+  const [common, hintLogin, hintDashboard, awarenessAssets, quiz, module, content, campaigns, certificateBranding, surveyManagement] = await Promise.all([
     import(`@/messages/${locale}/common.json`).then((m) => m.default),
     import(`@/messages/${locale}/login.json`).then((m) => m.default),
     import(`@/messages/${locale}/dashboard.json`).then((m) => m.default),
@@ -25,6 +26,7 @@ export async function loadMessages(locale: Locale): Promise<AppMessages> {
     import(`@/messages/${locale}/content.json`).then((m) => m.default),
     import(`@/messages/${locale}/campaigns.json`).then((m) => m.default),
     import(`@/messages/${locale}/certificate-branding.json`).then((m) => m.default),
+    import(`@/messages/${locale}/survey-management.json`).then((m) => m.default),
   ]);
 
   return {
@@ -37,5 +39,6 @@ export async function loadMessages(locale: Locale): Promise<AppMessages> {
     content,
     campaigns,
     certificateBranding,
+    surveyManagement,
   };
 }

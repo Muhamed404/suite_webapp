@@ -26,6 +26,7 @@ import {
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
 import { useSurveyListAndStats } from "@/hooks/useSurvey";
 
 const ROWS_PER_PAGE = 8;
@@ -45,24 +46,27 @@ function getCompletionColor(percentage: number) {
   return "bg-orange-400";
 }
 
-function getStatusBadge(statusName: string) {
+function getStatusBadge(
+  statusName: string,
+  t: (key: string, values?: Record<string, unknown>) => string
+) {
   switch (statusName?.toUpperCase()) {
     case "COMPLETED":
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700">
-          <CheckCircle className="w-3 h-3" /> Completed
+          <CheckCircle className="w-3 h-3" /> {t("status.completed")}
         </span>
       );
     case "CANCELLED":
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-red-100 text-red-700">
-          <XCircle className="w-3 h-3" /> Cancelled
+          <XCircle className="w-3 h-3" /> {t("status.cancelled")}
         </span>
       );
     default:
       return (
         <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-medium bg-blue-100 text-blue-700">
-          <Zap className="w-3 h-3" /> In Progress
+          <Zap className="w-3 h-3" /> {t("status.inProgress")}
         </span>
       );
   }
@@ -82,6 +86,7 @@ function formatDate(dateStr?: string | null) {
 }
 
 export function SurveyManagementListPage() {
+  const t = useTranslations("surveyManagement");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
 
@@ -208,7 +213,7 @@ export function SurveyManagementListPage() {
         <div className={clsx("flex flex-col p-3", isRtl && "text-right")}>
           {/* ── Header Section */}
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Survey Management</h2>
+            <h2 className="text-lg font-semibold">{t("title")}</h2>
             <div className="flex items-center gap-3">
               <Button
                 as={Link}
@@ -218,7 +223,7 @@ export function SurveyManagementListPage() {
                 radius="full"
                 size="md"
               >
-                Quiz and Questions
+                {t("buttons.quizAndQuestions")}
               </Button>
               <Button
                 as={Link}
@@ -228,7 +233,7 @@ export function SurveyManagementListPage() {
                 size="md"
                 startContent={<Plus className="w-4 h-4" />}
               >
-                New Survey
+                {t("buttons.newSurvey")}
               </Button>
             </div>
           </div>
@@ -237,7 +242,7 @@ export function SurveyManagementListPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
             <div className="bg-white rounded-2xl p-3 flex justify-between items-start">
               <div>
-                <p className="text-xs text-gray-500">Total Survey Sent</p>
+                <p className="text-xs text-gray-500">{t("stats.totalSurveySent")}</p>
                 <p className="text-lg font-semibold">
                   {isLoading ? "…" : (metaStats?.total_surveys_sent ?? 0)}
                 </p>
@@ -248,7 +253,7 @@ export function SurveyManagementListPage() {
             </div>
             <div className="bg-white rounded-2xl p-3 flex justify-between items-start">
               <div>
-                <p className="text-xs text-gray-500">Unexpected Answers</p>
+                <p className="text-xs text-gray-500">{t("stats.unexpectedAnswers")}</p>
                 <p className="text-lg font-semibold">
                   {isLoading ? "…" : (metaStats?.total_users_ignored_submission ?? 0)}
                 </p>
@@ -259,7 +264,7 @@ export function SurveyManagementListPage() {
             </div>
             <div className="bg-white rounded-2xl p-3 flex justify-between items-start">
               <div>
-                <p className="text-xs text-gray-500">Expected Answers</p>
+                <p className="text-xs text-gray-500">{t("stats.expectedAnswers")}</p>
                 <p className="text-lg font-semibold">
                   {isLoading ? "…" : (metaStats?.total_users_submissions ?? 0)}
                 </p>
@@ -270,7 +275,7 @@ export function SurveyManagementListPage() {
             </div>
             <div className="bg-white rounded-2xl p-3 flex justify-between items-start">
               <div>
-                <p className="text-xs text-gray-500">Response Rate</p>
+                <p className="text-xs text-gray-500">{t("stats.responseRate")}</p>
                 <p className="text-lg font-semibold">
                   {isLoading ? "…" : `${metaStats?.response_rate?.toFixed(1) ?? 0}%`}
                 </p>
@@ -285,7 +290,7 @@ export function SurveyManagementListPage() {
           <div className="flex flex-col">
             <div className="flex flex-wrap items-center justify-between gap-3 bg-white px-4 py-3.5 rounded-t-xl border border-gray-100">
               <div className="flex items-center justify-between">
-                <h3 className="text-gray-900 font-medium">Survey List</h3>
+                <h3 className="text-gray-900 font-medium">{t("surveyList")}</h3>
               </div>
               <div className="flex flex-row gap-4">
                 <div className="flex flex-wrap gap-2 items-center">
@@ -296,7 +301,7 @@ export function SurveyManagementListPage() {
                         "h-10 bg-white border border-gray-200 rounded-full hover:border-gray-300 focus-within:!border-blue-500 focus-within:!ring-2 focus-within:!ring-blue-500/20",
                       input: "text-xs",
                     }}
-                    placeholder="Search Survey..."
+                    placeholder={t("searchPlaceholder")}
                     startContent={<Search className="text-gray-400 w-4 h-4" />}
                     type="text"
                     value={searchQuery}
@@ -321,9 +326,9 @@ export function SurveyManagementListPage() {
                       <XCircle className="w-10 h-10 text-red-400" />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                      Error Loading Surveys
+                      {t("states.errorTitle")}
                     </h3>
-                    <p className="text-sm text-gray-500">Please try again later</p>
+                    <p className="text-sm text-gray-500">{t("states.errorDescription")}</p>
                   </div>
                 </div>
               ) : paginatedSurveys.length === 0 ? (
@@ -332,9 +337,9 @@ export function SurveyManagementListPage() {
                     <div className="bg-gray-100 p-4 rounded-full inline-block mb-4">
                       <SearchX className="w-10 h-10 text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">No Surveys Found</h3>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">{t("states.emptyTitle")}</h3>
                     <p className="text-sm text-gray-500">
-                      Try adjusting your search or create a new survey
+                      {t("states.emptyDescription")}
                     </p>
                   </div>
                 </div>
@@ -348,22 +353,22 @@ export function SurveyManagementListPage() {
                       <thead className="bg-gray-50 text-gray-600 border-b sticky top-0 z-10">
                         <tr>
                           <th className="px-6 py-3.5 text-left font-semibold">
-                            <SortableHeader field="survey_name" label="Survey Name" />
+                            <SortableHeader field="survey_name" label={t("table.surveyName")} />
                           </th>
                           <th className="px-6 py-3.5 text-left font-semibold">
-                            <SortableHeader field="total_submitted" label="Submitted" />
+                            <SortableHeader field="total_submitted" label={t("table.submitted")} />
                           </th>
                           <th className="px-6 py-3.5 text-left font-semibold">
-                            <SortableHeader field="issue_date" label="Issued" />
+                            <SortableHeader field="issue_date" label={t("table.issued")} />
                           </th>
                           <th className="px-6 py-3.5 text-left font-semibold">
-                            <SortableHeader field="deadline_date" label="Deadline" />
+                            <SortableHeader field="deadline_date" label={t("table.deadline")} />
                           </th>
                           <th className="px-6 py-3.5 text-left font-semibold">
-                            <SortableHeader field="progress_percentage" label="Completed" />
+                            <SortableHeader field="progress_percentage" label={t("table.completed")} />
                           </th>
-                          <th className="px-6 py-3.5 text-left font-semibold">Status</th>
-                          <th className="px-6 py-3.5 text-left font-semibold">Action</th>
+                          <th className="px-6 py-3.5 text-left font-semibold">{t("table.status")}</th>
+                          <th className="px-6 py-3.5 text-left font-semibold">{t("table.action")}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
@@ -409,7 +414,7 @@ export function SurveyManagementListPage() {
                                 </span>
                               </div>
                             </td>
-                            <td className="px-6 py-3.5">{getStatusBadge(survey.status?.name)}</td>
+                            <td className="px-6 py-3.5">{getStatusBadge(survey.status?.name, t)}</td>
                             <td className="px-6 py-3.5">
                               <Button
                                 as={Link}
@@ -419,7 +424,7 @@ export function SurveyManagementListPage() {
                                 size="sm"
                                 startContent={<Eye className="w-3.5 h-3.5" />}
                               >
-                                View
+                                {t("buttons.view")}
                               </Button>
                             </td>
                           </tr>
@@ -431,8 +436,11 @@ export function SurveyManagementListPage() {
                   <div className="flex flex-col md:flex-row justify-between items-center px-4 py-3.5 border-t bg-gray-50 gap-3">
                     <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
                       <span>
-                        Showing {totalItems > 0 ? startIndex + 1 : 0}–{endIndex} out of {totalItems}{" "}
-                        Entries
+                        {t("pagination.showing", {
+                          start: totalItems > 0 ? startIndex + 1 : 0,
+                          end: endIndex,
+                          total: totalItems,
+                        })}
                       </span>
                     </div>
                     <Pagination
