@@ -784,6 +784,11 @@
             } else {
                 smtpContainer.classList.add('hidden');
             }
+
+            var hideNameTags = selected && (selected.value === 'qr' || selected.value === 'nfc');
+            document.querySelectorAll('[id="tag_first_name"], [id="tag_last_name"], [id="tag_email"]').forEach(function (btn) {
+                btn.style.display = hideNameTags ? 'none' : '';
+            });
         }
 
         document.querySelectorAll('input[name="phishType"]').forEach(function (radio) {
