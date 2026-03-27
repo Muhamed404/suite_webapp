@@ -194,7 +194,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
     .certificate-bottom-logo {
       position: absolute;
       bottom: 40px;
-      left: 50%;
+      left: calc(50% - 80px);
       transform: translateX(-50%);
       height: 60px;
       z-index: 2;
@@ -266,7 +266,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
     .certificate-stamp {
       position: absolute;
       bottom: 20px;
-      left: 50%;
+      left: calc(50% + 80px);
       transform: translateX(-50%);
       width: 120px;
       height: 120px;
