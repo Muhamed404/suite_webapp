@@ -89,7 +89,12 @@ module.exports = {
         SMS: {
             CREATE: (organizationId) => `/sms/settings/create/${organizationId}`,
             UPDATE: (organizationId) => `/sms/settings/${organizationId}`,
-        }
+        },
+        LDAP: {
+            CONFIG: (organizationId) => `/org/${organizationId}/ldap/config`,
+            SYNC: (organizationId) => `/org/${organizationId}/ldap/sync`,
+            STATUS: (organizationId) => `/org/${organizationId}/ldap/status`,
+        },
 
     },
     PHISHMAGNUS: {

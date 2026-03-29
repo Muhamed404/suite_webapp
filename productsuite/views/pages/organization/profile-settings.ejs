@@ -44,6 +44,16 @@
       </div>
       <span><img src="/securemagnus_2025/images/next.svg" alt="Next"></span>
     </a>
+
+    <!-- LDAP Settings -->
+    <a href="/settings/ldap/<%=profile.id%>?On=<%- encodeURIComponent(profile.name || '') %>"
+      class="flex items-center justify-between bg-[#F1F5F8] rounded-full px-4 py-3 cursor-pointer hover:bg-gray-200 transition">
+      <div class="flex items-center gap-3">
+        <div><img src="/securemagnus_2025/images/SMTPSettings.svg" alt="LDAP Settings"></div>
+        <span class="text-gray-800 font-medium">LDAP Settings</span>
+      </div>
+      <span><img src="/securemagnus_2025/images/next.svg" alt="Next"></span>
+    </a>
 <%if(magnusAdmin===false) {%>
 
     <!-- Dashboard -->

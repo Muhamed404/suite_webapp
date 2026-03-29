@@ -1,0 +1,482 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+      <a href="/home" class="hover:text-gray-700 transition">Home</a>
+      <span class="text-gray-400">›</span>
+      <a href="/organization/profile/<%= org %>" class="hover:text-gray-700 transition"><%= organizationName %></a>
+      <span class="text-gray-400">›</span>
+      <span class="font-semibold text-gray-900">LDAP Integration</span>
+    </nav>
+    <h3 class="text-3xl font-medium text-gray-900"><%= organizationName %> - LDAP Configuration</h3>
+  </div>
+</div>
+
+<div class="flex flex-col gap-6 mt-3 rounded-3xl bg-white p-8">
+  <div id="ldap-flash-data" data-message="<%= flashMessage || '' %>" data-type="<%= flashAlertType || '' %>" class="hidden"></div>
+  <div class="border-b border-gray-100 pb-4">
+    <h1 class="text-2xl font-semibold text-[var(--mainblue)]">Active Directory / LDAP</h1>
+    <p class="text-sm text-gray-500 mt-1">Configure secure directory connection and sync behavior.</p>
+  </div>
+
+  <div class="rounded-2xl bg-gray-50 border border-gray-200 p-5">
+    <h2 class="text-lg font-semibold text-gray-900">Connection &amp; Sync Status</h2>
+    <p class="text-sm text-gray-500 mt-1">Read-only system state.</p>
+    <% 
+      const formatSyncTime = (isoString) => {
+        if (!isoString) return 'Never';
+        const date = new Date(isoString);
+        if (isNaN(date.getTime())) return 'Invalid';
+        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+        return date.toLocaleString('en-US', options);
+      };
+      
+      const getStatusBadgeClass = (status) => {
+        if (status === 'success') return 'bg-green-100 text-green-800 border-green-300';
+        if (status === 'warning') return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+        if (status === 'failed') return 'bg-red-100 text-red-800 border-red-300';
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+      };
+
+      const getStatusIcon = (status) => {
+        if (status === 'success') return '✅';
+        if (status === 'warning') return '⚠️';
+        if (status === 'failed') return '❌';
+        return 'ℹ️';
+      };
+    %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mt-4">
+      <div class="bg-white rounded-xl p-4 border border-gray-100">
+        <p class="text-gray-500">Last Sync</p>
+        <p class="text-gray-900 font-medium mt-1"><%= formatSyncTime(syncStatus?.last_sync_at) %></p>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-gray-100">
+        <p class="text-gray-500">Last Status</p>
+        <div class="mt-1 flex items-center gap-2">
+          <span class="<%= getStatusBadgeClass(syncStatus?.last_sync_status) %> px-3 py-1 rounded-full font-semibold text-xs border capitalize flex items-center gap-1">
+            <span><%= getStatusIcon(syncStatus?.last_sync_status) %></span>
+            <%= syncStatus?.last_sync_status || 'N/A' %>
+          </span>
+          <% if (syncStatus?.last_sync_status === 'warning' && syncStatus?.last_sync_error) { %>
+            <div class="group relative">
+              <span class="cursor-help text-gray-400 hover:text-gray-600">❓</span>
+              <div class="hidden group-hover:flex absolute z-10 bottom-full mb-2 left-0 bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
+                <%= syncStatus?.last_sync_error %>
+              </div>
+            </div>
+          <% } %>
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-4 border border-gray-100">
+        <p class="text-gray-500">Last Error</p>
+        <p class="text-gray-900 font-medium mt-1"><%= syncStatus?.last_sync_error || 'None' %></p>
+      </div>
+    </div>
+    
+    <% if (syncStatus?.last_sync_stats) { %>
+      <div class="rounded-xl bg-blue-50 border border-blue-200 p-4 mt-4">
+        <p class="text-sm font-semibold text-blue-900 mb-3">Latest Sync Statistics</p>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+          <div class="bg-white rounded p-2 border border-blue-100">
+            <p class="text-gray-500">Users Fetched</p>
+            <p class="text-lg font-bold text-gray-900"><%= syncStatus.last_sync_stats.ldap_users_fetched || 0 %></p>
+          </div>
+          <div class="bg-white rounded p-2 border border-blue-100">
+            <p class="text-gray-500">Created</p>
+            <p class="text-lg font-bold text-green-600"><%= syncStatus.last_sync_stats.created_users || 0 %></p>
+          </div>
+          <div class="bg-white rounded p-2 border border-blue-100">
+            <p class="text-gray-500">Updated</p>
+            <p class="text-lg font-bold text-blue-600"><%= syncStatus.last_sync_stats.updated_users || 0 %></p>
+          </div>
+          <div class="bg-white rounded p-2 border border-blue-100">
+            <p class="text-gray-500">Groups Synced</p>
+            <p class="text-lg font-bold text-purple-600"><%= syncStatus.last_sync_stats.synced_group_memberships || 0 %></p>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <% const selectedTransportSecurity = ldapConfig?.transportSecurity
+    ? String(ldapConfig.transportSecurity).toUpperCase()
+    : (ldapConfig?.use_ssl ? 'LDAPS' : (ldapConfig?.use_starttls ? 'STARTTLS' : 'NONE')); %>
+
+  <form id="ldap-settings-form" action="/settings/ldap/<%= org %>" method="post" class="space-y-6">
+    <input type="hidden" id="transportSecurity" name="transportSecurity" value="<%= selectedTransportSecurity %>" />
+    <input type="hidden" id="reject_unauthorized" name="reject_unauthorized" value="<%= ldapConfig?.reject_unauthorized !== false ? 'true' : 'false' %>" />
+    <input type="hidden" id="auto_sync_enabled" name="auto_sync_enabled" value="<%= ldapConfig?.auto_sync_enabled ? 'true' : 'false' %>" />
+    <input type="hidden" id="incremental_sync_enabled" name="incremental_sync_enabled" value="<%= ldapConfig?.incremental_sync_enabled ? 'true' : 'false' %>" />
+    <input type="hidden" id="allow_domain_root_query" name="allow_domain_root_query" value="<%= ldapConfig?.allow_domain_root_query ? 'true' : 'false' %>" />
+
+    <div class="rounded-2xl border border-gray-200 p-5">
+      <h2 class="text-lg font-semibold text-gray-900">LDAP Connection Settings</h2>
+      <p class="text-sm text-gray-500 mt-1">Required connection fields for directory access.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Host <span class="text-red-500">*</span></label>
+          <input name="host" required value="<%= ldapConfig?.host || '' %>" placeholder="ad.company.com" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <p class="text-xs text-gray-500 mt-1">Directory server hostname or IP address.</p>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Port <span class="text-red-500">*</span></label>
+          <input id="ldap-port" name="port" type="number" min="1" max="65535" required value="<%= ldapConfig?.port || 389 %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <p class="text-xs text-gray-500 mt-1">Use 389 for LDAP/STARTTLS or 636 for LDAPS.</p>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" title="Base distinguished name where directory lookups begin.">Base DN <span class="text-red-500">*</span></label>
+          <input data-dn-field="true" name="base_dn" required value="<%= ldapConfig?.base_dn || '' %>" placeholder="DC=company,DC=com" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <p class="text-xs text-gray-500 mt-1">Root search base for LDAP queries.</p>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Users Base DN</label>
+          <input data-dn-field="true" name="users_base_dn" value="<%= ldapConfig?.users_base_dn || '' %>" placeholder="OU=Users,DC=company,DC=com" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <p class="text-xs text-gray-500 mt-1">Optional scope for user lookup.</p>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Groups Base DN</label>
+          <input data-dn-field="true" name="groups_base_dn" value="<%= ldapConfig?.groups_base_dn || '' %>" placeholder="OU=Groups,DC=company,DC=com" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <p class="text-xs text-gray-500 mt-1">Optional scope for group lookup.</p>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Departments Base DN</label>
+          <input data-dn-field="true" name="departments_base_dn" value="<%= ldapConfig?.departments_base_dn || '' %>" placeholder="OU=Departments,DC=company,DC=com" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <p class="text-xs text-gray-500 mt-1">Optional scope for department lookup.</p>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" title="Bind account distinguished name used to authenticate LDAP queries.">Bind DN <span class="text-red-500">*</span></label>
+          <input data-dn-field="true" name="bind_dn" required value="<%= ldapConfig?.bind_dn || '' %>" placeholder="CN=svc_ldap,OU=Service Accounts,DC=company,DC=com" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <p class="text-xs text-gray-500 mt-1">Service account DN used for bind.</p>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2">Bind Password <span class="text-red-500">*</span></label>
+          <input name="bind_password" type="password" autocomplete="new-password" placeholder="Enter new password to update" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <p class="text-xs text-gray-500 mt-1">Required on first save. On later edits, leave blank to keep existing password. Password is masked and never prefilled.</p>
+        </div>
+
+        <div class="md:col-span-2">
+          <p class="block text-gray-700 font-medium mb-2">Transport Security <span class="text-red-500">*</span></p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+            <label class="flex items-center gap-3 border rounded-lg p-3 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition <%= selectedTransportSecurity === 'NONE' ? 'border-blue-500 bg-blue-50' : 'border-gray-300' %>" data-transport-option="NONE">
+              <input class="w-4 h-4 min-w-[16px] min-h-[16px] accent-[var(--mainblue)]" type="radio" name="transport_mode" value="NONE" <%= selectedTransportSecurity === 'NONE' ? 'checked' : '' %> />
+              <span class="text-gray-800 font-medium">None (LDAP - No Encryption)</span>
+            </label>
+            <label class="flex items-center gap-3 border rounded-lg p-3 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition <%= selectedTransportSecurity === 'LDAPS' ? 'border-blue-500 bg-blue-50' : 'border-gray-300' %>" data-transport-option="LDAPS">
+              <input class="w-4 h-4 min-w-[16px] min-h-[16px] accent-[var(--mainblue)]" type="radio" name="transport_mode" value="LDAPS" <%= selectedTransportSecurity === 'LDAPS' ? 'checked' : '' %> />
+              <span class="text-gray-800 font-medium">LDAPS (SSL)</span>
+            </label>
+            <label class="flex items-center gap-3 border rounded-lg p-3 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition <%= selectedTransportSecurity === 'STARTTLS' ? 'border-blue-500 bg-blue-50' : 'border-gray-300' %>" data-transport-option="STARTTLS">
+              <input class="w-4 h-4 min-w-[16px] min-h-[16px] accent-[var(--mainblue)]" type="radio" name="transport_mode" value="STARTTLS" <%= selectedTransportSecurity === 'STARTTLS' ? 'checked' : '' %> />
+              <span class="text-gray-800 font-medium">STARTTLS</span>
+            </label>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">Select 'None' if your LDAP server does not support SSL/TLS (common for local Docker setups).</p>
+          <p id="transport-protocol-hint" class="text-xs text-[var(--mainblue)] mt-1 font-medium"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end">
+      <button
+        type="submit"
+        formaction="/settings/ldap/<%= org %>/sync"
+        formmethod="post"
+        class="px-6 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition"
+      >
+        Run Manual Sync
+      </button>
+    </div>
+
+    <div class="rounded-2xl border border-gray-200 p-5">
+      <h2 class="text-lg font-semibold text-gray-900">Directory Filters</h2>
+      <p class="text-sm text-gray-500 mt-1" title="LDAP filters limit which entries are synchronized from your directory.">LDAP filter expressions used for query customization.</p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" title="Example: (&(objectCategory=person)(objectClass=user))">User Filter</label>
+          <input name="user_filter" value="<%= ldapConfig?.user_filter || '(&(objectClass=user)(!(objectClass=computer)))' %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+        </div>
+
+        <div>
+          <label class="block text-gray-700 font-medium mb-2" title="Example: (objectClass=group)">Group Filter</label>
+          <input name="group_filter" value="<%= ldapConfig?.group_filter || '(objectClass=group)' %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-gray-700 font-medium mb-2" title="Example: (objectClass=organizationalUnit)">Department Filter</label>
+          <input name="department_filter" value="<%= ldapConfig?.department_filter || '(objectClass=organizationalUnit)' %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-gray-200">
+      <button type="button" id="advanced-toggle" class="w-full px-5 py-4 text-left flex items-center justify-between">
+        <span>
+          <span class="block text-lg font-semibold text-gray-900">Advanced Settings</span>
+          <span class="block text-sm text-gray-500">Optional controls for advanced administrators.</span>
+        </span>
+        <span id="advanced-toggle-icon" class="text-gray-600">+</span>
+      </button>
+
+      <div id="advanced-content" class="hidden px-5 pb-5 border-t border-gray-100">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">Page Size</label>
+            <input name="page_size" type="number" min="100" max="2000" value="<%= ldapConfig?.page_size || 500 %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+            <p class="text-xs text-gray-500 mt-1">Number of LDAP entries fetched per page.</p>
+          </div>
+
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">Sync Interval (minutes)</label>
+            <input name="sync_interval_minutes" type="number" min="5" max="1440" value="<%= ldapConfig?.sync_interval_minutes || 60 %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+            <p class="text-xs text-gray-500 mt-1">How often automatic sync runs in background.</p>
+          </div>
+
+          <label class="inline-flex items-start gap-2">
+            <input id="cb_auto_sync_enabled" type="checkbox" <%= ldapConfig?.auto_sync_enabled ? 'checked' : '' %> class="mt-1 h-4 w-4 rounded border border-gray-400 accent-[var(--mainblue)] bg-white" />
+            <span class="text-gray-800">Enable Auto Sync <span class="block text-xs text-gray-500">Runs scheduled background synchronization job.</span></span>
+          </label>
+
+          <label class="inline-flex items-start gap-2">
+            <input id="cb_reject_unauthorized" type="checkbox" <%= ldapConfig?.reject_unauthorized !== false ? 'checked' : '' %> class="mt-1 h-4 w-4 rounded border border-gray-400 accent-[var(--mainblue)] bg-white" />
+            <span class="text-gray-800">Validate Certificate <span class="block text-xs text-gray-500">Enforce trusted TLS certificates.</span></span>
+          </label>
+
+          <label class="inline-flex items-start gap-2">
+            <input id="cb_incremental_sync_enabled" type="checkbox" <%= ldapConfig?.incremental_sync_enabled ? 'checked' : '' %> class="mt-1 h-4 w-4 rounded border border-gray-400 accent-[var(--mainblue)] bg-white" />
+            <span class="text-gray-800">Incremental Sync <span class="block text-xs text-gray-500">Sync only changed records when supported.</span></span>
+          </label>
+
+          <div>
+            <label class="block text-gray-700 font-medium mb-2">CA Certificate (Optional)</label>
+            <textarea name="ca_cert" rows="4" placeholder="-----BEGIN CERTIFICATE-----" class="w-full px-4 py-2 border rounded-lg bg-gray-50"><%= ldapConfig?.ca_cert || '' %></textarea>
+            <p class="text-xs text-gray-500 mt-1">Paste internal CA certificate PEM when using LDAPS/STARTTLS with private PKI.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl bg-amber-50 border border-amber-200 p-5">
+      <h2 class="text-lg font-semibold text-gray-900">Config Override Behavior</h2>
+      <p class="text-sm text-gray-700 mt-1">The system applies the following overrides/defaults when values are omitted.</p>
+      <ul class="list-disc pl-5 text-sm text-gray-700 mt-3 space-y-1">
+        <li>If Users/Groups/Departments Base DN is empty, it falls back to Base DN.</li>
+        <li>If Bind Password is left empty on edit, existing encrypted password is reused.</li>
+        <li>Transport mode controls protocol and valid port (NONE/STARTTLS → 389, LDAPS → 636).</li>
+        <li>If port is omitted, default is chosen from transport mode (389 or 636).</li>
+        <li>Domain root queries are restricted by policy and remain disabled.</li>
+        <li>Legacy flags (<code>use_ssl</code>, <code>use_starttls</code>) are derived from Transport Security.</li>
+      </ul>
+    </div>
+
+    <div id="ldap-form-error" class="hidden rounded-lg border border-red-200 bg-red-50 text-red-600 text-sm p-3"></div>
+
+    <div class="flex justify-end mt-6">
+      <button type="submit" class="px-8 py-2 rounded-lg bg-[var(--mainblue)] text-white font-semibold hover:opacity-90 transition">
+        Save LDAP Settings
+      </button>
+    </div>
+  </form>
+
+  <% if (syncStatus?.last_sync_stats) { %>
+  <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+    <h3 class="text-lg font-semibold text-gray-900 mb-2">Latest Sync Statistics</h3>
+    <pre class="text-sm text-gray-700 whitespace-pre-wrap"><%= JSON.stringify(syncStatus.last_sync_stats, null, 2) %></pre>
+  </div>
+  <% } %>
+</div>
+
+<script>
+  (function () {
+    const form = document.getElementById("ldap-settings-form");
+    const errorBox = document.getElementById("ldap-form-error");
+    const advancedToggle = document.getElementById("advanced-toggle");
+    const advancedContent = document.getElementById("advanced-content");
+    const advancedToggleIcon = document.getElementById("advanced-toggle-icon");
+
+    const hiddenTransportSecurity = document.getElementById("transportSecurity");
+    const hiddenRejectUnauthorized = document.getElementById("reject_unauthorized");
+    const hiddenAutoSyncEnabled = document.getElementById("auto_sync_enabled");
+    const hiddenIncrementalSync = document.getElementById("incremental_sync_enabled");
+    const hiddenAllowDomainRoot = document.getElementById("allow_domain_root_query");
+    const ldapPortInput = document.getElementById("ldap-port");
+    const protocolHint = document.getElementById("transport-protocol-hint");
+    const transportOptionRows = document.querySelectorAll("[data-transport-option]");
+
+    const transportInputs = document.querySelectorAll("input[name='transport_mode']");
+    const cbRejectUnauthorized = document.getElementById("cb_reject_unauthorized");
+    const cbAutoSyncEnabled = document.getElementById("cb_auto_sync_enabled");
+    const cbIncrementalSync = document.getElementById("cb_incremental_sync_enabled");
+    const cbAllowDomainRoot = document.getElementById("cb_allow_domain_root_query");
+    const dnInputs = document.querySelectorAll("[data-dn-field='true']");
+    const flashDataElement = document.getElementById("ldap-flash-data");
+    const flashMessage = flashDataElement ? (flashDataElement.getAttribute("data-message") || "") : "";
+    const flashAlertType = flashDataElement ? (flashDataElement.getAttribute("data-type") || "") : "";
+
+    const dnPattern = /^\s*(?:[A-Za-z]+=[^,]+)(?:\s*,\s*[A-Za-z]+=[^,]+)*\s*$/;
+
+    function toggleAdvanced() {
+      const isHidden = advancedContent.classList.contains("hidden");
+      if (isHidden) {
+        advancedContent.classList.remove("hidden");
+        advancedToggleIcon.textContent = "−";
+      } else {
+        advancedContent.classList.add("hidden");
+        advancedToggleIcon.textContent = "+";
+      }
+    }
+
+    function syncTransportValues() {
+      const selected = document.querySelector("input[name='transport_mode']:checked");
+      const mode = selected ? selected.value : "NONE";
+      hiddenTransportSecurity.value = mode;
+
+      transportOptionRows.forEach(function (row) {
+        const rowMode = row.getAttribute("data-transport-option");
+        const isSelected = rowMode === mode;
+        row.classList.toggle("border-gray-300", !isSelected);
+        row.classList.toggle("border-blue-500", isSelected);
+        row.classList.toggle("bg-blue-50", isSelected);
+      });
+
+      if (protocolHint) {
+        if (mode === "LDAPS") {
+          protocolHint.textContent = "Connecting via ldaps:// (secure SSL)";
+        } else if (mode === "STARTTLS") {
+          protocolHint.textContent = "Connecting via ldap:// with STARTTLS upgrade";
+        } else {
+          protocolHint.textContent = "Connecting via ldap:// (no encryption)";
+        }
+      }
+
+      return mode;
+    }
+
+    function syncBooleanValues() {
+      hiddenRejectUnauthorized.value = cbRejectUnauthorized && cbRejectUnauthorized.checked ? "true" : "false";
+      hiddenAutoSyncEnabled.value = cbAutoSyncEnabled && cbAutoSyncEnabled.checked ? "true" : "false";
+      hiddenIncrementalSync.value = cbIncrementalSync && cbIncrementalSync.checked ? "true" : "false";
+      hiddenAllowDomainRoot.value = cbAllowDomainRoot && cbAllowDomainRoot.checked ? "true" : "false";
+    }
+
+    function validateDnInputs() {
+      let isValid = true;
+
+      dnInputs.forEach(function (input) {
+        const value = (input.value || "").trim();
+        input.setCustomValidity("");
+
+        if (!value) {
+          if (input.hasAttribute("required")) {
+            input.setCustomValidity("This field is required.");
+            isValid = false;
+          }
+          return;
+        }
+
+        if (!dnPattern.test(value)) {
+          input.setCustomValidity("Invalid DN format. Example: OU=Users,DC=company,DC=com");
+          isValid = false;
+        }
+      });
+
+      return isValid;
+    }
+
+    function validatePortForTransport(selectedMode) {
+      if (!ldapPortInput) {
+        return true;
+      }
+
+      const port = Number(ldapPortInput.value || 0);
+      ldapPortInput.setCustomValidity("");
+
+      if (!Number.isFinite(port) || port <= 0) {
+        ldapPortInput.setCustomValidity("Valid port is required.");
+        return false;
+      }
+
+      if (selectedMode === "LDAPS" && port !== 636) {
+        ldapPortInput.setCustomValidity("LDAPS requires port 636.");
+        return false;
+      }
+
+      if (selectedMode === "STARTTLS" && port !== 389) {
+        ldapPortInput.setCustomValidity("STARTTLS requires port 389.");
+        return false;
+      }
+
+      if (selectedMode === "NONE" && port !== 389) {
+        ldapPortInput.setCustomValidity("No Encryption (LDAP) allows port 389 only.");
+        return false;
+      }
+
+      return true;
+    }
+
+    if (advancedToggle) {
+      advancedToggle.addEventListener("click", toggleAdvanced);
+    }
+
+    transportInputs.forEach(function (input) {
+      input.addEventListener("change", syncTransportValues);
+    });
+
+    [cbRejectUnauthorized, cbAutoSyncEnabled, cbIncrementalSync, cbAllowDomainRoot].forEach(function (input) {
+      if (input) {
+        input.addEventListener("change", syncBooleanValues);
+      }
+    });
+
+    dnInputs.forEach(function (input) {
+      input.addEventListener("blur", validateDnInputs);
+    });
+
+    const initialMode = syncTransportValues();
+    syncBooleanValues();
+    validatePortForTransport(initialMode);
+
+    if (flashMessage) {
+      if (typeof showCustomToast === "function") {
+        showCustomToast(flashAlertType === "error" ? "error" : "success", flashMessage);
+      } else {
+        errorBox.textContent = flashMessage;
+        errorBox.classList.remove("hidden");
+        errorBox.classList.toggle("border-red-200", flashAlertType === "error");
+        errorBox.classList.toggle("bg-red-50", flashAlertType === "error");
+        errorBox.classList.toggle("text-red-600", flashAlertType === "error");
+      }
+    }
+
+    if (ldapPortInput) {
+      ldapPortInput.addEventListener("input", function () {
+        const mode = hiddenTransportSecurity.value || "NONE";
+        validatePortForTransport(mode);
+      });
+    }
+
+    if (form) {
+      form.addEventListener("submit", function (event) {
+        errorBox.classList.add("hidden");
+        errorBox.textContent = "";
+
+        const selectedMode = syncTransportValues();
+        syncBooleanValues();
+
+        if (!validateDnInputs() || !validatePortForTransport(selectedMode) || !form.checkValidity()) {
+          event.preventDefault();
+          errorBox.textContent = "Please fix validation errors: missing required fields, invalid DN format, or mismatched port for selected transport mode.";
+          errorBox.classList.remove("hidden");
+          form.reportValidity();
+        }
+      });
+    }
+  })();
+</script>
