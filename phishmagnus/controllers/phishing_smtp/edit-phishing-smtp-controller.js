@@ -7,18 +7,18 @@ const getApiClient = require('../../../utility/api-client');
 
 exports.editPhishingSMTP = async (req, res) => {
   const smtpId = req.params.smtpId;
-  logger.info(`Edit Phishing SMTP Controller: Incoming request for smtp id ${smtpId}`);
+  logger.info(`[SMTP Configuration] Retrieving Organziation SMTP byId ${smtpId}`);
 
   if (req.method === 'GET') {
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PHISHMAGNUS.PHISHING_SMTP.DETAIL(smtpId);
-    logger.info(`Edit Phishing SMTP Controller: GET - Fetching detail from ${url}`);
+    logger.info(`[SMTP Configuration] Backend API Calling - ${url}`);
 
     apiClient
       .get(url)
       .then((response) => {
         const data = response.data;
-        logger.info(`Edit Phishing SMTP Controller: GET - Response ${JSON.stringify(data, null, 2)}`);
+        logger.debug(`[SMTP Configuration] Response ${JSON.stringify(data.host, null, 2)}`);
 
         // const smtp = data.smtp ?? data;
         const smtp = { ...data.smtp, encrypt_password: data.smtp.is_encrypted ? true : false }; // Ensure encrypt_password is set for the view
@@ -28,8 +28,8 @@ exports.editPhishingSMTP = async (req, res) => {
         });
       })
       .catch((error) => {
-        logger.error(`Edit Phishing SMTP Controller: GET - Error fetching smtp detail: ${error.message}`);
-        req.flash('message', 'Error fetching SMTP details. Please try again.');
+        logger.error(`[SMTP Configuration] ${error.message}`);
+        req.flash('message', 'Error fetching SMTP details');
         req.flash('alertType', 'error');
         return res.redirect(frontend_api_urls.PHISHMAGNUS.SMTP_PHISHING.LIST);
       });
@@ -41,20 +41,20 @@ exports.editPhishingSMTP = async (req, res) => {
 
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PHISHMAGNUS.PHISHING_SMTP.UPDATE(smtpId);
-    logger.info(`Edit Phishing SMTP Controller: POST - Saving to ${url}`);
+    logger.info(`[SMTP Configuration] POST - Backend API calling: ${url}`);
 
     apiClient
       .put(url, smtpObj)
       .then((response) => {
         const data = response.data;
-        logger.info(`Edit Phishing SMTP Controller: POST - Response ${JSON.stringify(data, null, 2)}`);
+        logger.debug(`[SMTP Configuration] POST - Response ${JSON.stringify(data, null, 2)}`);
 
         req.flash('message', data.message || 'SMTP configuration updated successfully.');
         req.flash('alertType', data.success ? 'success' : 'error');
         return res.redirect(frontend_api_urls.PHISHMAGNUS.SMTP_PHISHING.LIST);
       })
       .catch((error) => {
-        logger.error(`Edit Phishing SMTP Controller: POST - Error updating smtp: ${error.message}`);
+        logger.error(`[SMTP Configuration] POST - Error updating smtp: ${error.message}`);
         req.flash('message', 'Error updating SMTP configuration. Please try again.');
         req.flash('alertType', 'error');
         return res.redirect(frontend_api_urls.PHISHMAGNUS.SMTP_PHISHING.EDIT(smtpId));

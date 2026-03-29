@@ -34,6 +34,8 @@
     "securityAwarenessCampaign": "Security Awareness Campaign",
     "campaignCompletionTimeline": "Campaign Completion Timeline",
     "completionsByDateAcrossCampaigns": "Module completions by date across all campaigns",
+    "noOfModules": "No. of Modules",
+    "date": "Date",
     "viewAll": "View All",
     "lastCampaignDate": "Last Campaign Date: {date}",
     "weeklyProgress": "Weekly Progress",
@@ -50,7 +52,8 @@
     "top3StrugglingTopics": "Top 3 Struggling Topics",
     "employeesNeedAttention": "Your employees need attention on these topics",
     "activeLearnersThisMonth": "Active Learners This Month",
-    "trainingCompletionRate": "Training Completion Rate"
+    "trainingCompletionRate": "Training Completion Rate",
+    "noCompletionData": "No completion data available"
   },
   "topics": {
     "wifiSecurity": "WIFI Security",
@@ -61,7 +64,7 @@
     "topHighRisk": "Top 10 High Risk Employees",
     "topLowRisk": "Top 10 Low Risk Employees",
     "sortBy": "Sort by",
-    "userId": "User Id",
+    "userId": "Name",
     "modulesCompleted": "Modules Completed",
     "achievementCount": "Achievement Count",
     "avatarLevel": "Avatar Level",
@@ -103,6 +106,7 @@
     "viewSurveys": "View Surveys",
     "quizQuestions": "Quiz and Questions",
     "trainingLibrary": "Awareness Library",
+    "awarenessAssets": "Awareness Assets",
     "systemLibrary": "Core Modules",
     "myLibrary": "My Modules",
     "systemBranding": "Branding",

@@ -499,6 +499,30 @@ input[type="datetime-local"]::-webkit-clear-button {
   display: none;
 }
 
+/* Hide Google Translate elements */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0px !important;
+}
+
+.goog-logo-link {
+  display: none !important;
+}
+
+.goog-te-gadget {
+  color: transparent !important;
+}
+
+#goog-gt-tt, .goog-tooltip, .goog-tooltip:hover, .goog-text-highlight {
+  display: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 input[type="datetime-local"]::-webkit-inner-spin-button {
   display: none;
 }

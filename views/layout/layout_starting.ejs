@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 
-<html lang="<%= locale %>" dir="<%= locale === 'ar' ? 'rtl' : 'ltr' %>">
+<html lang="<%= locale %>" dir="<%= locale === 'ar' ? 'rtl' : 'ltr' %>" translate="no" class="notranslate">
 
 <head>
 
   <!-- Security meta tags to block crawlers -->
   <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
   <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
-  <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex>
-  <meta charset=" UTF-8" />
+  <meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+  <meta name="google" content="notranslate" />
+  <meta name="googlebot" content="notranslate" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -42,10 +44,60 @@
   </style>
   <script src="/securemagnus_2025/ckeditor/ckeditor.js"></script>
 <script src="/securemagnus_2025/js/jquery.js"></script>
+  <script>
+    (function () {
+      function hideTranslateUi() {
+        var selectors = [
+          '.goog-te-banner-frame',
+          'iframe.goog-te-banner-frame',
+          '.goog-te-menu-frame',
+          'iframe.goog-te-menu-frame',
+          '.VIpgJd-ZVi9od-ORHb-OEVmcd',
+          '.VIpgJd-ZVi9od-l4eHX-hSRGPd',
+          '.VIpgJd-yAWNEb-L7lbkb',
+          '.VIpgJd-ZVi9od-aZ2wEe-wOHMyf',
+          '.VIpgJd-ZVi9od-aZ2wEe-OiiCO',
+          '#goog-gt-tt',
+          '.goog-tooltip',
+          '.goog-text-highlight'
+        ];
+
+        selectors.forEach(function (selector) {
+          document.querySelectorAll(selector).forEach(function (node) {
+            node.style.setProperty('display', 'none', 'important');
+            node.style.setProperty('visibility', 'hidden', 'important');
+          });
+        });
+
+        if (document.documentElement) {
+          document.documentElement.setAttribute('translate', 'no');
+          document.documentElement.classList.add('notranslate');
+          document.documentElement.style.setProperty('top', '0px', 'important');
+        }
+
+        if (document.body) {
+          document.body.setAttribute('translate', 'no');
+          document.body.classList.add('notranslate');
+          document.body.style.setProperty('top', '0px', 'important');
+        }
+      }
+
+      hideTranslateUi();
+      document.addEventListener('DOMContentLoaded', hideTranslateUi);
+      window.addEventListener('load', hideTranslateUi);
+      if (typeof MutationObserver !== 'undefined' && document.documentElement) {
+        var observer = new MutationObserver(hideTranslateUi);
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+      }
+      setTimeout(hideTranslateUi, 500);
+      setTimeout(hideTranslateUi, 1500);
+      setInterval(hideTranslateUi, 3000);
+    })();
+  </script>
 
 
 
   <title> Dashboard</title>
 </head>
 
-<body class="bg-black h-screen overflow-hidden">
+<body class="bg-black h-screen overflow-hidden notranslate" translate="no">

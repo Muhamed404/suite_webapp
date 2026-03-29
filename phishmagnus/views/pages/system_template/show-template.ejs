@@ -361,7 +361,7 @@
                         </div>
 
                         <!-- Import HTML from URL for Landing Page (missing in original) -->
-                        <div id="import-html-url-container" class="mb-6" style="display:none;">
+                        <!-- <div id="import-html-url-container" class="mb-6" style="display:none;">
                             <label for="import-html-url" class="block text-gray-700 font-medium mb-2">
                                 <%= __('system_template.create.labelImportHtmlUrl') || 'Import HTML Template from URL' %>
                             </label>
@@ -370,7 +370,7 @@
                                 <button type="button" id="fetch-html-template" class="bg-teal-400 text-white px-4 py-2 rounded-lg hover:bg-teal-500 transition"><%= __("system_template.create.fetchButtonText") %></button>
                             </div>
                             <div id="import-html-url-error" class="text-red-500 text-sm mt-2" style="display:none;"></div>
-                        </div>
+                        </div> -->
 
                         <!-- SMS Content Step (missing in original) -->
                         <div class="step hidden">
@@ -386,7 +386,7 @@
                                     placeholder="<%= __('system_template.create.sms_placeholder') || 'Enter SMS message (max 160 characters)' %>"
                                     class="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"><%= template?.sms_content || '' %></textarea>
                                 <div class="text-sm text-gray-500 mt-2">
-                                    <span id="sms-char-count">0</span> / 160 characters
+                                    <span id="sms-char-count">0</span> / 160 <%= __('system_template.create.sms_characters') %>
                                 </div>
                             </div>
                             <div id="placeholder-buttons-sms" class="flex flex-wrap gap-3 mt-4">
@@ -483,8 +483,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const customRadio = document.getElementById('landing_option_custom');
     const importContainer = document.getElementById('import-html-url-container');
     const fetchBtn = document.getElementById('fetch-html-template');
-    const urlInput = document.getElementById('import-html-url');
-    const errorDiv = document.getElementById('import-html-url-error');
+    // const urlInput = document.getElementById('import-html-url');
+    // const errorDiv = document.getElementById('import-html-url-error');
     const landingPageContent = document.getElementById('landing_page_content');
 
     function toggleImportField() {

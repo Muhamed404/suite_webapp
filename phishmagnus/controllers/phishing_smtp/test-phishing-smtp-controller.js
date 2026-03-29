@@ -15,12 +15,13 @@ exports.testPhishingSMTP = (req, res) => {
     .get(url)
     .then((response) => {
       const data = response.data;
-      console.log("SMTP TEST RESPONSE:", JSON.stringify(data, null, 2));
-      logger.info(`Test Phishing SMTP Controller: Response ${JSON.stringify(data, null, 2)}`);
+      // console.log("SMTP TEST RESPONSE:", JSON.stringify(data, null, 2));
+      logger.debug(`Test Phishing SMTP Controller: Response ${JSON.stringify(data, null, 2)}`);
       if (!data.success) {
         logger.warn(`Test Phishing SMTP Controller: SMTP test failed for smtp id ${smtpId} with message: ${data.message}`);
         return res.json({ success: false, message: data.message || 'SMTP connection failed.' });
       }
+      logger.info(`Phishing SMTP Connection successful.`)
       return res.json({ success: true, message: data.message || 'SMTP connection successful.' });
     })
     .catch((error) => {

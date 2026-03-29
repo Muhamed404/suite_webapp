@@ -10,6 +10,7 @@ import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { authService } from "@/services/authService";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { clearAuthTokenCookie } from "@/services/httpClient";
+import { isOrgAdmin } from "@/utils/roles";
 
 interface DashboardSidebarProps {
   /** On mobile: controls drawer visibility. On lg: ignored (sidebar always visible). */
@@ -34,7 +35,9 @@ export const DashboardSidebar = ({
   const isRtl =
     dir === "rtl" ||
     (typeof document !== "undefined" && document.documentElement.dir === "rtl");
+  const user = useAuthStore((state) => state.user);
   const resetAuth = useAuthStore((state) => state.reset);
+  const isOrgAdminUser = isOrgAdmin(user?.role_id);
 
   const handleLogout = async () => {
     try {
@@ -74,6 +77,16 @@ export const DashboardSidebar = ({
         },
       ],
     },
+    ...(isOrgAdminUser
+      ? [
+          {
+            href: "/dashboard/awareness-assets",
+            icon: getContentAssetUrl("/images/awaremagnus_sidebar/AwarenessAssets_Solid.svg"),
+            activeIcon: getContentAssetUrl("/images/awaremagnus_sidebar/AwarenessAssets_Solid.svg"),
+            label: t("menu.awarenessAssets"),
+          },
+        ]
+      : []),
     {
       href: "/dashboard/launch-awareness",
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Awareness_Solid.svg"),
@@ -149,6 +162,11 @@ export const DashboardSidebar = ({
       href: "/dashboard/my-report-card",
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Report.svg"),
       label: t("menu.reportCard"),
+    },
+    {
+      href: "/dashboard/my-achievements",
+      icon: getContentAssetUrl("/images/awaremagnus_sidebar/Achievements_Solid.svg"),
+      label: t("menu.achievements"),
     },
   ];
 

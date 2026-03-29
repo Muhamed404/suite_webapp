@@ -59,6 +59,10 @@ module.exports = {
             },
             Reports: {
                 ALL_REPORTS: 'pages/campaign/reports/all-reports',
+            },
+            ReportedEmails: {
+                LIST: 'pages/campaign/reported-emails/reported-emails-list',
+                DETAIL: 'pages/campaign/reported-emails/reported-email-detail',
             }
         },
         System_Template: {

@@ -34,6 +34,8 @@
     "securityAwarenessCampaign": "حملة التوعية الأمنية",
     "campaignCompletionTimeline": "الخط الزمني لإكمال الحملات",
     "completionsByDateAcrossCampaigns": "اكتمالات الوحدات حسب التاريخ عبر جميع الحملات",
+    "noOfModules": "عدد الوحدات",
+    "date": "التاريخ",
     "viewAll": "عرض الكل",
     "lastCampaignDate": "تاريخ آخر حملة: {date}",
     "weeklyProgress": "التقدّم الأسبوعي",
@@ -50,7 +52,8 @@
     "top3StrugglingTopics": "أكثر 3 مواضيع صعوبة",
     "employeesNeedAttention": "يحتاج موظفوك إلى تحسين في هذه المواضيع",
     "activeLearnersThisMonth": "المتعلمون النشطون هذا الشهر",
-    "trainingCompletionRate": "معدل إكمال التدريب"
+    "trainingCompletionRate": "معدل إكمال التدريب",
+    "noCompletionData": "لا توجد بيانات إكمال"
   },
   "topics": {
     "wifiSecurity": "أمن الواي فاي",
@@ -61,7 +64,7 @@
     "topHighRisk": "أفضل 10 موظفين مرتفعي المخاطر",
     "topLowRisk": "أفضل 10 موظفين منخفضي المخاطر",
     "sortBy": "الترتيب حسب",
-    "userId": "معرف المستخدم",
+    "userId": "الاسم",
     "modulesCompleted": "الوحدات المكتملة",
     "achievementCount": "عدد الإنجازات",
     "avatarLevel": "مستوى الصورة الرمزية",
@@ -103,6 +106,7 @@
     "viewSurveys": "عرض الاستبيانات",
     "quizQuestions": "الاختبارات والأسئلة",
     "trainingLibrary": "مكتبة التدريب",
+    "awarenessAssets": "أصول التوعية",
     "systemLibrary": "الوحدات الأساسية",
     "myLibrary": "وحداتي",
     "systemBranding": "العلامة التجارية",

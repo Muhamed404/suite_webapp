@@ -235,7 +235,9 @@
 		"systemTemplate": "قالب النظام",
 		"myTemplate": "قالباتي",
 		"smsCampaign": "إنشاء حملة رسائل قصيرة",
-		"whatsappCampaign": "إنشاء حملة واتساب"
+		"whatsappCampaign": "إنشاء حملة واتساب",
+		"reportedEmails": "رسائل البلاغات",
+		"reportedEmailDetail": "تفاصيل البلاغ"
 	},
 	"emailUserReport": {
 		"userReport": "تقرير المستخدم",
@@ -391,6 +393,7 @@
 				"labelAddress": "عنوان المؤسسة",
 				"labelPostalCode": "الرمز البريدي",
 				"labelContactNumber": "رقم الاتصال",
+				"labelUniqueCode": "الرمز الفريد",
 				"labelAdminInformation": "معلومات المدير",
 				"labelAdminFullName": "الاسم الكامل",
 				"labelAdminLastName": "اسم العائلة",
@@ -759,6 +762,7 @@
 			"sms_content": "محتوى قالب الرسائل النصية",
 			"sms_message": "نص الرسالة القصيرة",
 			"sms_placeholder": "أدخل نص الرسالة القصيرة (بحد أقصى 160 حرفًا)",
+			"sms_characters": "أحرف",
 			"smsShortMessageTitle": "رسالة قصيرة (المستوى 1)",
 			"smsShortMessageDescription": "إرسال رسالة نصية قصيرة بسيطة.",
 			"whatsappShortMessageTitle": "رسالة قصيرة",
@@ -1049,7 +1053,6 @@
 			"interactForm": "التفاعل مع النموذج",
 			"formSubmitted": "تم إرسال النموذج",
 			"attachmentOpened": "تم فتح المرفق",
-			"interactionReportByEachQrCode": "تقرير التفاعل لكل رمز QR",
 			"tagSequence": "تسلسل الوسم #",
 			"tagCode": "رمز الوسم",
 			"downloadQrCode": "تنزيل رمز QR",
@@ -1643,7 +1646,10 @@
 		"repeatedDownloads": "التحميلات المتكررة",
 		"searchHere": "ابحث هنا...",
 		"clickToTest": "انقر للاختبار",
-		"testUrl": "رابط الاختبار"
+		"testUrl": "رابط الاختبار",
+		"scanned": "تم المسح",
+		"scannedYes": "تم المسح",
+		"scannedNo": "لم يُمسح"
 	},
 	"whatsapp": {
 		"create": {
@@ -1774,6 +1780,10 @@
 		"nfcCode": "رمز NFC",
 		"copyUrl": "نسخ الرابط",
 		"viewReport": "عرض التقرير",
+		"scanned": "تم المسح",
+		"scannedYes": "تم المسح",
+		"scannedNo": "لم يُمسح",
+		"noRecords": "لا توجد سجلات.",
 		"showingEntries": "عرض {start}-{end} من {total} إدخالات",
 		"searchHere": "ابحث هنا...",
 		"sortBy": "ترتيب حسب",
@@ -2044,6 +2054,48 @@
 			"connection_success": "تم الاتصال بـ SMTP بنجاح.",
 			"connection_failed": "فشل الاتصال بـ SMTP.",
 			"endpoint_error": "تعذّر الوصول إلى نقطة الاختبار. يرجى المحاولة مرة أخرى."
+		}
+	},
+	"threat_reporter": {
+		"list": {
+			"title": "رسائل البلاغات",
+			"subtitle": "الرسائل التي أبلغ عنها المستخدمون في مؤسستك",
+			"total": "الإجمالي",
+			"col_type": "النوع",
+			"col_reporter": "المبلِّغ",
+			"col_reported_time": "وقت البلاغ",
+			"col_email_subject": "موضوع الرسالة",
+			"no_records": "لا توجد رسائل بلاغات",
+			"type_phishing": "بريد تصيد احتيالي",
+			"type_simulated": "بريد محاكاة",
+			"filter_all": "الكل",
+			"filter_real": "تصيد حقيقي",
+			"filter_simulated": "محاكاة"
+		},
+		"detail": {
+			"title": "تفاصيل البلاغ",
+			"back_to_list": "العودة إلى القائمة",
+			"reported_phishing_email": "رسالة تصيد احتيالي مُبلَّغ عنها",
+			"report_number": "بلاغ #",
+			"reporter": "المبلِّغ",
+			"organization": "المنظمة",
+			"org_id": "رقم المنظمة",
+			"campaign_info": "معلومات الحملة",
+			"campaign_id": "رقم الحملة",
+			"schedule_id": "رقم الجدولة",
+			"phish_sent": "تم إرسال التصيد",
+			"yes": "نعم",
+			"no": "لا",
+			"sent_at": "وقت الإرسال",
+			"email_headers": "مصدر الرسالة",
+			"no_headers": "لا توجد ترويسات متاحة.",
+			"real_phishing_email": "رسالة تصيد احتيالي حقيقية",
+			"real_phishing_email_desc": "لم يتم إنشاء هذه الرسالة بواسطة PhishMagnus. قد تكون محاولة تصيد احتيالي حقيقية.",
+			"phishmagnus_simulated_email": "حملة محاكاة PhishMagnus",
+			"phishmagnus_simulated_email_desc": "تم إرسال هذه الرسالة كجزء من حملة محاكاة PhishMagnus.",
+			"email_body": "محتوى الرسالة",
+			"suspicious_content": "محتوى مشبوه",
+			"not_found": "لم يتم العثور على البلاغ."
 		}
 	}
 }

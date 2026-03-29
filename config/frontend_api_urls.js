@@ -90,7 +90,8 @@ module.exports = {
 
             },
             EMAIL: {
-                EMAIL_REPORT: (campId) => `/phm/campaign/details/${campId}`
+                REPORT_DETAIL: (campId) => `/phm/campaign/details/${campId}`,
+                REPORT: `/phm/campaign/email/report`
             }
 
         },

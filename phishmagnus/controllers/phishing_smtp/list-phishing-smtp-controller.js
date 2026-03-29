@@ -23,7 +23,7 @@ exports.listOfPhishingSMTPController = (req, res) => {
       logger.info(`Listing Of Phishing SMTP Controller: Response ${JSON.stringify(data, null, 2)}`);
       const smtpList = data?.smtps ?? [];
       logger.info(`Listing Of Phishing SMTP Controller: Total SMTPs fetched ${smtpList.length}`);
-      logger.info(`Listing Of Phishing SMTP Controller: Rendering the list of phishing SMTPs \n ${JSON.stringify(smtpList, null, 2)}`);
+      logger.debug(`Listing Of Phishing SMTP Controller: Rendering the list of phishing SMTPs \n ${JSON.stringify(smtpList, null, 2)}`);
 
       const userPermissions = req.permissions || [];
       const canManageDefault = userPermissions.some(

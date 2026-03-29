@@ -62,7 +62,7 @@ exports.postLogin = async (req, res) => {
     try {
 
         const { data } = await apiClient.post(loginUrl, { email, password, userTimezone });
-        logger.info(`[PSuite Login Controller]: POST: Received login response: ${JSON.stringify(data, null, 2)}`);
+        // logger.info(`[PSuite Login Controller]: POST: Received login response: ${JSON.stringify(data, null, 2)}`);
         // const userData = data?.object?.user;
         const userToken = data?.object?.userToken || null;
         // const roleId = data?.object?.roleId || null;
