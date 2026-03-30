@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { campaignService } from "@/services/campaignService";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { useI18n } from "@/i18n/I18nProvider";
 
 export const CAMPAIGN_KEYS = {
   assignedCampaigns: ["campaign", "assigned"] as const,
@@ -31,9 +32,12 @@ export function useCampaignModules(campaignId: number, enabled = true) {
 
 /** Fetch certificates earned by the current Org User */
 export function useUserCertificates(enabled = true) {
+  const { locale } = useI18n();
+  const languageId = locale === "ar" ? "2" : "1";
+
   return useQuery({
-    queryKey: CAMPAIGN_KEYS.userCertificates,
-    queryFn: campaignService.getUserCertificates,
+    queryKey: [...CAMPAIGN_KEYS.userCertificates, languageId],
+    queryFn: () => campaignService.getUserCertificates(languageId),
     enabled,
   });
 }

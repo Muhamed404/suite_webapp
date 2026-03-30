@@ -1,0 +1,119 @@
+{
+  "title": "إدارة الاستبيانات",
+  "buttons": {
+    "quizAndQuestions": "الاختبار والأسئلة",
+    "newSurvey": "استبيان جديد",
+    "view": "عرض"
+  },
+  "stats": {
+    "totalSurveySent": "إجمالي الاستبيانات المرسلة",
+    "unexpectedAnswers": "الإجابات غير المتوقعة",
+    "expectedAnswers": "الإجابات المتوقعة",
+    "responseRate": "معدل الاستجابة"
+  },
+  "surveyList": "قائمة الاستبيانات",
+  "searchPlaceholder": "ابحث في الاستبيانات...",
+  "states": {
+    "errorTitle": "حدث خطأ أثناء تحميل الاستبيانات",
+    "errorDescription": "يرجى المحاولة مرة أخرى لاحقا",
+    "emptyTitle": "لم يتم العثور على استبيانات",
+    "emptyDescription": "حاول تعديل البحث أو إنشاء استبيان جديد"
+  },
+  "table": {
+    "surveyName": "اسم الاستبيان",
+    "submitted": "تم الإرسال",
+    "issued": "تاريخ الإصدار",
+    "deadline": "الموعد النهائي",
+    "completed": "مكتمل",
+    "status": "الحالة",
+    "action": "الإجراء"
+  },
+  "status": {
+    "completed": "مكتمل",
+    "cancelled": "ملغي",
+    "inProgress": "قيد التنفيذ"
+  },
+  "pagination": {
+    "showing": "عرض {start}-{end} من أصل {total} إدخال"
+  },
+  "surveyStats": {
+    "noSurvey": {
+      "title": "لم يتم تحديد استبيان",
+      "description": "يرجى اختيار استبيان من صفحة الإدارة",
+      "backToSurveys": "العودة إلى الاستبيانات"
+    },
+    "header": {
+      "loading": "جار التحميل...",
+      "surveyDetails": "تفاصيل الاستبيان",
+      "survey": "استبيان",
+      "surveyCode": "رمز الاستبيان:",
+      "copySurveyCode": "نسخ رمز الاستبيان",
+      "startDate": "تاريخ البدء:",
+      "endDate": "تاريخ الانتهاء:"
+    },
+    "retry": {
+      "button": "إعادة محاولة جلب المستخدمين",
+      "error": "فشلت إعادة المحاولة. يرجى المحاولة مرة أخرى.",
+      "success": "تم تشغيل إعادة المحاولة. ستظهر بيانات المستخدمين بعد اكتمال الجلب في الخلفية."
+    },
+    "stats": {
+      "submittedSurveys": "الاستبيانات المقدمة",
+      "riskLevel": "مستوى المخاطر",
+      "totalSurveysSent": "إجمالي الاستبيانات المرسلة",
+      "totalReceived": "إجمالي المستلم"
+    },
+    "risk": {
+      "pending": "قيد الانتظار",
+      "high": "مرتفع",
+      "low": "منخفض"
+    },
+    "charts": {
+      "responseByDepartment": "توزيع الردود حسب القسم",
+      "responseByGroup": "توزيع الردود حسب المجموعة",
+      "responseRate": "معدل الاستجابة",
+      "correct": "صحيح",
+      "notSubmitted": "غير مُرسل",
+      "incorrect": "غير صحيح",
+      "submissionTimeline": "الجدول الزمني للإرسال",
+      "responsesOverTime": "استجابات {name} عبر الوقت",
+      "submissions": "الإرسالات",
+      "noSubmissionData": "لا توجد بيانات إرسال حتى الآن",
+      "employeeRiskRates": "معدلات مخاطر الموظفين",
+      "nonRisky": "غير معرض للمخاطر",
+      "risky": "معرض للمخاطر",
+      "noDepartmentData": "لا توجد بيانات أقسام",
+      "noGroupData": "لا توجد بيانات مجموعات"
+    },
+    "questionsAnalysis": "تحليل الأسئلة",
+    "fallback": {
+      "department": "قسم {id}",
+      "group": "مجموعة {id}"
+    },
+    "answersList": {
+      "title": "قائمة الإجابات",
+      "viewAllUsers": "عرض جميع المستخدمين",
+      "searchPlaceholder": "ابحث بالاسم أو البريد الإلكتروني...",
+      "submissionFilter": "تصفية الإرسال",
+      "filters": {
+        "all": "الكل",
+        "submitted": "تم الإرسال",
+        "pending": "قيد الانتظار"
+      },
+      "noUsersFound": "لم يتم العثور على مستخدمين",
+      "table": {
+        "name": "الاسم",
+        "correct": "صحيح",
+        "incorrect": "غير صحيح",
+        "skipped": "تم التجاوز",
+        "riskLevel": "مستوى المخاطر",
+        "action": "الإجراء"
+      },
+      "pagination": {
+        "pageOf": "الصفحة {page} من {totalPages} ({users} مستخدما)"
+      }
+    },
+    "buttons": {
+      "view": "عرض"
+    }
+  }
+}

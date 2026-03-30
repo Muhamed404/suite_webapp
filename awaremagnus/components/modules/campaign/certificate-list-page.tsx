@@ -47,8 +47,8 @@ export function CertificateListPage() {
   // Transform certificates to match table format
   const certificateData = certificates.map((cert) => ({
     id: cert.id,
-    name: cert.campaign_name || "Unknown Campaign",
-    content: cert.module_name || "Unknown Module",
+    name: cert.campaign_name || t("unknownCampaign"),
+    content: cert.module_name || t("unknownModule"),
     date: cert.certificate_issue_date || cert.created_at || "",
     status: (cert.status as "active" | "pending" | "completed") || "completed",
   }));
@@ -112,9 +112,15 @@ export function CertificateListPage() {
 
   const statusBadge = (status: string) => {
     const badges = {
-      active: { class: "bg-green-50 text-green-700 border border-green-200", text: "Active" },
-      pending: { class: "bg-amber-50 text-amber-700 border border-amber-200", text: "Pending" },
-      completed: { class: "bg-gray-50 text-gray-700", text: "Completed" },
+      active: {
+        class: "bg-green-50 text-green-700 border border-green-200",
+        text: t("status.active"),
+      },
+      pending: {
+        class: "bg-amber-50 text-amber-700 border border-amber-200",
+        text: t("status.pending"),
+      },
+      completed: { class: "bg-gray-50 text-gray-700", text: t("status.completed") },
     };
     const badge = badges[status as keyof typeof badges] || badges.completed;
 
@@ -138,7 +144,7 @@ export function CertificateListPage() {
       } catch (error: any) {
         const message =
           error?.message ||
-          "An unknown error occurred while downloading the certificate.";
+          t("errors.downloadUnknown");
 
        
         if (message.includes("certificate download failed")) {
@@ -197,7 +203,7 @@ export function CertificateListPage() {
                 preview.document.close();
                 preview.onload = () => preview.print();
               } else {
-                window.alert("Unable to open preview window; please allow pop-ups.");
+                window.alert(t("errors.popupBlocked"));
               }
 
               // fallback handled – no error to log or display
@@ -225,7 +231,7 @@ export function CertificateListPage() {
           <polyline points="7,10 12,15 17,10" />
           <line x1="12" x2="12" y1="15" y2="3" />
         </svg>
-        <span>Download</span>
+        <span>{t("downloadCertificate")}</span>
       </button>
     );
   };
@@ -477,7 +483,7 @@ export function CertificateListPage() {
                 data-status="all"
                 onClick={() => handleTabClick("all")}
               >
-                <span className="tab-label">All</span>
+                <span className="tab-label">{t("filters.all")}</span>
                 <span
                   className={`tab-count w-5 h-5 rounded-full ${currentStatus === "all" ? "bg-white/30 text-white" : "bg-green-100 text-green-400"} text-[10px] font-bold flex items-center justify-center transition-all duration-200`}
                 >
@@ -489,7 +495,7 @@ export function CertificateListPage() {
                 data-status="active"
                 onClick={() => handleTabClick("active")}
               >
-                <span className="tab-label">Active</span>
+                <span className="tab-label">{t("status.active")}</span>
                 <span
                   className={`tab-count w-5 h-5 rounded-full ${currentStatus === "active" ? "bg-white/30 text-white" : "bg-green-100 text-green-400"} text-[10px] font-bold flex items-center justify-center transition-all duration-200`}
                 >
@@ -501,7 +507,7 @@ export function CertificateListPage() {
                 data-status="pending"
                 onClick={() => handleTabClick("pending")}
               >
-                <span className="tab-label">Pending</span>
+                <span className="tab-label">{t("status.pending")}</span>
                 <span
                   className={`tab-count w-5 h-5 rounded-full ${currentStatus === "pending" ? "bg-white/30 text-white" : "bg-green-100 text-green-400"} text-[10px] font-bold flex items-center justify-center transition-all duration-200`}
                 >
@@ -513,7 +519,7 @@ export function CertificateListPage() {
                 data-status="completed"
                 onClick={() => handleTabClick("completed")}
               >
-                <span className="tab-label">Completed</span>
+                <span className="tab-label">{t("status.completed")}</span>
                 <span
                   className={`tab-count w-5 h-5 rounded-full ${currentStatus === "completed" ? "bg-white/30 text-white" : "bg-green-100 text-green-400"} text-[10px] font-bold flex items-center justify-center transition-all duration-200`}
                 >
@@ -548,16 +554,16 @@ export function CertificateListPage() {
                 >
                   <span>
                     {currentDateFilter === "all"
-                      ? "All Time"
+                      ? t("filters.allTime")
                       : currentDateFilter === "7"
-                        ? "Last 7 Days"
+                        ? t("filters.last7Days")
                         : currentDateFilter === "30"
-                          ? "Last 30 Days"
+                          ? t("filters.last30Days")
                           : currentDateFilter === "90"
-                            ? "Last 3 Months"
+                            ? t("filters.last3Months")
                             : currentDateFilter === "180"
-                              ? "Last 6 Months"
-                              : "This Year"}
+                              ? t("filters.last6Months")
+                              : t("filters.thisYear")}
                   </span>
                   <div className="modern-dropdown-arrow">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -581,7 +587,7 @@ export function CertificateListPage() {
                         setShowDateDropdown(false);
                       }}
                     >
-                      All Time
+                      {t("filters.allTime")}
                     </button>
                     <button
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
@@ -591,7 +597,7 @@ export function CertificateListPage() {
                         setShowDateDropdown(false);
                       }}
                     >
-                      Last 7 Days
+                      {t("filters.last7Days")}
                     </button>
                     <button
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
@@ -601,7 +607,7 @@ export function CertificateListPage() {
                         setShowDateDropdown(false);
                       }}
                     >
-                      Last 30 Days
+                      {t("filters.last30Days")}
                     </button>
                     <button
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
@@ -611,7 +617,7 @@ export function CertificateListPage() {
                         setShowDateDropdown(false);
                       }}
                     >
-                      Last 3 Months
+                      {t("filters.last3Months")}
                     </button>
                     <button
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
@@ -621,7 +627,7 @@ export function CertificateListPage() {
                         setShowDateDropdown(false);
                       }}
                     >
-                      Last 6 Months
+                      {t("filters.last6Months")}
                     </button>
                     <button
                       className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
@@ -631,7 +637,7 @@ export function CertificateListPage() {
                         setShowDateDropdown(false);
                       }}
                     >
-                      This Year
+                      {t("filters.thisYear")}
                     </button>
                   </div>
                 )}
@@ -712,7 +718,7 @@ export function CertificateListPage() {
                       onClick={() => handleSort("content")}
                     >
                       <div className="flex items-center gap-2">
-                        <span>Content Name</span>
+                        <span>{t("certificatesContentName")}</span>
                         <span
                           className={`sort-icon ${sortColumn === "content" ? "text-blue-600" : "text-gray-400"}`}
                         >
@@ -770,7 +776,7 @@ export function CertificateListPage() {
                       onClick={() => handleSort("date")}
                     >
                       <div className="flex items-center gap-2">
-                        <span>Issue Date</span>
+                        <span>{t("issuedDate")}</span>
                         <span
                           className={`sort-icon ${sortColumn === "date" ? "text-blue-600" : "text-gray-400"}`}
                         >
@@ -828,7 +834,7 @@ export function CertificateListPage() {
                       onClick={() => handleSort("status")}
                     >
                       <div className="flex items-center gap-2">
-                        <span>Status</span>
+                        <span>{t("table.status")}</span>
                         <span
                           className={`sort-icon ${sortColumn === "status" ? "text-blue-600" : "text-gray-400"}`}
                         >
@@ -882,7 +888,7 @@ export function CertificateListPage() {
                     </th>
                     <th className="px-4 py-3.5 text-left font-semibold">
                       <div className="flex items-center gap-2">
-                        <span>Action</span>
+                        <span>{t("table.action")}</span>
                       </div>
                     </th>
                   </tr>
@@ -924,7 +930,7 @@ export function CertificateListPage() {
                     {t("emptyCertificatesTitle")}
                   </h3>
                   <p className="text-sm text-gray-500">
-                    Try adjusting your filters or search query
+                    {t("emptyState.description")}
                   </p>
                 </div>
               </div>
@@ -945,7 +951,11 @@ export function CertificateListPage() {
                 id="paginationInfo"
               >
                 <span>
-                  Showing {start + 1}–{end} out of {total} Entries
+                  {t("certificatesPaginationShowing", {
+                    start: start + 1,
+                    end,
+                    total,
+                  })}
                 </span>
               </div>
               <div className="flex gap-1.5" id="paginationButtons">
