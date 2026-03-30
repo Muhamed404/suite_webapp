@@ -133,7 +133,6 @@
     "description": "Some description",
     "languageFilter": "Language",
     "languageFilterHint": "This will list content based on the language e.g. English, Arabic. Will be handled from the backend.",
-    "allLanguages": "All Languages",
     "interactiveLesson": "Interactive Lesson",
     "quizzes": "Quizzes",
     "posters": "Posters",
@@ -170,6 +169,14 @@
     "breadcrumbMyAssignments": "My Assignments",
     "breadcrumbAwarenessCampaign": "Awareness Campaign",
     "breadcrumbCampaign": "Campaign",
-    "viewDetails": "View Details"
+    "viewDetails": "View Details",
+    "searchPlaceholderContent": "Search Content...",
+    "allLanguages": "All Languages",
+    "languageLabel": "Language",
+    "showingEntries": "Showing {from}–{to} of {total} Entries",
+    "createdLabel": "Created {date}",
+    "statusLoading": "Loading...",
+    "passed": "Passed",
+    "failed": "Failed"
   }
 }

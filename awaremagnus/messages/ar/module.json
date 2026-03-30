@@ -133,7 +133,6 @@
     "description": "بعض الوصف",
     "languageFilter": "اللغة",
     "languageFilterHint": "سيتم عرض المحتوى حسب اللغة، مثل الإنجليزية والعربية. يتم التعامل معه من الخادم.",
-    "allLanguages": "جميع اللغات",
     "interactiveLesson": "الدرس التفاعلي",
     "quizzes": "الاختبارات",
     "posters": "الملصقات",
@@ -170,6 +169,14 @@
     "breadcrumbMyAssignments": "مهامي",
     "breadcrumbAwarenessCampaign": "حملة التوعية",
     "breadcrumbCampaign": "الحملة",
-    "viewDetails": "عرض التفاصيل"
+    "viewDetails": "عرض التفاصيل",
+    "searchPlaceholderContent": "البحث عن المحتوى...",
+    "allLanguages": "جميع اللغات",
+    "languageLabel": "اللغة",
+    "showingEntries": "عرض {from}–{to} من أصل {total}",
+    "createdLabel": "تم الإنشاء {date}",
+    "statusLoading": "جاري التحميل...",
+    "passed": "ناجِح",
+    "failed": "فاشِل"
   }
 }
