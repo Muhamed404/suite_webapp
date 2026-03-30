@@ -1,6 +1,6 @@
-<div class="flex flex-col p-6 gap">
+<div class="flex flex-col p-6 pb-4">
   <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
-    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+    <nav class="flex items-center text-[1rem] text-gray-500 gap-2" aria-label="Breadcrumb">
       <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
       <span class="text-gray-400">›</span>
       <a href="/organization/profile/<%= organizationId %>" class="hover:text-gray-700 transition">
@@ -9,196 +9,82 @@
       <span class="text-gray-400">›</span>
       <span class="font-semibold text-gray-900"><%= __("breadcrumbs.audit") %></span>
     </nav>
-    <h3 class="text-3xl font-medium"><%= __("breadcrumbs.audit") %></h3>
+    <h3 class="text-3xl font-medium text-gray-900"><%= __("breadcrumbs.audit") %></h3>
+    <p class="text-sm text-gray-500"><%= __("Audit.subtitle") %></p>
   </div>
 </div>
 
+<div class="flex flex-col px-6 pb-6">
+  <div class="flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm">
 
-<div class="flex flex-col p-6 pt-0">
-  <div class="">
-    <div class="flex flex-row justify-between w-full gap-6 mb-6">
-      <!-- Tabs with counts -->
+    <!-- Card header: tabs left, search right -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 gap-4 flex-wrap">
       <div id="statusTabs"
-        class="flex items-center justify-start gap-4 p-1 text-sm font-medium bg-white rounded-full w-fit"
-        data-tab-all="<%- __('Audit.tabAll') %>"
-        data-tab-active="<%- __('Audit.tabActive') %>"
-        data-tab-inprogress="<%- __('Audit.tabInprogress') %>"
-        data-tab-completed="<%- __('Audit.tabCompleted') %>">
+        class="flex items-center gap-2 flex-wrap"
+        data-tab-all="<%- __('Audit.tabAll') %>">
       </div>
-      <!-- Search + Filter -->
-      <div class="flex items-center justify-between">
-        <div class="relative">
-          <input id="searchInput" type="text" placeholder="<%= __('Audit.searchPlaceholder') %>"
-            class="pl-10 pr-10 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-          <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-            <img src="/securemagnus_2025/images/img/search.svg"
-              class="w-5 h-5 text-gray-400" alt="">
-          </div>
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z"/>
+          </svg>
         </div>
+        <input id="searchInput" type="text"
+          placeholder="<%= __('Audit.searchPlaceholder') %>"
+          class="pl-9 pr-4 py-2 w-72 rounded-lg border border-gray-200 bg-gray-50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-100 focus:border-teal-400 transition">
       </div>
-
-
     </div>
 
     <!-- Table -->
-
-    <div class="overflow-x-auto bg-white hide-scrollbar rounded-2xl">
+    <div class="overflow-x-auto">
       <table class="min-w-full text-sm text-left">
-        <thead class="bg-[#FAFBFC]">
+        <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
           <tr>
-            <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="name">
-              <span class="inline-flex items-center gap-2">
-
-                <%= __("Audit.CreationDate") %>
-              </span>
-            </th>
-            <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="purchase_Date">
-              <span class="inline-flex items-center gap-2">
-                <img src="/securemagnus_2025/images/subscription_history/subscription_history_purchase_date.svg" alt="">
-                <%= __("Audit.User") %>
-
-              </span>
-            </th>
-            <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
-              <span class="inline-flex items-center gap-2">
-                <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg" alt="">
-                <%= __("Audit.ActionType") %>
-              </span>
-            </th>
-            <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
-              <span class="inline-flex items-center gap-2">
-                <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg" alt="">
-                <%= __("Audit.Module") %>
-              </span>
-            </th>
-
-            <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
-              <span class="inline-flex items-center gap-2">
-
-                <%= __("Audit.Description") %>
-
-              </span>
-            </th>
-            <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
-              <span class="inline-flex items-center gap-2">
-
-                <%= __("Audit.IPAddress") %>
-
-              </span>
-            </th>
-
-
-
-            <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="action">
-              <span class="inline-flex items-center gap-2">
-
-                <%= __("Audit.UrlPath") %>
-
-              </span>
-            </th>
+            <th class="px-6 py-3 font-medium" data-sort="created_at"><%= __("Audit.CreationDate") %></th>
+            <th class="px-6 py-3 font-medium" data-sort="user"><%= __("Audit.User") %></th>
+            <th class="px-6 py-3 font-medium" data-sort="action"><%= __("Audit.ActionType") %></th>
+            <th class="px-6 py-3 font-medium" data-sort="module"><%= __("Audit.Module") %></th>
+            <th class="px-6 py-3 font-medium"><%= __("Audit.Description") %></th>
+            <th class="px-6 py-3 font-medium" data-sort="ip_address"><%= __("Audit.IPAddress") %></th>
+            <th class="px-6 py-3 font-medium"><%= __("Audit.UrlPath") %></th>
           </tr>
         </thead>
-        <tbody id="tableBody">
-
+        <tbody id="tableBody" class="divide-y divide-gray-100">
         </tbody>
       </table>
     </div>
 
-
-
-
-    <!-- Pagination -->
-    <div class="flex items-center justify-between mt-4">
-      <select id="rowsPerPage" class="px-4 py-2 border rounded text-sm" style="padding-right: 2.5rem; background-position: right 0.75rem center;">
-        <option value="5">5</option>
-        <option value="10" selected>10</option>
-        <option value="20">20</option>
-      </select>
-      <div id="pagination" class="space-x-2"></div>
+    <!-- Pagination footer -->
+    <div class="flex items-center justify-between px-6 py-3 border-t border-gray-100 flex-wrap gap-3">
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-gray-500"><%= __("Audit.rowsPerPage") || "Rows per page" %>:</span>
+        <select id="rowsPerPage" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-100 bg-white">
+          <option value="5">5</option>
+          <option value="10" selected>10</option>
+          <option value="20">20</option>
+        </select>
+      </div>
+      <div id="pagination" class="flex items-center gap-2"></div>
     </div>
+
   </div>
-
-
-
-
 </div>
-
 
 <!-- Pass data to JavaScript -->
 <script>
-  // Pass server data to JavaScript
   window.auditData = {
     report: <%- JSON.stringify(report) %>,
-    pagination: <%- JSON.stringify(pagination) %>,
- 
-    };
-  // Localization data
+    pagination: <%- JSON.stringify(pagination) %>
+  };
   window.i18n = {
     Audit: {
-      tabAll: "<%- __('Audit.tabAll') %>",
-      tabActive: "<%- __('Audit.tabActive') %>",
-      tabInprogress: "<%- __('Audit.tabInprogress') %>",
-      tabCompleted: "<%- __('Audit.tabCompleted') %>"
+      tabAll:         "<%- __('Audit.tabAll') %>",
+      tabActive:      "<%- __('Audit.tabActive') %>",
+      tabInprogress:  "<%- __('Audit.tabInprogress') %>",
+      tabCompleted:   "<%- __('Audit.tabCompleted') %>",
+      noLogs:         "<%- __('Audit.noLogs') %>"
     }
   };
 </script>
 
-
-
 <script src="/securemagnus_2025/js/audit_log_table_jquery.js"></script>
-
-<script>
-// Override the renderTabs function to use localized tab names
-const originalRenderTabs = window.renderTabs || function() {};
-
-function renderTabs() {
-  // Count how many items are in each status
-  const counts = { All: window.auditData?.report?.report?.length || 0 };
-  ["active", "inprogress", "completed"].forEach(st => {
-    counts[st] = (window.auditData?.report?.report || []).filter(d => d.status === st).length;
-  });
-
-  // Generate buttons dynamically
-  const statusTabs = document.getElementById('statusTabs');
-  if (!statusTabs) return;
-
-  statusTabs.innerHTML = Object.entries(counts)
-    .map(([status, count]) => {
-      const isActive = (window.currentTab || 'All') === status;
-      let displayName = status;
-      
-      // Localize tab names from data attributes
-      if (status === 'All') displayName = statusTabs.dataset.tabAll || 'All';
-      else if (status === 'active') displayName = statusTabs.dataset.tabActive || 'Active';
-      else if (status === 'inprogress') displayName = statusTabs.dataset.tabInprogress || 'Inprogress';
-      else if (status === 'completed') displayName = statusTabs.dataset.tabCompleted || 'Completed';
-
-      // If active
-      if (isActive) {
-        return `
-          <button class="flex items-center gap-1 px-4 py-2 text-white transition-all duration-300 bg-gray-900 rounded-full filter-btn"
-                  onclick="setTab('${status}')">
-            ${displayName}
-            <span class="number bg-gray-700 text-white text-xs px-2 py-0.5 rounded-full transition-all duration-300">
-              ${count}
-            </span>
-          </button>`;
-      }
-
-      // If not active
-      return `
-        <button class="flex items-center gap-1 px-4 py-2 text-gray-600 transition-all duration-300 rounded-full filter-btn hover:text-black"
-                onclick="setTab('${status}')">
-          ${displayName}
-          <span class="number text-green-500 bg-green-500/15 text-xs px-2 py-0.5 rounded-full transition-all duration-300">
-            ${count}
-          </span>
-        </button>`;
-    }).join("");
-}
-
-// Call renderTabs when DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-  renderTabs();
-});
-</script>

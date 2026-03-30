@@ -315,6 +315,41 @@
 			"smtpNotifications": "SMTP Notifications"
 		}
 	},
+	"org_domain": {
+		"breadcrumb": "Domain Management",
+		"title": "Domain Management",
+		"subtitle": "Manage allowed email domains for this organization.",
+		"btn_add": "Add Domain",
+		"btn_save": "Save",
+		"btn_enable": "Enable",
+		"btn_disable": "Disable",
+		"config_section": "Configuration",
+		"label_domain_restrict": "Domain Restriction",
+		"desc_domain_restrict": "Enforce email domain validation for users in this organization.",
+		"btn_enable_restrict": "Enable",
+		"btn_disable_restrict": "Disable",
+		"restrict_confirm_enable_title": "Enable Domain Restriction",
+		"restrict_confirm_enable_subtitle": "This will affect all users in this organization.",
+		"restrict_confirm_enable_body": "Once enabled, only users with an approved email domain will be allowed access.",
+		"restrict_confirm_disable_title": "Disable Domain Restriction",
+		"restrict_confirm_disable_subtitle": "This will affect all users in this organization.",
+		"restrict_confirm_disable_body": "Once disabled, domain validation will no longer be enforced for this organization.",
+		"col_domain_name": "Domain Name",
+		"col_status": "Status",
+		"col_created_at": "Created At",
+		"total": "Total",
+		"no_records": "No domains configured yet.",
+		"modal_add_title": "Add New Domain",
+		"label_domain_name": "Domain Name",
+		"placeholder_domain_name": "e.g. example.com",
+		"hint_domain_name": "Enter the full domain name (e.g. company.com)",
+		"validation_domain_format": "Please enter a valid domain name.",
+		"label_status": "Status",
+		"delete_modal_title": "Delete Domain",
+		"delete_modal_subtitle": "This action cannot be undone.",
+		"confirm_delete": "Are you sure you want to delete the domain:",
+		"modal_edit_title": "Edit Domain"
+	},
 	"organization": {
 		"homescreen": {
 			"title": "Organization Management",
@@ -363,6 +398,7 @@
 			"labelAdminFirstName": "First Name",
 			"labelAdminLastName": "Last Name",
 			"labelAdminEmail": "Administrator Email",
+			"labelDomainRestrict": "Domain Restrict",
 			"labelAdminPassword": "Password",
 			"btnNext": "Next",
 			"btnBack": "Back",
@@ -397,7 +433,8 @@
 				"btnSuiteDashboard": "Suite Dashboard",
 				"btnSMTP": "SMTP Settings",
 				"btnAuditLog": "Audit Log",
-				"btnSMS": "SMS Settings"
+				"btnSMS": "SMS Settings",
+				"btnDomainManagement": "Domain Management"
 			},
 			"tabSubscription": {
 				"labelTabTitle": "Subscription",
@@ -899,11 +936,21 @@
 				"no_records": "No USB devices found.",
 				"start_date": "Start Date",
 				"actions": "Details"
-			}
+			},
+			"interaction_details_title": "USB Interaction Details",
+			"interactions_recorded": "interactions recorded",
+			"unique_users": "unique users",
+			"plugged": "Plugged",
+			"unplugged": "Unplugged",
+			"ip_address": "IP Address",
+			"mac_address": "MAC Address",
+			"env_path": "Environment Path",
+			"system_details": "System Details"
 		},
 		"device_code": "Device Code",
 		"description": "Description",
-		"start_date": "Start Date"
+		"start_date": "Start Date",
+		"no_records": "No records found."
 	},
 	"department": {
 		"labelTitleDepartmentManagement": "Department Management",
@@ -1378,7 +1425,10 @@
 		"tabActive": "Active",
 		"tabInprogress": "Inprogress",
 		"tabCompleted": "Completed",
-		"searchPlaceholder": "Search here..."
+		"searchPlaceholder": "Search here...",
+		"subtitle": "Track all user actions and system events.",
+		"rowsPerPage": "Rows per page",
+		"noLogs": "No audit logs found"
 	},
 	"CS-List": "Cybersecurity Categories",
 	"btn-CS-LibPosters-Upload-Document": "Upload Document",

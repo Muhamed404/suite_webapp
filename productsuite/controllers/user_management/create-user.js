@@ -74,7 +74,7 @@ exports.create = async (req, res, next) => {
 
 
 exports.submitCreationForm = async (req, res, next) => {
-  logger.info(`Controller - Create User: Incoming body ${JSON.stringify(req.body, null, 2)}`);
+  logger.info(`[UserCreationSubmit] Incoming request for user:${JSON.stringify(req.body.email, null, 2)}`);
   try {
     if (req.method === "POST") {
       const email = req.body?.email || null;
@@ -87,7 +87,7 @@ exports.submitCreationForm = async (req, res, next) => {
 
       if (!email || email === null || !first_name || first_name === null || !last_name || last_name === null
         || !contact || contact === null || !role || role === null) {
-        logger.warn(`Controller - Create User: Missing required fields in the form submission`);
+        logger.warn(`[UserCreationSubmit] Create User: Missing required fields in the form submission`);
         req.flash("message", "All fields are required.");
         req.flash("alertType", "error");
         return res.redirect(frontend_api_urls.PRODUCT_SUITE.User_Management.CREATE_USER);
@@ -102,13 +102,13 @@ exports.submitCreationForm = async (req, res, next) => {
         role_id: role,
         selectedProductKey
       };
-      logger.info('Controller - Create User: Posting user payload ' + JSON.stringify(user, null, 2))
+      logger.info('[UserCreationSubmit] Create User: Posting user payload ' + JSON.stringify(user.email, null, 2));
       let userOrganizationId = req.user.organization_id;
       if (userOrganizationId !== undefined && userOrganizationId !== null && !isNaN(userOrganizationId)
         && userOrganizationId !== 0) {
         userOrganizationId = Number(userOrganizationId);
       } else if (req.user.role.id === enums.userType.MagSuperAdmin || req.user.role.id === enums.userType.MagSubAdmin) {
-        logger.info(`Controller - Create User: MAG Admin user trying to create user. Setting orgId to 0`);
+        logger.info(`[UserCreationSubmit] Create User: MAG Admin user trying to create user. Setting orgId to 0`);
         userOrganizationId = 0;
       }
       const url = `/user/create/${userOrganizationId}`;
@@ -123,7 +123,8 @@ exports.submitCreationForm = async (req, res, next) => {
         .catch((error) => {
           logger.error(`error => ${error}`);
           logger.error(error.stack)
-          req.flash("message", 'Unable to create user');
+          const errMsg = error.response?.data?.message || error.message || 'Unable to create user';
+          req.flash("message", errMsg);
           req.flash("alertType", "error");
           return res.redirect(frontend_api_urls.PRODUCT_SUITE.User_Management.SUITE_USERS);
         });

@@ -10,10 +10,8 @@ const render_ejs_urls = require("../../../config/render_ejs_urls");
 
 exports.createOrganization = async (req, res) => {
   if (req.method === "GET") {
-    logger.info(`[CREATE ORGANIZATION]:: Incoming GET Request`);
+    logger.info(`[CreateOrganization]  Incoming GET Request`);
     const countryUrl = `/phm/commons/`;
-    const packageUrl = `/package/getPackages`;
-    const serviceUrl = `/phm/services/`;
     const apiClient = getApiClient(req);
     return Promise.all([
       apiClient.get(countryUrl),
@@ -24,7 +22,7 @@ exports.createOrganization = async (req, res) => {
         const countries = response1.data.countries;
         // const package = response2.data.Package;
         // const services = serviceResponse.data.services;
-        logger.info(`[CREATE ORGANIZATION]:: Rendring Add Organization EJS Page`);
+        logger.info(`[CreateOrganization]  Rendring Add Organization EJS Page`);
         // logger.info(`............... ${JSON.stringify(services)}`);
         // logger.info(package);
         res.render(render_ejs_urls.ProductSuiteManagement.Organization.CREATE, {
@@ -39,9 +37,9 @@ exports.createOrganization = async (req, res) => {
         throw error;
       });
   } else if (req.method === "POST") {
-    logger.info(`[CREATE ORGANIZATION]:: Incoming POST Request`);
+    logger.info(`[CreateOrganization]  Incoming POST Request`);
     try {
-      logger.info(`[CREATE ORGANIZATION]:: [${req.method}] Incoming Body Payload ${JSON.stringify(req.body)}`);
+      logger.info(`[CreateOrganization] Incoming request.`);
       const organization = {
         name: req.body.name,
         address: req.body.address,
@@ -53,18 +51,19 @@ exports.createOrganization = async (req, res) => {
         password: req.body.password,
         email: req.body.email,
         postalCode: parseInt(req.body.postalCode),
+        domain_restrict: req.body.domain_restrict === '1',
         // package: parseInt(req.body.package),
         // totalUserLicenses: parseInt(req.body.totalLicenses),
         // licenseStartDate: req.body.licenseStartDate,
         contact: req.body.contact
       };
-      logger.info(`[CREATE ORGANIZATION]:: Organization Creation Final Payload ${JSON.stringify(organization)}`);
+      logger.info(`[CreateOrganization] Posting payload Organization=${req.body.name}`);
       const apiClient = getApiClient(req);
       const response = await apiClient.post('/organization/', organization);
-      logger.info(`[CREATE ORGANIZATION]:: Response ${response.data.message}`);
+      logger.info(`[CreateOrganization] Response has received organization=${req.body.name}`);
       res.redirect(`/organization/?message=${response.data.message}&alertType=success&alertSwal=true`);
     } catch (error) {
-      logger.error(`[CREATE ORGANIZATION]:: ${error}`);
+      logger.error(`[CreateOrganization]  ${error}`);
       res.render("pages/product_suite_management/suite_management", {
         message: "Error in saving",
         alertType: "error",

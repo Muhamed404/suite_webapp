@@ -19,7 +19,7 @@ const enums = require('../../contants/enum')
 const groupRoute = require('./group/group-route')
 const organizationAuditLog = require('./audit/audit-log-route');
 const SystemTemplate = require('./template/system/system-template-routes');
-
+const DMSRoutes = require("./organization/domain-management-routes");
 const userRoutes = require("./user/user-routes");
 const SMSRoutes = require("./organization/sms-routes");
 const authenticateMiddleware = require('../../middleware/jwt_authenticator/jwt-authenticate-middleware');
@@ -27,7 +27,7 @@ const departmentRoute = require('./department/department-route')
 const {validate, handleValidationResult} = require('../../middleware/routes-validation')
 const { changePassword } = require("../controllers/auth/change_password_controller");
 
-
+protectedRouter.use('/dms', DMSRoutes)
 protectedRouter.use('/template', SystemTemplate)
 protectedRouter.use('/sms', SMSRoutes)
 protectedRouter.use("/audit", organizationAuditLog);

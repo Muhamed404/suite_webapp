@@ -83,6 +83,9 @@ module.exports = {
         LOGIN: 'pages/login/psm_login',
         LOGOUT: '/logout',
         Home: `pages/product_suite_management/suite_management`,
+        Domain_Management:{
+            Render_List_DMS : 'pages/organization/domain_management/list-domain-management',
+        },
         Service_Registry: {
             CREATE: 'pages/service_registry/create_service_registry',
             LIST: 'pages/service_registry/service_registry_list',

@@ -14,6 +14,9 @@ module.exports = {
         Home: {
             INDEX: '/home',
         },
+        Domain_Management: {
+            Render_List_View: (orgId) => `/dms/${orgId}/organization`
+        },
         User_Management: {
             CREATE_USER: '/user/create',
             // LIST_USERS: '/user/list',

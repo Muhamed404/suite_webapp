@@ -50,7 +50,7 @@ exports.viewLogs = async (req, res) => {
     const url = backend_api_urls.PRODUCT_SUITE.Audit_Log.VIEW_LOGS(queryParams);
     logger.info(`Controller - Audit Log: Backend API Caller: ${url}`);
     const response = await apiClient.get(url, { headers: { 'Accept': 'application/json' } });
-
+    logger.info(`audit report ${JSON.stringify(response.data, null, 2)}`)
     if (!response?.data || !response.data.success) {
       req.flash('alertType', 'error');
       req.flash('message', response?.data?.message || 'Failed to fetch audit logs');
@@ -58,7 +58,7 @@ exports.viewLogs = async (req, res) => {
     }
     logger.info(`Controller - View Logs: Successfully fetched audit logs from backend`);
     const { data: report } = response.data;
-    logger.info(`Controller - View Logs: Backend Response: ${JSON.stringify(report, null, 2)}`);
+    // logger.info(`Controller - View Logs: Backend Response: ${JSON.stringify(report, null, 2)}`);
 
     // Use pagination info from backend response
     const totalCount = response.data.totalRecords;

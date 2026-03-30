@@ -26,7 +26,12 @@ module.exports = {
                 DELETE: (catId) => `/cybersecurity/categories/delete/${catId}`
             }
         },
-
+        DOMAIN_MANAGEMENT: {
+            LIST_BY_ORGANIZATION: (orgId) => `/dms/${orgId}/organization`,
+            EDIT: (domainId) => `/dms/${domainId}/domain`,
+            DELETE: (domainOrgId, domainId) => `/dms/${domainOrgId}/organization/${domainId}/domain`,
+            TOGGLE_RESTRICT: (orgId) => `/organization/${orgId}/domain-restrict`,
+        },
         PACKAGE_MANAGEMENT: {
             CREATE: '/package/',
         },
