@@ -30,6 +30,23 @@ function normalizeTransportSecurity(value) {
   return "NONE";
 }
 
+function extractErrorMessage(error, fallbackMessage) {
+  const responseData = error?.response?.data || {};
+  const errorCode = responseData.errorCode || null;
+  const messagePayload = responseData.message;
+  const message = Array.isArray(messagePayload)
+    ? messagePayload.join(", ")
+    : typeof messagePayload === "string" && messagePayload.trim().length > 0
+      ? messagePayload
+      : error?.message || fallbackMessage;
+
+  return {
+    errorCode,
+    message,
+    displayMessage: errorCode ? `[${errorCode}] ${message}` : message,
+  };
+}
+
 async function renderLdapPage(req, res) {
   let orgId = 0;
 
@@ -101,9 +118,9 @@ async function saveLdapConfig(req, res) {
     req.flash("alertType", "success");
     return res.redirect(`/settings/ldap/${orgId}`);
   } catch (error) {
-    const message = error?.response?.data?.message || error.message || "Unable to save LDAP settings.";
-    logger.error(`[LDAP Settings][POST] ${message}`);
-    req.flash("message", Array.isArray(message) ? message.join(", ") : message);
+    const details = extractErrorMessage(error, "Unable to save LDAP settings.");
+    logger.error(`[LDAP Settings][POST][${details.errorCode || "LDAP_UI_ERROR"}] ${details.message}`);
+    req.flash("message", details.displayMessage);
     req.flash("alertType", "error");
     return res.redirect(orgId ? `/settings/ldap/${orgId}` : "/organization/");
   }
@@ -121,9 +138,9 @@ async function triggerManualSync(req, res) {
     req.flash("alertType", "success");
     return res.redirect(`/settings/ldap/${orgId}`);
   } catch (error) {
-    const message = error?.response?.data?.message || error.message || "LDAP sync failed.";
-    logger.error(`[LDAP Settings][SYNC] ${message}`);
-    req.flash("message", Array.isArray(message) ? message.join(", ") : message);
+    const details = extractErrorMessage(error, "LDAP sync failed.");
+    logger.error(`[LDAP Settings][SYNC][${details.errorCode || "LDAP_UI_ERROR"}] ${details.message}`);
+    req.flash("message", details.displayMessage);
     req.flash("alertType", "error");
     return res.redirect(orgId ? `/settings/ldap/${orgId}` : "/organization/");
   }
