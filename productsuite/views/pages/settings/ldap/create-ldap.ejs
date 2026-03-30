@@ -75,10 +75,18 @@
     <% if (syncStatus?.last_sync_stats) { %>
       <div class="rounded-xl bg-blue-50 border border-blue-200 p-4 mt-4">
         <p class="text-sm font-semibold text-blue-900 mb-3">Latest Sync Statistics</p>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
           <div class="bg-white rounded p-2 border border-blue-100">
             <p class="text-gray-500">Users Fetched</p>
             <p class="text-lg font-bold text-gray-900"><%= syncStatus.last_sync_stats.ldap_users_fetched || 0 %></p>
+          </div>
+          <div class="bg-white rounded p-2 border border-blue-100">
+            <p class="text-gray-500">Groups Fetched</p>
+            <p class="text-lg font-bold text-indigo-600"><%= syncStatus.last_sync_stats.ldap_groups_fetched || 0 %></p>
+          </div>
+          <div class="bg-white rounded p-2 border border-blue-100">
+            <p class="text-gray-500">Departments Fetched</p>
+            <p class="text-lg font-bold text-teal-600"><%= syncStatus.last_sync_stats.ldap_departments_fetched || 0 %></p>
           </div>
           <div class="bg-white rounded p-2 border border-blue-100">
             <p class="text-gray-500">Created</p>
@@ -89,7 +97,7 @@
             <p class="text-lg font-bold text-blue-600"><%= syncStatus.last_sync_stats.updated_users || 0 %></p>
           </div>
           <div class="bg-white rounded p-2 border border-blue-100">
-            <p class="text-gray-500">Groups Synced</p>
+            <p class="text-gray-500">Group Memberships Synced</p>
             <p class="text-lg font-bold text-purple-600"><%= syncStatus.last_sync_stats.synced_group_memberships || 0 %></p>
           </div>
         </div>
@@ -198,20 +206,30 @@
       <h2 class="text-lg font-semibold text-gray-900">Directory Filters</h2>
       <p class="text-sm text-gray-500 mt-1" title="LDAP filters limit which entries are synchronized from your directory.">LDAP filter expressions used for query customization.</p>
 
+      <div class="mt-4">
+        <label class="block text-gray-700 font-medium mb-2">Directory Type Preset</label>
+        <select id="directory-filter-preset" class="w-full md:w-[320px] px-4 py-2 border rounded-lg bg-gray-50">
+          <option value="AD">Active Directory (AD)</option>
+          <option value="OPENLDAP">OpenLDAP</option>
+          <option value="CUSTOM">Custom (Do not override)</option>
+        </select>
+        <p id="directory-filter-preset-hint" class="text-xs text-gray-500 mt-1">Selecting AD/OpenLDAP updates all 3 filter fields automatically.</p>
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-4">
         <div>
           <label class="block text-gray-700 font-medium mb-2" title="Example: (&(objectCategory=person)(objectClass=user))">User Filter</label>
-          <input name="user_filter" value="<%= ldapConfig?.user_filter || '(&(objectClass=user)(!(objectClass=computer)))' %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <input id="user-filter-input" name="user_filter" value="<%= ldapConfig?.user_filter || '(&(objectClass=user)(!(objectClass=computer)))' %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
         </div>
 
         <div>
           <label class="block text-gray-700 font-medium mb-2" title="Example: (objectClass=group)">Group Filter</label>
-          <input name="group_filter" value="<%= ldapConfig?.group_filter || '(objectClass=group)' %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <input id="group-filter-input" name="group_filter" value="<%= ldapConfig?.group_filter || '(objectClass=group)' %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
         </div>
 
         <div class="md:col-span-2">
           <label class="block text-gray-700 font-medium mb-2" title="Example: (objectClass=organizationalUnit)">Department Filter</label>
-          <input name="department_filter" value="<%= ldapConfig?.department_filter || '(objectClass=organizationalUnit)' %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
+          <input id="department-filter-input" name="department_filter" value="<%= ldapConfig?.department_filter || '(objectClass=organizationalUnit)' %>" class="w-full px-4 py-2 border rounded-lg bg-gray-50" />
         </div>
       </div>
     </div>
@@ -295,6 +313,19 @@
 
 <script>
   (function () {
+    const FILTER_PRESETS = {
+      AD: {
+        user: "(&(objectClass=user)(!(objectClass=computer)))",
+        group: "(objectClass=group)",
+        department: "(objectClass=organizationalUnit)",
+      },
+      OPENLDAP: {
+        user: "(objectClass=inetOrgPerson)",
+        group: "(|(objectClass=groupOfNames)(objectClass=groupOfUniqueNames)(objectClass=posixGroup))",
+        department: "(objectClass=organizationalUnit)",
+      },
+    };
+
     const form = document.getElementById("ldap-settings-form");
     const errorBox = document.getElementById("ldap-form-error");
     const advancedToggle = document.getElementById("advanced-toggle");
@@ -319,6 +350,11 @@
     const flashDataElement = document.getElementById("ldap-flash-data");
     const flashMessage = flashDataElement ? (flashDataElement.getAttribute("data-message") || "") : "";
     const flashAlertType = flashDataElement ? (flashDataElement.getAttribute("data-type") || "") : "";
+    const directoryFilterPreset = document.getElementById("directory-filter-preset");
+    const directoryFilterPresetHint = document.getElementById("directory-filter-preset-hint");
+    const userFilterInput = document.getElementById("user-filter-input");
+    const groupFilterInput = document.getElementById("group-filter-input");
+    const departmentFilterInput = document.getElementById("department-filter-input");
 
     const dnPattern = /^\s*(?:[A-Za-z]+=[^,]+)(?:\s*,\s*[A-Za-z]+=[^,]+)*\s*$/;
 
@@ -421,12 +457,99 @@
       return true;
     }
 
+    function detectPresetFromInputs() {
+      if (!userFilterInput || !groupFilterInput || !departmentFilterInput) {
+        return "CUSTOM";
+      }
+
+      const user = (userFilterInput.value || "").trim();
+      const group = (groupFilterInput.value || "").trim();
+      const department = (departmentFilterInput.value || "").trim();
+
+      const isAd =
+        user === FILTER_PRESETS.AD.user &&
+        group === FILTER_PRESETS.AD.group &&
+        department === FILTER_PRESETS.AD.department;
+
+      if (isAd) {
+        return "AD";
+      }
+
+      const isOpenLdap =
+        user === FILTER_PRESETS.OPENLDAP.user &&
+        group === FILTER_PRESETS.OPENLDAP.group &&
+        department === FILTER_PRESETS.OPENLDAP.department;
+
+      if (isOpenLdap) {
+        return "OPENLDAP";
+      }
+
+      return "CUSTOM";
+    }
+
+    function applyPreset(presetKey) {
+      if (!FILTER_PRESETS[presetKey] || !userFilterInput || !groupFilterInput || !departmentFilterInput) {
+        return;
+      }
+
+      userFilterInput.value = FILTER_PRESETS[presetKey].user;
+      groupFilterInput.value = FILTER_PRESETS[presetKey].group;
+      departmentFilterInput.value = FILTER_PRESETS[presetKey].department;
+      updatePresetHint(presetKey);
+    }
+
+    function updatePresetHint(presetKey) {
+      if (!directoryFilterPresetHint) {
+        return;
+      }
+
+      if (presetKey === "OPENLDAP") {
+        directoryFilterPresetHint.textContent = "OpenLDAP preset active: inetOrgPerson / groupOfNames/groupOfUniqueNames/posixGroup filters applied.";
+        return;
+      }
+
+      if (presetKey === "AD") {
+        directoryFilterPresetHint.textContent = "AD preset active: default Active Directory filters applied.";
+        return;
+      }
+
+      directoryFilterPresetHint.textContent = "Custom mode active: your current filter values will be used as-is.";
+    }
+
+    function handleManualFilterEdit() {
+      if (!directoryFilterPreset) {
+        return;
+      }
+
+      const detected = detectPresetFromInputs();
+      directoryFilterPreset.value = detected;
+      updatePresetHint(detected);
+    }
+
     if (advancedToggle) {
       advancedToggle.addEventListener("click", toggleAdvanced);
     }
 
     transportInputs.forEach(function (input) {
       input.addEventListener("change", syncTransportValues);
+    });
+
+    if (directoryFilterPreset) {
+      directoryFilterPreset.addEventListener("change", function () {
+        const selectedPreset = directoryFilterPreset.value;
+        if (selectedPreset === "CUSTOM") {
+          updatePresetHint("CUSTOM");
+          return;
+        }
+
+        applyPreset(selectedPreset);
+      });
+    }
+
+    [userFilterInput, groupFilterInput, departmentFilterInput].forEach(function (input) {
+      if (input) {
+        input.addEventListener("input", handleManualFilterEdit);
+      }
     });
 
     [cbRejectUnauthorized, cbAutoSyncEnabled, cbIncrementalSync, cbAllowDomainRoot].forEach(function (input) {
@@ -442,6 +565,11 @@
     const initialMode = syncTransportValues();
     syncBooleanValues();
     validatePortForTransport(initialMode);
+    if (directoryFilterPreset) {
+      const initialPreset = detectPresetFromInputs();
+      directoryFilterPreset.value = initialPreset;
+      updatePresetHint(initialPreset);
+    }
 
     if (flashMessage) {
       if (typeof showCustomToast === "function") {
