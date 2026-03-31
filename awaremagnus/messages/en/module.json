@@ -116,6 +116,7 @@
     "downloadBrochure": "Download Brochure",
     "downloadDocument": "Download Document",
     "downloadScreenSaver": "Download Screen Saver",
+    "durationFallback": "20 to 60 minutes",
     "next": "Next",
     "beginTraining": "Begin Training",
     "posterViews": "1,234 views",
@@ -178,5 +179,22 @@
     "statusLoading": "Loading...",
     "passed": "Passed",
     "failed": "Failed"
+  },
+  "videoTraining": {
+    "motionVideos": "Motion Videos",
+    "awarenessLibrary": "Awareness Library",
+    "systemLibrary": "System Library",
+    "videoNotSupported": "Your browser does not support the video tag.",
+    "play": "Play",
+    "pause": "Pause",
+    "back10s": "Back 10s",
+    "forward10s": "Forward 10s",
+    "restart": "Restart",
+    "progress": "Progress: {percentage}% ({current} / {total} seconds)",
+    "sendProgress": "Send Progress Now",
+    "defaultTitle": "{moduleName} Motion Video {index}",
+    "defaultDescription": "Learn about {moduleName} best practices and protocols",
+    "openFullScreen": "Open Full Screen",
+    "noContent": "No motion video content found for this module."
   }
 }

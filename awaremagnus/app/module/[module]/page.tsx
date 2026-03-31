@@ -11,6 +11,7 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
+import { setLocaleCookie } from "@/i18n/client-locale";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useContentsWithProgress, useModule, useModules } from "@/hooks/useQuiz";
 import { campaignService } from "@/services/campaignService";
@@ -18,6 +19,7 @@ import { awmClient, API_BASE } from "@/services/httpClient";
 import { isOrgUser } from "@/utils/roles";
 import { quizService } from "@/services/quizService";
 import { SUPPORTED_LANGUAGES, LANGUAGE_COUNTRY_CODES } from "@/utils/supportedLanguages";
+import { getModuleAssetUrl } from "@/utils/contentAssetUrl";
 
 export default function PhysicalSecurityPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -35,7 +37,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "completed">("all");
   // track selected language by supported language id (see utils/supportedLanguages); null = All Languages
-  const [language, setLanguage] = useState<number | null>(null);
+  const [language, setLanguage] = useState<number | null>(locale === "ar" ? 2 : null);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
@@ -78,13 +80,16 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     let name = slugDerivedName;
     let description = moduleRes?.data?.description || "";
 
-    if (moduleRes?.success && moduleRes.data?.translations) {
+    if (moduleRes?.success && moduleRes.data?.translations?.length) {
       // Prioritize the dropdown language if selected, otherwise use the global locale
       const currentLangId = language ?? (locale === "ar" ? 2 : 1);
-      const translation = moduleRes.data.translations.find((t) => t.language_id === currentLangId);
+      const translations = moduleRes.data.translations;
+      const primaryTranslation = translations.find((t) => t.language_id === currentLangId);
+      const fallbackTranslation = translations[0];
+      const source = primaryTranslation ?? fallbackTranslation;
 
-      if (translation?.name) name = translation.name;
-      if (translation?.description) description = translation.description;
+      if (source?.name) name = source.name;
+      if (source?.description) description = source.description;
     }
 
     return { moduleName: name, moduleDescription: description };
@@ -513,6 +518,31 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     };
   }, [moduleName, moduleDescription]);
 
+  const moduleLogoUrl = useMemo(() => {
+    if (!moduleRes?.success || !moduleRes?.data) return "";
+    const currentLangId = language ?? (locale === "ar" ? 2 : 1);
+    const translation = moduleRes.data.translations?.find((t) => t.language_id === currentLangId);
+
+    // If logo is null/empty for the current language, don't fall back – show nothing.
+    const logoPath = translation?.logo_banner_url || "";
+
+    return logoPath ? getModuleAssetUrl(logoPath) : "";
+  }, [moduleRes, language, locale]);
+
+  // Keep dropdown language in sync when global locale changes elsewhere in the app.
+  useEffect(() => {
+    setLanguage(locale === "ar" ? 2 : null);
+  }, [locale]);
+
+  const syncGlobalLocaleWithLanguage = (langId: number) => {
+    const targetLocale = langId === 2 ? "ar" : "en";
+
+    if (targetLocale !== locale) {
+      setLocaleCookie(targetLocale);
+      router.refresh();
+    }
+  };
+
 
   const updateTabIndicator = () => {
     if (!tabIndicatorRef.current || !tabsContainerRef.current) return;
@@ -861,6 +891,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                   className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
                                   onClick={() => {
                                     setLanguage(lang.id);
+                                    syncGlobalLocaleWithLanguage(lang.id);
                                     setShowLanguageDropdown(false);
                                   }}
                                 >
@@ -913,16 +944,19 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                         <div className="bg-gray-50 rounded-lg p-3 mb-6">
                           <h4 className="text-xs font-bold text-gray-900 mb-3">{t("moduleDetails.aboutModule") ?? "About The Module"}</h4>
                           {moduleInfo.description ? (
-                            <p className="text-xs text-gray-600 leading-relaxed">
-                              {moduleInfo.description}
-                            </p>
-                          ) : (
-                            <div className="space-y-2">
-                              <div className="h-3 bg-gray-200 rounded animate-pulse w-full" />
-                              <div className="h-3 bg-gray-200 rounded animate-pulse w-5/6" />
-                              <div className="h-3 bg-gray-200 rounded animate-pulse w-4/6" />
-                            </div>
-                          )}
+                            <>
+                              <p className="text-xs text-gray-600 leading-relaxed">
+                                {moduleInfo.description}
+                              </p>
+                              {isOrgUserView && moduleLogoUrl ? (
+                                <img
+                                  alt={`${moduleInfo.name} logo`}
+                                  className="mt-3 w-full h-auto max-h-40 object-cover rounded-md border border-gray-200"
+                                  src={moduleLogoUrl}
+                                />
+                              ) : null}
+                            </>
+                          ) : null}
                         </div>
 
                         <Button

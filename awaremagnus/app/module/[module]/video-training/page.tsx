@@ -377,23 +377,23 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                     <span>{moduleName}</span>
                   )}
                   <span className="text-gray-400">›</span>
-                  <span className="font-semibold text-gray-900">Motion Videos</span>
+                  <span className="font-semibold text-gray-900">{t("videoTraining.motionVideos")}</span>
                 </>
               ) : (
                 <>
                   <a className="hover:text-gray-700 transition" href="#">
-                    Awareness Library
+                    {t("videoTraining.awarenessLibrary")}
                   </a>
                   <span className="text-gray-400">›</span>
                   <a className="hover:text-gray-700 transition" href="#">
-                    System Library
+                    {t("videoTraining.systemLibrary")}
                   </a>
                   <span className="text-gray-400">›</span>
                   <a className="hover:text-gray-700 transition" href="#">
                     {moduleName}
                   </a>
                   <span className="text-gray-400">›</span>
-                  <span className="font-semibold text-gray-900">Motion Videos</span>
+                  <span className="font-semibold text-gray-900">{t("videoTraining.motionVideos")}</span>
                 </>
               )}
             </nav>
@@ -432,7 +432,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         onPlay={() => startVideoInterval(content.id)}
                         onTimeUpdate={(e) => handleVideoTimeUpdate(content.id, e.currentTarget)}
                       >
-                        Your browser does not support the video tag.
+                        {t("videoTraining.videoNotSupported")}
                       </video>
                     </div>
 
@@ -443,13 +443,13 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                           className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                           onClick={() => videoRefs.current[content.id]?.play()}
                         >
-                          Play
+                          {t("videoTraining.play")}
                         </button>
                         <button
                           className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                           onClick={() => videoRefs.current[content.id]?.pause()}
                         >
-                          Pause
+                          {t("videoTraining.pause")}
                         </button>
                         <button
                           className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
@@ -459,7 +459,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                             if (v) v.currentTime = Math.max(0, v.currentTime - 10);
                           }}
                         >
-                          Back 10s
+                          {t("videoTraining.back10s")}
                         </button>
                         <button
                           className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
@@ -470,7 +470,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                               v.currentTime = Math.min(v.duration, v.currentTime + 10);
                           }}
                         >
-                          Forward 10s
+                          {t("videoTraining.forward10s")}
                         </button>
                         <button
                           className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
@@ -483,7 +483,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                             }
                           }}
                         >
-                          Restart
+                          {t("videoTraining.restart")}
                         </button>
                         <span className="ml-1 text-sm text-gray-700">
                           {formatTime(videoProgress[content.id]?.currentTime ?? 0)} /{" "}
@@ -491,9 +491,11 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         </span>
                       </div>
                       <p className="mt-2 text-sm text-gray-700">
-                        Progress: {Math.round(videoProgress[content.id]?.watchedPercentage ?? 0)}% (
-                        {Math.floor(videoProgress[content.id]?.currentTime ?? 0)} /{" "}
-                        {Math.floor(videoProgress[content.id]?.duration ?? 0)} seconds)
+                        {t("videoTraining.progress", {
+                          percentage: Math.round(videoProgress[content.id]?.watchedPercentage ?? 0),
+                          current: Math.floor(videoProgress[content.id]?.currentTime ?? 0),
+                          total: Math.floor(videoProgress[content.id]?.duration ?? 0),
+                        })}
                       </p>
                       <div className="mt-2">
                         <button
@@ -516,18 +518,17 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                             lastSentPercentRef.current[content.id] = pct;
                           }}
                         >
-                          Send Progress Now
+                          {t("videoTraining.sendProgress")}
                         </button>
                       </div>
                     </div>
 
                     <div className="p-4 border-b border-gray-100">
                       <h4 className="text-base font-semibold mb-1">
-                        {content.name || `${moduleName} Motion Video ${index + 1}`}
+                        {content.name || t("videoTraining.defaultTitle", { moduleName, index: index + 1 })}
                       </h4>
                       <p className="text-xs text-gray-500">
-                        {content.description ||
-                          `Learn about ${moduleName.toLowerCase()} best practices and protocols`}
+                        {content.description || t("videoTraining.defaultDescription", { moduleName })}
                       </p>
                     </div>
 
@@ -559,7 +560,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                             >
                               <polygon points="5 3 19 12 5 21 5 3" />
                             </svg>
-                            Open Full Screen
+                            {t("videoTraining.openFullScreen")}
                           </a>
                         </div>
                       ) : null;
@@ -568,7 +569,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                 ))
               ) : (
                 <div className="flex items-center justify-center h-64">
-                  <p className="text-gray-500">No motion video content found for this module.</p>
+                  <p className="text-gray-500">{t("videoTraining.noContent")}</p>
                 </div>
               )}
             </div>
