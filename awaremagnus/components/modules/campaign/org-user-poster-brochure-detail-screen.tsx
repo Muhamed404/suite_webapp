@@ -60,8 +60,8 @@ function formatDate(dateStr: string | undefined): string {
   }
 }
 
-function formatDuration(minutes: number | undefined): string {
-  if (minutes == null || minutes <= 0) return "20 to 60 minutes";
+function formatDuration(minutes: number | undefined, t: (key: string) => string | undefined): string {
+  if (minutes == null || minutes <= 0) return t("library.durationFallback") ?? "20 to 60 minutes";
   if (minutes < 60) return `${minutes} min`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -414,7 +414,7 @@ export function OrgUserPosterBrochureDetailScreen({
                           <circle cx="12" cy="12" r="10" />
                           <polyline points="12 6 12 12 16 14" />
                         </svg>
-                        {formatDuration(content.duration)}
+                        {formatDuration(content.duration, t)}
                       </span>
 
                       {/* Date */}
@@ -522,7 +522,9 @@ export function OrgUserPosterBrochureDetailScreen({
                           >
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
-                          {completeContentMutation.isPending ? "Marking..." : "Mark as Done"}
+                          {completeContentMutation.isPending
+                            ? t("library.markingAsCompleted") ?? "Marking..."
+                            : t("library.markAsCompleted") ?? "Mark as Done"}
                         </button>
                       )}
                     </div>

@@ -11,6 +11,7 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
+import { setLocaleCookie } from "@/i18n/client-locale";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useContentsWithProgress, useModule, useModules } from "@/hooks/useQuiz";
 import { campaignService } from "@/services/campaignService";
@@ -18,12 +19,16 @@ import { awmClient, API_BASE } from "@/services/httpClient";
 import { isOrgUser } from "@/utils/roles";
 import { quizService } from "@/services/quizService";
 import { SUPPORTED_LANGUAGES, LANGUAGE_COUNTRY_CODES } from "@/utils/supportedLanguages";
+import { getModuleAssetUrl } from "@/utils/contentAssetUrl";
 
 export default function PhysicalSecurityPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
-  const moduleName = module.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase()); // Convert slug to title
+  const { locale, dir } = useI18n();
   const t = useTranslations("module");
-  const { dir } = useI18n();
+  const slugDerivedName = useMemo(
+    () => module.replace(/-/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase()),
+    [module]
+  );
   const isRtl = dir === "rtl";
   const { user } = useAuthStore();
   const router = useRouter();
@@ -32,7 +37,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "completed">("all");
   // track selected language by supported language id (see utils/supportedLanguages); null = All Languages
-  const [language, setLanguage] = useState<number | null>(null);
+  const [language, setLanguage] = useState<number | null>(locale === "ar" ? 2 : null);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 5;
@@ -49,13 +54,14 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   // Get module ID from slug
   const { data: modulesRes } = useModules({ filter: module });
+
   const moduleId = useMemo<number | null>(() => {
     if (modulesRes?.success && modulesRes.data) {
       const found = modulesRes.data.find((m) => {
         const codeMatch = m.code?.toLowerCase() === module.toLowerCase();
-        const titleMatch = m.title?.toLowerCase() === moduleName.toLowerCase();
+        const titleMatch = m.title?.toLowerCase() === slugDerivedName.toLowerCase();
         const translationMatch = m.translations?.some(
-          (t) => t.name.toLowerCase() === moduleName.toLowerCase()
+          (t) => t.name.toLowerCase() === slugDerivedName.toLowerCase()
         );
 
         return codeMatch || titleMatch || translationMatch;
@@ -65,7 +71,29 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     }
 
     return null; // Not yet resolved — prevents premature API calls with wrong default ID
-  }, [modulesRes, module, moduleName]);
+  }, [modulesRes, module, slugDerivedName]);
+
+  // Get module basic info
+  const { data: moduleRes } = useModule(moduleId ?? 1, !!moduleId);
+
+  const { moduleName, moduleDescription } = useMemo(() => {
+    let name = slugDerivedName;
+    let description = moduleRes?.data?.description || "";
+
+    if (moduleRes?.success && moduleRes.data?.translations?.length) {
+      // Prioritize the dropdown language if selected, otherwise use the global locale
+      const currentLangId = language ?? (locale === "ar" ? 2 : 1);
+      const translations = moduleRes.data.translations;
+      const primaryTranslation = translations.find((t) => t.language_id === currentLangId);
+      const fallbackTranslation = translations[0];
+      const source = primaryTranslation ?? fallbackTranslation;
+
+      if (source?.name) name = source.name;
+      if (source?.description) description = source.description;
+    }
+
+    return { moduleName: name, moduleDescription: description };
+  }, [moduleRes, locale, language, slugDerivedName]);
 
   const roleId = user?.role_id;
   const isOrgUserView = isOrgUser(roleId);
@@ -184,8 +212,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     }
   );
 
-  // Get module basic info
-  const { data: moduleRes } = useModule(moduleId ?? 1, !!moduleId);
+  // moduleRes is already fetched above
 
   // Transform API data to items format
   const items = useMemo(() => {
@@ -485,20 +512,36 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   // Get module info from API
   const moduleInfo = useMemo(() => {
-    if (!contentsWithProgressRes?.success) {
-      return {
-        name: moduleName,
-        description: moduleRes?.data?.description || "",
-      };
-    }
-
-    const data = contentsWithProgressRes.data;
-
     return {
-      name: data.module_name || moduleName,
-      description: data.module_description || moduleRes?.data?.description || "",
+      name: moduleName,
+      description: moduleDescription,
     };
-  }, [contentsWithProgressRes, moduleName, moduleRes]);
+  }, [moduleName, moduleDescription]);
+
+  const moduleLogoUrl = useMemo(() => {
+    if (!moduleRes?.success || !moduleRes?.data) return "";
+    const currentLangId = language ?? (locale === "ar" ? 2 : 1);
+    const translation = moduleRes.data.translations?.find((t) => t.language_id === currentLangId);
+
+    // If logo is null/empty for the current language, don't fall back – show nothing.
+    const logoPath = translation?.logo_banner_url || "";
+
+    return logoPath ? getModuleAssetUrl(logoPath) : "";
+  }, [moduleRes, language, locale]);
+
+  // Keep dropdown language in sync when global locale changes elsewhere in the app.
+  useEffect(() => {
+    setLanguage(locale === "ar" ? 2 : null);
+  }, [locale]);
+
+  const syncGlobalLocaleWithLanguage = (langId: number) => {
+    const targetLocale = langId === 2 ? "ar" : "en";
+
+    if (targetLocale !== locale) {
+      setLocaleCookie(targetLocale);
+      router.refresh();
+    }
+  };
 
 
   const updateTabIndicator = () => {
@@ -700,11 +743,11 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                     ) : (
                       <>
                         <Link className="hover:text-gray-700 transition" href="#">
-                          Awareness Campaign
+                          {t("moduleDetails.breadcrumbAwarenessCampaign") ?? "Awareness Campaign"}
                         </Link>
                         <ChevronRight className="w-3 h-3" />
                         <Link className="hover:text-gray-700 transition" href="#">
-                          Campaign 123
+                          {t("moduleDetails.breadcrumbCampaign") ?? "Campaign"} {campaignId}
                         </Link>
                         <ChevronRight className="w-3 h-3" />
                         <span className="font-semibold text-gray-900">{moduleName}</span>
@@ -738,7 +781,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                           setCurrentPage(1);
                         }}
                       >
-                        All{" "}
+                        {t("moduleDetails.tabAll") ?? "All"}{" "}
                         <span className="tab-count w-5 h-5 rounded-full bg-white/30 text-white text-[10px] font-bold flex items-center justify-center transition-all duration-200">
                           {tabCounts.all}
                         </span>
@@ -751,7 +794,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                           setCurrentPage(1);
                         }}
                       >
-                        Pending{" "}
+                        {t("moduleDetails.tabPending") ?? "Pending"}{" "}
                         <span className="tab-count w-5 h-5 rounded-full bg-green-100 text-green-400 text-[10px] font-bold flex items-center justify-center transition-all duration-200">
                           {tabCounts.pending}
                         </span>
@@ -764,7 +807,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                           setCurrentPage(1);
                         }}
                       >
-                        Completed{" "}
+                        {t("moduleDetails.tabCompleted") ?? "Completed"}{" "}
                         <span className="tab-count w-5 h-5 rounded-full bg-green-100 text-green-400 text-[10px] font-bold flex items-center justify-center transition-all duration-200">
                           {tabCounts.completed}
                         </span>
@@ -781,7 +824,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                         <input
                           className="datatable-input w-full pr-4 py-2 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-9 placeholder-gray-400"
                           id="searchInput"
-                          placeholder="Search Content..."
+                          placeholder={t("moduleDetails.searchPlaceholderContent") ?? "Search Content..."}
                           style={{ paddingLeft: "40px" }}
                           type="text"
                           value={searchQuery}
@@ -802,7 +845,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                             if (language === null) {
                               return (
                                 <span className="flex items-center gap-1">
-                                  <span>All Languages</span>
+                                  <span>{t("moduleDetails.allLanguages") ?? "All Languages"}</span>
                                 </span>
                               );
                             }
@@ -812,7 +855,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                               <>
                                 <span className="flex items-center gap-1">
                                   <span className={`fi fi-${code} rounded-full`} />
-                                  <span>{sel?.name || "Language"}</span>
+                                  <span>{sel?.name || (t("moduleDetails.languageLabel") ?? "Language")}</span>
                                 </span>
                               </>
                             );
@@ -838,7 +881,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                 setShowLanguageDropdown(false);
                               }}
                             >
-                              <span>All Languages</span>
+                              <span>{t("moduleDetails.allLanguages") ?? "All Languages"}</span>
                             </button>
                             {SUPPORTED_LANGUAGES.map((lang) => {
                               const code = LANGUAGE_COUNTRY_CODES[lang.id].toLowerCase();
@@ -848,6 +891,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                   className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
                                   onClick={() => {
                                     setLanguage(lang.id);
+                                    syncGlobalLocaleWithLanguage(lang.id);
                                     setShowLanguageDropdown(false);
                                   }}
                                 >
@@ -867,7 +911,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                     <div className="col-span-3 flex flex-col gap-4 justify-between bg-white rounded-2xl p-4 h-full">
                       <div>
                         <h2 className="text-sm font-semibold text-gray-900 mb-3">
-                          🎉 Welcome to the
+                          🎉 {t("moduleDetails.welcomeText") ?? "Welcome to the"}
                         </h2>
                         <h3 className="text-2xl font-bold text-gray-900 mb-6">{moduleInfo.name}</h3>
                         <div className="mb-6">
@@ -882,7 +926,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                             </div>
                           </div>
                           <div className="flex w-full justify-between items-center">
-                            <p className="text-[10px] text-gray-500">Progress</p>
+                            <p className="text-[10px] text-gray-500">{t("moduleDetails.progress") ?? "Progress"}</p>
                             <p className="text-[10px] text-gray-700 font-semibold">
                               {overallProgress}%
                             </p>
@@ -891,26 +935,28 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
                         <div className="">
                           <p className="text-xs text-gray-600">
-                            To complete this module you need to complete interactive lesson, than
-                            quizzes to complete 100%
+                            {t("moduleDetails.progressHint") ?? "To complete this module you need to complete interactive lesson, than quizzes to complete 100%"}
                           </p>
                         </div>
                       </div>
 
                       <div>
                         <div className="bg-gray-50 rounded-lg p-3 mb-6">
-                          <h4 className="text-xs font-bold text-gray-900 mb-3">About The Module</h4>
+                          <h4 className="text-xs font-bold text-gray-900 mb-3">{t("moduleDetails.aboutModule") ?? "About The Module"}</h4>
                           {moduleInfo.description ? (
-                            <p className="text-xs text-gray-600 leading-relaxed">
-                              {moduleInfo.description}
-                            </p>
-                          ) : (
-                            <div className="space-y-2">
-                              <div className="h-3 bg-gray-200 rounded animate-pulse w-full" />
-                              <div className="h-3 bg-gray-200 rounded animate-pulse w-5/6" />
-                              <div className="h-3 bg-gray-200 rounded animate-pulse w-4/6" />
-                            </div>
-                          )}
+                            <>
+                              <p className="text-xs text-gray-600 leading-relaxed">
+                                {moduleInfo.description}
+                              </p>
+                              {isOrgUserView && moduleLogoUrl ? (
+                                <img
+                                  alt={`${moduleInfo.name} logo`}
+                                  className="mt-3 w-full h-auto max-h-40 object-cover rounded-md border border-gray-200"
+                                  src={moduleLogoUrl}
+                                />
+                              ) : null}
+                            </>
+                          ) : null}
                         </div>
 
                         <Button
@@ -976,22 +1022,29 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                 .join(" ")
                             : "";
 
+                          let statusLabel = displayStatus;
+                          if (item.status === "completed") statusLabel = t("moduleDetails.completed") ?? "Completed";
+                          else if (item.status === "passed") statusLabel = t("moduleDetails.passed") ?? "Passed";
+                          else if (item.status === "failed") statusLabel = t("moduleDetails.failed") ?? "Failed";
+                          else if (!item.status || item.status === "pending" || item.status === "in_progress" || item.status === "in progress")
+                            statusLabel = t("moduleDetails.pending") ?? "Pending";
+
                           const statusBadge =
                             item.status === "loading" ? (
                               <span className="text-[11px] text-gray-500 bg-gray-100 px-3 py-1 rounded-full animate-pulse">
-                                Loading...
+                                {t("moduleDetails.statusLoading") ?? "Loading..."}
                               </span>
-                            ) : displayStatus === "Completed" || displayStatus === "Passed" ? (
+                            ) : item.status === "completed" || item.status === "passed" ? (
                               <span className="text-[11px] text-green-600 bg-green-100 px-3 py-1 rounded-full">
-                                {displayStatus}
+                                {statusLabel}
                               </span>
-                            ) : displayStatus === "Failed" ? (
+                            ) : item.status === "failed" ? (
                               <span className="text-[11px] text-red-600 bg-red-100 px-3 py-1 rounded-full">
-                                {displayStatus}
+                                {statusLabel}
                               </span>
                             ) : (
                               <span className="text-[11px] text-amber-600 bg-amber-100 px-3 py-1 rounded-full">
-                                {displayStatus || "Pending"}
+                                {statusLabel}
                               </span>
                             );
 
@@ -1013,7 +1066,9 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                     </h3>
                                   </div>
                                   <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 mb-3">
-                                    <span>Created {item.date} &nbsp; &nbsp;·</span>
+                                    <span>
+                                      {t("moduleDetails.createdLabel", { date: item.date }) ?? `Created ${item.date}`} &nbsp; &nbsp;·
+                                    </span>
                                     {langChips}
                                   </div>
                                   <p className="text-xs text-gray-600">
@@ -1200,7 +1255,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                     }
                                   }}
                                 >
-                                  Start
+                                  {t("moduleDetails.start") ?? "Start"}
                                 </button>
                               </div>
                             </div>
@@ -1208,10 +1263,13 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                         })}
                       </div>
                       <div className="mt-4 flex items-center justify-between">
-                        <p className="text-xs text-gray-600">
-                          Showing {(currentPage - 1) * rowsPerPage + 1}–
-                          {Math.min(currentPage * rowsPerPage, filteredItems.length)} of{" "}
-                          {filteredItems.length} Entries
+                         <p className="text-xs text-gray-600">
+                          {t("moduleDetails.showingEntries", {
+                            from: (currentPage - 1) * rowsPerPage + 1,
+                            to: Math.min(currentPage * rowsPerPage, filteredItems.length),
+                            total: filteredItems.length,
+                          }) ??
+                            `Showing ${(currentPage - 1) * rowsPerPage + 1}–${Math.min(currentPage * rowsPerPage, filteredItems.length)} of ${filteredItems.length} Entries`}
                         </p>
                         <div className="flex items-center gap-1">
                           <button

@@ -43,7 +43,7 @@
     "description": "Try adjusting your filters or search query"
   },
   "pagination": {
-    "showing": "Showing {{start}}–{{end}} out of {{total}} Entries"
+    "showing": "Showing {start}–{end} out of {total} Entries"
   },
   "certificatesTitle": "Certifications",
   "certificatesDescription": "View and download certifications you have earned.",
@@ -163,5 +163,25 @@
     "inProgress": "In Progress",
     "completed": "Completed",
     "cancelled": "Cancelled"
+  },
+  "assignmentPage": {
+    "title": "Assignment",
+    "stats": {
+      "assignment": "Assignment",
+      "completed": "Completed",
+      "pending": "Pending",
+      "responseRate": "Response Rate",
+      "active": "Active"
+    },
+    "filter": {
+      "allCampaigns": "All Campaigns"
+    },
+    "table": {
+      "loading": "Loading campaigns..."
+    },
+    "actions": {
+      "view": "View",
+      "startModule": "Start Module"
+    }
   }
 }

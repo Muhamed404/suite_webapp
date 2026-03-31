@@ -163,5 +163,25 @@
     "inProgress": "قيد التنفيذ",
     "completed": "مكتمل",
     "cancelled": "ملغى"
+  },
+  "assignmentPage": {
+    "title": "التكليفات",
+    "stats": {
+      "assignment": "التكليف",
+      "completed": "مكتمل",
+      "pending": "قيد الانتظار",
+      "responseRate": "معدل الاستجابة",
+      "active": "نشط"
+    },
+    "filter": {
+      "allCampaigns": "جميع الحملات"
+    },
+    "table": {
+      "loading": "جاري تحميل الحملات..."
+    },
+    "actions": {
+      "view": "عرض",
+      "startModule": "بدء الوحدة"
+    }
   }
 }
