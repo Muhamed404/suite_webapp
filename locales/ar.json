@@ -288,6 +288,11 @@
 		},
 		"messages": {
 			"noActiveSubscriptionMessage": "لا يوجد لديك اشتراك نشط أو انتهت صلاحية اشتراكك. يرجى الاتصال بالمسؤول أو زيارة صفحة الاشتراك للتجديد."
+		},
+		"alerts": {
+			"alert": "تنبيه!",
+			"phishMagnusLicenseExpired": "انتهت صلاحية ترخيص PhishMagnus.",
+			"awareMagnusLicenseExpired": "انتهت صلاحية ترخيص AwareMagnus."
 		}
 	},
 	"menu": {
