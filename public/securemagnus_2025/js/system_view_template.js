@@ -161,6 +161,7 @@ let currentStep = 0;
   let history = [0];
   const formData = {};
   let selectedPhishType = null;
+  const smsStepIndex = sms_phishing_screen - 1;
 
   const stepTitles = window.i18n && window.i18n.stepTitles ? window.i18n.stepTitles : [
     'Template Details',
@@ -291,11 +292,22 @@ let currentStep = 0;
     return candidates[0];
   }
 
-  function buildActiveFlow(matchedRule) {
-    if (!matchedRule) return Array.from({ length: steps.length }, (_, i) => i);
+  function getBaseFlowForType(phishType) {
+    const fullFlow = Array.from({ length: steps.length }, (_, i) => i);
+    if (!['sms', 'whatsapp'].includes(phishType)) {
+      return fullFlow.filter(stepIndex => stepIndex !== smsStepIndex);
+    }
+    return fullFlow;
+  }
+
+  function buildActiveFlow(matchedRule, phishType) {
+    if (!matchedRule) return getBaseFlowForType(phishType);
     const goToZeroBased = matchedRule.goTo.map(n => n - 1);
     const uniq = [0, 1];
     goToZeroBased.forEach(x => { if (!uniq.includes(x)) uniq.push(x); });
+    if (!['sms', 'whatsapp'].includes(phishType)) {
+      return uniq.filter(stepIndex => stepIndex !== smsStepIndex);
+    }
     return uniq;
   }
 
@@ -377,6 +389,7 @@ let currentStep = 0;
         return;
       }
       selectedPhishType = sel;
+      activeFlow = getBaseFlowForType(selectedPhishType);
 
       if ((selectedPhishType === 'nfc' || selectedPhishType === 'qr') && emailContent) {
         emailContent.style.display = 'none';
@@ -395,7 +408,7 @@ let currentStep = 0;
         return;
       }
       const matched = computeMatchingRule(selectedPhishType, selectedOptions);
-      activeFlow = buildActiveFlow(matched);
+      activeFlow = buildActiveFlow(matched, selectedPhishType);
       const idxInFlow = activeFlow.indexOf(1);
       const nextInFlow = activeFlow[idxInFlow + 1] || steps.length - 1;
       history.push(nextInFlow);
@@ -431,6 +444,11 @@ let currentStep = 0;
   }
 
   function init() {
+    const preselectedPhishType = document.querySelector('input[name="phishType"]:checked');
+    if (preselectedPhishType) {
+      selectedPhishType = preselectedPhishType.value;
+      activeFlow = getBaseFlowForType(selectedPhishType);
+    }
     renderProgressBar();
     showStep(0);
     if (nextBtn) nextBtn.addEventListener('click', handleNext);
