@@ -5,9 +5,7 @@ import type { User } from "@/services/suiteSuiteService";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@heroui/button";
 import {
-  ArrowLeft,
   Info,
   Users,
   BookOpen,
@@ -386,28 +384,23 @@ export default function CreateCampaignPage() {
     <ProtectedRoute>
       <DashboardLayout>
         <div className={clsx("p-3", isRtl && "text-right")}>
-          <div className="flex items-center gap-2 mb-3">
-            <Button isIconOnly size="sm" variant="light" onClick={() => router.back()}>
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <nav
-              aria-label="Breadcrumb"
-              className="flex items-center text-xs text-gray-500 mb-6 gap-1.5"
+          <nav
+            aria-label="Breadcrumb"
+            className="flex flex-wrap items-center text-xs text-gray-500 mb-6 gap-1.5"
+          >
+            <Link className="hover:text-gray-700 transition" href="/dashboard/launch-awareness">
+              {tDashboard("menu.launchAwareness")}
+            </Link>
+            <span className="text-gray-400">›</span>
+            <Link
+              className="hover:text-gray-700 transition"
+              href="/dashboard/launch-awareness/campaigns"
             >
-              <Link className="hover:text-gray-700 transition" href="/dashboard/launch-awareness">
-                {tDashboard("menu.launchAwareness")}
-              </Link>
-              <span className="text-gray-400">›</span>
-              <Link
-                className="hover:text-gray-700 transition"
-                href="/dashboard/launch-awareness/campaigns"
-              >
-                {t("title")}
-              </Link>
-              <span className="text-gray-400">›</span>
-              <span className="font-semibold text-gray-900">{t("createNew")}</span>
-            </nav>
-          </div>
+              {t("title")}
+            </Link>
+            <span className="text-gray-400">›</span>
+            <span className="font-semibold text-gray-900">{t("createNew")}</span>
+          </nav>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-x-hidden">
             <div className="p-4">

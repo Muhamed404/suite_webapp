@@ -650,7 +650,7 @@ export function CreateContentForm({
                             </label>
                             <input
                               ref={quizExcelInputRef}
-                              accept=".xlsx,.xls"
+                              accept=".csv,.xlsx,.xls,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                               className="block w-full text-xs text-gray-600 file:mr-3 file:rounded-full file:border-0 file:bg-[#32B8FF] file:px-3 file:py-1.5 file:text-xs file:text-white file:cursor-pointer"
                               type="file"
                               onChange={(e) => setQuizExcelFile(e.target.files?.[0] ?? null)}

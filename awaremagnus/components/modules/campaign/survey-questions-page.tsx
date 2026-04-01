@@ -586,7 +586,7 @@ export function SurveyQuestionsPage() {
                   <label className="block w-full cursor-pointer">
                     <input
                       ref={fileInputRef}
-                      accept=".csv,.xlsx,.xls"
+                      accept=".csv,.xlsx,.xls,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                       className="hidden"
                       type="file"
                       onChange={handleCsvFileChange}
