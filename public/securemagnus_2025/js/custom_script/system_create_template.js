@@ -117,6 +117,26 @@ const customRules = [
     phishType: 'whatsapp', options: [difficulty_level_url_click],
     goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
   },
+  {
+    phishType: 'whatsapp', options: ['2'],
+    goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
+  },
+  {
+    phishType: 'whatsapp', options: [difficulty_level_sms_short_message, '2'],
+    goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
+  },
+  {
+    phishType: 'whatsapp', options: [difficulty_level_sms_short_message, difficulty_level_url_click],
+    goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
+  },
+  {
+    phishType: 'whatsapp', options: ['2', difficulty_level_url_click],
+    goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
+  },
+  {
+    phishType: 'whatsapp', options: [difficulty_level_sms_short_message, '2', difficulty_level_url_click],
+    goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
+  },
 ];
 
 

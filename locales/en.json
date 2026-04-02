@@ -115,6 +115,7 @@
 		"end_time_required": "End date and time are required.",
 		"no_departments_groups": "No departments or groups available. Please add users to departments or groups before creating a campaign.",
 		"select_department_group": "Please select at least one department or group to target.",
+		"select_at_least_one_option": "Please select at least one option.",
 		"validation_error": "Validation Error:",
 		"no_members_in_selection": "The selected departments/groups have no members. Please select departments or groups with members, or add members to the selected ones.",
 		"some_empty_selections": "Warning: Some selections have no members. The campaign will only target departments/groups with members.",
