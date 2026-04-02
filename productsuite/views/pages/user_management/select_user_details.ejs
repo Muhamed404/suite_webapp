@@ -17,17 +17,17 @@
                     <% if (typeof roles !=='undefined' && roles) { %>
                         <% 
                         const roleDisplayMap = {
-                          'Org User': 'End-user',
-                          'Sub Org User': 'Organization Sub-Admin',
-                          'Super Org User': 'Organization Superadmin'
+                          'Org User': 'End-user'
                         };
                         %>
                         <% roles.forEach(role=> { %>
+                            <% if (role.role_name !== 'Sub Org User' && role.role_name !== 'Super Org User') { %>
                             <option value="<%= role.id %>">
                                 <%= roleDisplayMap[role.role_name] || role.role_name %>
                             </option>
-                            <% }); %>
-                                <% } %>
+                            <% } %>
+                        <% }); %>
+                        <% } %>
                 </select>
             </div>
             <div>

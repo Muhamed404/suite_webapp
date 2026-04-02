@@ -277,6 +277,11 @@
 		},
 		"messages": {
 			"noActiveSubscriptionMessage": "You do not have an active subscription, or your subscription has expired. Please contact your administrator or visit the subscription page to renew."
+		},
+		"alerts": {
+			"alert": "Alert!",
+			"phishMagnusLicenseExpired": "PhishMagnus license has expired.",
+			"awareMagnusLicenseExpired": "AwareMagnus license has expired."
 		}
 	},
 	"menu": {
