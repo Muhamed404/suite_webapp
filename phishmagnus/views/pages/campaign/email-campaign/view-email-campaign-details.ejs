@@ -1,8 +1,21 @@
-<div class="flex flex-col  p-6 pt-0">
+<div class="flex flex-col p-6 pt-0">
+    <!-- Breadcrumb -->
+    <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4 mt-3">
+        <nav class="flex items-center text-sm text-gray-500 gap-2" aria-label="Breadcrumb">
+            <a href="/home" class="hover:text-gray-700 transition"><%= __('breadcrumbs.home') %></a>
+            <span class="text-gray-400">›</span>
+            <a href="/phm/campaign/reports" class="hover:text-gray-700 transition"><%= __('breadcrumbs.reports') %></a>
+            <span class="text-gray-400">›</span>
+            <a href="/phm/campaign/email/report" class="hover:text-gray-700 transition"><%= __('breadcrumbs.emailCampaignReport') %></a>
+            <span class="text-gray-400">›</span>
+            <span class="font-semibold text-gray-900"><%= campaignDetails.name || campaignDetails.campaign_name || __("campaign.email_campaign_detail.labelTitle") %></span>
+        </nav>
+        <h1 class="text-3xl font-medium text-gray-900"><%= campaignDetails.name || campaignDetails.campaign_name || __("campaign.email_campaign_detail.labelTitle") %></h1>
+    </div>
+
     <!-- first section  -->
-    <div class="flex flex-col gap-4 mt-3">
-        <!-- Title -->
-        <h1 class="text-2xl font-semibold my-2"><%= __("campaign.email_campaign_detail.labelTitle") %></h1>
+    <div class="flex flex-col gap-4">
+        <!-- Title removed (shown in breadcrumb header above) -->
 
         <!-- Top Metrics -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">

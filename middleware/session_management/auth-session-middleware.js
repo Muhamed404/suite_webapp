@@ -61,6 +61,11 @@ async function validateSessionMiddleware(req, res, next) {
         // Check if JWT is stored in session
         const userjwtToken = req.session.jwtToken;
         if (!userjwtToken) {
+            // Allow through if MFA is pending — user is mid-authentication
+            if (req.session.mfaPendingUser) {
+                logger.info('Middleware - No jwtToken but mfaPendingUser found, allowing MFA flow');
+                return next();
+            }
             logger.warn('Middleware - No JWT token found in Redis session');
             req.flash('message', 'Your session has expired. Please log in again.');
             req.flash('alertType', 'error');

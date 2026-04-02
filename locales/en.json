@@ -615,9 +615,14 @@
 		"labelSenderEmail": "Sender Email",
 		"labelDetails": "Detail",
 		"enableStartTLS": "Enable STARTTLS",
+		"enableStartTLSDesc": "Use STARTTLS to upgrade a plain connection to secure.",
 		"enableSSL": "Enable SSL",
+		"enableSSLDesc": "Use SSL/TLS for a fully encrypted connection from the start.",
 		"enableSMTPEncryption": "Enable Encryption",
-		"enablePasswordEncryption": "smtp.enablePasswordEncryption"
+		"enableSMTPEncryptionDesc": "Encrypt email messages before sending through this SMTP connection.",
+		"enablePasswordEncryption": "smtp.enablePasswordEncryption",
+		"enableMFA": "Enable MFA",
+		"enableMFADesc": "Send one-time passwords via this SMTP connection."
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "Secmagnus User Management",

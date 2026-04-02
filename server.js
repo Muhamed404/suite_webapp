@@ -112,7 +112,8 @@ app.use((req, res, next) => {
     FrontendApplicationAPI.LOGIN.PRODUCT_SUITE_DEFAULT,
     FrontendApplicationAPI.LOGIN.PHISHMAGNUS,
     FrontendApplicationAPI.LOGIN.AWAREMAGNUS,
-    FrontendApplicationAPI.LOGOUT.SIGNOUT
+    FrontendApplicationAPI.LOGOUT.SIGNOUT,
+    FrontendApplicationAPI.MFA.VERIFY
   ];
 
   // Check path without query parameters

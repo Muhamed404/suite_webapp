@@ -1,23 +1,6 @@
 
 const { logger } = require('../../logger/logger');
-const path = require('path');
 const jwt = require('jsonwebtoken');
-const ApplicationConstants = require('../../contants/application-constants');
-
-// Allowlist paths and extensions that should not require auth
-const SAFE_PATHS = new Set(['/health', '/favicon.ico', '/login', '/']);
-const SAFE_EXTS = new Set(['.ico', '.png', '.jpg', '.jpeg', '.gif', '.css', '.js', '.map']);
-
-
-function isSafe(req) {
-  if (SAFE_PATHS.has(req.path)) return true;
-  const ext = path.extname(req.path || '');
-  if (SAFE_EXTS.has(ext)) return true;
-  // static/public assets
-  if (req.path && (req.path.startsWith('/public/') || req.path.startsWith('/assets/'))) return true;
-  return false;
-}
-
 
 
 const logTxn = 'JWT Auth Middleware ';
