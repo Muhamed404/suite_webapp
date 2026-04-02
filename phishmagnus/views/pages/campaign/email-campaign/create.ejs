@@ -23,7 +23,7 @@
             class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white font-bold text-xs">
             1</div>
           <span class="font-medium step-label text-teal-700 text-sm">
-            Select Template
+            <%= __("sms.create_campaign.step1") %>
           </span>
         </div>
         <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
@@ -32,7 +32,7 @@
             class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-white border-2 border-teal-300 text-teal-400 font-bold text-xs">
             2</div>
           <span class="font-medium step-label text-gray-400 text-sm">
-            Select Department & Group
+            <%= __("sms.create_campaign.step2") %>
           </span>
         </div>
         <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
@@ -41,7 +41,7 @@
             class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-white border-2 border-teal-300 text-teal-400 font-bold text-xs">
             3</div>
           <span class="font-medium step-label text-gray-400 text-sm">
-            Select Timer
+            <%= __("sms.create_campaign.step3") %>
           </span>
         </div>
 
@@ -66,9 +66,9 @@
     <!-- Buttons -->
     <div class="flex justify-end gap-4 mt-10 p-8">
       <button id="backBtn" type="button"
-        class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition">Back</button>
+        class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition"><%= __("generic_label.back") %></button>
       <button id="nextBtn" type="submit"
-        class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition">Next</button>
+        class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition"><%= __("generic_label.next") %></button>
     </div>
 
 
@@ -81,10 +81,60 @@
   // templates & systemTemplate come from controller
   window._userTemplates = <%- JSON.stringify(templates || []) %>;
   window._systemTemplates = <%- JSON.stringify(systemTemplate || []) %>;
+  window.backendUrl = '<%= backendUrl %>';
+  window.backendTVBSUrl = '<%= backendTVBSUrl %>';
   window.i18n = {
     labels: {
       next: "<%= __('generic_label.next') %>",
-      finish: "<%= __('generic_label.Finish') %>"
+      finish: "<%= __('generic_label.Finish') %>",
+      selectTemplate: "<%= __('generic_label.select_template') %>"
+    },
+    generic_label: {
+      emailOpened: "<%= __('generic_label.emailOpened') %>",
+      linkClicked: "<%= __('generic_label.linkClicked') %>",
+      qrScanned: "<%= __('generic_label.qrScanned') %>",
+      nfcScanned: "<%= __('generic_label.nfcScanned') %>",
+      attachmentOpened: "<%= __('generic_label.attachmentOpened') %>",
+      formInteraction: "<%= __('generic_label.formInteraction') %>",
+      formSubmitted: "<%= __('generic_label.formSubmitted') %>"
+    },
+    template: {
+      tracking_header: "<%= __('template.tracking_header') %>"
+    },
+    validation: {
+      campaign_name_required: "<%= __('sms.validation_messages.campaign_name_required') %>",
+      template_required: "<%= __('sms.validation_messages.template_required') %>",
+      start_time_required: "<%= __('sms.validation_messages.start_time_required') %>",
+      end_time_required: "<%= __('sms.validation_messages.end_time_required') %>",
+      no_departments_groups: "<%= __('sms.validation_messages.no_departments_groups') %>",
+      select_department_group: "<%= __('sms.validation_messages.select_department_group') %>",
+      validation_error: "<%= __('sms.validation_messages.validation_error') %>"
+    },
+    validation_messages: {
+      campaign_name_required: "<%= __('validation_messages.campaign_name_required') %>",
+      template_required: "<%= __('validation_messages.template_required') %>",
+      start_time_required: "<%= __('validation_messages.start_time_required') %>",
+      end_time_required: "<%= __('validation_messages.end_time_required') %>",
+      no_departments_groups: "<%= __('validation_messages.no_departments_groups') %>",
+      select_department_group: "<%= __('validation_messages.select_department_group') %>",
+      validation_error: "<%= __('validation_messages.validation_error') %>",
+      no_members_in_selection: "<%= __('validation_messages.no_members_in_selection') %>",
+      some_empty_selections: "<%= __('validation_messages.some_empty_selections') %>",
+      validation_failed: "<%= __('validation_messages.validation_failed') %>"
+    },
+    sms: {
+      validation_messages: {
+        campaign_name_required: "<%= __('sms.validation_messages.campaign_name_required') %>",
+        template_required: "<%= __('sms.validation_messages.template_required') %>",
+        start_time_required: "<%= __('sms.validation_messages.start_time_required') %>",
+        end_time_required: "<%= __('sms.validation_messages.end_time_required') %>",
+        no_departments_groups: "<%= __('sms.validation_messages.no_departments_groups') %>",
+        select_department_group: "<%= __('sms.validation_messages.select_department_group') %>",
+        validation_error: "<%= __('sms.validation_messages.validation_error') %>",
+        no_members_in_selection: "<%= __('sms.validation_messages.no_members_in_selection') %>",
+        some_empty_selections: "<%= __('sms.validation_messages.some_empty_selections') %>",
+        validation_failed: "<%= __('sms.validation_messages.validation_failed') %>"
+      }
     }
   };
 </script>

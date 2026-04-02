@@ -2,7 +2,7 @@
  
 const { logger } = require("../../logger/logger");
 const enums = require("../../contants/enum");
- 
+const { getUserInfo, canAccessOrganization, logAuthResult } = require("../../utility/authorization-helper");
 
 const getApiClient = require('../../utility/api-client')
 
@@ -12,7 +12,23 @@ async function displayInvoice(req, res) {
   if (req.method === "GET") {
     const { organizationId, subscriptionId, orderId } = req.params;
     try {
-      // const result = await commons.validateUserAndOrganization(req);
+      const orgIdNum = parseInt(organizationId, 10);
+      if (isNaN(orgIdNum)) {
+        logger.warn(`[Display Invoice]: Invalid organizationId: ${organizationId}`);
+        const errMessage = "Invalid organization ID";
+        return res.redirect(`/phm/index?message=${errMessage}&alertType=error`);
+      }
+
+      const userInfo = getUserInfo(req);
+      const authResult = canAccessOrganization(userInfo, orgIdNum, enums.ModuleNames.Subscription_History);
+      logAuthResult('View Invoice', userInfo, authResult, organizationId);
+
+      if (!authResult.allowed) {
+        logger.warn(`[Display Invoice]: User ${userInfo.userId} attempted unauthorized access to organization ${organizationId}'s invoice - Reason: ${authResult.reason}`);
+        const errMessage = "Unauthorized: You do not have permission to view this invoice";
+        return res.redirect(`/home?message=${errMessage}&alertType=error`);
+      }
+
       logger.info(
         `INVOICE PARAMETERS org ${organizationId}, subscription ${subscriptionId}, order ${orderId}`
       );
@@ -33,13 +49,14 @@ async function displayInvoice(req, res) {
 }
 
 async function updateInvoice(req, res) {
+  let orgId;
   try {
     //let organizationId = req.user.organization_id;
     logger.info('Request has received in update invoice')
     logger.info(JSON.stringify(req.body))
     let orderId = req.body.order;
     let subscriptionId = req.body.subscription;
-    let orgId = req.body.org;
+    orgId = req.body.org;
 
     if (
       subscriptionId === null ||
@@ -62,16 +79,16 @@ async function updateInvoice(req, res) {
     let message = data.message;
     let alertType = data.alertType;
     logger.info(`Response in update invoice : ${message} ${alertType}`);
-    res.redirect(
-      `/organization/?message=${message}&alertType=${alertType}`
-    );
     // res.redirect(
-    //   `/organization/profile/${orgId}?message=${message}&alertType=${alertType}`
+    //   `/organization/?message=${message}&alertType=${alertType}`
     // );
+    res.redirect(
+      `/organization/profile/${orgId}?message=${message}&alertType=${alertType}`
+    );
   } catch (error) {
     logger.error(`Exception in updateInvoice \n` + error);
     const errMessage = "Error in Request, Contact Administrator";
-    res.redirect(`/phm/index?message=${errMessage}&alertType=error`);
+    res.redirect(`/organization/profile/${orgId}?message=${errMessage}&alertType=error`);
   }
 }
 

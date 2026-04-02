@@ -31,11 +31,9 @@ function initSingleTagSelector(container) {
 
   const fieldFromData = container.dataset?.field?.trim() || null;
   const fieldFromSelectName = select?.name?.replace(/\[\]$/, '').trim() || null;
-  const labelText = container.querySelector('label')?.textContent?.toLowerCase() || '';
-  const inferredField = labelText.includes('department') ? 'department' : 
-                       (labelText.includes('group') ? 'group' : 'field');
-
-  const logicalField = fieldFromData || fieldFromSelectName || inferredField;
+  
+  // Use data-field attribute as the primary source for field identification
+  const logicalField = fieldFromData || fieldFromSelectName || 'field';
   let hiddenContainer = container.querySelector('.hidden-inputs');
 
   if (!hiddenContainer) {
@@ -204,7 +202,7 @@ function updateStep(newStep) {
     backBtn.classList.toggle("bg-gray-300", currentStep === 0);
     backBtn.classList.toggle("bg-teal-500", currentStep !== 0);
     backBtn.classList.toggle("text-white", currentStep !== 0);
-    nextBtn.textContent = currentStep === steps.length - 1 ? "Finish" : "Next";
+    nextBtn.textContent = currentStep === steps.length - 1 ? (window.i18n?.labels?.finish || 'Finish') : (window.i18n?.labels?.next || 'Next');
 
     // Trigger validation check when step changes
     if (window.jQuery && typeof window.validateFormAndToggleSubmit === 'function') {
@@ -235,7 +233,11 @@ nextBtn.addEventListener("click", (e) => {
   }
 
   if (currentStep < steps.length - 1) {
-    updateStep(currentStep + 1);
+    const newStep = currentStep + 1;
+    updateStep(newStep);
+    if (window.onStepChange && typeof window.onStepChange === 'function') {
+      window.onStepChange(newStep);
+    }
   } else {
     // On last step, validate entire form before submit
     if (mainForm && window.jQuery && typeof jQuery === "function" && typeof jQuery(mainForm).valid === "function") {

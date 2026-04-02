@@ -5,12 +5,12 @@
       <span class="text-gray-400">›</span>
       <span class="font-semibold text-gray-900"><%= __("breadcrumbs.allCampaigns") %></span>
     </nav>
-    <h3 class="text-3xl font-medium text-gray-900">All Campaigns</h3>
+    <h3 class="text-3xl font-medium text-gray-900"><%= __("breadcrumbs.allCampaigns") %></h3>
   </div>
   <div class="flex items-center justify-between">
     <div>
-      <p class="text-sm uppercase tracking-wider text-gray-400 mb-2">Campaign Center</p>
-      <p class="text-sm text-gray-500 mt-1">Track every phishing touchpoint from a single view.</p>
+      <p class="text-sm uppercase tracking-wider text-gray-400 mb-2"><%= __("all_campaigns.campaignCenter") %></p>
+      <p class="text-sm text-gray-500 mt-1"><%= __("all_campaigns.campaignCenterDescription") %></p>
     </div>
     <div class="p-0 text-sm">
       <ul class="flex items-center gap-2">
@@ -18,7 +18,7 @@
           <a id="openModal"
             class="flex items-center justify-center gap-3 px-6 max-sm:px-3 py-3 rounded-full bg-[var(--teal)] text-white border border-transparent transition-all duration-300 hover:bg-[var(--mainblue)] hover:border-[var(--mainblue)] cursor-pointer">
             <img src="/securemagnus_2025/images/img/add.svg" class="size-5" alt="">
-            <p class="md:flex hidden">New Campaign</p>
+            <p class="md:flex hidden"><%= __("dashboard.newCampaign") %></p>
           </a>
         <% } %>
       </ul>
@@ -32,31 +32,31 @@
       <button id="closeModal" class="absolute top-3 right-3 text-gray-500 hover:text-black text-xl">
         <img src="/securemagnus_2025/images/img/close.svg" alt="">
       </button>
-      <h2 class="text-xl text-center font-semibold mb-4">Create New Campaign</h2>
+      <h2 class="text-xl text-center font-semibold mb-4"><%= __("dashboard.createNewCampaign") %></h2>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mx-6 md:mx-0">
         <a href="/phm/campaign/email" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
           <img src="/securemagnus_2025/images/img/c-mail.svg" class="size-20" alt="">
-          Email
+          <%= __("menu.phishmagnus.campaignEmail") %>
         </a>
-        <a href="#" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+        <a href="/phm/campaign/sms/create" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
           <img src="/securemagnus_2025/images/img/c-sms.svg" class="size-20" alt="">
-          SMS
+          <%= __("menu.phishmagnus.campaignSMS") %>
         </a>
-        <a href="#" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+        <a href="/phm/campaign/usb/" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
           <img src="/securemagnus_2025/images/img/c-usb.svg" class="size-20" alt="">
-          USB
+          <%= __("menu.phishmagnus.campaignUSB") %>
         </a>
         <a href="/phm/campaign/nfc/create" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
           <img src="/securemagnus_2025/images/img/c-nfc.svg" class="size-20" alt="">
-          NFC
+          <%= __("menu.phishmagnus.campaignNFC") %>
         </a>
         <a href="/phm/campaign/qr/create" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
           <img src="/securemagnus_2025/images/img/c-qr.svg" class="size-20" alt="">
-          QR
+          <%= __("menu.phishmagnus.campaignQR") %>
         </a>
-        <a href="#" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+        <a href="/phm/campaign/whatsapp/create" class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
           <img src="/securemagnus_2025/images/img/c-wp.svg" class="size-20" alt="">
-          WhatsApp
+          <%= __("menu.phishmagnus.campaignWhatsapp") %>
         </a>
       </div>
     </div>
@@ -70,15 +70,17 @@
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div class="relative">
-        <input id="searchInput" type="text" placeholder="Search campaigns..."
-          class="pl-12 pr-10 py-3 w-[260px] sm:w-[320px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-        <img src="/securemagnus_2025/images/img/search.svg"
-          class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-4 top-1/2" alt="Search icon">
+        <input id="searchInput" type="text" placeholder="<%= __("all_campaigns.searchCampaigns") %>"
+          class="pl-10 pr-10 py-3 w-[240px] sm:w-[300px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+        <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+          <img src="/securemagnus_2025/images/img/search.svg"
+            class="w-5 h-5 text-gray-400" alt="Search icon">
+        </div>
       </div>
 
       <select id="filterType"
-        class="px-4 py-2 rounded-full border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-        <option value="all">All Types</option>
+        class="px-6 py-3 rounded-full border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+        <option value="all"><%= __("all_campaigns.allTypes") %></option>
         <% typeOptions.forEach(type => { %>
           <option value="<%= type.key %>"><%= type.label %></option>
         <% }) %>
@@ -90,14 +92,14 @@
     <table class="min-w-full text-sm text-left">
       <thead class="bg-[#FAFBFC]">
         <tr>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Campaign</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Type</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Template</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Start Date</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">End Date</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Status</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Total Targets</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap text-right">Action</th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap" data-sort="name"><%= __("all_campaigns.campaignHeader") %></th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap" data-sort="typeLabel"><%= __("all_campaigns.typeHeader") %></th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap" data-sort="templateName"><%= __("all_campaigns.templateHeader") %></th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap" data-sort="startDate"><%= __("generic_label.start_date") %></th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap" data-sort="endDate"><%= __("generic_label.end_date") %></th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap" data-sort="status"><%= __("generic_label.status") %></th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap" data-sort="totalTargets"><%= __("all_campaigns.totalTargetsHeader") %></th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap text-right"><%= __("generic_label.action") %></th>
         </tr>
       </thead>
       <tbody id="tableBody"></tbody>
@@ -106,8 +108,8 @@
 
   <div class="flex flex-col gap-3 mt-4 sm:flex-row sm:items-center sm:justify-between">
     <div class="flex items-center gap-2 text-sm">
-      <span class="text-gray-500">Rows per page:</span>
-      <select id="rowsPerPage" class="px-2 py-1 border rounded">
+      <span class="text-gray-500"><%= __("all_campaigns.rowsPerPage") %></span>
+      <select id="rowsPerPage" class="<%= locale === 'ar' ? 'pr-2 pl-8' : 'pl-2 pr-8' %> py-1 border rounded">
         <option value="5">5</option>
         <option value="10" selected>10</option>
         <option value="20">20</option>
@@ -128,10 +130,21 @@
     if (dataEl) {
       window.allCampaignsData = {
         campaigns: JSON.parse(dataEl.getAttribute('data-campaigns') || '[]'),
-        typeOptions: JSON.parse(dataEl.getAttribute('data-type-options') || '[]')
+        typeOptions: JSON.parse(dataEl.getAttribute('data-type-options') || '[]'),
+        translations: {
+          noCampaignsFound: "<%= __("all_campaigns.noCampaignsFound") %>",
+          createFirstCampaign: "<%= __("all_campaigns.createFirstCampaign") %>",
+          filterAll: "<%= __("all_campaigns.filterAll") %>",
+          filterActive: "<%= __("all_campaigns.filterActive") %>",
+          filterScheduled: "<%= __("all_campaigns.filterScheduled") %>",
+          filterCompleted: "<%= __("all_campaigns.filterCompleted") %>",
+          filterDraft: "<%= __("all_campaigns.filterDraft") %>",
+          viewDetails: "<%= __("all_campaigns.viewDetails") %>",
+          showingResults: "<%= __("all_campaigns.showingResults") %>"
+        }
       };
     } else {
-      window.allCampaignsData = { campaigns: [], typeOptions: [] };
+      window.allCampaignsData = { campaigns: [], typeOptions: [], translations: {} };
     }
   })();
 </script>

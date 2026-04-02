@@ -9,6 +9,11 @@ module.exports = {
         PRODUCT_DASHBOARD: 'pages/dashboard/phm_product_dashboard',
         LOGIN: 'pages/login/phm_login',
         LOGOUT: '/logout',
+        SMTP_PHISHING: {
+            LIST: 'pages/settings/smtp/phishing/list-phishing-smtp',
+            CREATE: 'pages/settings/smtp/phishing/create-phishing-smtp',
+            EDIT: 'pages/settings/smtp/phishing/edit-phishing-smtp',
+        },
         Campaign: {
             NFC: {
                 CREATE: 'pages/campaign/nfc-campaign/createNFCCampaign',
@@ -54,6 +59,10 @@ module.exports = {
             },
             Reports: {
                 ALL_REPORTS: 'pages/campaign/reports/all-reports',
+            },
+            ReportedEmails: {
+                LIST: 'pages/campaign/reported-emails/reported-emails-list',
+                DETAIL: 'pages/campaign/reported-emails/reported-email-detail',
             }
         },
         System_Template: {
@@ -74,6 +83,9 @@ module.exports = {
         LOGIN: 'pages/login/psm_login',
         LOGOUT: '/logout',
         Home: `pages/product_suite_management/suite_management`,
+        Domain_Management:{
+            Render_List_DMS : 'pages/organization/domain_management/list-domain-management',
+        },
         Service_Registry: {
             CREATE: 'pages/service_registry/create_service_registry',
             LIST: 'pages/service_registry/service_registry_list',

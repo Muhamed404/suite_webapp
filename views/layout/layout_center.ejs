@@ -5,7 +5,7 @@
 <% if (typeof enableSuiteManagementLeftMenu !== 'undefined' && enableSuiteManagementLeftMenu) { %>
     <div class="flex-1 flex flex-col h-[98vh]  max-sm:h-full bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-3xl"> 
 <% } else { %>
-            <div class="flex-1 flex flex-col h-[98vh]  max-sm:h-full bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-r-3xl">
+            <div class="flex-1 flex flex-col h-[98vh]  max-sm:h-full bg-[#F1F5F8] lg:m-2 <%= locale === 'ar' ? 'lg:mr-0 lg:rounded-l-3xl' : 'lg:ml-0 lg:rounded-r-3xl' %> overflow-hidden">
 
 <% } %>
 
@@ -18,10 +18,32 @@
 <% if (toastMessage) { %>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Use EJS escaping for message and alertType to prevent XSS
+      let message = '<%- toastMessage.replace(/'/g, "&#39;").replace(/\"/g, "&quot;") %>';
+      <% if (locale === 'ar') { %>
+        const translations = {
+          'Package deleted successfully': 'تم حذف الباقة بنجاح',
+          'User deleted successfully': 'تم حذف المستخدم بنجاح',
+          'User created successfully': 'تم إنشاء المستخدم بنجاح',
+          'Success': 'نجاح',
+          'Success!': 'نجاح!',
+          '!Success': '!نجاح',
+          'Delete Successfully': 'تم الحذف بنجاح',
+          'Successfully': 'بنجاح',
+          'Campaign launch has been initiated': 'تم بدء إطلاق الحملة',
+          'Campaign Launch has been initiated': 'تم بدء إطلاق الحملة',
+          'Campaign has been initiated': 'تم بدء الحملة',
+          'campaign has been initiated': 'تم بدء الحملة',
+          'Campaign has been initated': 'تم بدء الحملة',
+          'Campaign has been initiated.': 'تم بدء الحملة.',
+          'QR Campaign created successfully': 'تم إنشاء حملة QR بنجاح'
+        };
+        for (const [en, ar] of Object.entries(translations)) {
+          message = message.replace(en, ar);
+        }
+      <% } %>
       showCustomToast(
         '<%- toastAlertType.replace(/'/g, "&#39;") %>',
-        '<%- toastMessage.replace(/'/g, "&#39;").replace(/\"/g, "&quot;") %>'
+        message
       );
     });
   </script>
@@ -29,7 +51,7 @@
    
 
             <!-- Main Scrollable Content -->
-            <main class="flex-1 overflow-y-auto">
+            <main class="flex-1 overflow-y-auto px-6">
 
             <!-- In layout_center.ejs, replace line 28: -->
           <% if (typeof username !== 'undefined' && username) { %>

@@ -1,9 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= locale || 'en' %>" dir="<%= (locale || 'en') === 'ar' ? 'rtl' : 'ltr' %>" translate="no" class="notranslate">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <meta name="googlebot" content="notranslate">
   <title>Secure Magnus</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,12 +17,63 @@
   <!-- <script src="js/tailwind_3.js"></script> -->
   <script src="/securemagnus_2025/js/tailwind_3.js"></script>
 
+  <script>
+    (function () {
+      function hideTranslateUi() {
+        var selectors = [
+          '.goog-te-banner-frame',
+          'iframe.goog-te-banner-frame',
+          '.goog-te-menu-frame',
+          'iframe.goog-te-menu-frame',
+          '.VIpgJd-ZVi9od-ORHb-OEVmcd',
+          '.VIpgJd-ZVi9od-l4eHX-hSRGPd',
+          '.VIpgJd-yAWNEb-L7lbkb',
+          '.VIpgJd-ZVi9od-aZ2wEe-wOHMyf',
+          '.VIpgJd-ZVi9od-aZ2wEe-OiiCO',
+          '#goog-gt-tt',
+          '.goog-tooltip',
+          '.goog-text-highlight'
+        ];
+
+        selectors.forEach(function (selector) {
+          document.querySelectorAll(selector).forEach(function (node) {
+            node.style.setProperty('display', 'none', 'important');
+            node.style.setProperty('visibility', 'hidden', 'important');
+          });
+        });
+
+        if (document.documentElement) {
+          document.documentElement.setAttribute('translate', 'no');
+          document.documentElement.classList.add('notranslate');
+          document.documentElement.style.setProperty('top', '0px', 'important');
+        }
+
+        if (document.body) {
+          document.body.setAttribute('translate', 'no');
+          document.body.classList.add('notranslate');
+          document.body.style.setProperty('top', '0px', 'important');
+        }
+      }
+
+      hideTranslateUi();
+      document.addEventListener('DOMContentLoaded', hideTranslateUi);
+      window.addEventListener('load', hideTranslateUi);
+      if (typeof MutationObserver !== 'undefined' && document.documentElement) {
+        var observer = new MutationObserver(hideTranslateUi);
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+      }
+      setTimeout(hideTranslateUi, 500);
+      setTimeout(hideTranslateUi, 1500);
+      setInterval(hideTranslateUi, 3000);
+    })();
+  </script>
+
   <link rel="stylesheet" href="/securemagnus_2025/css/style.css">
 
 
 </head>
 
-<body class="bg-white">
+<body class="bg-white notranslate" translate="no">
 
 
   <div class="grid grid-cols-12 min-h-screen">
@@ -49,7 +102,7 @@
       <div class="flex items-center justify-center">
         <div class="flex flex-col max-w-2xl items-stretch ">
 
-          <h3 class="text-center text-4xl font-semibold md:mt-12 lg:mt-24">Welcome to PhishMagnus</h3>
+          <h3 class="text-center text-4xl font-semibold md:mt-12 lg:mt-24"><%= __('generic_label.welcomeToPhishMagnus') %></h3>
 
           <!-- Alert Message -->
           <% if (locals.message) { %>
@@ -65,7 +118,7 @@
 
               <label
                 class="flex items-center w-full p-5 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--teal)] transition-colors duration-300">
-                <input type="email" placeholder="Email Address" name="email" id="email"
+                <input type="email" placeholder="<%= __('generic_label.emailAddress') %>" name="email" id="email"
                   class="bg-transparent border-none outline-none text-[14px] w-full" />
               </label>
             </fieldset>
@@ -73,7 +126,7 @@
 
               <label
                 class="flex items-center w-full p-5 mt-3 rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] focus-within:border-[var(--teal)] transition-colors duration-300">
-                <input class="bg-transparent border-none outline-none text-[14px] grow" placeholder="Password"
+                <input class="bg-transparent border-none outline-none text-[14px] grow" placeholder="<%= __('generic_label.password') %>"
                   name="password" id="password" type="password" />
 
               </label>
@@ -85,13 +138,13 @@
                   aria-label="Custom checkbox" />
 
                 <label for="agreement" class="text-sm ">
-                  Remember me
+                  <%= __('generic_label.rememberMe') %>
                 </label>
               </div>
 
               <div class="">
                 <a class="label-text text-[var(--teal)] text-base-content/80 text-xs" href="">
-                  Forgot Password?
+                  <%= __('generic_label.forgotPassword') %>
                 </a>
               </div>
 
@@ -101,13 +154,13 @@
               <button type="submit"
                 class="w-full flex items-center justify-center gap-3 mt-8 px-6 py-3 rounded-full bg-[var(--teal)] text-white border border-transparent transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
                 <!-- <span class="iconify lucide--log-in size-4"></span> -->
-                Login
+                <%= __('generic_label.login') %>
               </button>
 
             <p class="text-base-content/80 mt-4 text-center text-sm md:mt-6">
-              Don't have an account?
+              <%= __('generic_label.dontHaveAccount') %>
               <a class="text-[var(--teal)] ms-1 hover:underline" href="./onboarding1-eng.html">
-                Singup
+                <%= __('generic_label.signup') %>
               </a>
             </p>
           </div>

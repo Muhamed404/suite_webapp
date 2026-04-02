@@ -100,10 +100,26 @@ exports.renderCampaignReport = async (req, res) => {
                 filters: {
                     organizationId: req.user.organization_id
                 },
+                translations: {
+                    filterAll: req.__("all_campaigns.filterAll"),
+                    active: req.__("generic_label.active"),
+                    InProgress: req.__("InProgress") === "InProgress" ? (req.getLocale() === 'ar' ? 'قيد التنفيذ' : 'In Progress') : req.__("InProgress"),
+                    filterCompleted: req.__("all_campaigns.filterCompleted"),
+                    filterScheduled: req.__("all_campaigns.filterScheduled"),
+                    filterDraft: req.__("all_campaigns.filterDraft"),
+                    showingResults: req.__("all_campaigns.showingResults"),
+                    search_here: req.__("generic_label.search_here"),
+                    total_invitees: req.getLocale() === 'ar' ? 'إجمالي المدعوين' : 'Total Invitee',
+                    unsent: req.getLocale() === 'ar' ? 'في الانتظار' : 'Pending',
+                    sent: req.getLocale() === 'ar' ? 'مرسل' : 'Sent',
+                    noCampaignsFound: req.__("all_campaigns.noCampaignsFound"),
+                    createFirstCampaign: req.__("all_campaigns.createFirstCampaign")
+                },
                 user: req.user,
                 title: 'Email Campaign Reports',
                 message: res.locals.message || [],
-                alertType: res.locals.alertType || []
+                alertType: res.locals.alertType || [],
+                locale: req.getLocale()
             };
 
             // Render the EJS template with campaign data

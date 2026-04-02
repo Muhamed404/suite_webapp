@@ -1,0 +1,196 @@
+{
+  "header": {
+    "welcome": "Welcome {name}",
+    "searchPlaceholder": "Search here...",
+    "mail": "Mail",
+    "notifications": "Notifications",
+    "profileCompany": "Javidan Factory Co",
+    "profileEmail": "faizi@somecompany.com"
+  },
+  "page": {
+    "title": "AwareMagnus Dashboard"
+  },
+  "cards": {
+    "totalUserLicenses": "Total User Licenses",
+    "totalConsumedLicenses": "Total Consumed Licenses",
+    "organizationScore": "Organization Score",
+    "myScore": "My Score",
+    "totalComplianceScore": "Total Compliance Score",
+    "globalProgress": "Global Progress",
+    "totalXpTokens": "Total XP Tokens",
+    "totalAwarenessCampaigns": "Total Awareness\nCampaigns conducted",
+    "securityPosture": "Security Posture",
+    "moduleDetails": "Module Details",
+    "totalModules": "Total Module",
+    "dropdownOptions": {
+      "weekly": "Weekly",
+      "monthly": "Monthly",
+      "yearly": "Yearly"
+    },
+    "infoTitle": "This is an info alert",
+    "infoBody": "More info about this info alert goes here. This example text is longer to show spacing inside content.",
+    "viewMore": "View more",
+    "inRisk": "In Risk",
+    "securityAwarenessCampaign": "Security Awareness Campaign",
+    "campaignCompletionTimeline": "Campaign Completion Timeline",
+    "completionsByDateAcrossCampaigns": "Module completions by date across all campaigns",
+    "noOfModules": "No. of Modules",
+    "date": "Date",
+    "viewAll": "View All",
+    "lastCampaignDate": "Last Campaign Date: {date}",
+    "weeklyProgress": "Weekly Progress",
+    "quizAccuracy": "Quiz Accuracy",
+    "securityAwarenessScore": "Security Awareness Score",
+    "good": "Good",
+    "employeeRiskStates": "Employee Risk States",
+    "lowRisk": "Low Risk",
+    "mediumRisk": "Medium Risk",
+    "highRisk": "High Risk",
+    "employeeCertification": "Employee Certification",
+    "certified": "Certified: {count}",
+    "notCertified": "Not Certified: {count}",
+    "top3StrugglingTopics": "Top 3 Struggling Topics",
+    "employeesNeedAttention": "Your employees need attention on these topics",
+    "activeLearnersThisMonth": "Active Learners This Month",
+    "trainingCompletionRate": "Training Completion Rate",
+    "noCompletionData": "No completion data available"
+  },
+  "topics": {
+    "wifiSecurity": "WIFI Security",
+    "physicalSecurity": "Physical Security",
+    "phishingSecurity": "Phishing Security"
+  },
+  "tables": {
+    "topHighRisk": "Top 10 High Risk Employees",
+    "topLowRisk": "Top 10 Low Risk Employees",
+    "sortBy": "Sort by",
+    "userId": "Name",
+    "modulesCompleted": "Modules Completed",
+    "achievementCount": "Achievement Count",
+    "avatarLevel": "Avatar Level",
+    "riskLevel": "Risk Level",
+    "showingOf": "Showing {shown} of {total}"
+  },
+  "gamification": {
+    "title": "Gamified Distribution Statistics",
+    "courseCompleted": "Modules Completed",
+    "studyTime": "Study Time",
+    "achievementGallery": "Achievement Gallery",
+    "achievementSubtitle": "Organization locked and unlocked badges",
+    "achievements": "Achievements",
+    "employeeAvatarLevel": "Employee Avatar Level",
+    "vulnerableNewbie": "Vulnerable\nNewbie",
+    "levels": {
+      "alertApprentice": "Alert Apprentice",
+      "cautiousLearner": "Cautious Learner",
+      "informedDefender": "Informed Defender",
+      "vigilantGuardian": "Vigilant Guardian",
+      "skilledSentinel": "Skilled Sentinel",
+      "resilientProtector": "Resilient Protector",
+      "advancedWatchman": "Advanced Watchman",
+      "expertEnforcer": "Expert Enforcer"
+    }
+  },
+  "menu": {
+    "suitManagement": "Suit Management",
+    "organization": "Organization",
+    "users": "Users",
+    "department": "Department",
+    "group": "Group",
+    "subscriptionHistory": "Subscription History",
+    "products": "Products",
+    "dashboard": "Dashboard",
+    "licenseUser": "License User",
+    "survey": "Survey",
+    "surveyManagement": "Survey Management",
+    "viewSurveys": "View Surveys",
+    "quizQuestions": "Quiz and Questions",
+    "trainingLibrary": "Awareness Library",
+    "awarenessAssets": "Awareness Assets",
+    "systemLibrary": "Core Modules",
+    "myLibrary": "My Modules",
+    "systemBranding": "Branding",
+    "launchAwareness": "Launch Awareness",
+    "newCampaign": "New Campaign",
+    "campaigns": "View Campaigns",
+    "campaignAssignments": "My Assignments",
+    "reports": "Reports",
+    "systemSettings": "System Settings",
+    "myAwareness": "Reports & Analysis",
+    "profile": "Profile",
+    "certificates": "Certifications",
+    "achievements": "Achievements",
+    "assignments": "Assignments",
+    "reportCard": "Report Card",
+    "certificate": "Certification",
+    "logoAndImages": "Logo and Images"
+  },
+  "userWelcome": {
+    "welcome": "Welcome back, {name}!",
+    "question": "Ready To Continue Your Learning Journey?",
+    "level": "Level {level}",
+    "xp": "{xp}/10000 XP",
+    "streak": "You're on a {streak} day streak!",
+    "startButton": "Start"
+  },
+  "userCards": {
+    "certificateCompleted": "Certificate Completed",
+    "studyTime": "Study Time"
+  },
+  "thisWeek": {
+    "title": "This Week",
+    "dropdownWeekly": "Weekly",
+    "lessonsCompleted": "Lesson completed",
+    "studyTime": "Study Time",
+    "xpGained": "XP gained",
+    "learningVelocity": {
+      "label": "Lessons/Day",
+      "title": "Learning Velocity"
+    },
+    "bestSubject": {
+      "label": "Lessons/Day",
+      "title": "Best Subject"
+    }
+  },
+  "pendingTasks": {
+    "title": "Pending Assignments",
+    "viewAll": "View All",
+    "assigned": "Assigned {date}",
+    "level": "Level 1/1",
+    "days": "{days} Days",
+    "columnHeaders": {
+      "campaignName": "Campaign Name",
+      "moduleName": "Module Name",
+      "status": "Status",
+      "startDate": "Start Date",
+      "dueDate": "Due Date",
+      "action": "Action"
+    },
+    "noData": "No pending assignments",
+    "status": {
+      "pending": "Pending",
+      "inProgress": "In Progress"
+    },
+    "actions": {
+      "view": "View",
+      "start": "Start",
+      "starting": "Starting…"
+    },
+    "pagination": {
+      "showing": "Showing {shown}–{total} out of {all} Entries",
+      "showingSimple": "Showing 1–{total} Entries"
+    },
+    "surveyTitle": "Pending Assessment or Surveys",
+    "surveyColumnHeaders": {
+      "assessmentName": "Assessment Name / Survey",
+      "status": "Status",
+      "dueDate": "Due Date",
+      "action": "Action"
+    },
+    "surveyNoData": "No pending assessments or surveys",
+    "surveyLoading": "Loading pending assessments or surveys...",
+    "surveyStatus": {
+      "active": "Active"
+    }
+  }
+}

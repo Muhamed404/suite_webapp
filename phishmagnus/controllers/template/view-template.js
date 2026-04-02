@@ -75,6 +75,7 @@ exports.viewTemplate = async (req, res) => {
 
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
+    tpl.phishing_smtp = tpl.phishing_smtp_id; // ensure this property exists for the view, even if null
     // if(!tpl.phish_option){
     //   if(tpl.phishcat_id === enums.phishingCategories.DataEntryBasedPhishing){
     //     tpl.phish_option = 'data_entry';
@@ -89,17 +90,37 @@ exports.viewTemplate = async (req, res) => {
   } catch (err) {
     // Detailed logging for different axios failure modes
     logger.error(`Controller - View Template: error fetching template \n ${err.stack}`);
+    
+    if (err?.response?.status === 403) {
+      const errorMessage = err.response.data?.message || 'Access Denied';
+      logger.warn(`[View Template] Access denied: ${errorMessage}`);
+      
+      if (errorMessage.toLowerCase().includes('subscription')) {
+        if (req.session) {
+          req.flash('message', 'You do not have an active subscription to view templates.');
+          req.flash('alertType', 'error');
+        }
+        return res.redirect(frontend_api_urls.PHISHMAGNUS.Home.INDEX);
+      }
+    }
+    
     if (err?.response) {
-      req.flash('message', 'Error fetching template');
-      req.flash('alertType', 'error');
+      if (req.session) {
+        req.flash('message', 'Error fetching template');
+        req.flash('alertType', 'error');
+      }
       return res.redirect('/template/list');
     } else if (err?.request) {
-      req.flash('message', 'Error fetching template');
-      req.flash('alertType', 'error');
+      if (req.session) {
+        req.flash('message', 'Error fetching template');
+        req.flash('alertType', 'error');
+      }
       return res.redirect('/template/list');
     } else {
-      req.flash('message', 'Error fetching template');
-      req.flash('alertType', 'error');
+      if (req.session) {
+        req.flash('message', 'Error fetching template');
+        req.flash('alertType', 'error');
+      }
       return res.redirect('/template/list');
     }
   }

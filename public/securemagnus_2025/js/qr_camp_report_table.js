@@ -41,6 +41,16 @@ const filterType = document.getElementById("filterType");
 const rowsSelect = document.getElementById("rowsPerPage");
 
 // ===============================
+// Status translations
+// ===============================
+const statusTranslations = {
+  All: window.translations.filterAll,
+  active: window.translations.active,
+  inprogress: window.translations.InProgress,
+  completed: window.translations.filterCompleted
+};
+
+// ===============================
 // Render status tabs (with counts) - Updated for campaign statuses
 // ===============================
 function renderTabs() {
@@ -54,7 +64,7 @@ function renderTabs() {
   statusTabs.innerHTML = Object.entries(counts)
     .map(([status, count]) => {
       const isActive = currentTab === status;
-      const displayName = status.charAt(0).toUpperCase() + status.slice(1);
+      const displayName = statusTranslations[status] || status;
 
       // If active
       if (isActive) {
@@ -301,8 +311,8 @@ if (data.length > 0) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-          <div class="text-lg font-medium mb-2">No campaigns found</div>
-          <p>Create your first email campaign to get started.</p>
+          <div class="text-lg font-medium mb-2">${translations.noCampaignsFound || 'No campaigns found'}</div>
+          <p>${translations.createFirstCampaign || 'Create your first campaign to get started.'}</p>
         </td>
       </tr>
     `;

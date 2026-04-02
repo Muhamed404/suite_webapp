@@ -1,0 +1,61 @@
+<div id="addDomainModal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/40 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+      <h3 class="text-lg font-semibold text-gray-800"><%= __('org_domain.modal_add_title') %></h3>
+      <button type="button" onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <form action="/dms/create" method="POST">
+      <input type="hidden" name="organization_id" value="<%= orgId %>">
+      <div class="px-6 py-5 flex flex-col gap-5">
+        <!-- Domain Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            <%= __('org_domain.label_domain_name') %> <span class="text-red-500">*</span>
+          </label>
+          <div class="relative">
+            <div class="absolute top-0 left-0 h-10 flex items-center pl-3 pointer-events-none">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+              </svg>
+            </div>
+            <input type="text" id="domain_name" name="domain_name" required
+              placeholder="<%= __('org_domain.placeholder_domain_name') %>"
+              class="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-200 focus:border-teal-400 focus:ring-2 focus:ring-teal-100 text-gray-800 text-sm outline-none transition"
+              pattern="^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$"
+              title="<%= __('org_domain.validation_domain_format') %>"/>
+            <p class="text-xs text-gray-400 mt-1.5"><%= __('org_domain.hint_domain_name') %></p>
+          </div>
+        </div>
+        <!-- Status -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5"><%= __('org_domain.label_status') %></label>
+          <div class="flex items-center gap-3">
+            <input type="hidden" name="is_active" id="modal_is_active" value="1"/>
+            <button type="button" id="modalStatusToggle" onclick="toggleModalStatus()"
+              class="relative inline-flex items-center w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none bg-teal-500">
+              <span id="modalStatusThumb"
+                class="inline-block w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 translate-x-6"></span>
+            </button>
+            <span id="modalStatusLabel" class="text-sm font-medium text-teal-600">
+              <%= __('generic_label.active') %>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-100">
+        <button type="button" onclick="closeAddModal()"
+          class="px-5 py-2 rounded-lg text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors">
+          <%= __('generic_label.cancel') %>
+        </button>
+        <button type="submit"
+          class="px-5 py-2 rounded-lg text-sm font-semibold text-white bg-teal-600 hover:bg-teal-700 transition-colors">
+          <%= __('org_domain.btn_save') %>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

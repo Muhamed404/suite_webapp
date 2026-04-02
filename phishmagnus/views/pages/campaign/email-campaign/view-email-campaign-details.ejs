@@ -279,10 +279,10 @@
 
                     <button class="hidden lg:block ms-auto">
                         <div class="relative">
-                            <input type="text" placeholder="Search here..."
-                                class="pl-14 pr-10 py-3 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+                            <input type="text" placeholder="<%= __("generic_label.search_here") || 'Search here...' %>"
+                                class="pl-14 pr-10 py-3 h-12 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
                             <img src="/securemagnus_2025/images/img/search.svg"
-                                class="w-5 h-5 text-gray-400 absolute left-7 top-1/2 transform -translate-y-1/2" alt="">
+                                class="w-5 h-5 text-gray-400 absolute left-4 top-3.5" alt="">
                         </div>
 
                     </button>
@@ -290,7 +290,7 @@
                         <a href=""
                             class=" flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
 
-                            Sort by
+                            <%= __("generic_label.sort_by") %>
                             <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
                         </a>
 
@@ -306,6 +306,7 @@
                 <table class="min-w-full text-sm text-left">
                     <thead class="bg-[#FAFBFC]">
                         <tr>
+                            <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap"><%= __("campaign.email_campaign_detail.scheduleTime") %></th>
                             <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap"><%= __("campaign.email_campaign_detail.labelFirstName") %></th>
                             <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap"><%= __("campaign.email_campaign_detail.labelLastName") %></th>
                             <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap"><%= __("campaign.email_campaign_detail.labelEmail") %></th>
@@ -347,6 +348,9 @@
     <% usersDetail.Phishing_Invities.forEach((invitee,index)=> { %>
 
                             <tr class="border-t hover:bg-blue-50 transition-colors">
+                                <td class="px-6 py-6 whitespace-nowrap editable">
+                                    <%=invitee.CampaignSchedule.start_datetime %>
+                                </td>
                                 <td class="px-6 py-6 whitespace-nowrap editable">
                                     <%=invitee.User.UserProfile.first_name %>
                                 </td>
@@ -405,40 +409,11 @@
 
 
 
-            <div class="flex justify-between items-center px-6 mt-16">
-
-                <p class="text-[#656972]">
-                    Showing 1-8 out of 32 Entries
-                </p>
-
-
-                <div class=" py-7 pb-9 flex flex-wrap items-center justify-center gap-2">
-                    <button
-                        class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] duration-300">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                    </button>
-                    <button
-                        class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">1</button>
-                    <button
-                        class="w-8 h-8 rounded-full bg-teal-50 text-[var(--teal)] border border-[var(--teal)]">2</button>
-                    <button
-                        class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">3</button>
-                    <button
-                        class="w-8 h-8 rounded-full flex items-center justify-center text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">4</button>
-                    <button
-                        class="w-8 h-8 rounded-full flex items-center justify-center bg-[#F1F5F8] text-gray-500 hover:text-white hover:bg-[var(--teal)] duration-300">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
         </div>
     </div>
 </div>
 <script>
+    window.translations = <%- JSON.stringify(translations) %>;
     window.phishingSuccessRate = {
         view: <%= typeof campaignStats !== 'undefined' && campaignStats.campaignInteractionStats?.is_phish_msg_opened || 0 %>,
         linkClicks: <%= typeof campaignStats !== 'undefined' && campaignStats.campaignInteractionStats?.is_phish_msg_link_opened || 0 %>,

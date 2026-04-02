@@ -29,9 +29,8 @@ exports.viewNFCCampaignDetails = async (req, res) => {
 
     // Function to fetch campaign statistics
     // Fetch statistics and user details in parallel for performance
-    const [apiResponseCampaignReport, apiResponseNFCDevicesData] = await Promise.all([
+    const [apiResponseCampaignReport] = await Promise.all([
       generateReport(req, campaignId),
-      retrieveNFCDevices(req, campaignId)
     ]);
 
     logger.info('NFC Campaign Detail: FETCHED ALL DATA');
@@ -49,7 +48,8 @@ exports.viewNFCCampaignDetails = async (req, res) => {
     const scannedNotScannedStats = apiResponseCampaignReport?.data?.message.scannedNotScannedStats || {};
 
 
-    let nfcDevices = apiResponseNFCDevicesData?.data?.message || [];
+    let nfcDevices = apiResponseCampaignReport?.data?.message.nfcTagScanReport || [];
+
     // logger.info(`Parsed qrImageUrls: ${JSON.stringify(qrImageUrls, null, 2)}`);
 
     if (!nfcDevices || nfcDevices.length === 0) {
@@ -60,6 +60,7 @@ exports.viewNFCCampaignDetails = async (req, res) => {
         ...device,
         download_url: ApplicationConstants.BACKEND_TVBS_URL + ApplicationConstants.TVB_Main_Routes.NFC +`?`+ ApplicationConstants.TVB_Query_Params.NFC_Device_Code + `=${device.nfc_code}&` + ApplicationConstants.TVB_Query_Params.Campaign_Id + `=${campaignId}`
       }));
+      nfcDevices.forEach(device => logger.info(`NFC Device download_url: ${device.download_url}`));
     }
 
     logger.info('NFC Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));

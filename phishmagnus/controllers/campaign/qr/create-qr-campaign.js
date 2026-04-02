@@ -84,7 +84,7 @@ exports.submitForm = async (req, res) => {
 
       if (!payload.templateSelect) {
         logger.warn('Invalid Template has passed in qr campaign: ' + payload.templateSelect);
-        req.flash('message', 'Invalid QR Template Selected');
+        req.flash('message', req.__('validation_messages.invalid_qr_template_selected'));
         req.flash('alertType', 'error');
         return res.redirect('/phm/campaign/qr/create');
       }

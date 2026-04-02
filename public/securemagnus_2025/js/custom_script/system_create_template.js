@@ -17,28 +17,28 @@ const editors = ['phishing_content', 'phishing_page_content', 'landing_page_cont
 // ✅ Conditions for step 2 options
 const conditions = {
   email: [
-    { id: 'open', title: 'Open Email (Level 1)', value: 'simple', difficulty_level: 1, desc: 'Simple phishing email template to monitor email open by users.' },
-    { id: 'download', title: 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: 'Phishing email template with file attached in the message to monitor download by users.' },
-    { id: 'url', title: 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: 'Email template with a dedicated URL for testing users visiting the phishing page.' }
+    { id: 'open', title: window.i18n ? window.i18n.__('system_template.create.simplePhishingTitle') : 'Open Email (Level 1)', value: 'simple', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.simplePhishingDescription') : 'Simple phishing email template to monitor email open by users.' },
+    { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing email template with file attached in the message to monitor download by users.' },
+    { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'Email template with a dedicated URL for testing users visiting the phishing page.' }
   ],
   nfc: [
-    { id: 'download', title: 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: 'Phishing nfc template with file attached in the message to monitor download by users.' },
-    { id: 'url', title: 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: 'NFC template with a dedicated URL for testing users visiting the phishing page.' }
+    { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing nfc template with file attached in the message to monitor download by users.' },
+    { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'NFC template with a dedicated URL for testing users visiting the phishing page.' }
   ],
   qr: [
-    { id: 'download', title: 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: 'Phishing qr template with file attached in the message to monitor download by users.' },
-    { id: 'url', title: 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: 'QR template with a dedicated URL for testing users visiting the phishing page.' }
+    { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing qr template with file attached in the message to monitor download by users.' },
+    { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'QR template with a dedicated URL for testing users visiting the phishing page.' }
   ],
 
   sms: [
-    { id: 'short', title: 'Short Message (Level 1)', difficulty_level: 1, desc: 'Send a simple SMS message.' },
-    { id: 'download', title: 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: 'Phishing SMS template with file attached in the message to monitor download by users.' },
-    { id: 'url', title: 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: 'SMS template with a dedicated URL for testing users visiting the phishing page.' }
+    { id: 'short', title: window.i18n ? window.i18n.__('system_template.create.smsShortMessageTitle') : 'Short Message (Level 1)', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.smsShortMessageDescription') : 'Send a simple SMS message.' },
+    { id: 'download', title: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedTitle') : 'Download File Based (Level 2)', value: 'attachment', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.downloadFileBasedDescription') : 'Phishing SMS template with file attached in the message to monitor download by users.' },
+    { id: 'url', title: window.i18n ? window.i18n.__('system_template.create.urlClickBasedTitle') : 'URL Click Based (Level 3)', value: 'click_url', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.urlClickBasedDescription') : 'SMS template with a dedicated URL for testing users visiting the phishing page.' }
   ],
   whatsapp: [
-    { id: 'short', title: 'Short Message', difficulty_level: 1, desc: 'Send a simple SMS message.' },
-    { id: 'attach', title: 'Attach URL', difficulty_level: 2, desc: 'Include a clickable link in SMS.' },
-    { id: 'template', title: 'Download Template', difficulty_level: 3, desc: 'Use a ready-made SMS template.' }
+    { id: 'short', title: window.i18n ? window.i18n.__('system_template.create.whatsappShortMessageTitle') : 'Short Message', difficulty_level: 1, desc: window.i18n ? window.i18n.__('system_template.create.whatsappShortMessageDescription') : 'Send a simple SMS message.' },
+    { id: 'attach', title: window.i18n ? window.i18n.__('system_template.create.whatsappAttachUrlTitle') : 'Attach URL', difficulty_level: 2, desc: window.i18n ? window.i18n.__('system_template.create.whatsappAttachUrlDescription') : 'Include a clickable link in SMS.' },
+    { id: 'template', title: window.i18n ? window.i18n.__('system_template.create.whatsappDownloadTemplateTitle') : 'Download Template', difficulty_level: 3, desc: window.i18n ? window.i18n.__('system_template.create.whatsappDownloadTemplateDescription') : 'Use a ready-made SMS template.' }
   ],
 };
 
@@ -178,6 +178,7 @@ let currentStep = 0;
   let history = [0]; // Track visited steps
   const formData = {};
   let selectedPhishType = null;
+  const smsStepIndex = sms_phishing_screen - 1;
 
 
 
@@ -192,9 +193,10 @@ let currentStep = 0;
       const isActive = i === currentIndexInFlow;
       const isCompleted = i < currentIndexInFlow;
       const circle = document.createElement('div');
-      circle.className = 'flex flex-col items-center text-center mx-2';
+      circle.className = 'flex flex-col items-start text-center flex-shrink-0';
+      circle.style.width = '125px';
       circle.innerHTML = `
-        <div class="w-8 h-8 flex items-center justify-center rounded-full border-2
+        <div class="w-8 h-8 flex items-center justify-center rounded-full border-2 mx-auto
           ${isActive
           ? 'bg-teal-400 text-white border-teal-400'
           : isCompleted
@@ -202,14 +204,16 @@ let currentStep = 0;
             : 'bg-white text-gray-600 border-gray-300'}">
           ${i + 1}
         </div>
-        <div class="text-xs mt-1">${stepTitles[stepIndex]}</div>
+        <div class="text-xs mt-1 px-1 leading-tight w-full font-semibold" style="min-height: 32px; word-wrap: break-word;">${stepTitles[stepIndex]}</div>
       `;
       progressWrap.appendChild(circle);
       // alert(progressWrap.innerHTML);
       if (i < activeFlow.length - 1) {
         const isLineActive = i < currentIndexInFlow;
         const line = document.createElement('div');
-        line.className = `flex-1 h-1 ${isLineActive ? 'bg-teal-400' : 'bg-gray-200'}`;
+        line.className = `h-1 flex-shrink-0 ${isLineActive ? 'bg-teal-400' : 'bg-gray-200'}`;
+        line.style.width = '60px';
+        line.style.marginTop = '16px';
         progressWrap.appendChild(line);
       }
 
@@ -225,7 +229,7 @@ let currentStep = 0;
     prevBtn.disabled = history.length <= 1;
     const currentPos = activeFlow.indexOf(currentStep);
     // alert('Current Position in Active Flow: ' + currentPos);
-    nextBtn.textContent = currentPos === activeFlow.length - 1 ? 'Finish' : 'Next';
+    nextBtn.textContent = currentPos === activeFlow.length - 1 ? window.i18n.finish : window.i18n.next;
     if (index === steps.length - 1) {
       previewEl.textContent = JSON.stringify(formData, null, 2);
     }
@@ -246,6 +250,63 @@ let currentStep = 0;
 
     if (placeholderButtons) {
       placeholderButtons.style.display = showPlaceholders ? '' : 'none';
+    }
+    updatePhishingPlaceholderVisibility();
+  }
+
+
+  function updatePhishingPlaceholderVisibility() {
+    // Email placeholders
+    const tagPhishingUrl = document.getElementById('tag_phishing_url');
+    const tagPhishingFile = document.getElementById('tag_phishing_file');
+    // SMS placeholders
+    const tagSmsPhishingUrl = document.getElementById('tag_sms_phishing_url');
+    const tagSmsPhishingFile = document.getElementById('tag_sms_phishing_file');
+
+    // Get the selected tracking options from step 2 (stored in formData.step2.options)
+    const selectedOptions = (formData.step2 && formData.step2.options) ? formData.step2.options : [];
+
+    // Level constants: Level 1 = '1', Level 2 = '2' (Download File), Level 3 = '3' (URL Click)
+    const hasLevel2 = selectedOptions.includes(difficulty_level_download_file);
+    const hasLevel3 = selectedOptions.includes(difficulty_level_url_click);
+    const hasLevel2Or3 = hasLevel2 || hasLevel3;
+
+    // Handle EMAIL template placeholders
+    if (selectedPhishType === 'email') {
+      const hasOnlyEmailLevel1 = selectedOptions.length === 1 && selectedOptions.includes(difficulty_level_open_email);
+
+      if (hasOnlyEmailLevel1 && !hasLevel2Or3) {
+        // Only Level 1 selected - hide both placeholders
+        if (tagPhishingUrl) tagPhishingUrl.style.display = 'none';
+        if (tagPhishingFile) tagPhishingFile.style.display = 'none';
+      } else {
+        // Show based on which levels are selected
+        if (tagPhishingUrl) {
+          tagPhishingUrl.style.display = hasLevel3 ? 'inline-block' : 'none';
+        }
+        if (tagPhishingFile) {
+          tagPhishingFile.style.display = hasLevel2 ? 'inline-block' : 'none';
+        }
+      }
+    }
+
+    // Handle SMS template placeholders
+    if (selectedPhishType === 'sms') {
+      const hasOnlySmsLevel1 = selectedOptions.length === 1 && selectedOptions.includes(difficulty_level_sms_short_message);
+
+      if (hasOnlySmsLevel1 && !hasLevel2Or3) {
+        // Only Level 1 selected - hide both placeholders
+        if (tagSmsPhishingUrl) tagSmsPhishingUrl.style.display = 'none';
+        if (tagSmsPhishingFile) tagSmsPhishingFile.style.display = 'none';
+      } else {
+        // Show based on which levels are selected
+        if (tagSmsPhishingUrl) {
+          tagSmsPhishingUrl.style.display = hasLevel3 ? 'inline-block' : 'none';
+        }
+        if (tagSmsPhishingFile) {
+          tagSmsPhishingFile.style.display = hasLevel2 ? 'inline-block' : 'none';
+        }
+      }
     }
   }
 
@@ -317,13 +378,24 @@ let currentStep = 0;
     return candidates[0];
   }
 
-  function buildActiveFlow(matchedRule) {
+  function getBaseFlowForType(phishType) {
+    const fullFlow = Array.from({ length: steps.length }, (_, i) => i);
+    if (!['sms', 'whatsapp'].includes(phishType)) {
+      return fullFlow.filter(stepIndex => stepIndex !== smsStepIndex);
+    }
+    return fullFlow;
+  }
+
+  function buildActiveFlow(matchedRule, phishType) {
     // alert('build active flow alert');
     // alert('Building active flow based on matched rule: ' + JSON.stringify(matchedRule));
-    if (!matchedRule) return Array.from({ length: steps.length }, (_, i) => i);
+    if (!matchedRule) return getBaseFlowForType(phishType);
     const goToZeroBased = matchedRule.goTo.map(n => n - 1);
     const uniq = [0, 1];
     goToZeroBased.forEach(x => { if (!uniq.includes(x)) uniq.push(x); });
+    if (!['sms', 'whatsapp'].includes(phishType)) {
+      return uniq.filter(stepIndex => stepIndex !== smsStepIndex);
+    }
     return uniq;
   }
 
@@ -356,15 +428,25 @@ let currentStep = 0;
     // alert('Handling Next for current step ' + (currentStep));
     // renderProgressBar();
     // alert('Handling Next for next step ' + (currentStep + 1));
+
+    // Validate current step before proceeding
+    if (typeof window.validateCurrentStep === 'function') {
+      const isValid = window.validateCurrentStep(currentStep, selectedPhishType);
+      if (!isValid) {
+        return; // Stop if validation fails
+      }
+    }
+
     saveDataForStep(currentStep);
     const sel = formData.step1.phishType;
     if (currentStep === 0) {
       // alert('currentStep Processing selections for step 0...');
       if (!sel) {
-        alert('Please choose a phish Type to continue.');
+        // Validation already handled by validateCurrentStep
         return;
       }
       selectedPhishType = sel;
+      activeFlow = getBaseFlowForType(selectedPhishType);
 
       // ✅ NEW FEATURE: Hide email if NFC selected
       if (selectedPhishType === 'nfc' && emailContent) {
@@ -387,11 +469,11 @@ let currentStep = 0;
       // alert('currentStep Processing selections for step 1...');
       const selectedOptions = (formData.step2.options) ? formData.step2.options : [];
       if (selectedOptions.length === 0) {
-        alert('Please select at least one option.');
+        // Validation already handled by validateCurrentStep
         return;
       }
       const matched = computeMatchingRule(selectedPhishType, selectedOptions);
-      activeFlow = buildActiveFlow(matched);
+      activeFlow = buildActiveFlow(matched, selectedPhishType);
       // alert('Active Flow Steps: ' + JSON.stringify(activeFlow));
       const idxInFlow = activeFlow.indexOf(1);
       const nextInFlow = activeFlow[idxInFlow + 1] || steps.length - 1;

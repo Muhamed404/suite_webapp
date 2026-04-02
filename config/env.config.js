@@ -42,14 +42,10 @@ module.exports = {
     process.env.BACKEND_SUITE_PUBLIC_KEY_PATH,
     'BACKEND_SUITE_PUBLIC_KEY'
   ),
-
-  // SECURE_MAGNUS_DIRCTORY: process.env.SECURE_MAGNUS_DIRCTORY,
-  // SECURE_MAGNUS_WORKSPACE: process.env.SECURE_MAGNUS_WORKSPACE,
-  // POSTERS_LIBRARY_DEFAULT_FOLDER: process.env.POSTERS_LIBRARY_DEFAULT_FOLDER,
-  // USERS_UPLOAD_FOLDER: process.env.USERS_UPLOAD_FOLDER,
-  // SMTP_TEST_API: process.env.SMTP_TEST_API,
-  // TEST_CAMPAIGN_API: process.env.TEST_CAMPAIGN_API,
-  // INSTANT_CAMPAIGN_LAUNCH: process.env.INSTANT_CAMPAIGN_LAUNCH,
-
   BACKEND_TVBS_URL: process.env.BACKEND_TVBS_URL,
+
+  /** Base URL of the Aware Magnus dashboard app (e.g. https://awm.example.com). Used for "View Dashboard" redirect with token. */
+  AWAREMAGNUS_DASHBOARD_URL: process.env.AWAREMAGNUS_DASHBOARD_URL
+    ? process.env.AWAREMAGNUS_DASHBOARD_URL.replace(/\/$/, '')
+    : '',
 };

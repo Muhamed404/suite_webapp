@@ -15,7 +15,7 @@ exports.renderUpdateForm = async (req, res) => {
 
     if (!serviceId || !registryId) {
       logger.warn(`Controller - [Service Registry - Update]: Invalid service ID passed: ${serviceId}`);
-      req.flash("message", "Invalid Service ID has passed. Please contact administrator.");
+      req.flash("message", req.__("generic_label.invalid_service_id_passed"));
       req.flash("alertType", "error");
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.LIST);
     }
@@ -26,7 +26,7 @@ exports.renderUpdateForm = async (req, res) => {
 
     // Handle service not found or error from API 
     if (!serviceResponse.data.success) {
-      req.flash("message", serviceResponse.data.message || "Service not found.");
+      req.flash("message", serviceResponse.data.message || req.__("generic_label.service_not_found"));
       req.flash("alertType", "error");
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.LIST);
     }
@@ -41,7 +41,7 @@ exports.renderUpdateForm = async (req, res) => {
   } catch (error) {
     logger.error(`Error Controller - [Service Registry - Update]: ${error}`);
     logger.error(`Error Controller - [Service Registry - Update]: ${error.stack}`);
-    req.flash("message", error?.response?.data?.message || 'Error in retrieving service.');
+    req.flash("message", error?.response?.data?.message || req.__('generic_label.error_in_retrieving_service'));
     req.flash("alertType", "error");
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.LIST);
   }
@@ -54,7 +54,7 @@ exports.submitUpdateForm = async (req, res) => {
 
     if (!serviceId) {
       logger.warn(`${logTxn}: Invalid service ID passed: ${serviceId}`);
-      req.flash("message", "Invalid Service ID has passed.");
+      req.flash("message", req.__("generic_label.invalid_service_id"));
       req.flash("alertType", "error");
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.LIST);
     }
@@ -64,7 +64,7 @@ exports.submitUpdateForm = async (req, res) => {
 
     if (!service_id || !service_type || !public_key || !service_name || typeof status === 'undefined') {
       logger.warn(`${logTxn}: Incomplete payload received: ${JSON.stringify(payload)}`);
-      req.flash("message", "Incomplete data submitted. Please fill all required fields.");
+      req.flash("message", req.__("generic_label.incomplete_data_submitted"));
       req.flash("alertType", "error");
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.EDIT_SERVICE(serviceId));
     }
@@ -75,18 +75,18 @@ exports.submitUpdateForm = async (req, res) => {
 
     // Handle user not found or error from API
     if (!serviceResponse.data.success) {
-      req.flash("message", serviceResponse.data.message || "Error in saving service.");
+      req.flash("message", serviceResponse.data.message || req.__("generic_label.error_in_saving_service"));
       req.flash("alertType", "error");
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.EDIT_SERVICE(serviceId));
     }
 
-    req.flash("message", serviceResponse.data.message || "Error in saving service.");
+    req.flash("message", req.__("generic_label.service_updated_successfully"));
     req.flash("alertType", "success");
     res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.LIST);
   } catch (error) {
     logger.error(`Error ${logTxn}: ${error}`);
     logger.error(`Error ${logTxn}: ${error.stack}`);
-    req.flash("message", error?.response?.data?.message || 'Error in saving service.');
+    req.flash("message", error?.response?.data?.message || req.__('generic_label.error_in_saving_service'));
     req.flash("alertType", "error");
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.LIST);
   }

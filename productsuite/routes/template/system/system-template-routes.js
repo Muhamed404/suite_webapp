@@ -19,7 +19,7 @@ router.get("/duplicate/:templateId", checkPermission(enums.ModuleNames.System_Te
 router.post("/duplicate/:templateId/:organizationId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_O]), duplicateTemplate);
 router.get("/view/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), viewTemplate);
 router.post("/edit/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), updateTemplate);
-router.get("/delete/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), disableTemplate);
+router.delete("/delete/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), disableTemplate);
 router.get("/create", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), renderCreateTemplate);
 router.post("/create", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), createTemplate);
 
@@ -32,40 +32,13 @@ router.post('/api/fetch-html', async (req, res) => {
     const html = await fetchHtmlFromUrl(url);
     res.json({ html });
   } catch (err) {
-    res.status(400).json({ error: err.message || 'Server error.' });
+    let errorMessage = err.message || 'Server error.';
+    if (errorMessage === 'Invalid URL format.') {
+      errorMessage = req.__('system_template.create.invalidUrlFormat');
+    }
+    res.status(400).json({ error: errorMessage });
   }
 });
-
-
-
-// router.get("/showTemplate/:orgId?", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]) ,viewTemplate);
-
-
-// display all templates by organization id is an optional value here.
-
-// for create template to display the webpage
-
-
-// for update template to display the webpage
-// router.post("/update/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), SystemTemplateController.update);
-
-// for disable the template
-// router.get("/delete/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), 
-// disableTemplate);
-
-
-// for editing the template
-// router.get("/edit/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), 
-// SystemTemplateController.renderEditFormTemplate);
-
-
-
-
-// for template creation either secure magnus admins / organization admins
-// router.post("/update/:templateId", checkPermission(enums.ModuleNames.System_Template, [enums.Access_Types.RWD_ALL]), 
-// updateTemplateController);
-
-
 
 
 

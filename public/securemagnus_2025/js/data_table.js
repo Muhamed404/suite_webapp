@@ -4,7 +4,45 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
-  const dataTable = new simpleDatatables.DataTable('#filter-table');
+  const table = document.getElementById('filter-table');
+  const placeholder = table.dataset.placeholder || (window.translations && window.translations.search) || 'Search...';
+  const perPageLabel = table.dataset.perPage || (window.translations && window.translations.entriesPerPage) || 'entries per page';
+  const infoLabel = table.dataset.info || (window.translations && window.translations.datatableInfo) || 'Showing {start} to {end} of {rows} entries';
+  const noRowsLabel = table.dataset.noRows || (window.translations && window.translations.no_entries_found) || 'No entries found';
+
+  const dataTable = new simpleDatatables.DataTable('#filter-table', {
+    perPageSelect: [10, 20, 25, 50, 100],
+    labels: {
+      placeholder: placeholder,
+      perPage: perPageLabel,
+      info: infoLabel,
+      noRows: noRowsLabel
+    }
+  });
+
+  // Extend search bar to full width
+  const searchContainer = document.querySelector('.datatable-search');
+  if (searchContainer) {
+    searchContainer.style.width = '100%';
+    const input = searchContainer.querySelector('input');
+    if (input) {
+      input.style.width = '100%';
+    }
+  }
+
+  // Adjust layout to have search and per page on one line with more space
+  const topContainer = document.querySelector('.datatable-top');
+  if (topContainer) {
+    topContainer.style.display = 'flex';
+    topContainer.style.justifyContent = 'space-between';
+    topContainer.style.alignItems = 'center';
+    topContainer.style.gap = '2rem'; // add more space between elements
+    // Shrink search bar by setting flex
+    if (searchContainer) {
+      searchContainer.style.flex = '1';
+      searchContainer.style.maxWidth = '80%'; // set to 80%
+    }
+  }
 
   const filter = document.getElementById('filter');
   filter.addEventListener('change', function () {

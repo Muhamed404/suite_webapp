@@ -26,13 +26,13 @@ var barOptions = {
   },
   xaxis: {
     categories: [
-      'Devices Sent',
-      'Total Scans',
-      'Not Scanned',
-      'Opened Link',
-      'Interact Form',
-      'Submit Form',
-      'Downloaded'
+      localizedLabels.devicesSent,
+      localizedLabels.totalScans,
+      localizedLabels.notScanned,
+      localizedLabels.openedLink,
+      localizedLabels.interactForm,
+      localizedLabels.submitForm,
+      localizedLabels.downloaded
     ],
     labels: {
       style: {
@@ -59,7 +59,7 @@ var barOptions = {
       lines: { show: false }
     }
   },
-  colors: ['#38bdf8', '#a3e635', '#f87171', '#fbbf24', '#a78bfa', '#6366f1'],
+  colors: ['#7CC5FA', '#FB5050', '#3ACE89', '#FBBF24', '#00CCC4', '#8B5CF6', '#FF8F5E'],
   tooltip: {
     theme: 'light'
   }
@@ -75,11 +75,11 @@ const targetCompromised = campMetricsData.totalNFCDevices - campMetricsData.tota
 const totalNotScans = campMetricsData?.totalNotScans || 0
 
 // Update left labels dynamically
-document.getElementById('scanText').innerText = `${openLink} People`;
-document.getElementById('notScanText').innerText = `${totalNotScans} People`;
-document.getElementById('formInteractionText').innerText = `${formInteractions} People`;
-document.getElementById('targetCompromisedText').innerText = `${targetCompromised} People`;
-document.getElementById('attachmentDownloadedText').innerText = `${attachmentDownloaded} People`;
+document.getElementById('scanText').innerText = `${openLink} ${localizedLabels.people}`;
+document.getElementById('notScanText').innerText = `${totalNotScans} ${localizedLabels.people}`;
+document.getElementById('formInteractionText').innerText = `${formInteractions} ${localizedLabels.people}`;
+document.getElementById('targetCompromisedText').innerText = `${targetCompromised} ${localizedLabels.people}`;
+document.getElementById('attachmentDownloadedText').innerText = `${attachmentDownloaded} ${localizedLabels.people}`;
 // ApexCharts Configuration
 var successOptions = {
   series: [openLink, formInteractions, attachmentDownloaded, targetCompromised,totalNotScans],
@@ -87,7 +87,7 @@ var successOptions = {
     type: 'donut',
     height: '100%'
   },
-  labels: ['Scanned',  'Interaction', 'File Downloaded', 'Target Compromised', 'Not Scanned'],
+  labels: [localizedLabels.nfcScan, localizedLabels.interaction, localizedLabels.download, localizedLabels.compromised, localizedLabels.notScanned],
   colors: ['#3b82f6', '#fb923c', '#34d399', '#ef4444', '#9ca3af'],
 
   dataLabels: { enabled: false },
@@ -123,7 +123,7 @@ var successOptions = {
     enabled: true,
     y: {
       formatter: function (val) {
-        return val + ' People';
+        return val + ' ' + localizedLabels.people;
       }
     }
   }
@@ -145,11 +145,11 @@ var segmentsOptions = {
     height: 300
   },
   labels: [
-    'Total Devices',
-    'Total Not Scanned',
-    'Total Scanned',
-    'Total Interactions',
-    'Total Attachment Downloaded'
+    localizedLabels.totalDevices,
+    localizedLabels.totalNotScanned,
+    localizedLabels.totalScanned,
+    localizedLabels.totalInteractions,
+    localizedLabels.totalAttachmentDownloaded
   ],
   colors: ['#60a5fa', '#e5e7eb', '#fbbf24', '#a78bfa', '#4ade80'],
   legend: {
@@ -167,7 +167,7 @@ var segmentsOptions = {
     enabled: true,
     y: {
       formatter: function (val) {
-        return val + " People";
+        return val + " " + localizedLabels.people;
       }
     }
   },
@@ -188,7 +188,7 @@ var reportOptions = {
   series: [1, 1, 1],
   // series: [40, 30, 30],
   chart: { type: 'pie', height: 300 },
-  labels: ['Open Not Reported', 'Opened & Reported', 'Not Opened & Reported'],
+  labels: [localizedLabels.openNotReported, localizedLabels.openedReported, localizedLabels.notOpenedReported],
 
   colors: ['#f87171', '#60a5fa', '#4ade80'],
   legend: {

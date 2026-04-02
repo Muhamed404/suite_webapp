@@ -22,10 +22,10 @@
             <!-- Search + Filter -->
             <div class="flex items-center justify-between">
                 <div class="relative">
-                    <input id="searchInput" type="text" placeholder="Search here..."
-                        class="pl-14 pr-10 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-                    <img src="/securemagnus_2025/images/img/search.svg"
-                        class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-7 top-1/2" alt="">
+                    <input id="searchInput" type="text" placeholder="<%= __('nfc_campaign.searchHere') %>"
+                        class="<%= locals.locale === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4' %> py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)] <%= locals.locale === 'ar' ? 'text-right' : '' %>"
+                        <%= locals.locale === 'ar' ? 'dir="rtl"' : '' %>>
+                    <i class="fas fa-search absolute <%= locals.locale === 'ar' ? 'right-3' : 'left-3' %> top-1/2 transform -translate-y-[49%] text-gray-400"></i>
                 </div>
             </div>
 
@@ -41,41 +41,41 @@
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="name">
                             <span class="inline-flex items-center gap-2">
 
-                                <%= __("Campaign.Report.CampName") %>
+                                <%= __("nfc_campaign.name") %>
                             </span>
                         </th>
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="purchase_Date">
                             <span class="inline-flex items-center gap-2">
                                 <img src="/securemagnus_2025/images/subscription_history/subscription_history_purchase_date.svg"
                                     alt="">
-                                <%= __("Campaign.Report.TemplateName") %>
+                                <%= __("nfc_campaign.templateName") %>
                             </span>
                         </th>
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
                             <span class="inline-flex items-center gap-2">
                                 <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg"
                                     alt="">
-                                Start Date
+                                <%= __("nfc_campaign.startDate") %>
                             </span>
                         </th>
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
                             <span class="inline-flex items-center gap-2">
                                 <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg"
                                     alt="">
-                                End Date
+                                <%= __("nfc_campaign.endDate") %>
                             </span>
                         </th>
 
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
                             <span class="inline-flex items-center gap-2">
 
-                                Status
+                                <%= __("nfc_campaign.status") %>
                             </span>
                         </th>
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
                             <span class="inline-flex items-center gap-2">
 
-                                Total NFC Devices
+                                <%= __("nfc_campaign.totalNFCDevices") %>
                             </span>
                         </th>
                                                  
@@ -84,7 +84,7 @@
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="action">
                             <span class="inline-flex items-center gap-2">
 
-                                Action
+                                <%= __("nfc_campaign.action") %>
                             </span>
                         </th>
                     </tr>
@@ -100,11 +100,14 @@
 
         <!-- Pagination -->
         <div class="flex items-center justify-between mt-4">
-            <select id="rowsPerPage" class="px-2 py-1 border rounded">
-                <option value="5">5</option>
-                <option value="10" selected>10</option>
-                <option value="20">20</option>
-            </select>
+            <div class="flex items-center gap-2 text-sm">
+                <span class="text-gray-500"><%= __("all_campaigns.rowsPerPage") %></span>
+                <select id="rowsPerPage" class="<%= locals.locale === 'ar' ? 'pr-2 pl-8' : 'pl-2 pr-8' %> py-1 border rounded">
+                    <option value="5">5</option>
+                    <option value="10" selected>10</option>
+                    <option value="20">20</option>
+                </select>
+            </div>
             <div id="pagination" class="space-x-2"></div>
         </div>
     </div>
@@ -122,6 +125,19 @@
         campaigns: <%- JSON.stringify(campaigns) %>,
         pagination: <%- JSON.stringify(pagination) %>,
         filters: <%- JSON.stringify(filters) %>
+    };
+
+    window.I18N = {
+        showing: '<%= __("generic_label.showing") || "Showing" %>',
+        to: '<%= __("generic_label.to") || "to" %>',
+        of: '<%= __("generic_label.of") || "of" %>',
+        results: '<%= __("nfc_campaign.results") || "results" %>',
+        tabAll: '<%= __("generic_label.all") || "All" %>',
+        tabActive: '<%= __("generic_label.active") || "Active" %>',
+        tabInprogress: '<%= __("InProgress") || "In Progress" %>',
+        tabCompleted: '<%= __("filterCompleted") || "Completed" %>',
+        noCampaignsFound: '<%= translations.noCampaignsFound || __("all_campaigns.noCampaignsFound") %>',
+        createFirstCampaign: '<%= translations.createFirstCampaign || __("all_campaigns.createFirstCampaign") %>'
     };
 </script>
 

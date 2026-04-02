@@ -4,7 +4,7 @@
       <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
         <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
         <span class="text-gray-400">›</span>
-        <span class="font-semibold text-gray-900">Service Registry</span>
+        <span class="font-semibold text-gray-900"><%= __("breadcrumbs.serviceRegistry") %></span>
       </nav>
       <h3 class="text-3xl font-medium"><%= __("settings.serviceRegistry.homescreen.title") %></h3>
     </div>
@@ -15,7 +15,7 @@
     </div>
     <a href="/service-registry/create"
       class="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-teal-600 text-white font-semibold shadow hover:bg-teal-700 transition-all duration-200 border border-teal-600 hover:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-400 lg:order-2"
-      title="Create New Service">
+      title="<%= __("settings.serviceRegistry.homescreen.createServiceTitle") %>">
       <!-- Heroicons Plus Circle SVG -->
       <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
@@ -36,10 +36,12 @@
             <!-- Search + Filter -->
             <div class="flex items-center justify-between">
                 <div class="relative">
-                    <input id="searchInput" type="text" placeholder="Search here..."
-                        class="pl-14 pr-10 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-                    <img src="/securemagnus_2025/images/img/search.svg"
-                        class="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-7 top-1/2" alt="">
+                    <input id="searchInput" type="text" placeholder="<%= __("generic_label.search_here") %>"
+                        class="pl-10 pr-10 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+                        <img src="/securemagnus_2025/images/img/search.svg"
+                            class="w-5 h-5 text-gray-400" alt="">
+                    </div>
                 </div>
             </div>
 
@@ -106,7 +108,7 @@
 
         <!-- Pagination -->
         <div class="flex items-center justify-between mt-4">
-            <select id="rowsPerPage" class="px-2 py-1 border rounded">
+            <select id="rowsPerPage" class="ps-2 pe-8 py-1 border rounded">
                 <option value="5">5</option>
                 <option value="10" selected>10</option>
                 <option value="20">20</option>
@@ -122,13 +124,12 @@
   <div id="deleteConfirmModal"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
-      <h2 class="text-lg font-semibold mb-4">Confirm License Assignment</h2>
-      <p class="mb-6">Are you sure you want to set this user as <span class="font-bold text-green-600">Licensed</span>?
-      </p>
+      <h2 class="text-lg font-semibold mb-4"><%= __("settings.serviceRegistry.homescreen.modalConfirmServiceDeletion") %></h2>
+      <p class="mb-6" id="deleteConfirmText"><%= __("settings.serviceRegistry.homescreen.modalConfirmDeleteService").replace("{serviceId}", '<span class="font-bold text-red-600" id="deleteServiceId"></span>') %></p>
       <div class="flex justify-end gap-3">
-        <button id="cancelLicenseConfirm" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">Cancel</button>
+        <button id="cancelLicenseConfirm" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"><%= __("generic_label.cancel") %></button>
         <button id="confirmLicenseBtn"
-          class="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700">Confirm</button>
+          class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"><%= __("generic_label.confirm") %></button>
       </div>
     </div>
   </div>
@@ -139,6 +140,20 @@
     window.registryData = {
         serviceRegistry: <%- JSON.stringify(services) %>,
         pagination: <%- JSON.stringify(pagination) %>,
+    };
+    // Pass translations to JavaScript
+    window.translations = {
+        modalConfirmServiceDeletion: "<%= __("settings.serviceRegistry.homescreen.modalConfirmServiceDeletion") %>",
+        modalConfirmDeleteService: "<%= __("settings.serviceRegistry.homescreen.modalConfirmDeleteService") %>",
+        cancel: "<%= __("generic_label.cancel") %>",
+        confirm: "<%= __("generic_label.confirm") %>",
+        edit: "<%= __("generic_label.edit") %>",
+        delete: "<%= __("generic_label.delete") %>",
+        active: "<%= __("generic_label.active") %>",
+        suspended: "<%= __("generic_label.suspended") %>",
+        all: "<%= __("generic_label.all") %>",
+        noDataFound: "<%= __("settings.serviceRegistry.homescreen.noDataFound") %>",
+        createFirstEntry: "<%= __("settings.serviceRegistry.homescreen.createFirstEntry") %>"
     };
 </script>
 

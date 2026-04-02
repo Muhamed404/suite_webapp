@@ -99,7 +99,12 @@ function createPhishmagnusDashboardSemiDonutChart(el, values, labels, formatter,
               fontSize: '28px',
               fontWeight: 'medium',
               color: '#000',
-              show: true
+              show: true,
+              formatter: function (val) {
+                const localeEl = document.getElementById("locale-data");
+                const locale = localeEl ? localeEl.dataset.locale : 'en';
+                return locale === 'ar' ? val.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : val;
+              }
             },
             total: {
               show: true,
@@ -110,7 +115,9 @@ function createPhishmagnusDashboardSemiDonutChart(el, values, labels, formatter,
               formatter: function (w) {
                 let sent = w.globals.series[0];   // sent
                 let opened = w.globals.series[1]; // opened
-                return opened;             // ✅ still subtraction
+                const localeEl = document.getElementById("locale-data");
+                const locale = localeEl ? localeEl.dataset.locale : 'en';
+                return locale === 'ar' ? opened.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : opened;
               }
             }
           }
@@ -118,7 +125,7 @@ function createPhishmagnusDashboardSemiDonutChart(el, values, labels, formatter,
       }
     },
     colors: [color1, color2, color3], // ✅ 3 colors
-    labels: labels || ['Sent', 'Opened', 'Reported To Admin'], // ✅ changed from "Other" → "Admin"
+    labels: labels,
     legend: {
       show: true,
       fontSize: '14px',
@@ -130,7 +137,11 @@ function createPhishmagnusDashboardSemiDonutChart(el, values, labels, formatter,
         vertical: 2
       },
       formatter: function (val, opts) {
-        return val + "  " + opts.w.globals.series[opts.seriesIndex];
+        const localeEl = document.getElementById("locale-data");
+        const locale = localeEl ? localeEl.dataset.locale : 'en';
+        const num = opts.w.globals.series[opts.seriesIndex];
+        const formattedNum = locale === 'ar' ? num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : num;
+        return val + "  " + formattedNum;
       }
     },
     dataLabels: {
@@ -175,7 +186,12 @@ function createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noCl
               fontSize: '28px',
               fontWeight: 'medium',
               color: '#000',
-              show: true
+              show: true,
+              formatter: function (val) {
+                const localeEl = document.getElementById("locale-data");
+                const locale = localeEl ? localeEl.dataset.locale : 'en';
+                return locale === 'ar' ? val.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : val;
+              }
             },
             total: {
               show: true,
@@ -186,7 +202,9 @@ function createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noCl
               formatter: function (w) {
                 let sent = w.globals.series[0];   // sent
                 let opened = w.globals.series[1]; // opened
-                return opened;             // ✅ still subtraction
+                const localeEl = document.getElementById("locale-data");
+                const locale = localeEl ? localeEl.dataset.locale : 'en';
+                return locale === 'ar' ? opened.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : opened;
               }
             }
           }
@@ -194,7 +212,7 @@ function createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noCl
       }
     },
     colors: [uniqueColor, repeatedClicksColor, noClicksColor], // ✅ 3 colors
-    labels: labels || ['Sent', 'Opened', 'Reported To Admin'], // ✅ changed from "Other" → "Admin"
+    labels: labels,
     legend: {
       show: true,
       fontSize: '14px',
@@ -206,7 +224,11 @@ function createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noCl
         vertical: 2
       },
       formatter: function (val, opts) {
-        return val + "  " + opts.w.globals.series[opts.seriesIndex];
+        const localeEl = document.getElementById("locale-data");
+        const locale = localeEl ? localeEl.dataset.locale : 'en';
+        const num = opts.w.globals.series[opts.seriesIndex];
+        const formattedNum = locale === 'ar' ? num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : num;
+        return val + "  " + formattedNum;
       }
     },
     dataLabels: {
@@ -220,6 +242,18 @@ function createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noCl
 
   var chart = new ApexCharts(el, options);
   chart.render();
+}
+
+// Helper function to convert numbers to Arabic numerals
+function toArabicNum(num) {
+  return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+}
+
+// Helper function to format numbers based on locale
+function formatNumber(num) {
+  const localeEl = document.getElementById("locale-data");
+  const locale = localeEl ? localeEl.dataset.locale : 'en';
+  return locale === 'ar' ? toArabicNum(num) : num.toString();
 }
 
 // Auto-generate charts from attributes
@@ -242,7 +276,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const color1 = el.getAttribute('color1') || '#CFE2FF';
     const color2 = el.getAttribute('color2') || '#4BA6FF';
 
-    createPhishmagnusDashboardSemiDonutChart(el, [totalNFCCodes, totalScannedNFCCodes], ['Total NFC Codes', 'Total Scanned'], 'Scanned', color1, color2);
+    createPhishmagnusDashboardSemiDonutChart(el, [totalNFCCodes, totalScannedNFCCodes], [window.chartTranslations?.totalNFCCodes || 'Total NFC Codes', window.chartTranslations?.totalScanned || 'Total Scanned'], window.chartTranslations?.scanned || 'Scanned', color1, color2);
   });
 
 
@@ -252,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const color1 = el.getAttribute('color1') || '#CFE2FF';
     const color2 = el.getAttribute('color2') || '#4BA6FF';
 
-    createPhishmagnusDashboardSemiDonutChart(el, [sent, opened], ['Sent', 'Opened'], 'Opened', color1, color2);
+    createPhishmagnusDashboardSemiDonutChart(el, [sent, opened], [window.chartTranslations?.sent || 'Sent', window.chartTranslations?.opened || 'Opened'], window.chartTranslations?.opened || 'Opened', color1, color2);
   });
 
   document.querySelectorAll('.dashboardEmailSemiChart').forEach((el) => {
@@ -263,7 +297,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const color2 = el.getAttribute('color2') || '#4BA6FF';
     const color3 = el.getAttribute('color3') || '#FFB84B';
 
-    createPhishmagnusDashboardSemiDonutChart(el, [sent, opened, admin], ['Sent', 'Opened', 'Reported To Admin'], 'Opened', color1, color2, color3);
+    createPhishmagnusDashboardSemiDonutChart(el, [sent, opened, admin], [window.chartTranslations?.sent || 'Sent', window.chartTranslations?.opened || 'Opened', window.chartTranslations?.reportedToAdmin || 'Reported To Admin'], window.chartTranslations?.opened || 'Opened', color1, color2, color3);
   });
 
   document.querySelectorAll('.dashboardUsbSemiChart').forEach((el) => {
@@ -271,7 +305,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const plugged = parseInt(el.getAttribute('plugged'), 10) || 0;
     const color1 = el.getAttribute('color1') || '#CFE2FF';
     const color2 = el.getAttribute('color2') || '#4BA6FF';
-    createPhishmagnusDashboardSemiDonutChart(el, [created, plugged], ['Created', 'Plugged'], 'Plugged', color1, color2);
+    createPhishmagnusDashboardSemiDonutChart(el, [created, plugged], [window.chartTranslations?.created || 'Created', window.chartTranslations?.plugged || 'Plugged'], window.chartTranslations?.plugged || 'Plugged', color1, color2);
   });
 
 
@@ -284,7 +318,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const color2 = el.getAttribute('color2') || '#ff4b4eff';
     const color3 = el.getAttribute('color3') || '#FFB84B';
 
-    createPhishmagnusDashboardSemiDonutChart(el, [sent, Unsent, admin], ['Sent', 'Unsent', 'Open'], 'Unsent', color1, color2, color3);
+    createPhishmagnusDashboardSemiDonutChart(el, [sent, Unsent, admin], [window.chartTranslations?.sent || 'Sent', window.chartTranslations?.unsent || 'Unsent', window.chartTranslations?.reportedToAdmin || 'Open'], window.chartTranslations?.unsent || 'Unsent', color1, color2, color3);
   });
 
   document.querySelectorAll('.dashboardQRSemiChart').forEach((el) => {
@@ -295,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const color2 = el.getAttribute('color2') || '#4BA6FF';
     // const color3 = el.getAttribute('color3') || '#FFB84B';
 
-    createPhishmagnusDashboardSemiDonutChart(el, [totalQRCodes, totalScannedQRCodes], ['Total QR Images', 'Total Scanned'], 'Scanned', color1, color2);
+    createPhishmagnusDashboardSemiDonutChart(el, [totalQRCodes, totalScannedQRCodes], [window.chartTranslations?.totalQRImages || 'Total QR Images', window.chartTranslations?.totalScanned || 'Total Scanned'], window.chartTranslations?.scanned || 'Scanned', color1, color2);
   });
 
   document.querySelectorAll('.semichartLinksInteraction').forEach((el) => {
@@ -305,8 +339,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedClicksColor = el.getAttribute('color2') || '#FF4B4B';
     const noClicksColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique', 'Repeated', 'No Interaction'];
-    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels);
+    const labels = [
+      window.translations?.campaign?.email_campaign_detail?.labelUnique || 'Unique',
+      window.translations?.campaign?.email_campaign_detail?.labelRepeated || 'Repeated', 
+      window.translations?.campaign?.email_campaign_detail?.labelNoInteraction || 'No Interaction'
+    ];
+    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks');
   });
 
 
@@ -317,8 +355,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedClicksColor = el.getAttribute('color2') || '#FF4B4B';
     const noClicksColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Clicks', 'Repeated Clicks', 'No Clicks'];
-    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels);
+    const labels = [
+      window.translations?.campaign?.email_campaign_detail?.labelUniqueClicks || 'Unique Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelNoClicks || 'No Clicks'
+    ];
+    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks');
   });
 
 
@@ -329,8 +371,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedClicksColor = el.getAttribute('color2') || '#FF4B4B';
     const noClicksColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Clicks', 'Repeated Clicks', 'No Clicks'];
-    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels);
+    const labels = [
+      window.translations?.campaign?.email_campaign_detail?.labelUniqueClicks || 'Unique Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelNoClicks || 'No Clicks'
+    ];
+    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks');
   });
 
 
@@ -341,8 +387,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedClicksColor = el.getAttribute('color2') || '#FF4B4B';
     const noClicksColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Clicks', 'Repeated Clicks', 'No Clicks'];
-    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels);
+    const labels = [
+      window.translations?.campaign?.email_campaign_detail?.labelUniqueClicks || 'Unique Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks',
+      window.translations?.campaign?.email_campaign_detail?.labelNoClicks || 'No Clicks'
+    ];
+    createEmailCampaignSemiDonutChart(el, uniqueClick, repeatedClicks, noClicks, uniqueColor, repeatedClicksColor, noClicksColor, labels, window.translations?.campaign?.email_campaign_detail?.labelRepeatedClicks || 'Repeated Clicks');
   });
 
   // Below semi chart is for QR Campaign Details Page
@@ -353,8 +403,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, 'Repeated Scans');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedScans || 'Repeated Scans');
   });
 
   document.querySelectorAll('.qrSemiChartInteract').forEach((el) => {
@@ -364,8 +414,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, 'Repeated Interactions');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedInteractions || 'Repeated Interactions');
   });
 
   document.querySelectorAll('.qrSemiChartSubmitted').forEach((el) => {
@@ -375,8 +425,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, 'Repeated Submitted');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedSubmitted || 'Repeated Submitted');
   });
 
 
@@ -387,8 +437,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, 'Repeated Downloads');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedDownloads || 'Repeated Downloads');
   });
 
 
@@ -400,8 +450,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, 'Total Scans');
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedScans || 'Total Scans');
   });
 
   document.querySelectorAll('.nfcSemiChartInteract').forEach((el) => {
@@ -411,8 +461,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const totalScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Interactions', 'Repeated Interactions', 'No Interactions'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, totalInteractions, noScan, uniqueColor, totalScanColor, noScanColor, labels, 'Total Interactions');
+    const labels = [window.localizedLabels?.uniqueInteractions || 'Unique Interactions', window.localizedLabels?.repeatedInteractions || 'Repeated Interactions', window.localizedLabels?.noInteractions || 'No Interactions'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, totalInteractions, noScan, uniqueColor, totalScanColor, noScanColor, labels, window.localizedLabels?.repeatedInteractions || 'Total Interactions');
   });
 
   document.querySelectorAll('.nfcSemiChartSubmitted').forEach((el) => {
@@ -422,8 +472,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const totalSubmittedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Submitted', 'Repeated Submitted', 'No Submitted'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, totalSubmitted, noScan, uniqueColor, totalSubmittedScanColor, noScanColor, labels, 'Total Submitted');
+    const labels = [window.localizedLabels?.uniqueSubmitted || 'Unique Submitted', window.localizedLabels?.repeatedSubmitted || 'Repeated Submitted', window.localizedLabels?.noSubmitted || 'No Submitted'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, totalSubmitted, noScan, uniqueColor, totalSubmittedScanColor, noScanColor, labels, window.localizedLabels?.repeatedSubmitted || 'Total Submitted');
   });
 
 
@@ -434,8 +484,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const uniqueColor = el.getAttribute('color1') || '#FFB84B';
     const repeatedScanColor = el.getAttribute('color2') || '#FF4B4B';
     const noScanColor = el.getAttribute('color3') || '#3ACE89';
-    const labels = ['Unique Scans', 'Repeated Scans', 'No Scans'];
-    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels);
+    const labels = [window.localizedLabels?.uniqueScans || 'Unique Scans', window.localizedLabels?.repeatedScans || 'Repeated Scans', window.localizedLabels?.noScans || 'No Scans'];
+    createEmailCampaignSemiDonutChart(el, uniqueScan, repeatedScan, noScan, uniqueColor, repeatedScanColor, noScanColor, labels, window.localizedLabels?.repeatedDownloads || 'Repeated Downloads');
   });
 
   // document.querySelectorAll('.semichartFormSubmitted').forEach((el) => {

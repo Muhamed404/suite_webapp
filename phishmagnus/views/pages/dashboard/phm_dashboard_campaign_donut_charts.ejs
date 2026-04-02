@@ -1,3 +1,5 @@
+<div id="locale-data" data-locale="<%= locals.locale || 'en' %>"></div>
+
 <!-- mail -->
 
 <div class="flex flex-col gap-4 mt-6 bg-white rounded-3xl">
@@ -6,13 +8,13 @@
 
         <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
             <img src="/securemagnus_2025/images/mail-large.svg" alt="">
-            <p>Email Campaign</p>
+            <p><%= __('dashboard.emailCampaign') %></p>
         </div>
         <button class="hidden lg:block ms-auto">
             <a href=""
                 class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
 
-                This Month
+                <%= __('dashboard.thisMonth') %>
                 <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
             </a>
 
@@ -44,18 +46,18 @@
                             <span>
                                 <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#57ABE6]"
                                     alt="">
-                            </span> Links Clicked
+                            </span> <%= __('dashboard.linksClicked') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#57ABE6]"></span>
-                                Clicked <span class="ml-1">
+                                <%= __('dashboard.clicked') %> <span class="ml-1 convert-number">
                                     <%=uniqueEmailInteractionsCount?.linkOpened %>
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#D9E5F3]"></span>
-                                Ignored <span class="ml-1">
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number">
                                     <%=inviteesEmailSentUnSentStats?.sentCount - uniqueEmailInteractionsCount?.linkOpened %>
                                 </span>
                             </div>
@@ -80,18 +82,18 @@
                             <span>
                                 <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#57ABE6]"
                                     alt="">
-                            </span> Interact Form
+                            </span> <%= __('dashboard.interactForm') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#57ABE6]"></span>
-                                Clicked <span class="ml-1">
+                                <%= __('dashboard.clicked') %> <span class="ml-1 convert-number">
                                     <%=uniqueEmailInteractionsCount?.dataEnteredInForm %>
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#D9E5F3]"></span>
-                                Ignored <span class="ml-1">
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number">
                                     <%=inviteesEmailSentUnSentStats?.sentCount - uniqueEmailInteractionsCount?.dataEnteredInForm %>
                                 </span>
                             </div>
@@ -118,18 +120,18 @@
                             <span>
                                 <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#57ABE6]"
                                     alt="">
-                            </span> Form Submit
+                            </span> <%= __('dashboard.formSubmit') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#57ABE6]"></span>
-                                Submitted <span class="ml-1">
+                                <%= __('dashboard.submitted') %> <span class="ml-1 convert-number">
                                     <%=uniqueEmailInteractionsCount?.dataEnteredSubmittedInForm %>
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#D9E5F3]"></span>
-                                Ignored <span class="ml-1">
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number">
                                     <%=inviteesEmailSentUnSentStats?.sentCount - uniqueEmailInteractionsCount?.dataEnteredSubmittedInForm %>
                                 </span>
                             </div>
@@ -155,18 +157,18 @@
                             <span>
                                 <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#57ABE6]"
                                     alt="">
-                            </span> Attachment Open
+                            </span> <%= __('dashboard.attachmentOpen') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#57ABE6]"></span>
-                                Opened <span class="ml-1">
+                                <%= __('dashboard.opened') %> <span class="ml-1 convert-number">
                                     <%=uniqueEmailInteractionsCount?.fileDownloaded %>
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#D9E5F3]"></span>
-                                Ignored <span class="ml-1">
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number">
                                     <%=inviteesEmailSentUnSentStats?.sentCount - uniqueEmailInteractionsCount?.fileDownloaded %>
                                 </span>
                             </div>
@@ -202,13 +204,13 @@
 
         <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
             <img src="/securemagnus_2025/images/Icon_SMS.svg" alt="">
-            <p>SMS Campaign</p>
+            <p><%= __('dashboard.smsCampaign') %></p>
         </div>
         <button class="hidden lg:block ms-auto">
             <a href=""
                 class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
 
-                This Month
+                <%= __('dashboard.thisMonth') %>
                 <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
             </a>
 
@@ -238,16 +240,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#FAA139]"
                                     alt="">
-                            </span> Links Clicked
+                            </span> <%= __('dashboard.linksClicked') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#FAA139]"></span>
-                                Clicked <span class="ml-1"><%= uniqueSMSInteractionsCount?.linkClicked %></span>
+                                <%= __('dashboard.clicked') %> <span class="ml-1 convert-number"><%= uniqueSMSInteractionsCount?.linkClicked %></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#F2E9E0]"></span>
-                                Ignored <span class="ml-1"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.linkClicked %></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.linkClicked %></span>
                             </div>
 
                         </div>
@@ -270,16 +272,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#FAA139]"
                                     alt="">
-                            </span> Interact Form
+                            </span> <%= __('dashboard.interactForm') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#FAA139]"></span>
-                                Clicked <span class="ml-1"><%= uniqueSMSInteractionsCount?.formInteracted %></span>
+                                <%= __('dashboard.clicked') %> <span class="ml-1 convert-number"><%= uniqueSMSInteractionsCount?.formInteracted %></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#F2E9E0]"></span>
-                                Ignored <span class="ml-1"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.formInteracted %></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.formInteracted %></span>
                             </div>
 
                         </div>
@@ -304,16 +306,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#FAA139]"
                                     alt="">
-                            </span> Form Submit
+                            </span> <%= __('dashboard.formSubmit') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#FAA139]"></span>
-                                Submitted <span class="ml-1"><%= uniqueSMSInteractionsCount?.formSubmitted %></span>
+                                <%= __('dashboard.submitted') %> <span class="ml-1 convert-number"><%= uniqueSMSInteractionsCount?.formSubmitted %></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#F2E9E0]"></span>
-                                Ignored <span class="ml-1"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.formSubmitted %></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.formSubmitted %></span>
                             </div>
 
                         </div>
@@ -337,16 +339,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#FAA139]"
                                     alt="">
-                            </span> Attachment Open
+                            </span> <%= __('dashboard.attachmentOpen') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#FAA139]"></span>
-                                Downloaded <span class="ml-1"><%= uniqueSMSInteractionsCount?.fileDownloaded %></span>
+                                <%= __('dashboard.downloaded') %> <span class="ml-1 convert-number"><%= uniqueSMSInteractionsCount?.fileDownloaded %></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#F2E9E0]"></span>
-                                Ignored <span class="ml-1"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.fileDownloaded %></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%= smsSentUnSentCount?.sentCount - uniqueSMSInteractionsCount?.fileDownloaded %></span>
                             </div>
 
                         </div>
@@ -379,13 +381,13 @@
 
         <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
             <img src="/securemagnus_2025/images/Icon_USB.svg" alt="">
-            <p>USB Campaign</p>
+            <p><%= __('dashboard.usbCampaign') %></p>
         </div>
         <button class="hidden lg:block ms-auto">
             <a href=""
                 class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
 
-                This Month
+                <%= __('dashboard.thisMonth') %>
                 <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
             </a>
 
@@ -415,16 +417,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#A3B5C3]"
                                     alt="">
-                            </span> plugged USB
+                            </span> <%= __('dashboard.pluggedUsb') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#A3B5C3]"></span>
-                                Plugged <span class="ml-1"><%= usbTotalInteracted.is_plugged %></span>
+                                <%= __('dashboard.plugged') %> <span class="ml-1 convert-number"><%= usbTotalInteracted.is_plugged %></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#E2E7EB]"></span>
-                                Ignored <span class="ml-1"><%= usbTotalCreated.createdCount - usbTotalInteracted.is_plugged %></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%= usbTotalCreated.createdCount - usbTotalInteracted.is_plugged %></span>
                             </div>
 
                         </div>
@@ -447,16 +449,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#A3B5C3]"
                                     alt="">
-                            </span> Interact Form
+                            </span> <%= __('dashboard.interactForm') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#A3B5C3]"></span>
-                                Clicked <span class="ml-1">0</span>
+                                <%= __('dashboard.clicked') %> <span class="ml-1">0</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#E2E7EB]"></span>
-                                Ignored <span class="ml-1">0</span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1">0</span>
                             </div>
 
                         </div>
@@ -481,16 +483,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#A3B5C3]"
                                     alt="">
-                            </span> Form Submit
+                            </span> <%= __('dashboard.formSubmit') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#A3B5C3]"></span>
-                                Submitted <span class="ml-1">0</span>
+                                <%= __('dashboard.submitted') %> <span class="ml-1">0</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#E2E7EB]"></span>
-                                Ignored <span class="ml-1">0</span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1">0</span>
                             </div>
 
                         </div>
@@ -514,16 +516,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#A3B5C3]"
                                     alt="">
-                            </span> Attachment Open
+                            </span> <%= __('dashboard.attachmentOpen') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#A3B5C3]"></span>
-                                Opened <span class="ml-1">0</span>
+                                <%= __('dashboard.opened') %> <span class="ml-1">0</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#E2E7EB]"></span>
-                                Ignored <span class="ml-1">0</span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1">0</span>
                             </div>
 
                         </div>
@@ -557,13 +559,13 @@
 
         <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
             <img src="/securemagnus_2025/images/Icon_QR.svg" alt="">
-            <p>QR Campaign</p>
+            <p><%= __('dashboard.qrCampaign') %></p>
         </div>
         <button class="hidden lg:block ms-auto">
             <a href=""
                 class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
 
-                This Month
+                <%= __('dashboard.thisMonth') %>
                 <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
             </a>
 
@@ -596,18 +598,18 @@
                             <span>
                                 <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#45D8DD]"
                                     alt="">
-                            </span> QR Scanned
+                            </span> <%= __('dashboard.qrScanned') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#45D8DD]"></span>
-                                Scanned <span class="ml-1">
+                                <%= __('dashboard.scanned') %> <span class="ml-1 convert-number">
                                     <%=uniqueQRInteractionsCount?.scan %>
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
-                                Ignored <span class="ml-1">
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number">
                                    <%=qrCreatedAndScannedStats.total_qrs_created - uniqueQRInteractionsCount?.scan %>
                                 </span>
                             </div>
@@ -632,18 +634,18 @@
                             <span>
                                 <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#45D8DD]"
                                     alt="">
-                            </span> Interact Form
+                            </span> <%= __('dashboard.interactForm') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#45D8DD]"></span>
-                                Clicked <span class="ml-1">
+                                <%= __('dashboard.clicked') %> <span class="ml-1 convert-number">
                                     <%=uniqueQRInteractionsCount?.formInteracted %>
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
-                                Ignored <span class="ml-1">
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number">
                                     <%=qrCreatedAndScannedStats.total_qrs_created - uniqueQRInteractionsCount?.formInteracted %>
                                 </span>
                             </div>
@@ -670,19 +672,19 @@
                             <span>
                                 <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#45D8DD]"
                                     alt="">
-                            </span> Form Submit
+                            </span> <%= __('dashboard.formSubmit') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#45D8DD]"></span>
-                                Submitted <span class="ml-1">
+                                <%= __('dashboard.submitted') %> <span class="ml-1 convert-number">
                                     <%=uniqueQRInteractionsCount?.formSubmitted %>
                                   
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
-                                Ignored <span class="ml-1">
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number">
                                       <%=qrCreatedAndScannedStats.total_qrs_created - uniqueQRInteractionsCount?.formSubmitted %>
                                 </span>
                             </div>
@@ -708,18 +710,18 @@
                             <span>
                                 <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#45D8DD]"
                                     alt="">
-                            </span> Attachment Open
+                            </span> <%= __('dashboard.attachmentOpen') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#45D8DD]"></span>
-                                Opened <span class="ml-1">
+                                <%= __('dashboard.opened') %> <span class="ml-1 convert-number">
                                       <%=uniqueQRInteractionsCount?.fileDownloaded %>
                                 </span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
-                                Ignored <span class="ml-1">
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number">
                                    <%=qrCreatedAndScannedStats.total_qrs_created - uniqueQRInteractionsCount?.fileDownloaded %>
                                 </span>
                             </div>
@@ -753,13 +755,13 @@
 
         <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
             <img src="/securemagnus_2025/images/Icon_NFC.svg" alt="">
-            <p>NFC Campaign</p>
+            <p><%= __('dashboard.nfcCampaign') %></p>
         </div>
         <button class="hidden lg:block ms-auto">
             <a href=""
                 class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
 
-                This Month
+                <%= __('dashboard.thisMonth') %>
                 <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
             </a>
 
@@ -792,16 +794,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#AE62E9]"
                                     alt="">
-                            </span> Links Clicked
+                            </span> <%= __('dashboard.linksClicked') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#AE62E9]"></span>
-                                Clicked <span class="ml-1"><%=uniqueNFCInteractionsCount.scan%></span>
+                                <%= __('dashboard.clicked') %> <span class="ml-1 convert-number"><%=uniqueNFCInteractionsCount.scan%></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
-                                Ignored <span class="ml-1"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.scan %></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.scan %></span>
                             </div>
 
                         </div>
@@ -824,16 +826,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#AE62E9]"
                                     alt="">
-                            </span> Interact Form
+                            </span> <%= __('dashboard.interactForm') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#AE62E9]"></span>
-                                Clicked <span class="ml-1"><%=uniqueNFCInteractionsCount.formInteracted%></span>
+                                <%= __('dashboard.clicked') %> <span class="ml-1 convert-number"><%=uniqueNFCInteractionsCount.formInteracted%></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
-                                Ignored <span class="ml-1"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.formInteracted %></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.formInteracted %></span>
                             </div>
 
                         </div>
@@ -858,16 +860,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#AE62E9]"
                                     alt="">
-                            </span> Form Submit
+                            </span> <%= __('dashboard.formSubmit') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#AE62E9]"></span>
-                                Submitted <span class="ml-1"><%=uniqueNFCInteractionsCount.formSubmitted%></span>
+                                <%= __('dashboard.submitted') %> <span class="ml-1 convert-number"><%=uniqueNFCInteractionsCount.formSubmitted%></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
-                                Ignored <span class="ml-1"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.formSubmitted %></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.formSubmitted %></span>
                             </div>
 
                         </div>
@@ -891,16 +893,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#AE62E9]"
                                     alt="">
-                            </span> Attachment Open
+                            </span> <%= __('dashboard.attachmentOpen') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#AE62E9]"></span>
-                                Opened <span class="ml-1"><%=uniqueNFCInteractionsCount.fileDownloaded%></span>
+                                <%= __('dashboard.opened') %> <span class="ml-1 convert-number"><%=uniqueNFCInteractionsCount.fileDownloaded%></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DEEDF0]"></span>
-                                Ignored <span class="ml-1"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.fileDownloaded %></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%=nfcCreatedAndScannedStats?.total_nfc_created - uniqueNFCInteractionsCount.fileDownloaded %></span>
                             </div>
 
                         </div>
@@ -935,13 +937,13 @@
 
         <div class="flex gap-4 text-2xl font-medium max-sm:text-xl">
             <img src="/securemagnus_2025/images/Icon_Whatsapp.svg" alt="">
-            <p>Whatsapp Campaign</p>
+            <p><%= __('dashboard.whatsappCampaign') %></p>
         </div>
         <button class="hidden lg:block ms-auto">
             <a href=""
                 class=" flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
 
-                This Month
+                <%= __('dashboard.thisMonth') %>
                 <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
             </a>
 
@@ -971,16 +973,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/click.svg" class="svg-color w-6 h-6 text-[#47E7C5]"
                                     alt="">
-                            </span> Links Clicked
+                            </span> <%= __('dashboard.linksClicked') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#47E7C5]"></span>
-                                Clicked <span class="ml-1"><%=uniqueWhatsappInteractionsCount.clickLink%></span>
+                                <%= __('dashboard.clicked') %> <span class="ml-1 convert-number"><%=uniqueWhatsappInteractionsCount.clickLink%></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DDF3EE]"></span>
-                                Ignored <span class="ml-1"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.clickLink%></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.clickLink%></span>
                             </div>
 
                         </div>
@@ -1003,16 +1005,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/eye.svg" class="svg-color w-6 h-6 text-[#47E7C5]"
                                     alt="">
-                            </span> Interact Form
+                            </span> <%= __('dashboard.interactForm') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#47E7C5]"></span>
-                                Clicked <span class="ml-1"><%=uniqueWhatsappInteractionsCount.formInteracted%></span>
+                                <%= __('dashboard.clicked') %> <span class="ml-1 convert-number"><%=uniqueWhatsappInteractionsCount.formInteracted%></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DDF3EE]"></span>
-                                Ignored <span class="ml-1"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.formInteracted%></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.formInteracted%></span>
                             </div>
 
                         </div>
@@ -1037,16 +1039,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/form.svg" class="svg-color w-6 h-6 text-[#47E7C5]"
                                     alt="">
-                            </span> Form Submit
+                            </span> <%= __('dashboard.formSubmit') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#47E7C5]"></span>
-                                Submitted <span class="ml-1"><%=uniqueWhatsappInteractionsCount.formSubmitted%></span>
+                                <%= __('dashboard.submitted') %> <span class="ml-1 convert-number"><%=uniqueWhatsappInteractionsCount.formSubmitted%></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DDF3EE]"></span>
-                                Ignored <span class="ml-1"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.formSubmitted%></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.formSubmitted%></span>
                             </div>
 
                         </div>
@@ -1070,16 +1072,16 @@
                             <span>
                                 <img src="/securemagnus_2025/images/attach.svg" class="svg-color w-6 h-6 text-[#47E7C5]"
                                     alt="">
-                            </span> Attachment Open
+                            </span> <%= __('dashboard.attachmentOpen') %>
                         </div>
                         <div class="flex flex-col items-start gap-2 text-sm text-gray-700">
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#47E7C5]"></span>
-                                Opened <span class="ml-1"><%=uniqueWhatsappInteractionsCount.fileDownloaded%></span>
+                                <%= __('dashboard.opened') %> <span class="ml-1 convert-number"><%=uniqueWhatsappInteractionsCount.fileDownloaded%></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <span class="w-3 h-3 rounded-full bg-[#DDF3EE]"></span>
-                                Ignored <span class="ml-1"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.fileDownloaded%></span>
+                                <%= __('dashboard.ignored') %> <span class="ml-1 convert-number"><%=whatsappSentUnSentCount.sentCount - uniqueWhatsappInteractionsCount.fileDownloaded%></span>
                             </div>
 
                         </div>
@@ -1100,3 +1102,21 @@
 
 
 </div>
+
+<script>
+    function toArabicNum(num) {
+        return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const localeEl = document.getElementById("locale-data");
+        const locale = localeEl ? localeEl.dataset.locale : 'en';
+        const convertNum = (num) => {
+            return locale === 'ar' ? toArabicNum(num) : num.toString();
+        };
+
+        document.querySelectorAll('.convert-number').forEach(el => {
+            el.textContent = convertNum(el.textContent);
+        });
+    });
+</script>

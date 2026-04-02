@@ -54,7 +54,25 @@ function renderTabs() {
   statusTabs.innerHTML = Object.entries(counts)
     .map(([status, count]) => {
       const isActive = currentTab === status;
-      const displayName = status.charAt(0).toUpperCase() + status.slice(1);
+      let displayName = status.charAt(0).toUpperCase() + status.slice(1);
+
+      // Use I18N translations if available
+      if (window.I18N) {
+        switch(status) {
+          case 'All':
+            displayName = window.I18N.tabAll;
+            break;
+          case 'active':
+            displayName = window.I18N.tabActive;
+            break;
+          case 'inprogress':
+            displayName = window.I18N.tabInprogress;
+            break;
+          case 'completed':
+            displayName = window.I18N.tabCompleted;
+            break;
+        }
+      }
 
       // If active
       if (isActive) {
@@ -139,6 +157,22 @@ function renderTable() {
     if (campaign.status === "inprogress") statusClass = "px-4 py-1 text-sm text-yellow-700 bg-yellow-100 rounded-full";
     if (campaign.status === "completed") statusClass = "px-4 py-1 text-sm text-green-700 bg-green-100 rounded-full";
 
+    // Get translated status text
+    let statusText = campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1);
+    if (window.I18N) {
+      switch(campaign.status) {
+        case 'active':
+          statusText = window.I18N.tabActive;
+          break;
+        case 'inprogress':
+          statusText = window.I18N.tabInprogress;
+          break;
+        case 'completed':
+          statusText = window.I18N.tabCompleted;
+          break;
+      }
+    }
+
     // Action icons (view details, edit)
     const actionIcon = `
       <div class="flex gap-2">
@@ -168,7 +202,7 @@ function renderTable() {
         <div class="text-xs text-gray-500">${campaign.end_time}</div>
       </td>
       <td class="px-6 py-6 whitespace-nowrap">
-        <span class="${statusClass}">${campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}</span>
+        <span class="${statusClass}">${statusText}</span>
       </td>
       <td class="px-6 py-6 whitespace-nowrap">${campaign.totalNFCDeviceCount}</td>
      
@@ -212,9 +246,9 @@ function renderPagination(total) {
     <div class="flex items-center justify-between w-full">
       <div>
         <p class="text-sm text-gray-700">
-          Showing ${((currentPageNum - 1) * pageSize) + 1}
-          to ${Math.min(currentPageNum * pageSize, totalCount)}
-          of ${totalCount} results
+          ${window.I18N ? window.I18N.showing : 'Showing'} ${((currentPageNum - 1) * pageSize) + 1}
+          ${window.I18N ? window.I18N.to : 'to'} ${Math.min(currentPageNum * pageSize, totalCount)}
+          ${window.I18N ? window.I18N.of : 'of'} ${totalCount} ${window.I18N ? window.I18N.results : 'results'}
         </p>
       </div>
       <div class="flex space-x-2">
@@ -301,8 +335,8 @@ if (data.length > 0) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-          <div class="text-lg font-medium mb-2">No campaigns found</div>
-          <p>Create your first email campaign to get started.</p>
+          <div class="text-lg font-medium mb-2">${window.I18N.noCampaignsFound || 'No campaigns found'}</div>
+          <p>${window.I18N.createFirstCampaign || 'Create your first campaign to get started.'}</p>
         </td>
       </tr>
     `;

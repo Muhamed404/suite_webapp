@@ -17,7 +17,7 @@ $(document).ready(function() {
             return value && value.trim() !== '';
         }
         return true; // Not required if confirm is empty
-    }, 'New password is required when confirm password is provided');
+    }, window.validationMessages ? window.validationMessages.newPasswordRequired : 'New password is required when confirm password is provided');
 
     // Add custom validation method: confirmPassword required only if newPassword is filled
     $.validator.addMethod('requiredIfNewFilled', function(value, element) {
@@ -27,7 +27,7 @@ $(document).ready(function() {
             return value && value.trim() !== '';
         }
         return true; // Not required if new password is empty
-    }, 'Confirm password is required when new password is provided');
+    }, window.validationMessages ? window.validationMessages.confirmPasswordRequired : 'Confirm password is required when new password is provided');
 
     // Add custom validation method: passwords must match if both are filled
     $.validator.addMethod('passwordMatch', function(value, element) {
@@ -39,7 +39,7 @@ $(document).ready(function() {
             return newPassword === confirmPassword;
         }
         return true; // Valid if both are empty
-    }, 'Passwords must match');
+    }, window.validationMessages ? window.validationMessages.passwordsMustMatch : 'Passwords must match');
 
     // Add custom validation method: password complexity (only when password is provided)
     $.validator.addMethod('strongPassword', function(value, element) {
@@ -49,7 +49,7 @@ $(document).ready(function() {
             return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
         }
         return true; // Valid if empty
-    }, 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character (@$!%*?&).');
+    }, window.validationMessages ? window.validationMessages.passwordComplexity : 'Password must be at least 8 characters and include uppercase, lowercase, number, and special character (@$!%*?&).');
 
     // Initialize jQuery Validation Plugin
     var validator = $('form').validate({

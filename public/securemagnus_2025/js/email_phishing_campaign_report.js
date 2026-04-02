@@ -26,12 +26,12 @@ var barOptions = {
   },
   xaxis: {
     categories: [
-      'Email Sent',
-      'Email Open',
-      'Clicked Linked',
-      'Interact Form',
-      'Form Submit',
-      'Attachment Opened'
+      window.translations?.campaign?.email_campaign_detail?.labelSent || 'Email Sent',
+      window.translations?.campaign?.email_campaign_detail?.labelEmailOpen || 'Email Open',
+      window.translations?.campaign?.email_campaign_detail?.labelClickedLink || 'Clicked Linked',
+      window.translations?.campaign?.email_campaign_detail?.labelInteractForm || 'Interact Form',
+      window.translations?.campaign?.email_campaign_detail?.labelFormSubmit || 'Form Submit',
+      window.translations?.campaign?.email_campaign_detail?.labelAttachmentOpened || 'Attachment Opened'
     ],
     labels: {
       style: {
@@ -88,9 +88,9 @@ const successFormula = (emailViewed + targetCompromised) - linksClicked;
 const successRate = Math.max(0, Math.round((successFormula / total) * 100)); // Prevent negative %
 
 // Update left labels dynamically
-document.getElementById('emailViewedText').innerText = `${emailViewed} People`;
-document.getElementById('linksClickedText').innerText = `${linksClicked} People`;
-document.getElementById('targetCompromisedText').innerText = `${targetCompromised} People`;
+document.getElementById('emailViewedText').innerText = `${emailViewed} ${window.translations?.campaign?.email_campaign_detail?.labelPeople || 'People'}`;
+document.getElementById('linksClickedText').innerText = `${linksClicked} ${window.translations?.campaign?.email_campaign_detail?.labelPeople || 'People'}`;
+document.getElementById('targetCompromisedText').innerText = `${targetCompromised} ${window.translations?.campaign?.email_campaign_detail?.labelTimes || 'Times'}`;
 
 // ApexCharts Configuration
 var successOptions = {
@@ -99,7 +99,12 @@ var successOptions = {
     type: 'donut',
     height: '100%'
   },
-  labels: ['Email Viewed', 'Links Clicked', 'Target Compromised', 'Reported To Admin'],
+  labels: [
+    window.translations?.campaign?.email_campaign_detail?.labelEmailViews || 'Email Viewed',
+    window.translations?.campaign?.email_campaign_detail?.labelLinksClicked || 'Links Clicked',
+    window.translations?.campaign?.email_campaign_detail?.labelTargetCompromised || 'Target Compromised',
+    window.translations?.campaign?.email_campaign_detail?.labelReportToAdmin || 'Reported To Admin'
+  ],
   colors: ['#fbbf24', '#f87171', '#34d399', '#38bdf8'],
 
   dataLabels: { enabled: false },
@@ -119,7 +124,7 @@ var successOptions = {
           },
           total: {
             show: true,
-            label: 'Success Rate',
+            label: window.translations?.campaign?.email_campaign_detail?.labelPhishingSuccess || 'Success Rate',
             fontSize: '14px',
             color: '#6b7280',
             fontWeight: 'normal',
@@ -135,7 +140,7 @@ var successOptions = {
     enabled: true,
     y: {
       formatter: function (val) {
-        return val + ' People';
+        return val + ' ' + (window.translations?.campaign?.email_campaign_detail?.labelPeople || 'People');
       }
     }
   }
@@ -155,11 +160,11 @@ var segmentsOptions = {
     height: 300
   },
   labels: [
-    'Sent Email',
-    'Email Not Opened',
-    'Interact Form',
-    'Submit Data',
-    'Attachment Opened'
+    window.translations?.campaign?.email_campaign_detail?.labelSent || 'Sent Email',
+    window.translations?.campaign?.email_campaign_detail?.labelEmailNotOpened || 'Email Not Opened',
+    window.translations?.campaign?.email_campaign_detail?.labelInteractForm || 'Interact Form',
+    window.translations?.campaign?.email_campaign_detail?.labelSubmitData || 'Submit Data',
+    window.translations?.campaign?.email_campaign_detail?.labelAttachmentOpened || 'Attachment Opened'
   ],
   colors: ['#60a5fa', '#e5e7eb', '#fbbf24', '#a78bfa', '#4ade80'],
   legend: {
@@ -177,7 +182,7 @@ var segmentsOptions = {
     enabled: true,
     y: {
       formatter: function (val) {
-        return val + " People";
+        return val + " " + (window.translations?.campaign?.email_campaign_detail?.labelPeople || 'People');
       }
     }
   },
@@ -198,7 +203,11 @@ var reportOptions = {
   series: [reportToAdminSegments.opened_not_reported, reportToAdminSegments.opened_and_reported, reportToAdminSegments.not_opened_but_reported],
   // series: [40, 30, 30],
   chart: { type: 'pie', height: 300 },
-  labels: ['Email Opened Not Reported', 'Email Opened & Reported', 'Email Not Opened & Reported'],
+  labels: [
+    window.translations?.campaign?.email_campaign_detail?.labelEmailOpenedNotReported || 'Email Opened Not Reported',
+    window.translations?.campaign?.email_campaign_detail?.labelEmailOpenedAndReported || 'Email Opened & Reported',
+    window.translations?.campaign?.email_campaign_detail?.labelEmailNotOpenedAndReported || 'Email Not Opened & Reported'
+  ],
 
   colors: ['#f87171', '#60a5fa', '#4ade80'],
   legend: {
@@ -282,7 +291,12 @@ function createSemiDonutChart(el, sentValue, openedValue, label1, label2, color1
               fontSize: '28px',
               fontWeight: 'medium',
               color: '#000',
-              show: true
+              show: true,
+              formatter: function (val) {
+                const localeEl = document.getElementById("locale-data");
+                const locale = localeEl ? localeEl.dataset.locale : 'en';
+                return locale === 'ar' ? val.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : val;
+              }
             },
             total: {
               show: true,
@@ -293,7 +307,10 @@ function createSemiDonutChart(el, sentValue, openedValue, label1, label2, color1
               formatter: function (w) {
                 let sent = w.globals.series[0];
                 let opened = w.globals.series[1];
-                return sent + opened;
+                const total = sent + opened;
+                const localeEl = document.getElementById("locale-data");
+                const locale = localeEl ? localeEl.dataset.locale : 'en';
+                return locale === 'ar' ? total.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : total;
               }
             }
           }
@@ -313,7 +330,11 @@ function createSemiDonutChart(el, sentValue, openedValue, label1, label2, color1
         vertical: 2
       },
       formatter: function (val, opts) {
-        return val + "  " + opts.w.globals.series[opts.seriesIndex];
+        const localeEl = document.getElementById("locale-data");
+        const locale = localeEl ? localeEl.dataset.locale : 'en';
+        const num = opts.w.globals.series[opts.seriesIndex];
+        const formattedNum = locale === 'ar' ? num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]) : num;
+        return val + "  " + formattedNum;
       }
     },
     dataLabels: {

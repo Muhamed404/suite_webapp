@@ -99,6 +99,15 @@ exports.renderQRCampaignReport = async (req, res) => {
                 filters: {
                     organizationId: req.user.organization_id
                 },
+                translations: {
+                    filterAll: req.__("all_campaigns.filterAll"),
+                    active: req.__("generic_label.active"),
+                    InProgress: req.__("InProgress") === "InProgress" ? (req.getLocale() === 'ar' ? 'قيد التنفيذ' : 'In Progress') : req.__("InProgress"),
+                    filterCompleted: req.__("all_campaigns.filterCompleted"),
+                    search_here: req.__("generic_label.search_here"),
+                    noCampaignsFound: req.__("all_campaigns.noCampaignsFound"),
+                    createFirstCampaign: req.__("all_campaigns.createFirstCampaign")
+                },
                 user: req.user,
                 title: 'QR Campaign Reports',
                 message: res.locals.message || [],

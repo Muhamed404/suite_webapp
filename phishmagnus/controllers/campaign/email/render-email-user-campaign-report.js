@@ -55,7 +55,8 @@ exports.emailUserReport = async (req, res) => {
       campaignStats,
       campaignDetails,
       userProfile,
-      userInteractionTimeline // Pass timeline separately for easier access
+      userInteractionTimeline, // Pass timeline separately for easier access
+      inviteeId,
     });
 
   } catch (error) {

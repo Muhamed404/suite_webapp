@@ -1,0 +1,119 @@
+{
+  "title": "Survey Management",
+  "buttons": {
+    "quizAndQuestions": "Quiz and Questions",
+    "newSurvey": "New Survey",
+    "view": "View"
+  },
+  "stats": {
+    "totalSurveySent": "Total Survey Sent",
+    "unexpectedAnswers": "Unexpected Answers",
+    "expectedAnswers": "Expected Answers",
+    "responseRate": "Response Rate"
+  },
+  "surveyList": "Survey List",
+  "searchPlaceholder": "Search Survey...",
+  "states": {
+    "errorTitle": "Error Loading Surveys",
+    "errorDescription": "Please try again later",
+    "emptyTitle": "No Surveys Found",
+    "emptyDescription": "Try adjusting your search or create a new survey"
+  },
+  "table": {
+    "surveyName": "Survey Name",
+    "submitted": "Submitted",
+    "issued": "Issued",
+    "deadline": "Deadline",
+    "completed": "Completed",
+    "status": "Status",
+    "action": "Action"
+  },
+  "status": {
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "inProgress": "In Progress"
+  },
+  "pagination": {
+    "showing": "Showing {start}-{end} out of {total} Entries"
+  },
+  "surveyStats": {
+    "noSurvey": {
+      "title": "No Survey Selected",
+      "description": "Please select a survey from the management page",
+      "backToSurveys": "Back to Surveys"
+    },
+    "header": {
+      "loading": "Loading...",
+      "surveyDetails": "Survey Details",
+      "survey": "Survey",
+      "surveyCode": "Survey Code:",
+      "copySurveyCode": "Copy survey code",
+      "startDate": "Start Date:",
+      "endDate": "End Date:"
+    },
+    "retry": {
+      "button": "Retry user fetch",
+      "error": "Failed to retry user fetch. Please try again.",
+      "success": "Retry triggered. Users will appear once the background fetch completes."
+    },
+    "stats": {
+      "submittedSurveys": "Submitted Surveys",
+      "riskLevel": "Risk Level",
+      "totalSurveysSent": "Total Surveys Sent",
+      "totalReceived": "Total Received"
+    },
+    "risk": {
+      "pending": "Pending",
+      "high": "High",
+      "low": "Low"
+    },
+    "charts": {
+      "responseByDepartment": "Response Distribution by Department",
+      "responseByGroup": "Response Distribution by Group",
+      "responseRate": "Response Rate",
+      "correct": "Correct",
+      "notSubmitted": "Not Submitted",
+      "incorrect": "Incorrect",
+      "submissionTimeline": "Submission Timeline",
+      "responsesOverTime": "{name} responses over time",
+      "submissions": "Submissions",
+      "noSubmissionData": "No submission data yet",
+      "employeeRiskRates": "Employee Risk Rates",
+      "nonRisky": "Non-Risky",
+      "risky": "Risky",
+      "noDepartmentData": "No department data",
+      "noGroupData": "No group data"
+    },
+    "questionsAnalysis": "Questions Analysis",
+    "fallback": {
+      "department": "Dept {id}",
+      "group": "Group {id}"
+    },
+    "answersList": {
+      "title": "Answers List",
+      "viewAllUsers": "View All Users",
+      "searchPlaceholder": "Search by name or email...",
+      "submissionFilter": "Submission filter",
+      "filters": {
+        "all": "All",
+        "submitted": "Submitted",
+        "pending": "Pending"
+      },
+      "noUsersFound": "No users found",
+      "table": {
+        "name": "Name",
+        "correct": "Correct",
+        "incorrect": "Incorrect",
+        "skipped": "Skipped",
+        "riskLevel": "Risk Level",
+        "action": "Action"
+      },
+      "pagination": {
+        "pageOf": "Page {page} of {totalPages} ({users} users)"
+      }
+    },
+    "buttons": {
+      "view": "View"
+    }
+  }
+}

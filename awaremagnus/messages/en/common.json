@@ -1,0 +1,29 @@
+{
+  "appName": "AwareMagnus",
+  "language": {
+    "switchToArabic": "عربي",
+    "switchToEnglish": "EN"
+  },
+  "suitePrimaryMenu": {
+    "suiteManagement": "Suite Management",
+    "organization": "Organization",
+    "users": "Users",
+    "department": "Department",
+    "group": "Group",
+    "subscriptionLog": "Subscription Log",
+    "products": "Products",
+    "settings": "Settings",
+    "serviceRegistry": "Service Registry",
+    "logout": "Logout"
+  },
+  "save": "Save",
+  "cancel": "Cancel",
+  "close": "Close",
+  "loading": "Loading...",
+  "remove": "Remove",
+  "saved": "Saved",
+  "errors": {
+    "networkError": "Network error: Unable to connect to the server. Please try again later.",
+    "unknown": "An unexpected error occurred. Please try again."
+  }
+}

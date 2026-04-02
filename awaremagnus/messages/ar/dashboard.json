@@ -1,0 +1,196 @@
+{
+  "header": {
+    "welcome": "مرحبًا {name}",
+    "searchPlaceholder": "ابحث هنا...",
+    "mail": "البريد",
+    "notifications": "الإشعارات",
+    "profileCompany": "بنك الراجحي",
+    "profileEmail": "info@user.com"
+  },
+  "page": {
+    "title": "لوحة التحكم AwareMagnus"
+  },
+  "cards": {
+    "totalUserLicenses": "إجمالي تراخيص المستخدمين",
+    "totalConsumedLicenses": "إجمالي التراخيص المستهلكة",
+    "organizationScore": "مؤشر المؤسسة",
+    "myScore": "نتيجتي",
+    "totalComplianceScore": "إجمالي درجة الالتزام",
+    "globalProgress": "التقدّم العام",
+    "totalXpTokens": "إجمالي نقاط الخبرة",
+    "totalAwarenessCampaigns": "إجمالي حملات التوعية المنفّذة",
+    "securityPosture": "الوضع الأمني",
+    "moduleDetails": "تفاصيل الوحدة",
+    "totalModules": "إجمالي الوحدات",
+    "dropdownOptions": {
+      "weekly": "أسبوعي",
+      "monthly": "شهري",
+      "yearly": "سنوي"
+    },
+    "infoTitle": "تنبيه معلوماتي",
+    "infoBody": "مزيد من المعلومات حول هذا التنبيه تظهر هنا. هذا نص أطول لعرض المسافات داخل المحتوى.",
+    "viewMore": "عرض المزيد",
+    "inRisk": "ضمن المخاطر",
+    "securityAwarenessCampaign": "حملة التوعية الأمنية",
+    "campaignCompletionTimeline": "الخط الزمني لإكمال الحملات",
+    "completionsByDateAcrossCampaigns": "اكتمالات الوحدات حسب التاريخ عبر جميع الحملات",
+    "noOfModules": "عدد الوحدات",
+    "date": "التاريخ",
+    "viewAll": "عرض الكل",
+    "lastCampaignDate": "تاريخ آخر حملة: {date}",
+    "weeklyProgress": "التقدّم الأسبوعي",
+    "quizAccuracy": "دقة الاختبار",
+    "securityAwarenessScore": "درجة الوعي الأمني",
+    "good": "جيد",
+    "employeeRiskStates": "حالات مخاطر الموظفين",
+    "lowRisk": "مخاطر منخفضة",
+    "mediumRisk": "مخاطر متوسطة",
+    "highRisk": "مخاطر عالية",
+    "employeeCertification": "شهادات الموظفين",
+    "certified": "حاصلون على شهادة: {count}",
+    "notCertified": "غير حاصلين على شهادة: {count}",
+    "top3StrugglingTopics": "أكثر 3 مواضيع صعوبة",
+    "employeesNeedAttention": "يحتاج موظفوك إلى تحسين في هذه المواضيع",
+    "activeLearnersThisMonth": "المتعلمون النشطون هذا الشهر",
+    "trainingCompletionRate": "معدل إكمال التدريب",
+    "noCompletionData": "لا توجد بيانات إكمال"
+  },
+  "topics": {
+    "wifiSecurity": "أمن الواي فاي",
+    "physicalSecurity": "الأمن المادي",
+    "phishingSecurity": "أمن التصيّد"
+  },
+  "tables": {
+    "topHighRisk": "أفضل 10 موظفين مرتفعي المخاطر",
+    "topLowRisk": "أفضل 10 موظفين منخفضي المخاطر",
+    "sortBy": "الترتيب حسب",
+    "userId": "الاسم",
+    "modulesCompleted": "الوحدات المكتملة",
+    "achievementCount": "عدد الإنجازات",
+    "avatarLevel": "مستوى الصورة الرمزية",
+    "riskLevel": "مستوى المخاطر",
+    "showingOf": "عرض {shown} من {total}"
+  },
+  "gamification": {
+    "title": "إحصائيات التوزيع المحفّز",
+    "courseCompleted": "الدورات المكتملة",
+    "studyTime": "وقت الدراسة",
+    "achievementGallery": "معرض الإنجازات",
+    "achievementSubtitle": "شارات المؤسسة المقفلة والمفتوحة",
+    "achievements": "الإنجازات",
+    "employeeAvatarLevel": "مستوى أفاتار الموظف",
+    "vulnerableNewbie": "مبتدئ\nمعرّض",
+    "levels": {
+      "alertApprentice": "متدرّب يقظ",
+      "cautiousLearner": "متعلّم حذر",
+      "informedDefender": "مدافع مطّلع",
+      "vigilantGuardian": "حارس يقظ",
+      "skilledSentinel": "مراقب ماهر",
+      "resilientProtector": "حامٍ صامد",
+      "advancedWatchman": "مراقب متقدّم",
+      "expertEnforcer": "منفّذ خبير"
+    }
+  },
+  "menu": {
+    "suitManagement": "إدارة البدلة",
+    "organization": "المؤسسة",
+    "users": "المستخدمون",
+    "department": "الأقسام",
+    "group": "المجموعات",
+    "subscriptionHistory": "سجل الاشتراك",
+    "products": "المنتجات",
+    "dashboard": "لوحة التحكم",
+    "licenseUser": "مستخدمو الترخيص",
+    "survey": "استبيان",
+    "surveyManagement": "إدارة الاستبيانات",
+    "viewSurveys": "عرض الاستبيانات",
+    "quizQuestions": "الاختبارات والأسئلة",
+    "trainingLibrary": "مكتبة التدريب",
+    "awarenessAssets": "أصول التوعية",
+    "systemLibrary": "الوحدات الأساسية",
+    "myLibrary": "وحداتي",
+    "systemBranding": "العلامة التجارية",
+    "launchAwareness": "إطلاق التوعية",
+    "newCampaign": "حملة جديدة",
+    "campaigns": "عرض الحملات",
+    "campaignAssignments": "مهامي",
+    "reports": "التقارير",
+    "systemSettings": "إعدادات النظام",
+    "myAwareness": "التقارير والتحليل",
+    "profile": "الملف الشخصي",
+    "certificates": "الشهادات",
+    "achievements": "الإنجازات",
+    "assignments": "المهام",
+    "reportCard": "كرت الدرجات",
+    "certificate": "الشهادة",
+    "logoAndImages": "الشعار والصور"
+  },
+  "userWelcome": {
+    "welcome": "مرحباً بعودتك، {name}!",
+    "question": "هل أنت مستعد لمواصلة رحلة التعلم الخاصة بك؟",
+    "level": "المستوى {level}",
+    "xp": "{xp}/10000 XP",
+    "streak": "أنت على سلسلة {streak} يوم!",
+    "startButton": "ابدأ"
+  },
+  "userCards": {
+    "certificateCompleted": "الشهادة المكتملة",
+    "studyTime": "وقت الدراسة"
+  },
+  "thisWeek": {
+    "title": "هذا الأسبوع",
+    "dropdownWeekly": "أسبوعي",
+    "lessonsCompleted": "الدرس المكتمل",
+    "studyTime": "وقت الدراسة",
+    "xpGained": "نقاط الخبرة المكتسبة",
+    "learningVelocity": {
+      "label": "الدروس/اليوم",
+      "title": "سرعة التعلم"
+    },
+    "bestSubject": {
+      "label": "الدروس/اليوم",
+      "title": "أفضل موضوع"
+    }
+  },
+  "pendingTasks": {
+    "title": "المهام المعلقة",
+    "viewAll": "عرض الكل",
+    "assigned": "مُسند {date}",
+    "level": "المستوى 1/1",
+    "days": "{days} أيام",
+    "columnHeaders": {
+      "campaignName": "اسم الحملة",
+      "moduleName": "اسم الوحدة",
+      "status": "الحالة",
+      "startDate": "تاريخ البدء",
+      "dueDate": "تاريخ الاستحقاق",
+      "action": "الإجراء"
+    },
+    "noData": "لا توجد مهام معلقة",
+    "status": {
+      "pending": "معلق",
+      "inProgress": "قيد التقدم"
+    },
+    "actions": {
+      "view": "عرض",
+      "start": "ابدأ",
+      "starting": "يبدأ…"
+    },
+    "pagination": {
+      "showing": "عرض {shown}–{total} من أصل {all} إدخالات",
+      "showingSimple": "عرض 1–{total} إدخالات"
+    },
+    "surveyTitle": "التقييمات أو الاستطلاعات المعلقة",
+    "surveyColumnHeaders": {
+      "assessmentName": "اسم التقييم / الاستطلاع",
+      "status": "الحالة",
+      "dueDate": "تاريخ الاستحقاق",
+      "action": "الإجراء"
+    },
+    "surveyNoData": "لا توجد تقييمات أو استطلاعات معلقة",
+    "surveyLoading": "جارٍ تحميل التقييمات أو الاستطلاعات المعلقة…",
+    "surveyStatus": {
+      "active": "نشط"
+    }
+  }
+}

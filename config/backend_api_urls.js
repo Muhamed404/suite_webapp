@@ -6,6 +6,9 @@ module.exports = {
     PRODUCT_SUITE: {
         LICENSE_INFORMATION: '/suite/management/information',
         PRODUCT_SUITE_DASHBOARD: '/phm/dashboard/',
+        ORGANIZATION: {
+            Active_Organization_List: '/organization/active/names',
+        },
         SERVICE_REGISTRY: {
             CREATE: '/service-registry/create',
             LIST: '/service-registry/',
@@ -23,7 +26,12 @@ module.exports = {
                 DELETE: (catId) => `/cybersecurity/categories/delete/${catId}`
             }
         },
-
+        DOMAIN_MANAGEMENT: {
+            LIST_BY_ORGANIZATION: (orgId) => `/dms/${orgId}/organization`,
+            EDIT: (domainId) => `/dms/${domainId}/domain`,
+            DELETE: (domainOrgId, domainId) => `/dms/${domainOrgId}/organization/${domainId}/domain`,
+            TOGGLE_RESTRICT: (orgId) => `/organization/${orgId}/domain-restrict`,
+        },
         PACKAGE_MANAGEMENT: {
             CREATE: '/package/',
         },
@@ -34,6 +42,7 @@ module.exports = {
         Application_Service: {
             LIST: '/app_service/list',
             CREATE: '/app_service/create',
+            DELETE: '/app_service/delete',
         },
 
         Subscription: {
@@ -95,7 +104,7 @@ module.exports = {
             FIND_GROUP_BY_ORGANIZATION: (orgId) => `/group/findByOrganization/${orgId}`,
             CREATE: '/group/create',
             ASSIGNED_USERS_BY_GROUP: (groupId) => `/group/assignedUsersByGroup/${groupId}`,
-            UNASSIGNED_USERS_BY_GROUP: `/group/getUnassignedUser`,
+            UNASSIGNED_USERS_BY_GROUP: (groupId) => `/group/getUnassignedUser/${groupId}`,
             EnrolUserToGroup: (groupId, hasRequestedToUnenroll) => `/group/enrolUserToGroup/${groupId}/${hasRequestedToUnenroll}`,
         },
         CAMPAIGN: {
@@ -154,6 +163,19 @@ module.exports = {
             ASSIGNED_USERS_BY_DEPARTMENT: (orgId, deptId) => `/department/assigned-users/${orgId}?department=${deptId}`,
             UNASSIGNED_USERS_BY_ORGANIZATION: (orgId) => `/department/unassigned-users/${orgId}`,
             EnrolUserToDepartment: (departmentId, hasRequestedToUnenroll) => `/department/enrolUserToDepartment/${departmentId}/${hasRequestedToUnenroll}`,
+        },
+        THREAT_REPORTER: {
+            LIST_BY_ORGANIZATION: (orgId) => `/phm/threat-reporter/${orgId}/organization`,
+            REPORT_DETAIL: (reportId) => `/phm/threat-reporter/${reportId}/report`,
+            REPORT_DETAIL_By_INVTEE: (invId) => `/phm/threat-reporter/${invId}/invitee`,
+        },
+        PHISHING_SMTP: {
+            LIST: (orgId) => `/phm/phishing-smtp/organization/${orgId}`,
+            CREATE: (orgId) => `/phm/phishing-smtp/create/${orgId}`,
+            DETAIL: (smtpId) => `/phm/phishing-smtp/detail/${smtpId}`,
+            UPDATE: (smtpId) => `/phm/phishing-smtp/edit/${smtpId}`,
+            DELETE: (smtpId) => `/phm/phishing-smtp/delete/${smtpId}`,
+            TEST: (smtpId) => `/phm/phishing-smtp/test-connection/${smtpId}`,
         },
 
     }

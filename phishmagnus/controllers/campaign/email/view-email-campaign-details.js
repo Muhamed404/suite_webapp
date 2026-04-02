@@ -31,7 +31,7 @@ exports.viewCampaignDetails = async (req, res) => {
     ]);
 
     logger.info('Email Campaign Detail: FETCH CAMPAIGN STATISTICS AND PHISHING USER DETAILS API CALL COMPLETED');
-    logger.info(`Email Campaign Detail: respStatistics ${JSON.stringify(campaignReportDetails?.data, null, 2)}`);
+    logger.debug(`Email Campaign Detail: respStatistics ${JSON.stringify(campaignReportDetails?.data, null, 2)}`);
     const campaignDetails = campaignReportDetails?.data?.message.campaign || {};
     // const campaignInvitees = campaignReportDetails?.data?.message.invitees || [];
     const sentUnSentStats = campaignReportDetails?.data?.message.sentUnSentStats || {};
@@ -51,13 +51,53 @@ exports.viewCampaignDetails = async (req, res) => {
     }
 
     const usersDetail = respPhishingUserDetails?.data?.message || [];
-    logger.info('respPhishingUserDetails: user Details ' + JSON.stringify(usersDetail, null, 2));
+    logger.debug('respPhishingUserDetails: user Details ' + JSON.stringify(usersDetail, null, 2));
 
-    logger.info('Email Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));
+    logger.debug('Email Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));
     return res.render(render_ejs_urls.PhishMagnus.Campaign.Email.VIEW_CAMPAIGN, {
       campaignStats,
       campaignDetails,
-      usersDetail
+      usersDetail,
+      translations: {
+        campaign: {
+          email_campaign_detail: {
+            labelPeople: req.__("campaign.email_campaign_detail.labelPeople"),
+            labelTimes: req.__("campaign.email_campaign_detail.labelTimes"),
+            labelSent: req.__("campaign.email_campaign_detail.labelSent"),
+            labelEmailOpen: req.__("campaign.email_campaign_detail.labelEmailOpen"),
+            labelClickedLink: req.__("campaign.email_campaign_detail.labelClickedLink"),
+            labelInteractForm: req.__("campaign.email_campaign_detail.labelInteractForm"),
+            labelFormSubmit: req.__("campaign.email_campaign_detail.labelFormSubmit"),
+            labelAttachmentOpened: req.__("campaign.email_campaign_detail.labelAttachmentOpened"),
+            labelEmailViews: req.__("campaign.email_campaign_detail.labelEmailViews"),
+            labelLinksClicked: req.__("campaign.email_campaign_detail.labelLinksClicked"),
+            labelTargetCompromised: req.__("campaign.email_campaign_detail.labelTargetCompromised"),
+            labelReportToAdmin: req.__("campaign.email_campaign_detail.labelReportToAdmin"),
+            labelPhishingSuccess: req.__("campaign.email_campaign_detail.labelPhishingSuccess"),
+            labelEmployeesPhishingSegments: req.__("campaign.email_campaign_detail.labelEmployeesPhishingSegments"),
+            labelAdminReportSegments: req.__("campaign.email_campaign_detail.labelAdminReportSegments"),
+            labelEmailNotOpened: req.__("campaign.email_campaign_detail.labelEmailNotOpened"),
+            labelSubmitData: req.__("campaign.email_campaign_detail.labelSubmitData"),
+            labelEmailOpenedNotReported: req.__("campaign.email_campaign_detail.labelEmailOpenedNotReported"),
+            labelEmailOpenedAndReported: req.__("campaign.email_campaign_detail.labelEmailOpenedAndReported"),
+            labelEmailNotOpenedAndReported: req.__("campaign.email_campaign_detail.labelEmailNotOpenedAndReported"),
+            labelUniqueClicks: req.__("campaign.email_campaign_detail.labelUniqueClicks"),
+            labelRepeatedClicks: req.__("campaign.email_campaign_detail.labelRepeatedClicks"),
+            labelNoClicks: req.__("campaign.email_campaign_detail.labelNoClicks"),
+            labelUnique: req.__("campaign.email_campaign_detail.labelUnique"),
+            labelRepeated: req.__("campaign.email_campaign_detail.labelRepeated"),
+            labelNoInteraction: req.__("campaign.email_campaign_detail.labelNoInteraction"),
+            labelRepeatedClicks: req.__("campaign.email_campaign_detail.labelRepeatedClicks"),
+            labelRepeatedScans: req.__("campaign.email_campaign_detail.labelRepeatedScans"),
+            labelRepeatedInteractions: req.__("campaign.email_campaign_detail.labelRepeatedInteractions"),
+            labelRepeatedSubmitted: req.__("campaign.email_campaign_detail.labelRepeatedSubmitted"),
+            labelRepeatedDownloads: req.__("campaign.email_campaign_detail.labelRepeatedDownloads"),
+            labelTotalScans: req.__("campaign.email_campaign_detail.labelTotalScans"),
+            labelTotalInteractions: req.__("campaign.email_campaign_detail.labelTotalInteractions"),
+            labelTotalSubmitted: req.__("campaign.email_campaign_detail.labelTotalSubmitted")
+          }
+        }
+      }
     });
 
 

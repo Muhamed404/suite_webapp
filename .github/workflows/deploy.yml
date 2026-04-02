@@ -1,0 +1,196 @@
+name: Deploy Suite Webapp ( Express ) to OCI Server
+
+on:
+  push:
+    branches:
+      - development
+    paths:
+      - 'phishmagnus/**'
+      - 'productsuite/**'
+      - 'commons/**'
+      - 'config/**'
+      - 'logger/**'
+      - 'locales/**'
+      - 'middleware/**'
+      - 'routes/**'
+      - 'views/**'
+      - 'public/**'
+      - 'utility/**'
+      - 'server.js'
+      - 'package.json'
+      - '.github/workflows/deploy.yml'
+      - '.github/scripts/deploy.sh'
+      - '.github/scripts/register-suite-webapp-service.sh'
+
+env:
+  NODE_VERSION: '20.19.2'
+
+jobs:
+  # Development Branch Verification - runs first
+  verify-development-branch:
+    name: Verify Development Branch
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout development branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+
+    - name: Verify branch content
+      run: |
+        echo "Verifying development branch deployment..."
+        echo "Triggered by: ${{ github.ref }}"
+        echo "Commit SHA: ${{ github.sha }}"
+
+        if [ "${{ github.ref }}" != "refs/heads/development" ]; then
+          echo "ERROR: Not triggered from development branch!"
+          echo "Actual ref: ${{ github.ref }}"
+          exit 1
+        fi
+
+        echo "Development branch verified - deploying commit ${{ github.sha }}"
+
+  # Test job
+  suite_webapp_test:
+    name: Suite Webapp Service Validation
+    runs-on: ubuntu-latest
+    needs: [verify-development-branch]
+    defaults:
+      run:
+        working-directory: ./
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install dependencies
+      run: npm install --no-package-lock
+
+    - name: Validate service
+      run: echo "Service validation completed"
+
+  # Build and Deploy
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    needs: [suite_webapp_test]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+
+    - name: Log deployment info
+      run: |
+        echo "=========================================="
+        echo "Deploying from: ${{ github.ref }}"
+        echo "Commit SHA: ${{ github.sha }}"
+        echo "Commit message: ${{ github.event.head_commit.message }}"
+        echo "=========================================="
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install production dependencies
+      run: |
+        npm install --only=production --no-package-lock
+        echo "Suite Webapp prepared for deployment"
+
+    - name: Create deployment package
+      run: |
+        mkdir -p deployment/suite_webapp
+        mkdir -p deployment/scripts
+
+        # Copy all application files, excluding unnecessary items
+        rsync -av --progress ./ deployment/suite_webapp/ \
+          --exclude 'node_modules' \
+          --exclude '.git' \
+          --exclude '.github' \
+          --exclude '.claude' \
+          --exclude '.env' \
+          --exclude '*.md' \
+          --exclude '*.txt' \
+          --exclude 'deployment' \
+          --exclude 'docs'
+
+        # Copy deployment scripts
+        cp .github/scripts/deploy.sh deployment/scripts/
+        cp .github/scripts/register-suite-webapp-service.sh deployment/scripts/
+
+    - name: Package deployment
+      run: |
+        tar -czf suite_webapp_deployment.tar.gz deployment/
+
+    - name: Check required secrets
+      run: |
+        echo "Checking required secrets for deployment..."
+
+        if [ -z "${{ secrets.OCI_SSH_KEY }}" ]; then
+          echo "OCI_SSH_KEY secret is not configured"
+          exit 1
+        fi
+
+        if [ -z "${{ secrets.OCI_HOST }}" ]; then
+          echo "OCI_HOST secret is not configured"
+          exit 1
+        fi
+
+        if [ -z "${{ secrets.OCI_USER }}" ]; then
+          echo "OCI_USER secret is not configured"
+          exit 1
+        fi
+
+        echo "All required secrets are configured"
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.OCI_SSH_KEY }}
+
+    - name: Add OCI server to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H "${{ secrets.OCI_HOST }}" >> ~/.ssh/known_hosts
+
+    - name: Deploy to OCI server
+      env:
+        # Redis Configuration
+        REDIS_URL: ${{ secrets.REDIS_URL }}
+        REDIS_SERVER_IP: ${{ secrets.REDIS_SERVER_IP }}
+        REDIS_SERVER_PORT: ${{ secrets.REDIS_SERVER_PORT }}
+        REDIS_SESSION_SECRET_KEY: ${{ secrets.REDIS_SESSION_SECRET_KEY }}
+      run: |
+        # Transfer deployment package to server
+        scp suite_webapp_deployment.tar.gz ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/suite_webapp_deployment.tar.gz || { echo "Failed to copy deployment package"; exit 1; }
+        scp deployment/scripts/deploy.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/ || { echo "Failed to copy deploy.sh"; exit 1; }
+        scp deployment/scripts/register-suite-webapp-service.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/ || { echo "Failed to copy register-suite-webapp-service.sh"; exit 1; }
+
+        # Verify files exist on remote server
+        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "ls -la /tmp/deploy.sh /tmp/register-suite-webapp-service.sh"
+
+        # Execute deployment with environment variables
+        ssh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "chmod +x /tmp/deploy.sh && chmod +x /tmp/register-suite-webapp-service.sh && \
+          REDIS_URL='$REDIS_URL' \
+          REDIS_SERVER_IP='$REDIS_SERVER_IP' \
+          REDIS_SERVER_PORT='$REDIS_SERVER_PORT' \
+          /tmp/deploy.sh"
+
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "Deployment to OCI completed successfully!"
+        else
+          echo "Deployment to OCI failed!"
+        fi

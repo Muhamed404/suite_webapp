@@ -10,13 +10,13 @@
 
 
         <!-- Title -->
-        <h1 class="text-2xl font-semibold my-2">USB Campaign View Report</h1>
+        <h1 class="text-2xl font-semibold my-2"><%= __('usb_campaign.report.view_report_title') %></h1>
 
         <!-- Top Metrics -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div class="bg-white p-4 flex flex-col rounded-xl">
                 <div class="flex items-center justify-between gap-2 mb-8">
-                    <p class="text-gray-500 text-sm">Total USB Initiated</p>
+                    <p class="text-gray-500 text-sm"><%= __('usb_campaign.report.total_usb_initiated') %></p>
                     <img src="/securemagnus_2025/images/Icons_Campaign_Report/Email_Sent.svg" alt="">
                 </div>
                 <p class="text-4xl">
@@ -26,7 +26,7 @@
             </div>
             <div class="bg-white p-4 flex flex-col rounded-xl">
                 <div class="flex items-center justify-between gap-2 mb-8">
-                    <p class="text-gray-500 text-sm"> USB Plugged</p>
+                    <p class="text-gray-500 text-sm"> <%= __('usb_campaign.report.usb_plugged') %></p>
                     <img src="/securemagnus_2025/images/Icons_Campaign_Report/Opened_by_people.svg" alt=""
                         style="color: black;">
                 </div>
@@ -37,7 +37,7 @@
             </div>
             <div class="bg-white p-4 flex flex-col rounded-xl">
                 <div class="flex items-center justify-between gap-2 mb-8">
-                    <p class="text-gray-500 text-sm"> USB Plugged</p>
+                    <p class="text-gray-500 text-sm"> <%= __('usb_campaign.report.usb_unplugged') %></p>
                     <img src="/securemagnus_2025/images/Icons_Campaign_Report/Opened_by_people.svg" alt=""
                         style="color: black;">
                 </div>
@@ -56,7 +56,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <!-- Bar Chart -->
             <div class="bg-white p-6 rounded-xl   col-span-2">
-                <h2 class="text-lg font-semibold mb-4">USB Campaign Metrics</h2>
+                <h2 class="text-lg font-semibold mb-4"><%= __('usb_campaign.report.usb_campaign_metrics') %></h2>
                 <div id="barChart"></div>
             </div>
 
@@ -69,7 +69,7 @@
 
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-500">
-                            Campaign Name
+                            <%= __('usb_campaign.report.campaign_name') %>
                         </span>
                         <span class="text-gray-800 font-medium">
                             <%=campaigns.campaign_name%>
@@ -77,7 +77,7 @@
                     </div>
                     <div class="flex justify-between text-sm">
                         <span class="text-gray-500">
-                            <%= __("campaign.email_campaign_detail.labelLaunchDate") %>
+                            <%= __('usb_campaign.report.launch_date') %>
                         </span>
                         <span class="text-gray-800 font-medium">
                             <%=campaigns.start_datetime%>
@@ -94,7 +94,7 @@
             <div class="flex items-center justify-between gap-3 px-5 pt-5">
 
                 <div class="relative">
-                    <h2 class="text-2xl mb-4">Download USB Package</h2>
+                    <h2 class="text-2xl mb-4"><%= __('usb_campaign.report.download_usb_package') %></h2>
 
                 </div>
 
@@ -106,10 +106,10 @@
 
                     <button class="hidden lg:block ms-auto">
                         <div class="relative">
-                            <input type="text" placeholder="Search here..."
-                                class="pl-14 pr-10 py-3 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-                            <img src="/securemagnus_2025/images/img/search.svg"
-                                class="w-5 h-5 text-gray-400 absolute left-7 top-1/2 transform -translate-y-1/2" alt="">
+                        <input type="text" placeholder="<%= __("generic_label.search_here") || 'Search here...' %>"
+                            class="pl-10 pr-4 py-3 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+                        <img src="/securemagnus_2025/images/img/search.svg"
+                            class="absolute w-5 h-5 text-gray-400 transform -translate-y-[49%] left-3 top-1/2" alt="">
                         </div>
 
                     </button>
@@ -117,7 +117,7 @@
                         <a href=""
                             class=" flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
 
-                            Sort by
+                            <%= __("generic_label.sort_by") %>
                             <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
                         </a>
 
@@ -136,7 +136,7 @@
 
 
             <div class="bg-white rounded-xl shadow mt-8">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table dir="ltr" class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
                             <th
@@ -157,7 +157,7 @@
                             
                             <th
                                 class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Download
+                                <%= __('usb_campaign.report.download') %>
                             </th>
                         </tr>
                     </thead>
@@ -175,7 +175,7 @@
                                         <%= device.description %>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-gray-800">
-                                        <%= new Date(device.createdAt).toLocaleString() %>
+                                        <%= device.creation_date ? new Date(device.creation_date).toLocaleString() : 'N/A' %>
                                     </td>
                                      
                                     <td>
@@ -241,8 +241,149 @@
 
 
         </div>
+
+        <!-- USB Interaction Details -->
+        <% if (campaigns.usbUserDataDetails && campaigns.usbUserDataDetails.length > 0) { %>
+        <div class="flex flex-col gap-4 bg-white rounded-3xl p-6">
+
+          <button type="button" onclick="toggleUsbDetails()" class="flex items-center justify-between w-full text-left cursor-pointer" id="usbDetailsToggle">
+            <div>
+              <h2 class="text-xl font-bold text-gray-800"><%= __('usb_campaign.report.interaction_details_title') %></h2>
+              <p class="text-xs text-gray-400 mt-0.5"><%= campaigns.usbUserDataDetails.length %> <%= __('usb_campaign.report.interactions_recorded') %></p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs px-3 py-1.5 rounded-full font-semibold" style="background:#fff7ed;color:#c2410c">
+                <%= campaigns.unique_users %> <%= __('usb_campaign.report.unique_users') %>
+              </span>
+              <span id="usbDetailsChevron" class="flex items-center justify-center w-7 h-7 rounded-full transition-transform" style="background:#f1f5f9">
+                <svg class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"/>
+                </svg>
+              </span>
+            </div>
+          </button>
+
+          <div id="usbDetailsBody" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <% campaigns.usbUserDataDetails.forEach((entry, i) => { %>
+              <%
+                let sysDet = {};
+                try { sysDet = JSON.parse(entry.system_details || '{}'); } catch(e) {}
+                const linkedDevice = (campaigns.usb_devices || []).find(d => d.id === entry.usb_device_id);
+                const deviceCode = linkedDevice ? linkedDevice.usb_code : '—';
+                const usbFullName = [entry.first_name, entry.last_name].filter(Boolean).join(' ');
+                const usbInitials = usbFullName
+                  ? (entry.first_name?.[0] || '') + (entry.last_name?.[0] || '')
+                  : (entry.user_email || entry.ip_address || '?').slice(0, 2).toUpperCase();
+              %>
+              <div class="rounded-xl overflow-hidden" style="border:1px solid #e5e7eb">
+
+                <!-- Card header -->
+                <div class="flex items-center justify-between px-4 py-3" style="background:#f8fafc;border-bottom:1px solid #e5e7eb">
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style="background:linear-gradient(135deg,#f97316,#c2410c)">
+                      <%- usbInitials %>
+                    </span>
+                    <div>
+                      <% if (usbFullName) { %>
+                        <p class="text-sm font-semibold text-gray-800"><%- usbFullName %></p>
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                          <!-- <span class="text-xs text-gray-400"><%= entry.ip_address || '—' %></span> -->
+                        <p class="text-xs text-gray-400"><%= entry.creation_date ? entry.creation_date : '—' %></p>
+
+                          <% if (entry.user_email) { %>
+                            <span class="text-xs px-1.5 py-0.5 rounded font-medium" style="background:#f0fdf4;color:#16a34a"><%= entry.user_email %></span>
+                          <% } %>
+                        </div>
+                      <% } else { %>
+                        <p class="text-sm font-semibold text-gray-800"><%= entry.user_email || entry.ip_address || '—' %></p>
+                        <p class="text-xs text-gray-400"><%= entry.creation_date ? entry.creation_date : '—' %></p>
+                      <% } %>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs px-2 py-1 rounded-full font-semibold font-mono" style="background:#fff7ed;color:#c2410c" title="Device Code">
+                      <svg class="w-3 h-3 inline-block mr-0.5 -mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+                      </svg>
+                      <%= deviceCode %>
+                    </span>
+                    <% if (entry.is_plugged) { %>
+                      <span class="text-xs px-2 py-1 rounded-full font-semibold" style="background:#f0fdf4;color:#16a34a">● <%= __('usb_campaign.report.plugged') %></span>
+                    <% } else { %>
+                      <span class="text-xs px-2 py-1 rounded-full font-semibold" style="background:#fef2f2;color:#dc2626">● <%= __('usb_campaign.report.unplugged') %></span>
+                    <% } %>
+                  </div>
+                </div>
+
+                <!-- Card body -->
+                <div class="p-4 bg-white flex flex-col gap-3">
+
+                  <!-- IP + MAC row -->
+                  <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-lg p-3" style="background:#eff6ff">
+                      <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color:#2563eb"><%= __('usb_campaign.report.ip_address') %></p>
+                      <p class="text-sm font-mono font-bold text-gray-800"><%= entry.ip_address || '—' %></p>
+                    </div>
+                    <div class="rounded-lg p-3" style="background:#faf5ff">
+                      <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color:#7c3aed"><%= __('usb_campaign.report.mac_address') %></p>
+                      <p class="text-sm font-mono font-bold text-gray-800"><%= entry.mac_address || '—' %></p>
+                    </div>
+                  </div>
+
+                  <!-- Env data -->
+                  <div class="rounded-lg p-3" style="background:#fffbeb">
+                    <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color:#d97706"><%= __('usb_campaign.report.env_path') %></p>
+                    <p class="text-xs font-mono text-gray-700 break-all"><%= entry.env_data || '—' %></p>
+                  </div>
+
+                  <!-- System details parsed -->
+                  <% if (Object.keys(sysDet).length > 0) { %>
+                  <div class="rounded-lg overflow-hidden" style="border:1px solid #f43f5e33">
+                    <div class="flex items-center gap-1.5 px-3 py-2" style="background:#fff1f2">
+                      <svg class="w-3.5 h-3.5 flex-shrink-0" style="color:#e11d48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+                      </svg>
+                      <span class="text-xs font-bold uppercase tracking-widest" style="color:#e11d48"><%= __('usb_campaign.report.system_details') %></span>
+                    </div>
+                    <div class="px-3 divide-y" style="background:#fff8f8;border-color:#f43f5e22">
+                      <% Object.entries(sysDet).forEach(([k, v]) => { %>
+                        <div class="flex items-start gap-2 py-2">
+                          <span class="text-xs font-semibold capitalize min-w-[90px] flex-shrink-0" style="color:#e11d48"><%= k.replace(/_/g, ' ') %></span>
+                          <span class="text-xs text-gray-700 break-all font-mono"><%= v %></span>
+                        </div>
+                      <% }) %>
+                    </div>
+                  </div>
+                  <% } %>
+
+                </div>
+              </div>
+            <% }) %>
+          </div>
+
+        </div>
+        <% } %>
+
     </div>
 </div>
+
+<script>
+(function () {
+  var _usbOpen = true;
+  function toggleUsbDetails() {
+    _usbOpen = !_usbOpen;
+    var body = document.getElementById('usbDetailsBody');
+    var chevron = document.getElementById('usbDetailsChevron');
+    if (body) {
+      body.style.display = _usbOpen ? '' : 'none';
+    }
+    if (chevron) {
+      chevron.style.transform = _usbOpen ? '' : 'rotate(180deg)';
+    }
+  }
+  window.toggleUsbDetails = toggleUsbDetails;
+})();
+</script>
 
 
 <script>
@@ -254,6 +395,18 @@
         totalPlugged: <%= typeof campaigns !== 'undefined' && campaigns.total_plugged_usb || 0 %>,
         totalUnPlugged: <%= typeof campaigns !== 'undefined' && campaigns.total_unplugged_usb || 0 %>,
     };
+</script>
+<script>
+// Client-side i18n setup for USB report
+window.i18n = {
+  usb_campaign: {
+    report: {
+      total_devices: "<%= __('usb_campaign.report.total_devices') %>",
+      total_plugged: "<%= __('usb_campaign.report.total_plugged') %>",
+      total_unplugged: "<%= __('usb_campaign.report.total_unplugged') %>"
+    }
+  }
+};
 </script>
 <script src="/securemagnus_2025/js/JQuery_usb_phishing_campaign_report.js"></script>
 

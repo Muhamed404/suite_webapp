@@ -5,52 +5,57 @@
       <span class="text-gray-400">›</span>
       <span class="font-semibold text-gray-900"><%= __("breadcrumbs.reports") %></span>
     </nav>
-    <h3 class="text-3xl font-medium text-gray-900">Campaign Reports</h3>
+    <h3 class="text-3xl font-medium text-gray-900"><%= __("reports.campaignReports") %></h3>
   </div>
   <div class="flex items-center justify-between">
     <div>
-      <p class="text-sm uppercase tracking-wider text-gray-400 mb-2">Report Center</p>
-      <p class="text-sm text-gray-500 mt-1">View detailed reports for all your phishing campaigns.</p>
+      <p class="text-sm uppercase tracking-wider text-gray-400 mb-2"><%= __("reports.reportCenter") %></p>
+      <p class="text-sm text-gray-500 mt-1"><%= __("reports.reportCenterDescription") %></p>
     </div>
   </div>
 </div>
 
 <div class="flex flex-col p-6 pt-0">
   <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white p-6 lg:p-10 lg:px-40">
-    <h2 class="text-xl text-center font-semibold mb-4">Campaign Reporting</h2>
+    <h2 class="text-xl text-center font-semibold mb-4"><%= __("dashboard.campaignReporting") %></h2>
 
     <!-- Responsive grid: margin-x-6 (24px) on mobile; resets to mx-0 at md and up if you wish -->
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mx-6 md:mx-0">
       <a href="/phm/campaign/email/report" id="mail"
         class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
         <img src="/securemagnus_2025/images/img/c-mail.svg" class="size-20" alt="">
-        Email
+        <%= __("dashboard.email") %>
       </a>
       <a href="/phm/campaign/sms/report" id="sms" data-modal-target="sms"
         class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
         <img src="/securemagnus_2025/images/img/c-sms.svg" class="size-20" alt="">
-        SMS
+        <%= __("dashboard.sms") %>
       </a>
       <a href="/phm/campaign/usb/report" id="usb" data-modal-target="usb"
         class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
         <img src="/securemagnus_2025/images/img/c-usb.svg" class="size-20" alt="">
-        USB
+        <%= __("dashboard.usb") %>
       </a>
       <a href="/phm/campaign/nfc/report" id="nfc" data-modal-target="nfc"
         class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
         <img src="/securemagnus_2025/images/img/c-nfc.svg" class="size-20" alt="">
-        NFC
+        <%= __("dashboard.nfc") %>
       </a>
       <a href="/phm/campaign/qr/report" id="qr" data-modal-target="qr"
         class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
         <img src="/securemagnus_2025/images/img/c-qr.svg" class="size-20" alt="">
-        QR
+        <%= __("dashboard.qr") %>
       </a>
       <a href="/phm/campaign/whatsapp/report" id="wp" data-modal-target="wp"
         class="flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg hover:bg-gray-50 transition">
         <img src="/securemagnus_2025/images/img/c-wp.svg" class="size-20" alt="">
-        WhatsApp
+        <%= __("dashboard.whatsapp") %>
       </a>
+                        <a href="/phm/reported-emails/list" id="reported-emails" data-modal-target="reported-emails"
+                    class=" flex flex-col items-center gap-3 p-4 text-lg text-center rounded-lg">
+                    <img src="/securemagnus_2025/images/img/c-mail.svg" class="size-20" alt="">
+                    <%= __('dashboard.reported_emails') %>
+                  </a>
     </div>
   </div>
 </div>

@@ -72,6 +72,17 @@ app.use(storeSessionMiddleware);
  * Flash messages
  */
 app.use(flash());
+// Safe flash: when session is missing (e.g. some API/fetch requests), no-op instead of throwing
+app.use((req, res, next) => {
+  const originalFlash = req.flash;
+  if (originalFlash && req.session === undefined) {
+    req.flash = function (key, value) {
+      if (arguments.length === 1) return [];
+      // setter: no-op
+    };
+  }
+  next();
+});
 app.use((req, res, next) => {
   res.locals.message = req.flash('message');
   res.locals.alertType = req.flash('alertType');
@@ -87,6 +98,7 @@ app.use(requestLogger);
  * i18n and locale
  */
 app.use(i18n.init);
+app.use(localeMiddleware);
 app.use((req, res, next) => {
   res.locals.locale = req.getLocale();
   next();
@@ -103,7 +115,9 @@ app.use((req, res, next) => {
     FrontendApplicationAPI.LOGOUT.SIGNOUT
   ];
 
-  if (skipPaths.includes(req.originalUrl)) return next();
+  // Check path without query parameters
+  const pathWithoutQuery = req.path;
+  if (skipPaths.includes(pathWithoutQuery)) return next();
 
   // Validate session for all other paths
 

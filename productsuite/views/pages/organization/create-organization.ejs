@@ -44,27 +44,27 @@
             <!-- Left Side: App/License/Duration -->
             <div class="flex flex-col gap-6">
               <div>
-                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgName") %></label>
-                <input placeholder="Enter organization name" type="text" value="" id="name" name="name"
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgName") %> *</label>
+                <input placeholder="<%= __('organization.create.placeholderOrgName') %>" type="text" value="" id="name" name="name"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
               </div>
               <div>
-                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgAddress") %></label>
-                <input placeholder="Enter organization address" type="text" value="" id="address" name="address"
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgAddress") %> *</label>
+                <input placeholder="<%= __('organization.create.placeholderOrgAddress') %>" type="text" value="" id="address" name="address"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
               </div>
 
               <div>
-                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgPostalCode") %></label>
-                <input placeholder="Enter postcode" type="text" value=""
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgPostalCode") %> *</label>
+                <input placeholder="<%= __('organization.create.placeholderOrgPostalCode') %>" type="text" value=""
                   oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
                   min="1" id="postalCode" name="postalCode"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
               </div>
 
               <div>
-                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgContactNumber") %></label>
-                <input placeholder="Enter contact number"
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgContactNumber") %> *</label>
+                <input placeholder="<%= __('organization.create.placeholderOrgContactNumber') %>"
                   oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
                   min="1" id="contact" name="contact" type="text" value=""
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
@@ -74,7 +74,7 @@
             <!-- Right Side: Package/Start Date -->
             <div class="flex flex-col gap-6">
               <div>
-                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgCountry") %></label>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgCountry") %> *</label>
                 <select name="country" id="country"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-white">
                   <option value="">
@@ -88,7 +88,7 @@
                 </select>
               </div>
               <div>
-                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgState") %></label>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgState") %> *</label>
                 <select name="state" id="state"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-white">
 
@@ -99,7 +99,7 @@
               </div>
 
               <div>
-                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgCity") %></label>
+                <label class="block text-gray-700 font-medium mb-3"><%= __("organization.create.labelOrgCity") %> *</label>
                 <select name="city" id="city"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-white">
                   <option value="" selected disabled>
@@ -118,9 +118,6 @@
         <!-- 2nd -->
 
         <div class="step hidden">
-           <!-- Main Form -->
-          <!-- <form class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start"> -->
-            <!-- Left Side: App/License/Duration -->
              <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
             <div class="flex flex-col gap-6">
               <div>
@@ -136,6 +133,23 @@
                 </label>
                 <input type="email" value="" id="email" name="email"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">
+                  <%= __("organization.create.labelDomainRestrict") %>
+                </label>
+                <div class="flex items-center gap-3">
+                  <input type="hidden" name="domain_restrict" id="domain_restrict" value="1" />
+                  <button type="button" id="domainRestrictToggle"
+                    onclick="toggleDomainRestrict()"
+                    class="relative inline-flex items-center w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none bg-teal-500">
+                    <span id="domainRestrictThumb"
+                      class="inline-block w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 translate-x-6"></span>
+                  </button>
+                  <span id="domainRestrictLabel" class="text-sm font-medium text-teal-600">
+                    <%= __("generic_label.active") %>
+                  </span>
+                </div>
               </div>
 
 
@@ -178,4 +192,49 @@
 
 </div>
 <script src="/securemagnus_2025/js/form_stepper.js"></script>
+<script>
+  window.i18n = {
+    labels: {
+      next: "<%= __('organization.create.btnNext') %>",
+      finish: "<%= __('organization.create.btnFinish') %>"
+    }
+  };
+
+  function toggleDomainRestrict() {
+    var input   = document.getElementById('domain_restrict');
+    var toggle  = document.getElementById('domainRestrictToggle');
+    var thumb   = document.getElementById('domainRestrictThumb');
+    var label   = document.getElementById('domainRestrictLabel');
+    var active  = input.value === '1';
+
+    if (active) {
+      input.value = '0';
+      toggle.classList.replace('bg-teal-500', 'bg-gray-300');
+      thumb.classList.replace('translate-x-6', 'translate-x-1');
+      label.textContent = "<%= __('generic_label.inactive') %>";
+      label.classList.replace('text-teal-600', 'text-gray-400');
+    } else {
+      input.value = '1';
+      toggle.classList.replace('bg-gray-300', 'bg-teal-500');
+      thumb.classList.replace('translate-x-1', 'translate-x-6');
+      label.textContent = "<%= __('generic_label.active') %>";
+      label.classList.replace('text-gray-400', 'text-teal-600');
+    }
+  }
+  window.organizationValidationMessages = {
+    name: "<%= __('organization.create.validationOrgNameRequired') %>",
+    address: "<%= __('organization.create.validationOrgAddressRequired') %>",
+    postalCode: "<%= __('organization.create.validationOrgPostalCodeRequired') %>",
+    contact: "<%= __('organization.create.validationOrgContactRequired') %>",
+    country: "<%= __('organization.create.validationOrgCountryRequired') %>",
+    state: "<%= __('organization.create.validationOrgStateRequired') %>",
+    city: "<%= __('organization.create.validationOrgCityRequired') %>",
+    firstName: "<%= __('organization.create.validationAdminFirstNameRequired') %>",
+    lastName: "<%= __('organization.create.validationAdminLastNameRequired') %>",
+    email: "<%= __('organization.create.validationAdminEmailRequired') %>",
+    password: "<%= __('organization.create.validationAdminPasswordRequired') %>",
+    nameTaken: "<%= __('organization.create.validationOrgNameTaken') %>",
+    emailTaken: "<%= __('organization.create.validationEmailTaken') %>",
+  };
+</script>
 <script src="/securemagnus_2025/js/custom_script/create-organization-validation.js"></script>

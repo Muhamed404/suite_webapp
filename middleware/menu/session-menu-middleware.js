@@ -19,7 +19,7 @@ function generateMenuMiddleware(req, res, next) {
     logger.info(`Middleware - Generating menu for user ${user.email} in organization ${user.organization_id}`);
     const orgId = user.organization_id;
 
-    if (req.path.startsWith('/phm') || (req.path.startsWith('/awm') || req.path.startsWith('/')) && user.phm_license) {
+    if (req.path.startsWith('/phm') || (req.path.startsWith('/awm') || req.path.startsWith('/')) && (user.phm_license || user.awm_license)) {
       res.locals.menu = generateMenu(req, orgId);
     } 
     // else if (req.path.startsWith('/awm') && session?.jwtToken.user.awm_license) {

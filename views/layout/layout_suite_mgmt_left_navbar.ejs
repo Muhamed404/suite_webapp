@@ -1,3 +1,4 @@
+<% var isRtl = locale === 'ar'; %>
 <!-- Sidebar Backdrop -->
 <div id="sidebar-backdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden"></div>
 
@@ -14,8 +15,8 @@
 
       <div class="relative">
         <button onclick="toggleMainMenu()"
-          class="absolute right-0 top-7 font-bold py-1 h-14 px-1 bg-[#00CCC440] rounded-l-2xl z-20">
-          <span class="text-2xl font-light scale-x-[-1] inline-block" id="flip">›</span>
+          class="absolute <%= isRtl ? 'left-0 rounded-r-2xl' : 'right-0 rounded-l-2xl' %> top-7 font-bold py-1 h-14 px-1 bg-[#00CCC440] z-20">
+          <span class="text-2xl font-light inline-block transition-transform duration-300" id="flip"><%= isRtl ? '‹' : '›' %></span>
         </button>
       </div>
 
@@ -41,13 +42,15 @@
                         <span
                           class="transition-transform duration-300 group-[.open]:rotate-90 text-2xl menu-text">›</span>
                       </button>
-                      <%item.children.forEach((child) => { %>
                         <div id="menuA" class="mt-2 hidden flex-col space-y-2 pl-4">
+                    
+                      <%item.children.forEach((child) => { %>
                           <a href="<%= child.link %>" class="block px-4 py-2 rounded hover:bg-white/10 text-base font-medium menu-text">
                             <%= child.label %>
                           </a>
-                        </div>
                       <% }) %>
+                        </div>
+
                     </div>
                     <% } else { %>
                       <a href="<%= item.link %>"
@@ -69,7 +72,7 @@
 
               <a href="/logout" class="flex items-center gap-3 px-4 py-4 font-bold transition hover:bg-white/10 group">
                 <img src="/securemagnus_2025/images/icons/logout.svg" class="size-6" alt="">
-                <span class="text-base font-normal menu-text">Logout</span>
+                <span class="text-base font-normal menu-text"><%= __('menu.suite.logout') %></span>
               </a>
             </div>
 

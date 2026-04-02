@@ -36,7 +36,7 @@ exports.disableTemplate = async (req, res) => {
       req.flash('alertType', 'error');
       return res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);
     }
-    req.flash('message', 'Template deleted successfully');
+    req.flash('message', req.__('Template.template_deleted_successfully'));
     req.flash('alertType', 'success');
     const redirectUrl = frontend_api_urls.PHISHMAGNUS.Template.LIST;
     return res.redirect(redirectUrl)
@@ -44,8 +44,25 @@ exports.disableTemplate = async (req, res) => {
   } catch (error) {
     logger.error("Controller - Disable Template: Exception in delete template" + error);
     logger.error(error.stack)
-    req.flash('message', 'Unable to delete template');
-    req.flash('alertType', 'error');
+    
+    if (error.response && error.response.status === 403) {
+      const errorMessage = error.response.data?.message || 'Access Denied';
+      logger.warn(`[Disable Template] Access denied: ${errorMessage}`);
+      
+      if (errorMessage.toLowerCase().includes('subscription')) {
+        // Subscription error - redirect to home with message
+        if (req.session) {
+          req.flash('message', 'You do not have an active subscription to delete templates.');
+          req.flash('alertType', 'error');
+        }
+        return res.redirect(frontend_api_urls.PHISHMAGNUS.Home.INDEX);
+      }
+    }
+    
+    if (req.session) {
+      req.flash('message', 'Unable to delete template');
+      req.flash('alertType', 'error');
+    }
     return res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);
 
   }

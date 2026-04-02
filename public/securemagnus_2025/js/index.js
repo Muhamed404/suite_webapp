@@ -73,6 +73,40 @@ function showCustomToast(alertType, alertMessage = null) {
     return;
   }
 
+  const lang = document.documentElement.lang;
+  let title = alertType === 'error' ? 'Error' : 'Success!';
+  let message = alertMessage;
+
+  if (lang === 'ar') {
+    if (alertType === 'error') {
+      title = 'خطأ';
+    } else {
+      title = 'نجاح!';
+    }
+    const translations = {
+      'Package deleted successfully': 'تم حذف الباقة بنجاح',
+      'User deleted successfully': 'تم حذف المستخدم بنجاح',
+      'User created successfully': 'تم إنشاء المستخدم بنجاح',
+      'Campaign launch has been initiated': 'تم بدء إطلاق الحملة',
+      'Campaign Launch has been initiated': 'تم بدء إطلاق الحملة',
+      'Campaign has been initiated': 'تم بدء الحملة',
+      'campaign has been initiated': 'تم بدء الحملة',
+      'Campaign has been initated': 'تم بدء الحملة',
+      'Campaign has been initiated.': 'تم بدء الحملة.',
+      'QR Campaign created successfully': 'تم إنشاء حملة QR بنجاح',
+      'Success': 'نجاح',
+      'Success!': 'نجاح!',
+      '!Success': '!نجاح',
+      '! Success': '! نجاح',
+      'Success !': 'نجاح !',
+      'Delete Successfully': 'تم الحذف بنجاح',
+      'Successfully': 'بنجاح'
+    };
+    for (const [en, ar] of Object.entries(translations)) {
+      message = message.replaceAll(en, ar);
+    }
+  }
+
   const toast = document.createElement('div');
   toast.className =
     'flex items-start p-6 rounded-2xl shadow-xl max-w-md w-full ' +
@@ -83,12 +117,10 @@ function showCustomToast(alertType, alertMessage = null) {
     <span class="mt-1" aria-hidden="true">${alertType === 'error' ? errorIcon : successIcon}</span>
     <div>
       <div class="text-[18px] font-bold">
-        ${alertType === 'error' ? 'Error' : 'Success!'}
+        ${title}
       </div>
       <div class="text-[12px] font-normal mt-1">
-        ${alertType === 'error'
-          ? alertMessage
-          : alertMessage}
+        ${message}
       </div>
     </div>
   `;
@@ -101,6 +133,77 @@ function showCustomToast(alertType, alertMessage = null) {
     toast.classList.add('opacity-0', 'transition-opacity');
     setTimeout(() => toast.remove(), 700);
   }, 3000);
+}
+
+/**
+ * Displays a modern confirmation modal.
+ * @param {string} message - Body text shown in the modal.
+ * @param {Function} onConfirm - Called when the user clicks Confirm.
+ * @param {Function} [onCancel] - Optional callback when the user cancels.
+ */
+function showCustomConfirm(message, onConfirm, onCancel) {
+  const backdrop = document.createElement('div');
+  backdrop.className =
+    'fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in';
+
+  backdrop.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 flex flex-col gap-6">
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0 w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+          <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+          </svg>
+        </div>
+        <p class="text-gray-800 font-medium text-base leading-relaxed pt-2">${message}</p>
+      </div>
+      <div class="flex justify-end gap-3">
+        <button id="_confirmModalCancel" type="button"
+          class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition">
+          Cancel
+        </button>
+        <button id="_confirmModalConfirm" type="button"
+          class="px-6 py-2.5 rounded-lg bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition">
+          Confirm
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(backdrop);
+
+  function close() {
+    backdrop.classList.add('opacity-0', 'transition-opacity', 'duration-200');
+    setTimeout(() => backdrop.remove(), 200);
+  }
+
+  backdrop.querySelector('#_confirmModalCancel').addEventListener('click', function () {
+    close();
+    if (typeof onCancel === 'function') onCancel();
+  });
+
+  backdrop.querySelector('#_confirmModalConfirm').addEventListener('click', function () {
+    close();
+    onConfirm();
+  });
+
+  // Click outside modal to cancel
+  backdrop.addEventListener('click', function (e) {
+    if (e.target === backdrop) {
+      close();
+      if (typeof onCancel === 'function') onCancel();
+    }
+  });
+
+  // Escape key to cancel
+  function onKeyDown(e) {
+    if (e.key === 'Escape') {
+      document.removeEventListener('keydown', onKeyDown);
+      close();
+      if (typeof onCancel === 'function') onCancel();
+    }
+  }
+  document.addEventListener('keydown', onKeyDown);
 }
 
 // Inject fade-in animation CSS dynamically
@@ -135,40 +238,47 @@ function toggleMenus() {
   const subMenu = document.getElementById('subMenu');
   const icon = document.getElementById('flip');
 
-  if (!primaryMenu || !subMenu || !icon) return;
+  if (!primaryMenu || !subMenu || !icon) {
+    return;
+  }
 
   const primaryText = primaryMenu.querySelectorAll('.menu-text');
   const subText = subMenu.querySelectorAll('.menu-text');
 
   const isPrimaryCollapsed = primaryMenu.classList.contains('w-16');
   const isSubCollapsed = subMenu.classList.contains('w-16');
-
-  // If menus are already in the requested state, do nothing
-  if (!isPrimaryCollapsed && isSubCollapsed) return;
+  const isRtl = document.documentElement.dir === 'rtl';
 
   if (isPrimaryCollapsed) {
-    primaryMenu.classList.replace('w-16', 'w-48');
-    subMenu.classList.replace('w-48', 'w-16');
+    primaryMenu.classList.remove('w-16');
+    primaryMenu.classList.add('w-48');
+    subMenu.classList.remove('w-48');
+    subMenu.classList.add('w-16');
 
     primaryText.forEach(el => el.classList.remove('hidden'));
     subText.forEach(el => el.classList.add('hidden'));
 
-    icon.classList.add('scale-x-[-1]');
+    icon.innerHTML = isRtl ? '‹' : '›';
   } else {
-    primaryMenu.classList.replace('w-48', 'w-16');
-    subMenu.classList.replace('w-16', 'w-48');
+    primaryMenu.classList.remove('w-48');
+    primaryMenu.classList.add('w-16');
+    subMenu.classList.remove('w-16');
+    subMenu.classList.add('w-48');
 
     primaryText.forEach(el => el.classList.add('hidden'));
     subText.forEach(el => el.classList.remove('hidden'));
 
-    icon.classList.remove('scale-x-[-1]');
+    icon.innerHTML = isRtl ? '›' : '‹';
   }
 }
 
-// Run on page load to collapse primary menu by default
+// Run on page load
 document.addEventListener('DOMContentLoaded', () => {
   const icon = document.getElementById('flip');
-  if (icon) icon.classList.remove('scale-x-[-1]');
+  if (icon) {
+    const isRtl = document.documentElement.dir === 'rtl';
+    icon.innerHTML = isRtl ? '‹' : '›';
+  }
 });
 
 
@@ -176,19 +286,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   function toggleMainMenu() {
-    const menu = document.getElementById('mainMenu');
+    const menu = document.getElementById('primaryMenu');
     const menuTextElements = menu.querySelectorAll('.menu-text');
     const flipIcon = document.getElementById('flip');
 
-    menu.classList.toggle('w-48');
+    console.log('Toggling menu');
+
     menu.classList.toggle('w-16');
+    menu.classList.toggle('w-60');
 
     menuTextElements.forEach(el => {
       el.classList.toggle('hidden');
     });
 
-    flipIcon.classList.toggle('scale-x-[-1]');
-    flipIcon.classList.toggle('scale-x-[1]');
+    if (flipIcon.classList.contains('rotated')) {
+      flipIcon.style.transform = 'rotate(0deg)';
+      flipIcon.classList.remove('rotated');
+    } else {
+      flipIcon.style.transform = 'rotate(180deg)';
+      flipIcon.classList.add('rotated');
+    }
   }
 
   function toggleMenu(menuId, btn) {

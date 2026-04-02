@@ -1,0 +1,153 @@
+name: Deploy AwareMagnus (Next.js) to OCI Server
+
+on:
+  push:
+    branches:
+      - development
+    paths:
+      - 'awaremagnus/**'
+      - '.github/workflows/deploy-awaremagnus.yml'
+      - '.github/scripts/awaremagnus/**'
+
+jobs:
+  # Development Branch Verification
+  verify-development-branch:
+    name: Verify Development Branch
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout development branch
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+        fetch-depth: 0
+
+    - name: Verify branch content
+      run: |
+        echo "Verifying development branch deployment..."
+        echo "Triggered by: ${{ github.ref }}"
+        echo "Commit SHA: ${{ github.sha }}"
+
+        if [ "${{ github.ref }}" != "refs/heads/development" ]; then
+          echo "ERROR: Not triggered from development branch!"
+          exit 1
+        fi
+
+        echo "Development branch verified"
+
+  # Deploy to OCI Server
+  deploy-awaremagnus:
+    name: Deploy AwareMagnus to OCI
+    runs-on: ubuntu-latest
+    needs: [verify-development-branch]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.sha }}
+
+    - name: Log deployment info
+      run: |
+        echo "=========================================="
+        echo "Deploying AwareMagnus from: ${{ github.ref }}"
+        echo "Commit SHA: ${{ github.sha }}"
+        echo "Commit message: ${{ github.event.head_commit.message }}"
+        echo "=========================================="
+
+    - name: Create deployment package
+      run: |
+        mkdir -p deployment/scripts
+
+        # Copy awaremagnus source files
+        cp -r awaremagnus deployment/awaremagnus
+
+        # Copy deployment scripts
+        cp .github/scripts/awaremagnus/deploy-awaremagnus.sh deployment/scripts/
+        cp .github/scripts/awaremagnus/register-awaremagnus-service.sh deployment/scripts/
+        cp .github/scripts/awaremagnus/create-awaremagnus-env.sh deployment/scripts/
+
+    - name: Package deployment
+      run: |
+        tar -czf awaremagnus_deployment.tar.gz \
+          --exclude 'node_modules' \
+          --exclude '.next' \
+          --exclude '.git' \
+          --exclude '.github' \
+          --exclude '.claude' \
+          --exclude '.env' \
+          --exclude '*.md' \
+          --exclude '*.txt' \
+          --exclude 'package-lock.json' \
+          --exclude 'docs' \
+          deployment/
+
+    - name: Check required secrets
+      run: |
+        echo "Checking required secrets for deployment..."
+
+        if [ -z "${{ secrets.OCI_SSH_KEY }}" ]; then
+          echo "OCI_SSH_KEY secret is not configured"
+          exit 1
+        fi
+
+        if [ -z "${{ secrets.OCI_HOST }}" ]; then
+          echo "OCI_HOST secret is not configured"
+          exit 1
+        fi
+
+        if [ -z "${{ secrets.OCI_USER }}" ]; then
+          echo "OCI_USER secret is not configured"
+          exit 1
+        fi
+
+        echo "All required secrets are configured"
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.OCI_SSH_KEY }}
+
+    - name: Configure SSH and add OCI server to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H "${{ secrets.OCI_HOST }}" >> ~/.ssh/known_hosts
+        cat >> ~/.ssh/config << EOF
+        Host *
+          ServerAliveInterval 30
+          ServerAliveCountMax 20
+          TCPKeepAlive yes
+          ConnectionAttempts 3
+        EOF
+
+    - name: Deploy to OCI server
+      timeout-minutes: 30
+      env:
+        AWAREMAGNUS_API_URL: ${{ secrets.AWAREMAGNUS_API_URL }}
+        AWAREMAGNUS_PORT: ${{ secrets.AWAREMAGNUS_PORT }}
+        NEXT_PUBLIC_SERVICE_AWM_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_AWM_URL }}
+        NEXT_PUBLIC_SERVICE_SUITE_URL: ${{ secrets.NEXT_PUBLIC_SERVICE_SUITE_URL }}
+      run: |
+        # Transfer deployment package and scripts to server
+        scp awaremagnus_deployment.tar.gz ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
+        scp deployment/scripts/deploy-awaremagnus.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
+        scp deployment/scripts/register-awaremagnus-service.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
+        scp deployment/scripts/create-awaremagnus-env.sh ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }}:/tmp/
+
+        # Execute deployment on server (with keepalive to prevent timeout)
+        ssh -o ServerAliveInterval=30 -o ServerAliveCountMax=20 \
+          ${{ secrets.OCI_USER }}@${{ secrets.OCI_HOST }} "\
+          chmod +x /tmp/deploy-awaremagnus.sh /tmp/register-awaremagnus-service.sh /tmp/create-awaremagnus-env.sh && \
+          AWAREMAGNUS_API_URL='${AWAREMAGNUS_API_URL}' \
+          AWAREMAGNUS_PORT='${AWAREMAGNUS_PORT:-8001}' \
+          NEXT_PUBLIC_SERVICE_AWM_URL='${NEXT_PUBLIC_SERVICE_AWM_URL}' \
+          NEXT_PUBLIC_SERVICE_SUITE_URL='${NEXT_PUBLIC_SERVICE_SUITE_URL}' \
+          /tmp/deploy-awaremagnus.sh"
+
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "AwareMagnus deployment to OCI completed successfully!"
+        else
+          echo "AwareMagnus deployment to OCI failed!"
+        fi

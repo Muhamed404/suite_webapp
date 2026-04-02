@@ -3,7 +3,7 @@ $(document).ready(function () {
   $.validator.addMethod("strongPassword", function (value, element) {
     return this.optional(element) ||
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
-  }, "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.");
+  }, window.organizationValidationMessages.password);
 
   $("#createOrganization").validate({
     rules: {
@@ -19,19 +19,7 @@ $(document).ready(function () {
       email: { required: true, email: true },
       password: { required: true, strongPassword: true }
     },
-    messages: {
-      name: "Organization name is required.",
-      address: "Address is required.",
-      postalCode: "Postal code is required and must be digits.",
-      contact: "Contact number is required and must be digits.",
-      country: "Country is required.",
-      state: "State is required.",
-      city: "City is required.",
-      firstName: "First name is required.",
-      lastName: "Last name is required.",
-      email: "Valid email is required.",
-      password: "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
-    },
+    messages: window.organizationValidationMessages,
     errorClass: "text-red-500 text-sm mt-1",
     highlight: function (element) {
       $(element).addClass("border-red-500");
@@ -107,13 +95,13 @@ $(document).ready(function () {
           // console.log(JSON.stringify(response))
           if (response.isDuplicate === 'true') {
 
-            showCustomToast('error', "Email is already taken.");
+            showCustomToast('error', window.organizationValidationMessages.emailTaken);
             
             $('#email').val(''); // Reset the input field
           }
         },
         error: function () {
-          showCustomToast('error', "Error occurred, try again.");
+          showCustomToast('error', window.organizationValidationMessages.errorOccurred);
         }
       });
     }
@@ -129,13 +117,13 @@ $(document).ready(function () {
           // console.log(JSON.stringify(response))
           if (response.isDuplicate === 'true') {
 
-            showCustomToast('error', "Organization name is already taken.");
+            showCustomToast('error', window.organizationValidationMessages.nameTaken);
 
             $('#name').val(''); // Reset the input field
           }
         },
         error: function () {
-          showCustomToast('error', "Error occurred, try again.");
+          showCustomToast('error', window.organizationValidationMessages.errorOccurred);
         }
       });
     }

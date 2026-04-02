@@ -67,9 +67,9 @@
     <!-- Buttons -->
     <div class="flex justify-end gap-4 mt-10 p-8">
       <button id="backBtn" type="button"
-        class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition">Back</button>
+        class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition"><%= __("generic_label.back") %></button>
       <button id="nextBtn" type="submit"
-        class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition">Next</button>
+        class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition"><%= __("generic_label.next") %></button>
     </div>
 
 
@@ -82,8 +82,39 @@
   // templates & systemTemplate come from controller
   window._userTemplates = <%- JSON.stringify(templates || []) %>;
   window._systemTemplates = <%- JSON.stringify(systemTemplate || []) %>;
+  window.i18n = {
+    labels: {
+      select_template: "<%= __('qr_campaign.select_template') %>",
+      selectTemplate: "<%= __('qr_campaign.select_template') %>",
+      next: "<%= __('generic_label.next') %>",
+      back: "<%= __('generic_label.back') %>",
+      finish: "<%= __('generic_label.Finish') %>"
+    },
+    generic_label: {
+      emailOpened: "<%= __('generic_label.emailOpened') %>",
+      linkClicked: "<%= __('generic_label.linkClicked') %>",
+      qrScanned: "<%= __('generic_label.qrScanned') %>",
+      nfcScanned: "<%= __('generic_label.nfcScanned') %>",
+      attachmentOpened: "<%= __('generic_label.attachmentOpened') %>",
+      formInteraction: "<%= __('generic_label.formInteraction') %>",
+      formSubmitted: "<%= __('generic_label.formSubmitted') %>"
+    },
+    template: {
+      tracking_header: "<%= __('template.tracking_header') %>"
+    },
+    validation: {
+      campaign_name_required: "<%= __('validation_messages.campaign_name_required') %>",
+      template_type_required: "<%= __('validation_messages.template_type_required') %>",
+      template_required: "<%= __('validation_messages.template_required') %>",
+      qr_quantity_required: "<%= __('validation_messages.qr_quantity_required') %>",
+      qr_image_required: "<%= __('validation_messages.qr_image_required') %>",
+      start_time_required: "<%= __('validation_messages.start_time_required') %>",
+      end_time_required: "<%= __('validation_messages.end_time_required') %>"
+    }
+  };
 </script>
 <script src="/securemagnus_2025/js/form_stepper.js"></script>
 <script src="/securemagnus_2025/js/time-validation.js"></script>
 <script src="/securemagnus_2025/js/custom_script/qr_create_campaign_validation.js"></script>
+<script src="/securemagnus_2025/js/email_campaign_form_stepper.js"></script>
 

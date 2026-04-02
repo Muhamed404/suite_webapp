@@ -30,18 +30,32 @@ exports.renderSuiteUsers = async (req, res) => {
     logger.info(`Controller - Render Suite Users: Combined users count: ${combinedUsers.length}`);
 
 
-    let hasCreatePermission = Boolean(true);
+    let hasCreatePermission = Boolean(false);
+    let isReadOnly = Boolean(false);
     let userSession = req?.user;
-    if (!hasAccess(req, enums.ModuleNames.User_Management, [enums.Access_Types.RWD_ALL, enums.Access_Types.RWD_O])) {
-      logger.info(`[Organization User List] Disabling Create Button for user: ` + userSession.email)
-
-      hasCreatePermission = Boolean(false)
+    
+    const isViewingDifferentOrg = req.params.organizationId && 
+                                  parseInt(req.params.organizationId) !== parseInt(req.user.organization_id);
+    
+    logger.info(`[Organization User List] User org_id: ${req.user.organization_id}, Viewing org_id: ${req.params.organizationId}, isDifferentOrg: ${isViewingDifferentOrg}`);
+    
+    if (hasAccess(req, enums.ModuleNames.User_Management, [enums.Access_Types.RWD_ALL, enums.Access_Types.RWD_O]) && !isViewingDifferentOrg) {
+      hasCreatePermission = Boolean(true);
+      logger.info(`[Organization User List] Enabling Create Button for user: ` + userSession.email)
     }
-    logger.info(`Controller - Render Suite Users: Rendering user list view with ${JSON.stringify(combinedUsers, null, 2)} users.`);
+    
+    if (isViewingDifferentOrg) {
+      isReadOnly = Boolean(true);
+      logger.info(`[Organization User List] Setting read-only mode for user: ` + userSession.email + ` - viewing different organization`)
+    }
+    
+    logger.info(`Controller - Render Suite Users: Rendering user list view with hasCreatePermission: ${hasCreatePermission}, isReadOnly: ${isReadOnly}`);
     return res.render(render_ejs_urls.ProductSuiteManagement.User_Management.LIST, {
       enableSuiteManagementLeftMenu: true,
       users: combinedUsers,
-      hasCreatePermission
+      hasCreatePermission,
+      isReadOnly,
+      locale: req.getLocale()
     });
 
   } catch (error) {

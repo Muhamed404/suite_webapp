@@ -95,11 +95,11 @@ exports.updateTemplateController = async (req, res) => {
     const response = await apiClient.post(url, payload);
     logger.info(`Controller - Update Template: Backend response: ${JSON.stringify(response.data)}`);
     if (response.data.success) {
-      req.flash('message', 'Template saved successfully');
+      req.flash('message', req.__('system_template.save_success'));
       req.flash('alertType', 'success');
       return res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);
     } else {
-      req.flash('message', 'Unable to save template');
+      req.flash('message', req.__('system_template.create.errorMessage'));
       req.flash('alertType', 'error');
       return res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);
     }
@@ -108,8 +108,26 @@ exports.updateTemplateController = async (req, res) => {
   } catch (error) {
     logger.error('Controller - Update Template: Error:', error);
     logger.error(error.stack);
-    req.flash('message', 'Unable to save template');
-    req.flash('alertType', 'error');
+    
+    if (error.response && error.response.status === 403) {
+      const errorMessage = error.response.data?.message || 'Access Denied';
+      logger.warn(`[Update Template] Access denied: ${errorMessage}`);
+      
+      if (errorMessage.toLowerCase().includes('subscription')) {
+        // Subscription error - redirect to home with message
+        if (req.session) {
+          req.flash('message', 'You do not have an active subscription to update templates.');
+          req.flash('alertType', 'error');
+        }
+        return res.redirect(frontend_api_urls.PHISHMAGNUS.Home.INDEX);
+      }
+    }
+    
+    // Handle other errors
+    if (req.session) {
+      req.flash('message', req.__('system_template.create.errorMessage'));
+      req.flash('alertType', 'error');
+    }
     return res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);
 
   }

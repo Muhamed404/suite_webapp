@@ -73,8 +73,25 @@ exports.retrieveAllTemplates = async (req, res) => {
   } catch (error) {
     logger.error(`My Template: Issue in retrieving fetching system templates`);
     logger.error(error.stack)
-    req.flash('message', 'Error fetching templates');
-    req.flash('alertType', 'error');
-    res.redirect(frontend_api_urls.PHISHMAGNUS.Template.LIST);
+    
+    if (error.response && error.response.status === 403) {
+      const errorMessage = error.response.data?.message || 'Access Denied';
+      logger.warn(`[List Templates] Access denied: ${errorMessage}`);
+      
+      if (errorMessage.toLowerCase().includes('subscription')) {
+        logger.warn(`[List Templates] Redirecting to home - no active subscription`);
+        if (req.session) {
+          req.flash('message', 'You do not have an active subscription to manage templates.');
+          req.flash('alertType', 'error');
+        }
+        return res.redirect(frontend_api_urls.PHISHMAGNUS.Home.INDEX);
+      }
+    }
+    
+    if (req.session) {
+      req.flash('message', 'Error fetching templates');
+      req.flash('alertType', 'error');
+    }
+    return res.redirect(frontend_api_urls.PHISHMAGNUS.Home);
   }
 };

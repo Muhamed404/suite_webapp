@@ -1,0 +1,29 @@
+{
+  "appName": "AwareMagnus",
+  "language": {
+    "switchToArabic": "عربي",
+    "switchToEnglish": "EN"
+  },
+  "suitePrimaryMenu": {
+    "suiteManagement": "إدارة الدعاوى",
+    "organization": "المنظمة",
+    "users": "المستخدمون",
+    "department": "القسم",
+    "group": "المجموعة",
+    "subscriptionLog": "سجل الاشتراكات",
+    "products": "المنتجات",
+    "settings": "الإعدادات",
+    "serviceRegistry": "سجل الخدمة",
+    "logout": "تسجيل الخروج"
+  },
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "close": "إغلاق",
+  "loading": "جاري التحميل...",
+  "remove": "حذف",
+  "saved": "تم الحفظ",
+  "errors": {
+    "networkError": "خطأ في الشبكة: تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقًا.",
+    "unknown": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
+  }
+}

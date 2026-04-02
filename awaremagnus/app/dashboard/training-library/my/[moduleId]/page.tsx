@@ -1,0 +1,19 @@
+"use client";
+
+import { useParams } from "next/navigation";
+
+import { ModuleDetailsPage } from "@/components/modules/training-library/module-details-page";
+
+export default function MyLibraryModuleDetailsPage() {
+  const params = useParams();
+
+  if (!params) return null;
+
+  const moduleId = Number(params.moduleId);
+
+  if (!moduleId || Number.isNaN(moduleId)) {
+    return null;
+  }
+
+  return <ModuleDetailsPage libraryType="my" moduleId={moduleId} />;
+}

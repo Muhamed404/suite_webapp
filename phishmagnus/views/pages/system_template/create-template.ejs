@@ -9,10 +9,15 @@
                 <%= __("breadcrumbs.systemTemplate") %>
             </a>
             <span class="text-gray-400">›</span>
-            <span class="font-semibold text-gray-900">Create Template</span>
+            <span class="font-semibold text-gray-900">
+                <%= __("system_template.create.title") %>
+            </span>
         </nav>
+        <div>
+            <%- include('../../partials/back-button') %>
+        </div>
         <h3 class="text-3xl font-medium text-gray-900">
-            Create Template
+            <%= __("system_template.create.title") %>
         </h3>
     </div>
 </div>
@@ -21,9 +26,12 @@
     <!-- first section  -->
     <div class="flex flex-col p-8 gap-4 mt-3 rounded-3xl bg-white border border-gray-100 shadow-sm">
         <!-- Progress Bar -->
-        <div id="progress" class="flex items-center mb-6"></div>
+        <div class="overflow-x-auto mb-6">
+            <div id="progress" class="flex items-center min-w-max"></div>
+        </div>
         <form class="space-y-6" id="templateCreationForm" name="templateCreationForm" method="post"
             action="<%=typeof postMethodUrl !== 'undefined' ? postMethodUrl : '/template/' %>">
+            <!-- Steps -->
             <!-- Steps -->
             <div class="step hidden w-full lg:w-3/4">
                 <!-- Page Heading -->
@@ -64,7 +72,7 @@
                             <option value="ar">Arabic</option>
                         </select>
                         <!-- Custom Dropdown Icon -->
- 
+
                     </div>
                 </div>
                 <!-- Phishing Type -->
@@ -108,6 +116,7 @@
 
                     </div>
                 </div>
+
             </div>
             <div class="step hidden">
                 <h2 class="text-2xl font-bold mb-2" id="step-heading">
@@ -142,7 +151,7 @@
                             <option value="exe">EXE</option>
 
                         </select>
-                        
+
                     </div>
                 </div>
 
@@ -173,6 +182,20 @@
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
                     </div>
 
+                    <!-- Phishing SMTP (Email only) -->
+                    <div id="phishing-smtp-container" class="mb-6 hidden">
+                        <label class="block text-base font-semibold mb-2">
+                            <%= __("system_template.create.email_domain") %>
+                        </label>
+                        <div class="relative">
+                            <select name="phishing_smtp" id="phishing_smtp"
+                                class="appearance-none w-full border border-gray-300 rounded-lg pl-4 pr-12 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500">
+                                <option value=""><%= __("system_template.create.select_email_domain") %></option>
+                            </select>
+                        </div>
+                        <p id="phishing-smtp-error" class="text-red-500 text-sm mt-1 hidden"><%= __("system_template.create.failed_to_load_smtp_configurations") %></p>
+                    </div>
+
                     <!-- Sender Email -->
                     <div id="divSenderEmail">
                         <label class="block text-base font-semibold mb-2">
@@ -199,17 +222,17 @@
                         <input type="text" name="company_name" id="companyName"
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
                     </div>
-                </div>
 
-
-                <!-- Company Domain -->
-                <div class="my-6">
+                                    <!-- Company Domain -->
+                <div>
                     <label class="block text-base font-semibold mb-2">
                         <%= __("system_template.create.labelDetails_level1_CompanyDomain") %>
                     </label>
                     <input type="text" name="company_domain" id="companyDomain"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
                 </div>
+                </div>
+
 
                 <!-- Email Message with CKEditor -->
                 <div>
@@ -318,7 +341,7 @@
                     <label for="website" class="block text-sm text-gray-700 mb-2">
                         <%= __("system_template.create.labelDetails_level3_CustomPhishPageURL") %>
                     </label>
-                    <input type="text" id="website"
+                    <input type="text" id="website" name="phish_url"
                         class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400">
                 </div>
             </div>
@@ -403,13 +426,13 @@
                 <!-- Radio Buttons -->
 
                 <div class="space-y-4 mb-6">
-                    <label class="flex items-center custom-radio cursor-pointer">
+                    <!-- <label class="flex items-center custom-radio cursor-pointer">
                         <input type="radio" name="landing_option" value="link" id="landing_option_link">
                         <span class="radio-circle"></span>
                         <span class="text-gray-700">
                             <%= __("system_template.create.labelLandingPage_radioOption1") %>
                         </span>
-                    </label>
+                    </label> -->
                     <label class="flex items-center custom-radio cursor-pointer">
                         <input type="radio" name="landing_option" value="custom" id="landing_option_custom">
                         <span class="radio-circle"></span>
@@ -419,16 +442,19 @@
                     </label>
                 </div>
                 <!-- Import field for link option -->
-                <div id="import-html-url-container" class="mb-6" style="display:none;">
+                <!-- <div id="import-html-url-container" class="mb-6" style="display:none;">
                     <label for="import-html-url" class="block text-gray-700 font-medium mb-2">
                         <%= __('system_template.create.labelImportHtmlUrl') || 'Import HTML Template from URL' %>
                     </label>
                     <div class="flex gap-2">
-                        <input type="url" id="import-html-url" name="import_html_url" placeholder="https://example.com/template.html" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400">
-                        <button type="button" id="fetch-html-template" class="bg-teal-400 text-white px-4 py-2 rounded-lg hover:bg-teal-500 transition">Fetch</button>
+                        <input type="url" id="import-html-url" name="import_html_url"
+                            placeholder="https://example.com/template.html"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-400">
+                        <button type="button" id="fetch-html-template"
+                            class="bg-teal-400 text-white px-4 py-2 rounded-lg hover:bg-teal-500 transition">Fetch</button>
                     </div>
                     <div id="import-html-url-error" class="text-red-500 text-sm mt-2" style="display:none;"></div>
-                </div>
+                </div> -->
 
 
                 <!-- Custom Page Setting (hidden initially) -->
@@ -508,13 +534,13 @@
                 <div class="mb-6">
                     <label for="sms_content" class="block text-gray-700 font-medium mb-3">
                         <%= __("system_template.create.sms_message") || "SMS Message" %>
-                        <span class="text-red-500">*</span>
+                            <span class="text-red-500">*</span>
                     </label>
                     <textarea id="sms_content" name="sms_content" rows="6" maxlength="160"
                         placeholder="<%= __('system_template.create.sms_placeholder') || 'Enter SMS message (max 160 characters)' %>"
                         class="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 resize-none"></textarea>
                     <div class="text-sm text-gray-500 mt-2">
-                        <span id="sms-char-count">0</span> / 160 characters
+                        <span id="sms-char-count">0</span> / 160 <%= __('system_template.create.sms_characters') %>
                     </div>
                 </div>
 
@@ -530,7 +556,7 @@
                         onclick="insertSMSPlaceholder('last_name')">
                         <%= __("system_template.placeHolder_lastName") || "Last Name" %>
                     </button>
-                    <button type="button"
+                    <button type="button" id="tag_sms_phishing_url"
                         class="px-4 py-2 bg-teal-100 text-teal-700 rounded-lg hover:bg-teal-200 transition"
                         onclick="insertSMSPlaceholder('phishing_url')">
                         <%= __("system_template.placeHolder_phishingLink") || "URL" %>
@@ -553,11 +579,11 @@
                 <button id="prev" type="button"
                     class="border border-teal-400 text-teal-500 font-medium px-6 py-2 rounded-full hover:bg-teal-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled>
-                    Back
+                    <%= __("generic_label.back") %>
                 </button>
                 <button id="next" type="button"
                     class="bg-teal-400 text-white font-medium px-6 py-2 rounded-full hover:bg-teal-500 transition">
-                    Next
+                    <%= __("generic_label.next") %>
                 </button>
             </div>
         </form>
@@ -577,121 +603,216 @@
             "<%= __('system_template.stepper6') %>",
             "<%= __('system_template.stepper7') %>",
             "<%= __('system_template.stepper8') %>"
-        ]
+        ],
+        next: "<%= __('generic_label.next') %>",
+        finish: "<%= __('generic_label.Finish') %>",
+        validation_messages: {
+            template_name_required: "<%= __('validation_messages.template_name_required') %>",
+            phishing_type_required: "<%= __('validation_messages.phishing_type_required') %>",
+            sender_email_required: "<%= __('validation_messages.sender_email_required') %>",
+            email_subject_required: "<%= __('validation_messages.email_subject_required') %>",
+            company_name_required: "<%= __('validation_messages.company_name_required') %>",
+            sender_name_required: "<%= __('validation_messages.sender_name_required') %>",
+            company_domain_required: "<%= __('validation_messages.company_domain_required') %>",
+            email_content_required: "<%= __('validation_messages.email_content_required') %>",
+            valid_email_required: "<%= __('validation_messages.valid_email_required') %>",
+            file_name_required: "<%= __('validation_messages.file_name_required') %>",
+            phishing_page_content_required: "<%= __('validation_messages.phishing_page_content_required') %>",
+            validationSelectPhishingOption: "<%= __('system_template.create.validationSelectPhishingOption') %>",
+            validationEnterValidUrl: "<%= __('system_template.create.validationEnterValidUrl') %>",
+            urlRequired: "<%= __('system_template.create.urlRequired') %>",
+            urlInvalid: "<%= __('system_template.create.urlInvalid') %>",
+            fetchButtonText: "<%= __('system_template.create.fetchButtonText') %>",
+            fetchingButtonText: "<%= __('system_template.create.fetchingButtonText') %>",
+            selectPhishingSmtp: "<%= __('system_template.create.selectPhishingSmtp') %>",
+            sms_content_required: "<%= __('validation_messages.sms_content_required') %>",
+            template_name_minlength: "<%= __('validation_messages.template_name_minlength') %>",
+            file_name_minlength: "<%= __('validation_messages.file_name_minlength') %>",
+            subject_minlength: "<%= __('validation_messages.subject_minlength') %>",
+            sender_name_minlength: "<%= __('validation_messages.sender_name_minlength') %>",
+            company_name_minlength: "<%= __('validation_messages.company_name_minlength') %>",
+            company_domain_minlength: "<%= __('validation_messages.company_domain_minlength') %>",
+            sms_content_maxlength: "<%= __('validation_messages.sms_content_maxlength') %>"
+        },
+        __: function (key) {
+            const translations = {
+                "system_template.create.simplePhishingTitle": "<%= __('system_template.create.simplePhishingTitle') %>",
+                "system_template.create.simplePhishingDescription": "<%= __('system_template.create.simplePhishingDescription') %>",
+                "system_template.create.downloadFileBasedTitle": "<%= __('system_template.create.downloadFileBasedTitle') %>",
+                "system_template.create.downloadFileBasedDescription": "<%= __('system_template.create.downloadFileBasedDescription') %>",
+                "system_template.create.urlClickBasedTitle": "<%= __('system_template.create.urlClickBasedTitle') %>",
+                "system_template.create.urlClickBasedDescription": "<%= __('system_template.create.urlClickBasedDescription') %>",
+                "system_template.create.smsShortMessageTitle": "<%= __('system_template.create.smsShortMessageTitle') %>",
+                "system_template.create.smsShortMessageDescription": "<%= __('system_template.create.smsShortMessageDescription') %>",
+                "system_template.create.whatsappShortMessageTitle": "<%= __('system_template.create.whatsappShortMessageTitle') %>",
+                "system_template.create.whatsappShortMessageDescription": "<%= __('system_template.create.whatsappShortMessageDescription') %>",
+                "system_template.create.whatsappAttachUrlTitle": "<%= __('system_template.create.whatsappAttachUrlTitle') %>",
+                "system_template.create.whatsappAttachUrlDescription": "<%= __('system_template.create.whatsappAttachUrlDescription') %>",
+                "system_template.create.whatsappDownloadTemplateTitle": "<%= __('system_template.create.whatsappDownloadTemplateTitle') %>",
+                "system_template.create.whatsappDownloadTemplateDescription": "<%= __('system_template.create.whatsappDownloadTemplateDescription') %>",
+                "system_template.create.validationSelectLandingPage": "<%= __('system_template.create.validationSelectLandingPage') %>"
+            };
+            return translations[key] || key;
+        }
     };
 </script>
 
 <script src="/securemagnus_2025/js/custom_script/system_create_template.js"></script>
 <script>
-// Show import field when 'link' is selected, hide otherwise
-document.addEventListener('DOMContentLoaded', function() {
-    const linkRadio = document.getElementById('landing_option_link');
-    const customRadio = document.getElementById('landing_option_custom');
-    const importContainer = document.getElementById('import-html-url-container');
-    const fetchBtn = document.getElementById('fetch-html-template');
-    const urlInput = document.getElementById('import-html-url');
-    const errorDiv = document.getElementById('import-html-url-error');
-    const landingPageContent = document.getElementById('landing_page_content');
+    // Show import field when 'link' is selected, hide otherwise
+    document.addEventListener('DOMContentLoaded', function () {
+        const linkRadio = document.getElementById('landing_option_link');
+        const customRadio = document.getElementById('landing_option_custom');
+        const importContainer = document.getElementById('import-html-url-container');
+        const fetchBtn = document.getElementById('fetch-html-template');
+        // const urlInput = document.getElementById('import-html-url');
+        // const errorDiv = document.getElementById('import-html-url-error');
+        const landingPageContent = document.getElementById('landing_page_content');
 
-    function toggleImportField() {
-        if (linkRadio && linkRadio.checked) {
-            importContainer.style.display = '';
-        } else {
-            importContainer.style.display = 'none';
-            errorDiv.style.display = 'none';
+        function toggleImportField() {
+            if (linkRadio && linkRadio.checked) {
+                importContainer.style.display = '';
+            } else {
+                importContainer.style.display = 'none';
+                errorDiv.style.display = 'none';
+            }
         }
-    }
-    if (linkRadio && customRadio) {
-        linkRadio.addEventListener('change', toggleImportField);
-        customRadio.addEventListener('change', toggleImportField);
-        // On page load
-        toggleImportField();
-    }
+        if (linkRadio && customRadio) {
+            linkRadio.addEventListener('change', toggleImportField);
+            customRadio.addEventListener('change', toggleImportField);
+            // On page load
+            toggleImportField();
+        }
 
-    // Fetch HTML from URL using backend proxy and insert into landing_page_content
-    if (fetchBtn && urlInput && landingPageContent) {
-        fetchBtn.addEventListener('click', async function() {
-            const url = urlInput.value.trim();
-            errorDiv.style.display = 'none';
-            if (!url) {
-                errorDiv.textContent = 'Please enter a valid URL.';
-                errorDiv.style.display = '';
-                return;
-            }
-            try {
-                fetchBtn.disabled = true;
-                fetchBtn.textContent = 'Fetching...';
-                const response = await fetch('/template/api/fetch-html', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url })
-                });
-                const result = await response.json();
-                if (!response.ok) throw new Error(result.error || 'Failed to fetch HTML.');
-                const html = result.html;
-                // alert(html);
-                // Set value for textarea
-                landingPageContent.value = html;
-                // If CKEditor is used, set data there too
-                if (window.CKEDITOR && CKEDITOR.instances['landing_page_content']) {
-                    CKEDITOR.instances['landing_page_content'].setData(html);
-                }
-                fetchBtn.textContent = 'Fetch';
-                fetchBtn.disabled = false;
-            } catch (err) {
-                errorDiv.textContent = 'Error: ' + err.message;
-                errorDiv.style.display = '';
-                fetchBtn.textContent = 'Fetch';
-                fetchBtn.disabled = false;
-            }
+        // Fetch HTML from URL using backend proxy and insert into landing_page_content
+        // if (fetchBtn && urlInput && landingPageContent) {
+        //     fetchBtn.addEventListener('click', async function () {
+        //         const url = urlInput.value.trim();
+        //         errorDiv.style.display = 'none';
+        //         if (!url) {
+        //             errorDiv.textContent = window.i18n.validation_messages.validationEnterValidUrl;
+        //             errorDiv.style.display = '';
+        //             return;
+        //         }
+        //         try {
+        //             fetchBtn.disabled = true;
+        //             fetchBtn.textContent = window.i18n.validation_messages.fetchingButtonText;
+        //             const response = await fetch('/template/api/fetch-html', {
+        //                 method: 'POST',
+        //                 headers: { 'Content-Type': 'application/json' },
+        //                 body: JSON.stringify({ url })
+        //             });
+        //             const result = await response.json();
+        //             if (!response.ok) throw new Error(result.error || 'Failed to fetch HTML.');
+        //             const html = result.html;
+        //             // alert(html);
+        //             // Set value for textarea
+        //             landingPageContent.value = html;
+        //             // If CKEditor is used, set data there too
+        //             if (window.CKEDITOR && CKEDITOR.instances['landing_page_content']) {
+        //                 CKEDITOR.instances['landing_page_content'].setData(html);
+        //             }
+        //             fetchBtn.textContent = window.i18n.validation_messages.fetchButtonText;
+        //             fetchBtn.disabled = false;
+        //         } catch (err) {
+        //             errorDiv.textContent = 'Error: ' + err.message;
+        //             errorDiv.style.display = '';
+        //             fetchBtn.textContent = window.i18n.validation_messages.fetchButtonText;
+        //             fetchBtn.disabled = false;
+        //         }
+        //     });
+        // }
+    });
+</script>
+<script>
+    // Character counter for SMS
+    const smsContent = document.getElementById('sms_content');
+    const charCount = document.getElementById('sms-char-count');
+
+    if (smsContent && charCount) {
+        smsContent.addEventListener('input', function () {
+            charCount.textContent = this.value.length;
         });
     }
-});
-</script>
-<script>
-// Character counter for SMS
-const smsContent = document.getElementById('sms_content');
-const charCount = document.getElementById('sms-char-count');
 
-if (smsContent && charCount) {
-  smsContent.addEventListener('input', function() {
-    charCount.textContent = this.value.length;
-  });
-}
+    // Phishing SMTP dropdown: show when Email is selected, populate via AJAX
+    (function () {
+        var smtpContainer = document.getElementById('phishing-smtp-container');
+        var smtpSelect = document.getElementById('phishing_smtp');
+        var smtpError = document.getElementById('phishing-smtp-error');
+        var smtpLoaded = false;
 
-// Insert placeholder into SMS textarea
-function insertSMSPlaceholder(placeholder) {
-  const textarea = document.getElementById('sms_content');
-  if (!textarea) return;
-  
-  const start = textarea.selectionStart;
-  const end = textarea.selectionEnd;
-  const text = textarea.value;
-  // Use template literal with escaped characters
-  const placeholderText = '<' + '%=' + placeholder + '%' + '>'; // This prevents EJS from parsing it
-  
-  textarea.value = text.substring(0, start) + placeholderText + text.substring(end);
-  textarea.focus();
-  textarea.selectionStart = textarea.selectionEnd = start + placeholderText.length;
-  
-  // Update character count
-  document.getElementById('sms-char-count').textContent = textarea.value.length;
-}
-</script>
-<script>
-    $("#templateCreationForm").validate({
-  rules: {
-    // ...existing rules...
-    sms_content: { 
-      required: function() {
-        return selectedPhishType === 'sms';
-      },
-      maxlength: 160 
+        function loadPhishingSmtp() {
+            if (smtpLoaded) return;
+            console.log('[PhishingSMTP] Fetching from /phm/phishing-smtp/name');
+            fetch('/phm/phishing-smtp/name')
+                .then(function (res) {
+                    // console.log('[PhishingSMTP] HTTP status:', res.status);
+                    return res.json();
+                })
+                .then(function (data) {
+                    // console.log('[PhishingSMTP] Raw response:', data);
+                    smtpLoaded = true;
+                    var list = Array.isArray(data) ? data : (data.smtpList || data.data || data.message || []);
+                    // console.log('[PhishingSMTP] Parsed list:', list);
+                    smtpSelect.innerHTML = '<option value="">' + (window.i18n.validation_messages.selectPhishingSmtp || '-- Select Phishing SMTP --') + '</option>';
+                    list.forEach(function (item) {
+                        // console.log('[PhishingSMTP] Adding option:', item);
+                        var opt = document.createElement('option');
+                        opt.value = item.id;
+                        opt.dataset.senderEmail = item.sender_email || '';
+                        opt.textContent = '#' + item.organization_name + ' - ' + item.sender_email;
+                        smtpSelect.appendChild(opt);
+                    });
+
+                    smtpSelect.addEventListener('change', function () {
+                        var selected = this.options[this.selectedIndex];
+                        document.getElementById('sender_email').value = selected.dataset.senderEmail || '';
+                    });
+                })
+                .catch(function (err) {
+                    console.error('[PhishingSMTP] Fetch error:', err);
+                    smtpError.classList.remove('hidden');
+                });
+        }
+
+        function onPhishTypeChange() {
+            var selected = document.querySelector('input[name="phishType"]:checked');
+            if (selected && selected.value === 'email') {
+                smtpContainer.classList.remove('hidden');
+                loadPhishingSmtp();
+            } else {
+                smtpContainer.classList.add('hidden');
+            }
+
+            var hideNameTags = selected && (selected.value === 'qr' || selected.value === 'nfc');
+            document.querySelectorAll('[id="tag_first_name"], [id="tag_last_name"], [id="tag_email"]').forEach(function (btn) {
+                btn.style.display = hideNameTags ? 'none' : '';
+            });
+        }
+
+        document.querySelectorAll('input[name="phishType"]').forEach(function (radio) {
+            radio.addEventListener('change', onPhishTypeChange);
+        });
+    })();
+
+    // Insert placeholder into SMS textarea
+    function insertSMSPlaceholder(placeholder) {
+        const textarea = document.getElementById('sms_content');
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        // Use template literal with escaped characters
+        const placeholderText = '<' + '%=' + placeholder + '%' + '>'; // This prevents EJS from parsing it
+
+        textarea.value = text.substring(0, start) + placeholderText + text.substring(end);
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = start + placeholderText.length;
+
+        // Update character count
+        document.getElementById('sms-char-count').textContent = textarea.value.length;
     }
-  },
-  messages: {
-    // ...existing messages...
-    sms_content: "SMS message is required (max 160 characters)."
-  }
-});
 </script>
+<script src="/securemagnus_2025/js/custom_script/system_create_template_validation.js"></script>

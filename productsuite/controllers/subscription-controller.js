@@ -41,7 +41,6 @@ async function createSubscription(req, res, next) {
         });
       })
       .catch((error) => {
-        console.error("::::::inside error::::::::::::", error);
         res.render("pages/product_suite_management/suite_management", {
           message: "Issue in request, contact to administrator",
           alertType: "error",

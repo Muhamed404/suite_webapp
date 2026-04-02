@@ -13,7 +13,7 @@ $(document).ready(function () {
       email: { required: true, email: true },
       firstName: { required: true, minlength: 2 },
       lastName: { required: true, minlength: 2 },
-      password: { required: true, strongPassword: true }
+      password: { strongPassword: true }
     },
     messages: {
       address: "Address is required.",
@@ -21,8 +21,7 @@ $(document).ready(function () {
       contact: "Contact number is required and must be digits.",
       email: "Valid email is required.",
       firstName: "First name is required.",
-      lastName: "Last name is required.",
-      password: "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
+      lastName: "Last name is required."
     },
     errorClass: "text-red-500 text-sm mt-1",
     highlight: function (element) {

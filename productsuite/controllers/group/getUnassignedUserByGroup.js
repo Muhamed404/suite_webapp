@@ -12,7 +12,9 @@ async function getUnassignedUserByGroup(req, res) {
       logger.error("Invalid user organization");
       return res.status(400).json({ success: false, message: "Invalid request" });
     }
-    const url = backend_api_urls.PHISHMAGNUS.GROUPS.UNASSIGNED_USERS_BY_GROUP;
+    const groupId = parseInt(req.params.groupId);
+
+    const url = backend_api_urls.PHISHMAGNUS.GROUPS.UNASSIGNED_USERS_BY_GROUP(groupId);
     logger.info('Printing url for unassigned users by group: ' + url);
     const apiClient = getApiClient(req);
     const response = await apiClient.get(url)

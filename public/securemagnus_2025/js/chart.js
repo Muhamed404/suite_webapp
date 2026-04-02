@@ -16,7 +16,7 @@ const baseOptions = {
             fontSize: '14px',
             offsetY: -10,
             formatter: function () {
-              return 'Total Campaigns';
+              return translations.totalCampaigns || 'Total Campaigns';
             }
           },
           value: {
@@ -41,14 +41,17 @@ const baseOptions = {
     type: 'solid'
   },
   legend: {
-    position: 'right',
-    formatter: function (val, opts) {
-      let seriesValue = opts.w.globals.series[opts.seriesIndex];
-      return `${val}: ${seriesValue}`;
-    }
+    position: 'right'
   },
   title: {
     text: ''
+  },
+  tooltip: {
+    y: {
+      formatter: function (value) {
+        return value;
+      }
+    }
   },
   responsive: [{
     breakpoint: 480,
@@ -63,15 +66,28 @@ const baseOptions = {
   }]
 };
 
+function toArabicNum(num) {
+  return num.toString().replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
+  const localeEl = document.getElementById("locale-data");
+  const locale = localeEl ? localeEl.dataset.locale : 'en';
+  
+  const convertNum = (num) => {
+    const result = locale === 'ar' ? toArabicNum(num) : num.toString();
+    return result;
+  };
+
   const data = window.campaignChartData || {};
+  const translations = window.chartTranslations || {};
   const campaignChartData = [
     data?.emailCount || 0,
     data?.smsCount || 0,
     data?.usbCount || 0,
     data?.nfcCount || 0,
     data?.qrCount || 0,
-    0 // placeholder for WhatsApp
+    data?.whatsappCount || 0
   ];
   // Check if all values are zero
   const allZero = campaignChartData.every(val => val === 0);
@@ -90,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
       dataLabels: { enabled: false },
 
       title: {
-        text: 'No Campaign Data',
+        text: translations.noCampaignData || 'No Campaign Data',
         align: 'center'
       },
 
@@ -112,11 +128,57 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     };
   } else {
+    const total = campaignChartData.reduce((a, b) => a + b, 0);
+    
     chartOptions = {
       ...baseOptions,
       series: campaignChartData,
-      labels: ['Email', 'SMS', 'USB', 'NFC', 'QR', 'WhatsApp'],
-      colors: ['#57ABE6', '#FAA139', '#A3B5C3', '#45D8DD', '#AE62E9', '#47E7C5']
+      labels: [
+        translations.email || 'Email',
+        translations.sms || 'SMS',
+        translations.usb || 'USB',
+        translations.nfc || 'NFC',
+        translations.qr || 'QR',
+        translations.whatsapp || 'WhatsApp'
+      ],
+      colors: ['#57ABE6', '#FAA139', '#A3B5C3', '#45D8DD', '#AE62E9', '#47E7C5'],
+      plotOptions: {
+        ...baseOptions.plotOptions,
+        pie: {
+          ...baseOptions.plotOptions.pie,
+          donut: {
+            ...baseOptions.plotOptions.pie.donut,
+            labels: {
+              ...baseOptions.plotOptions.pie.donut.labels,
+              name: {
+                show: true,
+                fontSize: '14px',
+                offsetY: -10,
+                formatter: function () {
+                  return translations.totalCampaigns || 'Total Campaigns';
+                }
+              },
+              value: {
+                show: true,
+                fontSize: '20px',
+                offsetY: 10,
+                formatter: function (val) {
+                  const converted = convertNum(total);
+                  return converted;
+                }
+              },
+              total: {
+                show: true,
+                formatter: function (w) {
+                  const totalValue = w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                  const converted = convertNum(totalValue);
+                  return converted;
+                }
+              }
+            }
+          }
+        }
+      }
     };
   }
 

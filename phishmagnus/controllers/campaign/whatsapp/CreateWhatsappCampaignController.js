@@ -105,7 +105,7 @@ exports.submitFormController = async (req, res) => {
       // If both departmentIds and groupIds are empty -> error
       if ((departmentIds.length === 0) && (groupIds.length === 0)) {
         logger.warn('Controller - Create WhatsApp Campaign: Invitees are empty - no departments or groups selected');
-        const message = 'Invalid Invitees Selected';
+        const message = req.__('validation_messages.invalid_invitees_selected');
         const alertType = 'error';
         req.flash('message', message);
         req.flash('alertType', alertType);
@@ -115,7 +115,7 @@ exports.submitFormController = async (req, res) => {
       // Validate and convert templateSelect to templateId
       if (!payload.templateSelect) {
         logger.warn('Controller - Create WhatsApp Campaign: templateSelect is missing');
-        const message = 'Invalid Template Selected';
+        const message = req.__('validation_messages.invalid_template_selected');
         const alertType = 'error';
         req.flash('message', message);
         req.flash('alertType', alertType);
@@ -125,7 +125,7 @@ exports.submitFormController = async (req, res) => {
       const templateId = Number(payload.templateSelect);
       if (isNaN(templateId) || templateId <= 0) {
         logger.warn('Controller - Create WhatsApp Campaign: Invalid templateId: ' + payload.templateSelect);
-        const message = 'Invalid Template ID';
+        const message = req.__('validation_messages.invalid_template_id');
         const alertType = 'error';
         req.flash('message', message);
         req.flash('alertType', alertType);

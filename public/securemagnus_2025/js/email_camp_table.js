@@ -4,24 +4,39 @@
 const serverData = window.campaignsData || {};
 const originalCampaigns = serverData.campaigns || [];
 // console.log("Original Campaigns:", originalCampaigns);
-// console.log("Server Data:", serverData);
+// console.log("Server Data:", JSON.stringify(serverData,null,2));
+// Split "DD-MMM-YYYY hh:mm AM" → { date: "DD-MMM-YYYY", time: "hh:mm AM" }
+function splitDateTime(datetimeStr) {
+  if (!datetimeStr) return { date: '', time: '' };
+  const parts = datetimeStr.split(' ');
+  return {
+    date: parts[0] || '',
+    time: parts.length >= 3 ? `${parts[1]} ${parts[2]}` : parts[1] || ''
+  };
+}
+
 // Transform server data for table display
-const data = originalCampaigns.map(campaign => ({
-  id: campaign.id,
-  name: campaign.name,
-  campaign_identifier: campaign.campaign_identifier,
-  template_name: campaign.template_name,
-  start_date: campaign.start_datetime ? campaign.start_datetime.split(' ')[0] : '',
-  end_date: campaign.end_datetime ? campaign.end_datetime.split(' ')[0] : '',
-  start_time: campaign.start_datetime ? campaign.start_datetime.split(' ')[1] + ' ' + campaign.start_datetime.split(' ')[2] : '',
-  end_time: campaign.end_datetime ? campaign.end_datetime.split(' ')[1] + ' ' + campaign.end_datetime.split(' ')[2] : '',
-  status: campaign.status,
-  totalInvitees: campaign.totalInvitees,
-  sentCount: campaign.sentCount || 0,
-  unsentCount: (campaign.totalInvitees || 0) - (campaign.sentCount || 0),
-  difficulty: campaign.difficulty,
-  creation_date: new Date(campaign.creation_date).toLocaleDateString()
-}));
+const data = originalCampaigns.map(campaign => {
+  const start   = splitDateTime(campaign.start_datetime);
+  const end     = splitDateTime(campaign.end_datetime);
+  const created = splitDateTime(campaign.creation_date);
+  return {
+    id: campaign.id,
+    name: campaign.name,
+    campaign_identifier: campaign.campaign_identifier,
+    template_name: campaign.template_name,
+    start_date: start.date,
+    end_date:   end.date,
+    start_time: start.time,
+    end_time:   end.time,
+    status: campaign.status,
+    totalInvitees: campaign.totalInvitees,
+    sentCount: campaign.sentCount || 0,
+    unsentCount: (campaign.totalInvitees || 0) - (campaign.sentCount || 0),
+    difficulty: campaign.difficulty,
+    creation_date: created.date,
+  };
+});
 
 // ===============================
 // State variables
@@ -47,15 +62,24 @@ const rowsSelect  = document.getElementById("rowsPerPage");
 function renderTabs() {
   // Count how many items are in each status
   const counts = { All: data.length };
-  ["active", "inprogress", "completed"].forEach(st => {
+  ["draft", "scheduled", "inprogress", "completed"].forEach(st => {
     counts[st] = data.filter(d => d.status === st).length;
   });
+
+  // Translation map
+  const statusTranslations = {
+    All: window.translations.filterAll,
+    draft: window.translations.filterDraft,
+    scheduled: window.translations.filterScheduled,
+    inprogress: window.translations.InProgress,
+    completed: window.translations.filterCompleted
+  };
 
   // Generate buttons dynamically
   statusTabs.innerHTML = Object.entries(counts)
     .map(([status, count]) => {
       const isActive = currentTab === status;
-      const displayName = status.charAt(0).toUpperCase() + status.slice(1);
+      const displayName = statusTranslations[status] || status;
 
       // If active
       if (isActive) {
@@ -136,8 +160,7 @@ function renderTable() {
   // Render campaign rows into table body
   tableBody.innerHTML = pageData.map(campaign => {
     let statusClass = "";
-    if (campaign.status === "active") statusClass = "px-4 py-1 text-sm text-blue-700 bg-blue-100 rounded-full";
-    if (campaign.status === "inprogress") statusClass = "px-4 py-1 text-sm text-yellow-700 bg-yellow-100 rounded-full";
+    if (campaign.status === "inprogress") statusClass = "px-4 py-1 text-sm text-blue-700 bg-blue-100 rounded-full";
     if (campaign.status === "completed") statusClass = "px-4 py-1 text-sm text-green-700 bg-green-100 rounded-full";
 
     // Action icons (view details, edit)
@@ -214,9 +237,10 @@ function renderPagination(total) {
     <div class="flex items-center justify-between w-full">
       <div>
         <p class="text-sm text-gray-700">
-          Showing ${((currentPageNum - 1) * pageSize) + 1}
-          to ${Math.min(currentPageNum * pageSize, totalCount)}
-          of ${totalCount} results
+          ${window.translations.showingResults
+            .replace('{start}', ((currentPageNum - 1) * pageSize) + 1)
+            .replace('{end}', Math.min(currentPageNum * pageSize, totalCount))
+            .replace('{total}', totalCount)}
         </p>
       </div>
       <div class="flex space-x-2">
@@ -303,8 +327,8 @@ if (data.length > 0) {
     tableBody.innerHTML = `
       <tr>
         <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-          <div class="text-lg font-medium mb-2">No campaigns found</div>
-          <p>Create your first email campaign to get started.</p>
+          <div class="text-lg font-medium mb-2">${translations.noCampaignsFound || 'No campaigns found'}</div>
+          <p>${translations.createFirstCampaign || 'Create your first campaign to get started.'}</p>
         </td>
       </tr>
     `;
