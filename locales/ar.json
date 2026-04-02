@@ -625,6 +625,8 @@
 		"labelPassword": "كلمة المرور",
 		"btnTestConfiguration": "اختبار الإعدادات",
 		"btnSaveSettings": "حفظ الإعدادات",
+		"labelSenderEmail": "البريد الإلكتروني المرسل",
+		"labelDetails": "التفاصيل",
 		"enableStartTLS": "تفعيل STARTTLS",
 		"enableStartTLSDesc": "استخدام STARTTLS لترقية الاتصال العادي إلى اتصال آمن.",
 		"enableSSL": "تفعيل SSL",
@@ -632,7 +634,11 @@
 		"enableSMTPEncryption": "تفعيل التشفير",
 		"enableSMTPEncryptionDesc": "تشفير رسائل البريد الإلكتروني قبل إرسالها عبر هذا الاتصال.",
 		"enableMFA": "تفعيل المصادقة متعددة العوامل",
-		"enableMFADesc": "إرسال كلمات المرور المؤقتة عبر هذا الاتصال."
+		"enableMFADesc": "إرسال كلمات المرور المؤقتة عبر هذا الاتصال.",
+		"selectOrganization": "اختر المؤسسة",
+		"default": "افتراضي",
+		"enabled": "مفعل",
+		"disabled": "معطل"
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "إدارة مستخدمي سيكماجنوس",
