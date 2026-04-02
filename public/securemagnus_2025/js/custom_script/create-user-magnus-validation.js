@@ -49,4 +49,41 @@ $(document).ready(function () {
             error.insertAfter(element);
         }
     });
+
+    $('#email').on('blur', function () {
+        const email = $(this).val();
+        const $emailField = $(this);
+        
+        // Only check if email passes basic validation
+        if (email && $emailField.valid()) {
+            $.ajax({
+                url: '/phm/commons/check-duplicate-user?email=' + email,
+                method: 'GET',
+                success: function (response) {
+                    if (response.isDuplicate === 'true') {
+                        showCustomToast('error', "Email is already taken. Please use a different email address.");
+                        
+                        // Mark field as invalid but don't clear it
+                        $emailField.addClass('border-red-500');
+                        
+                        // Add error message if not already present
+                        if (!$emailField.next('.email-duplicate-error').length) {
+                            $emailField.after('<div class="email-duplicate-error text-red-500 text-sm mt-1">This email is already taken.</div>');
+                        }
+                    } else {
+                        // Remove duplicate error if email is now available
+                        $emailField.next('.email-duplicate-error').remove();
+                    }
+                },
+                error: function () {
+                    showCustomToast('error', "Error checking email availability. Please try again.");
+                }
+            });
+        }
+    });
+
+    // Remove duplicate error when user starts typing again
+    $('#email').on('input', function() {
+        $(this).next('.email-duplicate-error').remove();
+    });
 });
