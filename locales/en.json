@@ -1856,5 +1856,37 @@
 			"suspicious_content": "Suspicious Content",
 			"not_found": "Reported email not found."
 		}
+	},
+	"mfa": {
+		"create": "MFA SMTP Configuration",
+		"host": {
+			"name": "Host Name"
+		},
+		"port": "Port",
+		"service": {
+			"account": "Service Account"
+		},
+		"password": "Password",
+		"connectionName": "Connection Name",
+		"secureConnection": "Use Secure Connection",
+		"enableMFA": "Enable MFA",
+		"subtitle": "Configure the SMTP server used to deliver MFA one-time passwords.",
+		"placeholderConnectionName": "e.g. Corporate Mail",
+		"placeholderHost": "e.g. smtp.company.com",
+		"placeholderPort": "e.g. 587",
+		"placeholderAccount": "e.g. noreply@company.com",
+		"placeholderPassword": "Enter account password",
+		"secureConnectionDesc": "Enable TLS/SSL encryption for the SMTP connection.",
+		"enableEncryption": "Enable Encryption",
+		"enableEncryptionDesc": "Encrypt email messages before sending through this SMTP connection.",
+		"enableMFADesc": "Send one-time passwords via this SMTP connection.",
+		"testConnection": "Test Connection",
+		"save": "Save",
+		"loginTitle": "Two-Factor Authentication",
+		"loginSubtitle": "Enter the one-time code sent to your registered email or authenticator app.",
+		"loginLabel": "Verification Code",
+		"loginPlaceholder": "Enter 6-digit code",
+		"loginBtn": "Verify & Continue",
+		"loginBack": "Back to Login"
 	}
 }
