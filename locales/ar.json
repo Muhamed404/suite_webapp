@@ -521,6 +521,7 @@
 	"appservice": {
 		"homescreen": {
 			"title": "إدارة خدمات التطبيق",
+			"serviceManagement": "إدارة الخدمات",
 			"productName": "اسم المنتج",
 			"serviceName": "اسم الخدمة",
 			"serviceType": "نوع الخدمة",

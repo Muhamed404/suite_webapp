@@ -33,6 +33,7 @@ exports.createSMTP = async (req, res) => {
           showOrgSelect: true,
           organizations,
           actionUrl: frontend_api_urls.PHISHMAGNUS.SMTP_PHISHING.Create_Action_URL(orgId),
+          homeUrl: frontend_api_urls.PHISHMAGNUS.Home.INDEX,
         });
       })
       .catch((error) => {

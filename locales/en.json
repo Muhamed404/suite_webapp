@@ -509,6 +509,7 @@
 	"appservice": {
 		"homescreen": {
 			"title": "Application Service Management",
+			"serviceManagement": "Service Management",
 			"productName": "Product Name",
 			"serviceName": "Service Name",
 			"serviceType": "Service Type",
