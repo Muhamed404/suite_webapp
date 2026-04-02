@@ -63,15 +63,9 @@ exports.postLogin = async (req, res) => {
 
         const { data } = await apiClient.post(loginUrl, { email, password, userTimezone });
         // logger.info(`[PSuite Login Controller]: POST: Received login response: ${JSON.stringify(data, null, 2)}`);
-        // const userData = data?.object?.user;
         const userToken = data?.object?.userToken || null;
-        // const roleId = data?.object?.roleId || null;
-        // const permissions = data?.object?.permissions || [];
-        // const mfaRequired = data?.object?.mfaRequired || false;
-        const mfaRequired = false;
-
-        // const hasUserAWMSubscription = data?.object?.awmLicense || false;
-        // const hasUserPHMSubscription = data?.object?.phmLicense || false;
+        const mfaRequired = data?.object?.mfaRequired || false;
+        logger.info(`[PSuite Login Controller]: POST: MFA Required: ${mfaRequired} for user ${email}`);
 
 
         if (!userToken) {
@@ -80,28 +74,21 @@ exports.postLogin = async (req, res) => {
         }
 
         // 🚨 MFA required → Temporarily store pending session
-        if (mfaRequired === true) {
-            req.session.mfaPendingUser = {
-                id: userData.id,
-                email: userData.email,
-                user: userData,
-                jwtToken: userToken,
-                roleId,
-                permissions,
-                hasUserPHMSubscription,
-                hasUserAWMSubscription
-            };
+        if (mfaRequired) {
+            // console.log(`[PSuite Login Controller]: POST: MFA required for ${email}, ${JSON.stringify(userToken, null, 2)}`);
+            req.session.mfaPendingUser = { userToken };
 
             logger.info(`[PSuite Login Controller]: POST: MFA required for ${email}, redirecting to MFA screen`);
-            return res.redirect("/psm/mfa");
+            return res.redirect("/mfa/verify");
+        } else {
+            logger.info(`[PSuite Login Controller]: POST: No MFA required for ${email}, proceeding with login`);
+            // ✅ Set full session for authenticated user
+            // req.user = userData;
+            req.session.jwtToken = userToken;
+
+            logger.info(`[PSuite Login Controller]: POST: Session created for ${email}`);
+            return res.redirect("/home");
         }
-
-        // ✅ Set full session for authenticated user
-        // req.user = userData;
-        req.session.jwtToken = userToken;
-
-        logger.info(`[PSuite Login Controller]: POST: Session created for ${email}`);
-        return res.redirect("/home");
 
     } catch (err) {
         const message = err?.response?.data?.message || "Invalid Credentials";

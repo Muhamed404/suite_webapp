@@ -624,7 +624,15 @@
 		"labelServiceAccount": "حساب الخدمة",
 		"labelPassword": "كلمة المرور",
 		"btnTestConfiguration": "اختبار الإعدادات",
-		"btnSaveSettings": "حفظ الإعدادات"
+		"btnSaveSettings": "حفظ الإعدادات",
+		"enableStartTLS": "تفعيل STARTTLS",
+		"enableStartTLSDesc": "استخدام STARTTLS لترقية الاتصال العادي إلى اتصال آمن.",
+		"enableSSL": "تفعيل SSL",
+		"enableSSLDesc": "استخدام SSL/TLS لاتصال مشفر بالكامل من البداية.",
+		"enableSMTPEncryption": "تفعيل التشفير",
+		"enableSMTPEncryptionDesc": "تشفير رسائل البريد الإلكتروني قبل إرسالها عبر هذا الاتصال.",
+		"enableMFA": "تفعيل المصادقة متعددة العوامل",
+		"enableMFADesc": "إرسال كلمات المرور المؤقتة عبر هذا الاتصال."
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "إدارة مستخدمي سيكماجنوس",

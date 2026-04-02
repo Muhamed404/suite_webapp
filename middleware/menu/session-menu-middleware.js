@@ -38,6 +38,12 @@ function generateMenuMiddleware(req, res, next) {
     res.locals.locals_phm_subscription = false;
     res.locals.menu = [];
 
+    // Allow MFA pending users through — they are mid-authentication
+    if (req.session && req.session.mfaPendingUser) {
+      logger.info(`[SESSION-MIDDLEWARE] mfaPendingUser found, allowing MFA flow for: ${url}`);
+      return next();
+    }
+
     // Allow unauthenticated access to login and MFA routes
     const publicRoutes = ["/login", "/mfa"];
     const isAllowed = publicRoutes.some(route => url === route || url.startsWith(`${route}/`));
