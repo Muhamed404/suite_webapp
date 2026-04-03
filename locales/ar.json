@@ -2168,5 +2168,37 @@
 			"suspicious_content": "محتوى مشبوه",
 			"not_found": "لم يتم العثور على البلاغ."
 		}
+	},
+	"mfa": {
+		"create": "إعدادات SMTP للمصادقة متعددة العوامل",
+		"host": {
+			"name": "اسم المضيف"
+		},
+		"port": "المنفذ",
+		"service": {
+			"account": "حساب الخدمة"
+		},
+		"password": "كلمة المرور",
+		"connectionName": "اسم الاتصال",
+		"secureConnection": "استخدام اتصال آمن",
+		"enableMFA": "تفعيل المصادقة متعددة العوامل",
+		"subtitle": "قم بإعداد خادم SMTP المستخدم لإرسال كلمات المرور المؤقتة.",
+		"placeholderConnectionName": "مثال: البريد المؤسسي",
+		"placeholderHost": "مثال: smtp.company.com",
+		"placeholderPort": "مثال: 587",
+		"placeholderAccount": "مثال: noreply@company.com",
+		"placeholderPassword": "أدخل كلمة مرور الحساب",
+		"secureConnectionDesc": "تفعيل تشفير TLS/SSL لاتصال SMTP.",
+		"enableEncryption": "تفعيل التشفير",
+		"enableEncryptionDesc": "تشفير رسائل البريد الإلكتروني قبل إرسالها عبر هذا الاتصال.",
+		"enableMFADesc": "إرسال كلمات المرور المؤقتة عبر هذا الاتصال.",
+		"testConnection": "اختبار الاتصال",
+		"save": "حفظ",
+		"loginTitle": "التحقق بخطوتين",
+		"loginSubtitle": "أدخل الرمز المؤقت المرسل إلى بريدك الإلكتروني أو تطبيق المصادقة.",
+		"loginLabel": "رمز التحقق",
+		"loginPlaceholder": "أدخل الرمز المكون من 6 أرقام",
+		"loginBtn": "تحقق والمتابعة",
+		"loginBack": "العودة إلى تسجيل الدخول"
 	}
 }
