@@ -3670,7 +3670,7 @@ document.addEventListener('DOMContentLoaded', function () {
                   perPage: "entries per page",
                   pageTitle: "Page {page}",
                   noRows: "No entries found",
-                  noResults: "No results match your search query",
+                  noResults: window.i18n ? window.i18n.__('generic_label.no_results_match_search') : "No results match your search query",
                   info: "Showing {start} to {end} of {rows} entries",
                 },
                 template: (t, e) =>
