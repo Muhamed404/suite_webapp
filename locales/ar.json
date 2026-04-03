@@ -321,13 +321,12 @@
 			"reports": "التقارير",
 			"campaigns": "الحملات",
 			"campaignEmail": "البريد الإلكتروني",
-			"campaignQR": "QR",
-			"campaignNFC": "NFC",
-			"campaignUSB": "USB",
-			"campaignSMS": "SMS",
+			"campaignQR": "رمز الاستجابة السريعة (QR)",
+			"campaignNFC": "الاتصال قريب المدى (NFC)",
+			"campaignUSB": "منافذ USB",
+			"campaignSMS": "رسالة نصية",
 			"campaignWhatsapp": "واتساب",
 			"simulatorEmails": "رسائل المحاكاة"
-	
 		},
 		"suite": {
 			"suiteManagement": "إدارة المجموعة",
@@ -1618,7 +1617,7 @@
 		"totalPayable": "اجمالي المبلغ المستحق",
 		"back": "رجوع",
 		"downloadAsPdf": "تحميل كملف PDF",
-		"email": "Invoice.email"
+		"email": "البريد الإلكتروني"
 	},
 	"CS-Add": "إضافة فئة",
 	"btn-CS-Save": "حفظ",
