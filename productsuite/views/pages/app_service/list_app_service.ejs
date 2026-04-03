@@ -154,6 +154,15 @@
 </style>
 
 <script>
+window.translations = {
+  search: "<%= __('generic_label.search_here') %>",
+  entriesPerPage: "<%= __('entries per page') %>",
+  datatableInfo: "<%= __('generic_label.showing') %> {start} <%= __('generic_label.of') %> {end} <%= __('entries') %>",
+  no_entries_found: "<%= __('generic_label.no_entries_found') %>",
+  back: "<%= __('generic_label.back') %>",
+  next: "<%= __('generic_label.next') %>"
+};
+
 function adjustWidth(sel) {
   const text = sel.selectedOptions[0].text;
   const minWidth = 100;

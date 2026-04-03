@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const perPageLabel = table.dataset.perPage || (window.translations && window.translations.entriesPerPage) || 'entries per page';
   const infoLabel = table.dataset.info || (window.translations && window.translations.datatableInfo) || 'Showing {start} to {end} of {rows} entries';
   const noRowsLabel = table.dataset.noRows || (window.translations && window.translations.no_entries_found) || 'No entries found';
+  const previousLabel = (window.translations && window.translations.back) || 'Previous';
+  const nextLabel = (window.translations && window.translations.next) || 'Next';
 
   const dataTable = new simpleDatatables.DataTable('#filter-table', {
     perPageSelect: [10, 20, 25, 50, 100],
@@ -16,7 +18,9 @@ document.addEventListener('DOMContentLoaded', function () {
       placeholder: placeholder,
       perPage: perPageLabel,
       info: infoLabel,
-      noRows: noRowsLabel
+      noRows: noRowsLabel,
+      previous: previousLabel,
+      next: nextLabel
     }
   });
 

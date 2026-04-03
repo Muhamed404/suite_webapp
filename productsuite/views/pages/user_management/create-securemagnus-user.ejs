@@ -1,3 +1,9 @@
+<% const isArabic = (locals.locale || (typeof locale !== 'undefined' ? locale : 'en')) === 'ar'; %>
+<style>
+  .rtl-placeholder::placeholder {
+    text-align: right;
+  }
+</style>
 <!-- first section  -->
 
 <div class="flex flex-col h-[75vh] gap-4 mt-3 rounded-3xl bg-white">
@@ -38,7 +44,7 @@
         </label>
         <input placeholder="<%= __("user.placeholderContactNumber") %>" type="tel" value="" id="contact" name="contact" minlength="10"
           maxlength="15" pattern="\d{10,15}" required oninput="this.value = this.value.replace(/[^0-9]/g, '');"
-          class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+          class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent <%= isArabic ? 'rtl-placeholder' : '' %>" />
       </div>
 
       <!-- Post -->
