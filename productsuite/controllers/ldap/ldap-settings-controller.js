@@ -30,6 +30,15 @@ function normalizeTransportSecurity(value) {
   return "NONE";
 }
 
+function normalizeLdapIntegrationMode(value) {
+  const normalized = String(value || "SYNC_ONLY").trim().toUpperCase();
+  if (["SYNC_ONLY", "FULL_LDAP_AUTH"].includes(normalized)) {
+    return normalized;
+  }
+
+  return "SYNC_ONLY";
+}
+
 function extractErrorMessage(error, fallbackMessage) {
   const responseData = error?.response?.data || {};
   const errorCode = responseData.errorCode || null;
@@ -104,6 +113,7 @@ async function saveLdapConfig(req, res) {
       auto_sync_enabled: toBool(req.body.auto_sync_enabled, false),
       sync_interval_minutes: Number(req.body.sync_interval_minutes || 60),
       incremental_sync_enabled: toBool(req.body.incremental_sync_enabled, false),
+      ldap_integration_mode: normalizeLdapIntegrationMode(req.body.ldap_integration_mode),
       user_filter: req.body.user_filter,
       group_filter: req.body.group_filter,
       department_filter: req.body.department_filter,

@@ -170,6 +170,19 @@
         </div>
 
         <div class="md:col-span-2">
+          <label class="block text-gray-700 font-medium mb-2" title="Choose how synced LDAP users authenticate.">Integration Mode <span class="text-red-500">*</span></label>
+          <select name="ldap_integration_mode" class="w-full px-4 py-2 border rounded-lg bg-gray-50">
+            <option value="SYNC_ONLY" <%= String(ldapConfig?.ldap_integration_mode || 'SYNC_ONLY').toUpperCase() === 'SYNC_ONLY' ? 'selected' : '' %>>
+              Sync-only mode (import from LDAP, login using application password)
+            </option>
+            <option value="FULL_LDAP_AUTH" <%= String(ldapConfig?.ldap_integration_mode || 'SYNC_ONLY').toUpperCase() === 'FULL_LDAP_AUTH' ? 'selected' : '' %>>
+              Full LDAP Authentication mode (import + authenticate against LDAP/Active Directory)
+            </option>
+          </select>
+          <p class="text-xs text-gray-500 mt-1">Sync-only keeps DB password login for synced users. Full LDAP Authentication validates user credentials directly against LDAP/AD.</p>
+        </div>
+
+        <div class="md:col-span-2">
           <p class="block text-gray-700 font-medium mb-2">Transport Security <span class="text-red-500">*</span></p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
             <label class="flex items-center gap-3 border rounded-lg p-3 cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition <%= selectedTransportSecurity === 'NONE' ? 'border-blue-500 bg-blue-50' : 'border-gray-300' %>" data-transport-option="NONE">
@@ -287,6 +300,7 @@
       <ul class="list-disc pl-5 text-sm text-gray-700 mt-3 space-y-1">
         <li>If Users/Groups/Departments Base DN is empty, it falls back to Base DN.</li>
         <li>If Bind Password is left empty on edit, existing encrypted password is reused.</li>
+          <li>Integration Mode controls synced user behavior: Sync-only sets user_type=normal, Full LDAP Authentication sets user_type=ldap.</li>
         <li>Transport mode controls protocol and valid port (NONE/STARTTLS → 389, LDAPS → 636).</li>
         <li>If port is omitted, default is chosen from transport mode (389 or 636).</li>
         <li>Domain root queries are restricted by policy and remain disabled.</li>
