@@ -126,6 +126,7 @@
 		"end_time_required": "تاريخ ووقت الانتهاء مطلوبان.",
 		"no_departments_groups": "لا توجد أقسام أو مجموعات متاحة. يرجى إضافة مستخدمين إلى الأقسام أو المجموعات قبل إنشاء حملة.",
 		"select_department_group": "يرجى اختيار قسم واحد على الأقل أو مجموعة للاستهداف.",
+		"select_at_least_one_option": "يرجى اختيار خيار واحد على الأقل.",
 		"validation_error": "خطأ في التحقق:",
 		"no_members_in_selection": "الأقسام/المجموعات المختارة لا تحتوي على أعضاء. يرجى اختيار أقسام أو مجموعات تحتوي على أعضاء، أو إضافة أعضاء إلى المختارة.",
 		"some_empty_selections": "تحذير: بعض الاختيارات لا تحتوي على أعضاء. ستستهدف الحملة فقط الأقسام/المجموعات التي تحتوي على أعضاء.",
@@ -520,6 +521,7 @@
 	"appservice": {
 		"homescreen": {
 			"title": "إدارة خدمات التطبيق",
+			"serviceManagement": "إدارة الخدمات",
 			"productName": "اسم المنتج",
 			"serviceName": "اسم الخدمة",
 			"serviceType": "نوع الخدمة",
@@ -624,6 +626,8 @@
 		"labelPassword": "كلمة المرور",
 		"btnTestConfiguration": "اختبار الإعدادات",
 		"btnSaveSettings": "حفظ الإعدادات",
+		"labelSenderEmail": "البريد الإلكتروني المرسل",
+		"labelDetails": "التفاصيل",
 		"enableStartTLS": "تفعيل STARTTLS",
 		"enableStartTLSDesc": "استخدام STARTTLS لترقية الاتصال العادي إلى اتصال آمن.",
 		"enableSSL": "تفعيل SSL",
@@ -631,7 +635,11 @@
 		"enableSMTPEncryption": "تفعيل التشفير",
 		"enableSMTPEncryptionDesc": "تشفير رسائل البريد الإلكتروني قبل إرسالها عبر هذا الاتصال.",
 		"enableMFA": "تفعيل المصادقة متعددة العوامل",
-		"enableMFADesc": "إرسال كلمات المرور المؤقتة عبر هذا الاتصال."
+		"enableMFADesc": "إرسال كلمات المرور المؤقتة عبر هذا الاتصال.",
+		"selectOrganization": "اختر المؤسسة",
+		"default": "افتراضي",
+		"enabled": "مفعل",
+		"disabled": "معطل"
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "إدارة مستخدمي سيكماجنوس",

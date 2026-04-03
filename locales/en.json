@@ -115,6 +115,7 @@
 		"end_time_required": "End date and time are required.",
 		"no_departments_groups": "No departments or groups available. Please add users to departments or groups before creating a campaign.",
 		"select_department_group": "Please select at least one department or group to target.",
+		"select_at_least_one_option": "Please select at least one option.",
 		"validation_error": "Validation Error:",
 		"no_members_in_selection": "The selected departments/groups have no members. Please select departments or groups with members, or add members to the selected ones.",
 		"some_empty_selections": "Warning: Some selections have no members. The campaign will only target departments/groups with members.",
@@ -508,6 +509,7 @@
 	"appservice": {
 		"homescreen": {
 			"title": "Application Service Management",
+			"serviceManagement": "Service Management",
 			"productName": "Product Name",
 			"serviceName": "Service Name",
 			"serviceType": "Service Type",
@@ -613,7 +615,7 @@
 		"btnTestConfiguration": "Test Configuration",
 		"btnSaveSettings": "Save Settings",
 		"labelSenderEmail": "Sender Email",
-		"labelDetails": "Detail",
+		"labelDetails": "Details",
 		"enableStartTLS": "Enable STARTTLS",
 		"enableStartTLSDesc": "Use STARTTLS to upgrade a plain connection to secure.",
 		"enableSSL": "Enable SSL",
@@ -622,7 +624,11 @@
 		"enableSMTPEncryptionDesc": "Encrypt email messages before sending through this SMTP connection.",
 		"enablePasswordEncryption": "smtp.enablePasswordEncryption",
 		"enableMFA": "Enable MFA",
-		"enableMFADesc": "Send one-time passwords via this SMTP connection."
+		"enableMFADesc": "Send one-time passwords via this SMTP connection.",
+		"selectOrganization": "Select Organization",
+		"default": "Default",
+		"enabled": "Enabled",
+		"disabled": "Disabled"
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "Secmagnus User Management",

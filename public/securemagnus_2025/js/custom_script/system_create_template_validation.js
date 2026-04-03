@@ -226,7 +226,8 @@ $(document).ready(function () {
       checkboxContainer.find('.validation-error').remove();
       
       if (selectedOptions === 0) {
-        checkboxContainer.append('<div class="validation-error text-red-500 text-sm mt-2">Please select at least one option.</div>');
+        const errorMessage = window.i18n?.validation_messages?.select_at_least_one_option || 'Please select at least one option.';
+        checkboxContainer.append(`<div class="validation-error text-red-500 text-sm mt-2">${errorMessage}</div>`);
         isValid = false;
       }
     }
