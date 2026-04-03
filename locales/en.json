@@ -186,7 +186,21 @@
 		"smtp_configured_successfully": "SMTP Configured Successfully"
 	},
 	"topnavbar": {
-		"welcome": "Welcome"
+		"welcome": "Welcome",
+		"organizationSettings": "Organization Settings",
+		"addUser": "Add User",
+		"importUser": "Import User",
+		"dashboard": "Dashboard",
+		"campaigns": "Campaigns",
+		"reports": "Reports",
+		"organizations": "Organizations",
+		"packages": "Packages",
+		"users": "Users",
+		"auditLogs": "Audit Logs",
+		"systemTemplate": "System Template",
+		"phishingSmtp": "Phishing SMTP",
+		"createPackage": "Create Package",
+		"simulatorEmails": "Simulator Emails"
 	},
 	"breadcrumbs": {
 		"home": "Home",

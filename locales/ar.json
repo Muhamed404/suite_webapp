@@ -197,7 +197,21 @@
 		"smtp_configured_successfully": "تم تكوين SMTP بنجاح"
 	},
 	"topnavbar": {
-		"welcome": "مرحباً"
+		"welcome": "مرحباً",
+		"organizationSettings": "إعدادات المؤسسة",
+		"addUser": "إضافة مستخدم",
+		"importUser": "استيراد مستخدم",
+		"dashboard": "لوحة التحكم",
+		"campaigns": "الحملات",
+		"reports": "التقارير",
+		"organizations": "المؤسسات",
+		"packages": "الحزم",
+		"users": "المستخدمون",
+		"auditLogs": "سجلات التدقيق",
+		"systemTemplate": "قالب النظام",
+		"phishingSmtp": "SMTP التصيد",
+		"createPackage": "إنشاء حزمة",
+		"simulatorEmails": "رسائل المحاكي"
 	},
 	"breadcrumbs": {
 		"home": "الرئيسية",

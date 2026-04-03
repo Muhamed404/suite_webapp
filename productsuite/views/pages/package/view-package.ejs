@@ -45,7 +45,7 @@
       </div>
 
 
-      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} <%= __('generic_label.to') %> {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
+      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} <%= __('generic_label.to') %> {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>" data-no-results="<%= __('generic_label.no_results_match_search') %>">
         <thead class="bg-gray-50 text-gray-600  text-xs">
           <tr>
 
@@ -199,12 +199,17 @@
 </style>
 
 <script>
-if (!document.getElementById('filter-table') || typeof simpleDatatables === 'undefined' || typeof simpleDatatables.DataTable === 'undefined') {
+const packageTable = document.getElementById('filter-table');
+
+if (!packageTable || typeof simpleDatatables === 'undefined' || typeof simpleDatatables.DataTable === 'undefined') {
   console.warn('simple-datatables not found or table missing');
 } else {
   const dataTable = new simpleDatatables.DataTable('#filter-table', {
     searchable: true,
     fixedHeight: true,
+    labels: {
+      noResults: packageTable.dataset.noResults || '<%= __("generic_label.no_results_match_search") %>'
+    }
   });
 }
 </script>
