@@ -125,7 +125,7 @@
         </div>
         <div class="flex flex-col">
           <span class="font-semibold text-gray-800"><%= report.Organization ? report.Organization.name : '—' %></span>
-          <span class="text-xs text-gray-400"><%= __('threat_reporter.detail.org_id') %>: <%= report.organization_id || '—' %></span>
+          <!-- <span class="text-xs text-gray-400"><%= __('threat_reporter.detail.org_id') %>: <%= report.organization_id || '—' %></span> -->
         </div>
       </div>
     </div>
@@ -143,12 +143,12 @@
       <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
         <div>
           <p class="text-gray-400 text-xs"><%= __('threat_reporter.detail.campaign_id') %></p>
-          <p class="font-semibold text-gray-800"><%= inv ? inv.campaign_id : '—' %></p>
+          <p class="font-semibold text-gray-800"><%= inv ? inv.Campaign.name : '—' %></p>
         </div>
-        <div>
+        <!-- <div>
           <p class="text-gray-400 text-xs"><%= __('threat_reporter.detail.schedule_id') %></p>
           <p class="font-semibold text-gray-800"><%= inv ? inv.schedule_id : '—' %></p>
-        </div>
+        </div> -->
         <div>
           <p class="text-gray-400 text-xs"><%= __('threat_reporter.detail.phish_sent') %></p>
           <% if (inv) { %>

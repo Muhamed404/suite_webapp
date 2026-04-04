@@ -43,21 +43,26 @@
             <span class="w-1.5 h-1.5 rounded-full bg-teal-500 inline-block"></span>
             <%= __('generic_label.active') %>
           </span>
-          <button type="button"
-            onclick="openRestrictConfirm('/dms/restrict/<%= orgId %>/0?On=<%= encodeURIComponent(orgName) %>', false)"
-            class="px-4 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors">
-            <%= __('org_domain.btn_disable_restrict') %>
-          </button>
+          <% if (!isReadOnly) { %>
+
+            <button type="button"
+              onclick="openRestrictConfirm('/dms/restrict/<%= orgId %>/0?On=<%= encodeURIComponent(orgName) %>', false)"
+              class="px-4 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300 transition-colors">
+              <%= __('org_domain.btn_disable_restrict') %>
+            </button>
+          <%}%>
         <% } else { %>
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
             <span class="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block"></span>
             <%= __('generic_label.inactive') %>
           </span>
+          <% if (!isReadOnly) { %>
           <button type="button"
             onclick="openRestrictConfirm('/dms/restrict/<%= orgId %>/1?On=<%= encodeURIComponent(orgName) %>', true)"
             class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-teal-600 text-white hover:bg-teal-700 transition-colors">
             <%= __('org_domain.btn_enable_restrict') %>
           </button>
+            <%}%>
           <% } %>
       </div>
     </div>
@@ -69,6 +74,8 @@
       <span class="text-sm px-3 py-1 rounded-full font-medium" style="background:#eff6ff;color:#2563eb">
         <%= pagination.count %> <%= __('org_domain.total') %>
       </span>
+          <% if (!isReadOnly) { %>
+
       <button type="button" onclick="openAddModal()"
         class="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-teal-600 text-white text-sm font-semibold shadow hover:bg-teal-700 transition-all duration-200">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -77,6 +84,7 @@
         </svg>
         <span><%= __('org_domain.btn_add') %></span>
       </button>
+      <%}%>
     </div>
     <div class="p-6">
       <table class="min-w-full border-none text-sm text-left text-gray-700">
@@ -86,7 +94,9 @@
             <th class="px-4 py-3 font-medium"><%= __('org_domain.col_domain_name') %></th>
             <th class="px-4 py-3 font-medium"><%= __('org_domain.col_status') %></th>
             <th class="px-4 py-3 font-medium"><%= __('org_domain.col_created_at') %></th>
+          <% if (!isReadOnly) { %>
             <th class="px-4 py-3 font-medium"><%= __('generic_label.action') %></th>
+          <%}%>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-100">
@@ -119,6 +129,8 @@
                     ? new Date(domain.creation_time).toLocaleDateString([], { year: 'numeric', month: 'short', day: '2-digit' })
                     : '—' %>
               </td>
+          <% if (!isReadOnly) { %>
+
               <td class="px-4 py-3">
                 <div class="flex items-center gap-3">
                   <button type="button"
@@ -137,6 +149,7 @@
                   </button>
                 </div>
               </td>
+              <%}%>
             </tr>
           <% }); } else { %>
             <tr>

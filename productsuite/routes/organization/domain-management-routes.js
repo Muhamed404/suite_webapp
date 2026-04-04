@@ -5,7 +5,7 @@ const checkPermission = require("../../../utility/check-permission");
 const enums = require('../../../contants/enum')
 
 // Domain management
-router.get("/:orgId/organization", checkPermission(enums.ModuleNames.Domain_Management, [enums.Access_Types.RWD_ALL]), controller.listDomains);
+router.get("/:orgId/organization", checkPermission(enums.ModuleNames.Domain_Management, [enums.Access_Types.RWD_ALL, enums.Access_Types.R_O]), controller.listDomains);
 router.post("/create", checkPermission(enums.ModuleNames.Domain_Management, [enums.Access_Types.RWD_ALL]), controller.createDomain);
 router.post("/edit/:domainOrgId", checkPermission(enums.ModuleNames.Domain_Management, [enums.Access_Types.RWD_ALL]), controller.editDomain);
 router.get("/delete/:domainOrgId/organization/:domainId/domain", checkPermission(enums.ModuleNames.Domain_Management, [enums.Access_Types.RWD_ALL]), controller.deleteDomain);
