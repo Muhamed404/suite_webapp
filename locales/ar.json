@@ -2216,7 +2216,7 @@
 			"yes": "نعم",
 			"no": "لا",
 			"sent_at": "وقت الإرسال",
-			"email_headers": "مصدر الرسالة",
+			"magnus_email_headers": "مصدر الرسالة",
 			"no_headers": "لا توجد ترويسات متاحة.",
 			"real_phishing_email": "رسالة تصيد احتيالي حقيقية",
 			"real_phishing_email_desc": "لم يتم إنشاء هذه الرسالة بواسطة PhishMagnus. قد تكون محاولة تصيد احتيالي حقيقية.",

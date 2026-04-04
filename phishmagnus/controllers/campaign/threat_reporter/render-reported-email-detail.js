@@ -32,10 +32,10 @@ exports.renderReportedEmailDetail = async (req, res) => {
             return res.redirect('/phm/reported-emails/list');
         }
 
-        // Parse raw_email_header JSON safely
+        // Parse magnus_email_header JSON safely
         let emailHeaders = {};
         try {
-            emailHeaders = report.raw_email_header ? JSON.parse(report.raw_email_header) : {};
+            emailHeaders = report.magnus_email_header ? JSON.parse(report.magnus_email_header) : {};
         } catch (_) {
             emailHeaders = {};
         }

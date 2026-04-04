@@ -5,6 +5,7 @@ const checkPermission = require("../../../utility/check-permission");
 const { renderReportedEmails } = require('../../controllers/campaign/threat_reporter/render-reported-emails');
 const { renderReportedEmailDetail } = require('../../controllers/campaign/threat_reporter/render-reported-email-detail');
 const { renderReportByInvitee } = require('../../controllers/campaign/threat_reporter/render-reported-byInvtee');
+const { downloadReportByInvitee } = require('../../controllers/campaign/threat_reporter/download-report-by-invitee');
 router.get("/list",
     checkPermission(enums.ModuleNames.Campaign_Reports, [enums.Access_Types.RWD_O, enums.Access_Types.R_O]),
     renderReportedEmails);
@@ -16,6 +17,10 @@ router.get("/:reportId/detail",
 router.get("/:invId/invitee",
     checkPermission(enums.ModuleNames.Campaign_Reports, [enums.Access_Types.RWD_O, enums.Access_Types.R_O]),
     renderReportByInvitee);
+
+router.get("/invitee/:inviteeId/organization",
+    checkPermission(enums.ModuleNames.Campaign_Reports, [enums.Access_Types.RWD_O, enums.Access_Types.R_O]),
+    downloadReportByInvitee);
 
 
 module.exports = router;

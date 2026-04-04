@@ -34,13 +34,24 @@
     </nav>
     <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
       <h3 class="text-3xl font-medium text-gray-900"><%= __('threat_reporter.detail.title') %></h3>
-      <a href="/phm/reported-emails/list"
-         class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition self-start lg:self-auto">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-        </svg>
-        <%= __('threat_reporter.detail.back_to_list') %>
-      </a>
+      <div class="flex items-center gap-2 self-start lg:self-auto">
+        <% if (report && report.Invitee) { %>
+        <a href="/phm/reported-emails/invitee/<%= report.Invitee.id %>/organization"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-teal-600 text-white hover:bg-teal-700 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          Download Report
+        </a>
+        <% } %>
+        <a href="/phm/reported-emails/list"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          <%= __('threat_reporter.detail.back_to_list') %>
+        </a>
+      </div>
     </div>
   </div>
 </div>
@@ -184,7 +195,7 @@
           </svg>
         </div>
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-red-400 mb-0.5"><%= __('threat_reporter.detail.email_headers') %></p>
+          <p class="text-xs font-semibold uppercase tracking-wider text-red-400 mb-0.5"><%= __('threat_reporter.detail.magnus_email_headers') %></p>
           <p class="text-lg font-bold text-red-700"><%= __('threat_reporter.detail.real_phishing_email') %></p>
           <p class="text-xs text-red-500 mt-0.5"><%= __('threat_reporter.detail.real_phishing_email_desc') %></p>
         </div>
@@ -196,7 +207,7 @@
           </svg>
         </div>
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wider text-teal-400 mb-0.5"><%= __('threat_reporter.detail.email_headers') %></p>
+          <p class="text-xs font-semibold uppercase tracking-wider text-teal-400 mb-0.5"><%= __('threat_reporter.detail.magnus_email_headers') %></p>
           <p class="text-lg font-bold text-teal-700"><%= __('threat_reporter.detail.phishmagnus_simulated_email') %></p>
           <p class="text-xs text-teal-500 mt-0.5"><%= __('threat_reporter.detail.phishmagnus_simulated_email_desc') %></p>
         </div>
