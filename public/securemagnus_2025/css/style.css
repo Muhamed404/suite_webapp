@@ -312,6 +312,11 @@
   margin: 0;
 }
 
+/* RTL support for pagination */
+[dir="rtl"] .datatable-pagination-list {
+  flex-direction: row-reverse;
+}
+
 /* Pagination items */
 .datatable-pagination-list-item {
   display: inline-block;
