@@ -28,6 +28,7 @@ import { useAuthStore } from "@/hooks/useAuthStore";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { isOrgUser } from "@/utils/roles";
+import { getContentAssetUrl } from "@/services/awmStorage";
 import { LANGUAGE_COUNTRY_CODES, SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
 
 // Maps URL slug → contype_id (matches API content_type_id values)
@@ -332,12 +333,7 @@ export default function ContentPage() {
 
   const resolveLogoUrl = (raw: string | null): string | null => {
     if (!raw?.trim()) return null;
-    const s = raw.trim();
-
-    if (s.startsWith("http")) return s;
-    if (s.startsWith("/contents/")) return `/awm${s}`;
-
-    return `/awm/contents/${s.startsWith("/") ? s.slice(1) : s}`;
+    return getContentAssetUrl(raw) || null;
   };
 
   const ItemThumbnail = ({ src }: { src: string | null }) => {
@@ -540,9 +536,7 @@ export default function ContentPage() {
                     <div className="bg-white rounded-xl overflow-hidden">
                       {(() => {
                         const rawUrl = (viewingItem as any).source_url;
-                        const contentBase =
-                          process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://localhost:3002";
-                        const fullUrl = rawUrl ? `${contentBase}${rawUrl}` : null;
+                        const fullUrl = rawUrl ? getContentAssetUrl(rawUrl) : null;
                         const isPdf = fullUrl?.toLowerCase().endsWith(".pdf");
 
                         if (!fullUrl) {

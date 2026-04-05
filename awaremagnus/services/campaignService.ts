@@ -6,8 +6,6 @@ import type { ApiResponse } from "@/types/quiz";
 import { normalizeAWMResponse } from "./awmResponse";
 import { awmClient, API_BASE } from "./httpClient";
 
-const SERVICE_AWM_URL = process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://localhost:3002";
-
 async function request<T>(fn: () => Promise<{ data: AWMResponseBody }>): Promise<ApiResponse<T>> {
   const { data } = await fn();
   const normalized = normalizeAWMResponse<T>(data);
@@ -169,7 +167,7 @@ export const campaignService = {
   beginContent: async (campaignId: number, moduleId: number, contentId: number) => {
     return request<unknown>(() =>
       awmClient.post<AWMResponseBody>(
-        `${SERVICE_AWM_URL}/api/awm/useraction/report-actions/begin-content`,
+        `${API_BASE}/useraction/report-actions/begin-content`,
         {
           campaign_id: campaignId,
           module_id: moduleId,
