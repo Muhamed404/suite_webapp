@@ -90,7 +90,7 @@ $(document).ready(function() {
         },
 
         // Custom error messages
-        messages: {
+        messages: window.validationMessages || {
             // Step 1 Messages
             application: {
                 required: 'Please select a product/application'
@@ -146,7 +146,7 @@ $(document).ready(function() {
         if (!fromValue || !toValue) return true;
 
         return toValue >= fromValue;
-    }, 'User range "To" must be greater than or equal to "From"');
+    }, window.validationMessages?.license_range_to?.greaterThanFrom || 'User range "To" must be greater than or equal to "From"');
 
     // Apply custom validation rule
     $('#license_range_to').rules('add', {

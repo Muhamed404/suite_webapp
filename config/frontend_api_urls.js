@@ -7,6 +7,9 @@ module.exports = {
         PHISHMAGNUS: '/phm/login',
         AWAREMAGNUS: '/awm/login',
     },
+    MFA: {
+        VERIFY: '/mfa/verify',
+    },
     LOGOUT: {
         SIGNOUT: '/logout',
     },

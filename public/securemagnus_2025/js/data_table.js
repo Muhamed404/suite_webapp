@@ -9,6 +9,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const perPageLabel = table.dataset.perPage || (window.translations && window.translations.entriesPerPage) || 'entries per page';
   const infoLabel = table.dataset.info || (window.translations && window.translations.datatableInfo) || 'Showing {start} to {end} of {rows} entries';
   const noRowsLabel = table.dataset.noRows || (window.translations && window.translations.no_entries_found) || 'No entries found';
+  const noResultsLabel = table.dataset.noResults || (window.translations && (window.translations.no_results_match_search || window.translations.noResults)) || 'No results match your search query';
+  const previousLabel = (window.translations && window.translations.back) || 'Previous';
+  const nextLabel = (window.translations && window.translations.next) || 'Next';
 
   const dataTable = new simpleDatatables.DataTable('#filter-table', {
     perPageSelect: [10, 20, 25, 50, 100],
@@ -16,7 +19,10 @@ document.addEventListener('DOMContentLoaded', function () {
       placeholder: placeholder,
       perPage: perPageLabel,
       info: infoLabel,
-      noRows: noRowsLabel
+      noRows: noRowsLabel,
+      noResults: noResultsLabel,
+      previous: previousLabel,
+      next: nextLabel
     }
   });
 
@@ -3666,7 +3672,7 @@ document.addEventListener('DOMContentLoaded', function () {
                   perPage: "entries per page",
                   pageTitle: "Page {page}",
                   noRows: "No entries found",
-                  noResults: "No results match your search query",
+                  noResults: (window.translations && (window.translations.no_results_match_search || window.translations.noResults)) || (window.i18n ? window.i18n.__('generic_label.no_results_match_search') : "No results match your search query"),
                   info: "Showing {start} to {end} of {rows} entries",
                 },
                 template: (t, e) =>

@@ -45,7 +45,7 @@
               <%= __("appservice.create.labelServiceName") %> *
             </label>
             <input type="text" id="service_name" name="service_name" required
-              placeholder="Enter service name"
+              placeholder="<%= __("appservice.create.placeholderServiceName") %>"
               class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
           </div>
 
@@ -54,7 +54,7 @@
               <%= __("appservice.create.labelServiceCost") %> *
             </label>
             <input type="number" id="per_service_cost" name="per_service_cost" min="1" required
-              placeholder="Enter service cost"
+              placeholder="<%= __("appservice.create.placeholderServiceCost") %>"
               oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
               class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
           </div>
@@ -79,7 +79,7 @@
               <%= __("appservice.create.labelDescription") %> *
             </label>
             <input type="text" id="service_detail" name="service_detail" required
-              placeholder="Enter description"
+              placeholder="<%= __("appservice.create.placeholderDescription") %>"
               class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
           </div>
         </div>
@@ -97,6 +97,25 @@
   </div>
 
   <!-- jQuery and jQuery Validation Plugin (CDN) -->
+  <script>
+    window.validationMessages = {
+      application: "<%= __("appservice.create.validationSelectProduct") %>",
+      service_name: {
+        required: "<%= __("appservice.create.validationEnterServiceName") %>",
+        minlength: "<%= __("appservice.create.validationServiceNameMinLength") %>"
+      },
+      per_service_cost: {
+        required: "<%= __("appservice.create.validationEnterServiceCost") %>",
+        digits: "<%= __("appservice.create.validationValidNumber") %>",
+        min: "<%= __("appservice.create.validationServiceCostMin") %>"
+      },
+      service_type: "<%= __("appservice.create.validationSelectServiceType") %>",
+      service_detail: {
+        required: "<%= __("appservice.create.validationEnterDescription") %>",
+        minlength: "<%= __("appservice.create.validationDescriptionMinLength") %>"
+      }
+    };
+  </script>
 <script src="/securemagnus_2025/js/custom_script/create-app-service-validator.js"></script>
 
 </div>

@@ -21,23 +21,7 @@
             minlength: 2
           }
         },
-        messages: {
-          application: "Please select a product.",
-          service_name: {
-            required: "Please enter a service name.",
-            minlength: "Service name must be at least 2 characters."
-          },
-          per_service_cost: {
-            required: "Please enter the service cost.",
-            digits: "Please enter a valid number.",
-            min: "Service cost must be at least 1."
-          },
-          service_type: "Please select a service type.",
-          service_detail: {
-            required: "Please enter a description.",
-            minlength: "Description must be at least 2 characters."
-          }
-        },
+        messages: window.validationMessages,
         errorElement: 'div',
         errorClass: 'text-red-600 text-sm mt-1',
         highlight: function(element) {

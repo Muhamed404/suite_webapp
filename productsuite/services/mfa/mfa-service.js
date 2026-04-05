@@ -7,7 +7,7 @@ const retrieveMFAConfiguration = async (req) => {
         logger.info(`[MFA Configuration Retrieval]: Incoming request`);
 
         const apiClient = getApiClient(req);
-        const url = `/mfa/settings`;
+        const url = `/mfa/config`;
 
         const response = await apiClient.get(url); // await the promise
 
@@ -27,21 +27,22 @@ const retrieveMFAConfiguration = async (req) => {
 };
 
 
-const create = async (req, smtpName, smtpData, enable_mfa) => {
+const create = async (req, smtpName, smtpData, enable_mfa, is_encrypted) => {
     try {
-        logger.info(`[Save MFA Configuration Retrieval]: Incoming request`);
+        logger.info(`[Save MFA Configuration]: Incoming request`);
 
         const apiClient = getApiClient(req);
         const url = `/mfa/create`;
         const payload = {
             name: smtpName,
             smtp_data: smtpData,
-            enable_mfa
+            enable_mfa,
+            is_encrypted
         }
-        await apiClient.post(url, payload); // await the promise
+        await apiClient.post(url, payload);
 
     } catch (error) {
-        logger.error(`[MFA Configuration Retrieval]: Issue in saving mfa smtp: ${error.message}`);
+        logger.error(`[Save MFA Configuration]: Issue in saving mfa smtp: ${error.message}`);
         throw error;
     }
 };
