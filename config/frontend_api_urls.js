@@ -7,12 +7,18 @@ module.exports = {
         PHISHMAGNUS: '/phm/login',
         AWAREMAGNUS: '/awm/login',
     },
+    MFA: {
+        VERIFY: '/mfa/verify',
+    },
     LOGOUT: {
         SIGNOUT: '/logout',
     },
     PRODUCT_SUITE: {
         Home: {
             INDEX: '/home',
+        },
+        Domain_Management: {
+            Render_List_View: (orgId) => `/dms/${orgId}/organization`
         },
         User_Management: {
             CREATE_USER: '/user/create',

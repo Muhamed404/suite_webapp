@@ -78,9 +78,11 @@ export const campaignService = {
    * Get certificates earned by the current user.
    * API: GET /certificate/user/my-certificates  (uses token to identify user)
    */
-  getUserCertificates: async () => {
+  getUserCertificates: async (languageId?: string) => {
     return request<Certificate[]>(() =>
-      awmClient.get<AWMResponseBody>(`${API_BASE}/certificate/user/my-certificates`)
+      awmClient.get<AWMResponseBody>(`${API_BASE}/certificate/user/my-certificates`, {
+        params: { lang_id: languageId || "1" },
+      })
     );
   },
 

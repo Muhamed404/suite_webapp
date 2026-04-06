@@ -34,14 +34,10 @@ exports.retrieveLicenseInformationByProductEnumKey = async (req, res) => {
 
 
         if (selectedProductKey !== undefined && Number(selectedProductKey) === Number(enums.Product_Selection.PhishMagnus)) {
-            console.log('PHM License Info:');
-
             filteredLicense = { availableLicenses: filteredLicense.PhishMagnus.Subscription.TotalAvailable };
         } else if (selectedProductKey !== undefined && Number(selectedProductKey) === Number(enums.Product_Selection.AwareMagnus)) {
-            console.log('AWM License Info:');
             filteredLicense = { availableLicenses: filteredLicense.AwareMagnus.Subscription.TotalAvailable };
         } else if (selectedProductKey !== undefined && Number(selectedProductKey) === Number(enums.Product_Selection.GRC)) {
-            console.log('GRC License Info:');
             filteredLicense = { availableLicenses: filteredLicense.GRC.Subscription.TotalAvailable };
         } else {
             filteredLicense = { availableLicenses: 0 };

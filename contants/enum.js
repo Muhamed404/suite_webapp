@@ -103,6 +103,7 @@ const phishingCategoriesName = {
 
 
 const ModuleNames = {
+  Domain_Management: 'Domain_Management',
   Application_Services: 'Application_Services',
   Package: 'Package',
   Organization: 'Organization',

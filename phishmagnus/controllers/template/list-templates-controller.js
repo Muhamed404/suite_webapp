@@ -6,15 +6,31 @@ const backend_api_urls = require("../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 
+const PHISH_TYPE_OPTIONS = [
+  { key: 'email', label: 'Email', id: 2 },
+  { key: 'sms', label: 'SMS', id: 1 },
+  { key: 'whatsapp', label: 'Whatsapp', id: 4 },
+  { key: 'usb', label: 'USB', id: 3 },
+  { key: 'qr', label: 'QR', id: 5 },
+  { key: 'nfc', label: 'NFC', id: 6 }
+];
+
 
 exports.retrieveAllTemplates = async (req, res) => {
   try {
     logger.info('Controller - Show Template: Incoming request in system defined Template method')
+    const requestedPhishType = typeof req.query.phishType === 'string' ? req.query.phishType.toLowerCase() : 'all';
+    const selectedOption = PHISH_TYPE_OPTIONS.find((option) => option.key === requestedPhishType);
+    const selectedPhishType = selectedOption || { key: 'all', label: 'All', id: null };
     // console.log("My Template: INCOMING ORGANIZATION: " + orgId);
     // ✅ Add query parameters
     const queryParams = {
       organizationId: req.user.organization_id !== undefined ? req.user.organization_id : undefined,
     };
+
+    if (selectedPhishType.key !== 'all' && selectedPhishType.id) {
+      queryParams.phishType = selectedPhishType.id;
+    }
 
     if (queryParams.organizationId === undefined) {
       req.flash('message', 'Invalid template type');
@@ -33,6 +49,7 @@ exports.retrieveAllTemplates = async (req, res) => {
       apiClient.get(url, { params: queryParams }),
       // apiClient.get(attFileTpypes),
     ]);
+
 
     const { message: alertMessage, alertType, object: templates } = response.data;
 
@@ -64,6 +81,8 @@ exports.retrieveAllTemplates = async (req, res) => {
     return res.render(render_ejs_urls.PhishMagnus.System_Template.VIEW, {
       // enableSuiteManagementLeftMenu: true,
       templates,
+      typeOptions: PHISH_TYPE_OPTIONS,
+      selectedPhishType,
       disableOption: disableOption,
       templateTitleKey,
       breadcrumbs: 'breadcrumbs.myTemplate',

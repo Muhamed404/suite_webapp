@@ -51,11 +51,19 @@
   "emptyCertificatesDescription": "أكمل وحدات الحملة للحصول على الشهادات.",
   "searchCertificates": "ابحث عن الشهادات...",
   "certificateName": "اسم الشهادة",
+  "certificatesContentName": "اسم المحتوى",
   "loadingCertificates": "جارٍ تحميل الشهادات...",
   "campaignLabel": "الحملة",
   "moduleLabel": "الوحدة",
   "issuedDate": "تاريخ الإصدار",
   "expiryDate": "تاريخ الانتهاء",
+  "certificatesPaginationShowing": "عرض {start}–{end} من أصل {total} إدخال",
+  "unknownCampaign": "حملة غير معروفة",
+  "unknownModule": "وحدة غير معروفة",
+  "errors": {
+    "downloadUnknown": "حدث خطأ غير معروف أثناء تنزيل الشهادة.",
+    "popupBlocked": "تعذر فتح نافذة المعاينة؛ يرجى السماح بالنوافذ المنبثقة."
+  },
   "downloadCertificate": "تحميل الشهادة",
   "breadcrumb": {
     "dashboard": "لوحة التحكم"
@@ -155,5 +163,25 @@
     "inProgress": "قيد التنفيذ",
     "completed": "مكتمل",
     "cancelled": "ملغى"
+  },
+  "assignmentPage": {
+    "title": "التكليفات",
+    "stats": {
+      "assignment": "التكليف",
+      "completed": "مكتمل",
+      "pending": "قيد الانتظار",
+      "responseRate": "معدل الاستجابة",
+      "active": "نشط"
+    },
+    "filter": {
+      "allCampaigns": "جميع الحملات"
+    },
+    "table": {
+      "loading": "جاري تحميل الحملات..."
+    },
+    "actions": {
+      "view": "عرض",
+      "startModule": "بدء الوحدة"
+    }
   }
 }

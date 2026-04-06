@@ -140,6 +140,8 @@ export const quizService = {
     contype_id?: number;
     lang_id?: number;
     status?: number;
+    page?: number;
+    limit?: number;
   }) => {
     const p = { ...params };
 

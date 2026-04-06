@@ -118,9 +118,6 @@
         <!-- 2nd -->
 
         <div class="step hidden">
-           <!-- Main Form -->
-          <!-- <form class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start"> -->
-            <!-- Left Side: App/License/Duration -->
              <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
             <div class="flex flex-col gap-6">
               <div>
@@ -136,6 +133,23 @@
                 </label>
                 <input type="email" value="" id="email" name="email"
                   class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+              </div>
+              <div>
+                <label class="block text-gray-700 font-medium mb-3">
+                  <%= __("organization.create.labelDomainRestrict") %>
+                </label>
+                <div class="flex items-center gap-3">
+                  <input type="hidden" name="domain_restrict" id="domain_restrict" value="1" />
+                  <button type="button" id="domainRestrictToggle"
+                    onclick="toggleDomainRestrict()"
+                    class="relative inline-flex items-center w-12 h-6 rounded-full transition-colors duration-200 focus:outline-none bg-teal-500">
+                    <span id="domainRestrictThumb"
+                      class="inline-block w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 translate-x-6"></span>
+                  </button>
+                  <span id="domainRestrictLabel" class="text-sm font-medium text-teal-600">
+                    <%= __("generic_label.active") %>
+                  </span>
+                </div>
               </div>
 
 
@@ -185,6 +199,28 @@
       finish: "<%= __('organization.create.btnFinish') %>"
     }
   };
+
+  function toggleDomainRestrict() {
+    var input   = document.getElementById('domain_restrict');
+    var toggle  = document.getElementById('domainRestrictToggle');
+    var thumb   = document.getElementById('domainRestrictThumb');
+    var label   = document.getElementById('domainRestrictLabel');
+    var active  = input.value === '1';
+
+    if (active) {
+      input.value = '0';
+      toggle.classList.replace('bg-teal-500', 'bg-gray-300');
+      thumb.classList.replace('translate-x-6', 'translate-x-1');
+      label.textContent = "<%= __('generic_label.inactive') %>";
+      label.classList.replace('text-teal-600', 'text-gray-400');
+    } else {
+      input.value = '1';
+      toggle.classList.replace('bg-gray-300', 'bg-teal-500');
+      thumb.classList.replace('translate-x-1', 'translate-x-6');
+      label.textContent = "<%= __('generic_label.active') %>";
+      label.classList.replace('text-gray-400', 'text-teal-600');
+    }
+  }
   window.organizationValidationMessages = {
     name: "<%= __('organization.create.validationOrgNameRequired') %>",
     address: "<%= __('organization.create.validationOrgAddressRequired') %>",

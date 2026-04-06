@@ -108,6 +108,7 @@
 		"entries": "الإدخالات",
 		"to": "إلى",
 		"no_entries_found": "لم يتم العثور على إدخالات",
+		"no_results_match_search": "لا توجد نتائج تطابق استعلام البحث الخاص بك",
 		"people": "الأشخاص",
 		"InProgress": "قيد التقدم",
 		"completed": "مكتمل",
@@ -126,6 +127,7 @@
 		"end_time_required": "تاريخ ووقت الانتهاء مطلوبان.",
 		"no_departments_groups": "لا توجد أقسام أو مجموعات متاحة. يرجى إضافة مستخدمين إلى الأقسام أو المجموعات قبل إنشاء حملة.",
 		"select_department_group": "يرجى اختيار قسم واحد على الأقل أو مجموعة للاستهداف.",
+		"select_at_least_one_option": "يرجى اختيار خيار واحد على الأقل.",
 		"validation_error": "خطأ في التحقق:",
 		"no_members_in_selection": "الأقسام/المجموعات المختارة لا تحتوي على أعضاء. يرجى اختيار أقسام أو مجموعات تحتوي على أعضاء، أو إضافة أعضاء إلى المختارة.",
 		"some_empty_selections": "تحذير: بعض الاختيارات لا تحتوي على أعضاء. ستستهدف الحملة فقط الأقسام/المجموعات التي تحتوي على أعضاء.",
@@ -195,7 +197,21 @@
 		"smtp_configured_successfully": "تم تكوين SMTP بنجاح"
 	},
 	"topnavbar": {
-		"welcome": "مرحباً"
+		"welcome": "مرحباً",
+		"organizationSettings": "إعدادات المؤسسة",
+		"addUser": "إضافة مستخدم",
+		"importUser": "استيراد مستخدم",
+		"dashboard": "لوحة التحكم",
+		"campaigns": "الحملات",
+		"reports": "التقارير",
+		"organizations": "المؤسسات",
+		"packages": "الحزم",
+		"users": "المستخدمون",
+		"auditLogs": "سجلات التدقيق",
+		"systemTemplate": "قالب النظام",
+		"phishingSmtp": "SMTP التصيد",
+		"createPackage": "إنشاء حزمة",
+		"simulatorEmails": "رسائل المحاكي"
 	},
 	"breadcrumbs": {
 		"home": "الرئيسية",
@@ -288,6 +304,11 @@
 		},
 		"messages": {
 			"noActiveSubscriptionMessage": "لا يوجد لديك اشتراك نشط أو انتهت صلاحية اشتراكك. يرجى الاتصال بالمسؤول أو زيارة صفحة الاشتراك للتجديد."
+		},
+		"alerts": {
+			"alert": "تنبيه!",
+			"phishMagnusLicenseExpired": "انتهت صلاحية ترخيص PhishMagnus.",
+			"awareMagnusLicenseExpired": "انتهت صلاحية ترخيص AwareMagnus."
 		}
 	},
 	"menu": {
@@ -300,13 +321,12 @@
 			"reports": "التقارير",
 			"campaigns": "الحملات",
 			"campaignEmail": "البريد الإلكتروني",
-			"campaignQR": "QR",
-			"campaignNFC": "NFC",
-			"campaignUSB": "USB",
-			"campaignSMS": "SMS",
+			"campaignQR": "رمز الاستجابة السريعة (QR)",
+			"campaignNFC": "الاتصال قريب المدى (NFC)",
+			"campaignUSB": "منافذ USB",
+			"campaignSMS": "رسالة نصية",
 			"campaignWhatsapp": "واتساب",
 			"simulatorEmails": "رسائل المحاكاة"
-	
 		},
 		"suite": {
 			"suiteManagement": "إدارة المجموعة",
@@ -326,6 +346,41 @@
 			"logout": "تسجيل الخروج",
 			"smtpNotifications": "menu.suite.smtpNotifications"
 		}
+	},
+	"org_domain": {
+		"breadcrumb": "إدارة النطاقات",
+		"title": "إدارة النطاقات",
+		"subtitle": "إدارة نطاقات البريد الإلكتروني المسموح بها لهذه المنظمة.",
+		"btn_add": "إضافة نطاق",
+		"btn_save": "حفظ",
+		"btn_enable": "تفعيل",
+		"btn_disable": "تعطيل",
+		"config_section": "الإعدادات",
+		"label_domain_restrict": "تقييد النطاق",
+		"desc_domain_restrict": "فرض التحقق من نطاق البريد الإلكتروني للمستخدمين في هذه المنظمة.",
+		"btn_enable_restrict": "تفعيل",
+		"btn_disable_restrict": "تعطيل",
+		"restrict_confirm_enable_title": "تفعيل تقييد النطاق",
+		"restrict_confirm_enable_subtitle": "سيؤثر هذا على جميع المستخدمين في هذه المنظمة.",
+		"restrict_confirm_enable_body": "بعد التفعيل، سيُسمح فقط للمستخدمين الذين لديهم نطاق بريد إلكتروني معتمد بالوصول.",
+		"restrict_confirm_disable_title": "تعطيل تقييد النطاق",
+		"restrict_confirm_disable_subtitle": "سيؤثر هذا على جميع المستخدمين في هذه المنظمة.",
+		"restrict_confirm_disable_body": "بعد التعطيل، لن يتم تطبيق التحقق من النطاق على هذه المنظمة.",
+		"col_domain_name": "اسم النطاق",
+		"col_status": "الحالة",
+		"col_created_at": "تاريخ الإنشاء",
+		"total": "الإجمالي",
+		"no_records": "لم يتم تكوين أي نطاقات بعد.",
+		"modal_add_title": "إضافة نطاق جديد",
+		"label_domain_name": "اسم النطاق",
+		"placeholder_domain_name": "مثال: example.com",
+		"hint_domain_name": "أدخل اسم النطاق الكامل (مثال: company.com)",
+		"validation_domain_format": "يرجى إدخال اسم نطاق صحيح.",
+		"label_status": "الحالة",
+		"delete_modal_title": "حذف النطاق",
+		"delete_modal_subtitle": "لا يمكن التراجع عن هذا الإجراء.",
+		"confirm_delete": "هل أنت متأكد أنك تريد حذف النطاق:",
+		"modal_edit_title": "تعديل النطاق"
 	},
 	"organization": {
 		"homescreen": {
@@ -375,6 +430,7 @@
 			"labelAdminFirstName": "الاسم الأول",
 			"labelAdminLastName": "اسم العائلة",
 			"labelAdminEmail": "البريد الإلكتروني للمدير",
+			"labelDomainRestrict": "تقييد النطاق",
 			"labelAdminPassword": "كلمة المرور",
 			"btnNext": "التالي",
 			"btnBack": "السابق",
@@ -409,7 +465,8 @@
 				"btnSuiteDashboard": "لوحة تحكم المجموعة",
 				"btnSMTP": "إعدادات SMTP",
 				"btnAuditLog": "سجل التدقيق",
-				"btnSMS": "إعدادات SMS"
+				"btnSMS": "إعدادات SMS",
+				"btnDomainManagement": "إدارة النطاقات"
 			},
 			"tabSubscription": {
 				"labelTabTitle": "الاشتراك",
@@ -469,6 +526,35 @@
 			"labelUserRangeFrom": "عدد المستخدمين من",
 			"labelUserRangeTo": "عدد المستخدمين إلى",
 			"labelLicenseDuration": "المدة (بالأيام)",
+			"placeholderPackageName": "أدخل اسم الباقة",
+			"placeholderLicenseCost": "أدخل تكلفة الترخيص",
+			"placeholderDescription": "أدخل الوصف",
+			"validationSelectProduct": "يرجى اختيار منتج/تطبيق",
+			"validationSelectPackageType": "يرجى اختيار نوع الباقة (محلي أو سحابي)",
+			"validationEnterPackageName": "اسم الباقة مطلوب",
+			"validationPackageNameMinLength": "يجب أن يكون اسم الباقة على الأقل 3 أحرف",
+			"validationPackageNameMaxLength": "لا يمكن أن يتجاوز اسم الباقة 100 حرف",
+			"validationEnterDescription": "وصف الباقة مطلوب",
+			"validationDescriptionMinLength": "يجب أن يكون الوصف على الأقل حرف واحد",
+			"validationDescriptionMaxLength": "لا يمكن أن يتجاوز الوصف 500 حرف",
+			"validationEnterLicenseCost": "تكلفة الترخيص مطلوبة",
+			"validationLicenseCostNumber": "يرجى إدخال رقم صحيح",
+			"validationLicenseCostMin": "يجب أن تكون تكلفة الترخيص على الأقل 1",
+			"validationLicenseCostMax": "تكلفة الترخيص كبيرة جداً",
+			"validationEnterDuration": "مدة الترخيص مطلوبة",
+			"validationDurationDigits": "يرجى إدخال عدد أيام صحيح",
+			"validationDurationMin": "يجب أن تكون المدة على الأقل يوم واحد",
+			"validationDurationMax": "لا يمكن أن تتجاوز المدة 3650 يوم (10 سنوات)",
+			"validationEnterRangeFrom": "نطاق المستخدمين (من) مطلوب",
+			"validationRangeFromDigits": "يرجى إدخال رقم صحيح",
+			"validationRangeFromMin": "يجب أن يكون الحد الأدنى لنطاق المستخدمين على الأقل 1",
+			"validationRangeFromMax": "القيمة كبيرة جداً",
+			"validationEnterRangeTo": "نطاق المستخدمين (إلى) مطلوب",
+			"validationRangeToDigits": "يرجى إدخال رقم صحيح",
+			"validationRangeToMin": "يجب أن يكون الحد الأقصى لنطاق المستخدمين على الأقل 1",
+			"validationRangeToMax": "القيمة كبيرة جداً",
+			"validationRangeToGreaterThanFrom": "يجب أن يكون نطاق المستخدمين \"إلى\" أكبر من أو يساوي \"من\"",
+			"successMessage": "تم إنشاء الباقة بنجاح.",
 			"btnBack": "رجوع",
 			"btnNext": "التالي",
 			"btnSubmit": "إرسال",
@@ -478,6 +564,7 @@
 	"appservice": {
 		"homescreen": {
 			"title": "إدارة خدمات التطبيق",
+			"serviceManagement": "إدارة الخدمات",
 			"productName": "اسم المنتج",
 			"serviceName": "اسم الخدمة",
 			"serviceType": "نوع الخدمة",
@@ -499,6 +586,21 @@
 			"labelServiceName": "اسم الخدمة",
 			"labelDescription": "التفاصيل",
 			"labelServiceCost": "تكلفة الخدمة (دولار)",
+			"placeholderServiceName": "أدخل اسم الخدمة",
+			"placeholderServiceCost": "أدخل تكلفة الخدمة",
+			"placeholderDescription": "أدخل التفاصيل",
+			"successMessage": "تم إنشاء الخدمة بنجاح.",
+			"validationSelectProduct": "يرجى اختيار منتج.",
+			"validationEnterServiceName": "يرجى إدخال اسم الخدمة.",
+			"validationServiceNameMinLength": "يجب أن يكون اسم الخدمة على الأقل حرفين.",
+			"validationEnterServiceCost": "يرجى إدخال تكلفة الخدمة.",
+			"validationValidNumber": "يرجى إدخال رقم صحيح.",
+			"validationServiceCostMin": "يجب أن تكون تكلفة الخدمة على الأقل 1.",
+			"validationSelectServiceType": "يرجى اختيار نوع الخدمة.",
+			"validationEnterDescription": "يرجى إدخال التفاصيل.",
+			"validationDescriptionMinLength": "يجب أن تكون التفاصيل على الأقل حرفين.",
+			"errorUnableToCreate": "تعذر إنشاء الخدمة. يرجى المحاولة مرة أخرى.",
+			"errorCouldNotLoadApplications": "تعذر تحميل التطبيقات.",
 			"btnBack": "رجوع",
 			"btnSubmit": "إرسال",
 			"btnCancel": "إلغاء"
@@ -581,7 +683,21 @@
 		"labelServiceAccount": "حساب الخدمة",
 		"labelPassword": "كلمة المرور",
 		"btnTestConfiguration": "اختبار الإعدادات",
-		"btnSaveSettings": "حفظ الإعدادات"
+		"btnSaveSettings": "حفظ الإعدادات",
+		"labelSenderEmail": "البريد الإلكتروني المرسل",
+		"labelDetails": "التفاصيل",
+		"enableStartTLS": "تفعيل STARTTLS",
+		"enableStartTLSDesc": "استخدام STARTTLS لترقية الاتصال العادي إلى اتصال آمن.",
+		"enableSSL": "تفعيل SSL",
+		"enableSSLDesc": "استخدام SSL/TLS لاتصال مشفر بالكامل من البداية.",
+		"enableSMTPEncryption": "تفعيل التشفير",
+		"enableSMTPEncryptionDesc": "تشفير رسائل البريد الإلكتروني قبل إرسالها عبر هذا الاتصال.",
+		"enableMFA": "تفعيل المصادقة متعددة العوامل",
+		"enableMFADesc": "إرسال كلمات المرور المؤقتة عبر هذا الاتصال.",
+		"selectOrganization": "اختر المؤسسة",
+		"default": "افتراضي",
+		"enabled": "مفعل",
+		"disabled": "معطل"
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "إدارة مستخدمي سيكماجنوس",
@@ -1015,8 +1131,18 @@
 			},
 			"device_code": "رمز الجهاز",
 			"description": "الوصف",
-			"start_date": "تاريخ البدء"
+			"start_date": "تاريخ البدء",
+			"interaction_details_title": "تفاصيل تفاعل USB",
+			"interactions_recorded": "تفاعل مسجل",
+			"unique_users": "مستخدم فريد",
+			"plugged": "متصل",
+			"unplugged": "غير متصل",
+			"ip_address": "عنوان IP",
+			"mac_address": "عنوان MAC",
+			"env_path": "مسار البيئة",
+			"system_details": "تفاصيل النظام"
 		},
+		"no_records": "لا توجد سجلات.",
 		"qr_campaign": {
 			"name": "اسم الحملة",
 			"description": "الوصف",
@@ -1384,7 +1510,10 @@
 		"tabAll": "الكل",
 		"tabActive": "نشط",
 		"tabInprogress": "قيد التقدم",
-		"tabCompleted": "مكتمل"
+		"tabCompleted": "مكتمل",
+		"subtitle": "تتبع جميع إجراءات المستخدمين والأحداث.",
+		"rowsPerPage": "صفوف في الصفحة",
+		"noLogs": "لا توجد سجلات تدقيق"
 	},
 	"CS-List": "فئات الأمن السيبراني",
 	"btn-CS-LibPosters-Upload-Document": "رفع مستند",
@@ -1488,7 +1617,7 @@
 		"totalPayable": "اجمالي المبلغ المستحق",
 		"back": "رجوع",
 		"downloadAsPdf": "تحميل كملف PDF",
-		"email": "Invoice.email"
+		"email": "البريد الإلكتروني"
 	},
 	"CS-Add": "إضافة فئة",
 	"btn-CS-Save": "حفظ",
@@ -2087,7 +2216,7 @@
 			"yes": "نعم",
 			"no": "لا",
 			"sent_at": "وقت الإرسال",
-			"email_headers": "مصدر الرسالة",
+			"magnus_email_headers": "مصدر الرسالة",
 			"no_headers": "لا توجد ترويسات متاحة.",
 			"real_phishing_email": "رسالة تصيد احتيالي حقيقية",
 			"real_phishing_email_desc": "لم يتم إنشاء هذه الرسالة بواسطة PhishMagnus. قد تكون محاولة تصيد احتيالي حقيقية.",
@@ -2097,5 +2226,37 @@
 			"suspicious_content": "محتوى مشبوه",
 			"not_found": "لم يتم العثور على البلاغ."
 		}
+	},
+	"mfa": {
+		"create": "إعدادات SMTP للمصادقة متعددة العوامل",
+		"host": {
+			"name": "اسم المضيف"
+		},
+		"port": "المنفذ",
+		"service": {
+			"account": "حساب الخدمة"
+		},
+		"password": "كلمة المرور",
+		"connectionName": "اسم الاتصال",
+		"secureConnection": "استخدام اتصال آمن",
+		"enableMFA": "تفعيل المصادقة متعددة العوامل",
+		"subtitle": "قم بإعداد خادم SMTP المستخدم لإرسال كلمات المرور المؤقتة.",
+		"placeholderConnectionName": "مثال: البريد المؤسسي",
+		"placeholderHost": "مثال: smtp.company.com",
+		"placeholderPort": "مثال: 587",
+		"placeholderAccount": "مثال: noreply@company.com",
+		"placeholderPassword": "أدخل كلمة مرور الحساب",
+		"secureConnectionDesc": "تفعيل تشفير TLS/SSL لاتصال SMTP.",
+		"enableEncryption": "تفعيل التشفير",
+		"enableEncryptionDesc": "تشفير رسائل البريد الإلكتروني قبل إرسالها عبر هذا الاتصال.",
+		"enableMFADesc": "إرسال كلمات المرور المؤقتة عبر هذا الاتصال.",
+		"testConnection": "اختبار الاتصال",
+		"save": "حفظ",
+		"loginTitle": "التحقق بخطوتين",
+		"loginSubtitle": "أدخل الرمز المؤقت المرسل إلى بريدك الإلكتروني أو تطبيق المصادقة.",
+		"loginLabel": "رمز التحقق",
+		"loginPlaceholder": "أدخل الرمز المكون من 6 أرقام",
+		"loginBtn": "تحقق والمتابعة",
+		"loginBack": "العودة إلى تسجيل الدخول"
 	}
 }

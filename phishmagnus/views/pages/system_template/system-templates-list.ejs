@@ -33,6 +33,16 @@
 
 <div class="flex flex-col p-6 pt-0">
   <div class="flex flex-col rounded-3xl bg-white border border-gray-100 shadow-sm">
+    <div class="px-6 pt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-start">
+      <select id="templatePhishTypeFilter"
+        class="px-6 py-3 rounded-full border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+        <option value="all" <%= selectedPhishType.key === 'all' ? 'selected' : '' %>><%= __("all_campaigns.filterAll") %></option>
+        <% (typeOptions || []).forEach(type => { %>
+          <option value="<%= type.key %>" <%= selectedPhishType.key === type.key ? 'selected' : '' %>><%= type.label %></option>
+        <% }) %>
+      </select>
+    </div>
+
     <div class="p-6">
       <table id="filter-table" class="min-w-full border-none text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} to {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
         <thead class="bg-gray-50 text-gray-600 text-xs">
@@ -139,6 +149,22 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  const typeFilter = document.getElementById('templatePhishTypeFilter');
+  if (typeFilter) {
+    typeFilter.addEventListener('change', function() {
+      const url = new URL(window.location.href);
+      const selectedValue = this.value || 'all';
+
+      if (selectedValue === 'all') {
+        url.searchParams.delete('phishType');
+      } else {
+        url.searchParams.set('phishType', selectedValue);
+      }
+
+      window.location.href = url.toString();
+    });
+  }
+
   document.querySelectorAll('button[data-url]').forEach(button => {
     button.addEventListener('click', function() {
       const url = this.dataset.url;

@@ -1051,10 +1051,7 @@ export default function CampaignDetailsPage() {
                   <div>
                     Study Time
                     <div className="text-xl text-gray-900">
-                      {campaignDashboard?.metrics?.total_study_time
-                        ? Math.round(campaignDashboard?.metrics?.total_study_time / 60)
-                        : 0}
-                      h
+                      {campaignDashboard?.metrics?.total_study_time ?? 0}h
                     </div>
                   </div>
                 </div>

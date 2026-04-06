@@ -117,6 +117,26 @@ const customRules = [
     phishType: 'whatsapp', options: [difficulty_level_url_click],
     goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
   },
+  {
+    phishType: 'whatsapp', options: ['2'],
+    goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
+  },
+  {
+    phishType: 'whatsapp', options: [difficulty_level_sms_short_message, '2'],
+    goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
+  },
+  {
+    phishType: 'whatsapp', options: [difficulty_level_sms_short_message, difficulty_level_url_click],
+    goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
+  },
+  {
+    phishType: 'whatsapp', options: ['2', difficulty_level_url_click],
+    goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
+  },
+  {
+    phishType: 'whatsapp', options: [difficulty_level_sms_short_message, '2', difficulty_level_url_click],
+    goTo: [sms_phishing_screen, url_phishing_screen, phishing_webpage_screen, phishing_landing_page_screen]
+  },
 ];
 
 
@@ -178,6 +198,7 @@ let currentStep = 0;
   let history = [0]; // Track visited steps
   const formData = {};
   let selectedPhishType = null;
+  const smsStepIndex = sms_phishing_screen - 1;
 
 
 
@@ -377,13 +398,24 @@ let currentStep = 0;
     return candidates[0];
   }
 
-  function buildActiveFlow(matchedRule) {
+  function getBaseFlowForType(phishType) {
+    const fullFlow = Array.from({ length: steps.length }, (_, i) => i);
+    if (!['sms', 'whatsapp'].includes(phishType)) {
+      return fullFlow.filter(stepIndex => stepIndex !== smsStepIndex);
+    }
+    return fullFlow;
+  }
+
+  function buildActiveFlow(matchedRule, phishType) {
     // alert('build active flow alert');
     // alert('Building active flow based on matched rule: ' + JSON.stringify(matchedRule));
-    if (!matchedRule) return Array.from({ length: steps.length }, (_, i) => i);
+    if (!matchedRule) return getBaseFlowForType(phishType);
     const goToZeroBased = matchedRule.goTo.map(n => n - 1);
     const uniq = [0, 1];
     goToZeroBased.forEach(x => { if (!uniq.includes(x)) uniq.push(x); });
+    if (!['sms', 'whatsapp'].includes(phishType)) {
+      return uniq.filter(stepIndex => stepIndex !== smsStepIndex);
+    }
     return uniq;
   }
 
@@ -434,6 +466,7 @@ let currentStep = 0;
         return;
       }
       selectedPhishType = sel;
+      activeFlow = getBaseFlowForType(selectedPhishType);
 
       // ✅ NEW FEATURE: Hide email if NFC selected
       if (selectedPhishType === 'nfc' && emailContent) {
@@ -460,7 +493,7 @@ let currentStep = 0;
         return;
       }
       const matched = computeMatchingRule(selectedPhishType, selectedOptions);
-      activeFlow = buildActiveFlow(matched);
+      activeFlow = buildActiveFlow(matched, selectedPhishType);
       // alert('Active Flow Steps: ' + JSON.stringify(activeFlow));
       const idxInFlow = activeFlow.indexOf(1);
       const nextInFlow = activeFlow[idxInFlow + 1] || steps.length - 1;

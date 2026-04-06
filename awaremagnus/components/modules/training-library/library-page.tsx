@@ -3,7 +3,8 @@
 import type { Module, ModuleTranslation } from "@/types/quiz";
 
 import Link from "next/link";
-import { useState, useMemo } from "react";
+import Image from "next/image";
+import { useState, useMemo, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { Card, CardBody } from "@heroui/card";
@@ -25,6 +26,7 @@ import { isPlatformAdmin } from "@/utils/roles";
 import { SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
 import { useAwmCategories } from "@/hooks/useSuiteAwm";
 import { LibraryPageSkeleton } from "@/components/ui/skeletons";
+import { AuthImage } from "@/components/ui/auth-image";
 import { getContentAssetUrl, getModuleAssetUrl } from "@/utils/contentAssetUrl";
 import {
   SearchIcon,
@@ -82,7 +84,8 @@ function moduleLanguageIds(m: Module): number[] {
 }
 
 function getModuleLogoUrl(module: Module, selectedLanguageId: string | number | null): string {
-  const defaultLogo = getContentAssetUrl("/awm/images/Card.png");
+  /** Public placeholder; module banners are loaded via AuthImage with Bearer (same as content logos). */
+  const defaultLogo = getContentAssetUrl("/images/Icon_Template.svg");
 
   if (!selectedLanguageId) {
     const url = firstTranslation(module)?.logo_banner_url;
@@ -104,7 +107,7 @@ interface LibraryPageProps {
 
 export function LibraryPage({ libraryType, title }: LibraryPageProps) {
   const t = useTranslations("module");
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
   const { user } = useAuthStore();
   const isPlatform = isPlatformAdmin(user?.role_id);
@@ -121,6 +124,11 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
   const [sortField, setSortField] = useState<"name" | "description" | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    setLanguageFilter(locale === "ar" ? "2" : "");
+    setCurrentPage(1);
+  }, [locale]);
 
   const pathname = usePathname();
   const filter = pathname?.includes("/training-library/my") ? "my_module" : "global_module";
@@ -455,26 +463,28 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                     <Card key={item.id} className={cardClassName} shadow="sm">
                       <CardBody className="p-3 flex flex-col bg-white">
                         {/* Thumbnail: language-specific logo or default */}
-                        <div 
-                          className="w-full h-48 mb-3 shrink-0 relative overflow-hidden"
+                        <div
+                          className="w-full h-48 mb-3 shrink-0 relative overflow-hidden bg-gray-100"
                           style={{ borderRadius: 12 }}
                         >
-                          <img
+                          <AuthImage
+                            fill
                             alt=""
-                            className="w-full h-full object-cover"
+                            className="object-contain"
+                            fallbackContent={
+                              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                                <Image
+                                  aria-hidden
+                                  alt=""
+                                  className="w-12 h-12 object-contain opacity-60"
+                                  height={48}
+                                  src={getContentAssetUrl("/images/Icon_Template.svg")}
+                                  width={48}
+                                />
+                              </div>
+                            }
+                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                             src={getModuleLogoUrl(item, languageFilter)}
-                            onError={(e) => {
-                              const el = e.target as HTMLImageElement;
-
-                              el.style.display = "none";
-                              el.nextElementSibling?.classList.remove("hidden");
-                            }}
-                          />
-                          <img
-                            aria-hidden
-                            alt=""
-                            className="absolute inset-0 m-auto w-12 h-12 object-contain opacity-60 hidden"
-                            src={getContentAssetUrl("/images/Icon_Template.svg")}
                           />
                         </div>
                         <h3 className="font-semibold text-[var(--mainblue)] text-sm truncate">
@@ -580,26 +590,28 @@ export function LibraryPage({ libraryType, title }: LibraryPageProps) {
                     {(item: Module) => (
                       <TableRow key={item.id}>
                         <TableCell className="w-16 align-middle">
-                          <div 
-                            className="relative w-12 h-12 overflow-hidden shrink-0"
+                          <div
+                            className="relative w-12 h-12 overflow-hidden shrink-0 bg-gray-100"
                             style={{ borderRadius: 8 }}
                           >
-                            <img
+                            <AuthImage
+                              fill
                               alt=""
-                              className="w-full h-full object-cover"
+                              className="object-contain"
+                              fallbackContent={
+                                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                                  <Image
+                                    aria-hidden
+                                    alt=""
+                                    className="w-5 h-5 object-contain opacity-90"
+                                    height={20}
+                                    src={getContentAssetUrl("/images/Icon_Template.svg")}
+                                    width={20}
+                                  />
+                                </div>
+                              }
+                              sizes="48px"
                               src={getModuleLogoUrl(item, languageFilter)}
-                              onError={(e) => {
-                                const el = e.target as HTMLImageElement;
-
-                                el.style.display = "none";
-                                el.nextElementSibling?.classList.remove("hidden");
-                              }}
-                            />
-                            <img
-                              aria-hidden
-                              alt=""
-                              className="absolute inset-0 m-auto w-5 h-5 object-contain opacity-90 hidden"
-                              src={getContentAssetUrl("/images/Icon_Template.svg")}
                             />
                           </div>
                         </TableCell>

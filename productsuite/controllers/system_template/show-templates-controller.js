@@ -6,10 +6,22 @@ const backend_api_urls = require("../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 
+const PHISH_TYPE_OPTIONS = [
+  { key: 'email', label: 'Email', id: 2 },
+  { key: 'sms', label: 'SMS', id: 1 },
+  { key: 'whatsapp', label: 'Whatsapp', id: 4 },
+  { key: 'usb', label: 'USB', id: 3 },
+  { key: 'qr', label: 'QR', id: 5 },
+  { key: 'nfc', label: 'NFC', id: 6 }
+];
+
 
 exports.showTemplate = async (req, res) => {
   try {
     logger.info('Controller - Show Template: Incoming request in system defined Template method')
+    const requestedPhishType = typeof req.query.phishType === 'string' ? req.query.phishType.toLowerCase() : 'all';
+    const selectedOption = PHISH_TYPE_OPTIONS.find((option) => option.key === requestedPhishType);
+    const selectedPhishType = selectedOption || { key: 'all', label: 'All', id: null };
     // console.log("My Template: INCOMING ORGANIZATION: " + orgId);
 
     let url = backend_api_urls.PRODUCT_SUITE.Template.LIST
@@ -20,7 +32,8 @@ exports.showTemplate = async (req, res) => {
     const apiClient = getApiClient(req);
 
     // const [response, resAttFileTypes] = await Promise.all([
-    const response = await apiClient.get(url)
+    const params = selectedPhishType.key === 'all' || !selectedPhishType.id ? undefined : { phishType: selectedPhishType.id };
+    const response = await apiClient.get(url, { params })
 
     const { message: alertMessage, alertType, object: templates } = response.data;
 
@@ -54,6 +67,8 @@ exports.showTemplate = async (req, res) => {
     return res.render(render_ejs_urls.PhishMagnus.System_Template.VIEW, {
       // enableSuiteManagementLeftMenu: true,
       templates,
+      typeOptions: PHISH_TYPE_OPTIONS,
+      selectedPhishType,
       disableOption,
       templateTitleKey,
       breadcrumbs: 'breadcrumbs.systemTemplate',

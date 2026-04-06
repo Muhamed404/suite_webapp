@@ -354,25 +354,25 @@ export function VideoContentDetailScreen({
                           className={clsx("flex items-center gap-2", isRtl && "flex-row-reverse")}
                         >
                           {isOrgUser(roleId) && (
-                          <button
-                            className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
-                            type="button"
-                          >
-                            <svg
-                              fill="none"
-                              height="16"
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              viewBox="0 0 24 24"
-                              width="16"
-                              xmlns="http://www.w3.org/2000/svg"
+                            <button
+                              className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
+                              type="button"
                             >
-                              <polygon points="5 3 19 12 5 21 5 3" />
-                            </svg>
-                            Begin Training
-                          </button>
+                              <svg
+                                fill="none"
+                                height="16"
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                viewBox="0 0 24 24"
+                                width="16"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                              </svg>
+                              Begin Training
+                            </button>
                           )}
                           <button
                             className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-full text-xs font-medium transition"

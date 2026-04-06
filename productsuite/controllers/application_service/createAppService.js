@@ -28,7 +28,7 @@ exports.renderCreateForm = async (req, res) => {
     logger.error(error.stack);
     res.render(render_ejs_urls.ProductSuiteManagement.App_Service.CREATE, {
       applications: [],
-      message: "Could not load applications."
+      message: req.__('appservice.create.errorCouldNotLoadApplications')
     });
   }
 };
@@ -42,24 +42,24 @@ exports.createAppService = async (req, res) => {
   const errors = [];
   const { application, service_name, service_detail, service_type, per_service_cost } = req.body;
   if (!application || isNaN(parseInt(application, 10))) {
-    errors.push('Please select a product.');
+    errors.push(req.__('appservice.create.validationSelectProduct'));
   }
   if (!service_name || typeof service_name !== 'string' || service_name.trim().length < 2) {
-    errors.push('Service name must be at least 2 characters.');
+    errors.push(req.__('appservice.create.validationServiceNameMinLength'));
   }
   if (!service_type || typeof service_type !== 'string' || !['Fixed', 'Annual'].includes(service_type)) {
-    errors.push('Please select a valid service type.');
+    errors.push(req.__('appservice.create.validationSelectServiceType'));
   }
   if (!service_detail || typeof service_detail !== 'string' || service_detail.trim().length < 2) {
-    errors.push('Description must be at least 2 characters.');
+    errors.push(req.__('appservice.create.validationDescriptionMinLength'));
   }
   let cost = 0;
   if (!per_service_cost || isNaN(parseInt(per_service_cost, 10))) {
-    errors.push('Please enter a valid service cost.');
+    errors.push(req.__('appservice.create.validationEnterServiceCost'));
   } else {
     cost = parseInt(per_service_cost, 10);
     if (cost < 1) {
-      errors.push('Service cost must be at least 1.');
+      errors.push(req.__('appservice.create.validationServiceCostMin'));
     }
   }
 
@@ -89,13 +89,13 @@ exports.createAppService = async (req, res) => {
     if (!response.data.success) {
       logger.error(`[APP SERVICE][POST] Backend returned error status: ${response.data.message}`);
       req.flash('alertType', 'error');
-      req.flash('message', 'Unable to create service. Please try again.');
+      req.flash('message', req.__('appservice.create.errorUnableToCreate'));
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.App_Service.CREATE);
 
     }
     // success redirect
     req.flash('alertType', 'success');
-    req.flash('message', 'Service has been created successfully.');
+    req.flash('message', req.__('appservice.create.successMessage'));
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.App_Service.LIST);
 
   } catch (error) {

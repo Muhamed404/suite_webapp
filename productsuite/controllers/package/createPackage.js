@@ -126,7 +126,7 @@ exports.submitPackageForm = async (req, res) => {
         logger.info(`[PACKAGE CREATE][POST] Backend response: ${JSON.stringify(response.data)}`);
 
         // Redirect or render success
-        req.flash('message', 'Package created successfully');
+        req.flash('message', req.__('package.create.successMessage'));
         req.flash('alertType', 'success');
         res.redirect(frontend_api_urls.PRODUCT_SUITE.Package_Management.LIST_PACKAGES);
     } catch (error) {

@@ -43,7 +43,7 @@
     "description": "Try adjusting your filters or search query"
   },
   "pagination": {
-    "showing": "Showing {{start}}–{{end}} out of {{total}} Entries"
+    "showing": "Showing {start}–{end} out of {total} Entries"
   },
   "certificatesTitle": "Certifications",
   "certificatesDescription": "View and download certifications you have earned.",
@@ -51,11 +51,19 @@
   "emptyCertificatesDescription": "Complete campaign modules to earn certifications.",
   "searchCertificates": "Search certifications...",
   "certificateName": "Certification Name",
+  "certificatesContentName": "Content Name",
   "loadingCertificates": "Loading certifications...",
   "campaignLabel": "Campaign",
   "moduleLabel": "Module",
   "issuedDate": "Issued",
   "expiryDate": "Expires",
+  "certificatesPaginationShowing": "Showing {start}–{end} out of {total} Entries",
+  "unknownCampaign": "Unknown Campaign",
+  "unknownModule": "Unknown Module",
+  "errors": {
+    "downloadUnknown": "An unknown error occurred while downloading the certificate.",
+    "popupBlocked": "Unable to open preview window; please allow pop-ups."
+  },
   "downloadCertificate": "Download Certification",
   "breadcrumb": {
     "dashboard": "Dashboard"
@@ -155,5 +163,25 @@
     "inProgress": "In Progress",
     "completed": "Completed",
     "cancelled": "Cancelled"
+  },
+  "assignmentPage": {
+    "title": "Assignment",
+    "stats": {
+      "assignment": "Assignment",
+      "completed": "Completed",
+      "pending": "Pending",
+      "responseRate": "Response Rate",
+      "active": "Active"
+    },
+    "filter": {
+      "allCampaigns": "All Campaigns"
+    },
+    "table": {
+      "loading": "Loading campaigns..."
+    },
+    "actions": {
+      "view": "View",
+      "startModule": "Start Module"
+    }
   }
 }

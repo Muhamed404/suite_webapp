@@ -26,7 +26,12 @@ module.exports = {
                 DELETE: (catId) => `/cybersecurity/categories/delete/${catId}`
             }
         },
-
+        DOMAIN_MANAGEMENT: {
+            LIST_BY_ORGANIZATION: (orgId) => `/dms/${orgId}/organization`,
+            EDIT: (domainId) => `/dms/${domainId}/domain`,
+            DELETE: (domainOrgId, domainId) => `/dms/${domainOrgId}/organization/${domainId}/domain`,
+            TOGGLE_RESTRICT: (orgId) => `/organization/${orgId}/domain-restrict`,
+        },
         PACKAGE_MANAGEMENT: {
             CREATE: '/package/',
         },
@@ -168,6 +173,7 @@ module.exports = {
             LIST_BY_ORGANIZATION: (orgId) => `/phm/threat-reporter/${orgId}/organization`,
             REPORT_DETAIL: (reportId) => `/phm/threat-reporter/${reportId}/report`,
             REPORT_DETAIL_By_INVTEE: (invId) => `/phm/threat-reporter/${invId}/invitee`,
+            DOWNLOAD_BY_INVITEE: (inviteeId) => `/phm/threat-reporter/invitee/${inviteeId}/organization`,
         },
         PHISHING_SMTP: {
             LIST: (orgId) => `/phm/phishing-smtp/organization/${orgId}`,

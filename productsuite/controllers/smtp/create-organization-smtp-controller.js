@@ -44,7 +44,8 @@ exports.createSMTP = async (req, res) => {
             use_tls: smtp.use_tls,
             use_ssl: smtp.use_ssl,
             for_phishing_smtp: smtp.for_phishing_smtp,
-            encrypt_password: smtp.is_encrypted ? true : false
+            encrypt_password: smtp.is_encrypted ? true : false,
+            enable_mfa: smtp.enable_mfa ? true : false
           });
         } else {
           logger.info(`[Create Organization SMTP] No Existing SMTP for Org ${orgId}`);
@@ -71,7 +72,7 @@ exports.createSMTP = async (req, res) => {
       });
   } else {
     logger.info(`[Create Organization SMTP] POST: Incoming Request`);
-    const { host, port, smtp_account, smtp_password, sender_email, use_tls, use_ssl, encrypt_password = true } = req.body;
+    const { host, port, smtp_account, smtp_password, sender_email, use_tls, use_ssl, encrypt_password = true, enable_mfa } = req.body;
     logger.debug(`[Create Organization SMTP] POST: Incoming hostname ${JSON.stringify(req.body.host, null, 2)}`);
     let orgId = Number(req.params.orgId);
     const smtpObj = {
@@ -84,6 +85,7 @@ exports.createSMTP = async (req, res) => {
       use_ssl: use_ssl === 'true',
       organization_id: orgId,
       is_encrypted: encrypt_password === 'true',
+      enable_mfa: enable_mfa === 'true',
       is_active: true
     };
     const apiClient = getApiClient(req);

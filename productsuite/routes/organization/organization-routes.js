@@ -24,6 +24,4 @@ router.get("/subscription-history", checkPermission(enums.ModuleNames.Subscripti
 
 router.get("/statistics/:orgId", organizationController.organizationalStatistics)
 
-// router.get("/sms/:orgId", organizationController.organizationalStatistics)
-
 module.exports = router;

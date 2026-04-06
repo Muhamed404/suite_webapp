@@ -71,8 +71,12 @@ function formatCreatedDate(dateStr: string | undefined): string {
   }
 }
 
-function moduleName(m: Module): string {
-  return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
+function moduleName(m: Module, selectedLanguageId: string): string {
+  const translation = selectedLanguageId
+    ? m.translations?.find((tr) => String(tr.language_id) === selectedLanguageId)
+    : m.translations?.[0];
+
+  return translation?.name ?? m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
 }
 
 function contentTitle(c: ModuleContent): string {
@@ -148,7 +152,7 @@ interface ModuleDetailsPageProps {
 export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPageProps) {
   const t = useTranslations("module");
   const tContent = useTranslations("content");
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
   const { user } = useAuthStore();
   const roleId = user?.role_id;
   const isRtl = dir === "rtl";
@@ -170,6 +174,10 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
   const tabGroupRef = useRef<HTMLDivElement>(null);
   const tabIndicatorRef = useRef<HTMLSpanElement>(null);
   const rowsPerPage = 5;
+
+  useEffect(() => {
+    setLanguageFilter(locale === "ar" ? "2" : "");
+  }, [locale]);
 
   const { data: moduleRes, isLoading: moduleLoading } = useModule(moduleId, !!moduleId);
 
@@ -381,17 +389,18 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     );
   }
 
-  const moduleTitle = moduleName(moduleData);
+  const activeTranslation = languageFilter
+    ? moduleData.translations?.find((tr) => String(tr.language_id) === languageFilter)
+    : moduleData.translations?.[0];
+
+  const moduleTitle = moduleName(moduleData, languageFilter);
   const moduleDesc =
+    activeTranslation?.description ??
     moduleData.description ??
     moduleData.translations?.[0]?.description ??
     t("moduleDetails.description");
   const moduleLogoUrl = (() => {
-    const activeLanguageId = languageFilter ? Number(languageFilter) : null;
-    const translation =
-      activeLanguageId != null
-        ? moduleData.translations?.find((tr: any) => tr.language_id === activeLanguageId)
-        : moduleData.translations?.[0];
+    const translation = activeTranslation;
     const logoPath = translation?.logo_banner_url ?? moduleData.translations?.[0]?.logo_banner_url;
 
     return logoPath ? getModuleAssetUrl(logoPath) : "";
@@ -652,7 +661,10 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     </h4>
                     <div className="flex flex-col items-start gap-3">
                       <div 
-                        className="w-50 h-50 overflow-hidden shrink-0"
+                        className={clsx(
+                          "w-50 h-50 overflow-hidden shrink-0",
+                          locale === "ar" && "translate-x-4"
+                        )}
                         style={{ borderRadius: 12 }}
                       >
                         {moduleLogoUrl ? (

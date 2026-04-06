@@ -107,15 +107,16 @@
           <label class="block text-gray-700 font-medium mb-3">
             <%= __("smtp.enableStartTLS") %>
           </label>
-          <label class="inline-flex items-center cursor-pointer">
+          <div class="inline-flex items-center cursor-pointer">
             <input type="hidden" name="use_tls" id="use_tls_input" value="<%= smtp.use_tls ? 'true' : 'false' %>" />
-            <input type="checkbox" id="use_tls" <%= smtp.use_tls ? 'checked' : '' %>
-              class="sr-only peer" />
-            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+            <button type="button" id="use_tls" role="switch" aria-checked="<%= smtp.use_tls ? 'true' : 'false' %>"
+              class="relative w-11 h-6 rounded-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-colors duration-200">
+              <span id="use_tls_thumb" class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-300 transition-transform duration-200"></span>
+            </button>
             <span class="ms-3 text-sm text-gray-500 peer-checked:text-teal-600" id="use_tls_label">
               <%= smtp.use_tls ? 'Enabled' : 'Disabled' %>
             </span>
-          </label>
+          </div>
         </div>
 
         <!-- Use SSL -->
@@ -124,15 +125,16 @@
                         <%= __("smtp.enableSSL") %>
 
           </label>
-          <label class="inline-flex items-center cursor-pointer">
+          <div class="inline-flex items-center cursor-pointer">
             <input type="hidden" name="use_ssl" id="use_ssl_input" value="<%= smtp.use_ssl ? 'true' : 'false' %>" />
-            <input type="checkbox" id="use_ssl" <%= smtp.use_ssl ? 'checked' : '' %>
-              class="sr-only peer" />
-            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+            <button type="button" id="use_ssl" role="switch" aria-checked="<%= smtp.use_ssl ? 'true' : 'false' %>"
+              class="relative w-11 h-6 rounded-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-colors duration-200">
+              <span id="use_ssl_thumb" class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-300 transition-transform duration-200"></span>
+            </button>
             <span class="ms-3 text-sm text-gray-500 peer-checked:text-teal-600" id="use_ssl_label">
               <%= smtp.use_ssl ? 'Enabled' : 'Disabled' %>
             </span>
-          </label>
+          </div>
         </div>
 
         <!-- Encrypt Password -->
@@ -141,15 +143,16 @@
                         <%= __("smtp.enableSMTPEncryption") %>
 
           </label>
-          <label class="inline-flex items-center cursor-pointer">
+          <div class="inline-flex items-center cursor-pointer">
             <input type="hidden" name="encrypt_password" id="encrypt_password_input" value="<%= smtp.encrypt_password ? 'true' : 'false' %>" />
-            <input type="checkbox" id="encrypt_password" <%= smtp.encrypt_password ? 'checked' : '' %>
-              class="sr-only peer" />
-            <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-teal-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-teal-500"></div>
+            <button type="button" id="encrypt_password" role="switch" aria-checked="<%= smtp.encrypt_password ? 'true' : 'false' %>"
+              class="relative w-11 h-6 rounded-full bg-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-colors duration-200">
+              <span id="encrypt_password_thumb" class="absolute top-[2px] left-[2px] h-5 w-5 rounded-full bg-white border border-gray-300 transition-transform duration-200"></span>
+            </button>
             <span class="ms-3 text-sm text-gray-500 peer-checked:text-teal-600" id="encrypt_password_label">
               <%= smtp.encrypt_password ? 'Enabled' : 'Disabled' %>
             </span>
-          </label>
+          </div>
         </div>
       </div>
 
@@ -224,16 +227,33 @@
     detailsCount.textContent = this.value.length;
   });
 
-  // TLS / SSL toggle labels + hidden input sync
-  ['use_tls', 'use_ssl', 'encrypt_password'].forEach(function(id) {
-    var checkbox = document.getElementById(id);
+  function bindButtonToggle(id) {
+    var button = document.getElementById(id);
+    var thumb = document.getElementById(id + '_thumb');
     var label = document.getElementById(id + '_label');
     var hidden = document.getElementById(id + '_input');
-    checkbox.addEventListener('change', function() {
-      hidden.value = this.checked ? 'true' : 'false';
-      label.textContent = this.checked ? 'Enabled' : 'Disabled';
+    if (!button || !thumb || !label || !hidden) return;
+
+    function renderState(isOn) {
+      hidden.value = isOn ? 'true' : 'false';
+      button.setAttribute('aria-checked', isOn ? 'true' : 'false');
+      button.classList.toggle('bg-teal-500', isOn);
+      button.classList.toggle('bg-gray-200', !isOn);
+      thumb.classList.toggle('translate-x-5', isOn);
+      thumb.classList.toggle('translate-x-0', !isOn);
+      label.textContent = isOn ? 'Enabled' : 'Disabled';
+    }
+
+    renderState(hidden.value === 'true');
+
+    button.addEventListener('click', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      renderState(hidden.value !== 'true');
     });
-  });
+  }
+
+  ['use_tls', 'use_ssl', 'encrypt_password'].forEach(bindButtonToggle);
 
   // Active / Inactive toggle logic
   document.getElementById('is_active_toggle').addEventListener('change', function() {

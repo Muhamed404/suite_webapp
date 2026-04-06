@@ -25,6 +25,7 @@ import {
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
 import { DonutChart } from "@/components/modules/dashboard/charts/donut-chart";
 import { AreaChart } from "@/components/modules/dashboard/charts/area-chart";
 import { SemiCircleChart } from "@/components/modules/dashboard/charts/semi-circle-chart";
@@ -81,8 +82,11 @@ function formatDate(dateStr?: string | null) {
   }
 }
 
-function getRiskBadge(riskName?: string | null) {
-  if (!riskName) return <span className="text-[10px] text-gray-400">Pending</span>;
+function getRiskBadge(
+  riskName: string | null | undefined,
+  t: (key: string, values?: Record<string, unknown>) => string
+) {
+  if (!riskName) return <span className="text-[10px] text-gray-400">{t("risk.pending")}</span>;
   const lower = riskName.toLowerCase();
 
   if (lower.includes("very high") || lower.includes("high")) {
@@ -108,8 +112,12 @@ function getRiskBadge(riskName?: string | null) {
 }
 
 export function SurveyStatsPage() {
+  const tManagement = useTranslations("surveyManagement");
+  const t = (key: string, values?: Record<string, unknown>) =>
+    tManagement(`surveyStats.${key}`, values);
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const tableTextAlignClass = isRtl ? "text-right" : "text-left";
   const searchParams = useSearchParams();
   // useSearchParams can return null during initial render in some cases
   const surveyId = Number(searchParams?.get("id") ?? 0);
@@ -144,9 +152,13 @@ export function SurveyStatsPage() {
   const timeline = stats?.submission_timeline ?? [];
 
   const deptDonutValues = deptRisk.map((d) => d.total_employees);
-  const deptDonutLabels = deptRisk.map((d) => d.department_name ?? `Dept ${d.department_id}`);
+  const deptDonutLabels = deptRisk.map(
+    (d) => d.department_name ?? t("fallback.department", { id: d.department_id })
+  );
   const groupDonutValues = groupRisk.map((g) => g.total_employees);
-  const groupDonutLabels = groupRisk.map((g) => g.group_name ?? `Group ${g.group_id}`);
+  const groupDonutLabels = groupRisk.map(
+    (g) => g.group_name ?? t("fallback.group", { id: g.group_id })
+  );
 
   const timelineLabels = timeline.map((t) => {
     try {
@@ -175,9 +187,9 @@ export function SurveyStatsPage() {
         <DashboardLayout>
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
-              <h2 className="text-lg font-semibold text-gray-700">No Survey Selected</h2>
+              <h2 className="text-lg font-semibold text-gray-700">{t("noSurvey.title")}</h2>
               <p className="text-sm text-gray-500 mt-2">
-                Please select a survey from the management page
+                {t("noSurvey.description")}
               </p>
               <Button
                 as={Link}
@@ -185,7 +197,7 @@ export function SurveyStatsPage() {
                 href="/dashboard/survey"
                 radius="full"
               >
-                Back to Surveys
+                {t("noSurvey.backToSurveys")}
               </Button>
             </div>
           </div>
@@ -210,21 +222,21 @@ export function SurveyStatsPage() {
                 size="sm"
                 variant="flat"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className={clsx("w-4 h-4", isRtl && "rotate-180")} />
               </Button>
               <div>
                 <h2 className="text-xl font-semibold">
-                  {isLoading ? "Loading..." : (survey?.name ?? "Survey Details")}
+                  {isLoading ? t("header.loading") : (survey?.name ?? t("header.surveyDetails"))}
                 </h2>
                 {surveyCode && (
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs text-gray-500">Survey Code:</span>
+                    <span className="text-xs text-gray-500">{t("header.surveyCode")}</span>
                     <code className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
                       {surveyCode}
                     </code>
                     <button
                       className="text-gray-400 hover:text-blue-500 transition"
-                      title="Copy survey code"
+                      title={t("header.copySurveyCode")}
                       onClick={handleCopyLink}
                     >
                       <Copy className="w-3.5 h-3.5" />
@@ -232,12 +244,12 @@ export function SurveyStatsPage() {
                   </div>
                 )}
                 <div className="flex flex-wrap items-center gap-3 mt-2">
-                  <span className="text-sm text-gray-600 font-medium">Start Date:</span>
+                  <span className="text-sm text-gray-600 font-medium">{t("header.startDate")}</span>
                   <span className="text-sm text-gray-800 bg-gray-100 px-2.5 py-1 rounded font-medium">
                     {formatDate(surveyStartDate)}
                   </span>
                   <span className="text-sm text-gray-400">|</span>
-                  <span className="text-sm text-gray-600 font-medium">End Date:</span>
+                  <span className="text-sm text-gray-600 font-medium">{t("header.endDate")}</span>
                   <span className="text-sm text-gray-800 bg-gray-100 px-2.5 py-1 rounded font-medium">
                     {formatDate(surveyEndDate)}
                   </span>
@@ -258,16 +270,16 @@ export function SurveyStatsPage() {
                     retryFetchMutation.mutate(surveyId);
                   }}
                 >
-                  Retry user fetch
+                  {t("retry.button")}
                 </Button>
                 {retryFetchMutation.isError && (
                   <span className="text-[10px] text-red-500">
-                    Failed to retry user fetch. Please try again.
+                    {t("retry.error")}
                   </span>
                 )}
                 {retryFetchMutation.isSuccess && (
                   <span className="text-[10px] text-green-600">
-                    Retry triggered. Users will appear once the background fetch completes.
+                    {t("retry.success")}
                   </span>
                 )}
               </div>
@@ -285,32 +297,32 @@ export function SurveyStatsPage() {
                 <StatCard
                   color="bg-green-100"
                   icon={<CheckCircle className="w-5 h-5 text-green-600" />}
-                  label="Submitted Surveys"
+                  label={t("stats.submittedSurveys")}
                   value={stats?.survey_summary?.total_surveys_submitted ?? 0}
                 />
                 <StatCard
                   color="bg-yellow-100"
                   icon={<AlertTriangle className="w-5 h-5 text-yellow-600" />}
-                  label="Risk Level"
+                  label={t("stats.riskLevel")}
                   value={
                     overall
                       ? overall.total_overall_risky_employees >
                         overall.total_overall_nonrisky_employees
-                        ? "High"
-                        : "Low"
+                        ? t("risk.high")
+                        : t("risk.low")
                       : "—"
                   }
                 />
                 <StatCard
                   color="bg-blue-100"
                   icon={<Send className="w-5 h-5 text-blue-600" />}
-                  label="Total Surveys Sent"
+                  label={t("stats.totalSurveysSent")}
                   value={stats?.survey_summary?.total_surveys_sent ?? 0}
                 />
                 <StatCard
                   color="bg-purple-100"
                   icon={<Users className="w-5 h-5 text-purple-600" />}
-                  label="Total Received"
+                  label={t("stats.totalReceived")}
                   value={stats?.survey_summary?.total_surveys_submitted ?? 0}
                 />
               </div>
@@ -319,7 +331,7 @@ export function SurveyStatsPage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mb-2">
                 {/* Department Risk Donut */}
                 <div className="bg-white rounded-3xl p-6">
-                  <p className="font-medium mb-4">Response Distribution by Department</p>
+                  <p className="font-medium mb-4">{t("charts.responseByDepartment")}</p>
                   {deptRisk.length > 0 ? (
                     <div className="flex">
                       <div className="flex justify-center items-center">
@@ -336,19 +348,19 @@ export function SurveyStatsPage() {
                           <LegendDot
                             key={d.department_id}
                             color={donutColors[i % donutColors.length]}
-                            label={d.department_name ?? `Dept ${d.department_id}`}
+                            label={d.department_name ?? t("fallback.department", { id: d.department_id })}
                           />
                         ))}
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-400 text-center py-8">No department data</p>
+                    <p className="text-sm text-gray-400 text-center py-8">{t("charts.noDepartmentData")}</p>
                   )}
                 </div>
 
                 {/* Group Risk Donut */}
                 <div className="bg-white rounded-3xl p-6">
-                  <p className="font-medium mb-4">Response Distribution by Group</p>
+                  <p className="font-medium mb-4">{t("charts.responseByGroup")}</p>
                   {groupRisk.length > 0 ? (
                     <div className="flex">
                       <div className="flex justify-center items-center">
@@ -365,19 +377,19 @@ export function SurveyStatsPage() {
                           <LegendDot
                             key={g.group_id}
                             color={donutColors[i % donutColors.length]}
-                            label={g.group_name ?? `Group ${g.group_id}`}
+                            label={g.group_name ?? t("fallback.group", { id: g.group_id })}
                           />
                         ))}
                       </div>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-400 text-center py-8">No group data</p>
+                    <p className="text-sm text-gray-400 text-center py-8">{t("charts.noGroupData")}</p>
                   )}
                 </div>
 
                 {/* Response Rate / Overall Risk */}
                 <div className="bg-white rounded-3xl p-6 flex flex-col items-center">
-                  <p className="font-medium mb-4">Response Rate</p>
+                  <p className="font-medium mb-4">{t("charts.responseRate")}</p>
                   <div className="w-72 h-72 flex items-center justify-center">
                     <SemiCircleChart
                       admin={stats?.response_chart?.total_incorrect_answers ?? 0}
@@ -386,27 +398,29 @@ export function SurveyStatsPage() {
                       color3="#FB5050"
                       opened={stats?.response_chart?.total_not_submitted ?? 0}
                       sent={stats?.response_chart?.total_correct_answers ?? 0}
-                      labels={["Correct", "Not Submitted", "Incorrect"]}
+                      labels={[t("charts.correct"), t("charts.notSubmitted"), t("charts.incorrect")]}
                     />
                   </div>
                   <div className="flex gap-4 mt-2 text-[10px]">
-                    <LegendDot color="#3ACE89" label="Correct" />
-                    <LegendDot color="#BEC3C7" label="Not Submitted" />
-                    <LegendDot color="#FB5050" label="Incorrect" />
+                    <LegendDot color="#3ACE89" label={t("charts.correct")} />
+                    <LegendDot color="#BEC3C7" label={t("charts.notSubmitted")} />
+                    <LegendDot color="#FB5050" label={t("charts.incorrect")} />
                   </div>
                 </div>
               </div>
 
               {/* ─── Submission Timeline */}
               <div className="py-2 mt-2">
-                <h2 className="text-xl font-semibold mb-2">Questions Analysis</h2>
+                <h2 className="text-xl font-semibold mb-2">{t("questionsAnalysis")}</h2>
                 <div className="grid grid-cols-12 gap-2">
                   <div className="bg-white rounded-3xl col-span-12 lg:col-span-8 p-6">
                     <div className="flex justify-between mb-6">
                       <div>
-                        <p className="font-medium">Submission Timeline</p>
+                        <p className="font-medium">{t("charts.submissionTimeline")}</p>
                         <p className="text-gray-400 text-sm">
-                          {survey?.name ?? "Survey"} responses over time
+                          {t("charts.responsesOverTime", {
+                            name: survey?.name ?? t("header.survey"),
+                          })}
                         </p>
                       </div>
                     </div>
@@ -415,18 +429,18 @@ export function SurveyStatsPage() {
                         <AreaChart
                           data={timelineData}
                           labels={timelineLabels}
-                          seriesName="Submissions"
-                          yLabel="Submissions"
+                          seriesName={t("charts.submissions")}
+                          yLabel={t("charts.submissions")}
                         />
                       ) : (
                         <div className="flex items-center justify-center h-full text-gray-400">
-                          No submission data yet
+                          {t("charts.noSubmissionData")}
                         </div>
                       )}
                     </div>
                   </div>
                   <div className="bg-white rounded-3xl col-span-12 lg:col-span-4 p-6 flex flex-col items-center">
-                    <p className="font-medium mb-6">Employee Risk Rates</p>
+                    <p className="font-medium mb-6">{t("charts.employeeRiskRates")}</p>
                     <div className="w-72 h-72 flex items-center justify-center">
                       <SemiCircleChart
                         admin={overall?.total_overall_risky_employees ?? 0}
@@ -435,13 +449,13 @@ export function SurveyStatsPage() {
                         color3="#FB5050"
                         opened={overall?.total_overall_non_submitted_employees ?? 0}
                         sent={overall?.total_overall_nonrisky_employees ?? 0}
-                        labels={["Non-Risky", "Not Submitted", "Risky"]}
+                        labels={[t("charts.nonRisky"), t("charts.notSubmitted"), t("charts.risky")]}
                       />
                     </div>
                     <div className="flex gap-4 mt-2 text-[10px]">
-                      <LegendDot color="#3ACE89" label="Non-Risky" />
-                      <LegendDot color="#BEC3C7" label="Not Submitted" />
-                      <LegendDot color="#FB5050" label="Risky" />
+                      <LegendDot color="#3ACE89" label={t("charts.nonRisky")} />
+                      <LegendDot color="#BEC3C7" label={t("charts.notSubmitted")} />
+                      <LegendDot color="#FB5050" label={t("charts.risky")} />
                     </div>
                   </div>
                 </div>
@@ -450,7 +464,7 @@ export function SurveyStatsPage() {
               {/* ─── Answers List / Users Table */}
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold">Answers List</h2>
+                  <h2 className="text-xl font-semibold">{t("answersList.title")}</h2>
                   <Button
                     as={Link}
                     className="inline-flex items-center gap-1 px-4 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition"
@@ -459,7 +473,7 @@ export function SurveyStatsPage() {
                     size="sm"
                     startContent={<Users className="w-3.5 h-3.5" />}
                   >
-                    View All Users
+                    {t("answersList.viewAllUsers")}
                   </Button>
                 </div>
 
@@ -473,14 +487,14 @@ export function SurveyStatsPage() {
                           "h-9 bg-white border border-gray-200 rounded-full hover:border-gray-300 focus-within:!border-blue-500",
                         input: "text-xs",
                       }}
-                      placeholder="Search by name or email..."
+                      placeholder={t("answersList.searchPlaceholder")}
                       startContent={<Search className="text-gray-400 w-4 h-4" />}
                       type="text"
                       value={userSearch}
                       onValueChange={setUserSearch}
                     />
                     <Select
-                      aria-label="Submission filter"
+                      aria-label={t("answersList.submissionFilter")}
                       classNames={{
                         base: "w-40",
                         trigger:
@@ -494,9 +508,9 @@ export function SurveyStatsPage() {
                         if (v) setSubmissionFilter(v);
                       }}
                     >
-                      <SelectItem key="all">All</SelectItem>
-                      <SelectItem key="submitted">Submitted</SelectItem>
-                      <SelectItem key="pending">Pending</SelectItem>
+                      <SelectItem key="all">{t("answersList.filters.all")}</SelectItem>
+                      <SelectItem key="submitted">{t("answersList.filters.submitted")}</SelectItem>
+                      <SelectItem key="pending">{t("answersList.filters.pending")}</SelectItem>
                     </Select>
                   </div>
 
@@ -506,7 +520,7 @@ export function SurveyStatsPage() {
                     </div>
                   ) : (usersData?.users?.length ?? 0) === 0 ? (
                     <div className="flex items-center justify-center py-12">
-                      <p className="text-sm text-gray-400">No users found</p>
+                      <p className="text-sm text-gray-400">{t("answersList.noUsersFound")}</p>
                     </div>
                   ) : (
                     <>
@@ -514,12 +528,12 @@ export function SurveyStatsPage() {
                         <table className="w-full text-xs whitespace-nowrap">
                           <thead className="bg-gray-50 text-gray-600 border-b">
                             <tr>
-                              <th className="px-4 py-3 text-left font-semibold">Name</th>
-                              <th className="px-4 py-3 text-left font-semibold">Correct</th>
-                              <th className="px-4 py-3 text-left font-semibold">Incorrect</th>
-                              <th className="px-4 py-3 text-left font-semibold">Skipped</th>
-                              <th className="px-4 py-3 text-left font-semibold">Risk Level</th>
-                              <th className="px-4 py-3 text-left font-semibold">Action</th>
+                              <th className={clsx("px-4 py-3 font-semibold", tableTextAlignClass)}>{t("answersList.table.name")}</th>
+                              <th className={clsx("px-4 py-3 font-semibold", tableTextAlignClass)}>{t("answersList.table.correct")}</th>
+                              <th className={clsx("px-4 py-3 font-semibold", tableTextAlignClass)}>{t("answersList.table.incorrect")}</th>
+                              <th className={clsx("px-4 py-3 font-semibold", tableTextAlignClass)}>{t("answersList.table.skipped")}</th>
+                              <th className={clsx("px-4 py-3 font-semibold", tableTextAlignClass)}>{t("answersList.table.riskLevel")}</th>
+                              <th className={clsx("px-4 py-3 font-semibold", tableTextAlignClass)}>{t("answersList.table.action")}</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-100">
@@ -528,7 +542,7 @@ export function SurveyStatsPage() {
                                 key={user.invite_id}
                                 className="hover:bg-gray-50 transition-colors"
                               >
-                                <td className="px-4 py-3">
+                                <td className={clsx("px-4 py-3", tableTextAlignClass)}>
                                   <div>
                                     <p className="font-medium text-gray-800">
                                       {user.firstname} {user.lastname}
@@ -536,17 +550,17 @@ export function SurveyStatsPage() {
                                     <p className="text-[10px] text-gray-400">{user.email}</p>
                                   </div>
                                 </td>
-                                <td className="px-4 py-3 text-green-600 font-medium">
+                                <td className={clsx("px-4 py-3 text-green-600 font-medium", tableTextAlignClass)}>
                                   {user.correct_answers ?? "—"}
                                 </td>
-                                <td className="px-4 py-3 text-red-600 font-medium">
+                                <td className={clsx("px-4 py-3 text-red-600 font-medium", tableTextAlignClass)}>
                                   {user.incorrect_answers ?? "—"}
                                 </td>
-                                <td className="px-4 py-3 text-gray-500">
+                                <td className={clsx("px-4 py-3 text-gray-500", tableTextAlignClass)}>
                                   {user.skipped_answers ?? "—"}
                                 </td>
-                                <td className="px-4 py-3">{getRiskBadge(user.risk_level_name)}</td>
-                                <td className="px-4 py-3">
+                                <td className={clsx("px-4 py-3", tableTextAlignClass)}>{getRiskBadge(user.risk_level_name, t)}</td>
+                                <td className={clsx("px-4 py-3", tableTextAlignClass)}>
                                   <Button
                                     as={Link}
                                     className="text-[10px] h-7 px-3 bg-blue-50 text-blue-600"
@@ -556,7 +570,7 @@ export function SurveyStatsPage() {
                                     startContent={<Eye className="w-3 h-3" />}
                                     variant="flat"
                                   >
-                                    View
+                                    {t("buttons.view")}
                                   </Button>
                                 </td>
                               </tr>
@@ -569,9 +583,11 @@ export function SurveyStatsPage() {
                       {usersData?.pagination && usersData.pagination.total_pages > 1 && (
                         <div className="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
                           <span className="text-[10px] text-gray-400">
-                            Page {usersData.pagination.current_page} of{" "}
-                            {usersData.pagination.total_pages} ({usersData.pagination.total_items}{" "}
-                            users)
+                            {t("answersList.pagination.pageOf", {
+                              page: usersData.pagination.current_page,
+                              totalPages: usersData.pagination.total_pages,
+                              users: usersData.pagination.total_items,
+                            })}
                           </span>
                           <Pagination
                             showControls

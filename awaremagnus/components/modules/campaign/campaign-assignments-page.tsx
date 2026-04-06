@@ -32,10 +32,10 @@ import { isOrgUser } from "@/utils/roles"; // helper to detect organization user
 import { useUserDashboards } from "@/hooks/useDashboard";
 import { Spinner } from "@heroui/spinner"; // used for loading state in tables
 
-function formatDate(dateStr?: string): string {
+function formatDate(dateStr?: string, locale: string = "en-GB"): string {
   if (!dateStr) return "—";
   try {
-    return new Date(dateStr).toLocaleDateString("en-GB", {
+    return new Date(dateStr).toLocaleDateString(locale, {
       day: "numeric",
       month: "short",
       year: "numeric",
@@ -45,8 +45,8 @@ function formatDate(dateStr?: string): string {
   }
 }
 
-function campaignName(c: CampaignAssignment): string {
-  return c.name ?? `Campaign ${c.id}`;
+function campaignName(c: CampaignAssignment, t?: any): string {
+  return c.name ?? (t ? `${t("campaignLabel")} ${c.id}` : `Campaign ${c.id}`);
 }
 
 function generateModuleSlug(campaign: CampaignAssignment): string {
@@ -85,7 +85,7 @@ function getCampaignStatus(campaign: CampaignAssignment): "active" | "pending" |
 } 
 
 // add "inprogress" type for org users only
-function getStatusBadge(status: "active" | "pending" | "completed" | "inprogress") {
+function getStatusBadge(status: "active" | "pending" | "completed" | "inprogress", t: any) {
   const badges: Record<
     typeof status,
     { class: string; icon: string; text: string }
@@ -93,23 +93,23 @@ function getStatusBadge(status: "active" | "pending" | "completed" | "inprogress
     active: {
       class: "bg-green-100 text-green-700 border border-green-200",
       icon: "play-circle",
-      text: "Active",
+      text: t("status.active"),
     },
     inprogress: {
       // visually similar to active but with different label
       class: "bg-green-100 text-green-700 border border-green-200",
       icon: "play-circle",
-      text: "In Progress",
+      text: t("status.inProgress"),
     },
     pending: {
       class: "bg-amber-100 text-amber-700 border border-amber-200",
       icon: "clock",
-      text: "Pending",
+      text: t("status.pending"),
     },
     completed: {
       class: "bg-gray-100 text-gray-700 border border-gray-200",
       icon: "check-circle",
-      text: "Completed",
+      text: t("status.completed"),
     },
   };
 
@@ -127,6 +127,7 @@ function getStatusBadge(status: "active" | "pending" | "completed" | "inprogress
 function getActionButton(
   status: "active" | "pending" | "completed",
   campaign: CampaignAssignment,
+  t: any,
   onStart?: (campaign: CampaignAssignment) => void
 ) {
   const baseClasses =
@@ -140,7 +141,7 @@ function getActionButton(
         className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
         onClick={() => onStart(campaign)}
       >
-        <span>Start Module</span>
+        <span>{t("assignmentPage.actions.startModule")}</span>
       </button>
     );
   }
@@ -162,7 +163,7 @@ function getActionButton(
             });
         }}
       >
-        <span>View</span>
+        <span>{t("assignmentPage.actions.view")}</span>
       </button>
     </Link>
   );
@@ -170,7 +171,7 @@ function getActionButton(
 
 export function CampaignAssignmentsPage() {
   const t = useTranslations("campaigns");
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
   const queryClient = useQueryClient();
 
@@ -263,7 +264,7 @@ export function CampaignAssignmentsPage() {
     if (searchQuery) {
       filtered = filtered.filter(
         (c: CampaignAssignment) =>
-          campaignName(c).toLowerCase().includes(searchQuery.toLowerCase()) ||
+          campaignName(c, t).toLowerCase().includes(searchQuery.toLowerCase()) ||
           (c.campaign_name && c.campaign_name.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
@@ -274,8 +275,8 @@ export function CampaignAssignmentsPage() {
 
       switch (sortColumn) {
         case "name":
-          aVal = campaignName(a).toLowerCase();
-          bVal = campaignName(b).toLowerCase();
+          aVal = campaignName(a, t).toLowerCase();
+          bVal = campaignName(b, t).toLowerCase();
           break;
         case "start":
           aVal = a.start_date ? new Date(a.start_date).getTime() : 0;
@@ -418,7 +419,7 @@ export function CampaignAssignmentsPage() {
     <ProtectedRoute>
       <DashboardLayout>
         <div className="p-3 min-h-screen">
-          <h1 className="text-lg font-semibold mb-4">Assignment</h1>
+          <h1 className="text-lg font-semibold mb-4">{t("assignmentPage.title")}</h1>
 
           {/* STATS */}
           <div className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-4">
@@ -427,7 +428,7 @@ export function CampaignAssignmentsPage() {
                 <Image alt="" height={20} src="/awm/images/assing/assingment.svg" width={20} />
               </div>
               <div className="pr-10">
-                <p className="text-xs text-gray-500">Assignment</p>
+                <p className="text-xs text-gray-500">{t("assignmentPage.stats.assignment")}</p>
                 <p className="text-lg font-semibold">{stats.assignment}</p>
               </div>
             </Card>
@@ -437,7 +438,7 @@ export function CampaignAssignmentsPage() {
                 <Image alt="" height={20} src="/awm/images/assing/assingment.svg" width={20} />
               </div>
               <div className="pr-10">
-                <p className="text-xs text-gray-500">Completed</p>
+                <p className="text-xs text-gray-500">{t("assignmentPage.stats.completed")}</p>
                 <p className="text-lg font-semibold">{stats.completed}</p>
               </div>
             </Card>
@@ -447,7 +448,7 @@ export function CampaignAssignmentsPage() {
                 <Image alt="" height={20} src="/awm/images/assing/pending.svg" width={20} />
               </div>
               <div className="pr-10">
-                <p className="text-xs text-gray-500">Pending</p>
+                <p className="text-xs text-gray-500">{t("assignmentPage.stats.pending")}</p>
                 <p className="text-lg font-semibold">{stats.pending}</p>
               </div>
             </Card>
@@ -457,7 +458,7 @@ export function CampaignAssignmentsPage() {
                 <Image alt="" height={20} src="/awm/images/assing/res-rate.svg" width={20} />
               </div>
               <div className="pr-10">
-                <p className="text-xs text-gray-500">Response Rate</p>
+                <p className="text-xs text-gray-500">{t("assignmentPage.stats.responseRate")}</p>
                 <p className="text-lg font-semibold">{stats.responseRate}%</p>
               </div>
             </Card>
@@ -467,7 +468,7 @@ export function CampaignAssignmentsPage() {
                 <Image alt="" height={20} src="/awm/images/assing/assingment.svg" width={20} />
               </div>
               <div className="pr-10">
-                <p className="text-xs text-gray-500">Active</p>
+                <p className="text-xs text-gray-500">{t("assignmentPage.stats.active")}</p>
                 <p className="text-lg font-semibold">{stats.active}</p>
               </div>
             </Card>
@@ -580,10 +581,10 @@ export function CampaignAssignmentsPage() {
               />
 
               {[
-                { key: "all", label: "All", count: stats.assignment },
-                { key: "active", label: "Active", count: stats.active },
-                { key: "pending", label: "Pending", count: stats.pending },
-                { key: "completed", label: "Completed", count: stats.completed },
+                { key: "all", label: t("filters.all"), count: stats.assignment },
+                { key: "active", label: t("filters.active"), count: stats.active },
+                { key: "pending", label: t("filters.pending"), count: stats.pending },
+                { key: "completed", label: t("filters.completed"), count: stats.completed },
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -621,7 +622,7 @@ export function CampaignAssignmentsPage() {
                 />
                 <input
                   className="datatable-input w-full pr-4 py-2 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-9 placeholder-gray-400"
-                  placeholder="Search Campaign..."
+                  placeholder={t("filters.searchPlaceholder")}
                   style={{ paddingLeft: "40px" }}
                   type="text"
                   value={searchQuery}
@@ -637,9 +638,9 @@ export function CampaignAssignmentsPage() {
                 >
                   <span>
                     {campaignFilter === "all"
-                      ? "All Campaigns"
+                      ? t("assignmentPage.filter.allCampaigns")
                       : uniqueCampaigns.find((c) => c.id.toString() === campaignFilter)?.name ||
-                        "All Campaigns"}
+                        t("assignmentPage.filter.allCampaigns")}
                   </span>
                   <div className="modern-dropdown-arrow">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -662,7 +663,7 @@ export function CampaignAssignmentsPage() {
                         setShowCampaignDropdown(false);
                       }}
                     >
-                      All Campaigns
+                      {t("assignmentPage.filter.allCampaigns")}
                     </button>
                     {uniqueCampaigns.map((campaign: { id: number; name: string }, idx: number) => (
                       <button
@@ -694,7 +695,7 @@ export function CampaignAssignmentsPage() {
                   <tr>
                     <th className="px-4 py-3.5 text-left font-semibold">
                       <div className="flex items-center gap-2">
-                        <span>Campaign Name</span>
+                        <span>{t("table.campaignName")}</span>
                       </div>
                     </th>
                     <th
@@ -702,7 +703,7 @@ export function CampaignAssignmentsPage() {
                       onClick={() => handleSort("name")}
                     >
                       <div className="flex items-center gap-2">
-                        <span>Modules</span>
+                        <span>{t("table.modules")}</span>
                         <span className="sort-icon text-gray-400">
                           {sortColumn === "name" ? (
                             sortDirection === "asc" ? (
@@ -721,7 +722,7 @@ export function CampaignAssignmentsPage() {
                       onClick={() => handleSort("start")}
                     >
                       <div className="flex items-center gap-2">
-                        <span>Start Date</span>
+                        <span>{t("table.startDate")}</span>
                         <span className="sort-icon text-gray-400">
                           {sortColumn === "start" ? (
                             sortDirection === "asc" ? (
@@ -740,7 +741,7 @@ export function CampaignAssignmentsPage() {
                       onClick={() => handleSort("end")}
                     >
                       <div className="flex items-center gap-2">
-                        <span>End Date</span>
+                        <span>{t("table.endDate")}</span>
                         <span className="sort-icon text-gray-400">
                           {sortColumn === "end" ? (
                             sortDirection === "asc" ? (
@@ -759,7 +760,7 @@ export function CampaignAssignmentsPage() {
                       onClick={() => handleSort("status")}
                     >
                       <div className="flex items-center gap-2">
-                        <span>Status</span>
+                        <span>{t("table.status")}</span>
                         <span className="sort-icon text-gray-400">
                           {sortColumn === "status" ? (
                             sortDirection === "asc" ? (
@@ -775,7 +776,7 @@ export function CampaignAssignmentsPage() {
                     </th>
                     <th className="px-4 py-3.5 text-left font-semibold">
                       <div className="flex items-center gap-2">
-                        <span>Action</span>
+                        <span>{t("table.action")}</span>
                       </div>
                     </th>
                   </tr>
@@ -785,7 +786,7 @@ export function CampaignAssignmentsPage() {
                     <tr>
                       <td colSpan={6} className="h-[400px]">
                         <div className="flex items-center justify-center">
-                          <Spinner color="primary" label="Loading campaigns..." />
+                          <Spinner color="primary" label={t("assignmentPage.table.loading")} />
                         </div>
                       </td>
                     </tr>
@@ -824,23 +825,23 @@ export function CampaignAssignmentsPage() {
                           <td className="px-4 py-3.5">
                             <div className="flex items-center gap-2">
                               <span className="font-medium text-gray-700">
-                                {campaignName(campaign)}
+                                {campaignName(campaign, t)}
                               </span>
                             </div>
                           </td>
                           <td className="px-4 py-3.5 text-gray-600">
                             <div className="flex items-center gap-1.5">
-                              <span>{formatDate(campaign.start_date)}</span>
+                              <span>{formatDate(campaign.start_date, locale)}</span>
                             </div>
                           </td>
                           <td className="px-4 py-3.5 text-gray-600">
                             <div className="flex items-center gap-1.5">
-                              <span>{formatDate(campaign.end_date)}</span>
+                              <span>{formatDate(campaign.end_date, locale)}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3.5">{getStatusBadge(displayStatus)}</td>
+                          <td className="px-4 py-3.5">{getStatusBadge(displayStatus, t)}</td>
                           <td className="px-4 py-3.5">
-                            {getActionButton(status, campaign, handleStartModule)}
+                            {getActionButton(status, campaign, t, handleStartModule)}
                           </td>
                         </tr>
                       );
@@ -853,10 +854,10 @@ export function CampaignAssignmentsPage() {
                             <SearchX className="w-10 h-10 text-gray-400" />
                           </div>
                           <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                            No Campaigns Found
+                            {t("emptyState.title")}
                           </h3>
                           <p className="text-sm text-gray-500">
-                            Try adjusting your filters or search query
+                            {t("emptyState.description")}
                           </p>
                         </div>
                       </td>
@@ -870,9 +871,11 @@ export function CampaignAssignmentsPage() {
             <div className="flex flex-col md:flex-row justify-between items-center px-4 py-3.5 bg-gray-50 gap-3">
               <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
                 <span>
-                  Showing {(currentPage - 1) * itemsPerPage + 1}–
-                  {Math.min(currentPage * itemsPerPage, filteredCampaigns.length)} out of{" "}
-                  {filteredCampaigns.length} Entries
+                  {t("pagination.showing", {
+                    start: (currentPage - 1) * itemsPerPage + 1,
+                    end: Math.min(currentPage * itemsPerPage, filteredCampaigns.length),
+                    total: filteredCampaigns.length,
+                  })}
                 </span>
               </div>
               <div className="flex gap-1.5" id="paginationButtons">

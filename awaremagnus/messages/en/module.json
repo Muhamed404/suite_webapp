@@ -116,6 +116,7 @@
     "downloadBrochure": "Download Brochure",
     "downloadDocument": "Download Document",
     "downloadScreenSaver": "Download Screen Saver",
+    "durationFallback": "20 to 60 minutes",
     "next": "Next",
     "beginTraining": "Begin Training",
     "posterViews": "1,234 views",
@@ -133,7 +134,6 @@
     "description": "Some description",
     "languageFilter": "Language",
     "languageFilterHint": "This will list content based on the language e.g. English, Arabic. Will be handled from the backend.",
-    "allLanguages": "All Languages",
     "interactiveLesson": "Interactive Lesson",
     "quizzes": "Quizzes",
     "posters": "Posters",
@@ -170,6 +170,31 @@
     "breadcrumbMyAssignments": "My Assignments",
     "breadcrumbAwarenessCampaign": "Awareness Campaign",
     "breadcrumbCampaign": "Campaign",
-    "viewDetails": "View Details"
+    "viewDetails": "View Details",
+    "searchPlaceholderContent": "Search Content...",
+    "allLanguages": "All Languages",
+    "languageLabel": "Language",
+    "showingEntries": "Showing {from}–{to} of {total} Entries",
+    "createdLabel": "Created {date}",
+    "statusLoading": "Loading...",
+    "passed": "Passed",
+    "failed": "Failed"
+  },
+  "videoTraining": {
+    "motionVideos": "Motion Videos",
+    "awarenessLibrary": "Awareness Library",
+    "systemLibrary": "System Library",
+    "videoNotSupported": "Your browser does not support the video tag.",
+    "play": "Play",
+    "pause": "Pause",
+    "back10s": "Back 10s",
+    "forward10s": "Forward 10s",
+    "restart": "Restart",
+    "progress": "Progress: {percentage}% ({current} / {total} seconds)",
+    "sendProgress": "Send Progress Now",
+    "defaultTitle": "{moduleName} Motion Video {index}",
+    "defaultDescription": "Learn about {moduleName} best practices and protocols",
+    "openFullScreen": "Open Full Screen",
+    "noContent": "No motion video content found for this module."
   }
 }

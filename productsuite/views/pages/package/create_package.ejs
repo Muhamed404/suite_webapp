@@ -75,5 +75,53 @@
 </div>
 
 <!-- expose server-side arrays for client JS -->
+<script>
+    window.validationMessages = {
+        application: "<%= __("package.create.validationSelectProduct") %>",
+        package_type: "<%= __("package.create.validationSelectPackageType") %>",
+        name: {
+            required: "<%= __("package.create.validationEnterPackageName") %>",
+            minlength: "<%= __("package.create.validationPackageNameMinLength") %>",
+            maxlength: "<%= __("package.create.validationPackageNameMaxLength") %>"
+        },
+        description: {
+            required: "<%= __("package.create.validationEnterDescription") %>",
+            minlength: "<%= __("package.create.validationDescriptionMinLength") %>",
+            maxlength: "<%= __("package.create.validationDescriptionMaxLength") %>"
+        },
+        per_license_cost: {
+            required: "<%= __("package.create.validationEnterLicenseCost") %>",
+            number: "<%= __("package.create.validationLicenseCostNumber") %>",
+            min: "<%= __("package.create.validationLicenseCostMin") %>",
+            max: "<%= __("package.create.validationLicenseCostMax") %>"
+        },
+        duration_days: {
+            required: "<%= __("package.create.validationEnterDuration") %>",
+            digits: "<%= __("package.create.validationDurationDigits") %>",
+            min: "<%= __("package.create.validationDurationMin") %>",
+            max: "<%= __("package.create.validationDurationMax") %>"
+        },
+        license_range_from: {
+            required: "<%= __("package.create.validationEnterRangeFrom") %>",
+            digits: "<%= __("package.create.validationRangeFromDigits") %>",
+            min: "<%= __("package.create.validationRangeFromMin") %>",
+            max: "<%= __("package.create.validationRangeFromMax") %>"
+        },
+        license_range_to: {
+            required: "<%= __("package.create.validationEnterRangeTo") %>",
+            digits: "<%= __("package.create.validationRangeToDigits") %>",
+            min: "<%= __("package.create.validationRangeToMin") %>",
+            max: "<%= __("package.create.validationRangeToMax") %>",
+            greaterThanFrom: "<%= __("package.create.validationRangeToGreaterThanFrom") %>"
+        }
+    };
+</script>
+<script>
+    window.i18n = window.i18n || {};
+    window.i18n.labels = {
+      next: "<%= __("generic_label.next") %>",
+      finish: "<%= __("generic_label.Finish") %>"
+    };
+</script>
 <script src="/securemagnus_2025/js/form_stepper.js"></script>
 <script src="/securemagnus_2025/js/custom_script/validate_create_package.js"></script>

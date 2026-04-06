@@ -97,6 +97,7 @@
 		"heroText": "Empowering Future,<br /> <span class=\"text-[var(--teal)]\">Securing</span> Today",
 		"entries": "entries",
 		"no_entries_found": "No entries found",
+		"no_results_match_search": "No results match your search query",
 		"people": "People",
 		"to": "to",
 		"search": "Search",
@@ -115,6 +116,7 @@
 		"end_time_required": "End date and time are required.",
 		"no_departments_groups": "No departments or groups available. Please add users to departments or groups before creating a campaign.",
 		"select_department_group": "Please select at least one department or group to target.",
+		"select_at_least_one_option": "Please select at least one option.",
 		"validation_error": "Validation Error:",
 		"no_members_in_selection": "The selected departments/groups have no members. Please select departments or groups with members, or add members to the selected ones.",
 		"some_empty_selections": "Warning: Some selections have no members. The campaign will only target departments/groups with members.",
@@ -184,7 +186,21 @@
 		"smtp_configured_successfully": "SMTP Configured Successfully"
 	},
 	"topnavbar": {
-		"welcome": "Welcome"
+		"welcome": "Welcome",
+		"organizationSettings": "Organization Settings",
+		"addUser": "Add User",
+		"importUser": "Import User",
+		"dashboard": "Dashboard",
+		"campaigns": "Campaigns",
+		"reports": "Reports",
+		"organizations": "Organizations",
+		"packages": "Packages",
+		"users": "Users",
+		"auditLogs": "Audit Logs",
+		"systemTemplate": "System Template",
+		"phishingSmtp": "Phishing SMTP",
+		"createPackage": "Create Package",
+		"simulatorEmails": "Simulator Emails"
 	},
 	"breadcrumbs": {
 		"home": "Home",
@@ -277,6 +293,11 @@
 		},
 		"messages": {
 			"noActiveSubscriptionMessage": "You do not have an active subscription, or your subscription has expired. Please contact your administrator or visit the subscription page to renew."
+		},
+		"alerts": {
+			"alert": "Alert!",
+			"phishMagnusLicenseExpired": "PhishMagnus license has expired.",
+			"awareMagnusLicenseExpired": "AwareMagnus license has expired."
 		}
 	},
 	"menu": {
@@ -314,6 +335,41 @@
 			"logout": "Logout",
 			"smtpNotifications": "SMTP Notifications"
 		}
+	},
+	"org_domain": {
+		"breadcrumb": "Domain Management",
+		"title": "Domain Management",
+		"subtitle": "Manage allowed email domains for this organization.",
+		"btn_add": "Add Domain",
+		"btn_save": "Save",
+		"btn_enable": "Enable",
+		"btn_disable": "Disable",
+		"config_section": "Configuration",
+		"label_domain_restrict": "Domain Restriction",
+		"desc_domain_restrict": "Enforce email domain validation for users in this organization.",
+		"btn_enable_restrict": "Enable",
+		"btn_disable_restrict": "Disable",
+		"restrict_confirm_enable_title": "Enable Domain Restriction",
+		"restrict_confirm_enable_subtitle": "This will affect all users in this organization.",
+		"restrict_confirm_enable_body": "Once enabled, only users with an approved email domain will be allowed access.",
+		"restrict_confirm_disable_title": "Disable Domain Restriction",
+		"restrict_confirm_disable_subtitle": "This will affect all users in this organization.",
+		"restrict_confirm_disable_body": "Once disabled, domain validation will no longer be enforced for this organization.",
+		"col_domain_name": "Domain Name",
+		"col_status": "Status",
+		"col_created_at": "Created At",
+		"total": "Total",
+		"no_records": "No domains configured yet.",
+		"modal_add_title": "Add New Domain",
+		"label_domain_name": "Domain Name",
+		"placeholder_domain_name": "e.g. example.com",
+		"hint_domain_name": "Enter the full domain name (e.g. company.com)",
+		"validation_domain_format": "Please enter a valid domain name.",
+		"label_status": "Status",
+		"delete_modal_title": "Delete Domain",
+		"delete_modal_subtitle": "This action cannot be undone.",
+		"confirm_delete": "Are you sure you want to delete the domain:",
+		"modal_edit_title": "Edit Domain"
 	},
 	"organization": {
 		"homescreen": {
@@ -363,6 +419,7 @@
 			"labelAdminFirstName": "First Name",
 			"labelAdminLastName": "Last Name",
 			"labelAdminEmail": "Administrator Email",
+			"labelDomainRestrict": "Domain Restrict",
 			"labelAdminPassword": "Password",
 			"btnNext": "Next",
 			"btnBack": "Back",
@@ -397,7 +454,8 @@
 				"btnSuiteDashboard": "Suite Dashboard",
 				"btnSMTP": "SMTP Settings",
 				"btnAuditLog": "Audit Log",
-				"btnSMS": "SMS Settings"
+				"btnSMS": "SMS Settings",
+				"btnDomainManagement": "Domain Management"
 			},
 			"tabSubscription": {
 				"labelTabTitle": "Subscription",
@@ -457,6 +515,35 @@
 			"labelUserRangeFrom": "User Range From",
 			"labelUserRangeTo": "User Range To",
 			"labelLicenseDuration": "Duration (in Days)",
+			"placeholderPackageName": "Enter package name",
+			"placeholderLicenseCost": "Enter license cost",
+			"placeholderDescription": "Enter description",
+			"validationSelectProduct": "Please select a product/application",
+			"validationSelectPackageType": "Please select a package type (On Premise or Cloud)",
+			"validationEnterPackageName": "Package name is required",
+			"validationPackageNameMinLength": "Package name must be at least 3 characters long",
+			"validationPackageNameMaxLength": "Package name cannot exceed 100 characters",
+			"validationEnterDescription": "Package description is required",
+			"validationDescriptionMinLength": "Description must be at least 1 character long",
+			"validationDescriptionMaxLength": "Description cannot exceed 500 characters",
+			"validationEnterLicenseCost": "License cost is required",
+			"validationLicenseCostNumber": "Please enter a valid number",
+			"validationLicenseCostMin": "License cost must be at least 1",
+			"validationLicenseCostMax": "License cost is too large",
+			"validationEnterDuration": "License duration is required",
+			"validationDurationDigits": "Please enter a valid number of days",
+			"validationDurationMin": "Duration must be at least 1 day",
+			"validationDurationMax": "Duration cannot exceed 3650 days (10 years)",
+			"validationEnterRangeFrom": "User range (From) is required",
+			"validationRangeFromDigits": "Please enter a valid number",
+			"validationRangeFromMin": "Minimum user range must be at least 1",
+			"validationRangeFromMax": "Value is too large",
+			"validationEnterRangeTo": "User range (To) is required",
+			"validationRangeToDigits": "Please enter a valid number",
+			"validationRangeToMin": "Maximum user range must be at least 1",
+			"validationRangeToMax": "Value is too large",
+			"validationRangeToGreaterThanFrom": "User range \"To\" must be greater than or equal to \"From\"",
+			"successMessage": "Package created successfully.",
 			"btnBack": "Back",
 			"btnNext": "Next",
 			"btnSubmit": "Submit",
@@ -466,6 +553,7 @@
 	"appservice": {
 		"homescreen": {
 			"title": "Application Service Management",
+			"serviceManagement": "Service Management",
 			"productName": "Product Name",
 			"serviceName": "Service Name",
 			"serviceType": "Service Type",
@@ -487,6 +575,21 @@
 			"labelServiceName": "Service Name",
 			"labelDescription": "Description",
 			"labelServiceCost": "Service Cost (USD)",
+			"placeholderServiceName": "Enter service name",
+			"placeholderServiceCost": "Enter service cost",
+			"placeholderDescription": "Enter description",
+			"successMessage": "Service has been created successfully.",
+			"validationSelectProduct": "Please select a product.",
+			"validationEnterServiceName": "Please enter a service name.",
+			"validationServiceNameMinLength": "Service name must be at least 2 characters.",
+			"validationEnterServiceCost": "Please enter the service cost.",
+			"validationValidNumber": "Please enter a valid number.",
+			"validationServiceCostMin": "Service cost must be at least 1.",
+			"validationSelectServiceType": "Please select a service type.",
+			"validationEnterDescription": "Please enter a description.",
+			"validationDescriptionMinLength": "Description must be at least 2 characters.",
+			"errorUnableToCreate": "Unable to create service. Please try again.",
+			"errorCouldNotLoadApplications": "Could not load applications.",
 			"btnBack": "Back",
 			"btnSubmit": "Submit",
 			"btnCancel": "Cancel"
@@ -571,11 +674,20 @@
 		"btnTestConfiguration": "Test Configuration",
 		"btnSaveSettings": "Save Settings",
 		"labelSenderEmail": "Sender Email",
-		"labelDetails": "Detail",
+		"labelDetails": "Details",
 		"enableStartTLS": "Enable STARTTLS",
+		"enableStartTLSDesc": "Use STARTTLS to upgrade a plain connection to secure.",
 		"enableSSL": "Enable SSL",
+		"enableSSLDesc": "Use SSL/TLS for a fully encrypted connection from the start.",
 		"enableSMTPEncryption": "Enable Encryption",
-		"enablePasswordEncryption": "smtp.enablePasswordEncryption"
+		"enableSMTPEncryptionDesc": "Encrypt email messages before sending through this SMTP connection.",
+		"enablePasswordEncryption": "smtp.enablePasswordEncryption",
+		"enableMFA": "Enable MFA",
+		"enableMFADesc": "Send one-time passwords via this SMTP connection.",
+		"selectOrganization": "Select Organization",
+		"default": "Default",
+		"enabled": "Enabled",
+		"disabled": "Disabled"
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "Secmagnus User Management",
@@ -899,11 +1011,21 @@
 				"no_records": "No USB devices found.",
 				"start_date": "Start Date",
 				"actions": "Details"
-			}
+			},
+			"interaction_details_title": "USB Interaction Details",
+			"interactions_recorded": "interactions recorded",
+			"unique_users": "unique users",
+			"plugged": "Plugged",
+			"unplugged": "Unplugged",
+			"ip_address": "IP Address",
+			"mac_address": "MAC Address",
+			"env_path": "Environment Path",
+			"system_details": "System Details"
 		},
 		"device_code": "Device Code",
 		"description": "Description",
-		"start_date": "Start Date"
+		"start_date": "Start Date",
+		"no_records": "No records found."
 	},
 	"department": {
 		"labelTitleDepartmentManagement": "Department Management",
@@ -1378,7 +1500,10 @@
 		"tabActive": "Active",
 		"tabInprogress": "Inprogress",
 		"tabCompleted": "Completed",
-		"searchPlaceholder": "Search here..."
+		"searchPlaceholder": "Search here...",
+		"subtitle": "Track all user actions and system events.",
+		"rowsPerPage": "Rows per page",
+		"noLogs": "No audit logs found"
 	},
 	"CS-List": "Cybersecurity Categories",
 	"btn-CS-LibPosters-Upload-Document": "Upload Document",
@@ -1786,7 +1911,7 @@
 			"yes": "Yes",
 			"no": "No",
 			"sent_at": "Sent At",
-			"email_headers": "Email Origin",
+			"magnus_email_headers": "Email Origin",
 			"no_headers": "No headers available.",
 			"real_phishing_email": "Real Phishing Email",
 			"real_phishing_email_desc": "This email was not generated by PhishMagnus. It may be a genuine phishing attempt.",
@@ -1796,5 +1921,37 @@
 			"suspicious_content": "Suspicious Content",
 			"not_found": "Reported email not found."
 		}
+	},
+	"mfa": {
+		"create": "MFA SMTP Configuration",
+		"host": {
+			"name": "Host Name"
+		},
+		"port": "Port",
+		"service": {
+			"account": "Service Account"
+		},
+		"password": "Password",
+		"connectionName": "Connection Name",
+		"secureConnection": "Use Secure Connection",
+		"enableMFA": "Enable MFA",
+		"subtitle": "Configure the SMTP server used to deliver MFA one-time passwords.",
+		"placeholderConnectionName": "e.g. Corporate Mail",
+		"placeholderHost": "e.g. smtp.company.com",
+		"placeholderPort": "e.g. 587",
+		"placeholderAccount": "e.g. noreply@company.com",
+		"placeholderPassword": "Enter account password",
+		"secureConnectionDesc": "Enable TLS/SSL encryption for the SMTP connection.",
+		"enableEncryption": "Enable Encryption",
+		"enableEncryptionDesc": "Encrypt email messages before sending through this SMTP connection.",
+		"enableMFADesc": "Send one-time passwords via this SMTP connection.",
+		"testConnection": "Test Connection",
+		"save": "Save",
+		"loginTitle": "Two-Factor Authentication",
+		"loginSubtitle": "Enter the one-time code sent to your registered email or authenticator app.",
+		"loginLabel": "Verification Code",
+		"loginPlaceholder": "Enter 6-digit code",
+		"loginBtn": "Verify & Continue",
+		"loginBack": "Back to Login"
 	}
 }

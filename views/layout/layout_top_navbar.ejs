@@ -13,12 +13,21 @@
             </div>
 
             <datalist id="nav-options">
-              <option value="Organization Settings">
-              <option value="Add User">
-              <option value="Import User">
-              <option value="Dashboard">
-              <option value="Campaigns">
-              <option value="Reports">
+              <% if (locals.magnusAdmin) { %>
+                <option value="<%= __('topnavbar.organizations') %>">
+                <option value="<%= __('topnavbar.createPackage') %>">
+                <option value="<%= __('topnavbar.addUser') %>">
+                <option value="<%= __('topnavbar.dashboard') %>">
+                <option value="<%= __('topnavbar.systemTemplate') %>">
+                <option value="<%= __('topnavbar.simulatorEmails') %>">
+              <% } else { %>
+                <option value="<%= __('topnavbar.organizationSettings') %>">
+                <option value="<%= __('topnavbar.addUser') %>">
+                <option value="<%= __('topnavbar.importUser') %>">
+                <option value="<%= __('topnavbar.dashboard') %>">
+                <option value="<%= __('topnavbar.campaigns') %>">
+                <option value="<%= __('topnavbar.reports') %>">
+              <% } %>
             </datalist>
 
             <!-- Two Circle Buttons -->
@@ -113,12 +122,21 @@
 
         <script>
           const navMap = {
-            "Organization Settings": "/organization/profile",
-            "Add User": "/user/create",
-            "Import User": "/user/create/bulk",
-            "Dashboard": "/phm/index",
-            "Campaigns": "/phm/campaign/all-campaigns",
-            "Reports": "/phm/campaign/reports"
+            <% if (locals.magnusAdmin) { %>
+              "Organizations": "/organization",
+              "Create Package": "/package",
+              "Add User": "/user/securemagnus-users/create",
+              "Dashboard": "/suite_management_dashboard",
+              "System Template": "/template/list",
+              "Simulator Emails": "/phm/phishing-smtp/list"
+            <% } else { %>
+              "Organization Settings": "/organization/profile",
+              "Add User": "/user/create",
+              "Import User": "/user/create/bulk",
+              "Dashboard": "/phm/index",
+              "Campaigns": "/phm/campaign/all-campaigns",
+              "Reports": "/phm/campaign/reports"
+            <% } %>
           };
 
           function redirectToPage(value) {

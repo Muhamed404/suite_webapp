@@ -25,8 +25,10 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { quizService } from "@/services/quizService";
 import { awmClient, API_BASE } from "@/services/httpClient";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { isOrgUser } from "@/utils/roles";
+import { LANGUAGE_COUNTRY_CODES, SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
 
 // Maps URL slug → contype_id (matches API content_type_id values)
 const CONTENT_TYPE_ID: Record<string, number> = {
@@ -40,10 +42,14 @@ const CONTENT_TYPE_ID: Record<string, number> = {
 // Maps language name → ISO code
 function toLangCode(name?: string): string {
   if (!name) return "en";
-  const n = name.toLowerCase();
+  const n = name.toLowerCase().trim();
 
-  if (n === "arabic") return "ar";
-  if (n === "french") return "fr";
+  if (n.includes("arabic")) return "ar";
+  if (n.includes("urdu")) return "ur";
+  if (n.includes("french")) return "fr";
+  if (n.includes("mandarin") || n.includes("chinese")) return "zh";
+  if (n.includes("turk")) return "tr";
+  if (n.includes("english")) return "en";
 
   return "en";
 }
@@ -53,7 +59,9 @@ export default function ContentPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const t = useTranslations("module");
+  const { dir, locale } = useI18n();
   const { user } = useAuthStore();
+  const isRtl = dir === "rtl";
 
   const module = params?.module;
   const type = params?.type;
@@ -63,7 +71,7 @@ export default function ContentPage() {
   const slug = Array.isArray(type) ? type[0] : (type ?? "");
   const isPostersPage = slug === "posters";
   const [searchQuery, setSearchQuery] = useState("");
-  const [languageFilter, setLanguageFilter] = useState("all");
+  const [languageFilter, setLanguageFilter] = useState(locale === "ar" ? "ar" : "all");
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const [viewMode, setViewMode] = useState("table");
   const [sortBy, setSortBy] = useState("title");
@@ -71,9 +79,16 @@ export default function ContentPage() {
   const [viewingItem, setViewingItem] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [apiItems, setApiItems] = useState<any[]>([]);
+  const [apiPagination, setApiPagination] = useState<null | {
+    current_page: number;
+    per_page: number;
+    total_items: number;
+    total_pages: number;
+  }>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [reportContentsData, setReportContentsData] = useState<any>(null);
-  const itemsPerPage = 10;
+  const requestLimit = 10;
+  const itemsPerPage = apiPagination?.per_page ?? requestLimit;
 
   // Read mod_id and contype_id directly from URL query params
   const moduleId = searchParams?.get("mod_id") ? Number(searchParams.get("mod_id")) : 1;
@@ -92,10 +107,19 @@ export default function ContentPage() {
     }
     setIsLoading(true);
     quizService
-      .getContents({ mod_id: moduleId, contype_id })
+      .getContents({ mod_id: moduleId, contype_id, page: currentPage, limit: requestLimit })
       .then((res) => {
-        if (res.success && Array.isArray(res.data)) {
-          const mapped = res.data.map((c: any) => ({
+        if (res.success) {
+          const raw = res.data as any;
+          const list: any[] = Array.isArray(raw)
+            ? raw
+            : Array.isArray(raw?.contents)
+              ? raw.contents
+              : [];
+
+          setApiPagination(raw?.pagination ?? null);
+
+          const mapped = list.map((c: any) => ({
             id: c.id,
             title: c.title ?? c.name ?? `Content ${c.id}`,
             description: c.description ?? "",
@@ -117,7 +141,15 @@ export default function ContentPage() {
         setApiItems([]);
       })
       .finally(() => setIsLoading(false));
-  }, [type, moduleId, contypeIdFromUrl]);
+  }, [type, moduleId, contypeIdFromUrl, currentPage]);
+
+  useEffect(() => {
+    setLanguageFilter(locale === "ar" ? "ar" : "all");
+  }, [locale]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [type, contypeIdFromUrl]);
 
   // items are populated via API; legacy static array removed
 
@@ -163,12 +195,11 @@ export default function ContentPage() {
   }, [libraryItems, languageFilter, searchQuery, sortBy, sortOrder]);
 
   const paginatedItems = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
+    // API already returns per-page items; we only apply search/language/sort
+    return filteredItems;
+  }, [filteredItems]);
 
-    return filteredItems.slice(start, start + itemsPerPage);
-  }, [filteredItems, currentPage, itemsPerPage]);
-
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage) || 1;
+  const totalPages = (apiPagination?.total_pages ?? Math.ceil(filteredItems.length / itemsPerPage)) || 1;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -285,14 +316,18 @@ export default function ContentPage() {
     setCurrentPage(page);
   };
 
-  const flagClassMap: Record<string, string> = {
-    en: "fi-us",
-    ar: "fi-sa",
-    fr: "fi-fr",
-  };
+  const flagClassMap: Record<string, string> = SUPPORTED_LANGUAGES.reduce(
+    (acc, lang) => {
+      const code = toLangCode(lang.name);
+      const countryCode = LANGUAGE_COUNTRY_CODES[lang.id];
+      if (code && countryCode) acc[code] = `fi-${countryCode.toLowerCase()}`;
+      return acc;
+    },
+    {} as Record<string, string>
+  );
 
   const getFlagClass = (languageCode: string) => {
-    return flagClassMap[languageCode] || flagClassMap.en;
+    return flagClassMap[languageCode] || flagClassMap.en || "fi-us";
   };
 
   const resolveLogoUrl = (raw: string | null): string | null => {
@@ -698,7 +733,7 @@ export default function ContentPage() {
                           <input
                             className="w-full pl-10 pr-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             id="searchInput"
-                            placeholder="Search content..."
+                            placeholder={t("moduleDetails.searchPlaceholderContent") ?? "Search Content..."}
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -711,17 +746,17 @@ export default function ContentPage() {
                             className="modern-dropdown-button"
                             onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
                           >
-                            <span>
-                              {languageFilter === "all"
-                                ? "All Languages"
-                                : languageFilter === "en"
-                                  ? "English"
-                                  : languageFilter === "ar"
-                                    ? "Arabic"
-                                    : languageFilter === "fr"
-                                      ? "French"
-                                      : "All Languages"}
-                            </span>
+                            {languageFilter === "all" ? (
+                              <span>{t("moduleDetails.allLanguages") ?? t("library.allLanguages") ?? "All Languages"}</span>
+                            ) : (
+                              <span className="inline-flex items-center gap-2">
+                                <span className={`fi rounded-full w-4 h-4 ${getFlagClass(languageFilter)}`} />
+                                <span>
+                                  {SUPPORTED_LANGUAGES.find((l) => toLangCode(l.name) === languageFilter)?.name ??
+                                    (t("moduleDetails.allLanguages") ?? t("library.allLanguages") ?? "All Languages")}
+                                </span>
+                              </span>
+                            )}
                             <div className="modern-dropdown-arrow">
                               <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
@@ -736,23 +771,31 @@ export default function ContentPage() {
 
                           {showLanguageDropdown && (
                             <div className="modern-dropdown-menu open">
-                              {[
-                                { code: "all", label: "All Languages" },
-                                { code: "en", label: "English" },
-                                { code: "ar", label: "Arabic" },
-                                { code: "fr", label: "French" },
-                              ].map((opt) => (
-                                <button
-                                  key={opt.code}
-                                  className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
-                                  onClick={() => {
-                                    setLanguageFilter(opt.code);
-                                    setShowLanguageDropdown(false);
-                                  }}
-                                >
-                                  {opt.label}
-                                </button>
-                              ))}
+                              <button
+                                className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+                                onClick={() => {
+                                  setLanguageFilter("all");
+                                  setShowLanguageDropdown(false);
+                                }}
+                              >
+                                {t("moduleDetails.allLanguages") ?? t("library.allLanguages") ?? "All Languages"}
+                              </button>
+                              {SUPPORTED_LANGUAGES.map((lang) => {
+                                const code = toLangCode(lang.name);
+                                return (
+                                  <button
+                                    key={lang.id}
+                                    className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
+                                    onClick={() => {
+                                      setLanguageFilter(code);
+                                      setShowLanguageDropdown(false);
+                                    }}
+                                  >
+                                    <span className={`fi rounded-full w-4 h-4 ${getFlagClass(code)}`} />
+                                    <span>{lang.name}</span>
+                                  </button>
+                                );
+                              })}
                             </div>
                           )}
                         </div>
@@ -760,7 +803,9 @@ export default function ContentPage() {
 
                       {/* View toggle */}
                       <div
-                        className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-1 py-1 z-40 relative"
+                        className={`flex items-center gap-1 rounded-full border border-gray-200 bg-white px-1 py-1 z-40 relative ${
+                          isRtl ? "flex-row-reverse" : ""
+                        }`}
                         id="viewToggle"
                       >
                         <div
@@ -769,10 +814,17 @@ export default function ContentPage() {
                           style={{
                             top: "4px",
                             height: "calc(100% - 8px)",
-                            left: viewMode === "table" ? "4px" : "calc(50% - 2px)",
+                            insetInlineStart:
+                              viewMode === "table"
+                                ? isRtl
+                                  ? "calc(50% - 2px)"
+                                  : "4px"
+                                : isRtl
+                                ? "4px"
+                                : "calc(50% - 2px)",
                             width: "calc(50% - 4px)",
                             transition:
-                              "left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                              "inset-inline-start 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                           }}
                         />
                         <button
@@ -807,15 +859,16 @@ export default function ContentPage() {
                             aria-label="Library table"
                             className="w-full text-xs"
                             id="libraryTable"
+                            dir={isRtl ? "rtl" : "ltr"}
                           >
                             <thead className="bg-gray-50 text-gray-600 border-b sticky top-0 z-10">
                               <tr>
                                 <th
-                                  className="px-4 py-3.5 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors"
+                                  className={`px-4 py-3.5 ${isRtl ? "text-right" : "text-left"} font-semibold cursor-pointer hover:bg-gray-100 transition-colors`}
                                   onClick={() => handleSort("title")}
                                 >
                                   <div className="flex items-center gap-2">
-                                    <span>Module</span>
+                                    <span>{t("moduleDetails.module") ?? t("library.moduleName") ?? "Module"}</span>
                                     <span className="text-gray-400">
                                       {sortBy === "title" ? (
                                         sortOrder === "asc" ? (
@@ -829,13 +882,13 @@ export default function ContentPage() {
                                     </span>
                                   </div>
                                 </th>
-                                <th className="px-4 py-3.5 text-left font-semibold">Description</th>
+                                <th className={`px-4 py-3.5 ${isRtl ? "text-right" : "text-left"} font-semibold`}>{t("tableDescription") ?? "Description"}</th>
                                 <th
-                                  className="px-4 py-3.5 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors"
+                                  className={`px-4 py-3.5 ${isRtl ? "text-right" : "text-left"} font-semibold cursor-pointer hover:bg-gray-100 transition-colors`}
                                   onClick={() => handleSort("language")}
                                 >
                                   <div className="flex items-center gap-2">
-                                    <span>Language</span>
+                                    <span>{t("tableLanguage") ?? "Language"}</span>
                                     <span className="text-gray-400">
                                       {sortBy === "language" ? (
                                         sortOrder === "asc" ? (
@@ -849,18 +902,18 @@ export default function ContentPage() {
                                     </span>
                                   </div>
                                 </th>
-                                <th className="px-4 py-3.5 text-left font-semibold">Thumbnail</th>
-                                <th className="px-4 py-3.5 text-left font-semibold">Action</th>
+                                <th className={`px-4 py-3.5 ${isRtl ? "text-right" : "text-left"} font-semibold`}>{t("library.thumbnail") ?? "Thumbnail"}</th>
+                                <th className={`px-4 py-3.5 ${isRtl ? "text-right" : "text-left"} font-semibold`}>{t("library.action") ?? "Action"}</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100" id="tableBody">
                               {paginatedItems.map((item) => (
                                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                                  <td className="px-4 py-3 font-medium text-gray-700">
+                                  <td className={`px-4 py-3 font-medium text-gray-700 ${isRtl ? "text-right" : "text-left"}`}>
                                     {item.title}
                                   </td>
-                                  <td className="px-4 py-3 text-gray-600">{item.description}</td>
-                                  <td className="px-4 py-3 text-gray-700">
+                                  <td className={`px-4 py-3 text-gray-600 ${isRtl ? "text-right" : "text-left"}`}>{item.description}</td>
+                                  <td className={`px-4 py-3 text-gray-700 ${isRtl ? "text-right" : "text-left"}`}>
                                     <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full border text-gray-700 bg-white text-xs">
                                       <span className="w-4 h-4 rounded-full overflow-hidden border border-gray-200 bg-white flex items-center justify-center">
                                         <span
@@ -935,7 +988,7 @@ export default function ContentPage() {
                                       onClick={() => handleView("view", item)}
                                     >
                                       <Eye className="w-4 h-4" />
-                                      View
+                                      {t("library.view") ?? "View"}
                                     </button>
                                   </div>
                                 </div>
@@ -975,9 +1028,18 @@ export default function ContentPage() {
                       {/* Pagination */}
                       <div className="mt-4 flex items-center justify-between px-4 pb-4">
                         <p className="text-xs text-gray-600">
-                          Showing {(currentPage - 1) * itemsPerPage + 1}–
-                          {Math.min(currentPage * itemsPerPage, filteredItems.length)} of{" "}
-                          {filteredItems.length} Entries
+                          Showing{" "}
+                          {apiPagination
+                            ? (apiPagination.current_page - 1) * apiPagination.per_page + 1
+                            : (currentPage - 1) * itemsPerPage + 1}
+                          –
+                          {apiPagination
+                            ? Math.min(
+                                apiPagination.current_page * apiPagination.per_page,
+                                apiPagination.total_items
+                              )
+                            : Math.min(currentPage * itemsPerPage, filteredItems.length)} of{" "}
+                          {apiPagination ? apiPagination.total_items : filteredItems.length} Entries
                         </p>
                         <div className="flex items-center gap-1">
                           <button
