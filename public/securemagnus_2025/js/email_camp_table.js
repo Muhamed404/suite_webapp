@@ -20,6 +20,8 @@ const data = originalCampaigns.map(campaign => {
   const start   = splitDateTime(campaign.start_datetime);
   const end     = splitDateTime(campaign.end_datetime);
   const created = splitDateTime(campaign.creation_date);
+  const totalInvitees = Number(campaign.totalInvitees || 0);
+  const sentCount = Number(campaign.sentCount || 0);
   return {
     id: campaign.id,
     name: campaign.name,
@@ -30,9 +32,9 @@ const data = originalCampaigns.map(campaign => {
     start_time: start.time,
     end_time:   end.time,
     status: campaign.status,
-    totalInvitees: campaign.totalInvitees,
-    sentCount: campaign.sentCount || 0,
-    unsentCount: (campaign.totalInvitees || 0) - (campaign.sentCount || 0),
+    totalInvitees,
+    sentCount,
+    unsentCount: Math.max(totalInvitees - sentCount, 0),
     difficulty: campaign.difficulty,
     creation_date: created.date,
   };
@@ -195,9 +197,8 @@ function renderTable() {
         <span class="${statusClass}">${campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}</span>
       </td>
       <td class="px-6 py-6 whitespace-nowrap">${campaign.totalInvitees}</td>
-      <td class="px-6 py-6 whitespace-nowrap">${campaign.sentCount}</td>
-
       <td class="px-6 py-6 whitespace-nowrap">${campaign.unsentCount}</td>
+      <td class="px-6 py-6 whitespace-nowrap">${campaign.sentCount}</td>
 
       <td class="px-6 py-6 whitespace-nowrap">${actionIcon}</td>
     </tr>`;
