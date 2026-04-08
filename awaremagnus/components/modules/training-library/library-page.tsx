@@ -41,7 +41,7 @@ import {
 
 export type LibraryType = "system" | "my";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 8;
 
 function moduleCode(m: Module): string {
   return m.code ?? `Module ${m.id}`;
