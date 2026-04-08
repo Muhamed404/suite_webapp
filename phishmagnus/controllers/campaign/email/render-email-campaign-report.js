@@ -53,6 +53,8 @@ exports.renderCampaignReport = async (req, res) => {
             // Transform the nested campaign data structure
             const campaigns = rawCampaigns.map(item => {
                 const campaign = item.campaign || {};
+                const sentCount = Number(item.sentCount || 0);
+                const totalInvitees = Number(item.totalInvitees || 0);
                 return {
                     id: campaign.id,
                     campaign_identifier: campaign.campaign_identifier,
@@ -64,8 +66,10 @@ exports.renderCampaignReport = async (req, res) => {
                     end_datetime: campaign.end_datetime,
                     template_name: item.template?.name || 'N/A',
                     template_id: campaign.template_id,
-                    total_users: item.totalInvitees,
-                    totalInvitees: item.totalInvitees,
+                    total_users: totalInvitees,
+                    totalInvitees,
+                    sentCount,
+                    unsentCount: Math.max(totalInvitees - sentCount, 0),
                     is_camp_uploaded: campaign.is_camp_uploaded,
                     // Determine status based on dates and upload status
                     status: determineStatus(campaign),
@@ -209,6 +213,8 @@ exports.getCampaignReportsData = async (req, res) => {
         // Transform the campaigns
         const campaigns = rawCampaigns.map(item => {
             const campaign = item.campaign || {};
+            const sentCount = Number(item.sentCount || 0);
+            const totalInvitees = Number(item.totalInvitees || 0);
             return {
                 id: campaign.id,
                 name: campaign.name,
@@ -216,8 +222,10 @@ exports.getCampaignReportsData = async (req, res) => {
                 creation_date: campaign.creation_date,
                 start_datetime: campaign.start_datetime,
                 end_datetime: campaign.end_datetime,
-                template_name: campaign.Templates?.name || 'N/A',
-                totalInvitees: item.totalInvitees,
+                template_name: item.template?.name || 'N/A',
+                totalInvitees,
+                sentCount,
+                unsentCount: Math.max(totalInvitees - sentCount, 0),
                 status: determineStatus(campaign)
             };
         });
