@@ -168,6 +168,7 @@
     },
     "noData": "لا توجد مهام معلقة",
     "status": {
+      "notStarted": "لم يبدأ بعد",
       "pending": "معلق",
       "inProgress": "قيد التقدم"
     },

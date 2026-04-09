@@ -168,6 +168,7 @@
     },
     "noData": "No pending assignments",
     "status": {
+      "notStarted": "Not Started",
       "pending": "Pending",
       "inProgress": "In Progress"
     },

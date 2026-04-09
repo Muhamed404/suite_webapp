@@ -692,7 +692,7 @@ export default function DashboardPage() {
                               onClick={() => router.push("/dashboard/campaign-assignments")}
                               className="bg-[#3FBDFF] hover:bg-[#3FBDFF] justify-center text-white font-semibold text-xs px-2 py-3 rounded-full inline-flex items-center gap-2 transition-all duration-300 transform hover:scale-105 shadow-lg"
                             >
-                              Start
+                              {t("userWelcome.startButton")}
                               <svg
                                 className={clsx("w-5 h-5", isRtl && "rotate-180")}
                                 fill="none"
@@ -1137,7 +1137,8 @@ export default function DashboardPage() {
                         assignmentsData?.object?.assignments
                           ?.filter(
                             (a: any) =>
-                              a.status.name === "PENDING" || a.status.name === "IN_PROGRESS"
+                              (a.status.name === "PENDING" || a.status.name === "IN_PROGRESS") &&
+                              (a.progress_percentage == null || Number(a.progress_percentage) !== 100)
                           )
                           .slice(0, 4) || []
                       ).map((assignment: any, index: number) => {
@@ -1224,7 +1225,9 @@ export default function DashboardPage() {
                 const allAssignments: any[] = assignmentsData?.object?.assignments || [];
                 const pendingAssignments = [...allAssignments]
                   .filter(
-                    (a: any) => a.status?.name === "PENDING" || a.status?.name === "IN_PROGRESS"
+                    (a: any) =>
+                      (a.status?.name === "PENDING" || a.status?.name === "IN_PROGRESS") &&
+                      (a.progress_percentage == null || Number(a.progress_percentage) !== 100)
                   )
                   .sort(
                     (a: any, b: any) =>
@@ -1251,6 +1254,12 @@ export default function DashboardPage() {
                 };
 
                 const statusBadge = (statusName: string) => {
+                  if (statusName === "NOT_STARTED")
+                    return (
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-gray-100 text-gray-600 border border-gray-300 whitespace-nowrap">
+                        {t("pendingTasks.status.notStarted")}
+                      </span>
+                    );
                   if (statusName === "PENDING")
                     return (
                       <span className="px-2.5 py-1 rounded-full text-[10px] font-medium bg-yellow-50 text-yellow-600 border border-yellow-300 whitespace-nowrap">
@@ -1318,7 +1327,11 @@ export default function DashboardPage() {
                                         {assignment.module_name || "—"}
                                       </td>
                                       <td className="px-4 py-2.5">
-                                        {statusBadge(assignment.status?.name || "")}
+                                        {statusBadge(
+                                          assignment.progress_percentage == null
+                                            ? "NOT_STARTED"
+                                            : assignment.status?.name || ""
+                                        )}
                                       </td>
                                       <td
                                         className={`px-4 py-2.5 ${isFirst ? "text-blue-900 font-bold" : "text-gray-600"}`}
@@ -1329,7 +1342,9 @@ export default function DashboardPage() {
                                         {(() => {
                                           const key = `${assignment.campaign_id}-${assignment.module_id}`;
                                           const isStarting = startingKeys.has(key);
-                                          const statusName = assignment.status?.name;
+                                          const statusName = assignment.progress_percentage == null
+                                            ? "NOT_STARTED"
+                                            : assignment.status?.name;
 
                                           // IN_PROGRESS + user already begun (progress_percentage != null) → View
                                           if (
@@ -1357,7 +1372,7 @@ export default function DashboardPage() {
                                               disabled={isStarting}
                                               onClick={() => handleStartAssignment(assignment)}
                                             >
-                                              {isStarting ? "Starting…" : "Start"}
+                                              {isStarting ? t("pendingTasks.actions.starting") : t("pendingTasks.actions.start")}
                                             </button>
                                           );
                                         })()}
