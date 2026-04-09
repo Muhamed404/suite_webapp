@@ -1123,13 +1123,13 @@ export default function DashboardPage() {
                   <div className="bg-white rounded-2xl p-4 h-full">
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-sm font-semibold text-gray-900">{t("pendingTasks.title")}</h2>
-                      <a
+                      <Link
                         className="text-xs text-gray-500 flex items-center gap-1 hover:text-gray-700"
-                        href="#"
+                        href="/dashboard/campaign-assignments"
                       >
                         {t("pendingTasks.viewAll")}
                         <span className="text-sm">›</span>
-                      </a>
+                      </Link>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -1390,12 +1390,12 @@ export default function DashboardPage() {
                         <p className="text-gray-500 text-[10px] whitespace-nowrap">
                           {t("pendingTasks.pagination.showing", { shown: 1, total: moduleAssignments.length, all: assignmentsData?.object?.count || 0 })}
                         </p>
-                        <a
+                        <Link
                           className="text-[10px] text-blue-600 hover:underline"
                           href="/dashboard/campaign-assignments"
                         >
                           {t("pendingTasks.viewAll")}
-                        </a>
+                        </Link>
                       </div>
                     </div>
 
