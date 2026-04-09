@@ -64,11 +64,13 @@ export function AuthImage({
     setError(false);
     setIsLoading(true);
     const controller = new AbortController();
-    const headers: HeadersInit = {
-      "ngrok-skip-browser-warning": "true",
-    };
+    const headers: HeadersInit = {};
+    const isInternal = !isAbsolute || (typeof window !== "undefined" && urlToFetch.startsWith(window.location.origin)) || urlToFetch.startsWith("/");
 
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+    if (isInternal) {
+      headers["ngrok-skip-browser-warning"] = "true";
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+    }
 
     fetch(urlToFetch, { headers, signal: controller.signal })
       .then((res) => {

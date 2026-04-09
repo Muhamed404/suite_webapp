@@ -12,8 +12,7 @@ import { useAuthStore } from "@/hooks/useAuthStore";
 import { useModules, useContentReportByContentId } from "@/hooks/useQuiz";
 import { quizService } from "@/services/quizService";
 import { isOrgUser } from "@/utils/roles";
-
-const SERVICE_AWM_URL = process.env.NEXT_PUBLIC_SERVICE_AWM_URL ?? "http://localhost:3002";
+import { getContentAssetUrl } from "@/services/awmStorage";
 
 export default function VideoTrainingPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -419,10 +418,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         src={
                           !content.source_url
                             ? undefined
-                            : content.source_url.startsWith("http://") ||
-                                content.source_url.startsWith("https://")
-                              ? content.source_url
-                              : `${SERVICE_AWM_URL}${content.source_url}`
+                            : getContentAssetUrl(content.source_url) || undefined
                         }
                         onEnded={() => handleVideoEnded(content.id)}
                         onLoadedMetadata={(e) =>
@@ -535,10 +531,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                     {(() => {
                       const fullUrl = !content.source_url
                         ? undefined
-                        : content.source_url.startsWith("http://") ||
-                            content.source_url.startsWith("https://")
-                          ? content.source_url
-                          : `${SERVICE_AWM_URL}${content.source_url}`;
+                        : getContentAssetUrl(content.source_url) || undefined;
 
                       return fullUrl ? (
                         <div className="p-4 flex items-center gap-3 flex-wrap">
