@@ -36,6 +36,8 @@ const PdfViewer = dynamic(
 
 const BROCHURE_FALLBACK_PDF = getContentAssetUrl("/brochure.pdf");
 const POSTER_FALLBACK_IMG = getContentAssetUrl("/posters.png");
+const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg"]);
+const DOC_EXTENSIONS = new Set(["doc", "docx"]);
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -77,6 +79,16 @@ function resolveSourceUrl(raw: string | null | undefined): string | null {
   if (s.startsWith("/contents/")) return `/awm${s}`;
 
   return `/awm/contents/${s.startsWith("/") ? s.slice(1) : s}`;
+}
+
+function extractFileExtension(url: string | null | undefined): string | null {
+  if (!url?.trim()) return null;
+  const cleanUrl = url.trim().split("?")[0].split("#")[0];
+  const lastDot = cleanUrl.lastIndexOf(".");
+
+  if (lastDot < 0 || lastDot === cleanUrl.length - 1) return null;
+
+  return cleanUrl.slice(lastDot + 1).toLowerCase();
 }
 
 // ─── component ───────────────────────────────────────────────────────────────
@@ -234,6 +246,22 @@ export function OrgUserPosterBrochureDetailScreen({
   const rawSourceUrl =
     content?.source_url ?? (content as { source_path?: string } | null)?.source_path ?? null;
   const resolvedUrl = resolveSourceUrl(rawSourceUrl);
+  const fileExtension = extractFileExtension(rawSourceUrl ?? resolvedUrl);
+  const isPdfFile = fileExtension == null || fileExtension === "pdf";
+  const isImageFile = fileExtension != null && IMAGE_EXTENSIONS.has(fileExtension);
+  const isDocFile = fileExtension != null && DOC_EXTENSIONS.has(fileExtension);
+  const officePreviewSourceUrl =
+    isDocFile && resolvedUrl
+      ? resolvedUrl.startsWith("http")
+        ? resolvedUrl
+        : typeof window !== "undefined"
+          ? `${window.location.origin}${resolvedUrl}`
+          : null
+      : null;
+  const officeViewerEmbedUrl =
+    officePreviewSourceUrl != null
+      ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(officePreviewSourceUrl)}`
+      : null;
 
   // Detect if Misc content is a video file
   const isVideoSource = !!(rawSourceUrl?.match(/\.(mp4|webm|mov|ogg|avi|m3u8)(\?|$)/i));
@@ -364,16 +392,43 @@ export function OrgUserPosterBrochureDetailScreen({
                   />
                 </div>
               ) : isBrochure ? (
-                /* ── PDF viewer ── */
-                <div style={{ minHeight: 800 }}>
-                  <PdfViewer
-                    authToken={token}
-                    className="w-full"
-                    fallbackSrc={BROCHURE_FALLBACK_PDF}
-                    resolveUrl={rawSourceUrl ? !rawSourceUrl.startsWith("http") : true}
-                    src={rawSourceUrl ?? undefined}
+                isPdfFile ? (
+                  /* ── PDF viewer ── */
+                  <div style={{ minHeight: 800 }}>
+                    <PdfViewer
+                      authToken={token}
+                      className="w-full"
+                      fallbackSrc={BROCHURE_FALLBACK_PDF}
+                      resolveUrl={rawSourceUrl ? !rawSourceUrl.startsWith("http") : true}
+                      src={rawSourceUrl ?? undefined}
+                    />
+                  </div>
+                ) : isImageFile && resolvedUrl ? (
+                  /* ── Image viewer ── */
+                  <div className="w-full bg-gray-50 p-4" style={{ minHeight: 480 }}>
+                    <div className="relative w-full max-w-5xl mx-auto h-[760px] bg-white rounded-xl overflow-hidden shadow-inner">
+                      <AuthImage
+                        fill
+                        alt={content ? getContentTitle(content) : "Brochure image"}
+                        className="object-contain"
+                        loadingContent={<div className="w-full h-full animate-pulse bg-gray-200" />}
+                        sizes="(max-width: 1280px) 100vw, 1280px"
+                        src={resolvedUrl}
+                      />
+                    </div>
+                  </div>
+                ) : isDocFile && officeViewerEmbedUrl ? (
+                  /* ── DOC/DOCX viewer ── */
+                  <iframe
+                    className="w-full h-[800px] border-0 bg-gray-50"
+                    src={officeViewerEmbedUrl}
+                    title={content ? getContentTitle(content) : "Document preview"}
                   />
-                </div>
+                ) : (
+                  <div className="w-full h-64 flex items-center justify-center text-gray-500 text-sm bg-gray-50">
+                    Preview not available for this file type.
+                  </div>
+                )
               ) : (
                 <div className="w-full h-64 flex items-center justify-center text-gray-500 text-sm bg-gray-50">
                   Preview not available for this content type.
