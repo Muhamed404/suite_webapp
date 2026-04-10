@@ -224,8 +224,6 @@ function interactionScript() {
         ...data
       })
     }).catch(err => console.error("Tracking Error:", err));
-
-    console.log("[Sent Once Only]", data);
   }
 
   // Detect first typing on ANY input, textarea, or content-editable

@@ -754,7 +754,6 @@
 
         function loadPhishingSmtp() {
             if (smtpLoaded) return;
-            console.log('[PhishingSMTP] Fetching from /phm/phishing-smtp/name');
             fetch('/phm/phishing-smtp/name')
                 .then(function (res) {
                     // console.log('[PhishingSMTP] HTTP status:', res.status);
