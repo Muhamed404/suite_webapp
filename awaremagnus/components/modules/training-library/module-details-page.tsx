@@ -586,7 +586,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     <SearchIcon className="size-4" />
                   </span>
                   <Input
-                    aria-label={t("moduleDetails.searchPlaceholder")}
+                    aria-label={t("moduleDetails.searchPlaceholderContent")}
                     classNames={{
                       ...inputClassNames,
                       base: "w-full",
@@ -596,7 +596,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                       ),
                       input: "text-xs",
                     }}
-                    placeholder={t("moduleDetails.searchPlaceholder")}
+                    placeholder={t("moduleDetails.searchPlaceholderContent")}
                     value={searchQuery}
                     onValueChange={setSearchQuery}
                   />

@@ -376,7 +376,7 @@ function PublicSurveyPage({
                 <Button
                   color="primary"
                   className="px-6 py-2.5 text-sm font-semibold rounded-full shadow-sm"
-                  onClick={() => router.push("/")}
+                  onClick={() => router.push("/dashboard")}
                 >
                   Return to Home
                 </Button>
@@ -407,7 +407,7 @@ function PublicSurveyPage({
               This survey link is invalid or incomplete. Please check the link
               and try again.
             </p>
-            <Button color="primary" onClick={() => router.push("/")}> 
+            <Button color="primary" onClick={() => router.push("/dashboard")}> 
               Go to Home
             </Button>
           </div>
@@ -452,7 +452,7 @@ function PublicSurveyPage({
               The survey you are looking for does not exist, has been removed,
               or the link is invalid.
             </p>
-            <Button color="primary" onClick={() => router.push("/")}> 
+            <Button color="primary" onClick={() => router.push("/dashboard")}> 
               Go to Home
             </Button>
           </div>
@@ -482,7 +482,7 @@ function PublicSurveyPage({
             <Button
               color="primary"
               variant="bordered"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/dashboard")}
             >
               Return to Home
             </Button>
@@ -514,7 +514,7 @@ function PublicSurveyPage({
             <Button
               color="primary"
               variant="bordered"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/dashboard")}
             >
               Return to Home
             </Button>
@@ -545,7 +545,7 @@ function PublicSurveyPage({
             <Button
               color="primary"
               variant="bordered"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/dashboard")}
             >
               Return to Home
             </Button>
@@ -609,7 +609,7 @@ function PublicSurveyPage({
               color="primary"
               variant="bordered"
               className="px-10 py-6 text-base font-semibold rounded-full hover:bg-gray-50 border-2"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/dashboard")}
             >
               Return to Home
             </Button>

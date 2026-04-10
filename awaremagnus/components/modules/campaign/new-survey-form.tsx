@@ -3,7 +3,7 @@
 import type { SupportedLanguageId } from "@/utils/supportedLanguages";
 import type { Department, Group } from "@/services/suiteSuiteService";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@heroui/button";
@@ -57,6 +57,8 @@ export function NewSurveyForm() {
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
   const [isValidatingQuestions, setIsValidatingQuestions] = useState(false);
+  const [limitError, setLimitError] = useState<string | null>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
   // Step 1: Survey Details
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -122,6 +124,15 @@ export function NewSurveyForm() {
       .finally(() => setLoadingGroups(false));
   }, [user]);
 
+  // Check if max questions limit is exceeded
+  useEffect(() => {
+    if (currentStep === 3 && maxQuestions && filteredPreviewQuestions.length > Number(maxQuestions)) {
+      setLimitError(`Number of questions (${filteredPreviewQuestions.length}) exceeds the maximum limit (${maxQuestions}).`);
+    } else {
+      setLimitError(null);
+    }
+  }, [currentStep, maxQuestions, filteredPreviewQuestions.length]);
+
   // Validation
   const validateStep = useCallback(
     (step: number): boolean => {
@@ -171,6 +182,10 @@ export function NewSurveyForm() {
 
   const handleSubmit = async () => {
     if (!validateStep(3)) return;
+    if (limitError) {
+      errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
     setFormError(null);
     setFormSuccess(null);
     setIsValidatingQuestions(true);
@@ -216,7 +231,7 @@ export function NewSurveyForm() {
       });
 
       setFormSuccess("Survey created successfully! Redirecting...");
-      setTimeout(() => router.push("/dashboard/survey"), 2000);
+      setTimeout(() => router.push("/dashboard"), 2000);
     } catch (err: any) {
       setFormError(err?.message ?? "Failed to create survey");
       setIsValidatingQuestions(false);
@@ -293,9 +308,9 @@ export function NewSurveyForm() {
           </div>
 
           {/* Error / Success */}
-          {formError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
-              {formError}
+          {(formError || limitError) && (
+            <div ref={errorRef} className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-600">
+              {formError || limitError}
             </div>
           )}
           {formSuccess && (
@@ -614,7 +629,7 @@ export function NewSurveyForm() {
                 {/* Preview Questions */}
                 {selectedCategoryIds.length > 0 && (
                   <div className="border-t border-gray-100 pt-6">
-                    <h3 className="text-sm font-semibold text-gray-800 mb-2">
+                    <h3 className={clsx("text-sm font-semibold text-gray-800 mb-2", !!limitError && "text-red-600")}>
                       Available Questions ({filteredPreviewQuestions.length})
                     </h3>
                     <p className="text-xs text-gray-500 mb-4">
