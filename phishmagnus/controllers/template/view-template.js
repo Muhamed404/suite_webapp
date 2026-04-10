@@ -59,7 +59,6 @@ exports.viewTemplate = async (req, res) => {
     const selPhish = String(tpl?.PhishingCampaignType?.name).toLowerCase();
     tpl.selPhish = selPhish; // add a view-specific property for easier access in the template
     const filePath = String(tpl.file_attachment_path || '').trim();
-    console.log(filePath);
 
     // extract attachment info using helper
     const filePathRaw = String(tpl.file_attachment_path || tpl.file_attachment || '').trim();

@@ -21,7 +21,6 @@ const { renderAllReports } = require('../controllers/campaign/render-all-reports
 const ThreatReporterRoute  = require('./threat_reporter/threat-reporter-route');
 const PhishingSMTPRoute = require('./phishing_smtp/phishing-smtp-route');
 router.use((req, res, next) => {
-    console.log('[ROUTE] PhishMagnus route used:', req.method, req.originalUrl);
     next();
 });
 
