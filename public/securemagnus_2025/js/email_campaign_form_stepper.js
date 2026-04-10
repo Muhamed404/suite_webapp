@@ -271,7 +271,7 @@ class EmailCampaignStepper {
     const fieldFromData = container.dataset?.field?.trim() || null;
     const fieldFromSelectName = select?.name?.replace(/\[\]$/, '').trim() || null;
     const labelText = container.querySelector('label')?.textContent?.trim() || '';
-    console.log('Tag selector label text:', labelText);
+    // console.log('Tag selector label text:', labelText);
     
     let inferredField = 'field'; // default
     if (labelText.toLowerCase().includes('department') || labelText.includes('قسم') || labelText.includes('القسم')) {
@@ -280,7 +280,7 @@ class EmailCampaignStepper {
       inferredField = 'group';
     }
     
-    console.log('Inferred field type:', inferredField);
+    // console.log('Inferred field type:', inferredField);
 
     const logicalField = fieldFromData || fieldFromSelectName || inferredField;
     let hiddenContainer = container.querySelector('.hidden-inputs');
@@ -531,15 +531,15 @@ class EmailCampaignStepper {
       const departmentIds = document.querySelectorAll('input[name="departmentIds[]"]');
       const groupIds = document.querySelectorAll('input[name="groupIds[]"]');
 
-      console.log('Validation - Department IDs found:', departmentIds.length);
-      console.log('Validation - Group IDs found:', groupIds.length);
+      // console.log('Validation - Department IDs found:', departmentIds.length);
+      // console.log('Validation - Group IDs found:', groupIds.length);
       
       // Debug: Log actual hidden inputs
       departmentIds.forEach((input, index) => {
-        console.log(`Department ${index + 1}: ID=${input.value}, Name=${input.nextElementSibling?.value || 'N/A'}`);
+        // console.log(`Department ${index + 1}: ID=${input.value}, Name=${input.nextElementSibling?.value || 'N/A'}`);
       });
       groupIds.forEach((input, index) => {
-        console.log(`Group ${index + 1}: ID=${input.value}, Name=${input.nextElementSibling?.value || 'N/A'}`);
+        // console.log(`Group ${index + 1}: ID=${input.value}, Name=${input.nextElementSibling?.value || 'N/A'}`);
       });
 
       const hasDepartments = departmentIds.length > 0;
@@ -557,12 +557,12 @@ class EmailCampaignStepper {
           // Check for department (English and Arabic)
           if (labelText.toLowerCase().includes('department') || labelText.includes('قسم') || labelText.includes('القسم')) {
             departmentSelect = selector.querySelector('.groupSelect');
-            console.log('Found department selector with label:', labelText);
+            // console.log('Found department selector with label:', labelText);
           } 
           // Check for group (English and Arabic)
           else if (labelText.toLowerCase().includes('group') || labelText.includes('مجموعة') || labelText.includes('المجموعة')) {
             groupSelect = selector.querySelector('.groupSelect');
-            console.log('Found group selector with label:', labelText);
+            // console.log('Found group selector with label:', labelText);
           }
         }
       });
@@ -571,8 +571,8 @@ class EmailCampaignStepper {
       const hasDepartmentOptions = departmentSelect && departmentSelect.options.length > 1;
       const hasGroupOptions = groupSelect && groupSelect.options.length > 1;
 
-      console.log('Department options available:', hasDepartmentOptions);
-      console.log('Group options available:', hasGroupOptions);
+      // console.log('Department options available:', hasDepartmentOptions);
+      // console.log('Group options available:', hasGroupOptions);
 
       if (!hasDepartmentOptions && !hasGroupOptions) {
         this.showValidationError(window.i18n?.validation_messages?.no_departments_groups || window.i18n?.sms?.validation_messages?.no_departments_groups || 'No departments or groups available. Please add users to departments or groups before creating a campaign.');
@@ -607,14 +607,14 @@ class EmailCampaignStepper {
       }
     }
 
-    console.log('All validations passed for step:', this.currentStep);
+    // console.log('All validations passed for step:', this.currentStep);
     return true;
   }
 
   async validateMemberCount(departmentIds, groupIds) {
-    console.log('=== MEMBER VALIDATION STARTED ===');
-    console.log('Department IDs to check:', Array.from(departmentIds).map(input => input.value));
-    console.log('Group IDs to check:', Array.from(groupIds).map(input => input.value));
+    // console.log('=== MEMBER VALIDATION STARTED ===');
+    // console.log('Department IDs to check:', Array.from(departmentIds).map(input => input.value));
+    // console.log('Group IDs to check:', Array.from(groupIds).map(input => input.value));
     
     try {
       let hasMembers = false;
@@ -651,7 +651,7 @@ class EmailCampaignStepper {
         }
         
         try {
-          console.log(`Checking department ${departmentId} (${departmentName})`);
+          // console.log(`Checking department ${departmentId} (${departmentName})`);
           const response = await fetch(`/department/getUsersByDepartment/${departmentId}`, {
             method: 'GET',
             credentials: 'same-origin',
@@ -660,17 +660,17 @@ class EmailCampaignStepper {
             }
           });
           const data = await response.json();
-          console.log(`Department ${departmentId} response:`, data);
+          // console.log(`Department ${departmentId} response:`, data);
           
           if (data.success && data.assignedUsers && data.assignedUsers.length > 0) {
-            console.log(`Department ${departmentId} has ${data.assignedUsers.length} members`);
+            // console.log(`Department ${departmentId} has ${data.assignedUsers.length} members`);
             hasMembers = true;
           } else {
-            console.log(`Department ${departmentId} has no members`);
+            // console.log(`Department ${departmentId} has no members`);
             emptySelections.push(`Department: ${departmentName}`);
           }
         } catch (error) {
-          console.error(`Error checking department ${departmentId}:`, error);
+          // console.error(`Error checking department ${departmentId}:`, error);
           emptySelections.push(`Department: ${departmentName} (validation failed)`);
         }
       }
@@ -706,7 +706,7 @@ class EmailCampaignStepper {
         }
         
         try {
-          console.log(`Checking group ${groupId} (${groupName})`);
+          // console.log(`Checking group ${groupId} (${groupName})`);
           const response = await fetch(`/group/getUsersByGroup/${groupId}`, {
             method: 'GET',
             credentials: 'same-origin',
@@ -715,13 +715,13 @@ class EmailCampaignStepper {
             }
           });
           const data = await response.json();
-          console.log(`Group ${groupId} response:`, data);
+          // console.log(`Group ${groupId} response:`, data);
           
           if (data.success && data.assignedUsers && data.assignedUsers.length > 0) {
-            console.log(`Group ${groupId} has ${data.assignedUsers.length} members`);
+            // console.log(`Group ${groupId} has ${data.assignedUsers.length} members`);
             hasMembers = true;
           } else {
-            console.log(`Group ${groupId} has no members`);
+            // console.log(`Group ${groupId} has no members`);
             emptySelections.push(`Group: ${groupName}`);
           }
         } catch (error) {
@@ -730,15 +730,15 @@ class EmailCampaignStepper {
         }
       }
       
-      console.log('Member validation summary:');
-      console.log('- hasMembers:', hasMembers);
-      console.log('- emptySelections:', emptySelections);
+      // console.log('Member validation summary:');
+      // console.log('- hasMembers:', hasMembers);
+      // console.log('- emptySelections:', emptySelections);
       
       // If no members found in any selected department or group
       if (!hasMembers && emptySelections.length > 0) {
         const message = window.i18n?.validation_messages?.no_members_in_selection || window.i18n?.sms?.validation_messages?.no_members_in_selection || 
           `The selected departments/groups have no members. Please select departments or groups with members, or add members to the selected ones: ${emptySelections.join(', ')}`;
-        console.log('Showing error for empty selections:', message);
+        // console.log('Showing error for empty selections:', message);
         this.showValidationError(message);
         return false;
       }
@@ -750,7 +750,7 @@ class EmailCampaignStepper {
         console.warn(warningMessage);
       }
       
-      console.log('Step 2 member validation passed!');
+      // console.log('Step 2 member validation passed!');
       return true;
       
     } catch (error) {
@@ -921,23 +921,23 @@ class EmailCampaignStepper {
 
   async loadTemplatePreview(templateId) {
     if (!templateId) {
-      console.log('No templateId provided, clearing preview');
+      // console.log('No templateId provided, clearing preview');
       this.clearTemplatePreview();
       return;
     }
 
-    console.log('Loading template preview for ID:', templateId);
+    // console.log('Loading template preview for ID:', templateId);
     const previewEmpty = document.getElementById('preview-empty');
     const previewContent = document.getElementById('preview-content');
     const previewLoading = document.getElementById('preview-loading');
     const previewError = document.getElementById('preview-error');
 
-    console.log('Preview elements:', {
-      empty: !!previewEmpty,
-      content: !!previewContent,
-      loading: !!previewLoading,
-      error: !!previewError
-    });
+    // console.log('Preview elements:', {
+    //   empty: !!previewEmpty,
+    //   content: !!previewContent,
+    //   loading: !!previewLoading,
+    //   error: !!previewError
+    // });
 
     // Show loading state
     if (previewEmpty) previewEmpty.classList.add('hidden');
@@ -947,7 +947,7 @@ class EmailCampaignStepper {
 
     try {
       const url = `/phm/template/api/view/${templateId}`;
-      console.log('Fetching template from:', url);
+      // console.log('Fetching template from:', url);
       
       const response = await fetch(url, {
         method: 'GET',
@@ -956,7 +956,7 @@ class EmailCampaignStepper {
         }
       });
 
-      console.log('Response status:', response.status, response.statusText);
+      // console.log('Response status:', response.status, response.statusText);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -965,12 +965,12 @@ class EmailCampaignStepper {
       }
 
       const data = await response.json();
-      console.log('Raw API response:', data);
+      // console.log('Raw API response:', data);
       
       this.currentTemplateData = data.message || data.data || data;
       // currentPreviewTab will be set once we know which tabs have content
 
-      console.log('Template Preview Loaded:', this.currentTemplateData);
+      // console.log('Template Preview Loaded:', this.currentTemplateData);
 
       // Hide loading, show content
       if (previewLoading) previewLoading.classList.add('hidden');
@@ -1010,9 +1010,9 @@ class EmailCampaignStepper {
       return null;
     }
 
-    console.log('Setting up preview navigation with data:', this.currentTemplateData);
+    // console.log('Setting up preview navigation with data:', this.currentTemplateData);
     const buttons = document.querySelectorAll('.preview-nav-btn');
-    console.log('Found preview navigation buttons:', buttons.length);
+    // console.log('Found preview navigation buttons:', buttons.length);
     let firstVisibleTab = null;
     
     buttons.forEach(btn => {
@@ -1035,14 +1035,14 @@ class EmailCampaignStepper {
           hasContent = !!(this.currentTemplateData.landing_page_content || 
                          this.currentTemplateData.landing_page || 
                          this.currentTemplateData.landing_page_html);
-          console.log(`Landing page content available: ${hasContent}`);
+          // console.log(`Landing page content available: ${hasContent}`);
           break;
         case 'redirect':
           hasContent = !!(this.currentTemplateData.phishing_page_content || 
                          this.currentTemplateData.redirect_page || 
                          this.currentTemplateData.redirection_page || 
                          this.currentTemplateData.redirect_page_html);
-          console.log(`Redirect page content available: ${hasContent}`);
+          // console.log(`Redirect page content available: ${hasContent}`);
           break;
         case 'attachment':
           hasContent = !!(this.currentTemplateData.file_attachment_path || 
@@ -1052,7 +1052,7 @@ class EmailCampaignStepper {
                          this.currentTemplateData.file_url || 
                          this.currentTemplateData.file_attachment) &&
                        !!(this.currentTemplateData.inv && this.currentTemplateData.cid);
-          console.log(`Attachment available: ${hasContent}`);
+          // console.log(`Attachment available: ${hasContent}`);
           break;
       }
 
@@ -1071,10 +1071,10 @@ class EmailCampaignStepper {
         btn.parentNode.replaceChild(newBtn, btn);
         newBtn.onclick = (e) => {
           e.preventDefault();
-          console.log(`Button clicked for tab: ${tab}`);
+          // console.log(`Button clicked for tab: ${tab}`);
           this.showPreviewTab(tab);
         };
-        console.log(`Added click handler for ${tab} tab`);
+        // console.log(`Added click handler for ${tab} tab`);
       }
     });
 
