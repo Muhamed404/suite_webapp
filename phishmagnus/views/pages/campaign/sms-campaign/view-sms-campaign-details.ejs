@@ -633,7 +633,6 @@
             // Convert to boolean if needed
             const isSmsDelivered = response.is_sms_delivered === 1 || response.is_sms_delivered === true || response.is_sms_delivered === 'true';
             const isLinkClicked = response.is_link_clicked === 1 || response.is_link_clicked === true || response.is_link_clicked === 'true';
-            console.log('isLinkClicked:', isLinkClicked);
             const isPageVisited = response.is_page_visited === 1 || response.is_page_visited === true || response.is_page_visited === 'true';
             const isFormInteracted = response.is_form_interacted === 1 || response.is_form_interacted === true || response.is_form_interacted === 'true';
             const isFormSubmitted = response.is_form_submitted === 1 || response.is_form_submitted === true || response.is_form_submitted === 'true';

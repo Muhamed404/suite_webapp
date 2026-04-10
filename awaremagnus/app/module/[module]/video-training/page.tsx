@@ -33,6 +33,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   const [sentProgressMilestones, setSentProgressMilestones] = useState<{
     [key: number]: { lastReported: number };
   }>({});
+  const [sendingProgress, setSendingProgress] = useState<Set<number>>(new Set());
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
   const lastSentPercentRef = useRef<{ [key: number]: number }>({});
   const videoIntervals = useRef<{ [key: number]: ReturnType<typeof setInterval> | null }>({});
@@ -495,8 +496,11 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                       </p>
                       <div className="mt-2">
                         <button
-                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
-                          onClick={() => {
+                          className={`border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition ${
+                            sendingProgress.has(content.id) ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          disabled={sendingProgress.has(content.id)}
+                          onClick={async () => {
                             const v = videoRefs.current[content.id];
 
                             if (!v || !v.duration || isNaN(v.duration)) return;
@@ -506,15 +510,25 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
 
                             // Only send if current progress is strictly higher than what was already saved
                             if (pct <= lastReported) return;
-                            updateVideoProgress(content.id, pct);
-                            setSentProgressMilestones((prev) => ({
-                              ...prev,
-                              [content.id]: { lastReported: pct },
-                            }));
-                            lastSentPercentRef.current[content.id] = pct;
+
+                            setSendingProgress(prev => new Set(prev).add(content.id));
+                            try {
+                              await updateVideoProgress(content.id, pct);
+                              setSentProgressMilestones((prev) => ({
+                                ...prev,
+                                [content.id]: { lastReported: pct },
+                              }));
+                              lastSentPercentRef.current[content.id] = pct;
+                            } finally {
+                              setSendingProgress(prev => {
+                                const next = new Set(prev);
+                                next.delete(content.id);
+                                return next;
+                              });
+                            }
                           }}
                         >
-                          {t("videoTraining.sendProgress")}
+                          {sendingProgress.has(content.id) ? t("videoTraining.sendingProgress") : t("videoTraining.sendProgress")}
                         </button>
                       </div>
                     </div>

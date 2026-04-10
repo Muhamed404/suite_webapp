@@ -490,34 +490,6 @@ export default function CampaignDetailsPage() {
                   )}
                 </div>
 
-                <div className="space-y-1.5 pt-3 border-t border-gray-200">
-                  <label className="flex items-center gap-1.5 text-gray-700 font-medium text-xs">
-                    <input
-                      readOnly
-                      checked={campaignDashboard?.status_id === 2}
-                      className="w-3.5 h-3.5 rounded border-gray-400"
-                      type="checkbox"
-                    />
-                    Campaign Status
-                  </label>
-
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-600 text-xs">
-                      {campaignDashboard?.status_id === 2 ? "Active" : "Inactive"}
-                    </span>
-
-                    <label className="relative inline-flex items-center">
-                      <input
-                        readOnly
-                        checked={campaignDashboard?.status_id === 2}
-                        className="sr-only peer"
-                        type="checkbox"
-                      />
-                      <div className="w-6 h-3 bg-gray-400 peer-checked:bg-blue-500 rounded-full transition" />
-                      <div className="absolute left-[0px] top-[1.2px] bg-white w-2.5 h-2.5 rounded-full peer-checked:translate-x-3 transition" />
-                    </label>
-                  </div>
-                </div>
                 {/* Enabled Features */}
                 <div className="pt-3 border-t border-gray-200">
                   <h4 className="text-gray-700 font-medium text-xs mb-2">Enabled Features</h4>
@@ -1279,7 +1251,7 @@ export default function CampaignDetailsPage() {
                   variant="light"
                   onClick={() =>
                     router.push(
-                      `/dashboard/launch-awareness/campaigns/${campaignId}/employees?risk=high`
+                      `/dashboard/launch-awareness/campaigns/leaderboard?campaign=${campaignId}`
                     )
                   }
                 >
@@ -1341,7 +1313,7 @@ export default function CampaignDetailsPage() {
                   variant="light"
                   onClick={() =>
                     router.push(
-                      `/dashboard/launch-awareness/campaigns/${campaignId}/employees?risk=low`
+                      `/dashboard/launch-awareness/campaigns/leaderboard?campaign=${campaignId}`
                     )
                   }
                 >
