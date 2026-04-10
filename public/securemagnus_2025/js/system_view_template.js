@@ -381,6 +381,29 @@ let currentStep = 0;
   }
 
   function handleNext() {
+    if (selectedPhishType === 'email' && currentStep === (phishing_content_screen - 1)) {
+      const smtpSelect = document.getElementById('phishing_smtp');
+      if (smtpSelect && !smtpSelect.value) {
+        smtpSelect.classList.add('border-red-500');
+
+        let inlineError = document.getElementById('phishing-smtp-inline-error');
+        if (!inlineError) {
+          inlineError = document.createElement('div');
+          inlineError.id = 'phishing-smtp-inline-error';
+          inlineError.className = 'text-red-500 text-sm mt-1';
+          smtpSelect.parentNode.appendChild(inlineError);
+        }
+        inlineError.textContent = (window.i18n && window.i18n.__)
+          ? window.i18n.__('system_template.create.selectPhishingSmtp')
+          : 'Please select an email domain.';
+        return;
+      }
+
+      const inlineError = document.getElementById('phishing-smtp-inline-error');
+      if (smtpSelect) smtpSelect.classList.remove('border-red-500');
+      if (inlineError) inlineError.remove();
+    }
+
     saveDataForStep(currentStep);
     if (currentStep === 0) {
       const sel = formData.step1 && formData.step1.phishType;
