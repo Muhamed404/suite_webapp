@@ -104,8 +104,9 @@
 		"show": "Show",
 		"select_template_to_preview": "Select a template to preview",
 		"emailOpened": "Track email opened",
-		"fileDownloaded": "generic_label.fileDownloaded",
-		"qrScanned": "generic_label.qrScanned"
+		"fileDownloaded": "Download",
+		"qrScanned": "Scanned",
+		"select": "Select"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -1090,7 +1091,8 @@
 			"sender_id_minlength": "Please enter at least 2 characters.",
 			"api_key_minlength": "Please enter at least 8 characters.",
 			"create_success": "SMS Configuration created successfully.",
-			"create_failed": "SMS creation failed."
+			"create_failed": "SMS creation failed.",
+			"create_description": "Description"
 		},
 		"create_campaign": {
 			"title": "Create SMS Campaign",
@@ -1107,7 +1109,8 @@
 			"select_template": "Select Template",
 			"select_target_audience": "Select Target Audience",
 			"select_department": "Select Department",
-			"select_group": "Select Group"
+			"select_group": "Select Group",
+			"fb_account_required": "To launch an SMS campaign, a registered SMS provider account is required."
 		},
 		"validation_messages": {
 			"campaign_name_required": "Campaign name is required (minimum 2 characters).",
@@ -1208,7 +1211,8 @@
 			"select_template": "Select Template",
 			"select_target_audience": "Select Target Audience",
 			"select_department": "Select Department",
-			"select_group": "Select Group"
+			"select_group": "Select Group",
+			"fb_account_required": "To launch a WhatsApp campaign, a Facebook (Meta) Business account is required."
 		},
 		"campaign_report": {
 			"title": "WhatsApp Campaign Reports",
