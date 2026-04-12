@@ -60,15 +60,31 @@ $(document).ready(function () {
                 // Assuming response.availableLicenses contains the number
                 var licenseText = $('#alertLicenseAvailability').data('license-text') || 'Available Users License';
                 var available = response.filteredLicense.availableLicenses;
-                $('#alertLicenseAvailability').val(licenseText + ': ' + available);
-                if (available > 1) {
-                    $('#nextBtn').prop('disabled', false); // enable the button
-                    $('#nextBtn').removeClass('opacity-50 cursor-not-allowed bg-[var(--teal)] hover:bg-teal-500');
-                    $('#nextBtn').addClass('bg-green-500 hover:bg-green-600'); // turn green
+                var phishLicenses = response.filteredLicense.phishLicenses;
+                var awareLicenses = response.filteredLicense.awareLicenses;
+                
+                if (selectedProduct == 4) { // All
+                    $('#alertLicenseAvailability').val('Phish: ' + (phishLicenses || 0) + ', Aware: ' + (awareLicenses || 0));
+                    if ((phishLicenses > 0) && (awareLicenses > 0)) {
+                        $('#nextBtn').prop('disabled', false); // enable the button
+                        $('#nextBtn').removeClass('opacity-50 cursor-not-allowed bg-[var(--teal)] hover:bg-teal-500');
+                        $('#nextBtn').addClass('bg-green-500 hover:bg-green-600'); // turn green
+                    } else {
+                        $('#nextBtn').prop('disabled', true); // disable the button
+                        $('#nextBtn').addClass('opacity-50 cursor-not-allowed');
+                        $('#nextBtn').removeClass('bg-green-500 hover:bg-green-600 bg-[var(--teal)] hover:bg-teal-500');
+                    }
                 } else {
-                    $('#nextBtn').prop('disabled', true); // disable the button
-                    $('#nextBtn').addClass('opacity-50 cursor-not-allowed');
-                    $('#nextBtn').removeClass('bg-green-500 hover:bg-green-600 bg-[var(--teal)] hover:bg-teal-500');
+                    $('#alertLicenseAvailability').val(licenseText + ': ' + available);
+                    if (available > 0) {
+                        $('#nextBtn').prop('disabled', false); // enable the button
+                        $('#nextBtn').removeClass('opacity-50 cursor-not-allowed bg-[var(--teal)] hover:bg-teal-500');
+                        $('#nextBtn').addClass('bg-green-500 hover:bg-green-600'); // turn green
+                    } else {
+                        $('#nextBtn').prop('disabled', true); // disable the button
+                        $('#nextBtn').addClass('opacity-50 cursor-not-allowed');
+                        $('#nextBtn').removeClass('bg-green-500 hover:bg-green-600 bg-[var(--teal)] hover:bg-teal-500');
+                    }
                 }
             },
             error: function () {
