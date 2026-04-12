@@ -1001,8 +1001,7 @@
 			"select_template": "اختر القالب",
 			"select_target_audience": "اختر الجمهور المستهدف",
 			"select_department": "اختر القسم",
-			"select_group": "اختر المجموعة",
-			"fb_account_required": "لإطلاق حملة رسائل قصيرة، يلزم وجود حساب مزود خدمة SMS مسجّل."
+			"select_group": "اختر المجموعة"
 		},
 		"validation_messages": {
 			"campaign_name_required": "اسم الحملة مطلوب (حد أدنى حرفين).",
@@ -1796,8 +1795,7 @@
 			"select_group": "اختر المجموعة",
 			"select_date_time": "اختر التاريخ والوقت",
 			"start_time": "وقت البدء *",
-			"end_time": "وقت الانتهاء",
-			"fb_account_required": "لإطلاق حملة واتساب، يلزم وجود حساب فيسبوك (ميتا) للأعمال."
+			"end_time": "وقت الانتهاء"
 		},
 		"campaign_report": {
 			"title": "تقارير حملات واتساب",
