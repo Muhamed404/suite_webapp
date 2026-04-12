@@ -39,11 +39,22 @@ exports.retrieveLicenseInformationByProductEnumKey = async (req, res) => {
             filteredLicense = { availableLicenses: filteredLicense.AwareMagnus.Subscription.TotalAvailable };
         } else if (selectedProductKey !== undefined && Number(selectedProductKey) === Number(enums.Product_Selection.GRC)) {
             filteredLicense = { availableLicenses: filteredLicense.GRC.Subscription.TotalAvailable };
+        } else if (selectedProductKey !== undefined && Number(selectedProductKey) === Number(enums.Product_Selection.All)) {
+            const phishLicenses = filteredLicense.PhishMagnus ? filteredLicense.PhishMagnus.Subscription.TotalAvailable : 0;
+            const awareLicenses = filteredLicense.AwareMagnus ? filteredLicense.AwareMagnus.Subscription.TotalAvailable : 0;
+            filteredLicense = { 
+                availableLicenses: Math.min(phishLicenses, awareLicenses),
+                phishLicenses: phishLicenses,
+                awareLicenses: awareLicenses
+            };
         } else {
             filteredLicense = { availableLicenses: 0 };
         }
         logger.info(`[Retrieve License By Product Enum Key]: Filtered License: ${JSON.stringify(filteredLicense, null, 2)}`);
-        if (filteredLicense.availableLicenses > 0) {
+        if (Number(selectedProductKey) === Number(enums.Product_Selection.All)) {
+            // For All, always return success to show both licenses
+            return res.status(200).send({ filteredLicense });
+        } else if (filteredLicense.availableLicenses > 0) {
             return res.status(200).send({ filteredLicense });
         }
         return res.status(400).send({ filteredLicense: { availableLicenses: 0 } });
