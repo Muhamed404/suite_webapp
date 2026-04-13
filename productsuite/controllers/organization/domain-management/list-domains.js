@@ -33,6 +33,8 @@ exports.listDomains = async (req, res) => {
         // console.log('Is read-only access:', isReadOnly);
         return res.render(render_ejs_urls.ProductSuiteManagement.Domain_Management.Render_List_DMS, {
             domains,
+            enableSuiteManagementLeftMenu: true,
+
             isReadOnly,
             domainRestriction,
             orgId,
