@@ -5,6 +5,7 @@ import { useState } from "react";
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { useAchievementStatistics } from "@/hooks/useDashboard";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { useTranslations } from "@/i18n/useTranslations";
 import Image from "next/image";
 
 interface Achievement {
@@ -19,6 +20,7 @@ interface Achievement {
 function MyAchievementsContent() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const { data: achievementData } = useAchievementStatistics();
+  const t = useTranslations("dashboard");
 
   const achievements = achievementData?.object?.achievement_statistics || [];
 
@@ -27,7 +29,7 @@ function MyAchievementsContent() {
       <div className="p-3">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl font-semibold">Achievement History</h1>
+          <h1 className="text-xl font-semibold">{t("gamification.achievementHistory")}</h1>
 
           {/* View Toggle */}
           <div className="flex gap-2">
@@ -102,6 +104,21 @@ function MyAchievementsContent() {
             </div>
           ))}
         </div>
+
+        {/* Fallback for empty achievements */}
+        {achievements.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12">
+            <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-gray-400">
+                <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{t("gamification.noAchievementsYet")}</h3>
+            <p className="text-sm text-gray-500 text-center max-w-md">
+              {t("gamification.noAchievementsMessage")}
+            </p>
+          </div>
+        )}
       </div>
     </main>
   );
