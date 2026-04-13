@@ -14,20 +14,20 @@
                     class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50"
                     tabindex="1">
                     <option value="" disabled selected><%= __("user.optionSelectUserRole") %></option>
-                    <% if (typeof roles !=='undefined' && roles) { %>
+                   <% if (typeof roles !=='undefined' && roles) { %>
                         <% 
                         const roleDisplayMap = {
-                          'Org User': 'End-user'
+                          'Org User': 'End-user',
+                          'Sub Org User': 'Organization Sub-Admin',
+                          'Super Org User': 'Organization Superadmin'
                         };
                         %>
                         <% roles.forEach(role=> { %>
-                            <% if (role.role_name !== 'Sub Org User' && role.role_name !== 'Super Org User') { %>
                             <option value="<%= role.id %>">
                                 <%= roleDisplayMap[role.role_name] || role.role_name %>
                             </option>
-                            <% } %>
-                        <% }); %>
-                        <% } %>
+                            <% }); %>
+                                <% } %>
                 </select>
             </div>
             <div>
