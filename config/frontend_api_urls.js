@@ -33,6 +33,11 @@ module.exports = {
             LIST: '/service-registry/',
             EDIT_SERVICE: (serviceId) => `/service-registry/update/${serviceId}`,
         },
+        Notification_Template: {
+            LIST: '/notification-template',
+            CREATE: '/notification-template/create',
+            EDIT: (id) => `/notification-template/${id}/edit`,
+        },
         Subscription: {
             CREATE: (organizationId) => `/subscription/create/${organizationId}`,
             PROFILE: (organizationId) => `/organization/profile/${organizationId}`,

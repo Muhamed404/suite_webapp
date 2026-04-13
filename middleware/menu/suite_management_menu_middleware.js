@@ -104,6 +104,10 @@ function generateSuiteManagementMenu(req, organization) {
         {
           labelKey: "menu.suite.smtpNotifications",
           link: "/settings/smtp/"
+        },
+        {
+          labelKey: "menu.suite.notificationTemplates",
+          link: "/notification-template/"
         }
       ]
     }
