@@ -78,6 +78,9 @@
     "achievementGallery": "معرض الإنجازات",
     "achievementSubtitle": "شارات المؤسسة المقفلة والمفتوحة",
     "achievements": "الإنجازات",
+    "noAchievementsYet": "لا توجد إنجازات بعد",
+    "noAchievementsMessage": "ابدأ بالمشاركة في الحملات والوحدات لفتح إنجازك الأول!",
+    "achievementHistory": "تاريخ الإنجازات",
     "employeeAvatarLevel": "مستوى أفاتار الموظف",
     "vulnerableNewbie": "مبتدئ\nمعرّض",
     "levels": {
