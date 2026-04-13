@@ -182,7 +182,6 @@ function deleteTemplate(url, templateName) {
     },
   })
     .then(response => {
-      console.log('Delete request completed with status:', response.status);
       setTimeout(() => {
         location.reload();
       }, 500);

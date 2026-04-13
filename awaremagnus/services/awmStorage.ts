@@ -35,7 +35,8 @@ export type AssetType = "contents" | "certificates" | "module_translations";
  * Next.js proxy at `/awm/{assetType}/...`.
  *
  * Handles:
- *  - Absolute URLs (http/https) → returned as-is
+ *  - Absolute backend asset URLs (http/https + /{assetType}/...) → rewritten to /awm/... proxy
+ *  - Other absolute URLs (http/https) → returned as-is
  *  - Already-prefixed paths (/awm/...) → returned as-is
  *  - Bare video platform domains → https:// prepended
  *  - Paths starting with /{assetType}/ → /awm prepended
@@ -52,8 +53,24 @@ export function resolveAssetUrl(
   if (!path?.trim()) return "";
   const trimmed = path.trim();
 
-  // Already absolute → return as-is
+  // Absolute backend upload URLs should be proxied via /awm/{type}/...
+  // so client never depends on backend hostnames.
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    try {
+      const parsed = new URL(trimmed);
+      const marker = `/${type}/`;
+      const lowerPath = parsed.pathname.toLowerCase();
+      const markerIndex = lowerPath.indexOf(marker);
+
+      if (markerIndex >= 0) {
+        const relativeAssetPath = parsed.pathname.slice(markerIndex);
+
+        return `${AWM_BASE_PATH}${relativeAssetPath}${parsed.search}`;
+      }
+    } catch {
+      // If URL parsing fails, keep original value.
+    }
+
     return trimmed;
   }
 

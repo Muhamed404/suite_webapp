@@ -100,18 +100,34 @@ function initSMTPFormValidator(config) {
       },
       errorElement: 'span',
       errorPlacement: function(error, element) {
-        error.addClass('text-red-500 text-sm mt-1 block');
-        error.insertAfter(element);
+        // Don't place errors inline, we'll show them in the alert box
       },
       highlight: function(element) {
         $(element).removeClass('focus:ring-teal-400').addClass('border-red-500 focus:ring-red-400');
       },
       unhighlight: function(element) {
         $(element).removeClass('border-red-500 focus:ring-red-400').addClass('focus:ring-teal-400');
-      },
-      submitHandler: function(form) {
-        // Form is valid, submit it
-        form.submit();
+      }
+    });
+
+    // Override form submit to show validation errors
+    $('#smtpSettingsForm').on('submit', function(e) {
+      // Clear any existing validation error
+      $('#step-validation-error').remove();
+      
+      // Check if form is valid
+      if (!$(this).valid()) {
+        e.preventDefault();
+        // Collect all error messages
+        var validator = $(this).validate();
+        var errors = [];
+        for (var field in validator.errorMap) {
+          errors.push(validator.errorMap[field]);
+        }
+        if (errors.length > 0) {
+          showValidationError(errors.join('<br>'));
+        }
+        return false;
       }
     });
 
@@ -148,12 +164,27 @@ function initSMTPFormValidator(config) {
     // Add real-time validation on blur
     $('#smtpSettingsForm input, #smtpSettingsForm textarea').on('blur', function() {
       $(this).valid();
+      // Check if there are any invalid fields and show error
+      var validator = $('#smtpSettingsForm').validate();
+      var hasErrors = false;
+      var errors = [];
+      for (var field in validator.errorMap) {
+        hasErrors = true;
+        errors.push(validator.errorMap[field]);
+      }
+      if (hasErrors) {
+        showValidationError(errors.join('<br>'));
+      } else {
+        $('#step-validation-error').remove();
+      }
     });
 
     // Clear validation error on focus
     $('#smtpSettingsForm input, #smtpSettingsForm textarea').on('focus', function() {
       $(this).removeClass('border-red-500 focus:ring-red-400');
       $(this).next('span.text-red-500').remove();
+      // Also remove the alert box error
+      $('#step-validation-error').remove();
     });
 
     // Port number additional validation for common SMTP ports
@@ -218,4 +249,38 @@ function initSMTPFormValidator(config) {
       });
     });
   });
+}
+
+// Show validation error in alert box format like email campaign page
+function showValidationError(message) {
+  // Create or get error message container
+  let errorContainer = document.getElementById('step-validation-error');
+
+  if (!errorContainer) {
+    errorContainer = document.createElement('div');
+    errorContainer.id = 'step-validation-error';
+    errorContainer.className = 'bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4';
+    errorContainer.setAttribute('role', 'alert');
+
+    // Insert before the form
+    const formElement = document.getElementById('smtpSettingsForm');
+    if (formElement) {
+      formElement.parentNode.insertBefore(errorContainer, formElement);
+    }
+  }
+
+  errorContainer.innerHTML = `
+    <div class="flex items-start">
+      <span class="flex-shrink-0 mr-2">⚠️</span>
+      <div class="flex-1">
+        <strong class="font-medium">${window.i18n?.validation_messages?.validation_error || 'Validation Error:'}</strong>
+        <span class="block mt-1">${message}</span>
+      </div>
+      <button type="button" class="ml-4 text-red-700 hover:text-red-900" onclick="this.parentElement.parentElement.remove()">
+        ✕
+      </button>
+    </div>
+  `;
+
+  errorContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }

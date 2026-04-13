@@ -13,7 +13,7 @@
                     class="w-full px-4 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50"
                     tabindex="1">
                     <option value="" disabled selected><%= __("user.labelSelectProduct") %></option>
-                    <% Object.entries(Applications).forEach(([key, value]) => { %>
+                    <% Object.entries(Applications).filter(([key]) => key !== 'GRC').forEach(([key, value]) => { %>
                         <option value="<%= value %>"><%= key %></option>
                     <% }) %>
                 </select>

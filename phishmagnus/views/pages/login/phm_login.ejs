@@ -99,6 +99,7 @@
 
       <!-- Login Form -->
 <form id="loginForm" action="/login" method="POST">
+        <input type="hidden" name="userTimezone" id="userTimezone">
       <div class="flex items-center justify-center">
         <div class="flex flex-col max-w-2xl items-stretch ">
 
@@ -197,6 +198,12 @@
   </div>
 
 
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function () {
+      document.getElementById('userTimezone').value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    });
+  </script>
 
 </body>
 

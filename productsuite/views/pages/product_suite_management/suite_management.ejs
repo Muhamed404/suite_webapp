@@ -166,7 +166,7 @@
                         <img src="/securemagnus_2025/images/awarenessMagnus-logo.svg" class="max-w-48 md:max-w-64" alt="">
 
                         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:gap-3 w-full md:w-auto">
-                            <a href="/home/redirect-to-awm"
+                            <a href="/home/redirect-to-awm" data-awm-access-link="true"
                                 class="flex items-center justify-center gap-3 px-4 py-2 md:px-6 lg:px-9 md:py-2.5 lg:py-3 rounded-full bg-transparent text-[var(--blue)] border border-[var(--blue)] transition-all duration-300 hover:bg-[var(--blue)] hover:text-white text-sm md:text-base whitespace-nowrap">
                                 <%= __("productsuite.btn.dashboard") %>
                             </a>
@@ -176,7 +176,7 @@
                                 <%= __("productsuite.btn.subscription") %>
                             </a>
 
-                            <a href="/home/redirect-to-awm"
+                            <a href="/home/redirect-to-awm" data-awm-access-link="true"
                                 class="flex items-center justify-center gap-3 px-4 py-2 md:px-6 lg:px-9 md:py-2.5 lg:py-3 rounded-full bg-[var(--blue)] text-white border border-[var(--blue)] transition-all duration-300 hover:bg-transparent hover:text-[var(--blue)] text-sm md:text-base whitespace-nowrap">
                                 <%= __("productsuite.btn.openProduct") %>
 
@@ -279,7 +279,7 @@
                             </div>
                                 <%}else{%>
                                     <div class="col-span-2 md:col-span-6 md:row-span-1">
-        <a href="/home/redirect-to-awm"
+                <a href="/home/redirect-to-awm" data-awm-access-link="true"
           class="flex items-center justify-center gap-3 px-4 md:px-6 py-3 rounded-full bg-[var(--blue)] text-white border border-[var(--blue)] transition-all duration-300 hover:bg-transparent hover:text-[var(--blue)] text-sm md:text-base">
           <%= __("productsuite.btn.dashboard") %>
 
@@ -323,7 +323,23 @@
   data-phm-consumed="<%= phmConsumeLicense || 0 %>"
   data-awm-purchased="<%= awmPurchasedLicense || 0 %>"
   data-awm-consumed="<%= awmConsumeLicense || 0 %>"
+    data-awm-subscription="<%= locals_awm_subscription ? 'true' : 'false' %>"
+    data-awm-expiry="<%= awmLicenseExpiry || 'N/A' %>"
   data-locale="<%= locals.locale || 'en' %>"></div>
+
+<div id="awm-access-modal" class="hidden fixed inset-0 z-50 bg-black/50 items-center justify-center px-4" role="dialog" aria-modal="true" aria-labelledby="awm-access-modal-title">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-xl p-6">
+        <h3 id="awm-access-modal-title" class="text-xl font-semibold text-gray-900 mb-2">Access Restricted</h3>
+        <p class="text-sm md:text-base text-gray-600 mb-6">
+            You do not have an active AwareMagnus subscription or available license. Please contact your administrator.
+        </p>
+        <div class="flex justify-end">
+            <button type="button" id="awm-access-modal-close" class="px-5 py-2 rounded-full bg-[var(--blue)] text-white border border-[var(--blue)] transition-all duration-300 hover:bg-transparent hover:text-[var(--blue)]">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
 
 <script>
   function toArabicNum(num) {
@@ -343,6 +359,51 @@
     const phmConsumeLicense = Number(statsEl.dataset.phmConsumed || 0);
     const awmPurchasedLicense = Number(statsEl.dataset.awmPurchased || 0);
     const awmConsumeLicense = Number(statsEl.dataset.awmConsumed || 0);
+        const awmHasSubscription = statsEl.dataset.awmSubscription === "true";
+        const awmExpiry = statsEl.dataset.awmExpiry || "N/A";
+
+        const awmAccessLinks = document.querySelectorAll('[data-awm-access-link="true"]');
+        const awmModal = document.getElementById("awm-access-modal");
+        const awmModalCloseBtn = document.getElementById("awm-access-modal-close");
+
+        const hasLicenseOrSubscriptionIssue = (() => {
+            if (!awmHasSubscription) return true;
+            if (awmPurchasedLicense <= 0) return true;
+            if (awmExpiry !== "N/A" && new Date(awmExpiry) < new Date()) return true;
+            return false;
+        })();
+
+        const openAwmModal = () => {
+            if (!awmModal) return;
+            awmModal.classList.remove("hidden");
+            awmModal.classList.add("flex");
+        };
+
+        const closeAwmModal = () => {
+            if (!awmModal) return;
+            awmModal.classList.add("hidden");
+            awmModal.classList.remove("flex");
+        };
+
+        awmAccessLinks.forEach((link) => {
+            link.addEventListener("click", (event) => {
+                if (!hasLicenseOrSubscriptionIssue) return;
+                event.preventDefault();
+                openAwmModal();
+            });
+        });
+
+        if (awmModalCloseBtn) {
+            awmModalCloseBtn.addEventListener("click", closeAwmModal);
+        }
+
+        if (awmModal) {
+            awmModal.addEventListener("click", (event) => {
+                if (event.target === awmModal) {
+                    closeAwmModal();
+                }
+            });
+        }
 
     const originalSetProgress = window.setProgress;
     window.setProgress = function(circleId, textId, ...args) {

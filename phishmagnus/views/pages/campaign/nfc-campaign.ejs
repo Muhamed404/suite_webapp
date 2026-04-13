@@ -77,12 +77,6 @@ include('../../../../phishmagnus/views/layout/layout-ending.ejs') %>
               dataSrc: '',
               success: function (data) {
                 //alert('vvvvvvvv')
-                // This will log the response data
-                console.log('Response from the backend:', data);
-
-                // If needed, you can also check the structure of the data
-                console.log('First item in the response:', data[0]); // Example to print the first record
-
                 // After logging the data, DataTable will be populated as usual
                 dataTableCompleted.clear().rows.add(data).draw();
               },

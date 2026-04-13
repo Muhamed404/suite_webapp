@@ -1,9 +1,6 @@
 const { logger } = require("../../../logger/logger");
-const jwt = require('jsonwebtoken');
 const getApiClient = require('../../../utility/api-client');
-const envConfig = require("../../../config/env.config");
 const RENDER_PAGE_URLS = require('../../../config/render_ejs_urls');
-const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 exports.renderLoginPage = (req, res) => {
     logger.info('[Render Login Page]: Product Suite Incoming request' + req.originalUrl)
@@ -60,6 +57,7 @@ exports.postLogin = async (req, res) => {
     logger.info(`[PSuite Login Controller]: POST: Authenticating via ${loginUrl}`);
 
     try {
+        let userTimezone = req.body.userTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
         const { data } = await apiClient.post(loginUrl, { email, password, userTimezone });
         // logger.info(`[PSuite Login Controller]: POST: Received login response: ${JSON.stringify(data, null, 2)}`);

@@ -9,6 +9,7 @@ const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const axios = require("axios");
+const moment = require('moment');
 
 exports.usbCampaignViewReport = async (req, res) => {
   try {
@@ -25,6 +26,11 @@ exports.usbCampaignViewReport = async (req, res) => {
     const campaigns = result.data;
     logger.info(`Controller - USB Campaign View Report - Data fetched successfully`);
     logger.info(`Controller - USB Campaign View Report - ${JSON.stringify(campaigns, null, 2)}`);
+
+    // Format the start_datetime
+    if (campaigns && campaigns.start_datetime) {
+      campaigns.start_datetime = moment(campaigns.start_datetime).format('DD-MMM-YYYY hh:mm A');
+    }
 
     const pageSize = 5;
     const currentPage = 1;

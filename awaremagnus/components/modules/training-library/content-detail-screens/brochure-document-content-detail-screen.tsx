@@ -28,6 +28,18 @@ const PdfViewer = dynamic(
 
 /** Demo fallback when brochure/document URL fails or is missing (file in public folder). */
 const BROCHURE_DOCUMENT_FALLBACK_PDF = getContentAssetUrl("/brochure.pdf");
+const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg"]);
+const DOC_EXTENSIONS = new Set(["doc", "docx"]);
+
+function extractFileExtension(url: string | null | undefined): string | null {
+  if (!url?.trim()) return null;
+  const cleanUrl = url.trim().split("?")[0].split("#")[0];
+  const lastDot = cleanUrl.lastIndexOf(".");
+
+  if (lastDot < 0 || lastDot === cleanUrl.length - 1) return null;
+
+  return cleanUrl.slice(lastDot + 1).toLowerCase();
+}
 
 function moduleName(m: Module): string {
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
@@ -143,6 +155,22 @@ export function BrochureDocumentContentDetailScreen({
 
   const logoUrl = content?.logo_url || (content as any)?.logo_path;
   const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
+  const fileExtension = extractFileExtension(docSourceUrl ?? fullDocUrl);
+  const isPdfFile = fileExtension == null || fileExtension === "pdf";
+  const isImageFile = fileExtension != null && IMAGE_EXTENSIONS.has(fileExtension);
+  const isDocFile = fileExtension != null && DOC_EXTENSIONS.has(fileExtension);
+  const officePreviewSourceUrl =
+    isDocFile && fullDocUrl
+      ? fullDocUrl.startsWith("http")
+        ? fullDocUrl
+        : typeof window !== "undefined"
+          ? `${window.location.origin}${fullDocUrl}`
+          : null
+      : null;
+  const officeViewerEmbedUrl =
+    officePreviewSourceUrl != null
+      ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(officePreviewSourceUrl)}`
+      : null;
 
   if (content) {
     console.log("COMPLETE IMAGE URL:", completeImageUrl);
@@ -297,7 +325,7 @@ export function BrochureDocumentContentDetailScreen({
                         <div className="w-full h-[500px] flex items-center justify-center bg-gray-100">
                           <div className="animate-pulse w-full h-full bg-gray-200" />
                         </div>
-                      ) : content || docSourceUrl ? (
+                      ) : (content || docSourceUrl) && isPdfFile ? (
                         <PdfViewer
                           authToken={token}
                           className="w-full"
@@ -305,6 +333,43 @@ export function BrochureDocumentContentDetailScreen({
                           resolveUrl={docSourceUrl ? !docSourceUrl.startsWith("http") : true}
                           src={docSourceUrl ?? undefined}
                         />
+                      ) : (content || docSourceUrl) && isImageFile && fullDocUrl ? (
+                        <div className="relative w-full h-[800px] bg-gray-50">
+                          <AuthImage
+                            fill
+                            alt={content ? contentTitle(content) : "Brochure image"}
+                            className="object-contain"
+                            loadingContent={
+                              <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                                <div className="animate-pulse w-full h-full bg-gray-200" />
+                              </div>
+                            }
+                            sizes="100vw"
+                            src={fullDocUrl}
+                          />
+                        </div>
+                      ) : (content || docSourceUrl) && isDocFile && officeViewerEmbedUrl ? (
+                        <iframe
+                          className="w-full h-[800px] border-0 bg-gray-50"
+                          src={officeViewerEmbedUrl}
+                          title={content ? contentTitle(content) : "Document preview"}
+                        />
+                      ) : content || docSourceUrl ? (
+                        <div className="w-full h-[500px] flex flex-col items-center justify-center gap-3 text-gray-600 text-sm bg-gray-50 px-4">
+                          <p>Preview is not available for this file type.</p>
+                          {fullDocUrl ? (
+                            <a
+                              download
+                              className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
+                              href={fullDocUrl}
+                              rel="noopener noreferrer"
+                              target="_blank"
+                            >
+                              {t(downloadLabelKey) ??
+                                (isBrochure ? "Download Brochure" : "Download Document")}
+                            </a>
+                          ) : null}
+                        </div>
                       ) : (
                         <div className="w-full h-64 flex items-center justify-center text-gray-500 text-sm bg-gray-50">
                           Content not found

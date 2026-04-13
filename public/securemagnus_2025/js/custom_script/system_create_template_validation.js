@@ -48,6 +48,12 @@ $(document).ready(function () {
         },
         email: true
       },
+      phishing_smtp: {
+        required: function() {
+          const phishType = $('input[name="phishType"]:checked').val();
+          return phishType === 'email';
+        }
+      },
       sender_display_name: { 
         required: function() {
           const phishType = $('input[name="phishType"]:checked').val();
@@ -126,6 +132,9 @@ $(document).ready(function () {
       sender_email: {
         required: window.i18n?.validation_messages?.sender_email_required || "Sender email is required.",
         email: window.i18n?.validation_messages?.valid_email_required || "Please enter a valid email address."
+      },
+      phishing_smtp: {
+        required: window.i18n?.validation_messages?.selectPhishingSmtp || "Please select an email domain."
       },
       sender_display_name: {
         required: window.i18n?.validation_messages?.sender_name_required || "Sender name is required.",
@@ -250,6 +259,9 @@ $(document).ready(function () {
           isValid = false;
         }
         if (!$('#sender_email').valid()) {
+          isValid = false;
+        }
+        if (!$('#phishing_smtp').valid()) {
           isValid = false;
         }
         if (!$('#sender_display_name').valid()) {

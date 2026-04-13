@@ -192,6 +192,7 @@
     "restart": "Restart",
     "progress": "Progress: {percentage}% ({current} / {total} seconds)",
     "sendProgress": "Send Progress Now",
+    "sendingProgress": "Sending Progress...",
     "defaultTitle": "{moduleName} Motion Video {index}",
     "defaultDescription": "Learn about {moduleName} best practices and protocols",
     "openFullScreen": "Open Full Screen",
