@@ -276,12 +276,17 @@ let currentStep = 0;
 
 
   function updatePhishingPlaceholderVisibility() {
-    // Email placeholders
-    const tagPhishingUrl = document.getElementById('tag_phishing_url');
-    const tagPhishingFile = document.getElementById('tag_phishing_file');
-    // SMS placeholders
-    const tagSmsPhishingUrl = document.getElementById('tag_sms_phishing_url');
-    const tagSmsPhishingFile = document.getElementById('tag_sms_phishing_file');
+    // IDs are duplicated in multiple sections, so update all matching elements.
+    const tagPhishingUrls = document.querySelectorAll('[id="tag_phishing_url"]');
+    const tagPhishingFiles = document.querySelectorAll('[id="tag_phishing_file"]');
+    const tagSmsPhishingUrls = document.querySelectorAll('[id="tag_sms_phishing_url"]');
+    const tagSmsPhishingFiles = document.querySelectorAll('[id="tag_sms_phishing_file"]');
+
+    const setDisplayForAll = (elements, displayValue) => {
+      elements.forEach(el => {
+        el.style.display = displayValue;
+      });
+    };
 
     // Get the selected tracking options from step 2 (stored in formData.step2.options)
     const selectedOptions = (formData.step2 && formData.step2.options) ? formData.step2.options : [];
@@ -297,17 +302,19 @@ let currentStep = 0;
 
       if (hasOnlyEmailLevel1 && !hasLevel2Or3) {
         // Only Level 1 selected - hide both placeholders
-        if (tagPhishingUrl) tagPhishingUrl.style.display = 'none';
-        if (tagPhishingFile) tagPhishingFile.style.display = 'none';
+        setDisplayForAll(tagPhishingUrls, 'none');
+        setDisplayForAll(tagPhishingFiles, 'none');
       } else {
         // Show based on which levels are selected
-        if (tagPhishingUrl) {
-          tagPhishingUrl.style.display = hasLevel3 ? 'inline-block' : 'none';
-        }
-        if (tagPhishingFile) {
-          tagPhishingFile.style.display = hasLevel2 ? 'inline-block' : 'none';
-        }
+        setDisplayForAll(tagPhishingUrls, hasLevel3 ? 'inline-block' : 'none');
+        setDisplayForAll(tagPhishingFiles, hasLevel2 ? 'inline-block' : 'none');
       }
+    }
+
+    // Handle NFC/QR template placeholders (same placeholders as email)
+    if (selectedPhishType === 'nfc' || selectedPhishType === 'qr') {
+      setDisplayForAll(tagPhishingUrls, hasLevel3 ? 'inline-block' : 'none');
+      setDisplayForAll(tagPhishingFiles, hasLevel2 ? 'inline-block' : 'none');
     }
 
     // Handle SMS template placeholders
@@ -316,16 +323,12 @@ let currentStep = 0;
 
       if (hasOnlySmsLevel1 && !hasLevel2Or3) {
         // Only Level 1 selected - hide both placeholders
-        if (tagSmsPhishingUrl) tagSmsPhishingUrl.style.display = 'none';
-        if (tagSmsPhishingFile) tagSmsPhishingFile.style.display = 'none';
+        setDisplayForAll(tagSmsPhishingUrls, 'none');
+        setDisplayForAll(tagSmsPhishingFiles, 'none');
       } else {
         // Show based on which levels are selected
-        if (tagSmsPhishingUrl) {
-          tagSmsPhishingUrl.style.display = hasLevel3 ? 'inline-block' : 'none';
-        }
-        if (tagSmsPhishingFile) {
-          tagSmsPhishingFile.style.display = hasLevel2 ? 'inline-block' : 'none';
-        }
+        setDisplayForAll(tagSmsPhishingUrls, hasLevel3 ? 'inline-block' : 'none');
+        setDisplayForAll(tagSmsPhishingFiles, hasLevel2 ? 'inline-block' : 'none');
       }
     }
   }
@@ -468,15 +471,16 @@ let currentStep = 0;
       selectedPhishType = sel;
       activeFlow = getBaseFlowForType(selectedPhishType);
 
-      // ✅ NEW FEATURE: Hide email if NFC selected
-      if (selectedPhishType === 'nfc' && emailContent) {
+      // ✅ Show/hide Email Subject based on phish type
+      if (selectedPhishType === 'email' && emailContent) {
+        emailContent.style.display = '';
+      } else if ((selectedPhishType === 'nfc' || selectedPhishType === 'qr') && emailContent) {
         emailContent.style.display = 'none';
-        document.getElementById('tag_phishing_url').style.display = 'inline-block';
-      }
-
-      if (selectedPhishType === 'qr' && emailContent) {
+        document.querySelectorAll('[id="tag_phishing_url"]').forEach(el => {
+          el.style.display = 'inline-block';
+        });
+      } else if (emailContent) {
         emailContent.style.display = 'none';
-        document.getElementById('tag_phishing_url').style.display = 'inline-block';
       }
 
 
@@ -503,7 +507,9 @@ let currentStep = 0;
       renderProgressBar();
       if (selectedPhishType === 'sms' && selectedOptions.includes(difficulty_level_download_file)) {
         // Show the button
-        document.getElementById("tag_sms_phishing_file").style.display = "inline-block";
+        document.querySelectorAll('[id="tag_sms_phishing_file"]').forEach(el => {
+          el.style.display = 'inline-block';
+        });
 
       }
       showStep(nextInFlow);
