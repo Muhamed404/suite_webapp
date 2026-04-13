@@ -248,6 +248,9 @@ export const quizService = {
       formData.append("duration", String(payload.duration));
     }
     formData.append("org_id", String(payload.org_id ?? 0));
+    if (payload.parent_content_id !== undefined && payload.parent_content_id !== null) {
+      formData.append("parent_content_id", String(payload.parent_content_id));
+    }
     if (payload.source_url) formData.append("source_url", payload.source_url);
     if (payload.logo) formData.append("logo", payload.logo);
     if (payload.source) formData.append("source", payload.source);
