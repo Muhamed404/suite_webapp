@@ -15,16 +15,9 @@
                     tabindex="1">
                     <option value="" disabled selected><%= __("user.optionSelectUserRole") %></option>
                    <% if (typeof roles !=='undefined' && roles) { %>
-                        <% 
-                        const roleDisplayMap = {
-                          'Org User': 'End-user',
-                          'Sub Org User': 'Organization Sub-Admin',
-                          'Super Org User': 'Organization Superadmin'
-                        };
-                        %>
                         <% roles.forEach(role=> { %>
                             <option value="<%= role.id %>">
-                                <%= roleDisplayMap[role.role_name] || role.role_name %>
+                                <%= role.role_name %>
                             </option>
                             <% }); %>
                                 <% } %>

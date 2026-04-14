@@ -91,6 +91,11 @@ module.exports = {
             LIST: 'pages/service_registry/service_registry_list',
             EDIT_SERVICE: 'pages/service_registry/edit_service_registry',
         },
+        Notification_Template: {
+            LIST: 'pages/notification_template/list-notification-templates',
+            CREATE: 'pages/notification_template/create-notification-template',
+            EDIT: 'pages/notification_template/edit-notification-template',
+        },
         Package_Management: {
             CREATE: 'pages/package/create_package',
         },

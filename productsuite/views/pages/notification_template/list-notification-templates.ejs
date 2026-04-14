@@ -1,0 +1,203 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex-1">
+      <nav class="flex items-center text-[1rem] text-gray-500 gap-2 pb-0 mb-2" aria-label="Breadcrumb">
+        <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+        <span class="text-gray-400">›</span>
+        <span class="font-semibold text-gray-900"><%= __("breadcrumbs.notificationTemplates") %></span>
+      </nav>
+      <h3 class="text-3xl font-medium"><%= __("settings.notificationTemplate.list.title") %></h3>
+      <p class="text-sm text-gray-500 mt-1"><%= __("settings.notificationTemplate.list.subtitle") %></p>
+    </div>
+    <a href="/notification-template/create"
+      class="flex items-center justify-center gap-2 px-5 py-2 rounded-full bg-[var(--teal)] text-white font-semibold shadow hover:opacity-90 transition-all duration-200 whitespace-nowrap">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v8m-4-4h8"/>
+      </svg>
+      <%= __("settings.notificationTemplate.create.title") %>
+    </a>
+  </div>
+</div>
+
+<div class="flex flex-col p-6 pt-0">
+
+  <!-- Search -->
+  <div class="flex items-center justify-end mb-6">
+    <div class="relative">
+      <input id="searchInput" type="text"
+        placeholder="<%= __('settings.notificationTemplate.list.search') %>"
+        class="pl-10 pr-4 py-3 w-72 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="overflow-x-auto bg-white hide-scrollbar rounded-2xl">
+    <table id="notificationTemplateTable" class="min-w-full text-sm text-left">
+      <thead class="bg-[#FAFBFC]">
+        <tr>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">#</th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">
+            <%= __("settings.notificationTemplate.list.columns.name") %>
+          </th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">
+            <%= __("settings.notificationTemplate.list.columns.type") %>
+          </th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">
+            <%= __("settings.notificationTemplate.list.columns.language") %>
+          </th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">
+            <%= __("settings.notificationTemplate.list.columns.subject") %>
+          </th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">
+            <%= __("settings.notificationTemplate.list.columns.status") %>
+          </th>
+          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">
+            <%= __("settings.notificationTemplate.list.columns.actions") %>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <% if (!templates || templates.length === 0) { %>
+          <tr>
+            <td colspan="8" class="px-6 py-12 text-center text-gray-400">
+              <%= __("settings.notificationTemplate.list.empty") %>
+            </td>
+          </tr>
+        <% } else { %>
+          <% templates.forEach(function(tpl, index) { %>
+            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+              <td class="px-6 py-5 text-gray-500 whitespace-nowrap">
+                <%= ((pagination.currentPage - 1) * pagination.pageSize) + index + 1 %>
+              </td>
+              <td class="px-6 py-5 font-medium text-gray-800 whitespace-nowrap">
+                <%= tpl.name %>
+              </td>
+              <td class="px-6 py-5 whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+                  <%= tpl.notification_type %>
+                </span>
+              </td>
+              <td class="px-6 py-5 whitespace-nowrap text-gray-600">
+                <%= tpl.language %>
+              </td>
+              <td class="px-6 py-5 text-gray-600 max-w-xs truncate">
+                <%= tpl.subject || '—' %>
+              </td>
+              <td class="px-6 py-5 whitespace-nowrap">
+                <% if (tpl.is_active) { %>
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-600 border border-green-200">
+                    <%= __("settings.notificationTemplate.list.badge.active") %>
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-500 border border-red-200">
+                    <%= __("settings.notificationTemplate.list.badge.inactive") %>
+                  </span>
+                <% } %>
+              </td>
+              <td class="px-6 py-5 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <a href="/notification-template/<%= tpl.id %>/edit"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                    <%= __("generic_label.edit") %>
+                  </a>
+                  <button type="button"
+                    data-id="<%= tpl.id %>" data-name="<%= tpl.name %>"
+                    onclick="confirmDelete(this)"
+                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0a1 1 0 001-1h4a1 1 0 001 1m-7 0h8"/>
+                    </svg>
+                    <%= __("generic_label.delete") %>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <% if (pagination.totalPages > 1) { %>
+    <div class="flex items-center justify-between px-2 py-4 mt-2">
+      <span class="text-sm text-gray-500">
+        <%= __("generic_label.page") %> <%= pagination.currentPage %> <%= __("generic_label.of") %> <%= pagination.totalPages %>
+        &nbsp;·&nbsp; <%= pagination.totalCount %> <%= __("generic_label.total") %>
+      </span>
+      <div class="flex gap-2">
+        <% if (pagination.hasPreviousPage) { %>
+          <a href="?page=<%= pagination.previousPage %>&pageSize=<%= pagination.pageSize %>"
+            class="px-4 py-2 text-sm rounded-full font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+            <%= __("generic_label.previous") %>
+          </a>
+        <% } %>
+        <% if (pagination.hasNextPage) { %>
+          <a href="?page=<%= pagination.nextPage %>&pageSize=<%= pagination.pageSize %>"
+            class="px-4 py-2 text-sm rounded-full font-medium bg-[var(--teal)] text-white hover:opacity-90 transition">
+            <%= __("generic_label.next") %>
+          </a>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+</div>
+
+<!-- Delete Confirm Modal -->
+<div id="deleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+  <div class="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm">
+    <h2 class="text-lg font-semibold text-gray-800 mb-2"><%= __("settings.notificationTemplate.delete.confirmTitle") %></h2>
+    <p class="text-sm text-gray-500 mb-6" id="deleteModalMessage"></p>
+    <div class="flex justify-end gap-3">
+      <button onclick="closeDeleteModal()"
+        class="px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+        <%= __("generic_label.cancel") %>
+      </button>
+      <form id="deleteForm" method="POST" action="">
+        <input type="hidden" id="deleteNameInput" name="name" value="">
+        <button type="submit"
+          class="px-4 py-2 rounded-full text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition">
+          <%= __("generic_label.delete") %>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('searchInput').addEventListener('input', function () {
+    const query = this.value.toLowerCase();
+    document.querySelectorAll('#tableBody tr').forEach(function (row) {
+      row.style.display = row.textContent.toLowerCase().includes(query) ? '' : 'none';
+    });
+  });
+
+  function confirmDelete(btn) {
+    const id   = btn.dataset.id;
+    const name = btn.dataset.name;
+    document.getElementById('deleteModalMessage').textContent =
+      "<%= __('settings.notificationTemplate.delete.confirmMessage') %>".replace('{{name}}', name);
+    document.getElementById('deleteForm').action = '/notification-template/' + id + '/delete';
+    document.getElementById('deleteNameInput').value = name;
+    document.getElementById('deleteModal').classList.remove('hidden');
+  }
+
+  function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+  }
+
+  document.getElementById('deleteModal').addEventListener('click', function (e) {
+    if (e.target === this) closeDeleteModal();
+  });
+</script>

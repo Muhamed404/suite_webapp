@@ -5,17 +5,14 @@
                 <%= __("menu.phishmagnus.dashboard") %>
             </a>
             <span class="text-gray-400">›</span>
-            <a href="/template/list" class="hover:text-gray-700 transition">
-                <%= __("breadcrumbs.systemTemplate") %>
+            <a href="<%= typeof isSystemTemplate !== 'undefined' && isSystemTemplate ? '/template/list' : '/phm/template/list' %>" class="hover:text-gray-700 transition">
+                <%= typeof isSystemTemplate !== 'undefined' && isSystemTemplate ? __("breadcrumbs.systemTemplate") : __("breadcrumbs.myTemplate") %>
             </a>
             <span class="text-gray-400">›</span>
             <span class="font-semibold text-gray-900">
                 <%= __("system_template.create.title") %>
             </span>
         </nav>
-        <div>
-            <%- include('../../partials/back-button') %>
-        </div>
         <h3 class="text-3xl font-medium text-gray-900">
             <%= __("system_template.create.title") %>
         </h3>

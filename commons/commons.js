@@ -14,7 +14,8 @@ async function getFilteredRolesByOrganizationLevel(req, orgId = 0) {
     const response = await apiClient.get(url);
 
     const roles = response.data?.roles || null;
-    logger.info(`[Commong Fetch Roles] ${JSON.stringify(roles, null, 2)}`)
+    logger.info(`[Commong Fetch Roles] ${roles ? 'Roles fetched successfully' : 'No roles found'}`);
+    logger.info(`[Commong Fetch Roles] Roles length: ${roles ? roles.length : 0}`);
     return roles;
 
   } catch (error) {

@@ -228,6 +228,7 @@
 		"groupCreate": "إنشاء مجموعة",
 		"smtp": "إعدادات SMTP",
 		"serviceRegistry": "سجل الخدمات",
+		"notificationTemplates": "قوالب الإشعارات",
 		"audit": "سجل التدقيق",
 		"subscriptionHistory": "سجل الاشتراكات",
 		"createSubscription": "إنشاء اشتراك",
@@ -607,6 +608,74 @@
 		}
 	},
 	"settings": {
+		"notificationTemplate": {
+			"create": {
+				"title": "إنشاء قالب إشعار",
+				"subtitle": "أضف قالب إشعار جديدًا لمؤسستك",
+				"tabs": {
+					"english": "الإنجليزية",
+					"arabic": "العربية"
+				},
+				"fields": {
+					"notificationType": "نوع الإشعار",
+					"notificationTypePlaceholder": "اختر نوع الإشعار",
+					"isActive": "نشط",
+					"isSystem": "قالب نظامي",
+					"name": "اسم القالب",
+					"namePlaceholder": "أدخل اسم القالب",
+					"subject": "الموضوع",
+					"subjectPlaceholder": "أدخل موضوع البريد الإلكتروني (اختياري)",
+					"body": "المحتوى",
+					"bodyPlaceholder": "أدخل محتوى القالب"
+				},
+				"btnSubmit": "إنشاء القالب",
+				"btnCancel": "إلغاء",
+				"success": "تم إنشاء قالب (قوالب) الإشعار بنجاح.",
+				"error": "فشل إنشاء قالب الإشعار.",
+				"validation": {
+					"typeRequired": "يرجى اختيار نوع الإشعار.",
+					"atLeastOne": "يرجى ملء قالب لغة واحد على الأقل (الاسم والمحتوى مطلوبان).",
+					"nameRequired": "اسم القالب مطلوب.",
+					"bodyRequired": "محتوى القالب مطلوب."
+				}
+			},
+			"edit": {
+				"title": "تعديل قالب الإشعار",
+				"subtitle": "تحديث تفاصيل قالب الإشعار",
+				"btnSubmit": "حفظ التغييرات",
+				"btnCancel": "إلغاء",
+				"success": "تم تحديث قالب الإشعار بنجاح.",
+				"error": "فشل تحديث قالب الإشعار."
+			},
+			"delete": {
+				"success": "تم حذف قالب الإشعار بنجاح.",
+				"error": "فشل حذف قالب الإشعار.",
+				"confirmTitle": "حذف القالب",
+				"confirmMessage": "هل أنت متأكد من حذف هذا القالب؟ لا يمكن التراجع عن هذا الإجراء."
+			},
+			"list": {
+				"title": "قوالب الإشعارات",
+				"subtitle": "إدارة قوالب الإشعارات الخاصة بمؤسستك",
+				"columns": {
+					"name": "الاسم",
+					"type": "النوع",
+					"language": "اللغة",
+					"subject": "الموضوع",
+					"status": "الحالة",
+					"system": "النظام",
+					"createdAt": "تاريخ الإنشاء",
+					"actions": "الإجراءات"
+				},
+				"badge": {
+					"active": "نشط",
+					"inactive": "غير نشط",
+					"system": "نظامي",
+					"custom": "مخصص"
+				},
+				"empty": "لا توجد قوالب إشعارات.",
+				"search": "بحث في القوالب..."
+			}
+		},
 		"serviceRegistry": {
 			"homescreen": {
 				"title": "إدارة سجل الخدمات",

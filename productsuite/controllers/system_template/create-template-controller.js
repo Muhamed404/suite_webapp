@@ -35,6 +35,7 @@ exports.renderCreateTemplate = async (req, res) => {
       fileTypes,
       campaignTypes: filteredData,
       phishTypeMap: enums.phishingType,
+      isSystemTemplate: true,
 
     });
     logger.info('[System Template] Rendered create_template page successfully');
