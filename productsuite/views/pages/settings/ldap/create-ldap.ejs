@@ -52,18 +52,19 @@
       <div class="bg-white rounded-xl p-4 border border-gray-100">
         <p class="text-gray-500">Last Status</p>
         <div class="mt-1 flex items-center gap-2">
-          <span class="<%= getStatusBadgeClass(syncStatus?.last_sync_status) %> px-3 py-1 rounded-full font-semibold text-xs border capitalize flex items-center gap-1">
-            <span><%= getStatusIcon(syncStatus?.last_sync_status) %></span>
-            <%= syncStatus?.last_sync_status || 'N/A' %>
-          </span>
-          <% if (syncStatus?.last_sync_status === 'warning' && syncStatus?.last_sync_error) { %>
-            <div class="group relative">
-              <span class="cursor-help text-gray-400 hover:text-gray-600">❓</span>
-              <div class="hidden group-hover:flex absolute z-10 bottom-full mb-2 left-0 bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap">
-                <%= syncStatus?.last_sync_error %>
+          <div class="group relative">
+            <span class="<%= getStatusBadgeClass(syncStatus?.last_sync_status) %> px-3 py-1 rounded-full font-semibold text-xs border capitalize flex items-center gap-1 cursor-help">
+              <span><%= getStatusIcon(syncStatus?.last_sync_status) %></span>
+              <%= syncStatus?.last_sync_status || 'N/A' %>
+            </span>
+            <% if (syncStatus?.last_sync_error) { %>
+              <div class="hidden group-hover:block absolute z-10 bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] rounded-lg px-3 py-2 w-64 shadow-xl">
+                <p class="font-bold border-b border-gray-700 pb-1 mb-1">Details</p>
+                <p class="leading-relaxed"><%= syncStatus?.last_sync_error %></p>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-gray-900"></div>
               </div>
-            </div>
-          <% } %>
+            <% } %>
+          </div>
         </div>
       </div>
       <div class="bg-white rounded-xl p-4 border border-gray-100">
