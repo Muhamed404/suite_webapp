@@ -37,6 +37,10 @@ $(document).ready(function () {
             $(element).removeClass("border-red-500");
         },
         errorPlacement: function(error, element) {
+            if (element.attr('id') === 'password') {
+                error.insertAfter(element.closest('.relative'));
+                return;
+            }
             error.insertAfter(element);
         }
     });

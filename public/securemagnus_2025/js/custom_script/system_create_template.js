@@ -518,23 +518,6 @@ let currentStep = 0;
 
     // showStep(nextInFlow);
 
-    if (sel === 'nfc' || sel === 'qr' || sel === 'email' || sel === 'sms' || sel === 'whatsapp') {
-      // Remove landing page step if phish_option is 'simple'
-      // const phishOption = (formData.step3 && formData.step3.phish_option) ? formData.step3.phish_option : null;
-      // alert(phishOption)
-      const phishOption = document.querySelector(
-        'input[name="phish_option"]:checked'
-      )?.value;
-      // alert('.... '+phishOption)
-      const landingStepIdx = activeFlow.indexOf(phishing_landing_page_screen - 1);
-      if (phishOption === 'simple') {
-        // Remove landing page step if present
-        if (landingStepIdx !== -1) {
-          // alert('Removing landing page step as simple option selected');
-          activeFlow.splice(landingStepIdx, 1);
-        }
-      }
-    }
     const idx = activeFlow.indexOf(currentStep);
     // alert('Current Step: ' + currentStep + '\nIndex in Flow: ' + idx + '\nActive Flow: ' + JSON.stringify(activeFlow));
     if (idx < activeFlow.length - 1) {
