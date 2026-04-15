@@ -93,6 +93,7 @@ export interface ModuleContent {
   created_date?: string;
   quizzes?: { total_count: number };
   user_completion_status?: string;
+  languages_supported?: string[];
 }
 
 export interface QuizAnswer {
@@ -205,6 +206,7 @@ export interface CreateContentPayload {
     content?: string;
     summary?: string;
   }>;
+  parent_content_id?: number | null;
 }
 
 export interface UpdateContentPayload {
