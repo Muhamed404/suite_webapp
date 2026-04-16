@@ -47,8 +47,8 @@ export function CertificateListPage() {
   // Transform certificates to match table format
   const certificateData = certificates.map((cert) => ({
     id: cert.id,
-    name: cert.campaign_name || t("unknownCampaign"),
-    content: cert.module_name || t("unknownModule"),
+    name: cert.module_name || t("unknownModule"),
+    content: cert.campaign_name || t("unknownCampaign"),
     date: cert.certificate_issue_date || cert.created_at || "",
     status: (cert.status as "active" | "pending" | "completed") || "completed",
   }));

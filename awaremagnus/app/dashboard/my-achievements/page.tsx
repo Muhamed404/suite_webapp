@@ -24,6 +24,27 @@ function MyAchievementsContent() {
 
   const achievements = achievementData?.object?.achievement_statistics || [];
 
+  const categoryConfig: Record<string, { bg: string; text: string }> = {
+    Performance: { bg: "bg-orange-100", text: "text-orange-700" },
+    Milestone: { bg: "bg-blue-100", text: "text-blue-700" },
+    Behavior: { bg: "bg-red-100", text: "text-red-700" },
+    Streak: { bg: "bg-purple-100", text: "text-purple-700" },
+    Completion: { bg: "bg-teal-100", text: "text-teal-700" },
+    Learning: { bg: "bg-indigo-100", text: "text-indigo-700" },
+    Security: { bg: "bg-gray-100", text: "text-gray-700" },
+    Awareness: { bg: "bg-yellow-100", text: "text-yellow-700" },
+    Training: { bg: "bg-cyan-100", text: "text-cyan-700" },
+    Compliance: { bg: "bg-green-100", text: "text-green-700" },
+    Risk: { bg: "bg-pink-100", text: "text-pink-700" },
+    Engagement: { bg: "bg-lime-100", text: "text-lime-700" },
+    Consistency: { bg: "bg-rose-100", text: "text-rose-700" },
+    Exploration: { bg: "bg-emerald-100", text: "text-emerald-700" },
+    Leadership: { bg: "bg-violet-100", text: "text-violet-700" },
+    Mastery: { bg: "bg-amber-100", text: "text-amber-700" },
+    Resilience: { bg: "bg-sky-100", text: "text-sky-700" },
+    Resourcefulness: { bg: "bg-fuchsia-100", text: "text-fuchsia-700" },
+  };
+
   return (
     <main className="flex-1 overflow-y-auto">
       <div className="p-3">
@@ -78,7 +99,11 @@ function MyAchievementsContent() {
             <div key={index} className="bg-white rounded-2xl p-4 relative">
               {/* Header */}
               <div className="flex justify-between items-start mb-3">
-                <span className="px-2 py-0.5 text-[11px] rounded-full bg-orange-100 text-orange-500">
+                <span
+                  className={`px-2 py-0.5 text-[11px] rounded-full ${
+                    categoryConfig[item.achievement_category]?.bg ?? "bg-gray-100"
+                  } ${categoryConfig[item.achievement_category]?.text ?? "text-gray-500"}`}
+                >
                   {item.achievement_category}
                 </span>
                 <span className="text-[11px] text-gray-400">{item.employee_count}x</span>
