@@ -261,7 +261,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
         transformedItems.push({
           id: content.content_id,
-          title: content.content_type,
+          title: content.name || content.title || content.content_type,
           status: statusValue,
           statusLabel,
           date: content.created_date
@@ -279,6 +279,34 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
           type: content.content_type,
           content_type_id: content.content_type_id,
         });
+
+        if (content.quizzes && content.quizzes.total_count > 0) {
+          const qStatus = content.quizzes.status || "not_started";
+          const qLabel = qStatus.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase());
+
+          transformedItems.push({
+            id: `quiz-${content.content_id ?? content.id}`,
+            title: "Quizzes",
+            status: qStatus,
+            statusLabel: qLabel,
+            date: content.created_date
+              ? new Date(content.created_date).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })
+              : "—",
+            chapters: `${content.quizzes.total_count} Quizzes`,
+            lessons: `${content.quizzes.total_count} questions`,
+            languages: content.language_name
+              ? [content.language_name.toLowerCase() === "arabic" ? "ar" : "en"]
+              : ["en"],
+            type: "Quiz",
+            isQuizSummary: false,
+            contentIds: [content.content_id ?? content.id],
+            parentId: content.content_id ?? content.id,
+          });
+        }
       });
 
       // push a single card for each gallery type collected above
@@ -417,40 +445,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
       });
     }
 
-    // Add user progress summary if available for quizzes
-    if (data.user_progress_summary?.quizzes?.total > 0) {
-      // Collect content_ids from non_aggregated_contents that have quizzes
-      const quizContents = (data.non_aggregated_contents ?? []).filter(
-        (c: any) => (c.quizzes?.total_count ?? 0) > 0
-      );
-
-      const quizContentIds = quizContents.map((c: any) => c.content_id ?? c.id).filter(Boolean);
-
-      // Find the latest created_date from quiz contents
-      const latestQuizDate = quizContents
-        .map((c: any) => c.created_date)
-        .filter(Boolean)
-        .sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime())[0];
-
-      transformedItems.push({
-        id: "quizzes",
-        title: "Quizzes",
-        status: data.user_progress_summary.quizzes.status,
-        date: latestQuizDate
-          ? new Date(latestQuizDate).toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })
-          : "—",
-        chapters: `${data.user_progress_summary.quizzes.total} Quizzes`,
-        lessons: `${data.user_progress_summary.quizzes.total} questions`,
-        languages: ["en", "ar"],
-        type: "Quiz",
-        isQuizSummary: true,
-        contentIds: quizContentIds,
-      });
-    }
+    // Global quizzes aggregate block has been removed in favor of inline quizzes per content.
 
     return transformedItems;
   }, [contentsWithProgressRes, moduleRes, reportContentsData, reportContentsLoading]);
@@ -1051,7 +1046,11 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                           return (
                             <div
                               key={`${item.id}-${index}`}
-                              className="item bg-white rounded-2xl p-4 flex justify-between items-center border border-gray-100 hover:border-blue-200 transition-all hover:shadow-sm"
+                              className={`item bg-white rounded-2xl p-4 flex justify-between items-center border transition-all hover:shadow-sm relative z-10 ${
+                                item.type === "Quiz" && !item.isQuizSummary
+                                  ? "ml-8 -mt-2 border-blue-100 bg-slate-50 hover:border-blue-300 shadow-sm"
+                                  : "border-gray-100 hover:border-blue-200"
+                              }`}
                             >
                               <div className="flex gap-4 flex-1">
                                 <div
