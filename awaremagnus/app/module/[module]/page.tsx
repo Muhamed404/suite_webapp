@@ -52,6 +52,18 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const tabIndicatorRef = useRef<HTMLDivElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
+  
+  const generateModuleSlug = useCallback(
+    (name: string) =>
+      (name || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, ""),
+    []
+  );
+
   // Get module ID from slug
   const { data: modulesRes } = useModules({ filter: module });
 
@@ -63,15 +75,18 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         const translationMatch = m.translations?.some(
           (t) => t.name.toLowerCase() === slugDerivedName.toLowerCase()
         );
+        const slugMatch = m.translations?.some(
+          (t) => generateModuleSlug(t.name) === module
+        );
 
-        return codeMatch || titleMatch || translationMatch;
+        return codeMatch || titleMatch || translationMatch || slugMatch;
       });
 
       return found?.id ?? null;
     }
 
     return null; // Not yet resolved — prevents premature API calls with wrong default ID
-  }, [modulesRes, module, slugDerivedName]);
+  }, [modulesRes, module, slugDerivedName, generateModuleSlug]);
 
   // Get module basic info
   const { data: moduleRes } = useModule(moduleId ?? 1, !!moduleId);
@@ -177,18 +192,6 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
   // fetch list of modules that belong to this campaign so we can wire up "next module" navigation
   const { data: campaignModulesRes } = useCampaignModules(campaignId ?? 0, !!campaignId);
-
-  // helper for slugs (same as dashboard and campaign assignments)
-  const generateModuleSlug = useCallback(
-    (name: string) =>
-      (name || "")
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .replace(/^-|-$/g, ""),
-    []
-  );
 
   const nextModuleSlug = useMemo(() => {
     if (!campaignModulesRes?.success || !moduleId) return null;
