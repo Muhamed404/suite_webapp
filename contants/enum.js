@@ -130,6 +130,7 @@ const ModuleNames = {
   Service_Registry: 'Service_Registry',
   Campaign_SMS: 'Campaign_SMS',
   Campaign_Whatsapp: 'Campaign_Whatsapp',
+  Notification_Template: 'Notification_Template',
 }
 const Access_Types = {
   RWD_ALL: 'RWD-ALL',

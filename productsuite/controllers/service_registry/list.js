@@ -23,7 +23,6 @@ exports.retrieveServiceList = async (req, res) => {
         const result = response.data;
         logger.info(`${logTxn} - Successfully fetched service registry list`);
         logger.info(`${logTxn} - Response Data: ${JSON.stringify(result, null, 2)}`);
-        console.log(JSON.stringify('?????? '+JSON.stringify(result.data, null, 2)));
 
         res.render(render_ejs_urls.ProductSuiteManagement.Service_Registry.LIST, {
             enableSuiteManagementLeftMenu: true,

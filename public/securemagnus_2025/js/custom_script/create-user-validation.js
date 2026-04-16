@@ -37,6 +37,10 @@ $(document).ready(function () {
             $(element).removeClass("border-red-500");
         },
         errorPlacement: function(error, element) {
+            if (element.attr('id') === 'password') {
+                error.insertAfter(element.closest('.relative'));
+                return;
+            }
             error.insertAfter(element);
         }
     });
@@ -46,6 +50,10 @@ $(document).ready(function () {
     $('#application').on('change', function () {
         const selectedProduct = $(this).val();
         if (selectedProduct == 0) {
+            $('#nextBtn').data('license-ok', false);
+            if (typeof window.validateFormAndToggleSubmit === 'function') {
+                window.validateFormAndToggleSubmit();
+            }
             alert('Please select a valid product to proceed.');
             return
         };
@@ -65,7 +73,9 @@ $(document).ready(function () {
                 
                 if (selectedProduct == 4) { // All
                     $('#alertLicenseAvailability').val('Phish: ' + (phishLicenses || 0) + ', Aware: ' + (awareLicenses || 0));
-                    if ((phishLicenses > 0) && (awareLicenses > 0)) {
+                    var hasLicenseForProduct = (phishLicenses > 0) && (awareLicenses > 0);
+                    $('#nextBtn').data('license-ok', hasLicenseForProduct);
+                    if (hasLicenseForProduct) {
                         $('#nextBtn').prop('disabled', false); // enable the button
                         $('#nextBtn').removeClass('opacity-50 cursor-not-allowed bg-[var(--teal)] hover:bg-teal-500');
                         $('#nextBtn').addClass('bg-green-500 hover:bg-green-600'); // turn green
@@ -76,7 +86,9 @@ $(document).ready(function () {
                     }
                 } else {
                     $('#alertLicenseAvailability').val(licenseText + ': ' + available);
-                    if (available > 0) {
+                    var hasLicenseForProduct = available > 0;
+                    $('#nextBtn').data('license-ok', hasLicenseForProduct);
+                    if (hasLicenseForProduct) {
                         $('#nextBtn').prop('disabled', false); // enable the button
                         $('#nextBtn').removeClass('opacity-50 cursor-not-allowed bg-[var(--teal)] hover:bg-teal-500');
                         $('#nextBtn').addClass('bg-green-500 hover:bg-green-600'); // turn green
@@ -86,14 +98,23 @@ $(document).ready(function () {
                         $('#nextBtn').removeClass('bg-green-500 hover:bg-green-600 bg-[var(--teal)] hover:bg-teal-500');
                     }
                 }
+
+                if (typeof window.validateFormAndToggleSubmit === 'function') {
+                    window.validateFormAndToggleSubmit();
+                }
             },
             error: function () {
                 // alert('Failed to fetch license availability');
                 var licenseText = $('#alertLicenseAvailability').data('license-text') || 'Available Users License';
                 $('#alertLicenseAvailability').val(licenseText + ': ' + 0);
+                $('#nextBtn').data('license-ok', false);
 
                 $('#nextBtn').prop('disabled', true); // disables the button
                 $('#nextBtn').addClass('opacity-50 cursor-not-allowed'); // optional: visual feedback
+
+                if (typeof window.validateFormAndToggleSubmit === 'function') {
+                    window.validateFormAndToggleSubmit();
+                }
             }
         });
     });
@@ -137,23 +158,34 @@ $(document).ready(function () {
 
     // Real-time validation to enable/disable submit button
     window.validateFormAndToggleSubmit = function() {
+        const application = $('#application').val();
         const role = $('#role').val();
         const firstName = $('#first_name').val();
         const lastName = $('#last_name').val();
         const email = $('#email').val();
         const contact = $('#contact').val();
         const password = $('#password').val();
+        const hasLicense = $('#nextBtn').data('license-ok') === true;
 
-        // Check all required fields
-        const isRoleValid = role && role !== '';
-        const isFirstNameValid = firstName && firstName.trim().length >= 2;
-        const isLastNameValid = lastName && lastName.trim().length >= 2;
-        const isEmailValid = email && /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
-        const isContactValid = contact && /^\d{10,15}$/.test(contact);
-        const isPasswordValid = password && /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password);
+        const isApplicationVisible = $('#application').is(':visible');
+        const isRoleVisible = $('#role').is(':visible');
+        const isFirstNameVisible = $('#first_name').is(':visible');
+        const isLastNameVisible = $('#last_name').is(':visible');
+        const isEmailVisible = $('#email').is(':visible');
+        const isContactVisible = $('#contact').is(':visible');
+        const isPasswordVisible = $('#password').is(':visible');
+
+        // Validate only visible fields in the active step.
+        const isApplicationValid = !isApplicationVisible || ((application && application !== '0') && hasLicense);
+        const isRoleValid = !isRoleVisible || (role && role !== '');
+        const isFirstNameValid = !isFirstNameVisible || (firstName && firstName.trim().length >= 2);
+        const isLastNameValid = !isLastNameVisible || (lastName && lastName.trim().length >= 2);
+        const isEmailValid = !isEmailVisible || (email && /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email));
+        const isContactValid = !isContactVisible || (contact && /^\d{10,15}$/.test(contact));
+        const isPasswordValid = !isPasswordVisible || (password && /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password));
 
         // Check if all validations pass
-        const isFormValid = isRoleValid && isFirstNameValid && isLastNameValid && isEmailValid && isContactValid && isPasswordValid;
+        const isFormValid = isApplicationValid && isRoleValid && isFirstNameValid && isLastNameValid && isEmailValid && isContactValid && isPasswordValid;
 
         // Enable/disable submit button
         const $nextBtn = $('#nextBtn');

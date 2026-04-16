@@ -15,16 +15,9 @@
                     tabindex="1">
                     <option value="" disabled selected><%= __("user.optionSelectUserRole") %></option>
                    <% if (typeof roles !=='undefined' && roles) { %>
-                        <% 
-                        const roleDisplayMap = {
-                          'Org User': 'End-user',
-                          'Sub Org User': 'Organization Sub-Admin',
-                          'Super Org User': 'Organization Superadmin'
-                        };
-                        %>
                         <% roles.forEach(role=> { %>
                             <option value="<%= role.id %>">
-                                <%= roleDisplayMap[role.role_name] || role.role_name %>
+                                <%= role.role_name %>
                             </option>
                             <% }); %>
                                 <% } %>
@@ -65,11 +58,30 @@
 
             <div>
                 <label class="block text-gray-700 font-medium mb-3"><%= __("user.labelPassword") %></label>
-                <input placeholder="<%= __("user.placeholderPassword") %>" type="password" value="" id="password" name="password" required
-                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-                    title="Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
-                    class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
-                    tabindex="6" />
+                <div class="relative">
+                    <input placeholder="<%= __("user.placeholderPassword") %>" type="password" value="" id="password" name="password" required
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                        title="Password must be at least 8 characters and include uppercase, lowercase, number, and special character"
+                        class="w-full px-4 py-2 <%= (locals.locale || 'en') === 'ar' ? 'pl-10' : 'pr-10' %> rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+                        tabindex="6" />
+                    <button type="button" id="toggleCreateUserPassword"
+                        class="absolute inset-y-0 <%= (locals.locale || 'en') === 'ar' ? 'left-3' : 'right-3' %> flex items-center text-gray-500 hover:text-[var(--teal)] transition-colors duration-200"
+                        aria-label="Show password"
+                        aria-pressed="false">
+                        <svg id="toggleCreateUserPasswordIconEye" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        <svg id="toggleCreateUserPasswordIconEyeOff" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C5 20 1 12 1 12a21.77 21.77 0 0 1 5.06-6.94"></path>
+                            <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.9 21.9 0 0 1-3.17 4.83"></path>
+                            <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

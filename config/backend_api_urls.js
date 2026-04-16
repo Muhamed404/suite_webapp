@@ -94,7 +94,14 @@ module.exports = {
         SMS: {
             CREATE: (organizationId) => `/sms/settings/create/${organizationId}`,
             UPDATE: (organizationId) => `/sms/settings/${organizationId}`,
-        }
+        },
+        Notification_Template: {
+            LIST_BY_ORGANIZATION: (organizationId) => `/notification_template/${organizationId}/organization`,
+            CREATE: `/notification_template/create`,
+            GET_BY_ID: (id) => `/notification_template/${id}`,
+            UPDATE: (id) => `/notification_template/${id}/edit`,
+            DELETE: (id, name) => `/notification_template/${id}/delete/${name}/name`,
+        },
 
     },
     PHISHMAGNUS: {

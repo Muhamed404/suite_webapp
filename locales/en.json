@@ -218,6 +218,7 @@
 		"groupCreate": "Create Group",
 		"smtp": "SMTP Settings",
 		"serviceRegistry": "Service Registry",
+		"notificationTemplates": "Notification Templates",
 		"audit": "Audit Log",
 		"subscriptionHistory": "Subscription History",
 		"createSubscription": "Create Subscription",
@@ -334,7 +335,8 @@
 			"subscriptionHistory": "Subscription History",
 			"products": "Products",
 			"logout": "Logout",
-			"smtpNotifications": "SMTP Notifications"
+			"smtpNotifications": "SMTP Notifications",
+			"notificationTemplates": "Notification Templates"
 		}
 	},
 	"org_domain": {
@@ -597,6 +599,74 @@
 		}
 	},
 	"settings": {
+		"notificationTemplate": {
+			"create": {
+				"title": "Create Notification Template",
+				"subtitle": "Add a new notification template for your organization",
+				"tabs": {
+					"english": "English",
+					"arabic": "Arabic"
+				},
+				"fields": {
+					"notificationType": "Notification Type",
+					"notificationTypePlaceholder": "Select notification type",
+					"isActive": "Active",
+					"isSystem": "System Template",
+					"name": "Template Name",
+					"namePlaceholder": "Enter template name",
+					"subject": "Subject",
+					"subjectPlaceholder": "Enter email subject (optional)",
+					"body": "Body",
+					"bodyPlaceholder": "Enter template body content"
+				},
+				"btnSubmit": "Create Template",
+				"btnCancel": "Cancel",
+				"success": "Notification template(s) created successfully.",
+				"error": "Failed to create notification template.",
+				"validation": {
+					"typeRequired": "Please select a notification type.",
+					"atLeastOne": "Please fill in at least one language template (name and body required).",
+					"nameRequired": "Template name is required.",
+					"bodyRequired": "Template body is required."
+				}
+			},
+			"edit": {
+				"title": "Edit Notification Template",
+				"subtitle": "Update the notification template details",
+				"btnSubmit": "Save Changes",
+				"btnCancel": "Cancel",
+				"success": "Notification template updated successfully.",
+				"error": "Failed to update notification template."
+			},
+			"delete": {
+				"success": "Notification template deleted successfully.",
+				"error": "Failed to delete notification template.",
+				"confirmTitle": "Delete Template",
+				"confirmMessage": "Are you sure you want to delete this template? This action cannot be undone."
+			},
+			"list": {
+				"title": "Notification Templates",
+				"subtitle": "Manage your organization's notification templates",
+				"columns": {
+					"name": "Name",
+					"type": "Type",
+					"language": "Language",
+					"subject": "Subject",
+					"status": "Status",
+					"system": "System",
+					"createdAt": "Created At",
+					"actions": "Actions"
+				},
+				"badge": {
+					"active": "Active",
+					"inactive": "Inactive",
+					"system": "System",
+					"custom": "Custom"
+				},
+				"empty": "No notification templates found.",
+				"search": "Search templates..."
+			}
+		},
 		"serviceRegistry": {
 			"homescreen": {
 				"title": "Service Registry Management",

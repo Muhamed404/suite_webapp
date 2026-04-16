@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+    const duplicateEmailMessage = window.userValidationMessages.emailTaken || "This email is already taken.";
+
     $.validator.addMethod("strongPassword", function (value, element) {
         return this.optional(element) ||
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(value);
@@ -61,14 +63,14 @@ $(document).ready(function () {
                 method: 'GET',
                 success: function (response) {
                     if (response.isDuplicate === 'true') {
-                        showCustomToast('error', "Email is already taken. Please use a different email address.");
+                        showCustomToast('error', duplicateEmailMessage);
                         
                         // Mark field as invalid but don't clear it
                         $emailField.addClass('border-red-500');
                         
                         // Add error message if not already present
                         if (!$emailField.next('.email-duplicate-error').length) {
-                            $emailField.after('<div class="email-duplicate-error text-red-500 text-sm mt-1">This email is already taken.</div>');
+                            $emailField.after('<div class="email-duplicate-error text-red-500 text-sm mt-1">' + duplicateEmailMessage + '</div>');
                         }
                     } else {
                         // Remove duplicate error if email is now available
