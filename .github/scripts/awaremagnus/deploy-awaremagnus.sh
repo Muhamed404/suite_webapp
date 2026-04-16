@@ -100,7 +100,7 @@ cd "$DEPLOY_DIR"
 # Full install needed - devDependencies include build tools (TypeScript, Tailwind, etc.)
 npm install
 
-ls --lah .env
+ls -lah .env
 
 # After build, prune dev dependencies to reduce deployment size
 # This is handled after Step 2 below
