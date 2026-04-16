@@ -108,6 +108,10 @@ function generateSuiteManagementMenu(req, organization) {
         {
           labelKey: "menu.suite.smtpNotifications",
           link: "/settings/ldap/"
+        },
+        {
+          labelKey: "menu.suite.notificationTemplates",
+          link: "/notification-template/"
         }
       ]
     }

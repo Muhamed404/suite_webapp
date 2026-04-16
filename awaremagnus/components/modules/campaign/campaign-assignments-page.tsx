@@ -401,8 +401,11 @@ export function CampaignAssignmentsPage() {
             ? userMetrics.total_campaigns - (userMetrics.total_completed_modules ?? 0)
             : campaignCounts.pending;
 
+    const assignmentSummary = (campaignsRes as any)?.user_summary;
     const responseRateValue =
-      userMetrics && userMetrics.global_progress_percent != null
+      assignmentSummary && typeof assignmentSummary.response_rate === "number"
+        ? assignmentSummary.response_rate
+        : userMetrics && userMetrics.global_progress_percent != null
         ? Number(userMetrics.global_progress_percent)
         : 0;
 
@@ -413,7 +416,7 @@ export function CampaignAssignmentsPage() {
       responseRate: responseRateValue,
       active: campaignCounts.active,
     };
-  }, [displayCampaigns, userMetrics]);
+  }, [displayCampaigns, userMetrics, campaignsRes]);
 
   return (
     <ProtectedRoute>
@@ -807,11 +810,15 @@ export function CampaignAssignmentsPage() {
                         }
                       }
 
-                      // use a composite key in case module IDs repeat across campaigns
-                      const rowKey =
-                        campaign.campaign_id != null
-                          ? `${campaign.campaign_id}-${campaign.id}`
-                          : `${campaign.id}-${index}`;
+                      // id maps to module_id, which can repeat in the same campaign;
+                      // include more fields plus index so keys stay unique per rendered row.
+                      const rowKey = [
+                        campaign.campaign_id ?? "no-campaign",
+                        campaign.id,
+                        campaign.start_date ?? "no-start",
+                        campaign.end_date ?? "no-end",
+                        index,
+                      ].join("-");
 
                       return (
                         <tr key={rowKey} className="hover:bg-gray-50 transition-colors">

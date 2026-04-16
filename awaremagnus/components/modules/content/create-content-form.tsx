@@ -21,7 +21,7 @@ import { ContentForm, type ContentTranslation } from "./content-form";
 import { CONTENT_TYPES } from "@/constants/content-types";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useModules } from "@/hooks/useQuiz";
+import { useModules, useContentsByModule } from "@/hooks/useQuiz";
 import { useCreateContent } from "@/hooks/useQuiz";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { getLanguageId } from "@/utils/languageMapping";
@@ -135,6 +135,7 @@ export function CreateContentForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
   const [lastCreatedWasQuiz, setLastCreatedWasQuiz] = useState(false);
+  const [parentContentId, setParentContentId] = useState<string>("");
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const sourceInputRef = useRef<HTMLInputElement>(null);
@@ -151,6 +152,15 @@ export function CreateContentForm({
 
   const { data: modulesRes } = useModules();
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
+  
+  const { data: contentsRes } = useContentsByModule(Number(moduleId), { enabled: !!moduleId });
+  const allModuleContents = contentsRes?.success && Array.isArray(contentsRes?.data) ? contentsRes.data : [];
+  // Only show top-level contents as possible parents, and restrict to the currently selected content type
+  const parentContents = allModuleContents.filter((c: any) => 
+    !c.parent_content_id && 
+    c.content_type_id === selectedContentTypeId
+  );
+
   const createContent = useCreateContent();
 
   const backHref =
@@ -324,6 +334,7 @@ export function CreateContentForm({
             summary: translation.summary?.trim() || undefined,
           },
         ],
+        parent_content_id: parentContentId ? Number(parentContentId) : null,
       };
 
       await createContent.mutateAsync(payload);
@@ -341,6 +352,7 @@ export function CreateContentForm({
       setContentType(null);
       setSelectedContentTypeId(null);
       setLanguage("en");
+      setParentContentId("");
       setTranslation(createEmptyTranslation("en"));
       setDuration(0);
       setSourceType("file");
@@ -368,6 +380,7 @@ export function CreateContentForm({
     setContentType(null);
     setSelectedContentTypeId(null);
     setLanguage("en");
+    setParentContentId("");
     setTranslation(createEmptyTranslation("en"));
     setDuration(0);
     setSourceType("file");
@@ -626,6 +639,32 @@ export function CreateContentForm({
                       ))}
                     </Select>
                   </div>
+
+                  {moduleId && parentContents.length > 0 && (
+                    <div className="mb-3">
+                       <label className="text-xs text-gray-600 block mb-1.5">
+                         {t("parentContent", { defaultValue: "Parent Content (Optional)" })}
+                       </label>
+                       <Select
+                          classNames={{
+                            trigger: "w-full h-9 min-h-9 rounded-lg bg-white border border-gray-200 focus-within:border-[#32B8FF] text-xs px-3"
+                          }}
+                          aria-label={t("parentContent", { defaultValue: "Parent Content" })}
+                          placeholder={t("selectParentContent", { defaultValue: "Select a Parent Content" })}
+                          selectedKeys={parentContentId ? [parentContentId] : []}
+                          onSelectionChange={(keys) => {
+                             const v = keys === "all" || !keys ? "" : ((Array.from(keys as Iterable<string>)[0] as string) ?? "");
+                             setParentContentId(v);
+                          }}
+                       >
+                         {parentContents.map((c: any) => (
+                           <SelectItem key={String(c.id)} textValue={c.title || c.name || `Content ${c.id}`}>
+                             {c.title || c.name || `Content ${c.id}`}
+                           </SelectItem>
+                         ))}
+                       </Select>
+                    </div>
+                  )}
 
                   <div className="space-y-3 text-xs" id="leftForm">
                     {!selectedContentTypeName && !contentType ? (

@@ -66,9 +66,31 @@ $(document).ready(function () {
             success: function (response) {
                 // Assuming response.availableLicenses contains the number
                 var licenseText = $('#alertLicenseAvailability').data('license-text') || 'Available Users License';
-                $('#alertLicenseAvailability').val(licenseText + ': ' + response.filteredLicense.availableLicenses);
-                $('#nextBtn').prop('disabled', false); // enable the button
-                $('#nextBtn').removeClass('opacity-50 cursor-not-allowed'); // remove visual feedback
+                var available = response.filteredLicense.availableLicenses;
+                var phishLicenses = response.filteredLicense.phishLicenses;
+                var awareLicenses = response.filteredLicense.awareLicenses;
+                
+                if (selectedProduct == 4) { // All
+                    $('#alertLicenseAvailability').val('Phish: ' + (phishLicenses || 0) + ', Aware: ' + (awareLicenses || 0));
+                    var hasLicenseForProduct = (phishLicenses > 0) && (awareLicenses > 0);
+                    if (hasLicenseForProduct) {
+                        $('#nextBtn').prop('disabled', false); // enable the button
+                        $('#nextBtn').removeClass('opacity-50 cursor-not-allowed'); // remove visual feedback
+                    } else {
+                        $('#nextBtn').prop('disabled', true); // disables the button
+                        $('#nextBtn').addClass('opacity-50 cursor-not-allowed'); // optional: visual feedback
+                    }
+                } else {
+                    $('#alertLicenseAvailability').val(licenseText + ': ' + available);
+                    var hasLicenseForProduct = available > 0;
+                    if (hasLicenseForProduct) {
+                        $('#nextBtn').prop('disabled', false); // enable the button
+                        $('#nextBtn').removeClass('opacity-50 cursor-not-allowed'); // remove visual feedback
+                    } else {
+                        $('#nextBtn').prop('disabled', true); // disable the button
+                        $('#nextBtn').addClass('opacity-50 cursor-not-allowed'); // optional: visual feedback
+                    }
+                }
             },
             error: function () {
                 // alert('Failed to fetch license availability');

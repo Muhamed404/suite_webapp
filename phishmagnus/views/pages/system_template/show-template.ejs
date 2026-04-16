@@ -3,7 +3,7 @@
         <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
             <a href="/phm/index" class="hover:text-gray-700 transition"><%= __("menu.phishmagnus.dashboard") %></a>
             <span class="text-gray-400">›</span>
-            <a href="/template/list" class="hover:text-gray-700 transition"><%= __("breadcrumbs.systemTemplate") %></a>
+            <a href="<%= typeof isSystemTemplate !== 'undefined' && isSystemTemplate ? '/template/list' : '/phm/template/list' %>" class="hover:text-gray-700 transition"><%= typeof isSystemTemplate !== 'undefined' && isSystemTemplate ? __("breadcrumbs.systemTemplate") : __("breadcrumbs.myTemplate") %></a>
             <span class="text-gray-400">›</span>
             <span class="font-semibold text-gray-900">
                 <%= template?.name || 'View Template' %>
@@ -173,7 +173,7 @@
                         <label class="block text-base font-semibold mb-2">
                             <%= __("Template.senderEmail") %>
                         </label>
-                        <input type="text"   name="sender_email" id="sender_email" value="<%= template?.sender_email_or_contact || '' %>"
+                        <input type="text"   name="sender_email" id="sender_email" value="<%= template?.sender_email_or_contact || '' %>" readonly
                             class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 placeholder-gray-400 focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500 transition">
                     </div>
 
@@ -451,6 +451,7 @@
                 "system_template.create.downloadFileBasedDescription": "<%= __('system_template.create.downloadFileBasedDescription') %>",
                 "system_template.create.urlClickBasedTitle": "<%= __('system_template.create.urlClickBasedTitle') %>",
                 "system_template.create.urlClickBasedDescription": "<%= __('system_template.create.urlClickBasedDescription') %>",
+                "system_template.create.selectPhishingSmtp": "<%= __('system_template.create.selectPhishingSmtp') %>",
                 "system_template.create.validationEnterValidUrl": "<%= __('system_template.create.validationEnterValidUrl') %>",
                 "system_template.create.smsShortMessageTitle": "<%= __('system_template.create.smsShortMessageTitle') %>",
                 "system_template.create.smsShortMessageDescription": "<%= __('system_template.create.smsShortMessageDescription') %>",
@@ -550,16 +551,22 @@ if (smsContent && charCount) {
     var smtpContainer = document.getElementById('phishing-smtp-container');
     var smtpSelect = document.getElementById('phishing_smtp');
     var smtpError = document.getElementById('phishing-smtp-error');
+    var senderEmailInput = document.getElementById('sender_email');
     var savedSmtpId = '<%= template?.phishing_smtp != null ? template.phishing_smtp : "" %>';
 
     var selectedPhish = document.querySelector('input[name="phishType"]:checked');
     if (selectedPhish && selectedPhish.value === 'email') {
         smtpContainer.classList.remove('hidden');
+        smtpSelect.required = true;
+        if (senderEmailInput) {
+          senderEmailInput.readOnly = true;
+          senderEmailInput.classList.add('cursor-not-allowed', 'bg-gray-100');
+        }
         fetch('/phm/phishing-smtp/name')
             .then(function (res) { return res.json(); })
             .then(function (data) {
                 var list = Array.isArray(data) ? data : (data.smtpList || data.data || data.message || []);
-                smtpSelect.innerHTML = '';
+                smtpSelect.innerHTML = '<option value="">' + (window.i18n && window.i18n.__ ? window.i18n.__('system_template.create.selectPhishingSmtp') : '-- Select Email Domain --') + '</option>';
 
                 var matched = savedSmtpId
                     ? list.some(function (item) { return String(item.id) === String(savedSmtpId); })
@@ -577,11 +584,24 @@ if (smsContent && charCount) {
                     list.forEach(function (item) {
                         var opt = document.createElement('option');
                         opt.value = item.id;
+                        opt.dataset.senderEmail = item.sender_email || '';
                         opt.textContent = '#' + item.organization_name + ' - ' + item.sender_email;
                         if (String(item.id) === String(savedSmtpId)) {
                             opt.selected = true;
-                            smtpSelect.appendChild(opt);
                         }
+                        smtpSelect.appendChild(opt);
+                    });
+
+                    var selectedOption = smtpSelect.options[smtpSelect.selectedIndex];
+                    if (senderEmailInput) {
+                      senderEmailInput.value = (selectedOption && selectedOption.dataset ? selectedOption.dataset.senderEmail : '') || '';
+                    }
+
+                    smtpSelect.addEventListener('change', function () {
+                      var selected = this.options[this.selectedIndex];
+                      if (senderEmailInput) {
+                        senderEmailInput.value = (selected && selected.dataset ? selected.dataset.senderEmail : '') || '';
+                      }
                     });
                 }
             })

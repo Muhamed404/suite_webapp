@@ -68,7 +68,9 @@ exports.viewTemplate = async (req, res) => {
     }
 
 
-    const filesData = await readFiles(tpl.phishing_page_url, tpl.landing_page_url);
+    const filesData = await readFiles(tpl.phishing_page_url, tpl.landing_page_url).catch(err => {
+      return { phishing_page: null, landing_page: null };
+    });
     logger.info('[View Template] readFiles result' + JSON.stringify(filesData, null, 2));
 
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
@@ -83,7 +85,7 @@ exports.viewTemplate = async (req, res) => {
     if (req.user.organization_id) {
       postMethodUrl = frontend_api_urls.PRODUCT_SUITE.System_Template.CLONE(templateId, req.user.organization_id);
     }
-    return res.render(render_ejs_urls.PhishMagnus.System_Template.SHOW, { postMethodUrl, template: tpl, enableSuiteManagementLeftMenu: false });
+    return res.render(render_ejs_urls.PhishMagnus.System_Template.SHOW, { postMethodUrl, template: tpl, enableSuiteManagementLeftMenu: false, isSystemTemplate: true });
   } catch (err) {
     // Detailed logging for different axios failure modes
     logger.error(`[View Template] error fetching template \n ${err.stack}`);

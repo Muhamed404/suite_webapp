@@ -6,7 +6,6 @@ const apiClient = require("../../../utility/api-client");
 
 exports.createSMSSettings = async (req, res) => {
     logger.info(`Controller - Create SMS Settings: Create SMS Settings called`);
-    console.log(`Received SMS settings payload: ${JSON.stringify(req.body, null, 2)}`);
     const organizationId = !req.user.organizationId ? req.params.organizationId : req.user.organizationId;
     try {
         const {
@@ -25,7 +24,6 @@ exports.createSMSSettings = async (req, res) => {
             return res.redirect(`/sms/settings/${organizationId}`);
         }
 
-        console.log(`Received SMS settings payload: ${JSON.stringify(req.body, null, 2)}`);
         let finalPayload = {};
 
         switch (provider_name) {

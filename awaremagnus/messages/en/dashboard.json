@@ -78,6 +78,9 @@
     "achievementGallery": "Achievement Gallery",
     "achievementSubtitle": "Organization locked and unlocked badges",
     "achievements": "Achievements",
+    "noAchievementsYet": "No Achievements Yet",
+    "noAchievementsMessage": "Start participating in campaigns and modules to unlock your first achievement!",
+    "achievementHistory": "Achievement History",
     "employeeAvatarLevel": "Employee Avatar Level",
     "vulnerableNewbie": "Vulnerable\nNewbie",
     "levels": {
@@ -168,6 +171,7 @@
     },
     "noData": "No pending assignments",
     "status": {
+      "notStarted": "Not Started",
       "pending": "Pending",
       "inProgress": "In Progress"
     },

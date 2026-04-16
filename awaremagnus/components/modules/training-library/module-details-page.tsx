@@ -138,6 +138,7 @@ type ContentTypeCardItem =
         earliest_created?: string;
         latest_created?: string;
       } | null;
+      languagesSupported?: string[];
       items: ModuleContent[];
     }
   | { kind: "quizzes"; count: number };
@@ -290,6 +291,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
           typeName: agg.content_type,
           count: agg.total_count,
           dateRange: agg.date_range,
+          languagesSupported: agg.languages_supported,
           // We don't have individual items here, just the summary
           items: [],
         });
@@ -586,7 +588,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     <SearchIcon className="size-4" />
                   </span>
                   <Input
-                    aria-label={t("moduleDetails.searchPlaceholder")}
+                    aria-label={t("moduleDetails.searchPlaceholderContent")}
                     classNames={{
                       ...inputClassNames,
                       base: "w-full",
@@ -596,7 +598,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                       ),
                       input: "text-xs",
                     }}
-                    placeholder={t("moduleDetails.searchPlaceholder")}
+                    placeholder={t("moduleDetails.searchPlaceholderContent")}
                     value={searchQuery}
                     onValueChange={setSearchQuery}
                   />
@@ -774,27 +776,50 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                 <p className="text-[10px] text-gray-500 mt-1">
                                   {t("moduleDetails.created")} {createdStr}
                                 </p>
-                                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                  {lid != null && (
-                                    <div
-                                      className="flex items-center gap-1"
-                                      title={getLanguageName(lid)}
-                                    >
-                                      <ReactCountryFlag
-                                        svg
-                                        countryCode={getLanguageCountryCode(lid)}
-                                        style={{ fontSize: "1em", lineHeight: "1em" }}
-                                      />
-                                      <span className="text-[10px] text-gray-600">
+                                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                  <span className="text-[10px] text-gray-500 font-medium">
+                                    {t("moduleDetails.supportedLanguages", { defaultValue: "Supported Languages" })}
+                                  </span>
+                                  {item.languages_supported && item.languages_supported.length > 0 ? (
+                                    <>
+                                      <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-semibold">
+                                        {item.languages_supported.length}
+                                      </span>
+                                      {item.languages_supported.map((langName: string, idx: number) => {
+                                         const langEntry = SUPPORTED_LANGUAGES.find(sl => sl.name === langName);
+                                         const countryCode = langEntry ? getLanguageCountryCode(langEntry.id) : null;
+                                         return (
+                                           <span key={idx} className="text-[10px] text-gray-600 flex items-center gap-1">
+                                              {countryCode && (
+                                                <ReactCountryFlag
+                                                  svg
+                                                  countryCode={countryCode}
+                                                  style={{ fontSize: "1em" }}
+                                                />
+                                              )}
+                                              {langName}
+                                           </span>
+                                         );
+                                      })}
+                                    </>
+                                  ) : lid != null ? (
+                                    <>
+                                      <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-semibold">
+                                        1
+                                      </span>
+                                      <span className="text-[10px] text-gray-600 flex items-center gap-1">
+                                        <ReactCountryFlag
+                                          svg
+                                          countryCode={getLanguageCountryCode(lid)}
+                                          style={{ fontSize: "1em" }}
+                                        />
                                         {getLanguageName(lid)}
                                       </span>
-                                    </div>
-                                  )}
-                                  <span className="text-[10px] text-gray-600">
-                                    1 {displayName.toLowerCase()}
-                                  </span>
+                                    </>
+                                  ) : null}
+                                  
                                   {item.user_completion_status === "completed" && (
-                                    <span className="text-[10px] text-green-600 bg-green-100 px-3 py-1 rounded-full">
+                                    <span className="text-[10px] text-green-600 bg-green-100 px-3 py-1 rounded-full ml-auto">
                                       {t("moduleDetails.completed")}
                                     </span>
                                   )}
@@ -872,10 +897,36 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                               <p className="text-[10px] text-gray-500 mt-1">
                                 {t("moduleDetails.created")} {createdStr}
                               </p>
-                              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                <span className="text-[10px] text-gray-600">
+                              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                <span className="text-[10px] text-gray-700 font-semibold mr-2 border-r border-gray-300 pr-2">
                                   {count} {displayName}
                                 </span>
+                                <span className="text-[10px] text-gray-500 font-medium">
+                                  {t("moduleDetails.supportedLanguages", { defaultValue: "Supported Languages" })}
+                                </span>
+                                {card.languagesSupported && card.languagesSupported.length > 0 && (
+                                  <>
+                                    <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-semibold">
+                                      {card.languagesSupported.length}
+                                    </span>
+                                    {card.languagesSupported.map((langName: string, idx: number) => {
+                                      const langEntry = SUPPORTED_LANGUAGES.find(sl => sl.name === langName);
+                                      const countryCode = langEntry ? getLanguageCountryCode(langEntry.id) : null;
+                                      return (
+                                        <span key={idx} className="text-[10px] text-gray-600 flex items-center gap-1">
+                                          {countryCode && (
+                                            <ReactCountryFlag
+                                              svg
+                                              countryCode={countryCode}
+                                              style={{ fontSize: "1em" }}
+                                            />
+                                          )}
+                                          {langName}
+                                        </span>
+                                      );
+                                    })}
+                                  </>
+                                )}
                               </div>
                             </div>
                             <Button

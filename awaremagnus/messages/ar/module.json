@@ -192,6 +192,7 @@
     "restart": "إعادة التشغيل",
     "progress": "التقدم: {percentage}% ({current} / {total} ثانية)",
     "sendProgress": "إرسال التقدم الآن",
+    "sendingProgress": "جاري إرسال التقدم...",
     "defaultTitle": "فيديو {moduleName} المتحرك {index}",
     "defaultDescription": "تعرف على أفضل الممارسات والبروتوكولات الخاصة بـ {moduleName}",
     "openFullScreen": "فتح بملء الشاشة",
