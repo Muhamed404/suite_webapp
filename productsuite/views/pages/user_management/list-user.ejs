@@ -64,11 +64,42 @@
 
 <div class="flex flex-col  p-6 pt-0">
   <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
-    <!-- Search & Filter -->
+    <% const sp = typeof suitePagination !== 'undefined' && suitePagination ? suitePagination : { page: 1, pageSize: 25, total: 0, totalPages: 0, search: '', basePath: '/user/suite-users' }; %>
+    <!-- Server search & page size -->
     <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
+      <form method="get" action="<%= sp.basePath %>" class="flex flex-wrap items-end gap-3 w-full lg:flex-1">
+        <input type="hidden" name="page" value="1" />
+        <div class="flex flex-col gap-1 min-w-[12rem] flex-1">
+          <label for="suiteUserSearch" class="text-xs text-gray-500"><%= __("user.suiteUsersSearchLabel") %></label>
+          <input id="suiteUserSearch" type="search" name="search" value="<%= sp.search || '' %>"
+            placeholder="<%= __("generic_label.search_here") %>"
+            autocomplete="off"
+            class="w-full min-w-0 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+        </div>
+        <div class="flex flex-col gap-1">
+          <label for="suiteUserPageSize" class="text-xs text-gray-500"><%= __("user.suiteUsersPageSizeLabel") %></label>
+          <select id="suiteUserPageSize" name="pageSize"
+            class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500">
+            <% [10, 25, 50, 100].forEach(function (ps) { %>
+              <option value="<%= ps %>" <%= Number(sp.pageSize) === ps ? 'selected' : '' %>><%= ps %></option>
+            <% }); %>
+          </select>
+        </div>
+        <button type="submit"
+          class="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700"><%= __("user.suiteUsersSearchSubmit") %></button>
+        <% if (sp.search) { %>
+          <a href="<%= sp.basePath %>?page=1&amp;pageSize=<%= sp.pageSize %>" class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"><%= __("user.suiteUsersClearSearch") %></a>
+        <% } %>
+      </form>
+      <% if (sp.total > 0) { %>
+        <p class="text-sm text-gray-600 w-full lg:w-auto lg:text-right">
+          <%= ((sp.page - 1) * sp.pageSize) + 1 %>–<%= Math.min(sp.page * sp.pageSize, sp.total) %>
+          <%= __("generic_label.of") %> <%= sp.total %>
+        </p>
+      <% } %>
+    </div>
 
-
-      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} to {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
+      <table id="suite-users-table" class="min-w-full border-none  text-sm text-left text-gray-700">
         <thead class="bg-gray-50 text-gray-600  text-xs">
           <tr>
 
@@ -317,7 +348,24 @@
         </tbody>
       </table>
 
-    </div>
+    <% if (sp.totalPages > 1) { %>
+      <nav class="flex flex-wrap items-center justify-center gap-2 px-5 py-4 border-t border-gray-100" aria-label="Pagination">
+        <% if (sp.page > 1) { %>
+          <a class="px-3 py-1.5 rounded border border-gray-300 text-sm hover:bg-gray-50"
+            href="<%= sp.basePath %>?page=<%= sp.page - 1 %>&amp;pageSize=<%= sp.pageSize %>&amp;search=<%= encodeURIComponent(sp.search || '') %>"><%= __("user.suiteUsersPrev") %></a>
+        <% } %>
+        <% var win = 5; var startP = Math.max(1, sp.page - 2); var endP = Math.min(sp.totalPages, startP + win - 1); startP = Math.max(1, endP - win + 1);
+           for (var p = startP; p <= endP; p++) { %>
+          <a class="px-3 py-1.5 rounded text-sm <%= p === sp.page ? 'bg-teal-600 text-white font-semibold' : 'border border-gray-300 hover:bg-gray-50' %>"
+            href="<%= sp.basePath %>?page=<%= p %>&amp;pageSize=<%= sp.pageSize %>&amp;search=<%= encodeURIComponent(sp.search || '') %>"><%= p %></a>
+        <% } %>
+        <% if (sp.page < sp.totalPages) { %>
+          <a class="px-3 py-1.5 rounded border border-gray-300 text-sm hover:bg-gray-50"
+            href="<%= sp.basePath %>?page=<%= sp.page + 1 %>&amp;pageSize=<%= sp.pageSize %>&amp;search=<%= encodeURIComponent(sp.search || '') %>"><%= __("user.suiteUsersNext") %></a>
+        <% } %>
+      </nav>
+    <% } %>
+
   </div>
 </div>
 
@@ -365,15 +413,6 @@
 </style>
 
   <script>
-if (!document.getElementById('filter-table') || typeof simpleDatatables === 'undefined' || typeof simpleDatatables.DataTable === 'undefined') {
-  console.warn('simple-datatables not found or table missing');
-} else {
-  const dataTable = new simpleDatatables.DataTable('#filter-table', {
-    searchable: true,
-    fixedHeight: true,
-  });
-}
-
     let pendingLicenseUserId = null;
     let pendingLicenseStatus = null;
     let actionProduct = null;
