@@ -838,29 +838,29 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                     <p className="font-semibold text-base text-gray-900 leading-5">
                                       {t("moduleDetails.quizzes")}
                                     </p>
-                                    {isOrgUserView && (itemQuizzes as any).status && (itemQuizzes as any).status !== "not_started" && (
+                                    {isOrgUserView && itemQuizzes.status && itemQuizzes.status !== "not_started" && (
                                       <span 
                                         className={clsx(
                                           "text-[10px] px-2 py-0.5 rounded-full font-medium",
-                                          (itemQuizzes as any).status === "passed" ? "bg-green-100 text-green-700" :
-                                          (itemQuizzes as any).status === "failed" ? "bg-red-100 text-red-700" :
+                                          itemQuizzes.status === "passed" ? "bg-green-100 text-green-700" :
+                                          itemQuizzes.status === "failed" ? "bg-red-100 text-red-700" :
                                           "bg-orange-100 text-orange-700"
                                         )}
                                       >
-                                        {(itemQuizzes as any).status === "passed" ? t("moduleDetails.passed", { defaultValue: "Passed" }) : 
-                                         (itemQuizzes as any).status === "failed" ? t("moduleDetails.failed", { defaultValue: "Failed" }) : 
+                                        {itemQuizzes.status === "passed" ? t("moduleDetails.passed", { defaultValue: "Passed" }) : 
+                                         itemQuizzes.status === "failed" ? t("moduleDetails.failed", { defaultValue: "Failed" }) : 
                                          t("moduleDetails.inProgress", { defaultValue: "In Progress" })}
                                       </span>
                                     )}
                                   </div>
                                   <div className="text-[10px] text-gray-500 mt-1 flex items-center gap-2 flex-wrap">
                                     <span>{itemQuizzes.total_count} {t("moduleDetails.quizzesCount")}</span>
-                                    {isOrgUserView && (itemQuizzes as any).status !== undefined && (
+                                    {isOrgUserView && itemQuizzes.status !== undefined && (
                                       <>
                                         <span className="text-gray-300">•</span>
-                                        <span>{t("moduleDetails.score", { defaultValue: "Score" })}: {(itemQuizzes as any).percentage}%</span>
+                                        <span>{t("moduleDetails.score", { defaultValue: "Score" })}: {itemQuizzes.percentage}%</span>
                                         <span className="text-gray-300">•</span>
-                                        <span>{t("moduleDetails.attempts", { defaultValue: "Attempts" })}: {(itemQuizzes as any).retries_used} / {(itemQuizzes as any).retry_limit}</span>
+                                        <span>{t("moduleDetails.attempts", { defaultValue: "Attempts" })}: {itemQuizzes.retries_used} / {itemQuizzes.retry_limit}</span>
                                       </>
                                     )}
                                   </div>
@@ -873,7 +873,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                   href={`${basePath}/${moduleId}/quizzes?content_id=${item.content_id ?? item.id}`}
                                   size="sm"
                                 >
-                                  {isOrgUserView && (itemQuizzes as any).status === "passed" ? t("moduleDetails.review", { defaultValue: "Review" }) : t("moduleDetails.start")}
+                                  {isOrgUserView && itemQuizzes.status === "passed" ? t("moduleDetails.review", { defaultValue: "Review" }) : t("moduleDetails.start")}
                                 </Button>
                               </CardBody>
                             </Card>
