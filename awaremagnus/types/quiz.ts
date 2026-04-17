@@ -84,6 +84,8 @@ export interface ModuleContent {
   is_mandatory?: boolean;
   /** From API (single language or default) */
   title?: string;
+  /** Primary content name from some API responses */
+  name?: string;
   /** Language from API (e.g. { id, name }) */
   language?: { id: number; name?: string };
   language_id?: number;
@@ -91,7 +93,16 @@ export interface ModuleContent {
   /** Set from API creation_date / createdAt when normalizing list/detail */
   created_at?: string;
   created_date?: string;
-  quizzes?: { total_count: number };
+  quizzes?: { 
+    total_count: number;
+    completed_count?: number;
+    status?: string;
+    percentage?: number;
+    attempts?: number;
+    retries_used?: number;
+    retry_limit?: number;
+    languages_supported?: string[];
+  };
   user_completion_status?: string;
   languages_supported?: string[];
 }
