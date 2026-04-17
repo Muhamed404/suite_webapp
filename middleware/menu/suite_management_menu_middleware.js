@@ -43,6 +43,13 @@ function generateSuiteManagementMenu(req, organization) {
       allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin]
     },
     {
+      module: "Bulk import jobs",
+      labelKey: "menu.suite.bulkImportJobs",
+      link: "/user/bulk-import/jobs",
+      img_path: "/securemagnus_2025/images/icons/primary-uses.svg",
+      allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin]
+    },
+    {
       module: "Categories",
       labelKey: "menu.suite.cybersecurityCategories",
       link: "/cybersecurity/categories/list",
@@ -60,6 +67,13 @@ function generateSuiteManagementMenu(req, organization) {
       module: "Users",
       labelKey: "menu.suite.users",
       link: "/user/suite-users",
+      img_path: "/securemagnus_2025/images/icons/primary-uses.svg",
+      allowedRoles: [enums.userType.OrgSuperAdmin, enums.userType.OrgSubAdmin]
+    },
+    {
+      module: "Bulk import jobs",
+      labelKey: "menu.suite.bulkImportJobs",
+      link: "/user/bulk-import/jobs",
       img_path: "/securemagnus_2025/images/icons/primary-uses.svg",
       allowedRoles: [enums.userType.OrgSuperAdmin, enums.userType.OrgSubAdmin]
     },

@@ -60,6 +60,9 @@ module.exports = {
             SAVE_ENROLLMENT: (hasRequestedToUnenroll) => `/user/update-license-status/${hasRequestedToUnenroll}`,
             DELETE: (userId) => `/user/delete/${userId}`,
             LIST_SUITE_USERS: (organization) => `/user/suite-users/${organization}`,
+            BULK_IMPORT_LIST: (organizationId) => `/user/bulk-import/list/${organizationId}`,
+            BULK_IMPORT_STATUS: (organizationId, jobId) =>
+              `/user/bulk-import/${organizationId}/${jobId}`,
             RETRIEVE_USER_BY_ID: (userId) => `/user/show/${userId}`,
             SAVE_EDIT_USER: (userId) => `/user/update/${userId}`,
             LICENSED_USERS_BY_PRODUCT: (productId) => `/user/licensed-users/${productId}`,

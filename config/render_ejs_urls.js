@@ -107,6 +107,7 @@ module.exports = {
             LIST_SECUREMAGNUS_USERS: 'pages/user_management/list-securemagnus-users',
             LIST: 'pages/user_management/list-user',
             BULK_UPLOAD: 'pages/user_management/upload-user',
+            BULK_IMPORT_JOBS: 'pages/user_management/list-bulk-import-jobs',
             // CREATE: 'pages/user_management/addUser',
             CREATE_USER: 'pages/user_management/create-user', // This is new temporary file for new design
             CREATE_SECUREMAGNUS_USER: 'pages/user_management/create-securemagnus-user',

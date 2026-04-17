@@ -49,13 +49,21 @@ exports.renderSuiteUsers = async (req, res) => {
       logger.info(`[Organization User List] Setting read-only mode for user: ` + userSession.email + ` - viewing different organization`)
     }
     
+    const showBulkImportJobsNav = hasAccess(req, enums.ModuleNames.User_Management, [
+      enums.Access_Types.RWD_O,
+      enums.Access_Types.RWD_ALL,
+      enums.Access_Types.R_ALL,
+    ]);
+
     logger.info(`Controller - Render Suite Users: Rendering user list view with hasCreatePermission: ${hasCreatePermission}, isReadOnly: ${isReadOnly}`);
     return res.render(render_ejs_urls.ProductSuiteManagement.User_Management.LIST, {
       enableSuiteManagementLeftMenu: true,
       users: combinedUsers,
       hasCreatePermission,
       isReadOnly,
-      locale: req.getLocale()
+      locale: req.getLocale(),
+      suiteListOrganizationId: organization,
+      showBulkImportJobsNav,
     });
 
   } catch (error) {

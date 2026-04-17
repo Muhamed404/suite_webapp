@@ -138,13 +138,25 @@ exports.uploadBulkUsers = async (req, res, next) => {
 
         logger.info(`[File Upload]: Sending file to backend url=${url}`);
         try {
-          await apiClient.post(url, formData, {
+          const response = await apiClient.post(url, formData, {
             headers: { ...formData.getHeaders() },
             maxContentLength: Infinity,
             maxBodyLength: Infinity
           });
           logger.info('[File Upload]: File forwarded to backend successfully');
           try { fs.unlinkSync(file.path); } catch (e) { logger.error('[File Upload]: cleanup error'+ e); }
+          const data = response.data || {};
+          const jobId = data.object && data.object.job_id;
+          const orgFromJob = data.object && data.object.organization_id;
+          if (data.alertType === 'success' && jobId != null) {
+            const orgForJobs = orgFromJob != null && !Number.isNaN(Number(orgFromJob)) && Number(orgFromJob) > 0
+              ? Number(orgFromJob)
+              : organization;
+            const jobsPath = frontend_api_urls.PRODUCT_SUITE.User_Management.BULK_IMPORT_JOBS(orgForJobs);
+            req.flash("message", req.__("user.bulkImportQueuedShort"));
+            req.flash("alertType", "success");
+            return res.redirect(`${jobsPath}?jobId=${encodeURIComponent(String(jobId))}`);
+          }
           req.flash("message", 'File uploading is in Process.');
           req.flash("alertType", "success");
           return res.redirect(frontend_api_urls.PRODUCT_SUITE.User_Management.SUITE_USERS);
