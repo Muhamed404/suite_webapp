@@ -159,7 +159,6 @@
     "title": "Pending Assignments",
     "viewAll": "View All",
     "assigned": "Assigned {date}",
-    "level": "Level 1/1",
     "days": "{days} Days",
     "columnHeaders": {
       "campaignName": "Campaign Name",

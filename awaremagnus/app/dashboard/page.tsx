@@ -38,6 +38,7 @@ import {
   useOrganizationMonthlyCompletion,
   useUserAssignments,
   useAchievementStatistics,
+  useAchievements,
 } from "@/hooks/useDashboard";
 import { useLicenseInfo } from "@/hooks/useSuiteAwm";
 import { useUserPendingSurveys } from "@/hooks/useSurvey";
@@ -126,6 +127,7 @@ export default function DashboardPage() {
   const { data: assignmentsData } = useUserAssignments({ language_id: languageId });
   // Fetch achievement statistics for the org
   const { data: achievementStatsData } = useAchievementStatistics();
+  const { data: achievementsData } = useAchievements();
 
   const { data: systemStrugglingRaw } = useSystemStrugglingModules({ enabled: isPlatformAdmin });
   const { data: orgStrugglingRaw } = useOrganizationStrugglingModules();
@@ -568,23 +570,79 @@ export default function DashboardPage() {
     return set;
   }, [achievementStatsList]);
 
-  // Map: achievement number → full stats object (for tooltip data)
-  const achievementByNumber = useMemo(() => {
+  const allAchievementIds = useMemo(() => {
+    const apiAchievements = Array.isArray(achievementsData?.object?.achievements)
+      ? achievementsData.object.achievements
+      : [];
+    const idsFromApi = apiAchievements
+      .map((achievement: any) => Number(achievement?.id))
+      .filter((id: number) => Number.isFinite(id) && id > 0);
+
+    if (idsFromApi.length > 0) {
+      return Array.from(new Set(idsFromApi)).sort((a, b) => a - b);
+    }
+
+    const totalUniqueAchievements = Number(
+      (achievementStatsData as any)?.object?.total_unique_achievements_unlocked ?? 0
+    ) + Number((achievementStatsData as any)?.object?.total_unique_achievements_locked ?? 0);
+    const fallbackCount = Number.isFinite(totalUniqueAchievements) && totalUniqueAchievements > 0
+      ? Math.floor(totalUniqueAchievements)
+      : 16;
+
+    return Array.from({ length: fallbackCount }, (_, index) => index + 1);
+  }, [achievementsData, achievementStatsData]);
+
+  const orderedGalleryAchievementIds = useMemo(() => {
+    const unlocked: number[] = [];
+    const locked: number[] = [];
+
+    for (const achievementId of allAchievementIds) {
+      if (unlockedAchievementIds.has(achievementId)) {
+        unlocked.push(achievementId);
+      } else {
+        locked.push(achievementId);
+      }
+    }
+
+    return [...unlocked, ...locked].slice(0, 16);
+  }, [allAchievementIds, unlockedAchievementIds]);
+
+  // Map: achievement id -> merged metadata (catalog + unlocked stats) for tooltip and image path
+  const achievementById = useMemo(() => {
     const map = new Map<number, any>();
-    const items = achievementStatsList;
 
-    for (const a of items) {
-      const img = a?.image_small_url ?? "";
-      const m = img.trim().match(/^(\d{1,2})/);
+    const catalogAchievements = Array.isArray(achievementsData?.object?.achievements)
+      ? achievementsData.object.achievements
+      : [];
 
-      if (!m) continue;
-      const n = Number(m[1]);
+    for (const achievement of catalogAchievements) {
+      const id = Number(achievement?.id);
 
-      if (n >= 1 && n <= 16) map.set(n, a);
+      if (!Number.isFinite(id) || id <= 0) continue;
+      map.set(id, {
+        achievement_id: id,
+        achievement_name: achievement?.name,
+        achievement_description: achievement?.description,
+        achievement_category: achievement?.formula,
+        image_small_url: achievement?.image_small_url,
+      });
+    }
+
+    for (const achievement of achievementStatsList) {
+      const id = Number(achievement?.achievement_id);
+
+      if (!Number.isFinite(id) || id <= 0) continue;
+      const existing = map.get(id) || {};
+
+      map.set(id, {
+        ...existing,
+        ...achievement,
+        achievement_id: id,
+      });
     }
 
     return map;
-  }, [achievementStatsList]);
+  }, [achievementsData, achievementStatsList]);
 
   // Category stats for achievements
   const categoryStats = useMemo(() => {
@@ -623,6 +681,12 @@ export default function DashboardPage() {
     Compliance: { bg: "bg-green-100", iconBg: "bg-green-400", icon: "check-circle" },
     Risk: { bg: "bg-pink-100", iconBg: "bg-pink-400", icon: "clock" },
     Engagement: { bg: "bg-lime-100", iconBg: "bg-lime-400", icon: "rocket" },
+    Consistency: { bg: "bg-rose-100", iconBg: "bg-rose-400", icon: "clock" },
+    Exploration: { bg: "bg-emerald-100", iconBg: "bg-emerald-400", icon: "book" },
+    Leadership: { bg: "bg-violet-100", iconBg: "bg-violet-400", icon: "star" },
+    Mastery: { bg: "bg-amber-100", iconBg: "bg-amber-400", icon: "check-circle" },
+    Resilience: { bg: "bg-sky-100", iconBg: "bg-sky-400", icon: "star" },
+    Resourcefulness: { bg: "bg-fuchsia-100", iconBg: "bg-fuchsia-400", icon: "chart-bar" },
     // Add more if needed
   };
 
@@ -834,10 +898,10 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="grid grid-cols-4 gap-1.5 mb-3">
-                    {Array.from({ length: 16 }, (_, index) => {
-                      const achievementId = index + 1;
+                    {orderedGalleryAchievementIds.map((achievementId) => {
                       const isUnlocked = unlockedAchievementIds.has(achievementId);
-                      const meta = achievementByNumber.get(achievementId);
+                      const meta = achievementById.get(achievementId);
+                      const imageFileName = meta?.image_small_url || `${achievementId}.png`;
 
                       const tooltipContent = (
                         <div className="flex flex-col gap-1 max-w-[200px] p-1">
@@ -865,7 +929,13 @@ export default function DashboardPage() {
                       );
 
                       return (
-                        <Tooltip key={index} content={tooltipContent} placement="top" delay={300} closeDelay={0}>
+                        <Tooltip
+                          key={achievementId}
+                          content={tooltipContent}
+                          placement="top"
+                          delay={300}
+                          closeDelay={0}
+                        >
                           <div className="relative">
                             <div
                               className={`w-10 h-10 flex items-center justify-center ${isUnlocked ? "" : "opacity-40"}`}
@@ -874,7 +944,7 @@ export default function DashboardPage() {
                                 alt=""
                                 className="w-full h-full object-contain"
                                 height={40}
-                                src={getContentAssetUrl(`/images/achivement/${achievementId}.png`)}
+                                src={getContentAssetUrl(`/images/achivement/${imageFileName}`)}
                                 width={40}
                               />
                             </div>
@@ -886,8 +956,7 @@ export default function DashboardPage() {
 
                   <div className="flex flex-wrap gap-1 mb-3">
                     {Object.entries(categoryStats)
-                      .sort(() => Math.random() - 0.5)
-                      .slice(0, 5)
+                      .sort((a, b) => b[1] - a[1])
                       .map(([category, count]) => {
                         const config = categoryConfig[category] || {
                           bg: "bg-gray-100",
@@ -1143,24 +1212,18 @@ export default function DashboardPage() {
                           .slice(0, 4) || []
                       ).map((assignment: any, index: number) => {
                         const startDate = new Date(assignment.start_date);
-                        const endDate = new Date(assignment.end_date);
-                        // use numeric timestamps so TypeScript accepts the arithmetic and guard invalid dates
-                        const startMs = startDate.getTime();
-                        const endMs = endDate.getTime();
-                        const days =
-                          Number.isFinite(startMs) && Number.isFinite(endMs)
-                            ? Math.ceil((endMs - startMs) / (1000 * 60 * 60 * 24))
-                            : 0;
+                        const remainingDaysRaw = Number(assignment.remaining_days);
+                        const days = Number.isFinite(remainingDaysRaw)
+                          ? Math.max(remainingDaysRaw, 0)
+                          : 0;
                         const assigned = startDate.toLocaleDateString("en-GB", {
                           day: "numeric",
                           month: "short",
                         });
-                        const progress =
-                          assignment.status.name === "PENDING"
-                            ? 0
-                            : assignment.status.name === "IN_PROGRESS"
-                              ? 50
-                              : 100;
+                        const progressRaw = Number(assignment.progress_percentage);
+                        const progress = Number.isFinite(progressRaw)
+                          ? Math.min(Math.max(progressRaw, 0), 100)
+                          : 0;
 
                         return (
                           <div
@@ -1177,7 +1240,6 @@ export default function DashboardPage() {
                                 </h3>
                                 <p className="text-[11px] text-gray-400">{t("pendingTasks.assigned", { date: assigned })}</p>
                                 <div className="flex items-center gap-3 text-[11px] text-gray-500">
-                                  <span>{t("pendingTasks.level")}</span>
                                   <span className="flex items-center gap-1">⏱ {t("pendingTasks.days", { days })}</span>
                                 </div>
                                 <div className="w-36 h-1 bg-gray-200 rounded-full overflow-hidden">

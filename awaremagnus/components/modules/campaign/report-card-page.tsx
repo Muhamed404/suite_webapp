@@ -3,7 +3,7 @@
 import type { ReportCardModuleResult } from "@/types/reportCard";
 
 import { useMemo } from "react";
-import { Shield, Clock, TrendingUp, Download, Share2 } from "lucide-react";
+import { Shield, Clock, TrendingUp, Download, Share2, BadgeCheck, Medal } from "lucide-react";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -11,6 +11,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useMyReportCard, useUserReportCard } from "@/hooks/useReportCard";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 /* ─── Helpers ─── */
 function formatStudyTime(minutes: number): string {
@@ -32,28 +33,108 @@ function getRiskBadge(level: string | null): { text: string; bg: string } {
   if (!level) return { text: "Unknown", bg: "#6b7280" };
   const l = level.toLowerCase();
 
-  if (l.includes("very high") || l.includes("high")) return { text: "In Risk", bg: "#dc2626" };
-  if (l.includes("medium")) return { text: "At Risk", bg: "#f59e0b" };
+  if (l.includes("not evaluated")) return { text: "Not Evaluated", bg: "#6b7280" };
+  if (l.includes("very high")) return { text: "Very High", bg: "#b91c1c" };
+  if (l.includes("high")) return { text: "High", bg: "#dc2626" };
+  if (l.includes("medium")) return { text: "Medium", bg: "#f59e0b" };
+  if (l.includes("very low")) return { text: "Very Low", bg: "#15803d" };
+  if (l.includes("low")) return { text: "Low", bg: "#16a34a" };
 
-  return { text: "Low Risk", bg: "#16a34a" };
+  return { text: level, bg: "#6b7280" };
 }
+
+const AVATAR_IMAGE_BY_LEVEL: Record<number, string> = {
+  1: "Vulnerablenewbe_Level1_Robot.png",
+  2: "AlertApprentice_Level2_Robot.png",
+  3: "CautiousLearner_Level3_Robot.png",
+  4: "InformedDefender_Level4_Robot.png",
+  5: "VigilantGuardian_Level5_Robot.png",
+  6: "SkilledSentinel._Level6_Robot.png",
+  7: "ResilientProtector_Level7_Robot.png",
+  8: "AdvancedWatchman_Level8_Robot.png",
+  9: "ExpertEnforcer_Level9_Robot.png",
+  10: "MasterStrategist_Level10_Robot.png",
+  11: "EliteVanguard_Level11_Robot.png",
+  12: "LegendaryShieldbearer_Level12_Robot.png",
+  13: "SupremeCyberKnight_Level13_Robot.png",
+  14: "UltimateCyberSentinel_Level14_Robot.png",
+};
 
 /* ─── SVG Area Chart ─── */
 interface AreaChartProps {
   data: number[];
   labels: string[];
 }
+
+function buildCountTicks(maxValue: number): number[] {
+  const safeMax = Math.max(1, Math.ceil(maxValue));
+  const step = safeMax <= 6 ? 1 : Math.ceil(safeMax / 6);
+  const ticks: number[] = [];
+
+  for (let t = 0; t <= safeMax; t += step) {
+    ticks.push(t);
+  }
+  if (ticks[ticks.length - 1] !== safeMax) {
+    ticks.push(safeMax);
+  }
+
+  return ticks;
+}
+
+function parseModuleCompletionDate(dateStr: string | null | undefined): Date | null {
+  if (!dateStr) return null;
+
+  const trimmed = dateStr.trim();
+  const match = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(trimmed);
+
+  if (match) {
+    const day = parseInt(match[1], 10);
+    const monthMap: Record<string, number> = {
+      jan: 0,
+      feb: 1,
+      mar: 2,
+      apr: 3,
+      may: 4,
+      jun: 5,
+      jul: 6,
+      aug: 7,
+      sep: 8,
+      oct: 9,
+      nov: 10,
+      dec: 11,
+    };
+    const month = monthMap[match[2].toLowerCase()];
+    const year = parseInt(match[3], 10);
+
+    if (month !== undefined) {
+      return new Date(year, month, day);
+    }
+  }
+
+  const fallback = new Date(trimmed);
+
+  return Number.isNaN(fallback.getTime()) ? null : fallback;
+}
+
+function formatChartDateLabel(date: Date): string {
+  const day = date.getDate();
+  const month = date.toLocaleDateString("en-GB", { month: "short" });
+
+  return `${day} ${month}`;
+}
+
 function AreaChart({ data, labels }: AreaChartProps) {
   const color = "#38bdf8";
   const W = 300,
-    H = 130,
+    H = 140,
     pT = 16,
     pR = 12,
-    pB = 32,
+    pB = 40,
     pL = 32;
   const iW = W - pL - pR,
     iH = H - pT - pB,
-    maxY = 40;
+    maxY = Math.max(...data, 1);
+  const yTicks = buildCountTicks(maxY);
   const pts = data.map((v, i) => ({
     x: pL + (i / Math.max(data.length - 1, 1)) * iW,
     y: pT + iH - (Math.min(v, maxY) / maxY) * iH,
@@ -68,14 +149,14 @@ function AreaChart({ data, labels }: AreaChartProps) {
   ].join(" ");
 
   return (
-    <svg className="w-full h-full" viewBox={`0 0 ${W} ${H}`}>
+    <svg className="w-full h-full overflow-visible" viewBox={`0 0 ${W} ${H}`}>
       <defs>
         <linearGradient id="rcGrad" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.25" />
           <stop offset="100%" stopColor={color} stopOpacity="0.02" />
         </linearGradient>
       </defs>
-      {[0, 10, 20, 30, 40].map((t) => {
+      {yTicks.map((t) => {
         const cy = pT + iH - (t / maxY) * iH;
 
         return (
@@ -104,6 +185,17 @@ function AreaChart({ data, labels }: AreaChartProps) {
           {l}
         </text>
       ))}
+      <text fill="#6b7280" fontSize="8" textAnchor="middle" x={pL + iW / 2} y={H + 3}>
+        Module Completion Dates
+      </text>
+      <text
+        fill="#6b7280"
+        fontSize="8"
+        textAnchor="middle"
+        transform={`translate(8 ${pT + iH / 2}) rotate(-90)`}
+      >
+        Module Counts
+      </text>
     </svg>
   );
 }
@@ -158,9 +250,23 @@ function TimelineItem({ module: m, isLast }: { module: ReportCardModuleResult; i
           </span>
         )}
         <div className="flex items-center gap-3 text-[10px] text-gray-500 mb-1 flex-wrap">
-          <span className="text-orange-500">⭐ +{m.achieved_xp_tokens} XP</span>          <span className="text-purple-500">🏆 {m.achieved_compliance_score} pts</span>          {m.quiz_percentage !== undefined && (
+          <span className="text-orange-500">⭐ +{m.achieved_xp_tokens} XP</span>
+          <span className="text-purple-500">🏆 {m.achieved_compliance_score} pts</span>
+          {m.quiz_percentage !== undefined && (
             <span>📘 {m.quiz_percentage.toFixed(0)}% Quiz Score</span>
           )}
+          <span className="inline-flex items-center gap-1 text-emerald-600">
+            <BadgeCheck className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-gray-600">
+              Certificate Issue: {m.certificate_issued || "Not applicable"}
+            </span>
+          </span>
+          <span className="inline-flex items-center gap-1 text-fuchsia-600">
+            <Medal className="w-3.5 h-3.5 text-fuchsia-500" />
+            <span className="text-gray-600">
+              Achievement Unlocked: {m.achievements_unlocked_in_module ?? 0}
+            </span>
+          </span>
           {m.duration_minutes && <span>⏱ {m.duration_minutes} minutes</span>}
         </div>
         <p className="text-[11px] text-gray-500">{desc}</p>
@@ -221,12 +327,15 @@ const SEG_COLORS = [
 /* ─── PDF Print: build standalone HTML document ─── */
 function buildPrintHTML(args: {
   userName: string;
-  totalSurveySent: number;
-  surveysCompleted: number;
+  reportOwner: string;
+  leaderboardRank: number;
+  modulesCompleted: number;
+  certificates: number;
   quizAccuracy: number;
   xpLevel: number;
   xpTokens: number;
   studyTime: number;
+  userAvatarUrl: string;
   riskBadge: { text: string; bg: string };
   campaigns: Array<{ campaign_name: string; completed_modules: ReportCardModuleResult[] }>;
   chartData: number[];
@@ -235,12 +344,15 @@ function buildPrintHTML(args: {
 }): string {
   const {
     userName,
-    totalSurveySent,
-    surveysCompleted,
+    reportOwner,
+    leaderboardRank,
+    modulesCompleted,
+    certificates,
     quizAccuracy,
     xpLevel,
     xpTokens,
     studyTime,
+    userAvatarUrl,
     riskBadge,
     campaigns,
     chartData,
@@ -312,14 +424,14 @@ function buildPrintHTML(args: {
 
   /* SVG area chart */
   const W = 280,
-    H = 140,
+    H = 150,
     pT = 16,
     pR = 12,
-    pB = 36,
+    pB = 44,
     pL = 32;
   const iW = W - pL - pR,
     iH = H - pT - pB,
-    maxY = Math.max(...chartData, 40);
+    maxY = Math.max(...chartData, 1);
   const pts = chartData.map((v, i) => ({
     x: pL + (i / Math.max(chartData.length - 1, 1)) * iW,
     y: pT + iH - (Math.min(v, maxY) / maxY) * iH,
@@ -332,8 +444,8 @@ function buildPrintHTML(args: {
     ...pts.map((p) => `L ${p.x.toFixed(1)},${p.y.toFixed(1)}`),
     `L ${(pts[pts.length - 1]?.x ?? pL + iW).toFixed(1)},${(pT + iH).toFixed(1)} Z`,
   ].join(" ");
-  const yTicks = [0, 10, 20, 30, 40].filter((t) => t <= maxY || t === 0);
-  const svgChart = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:140px;">
+  const yTicks = buildCountTicks(maxY);
+  const svgChart = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:150px;overflow:visible;">
     <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/>
       <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.02"/>
@@ -355,6 +467,8 @@ function buildPrintHTML(args: {
         return `<text x="${x.toFixed(1)}" y="${H - 4}" text-anchor="middle" font-size="7" fill="#94a3b8">${l}</text>`;
       })
       .join("")}
+    <text x="${(pL + iW / 2).toFixed(1)}" y="${H + 3}" text-anchor="middle" font-size="8" fill="#6b7280">Module Completion Dates</text>
+    <text x="8" y="${(pT + iH / 2).toFixed(1)}" text-anchor="middle" font-size="8" fill="#6b7280" transform="rotate(-90 8 ${(pT + iH / 2).toFixed(1)})">Module Counts</text>
   </svg>`;
 
   return `<!DOCTYPE html>
@@ -403,27 +517,27 @@ function buildPrintHTML(args: {
   <div class="row">
     <div class="stat-cards">
       <div class="stat-card">
-        <p class="stat-label">Total Survey Sent</p>
+        <p class="stat-label">Leaderboard Rank</p>
         <div class="stat-row">
-          <span class="stat-value">${totalSurveySent}</span>
+          <span class="stat-value">${leaderboardRank}</span>
           <div class="icon-circle" style="background:#fffbeb;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#facc15" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
         </div>
       </div>
       <div class="stat-card">
-        <p class="stat-label">Surveys Completed</p>
+        <p class="stat-label">Modules Completed</p>
         <div class="stat-row">
-          <span class="stat-value">${surveysCompleted}</span>
+          <span class="stat-value">${modulesCompleted}</span>
           <div class="icon-circle" style="background:#f0fdfa;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#2dd4bf" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
         </div>
       </div>
       <div class="stat-card">
-        <p class="stat-label">Response Rate</p>
+        <p class="stat-label">Certificates</p>
         <div class="stat-row">
-          <span class="stat-value">${quizAccuracy.toFixed(0)}%</span>
+          <span class="stat-value">${certificates}</span>
           <div class="icon-circle" style="background:#fef2f2;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#f87171" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
           </div>
@@ -439,18 +553,23 @@ function buildPrintHTML(args: {
           </div>
           <div>
             <h2 style="font-size:13px;font-weight:600;color:#111827;line-height:1.3;">Security Awareness Report</h2>
-            <p style="font-size:11px;color:#6b7280;margin-top:2px;">${userName}'s comprehensive progress report</p>
+            <p style="font-size:11px;color:#6b7280;margin-top:2px;">${reportOwner}'s comprehensive progress report</p>
             <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280;margin-top:6px;">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               <span>Generated on: ${today}</span>
             </div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
-          <div style="width:20px;height:20px;border-radius:4px;background:#14b8a6;display:flex;align-items:center;justify-content:center;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8M3 17l6-6"/></svg>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:20px;height:20px;border-radius:4px;background:#14b8a6;display:flex;align-items:center;justify-content:center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8M3 17l6-6"/></svg>
+            </div>
+            <p style="font-size:12px;font-weight:500;color:#111827;">Level <strong>${xpLevel}</strong></p>
           </div>
-          <p style="font-size:12px;font-weight:500;color:#111827;">Level <strong>${xpLevel}</strong></p>
+          <div style="width:25px;height:25px;border-radius:9999px;overflow:hidden;border:1px solid #e5e7eb;flex-shrink:0;">
+            <img src="${userAvatarUrl}" alt="Level ${xpLevel}" style="width:100%;height:100%;object-fit:cover;" />
+          </div>
         </div>
       </div>
     </div>
@@ -515,6 +634,20 @@ function buildPrintHTML(args: {
                     <span style="color:#f97316;">⭐ +${m.achieved_xp_tokens} XP</span>
                     <span style="color:#a855f7;">🏆 ${m.achieved_compliance_score} pts</span>
                     ${m.quiz_percentage !== undefined ? `<span>📘 ${m.quiz_percentage.toFixed(0)}% Quiz Score</span>` : ""}
+                    <span style="display:inline-flex;align-items:center;gap:4px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#10b981" stroke-width="2">
+                        <circle cx="12" cy="12" r="9" fill="#d1fae5" stroke="none"/>
+                        <path d="M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span>Certificate Issue: ${m.certificate_issued || "Not applicable"}</span>
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:4px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#d946ef" stroke-width="2">
+                        <circle cx="12" cy="12" r="9" fill="#f5d0fe" stroke="none"/>
+                        <path d="M12 8l1.6 3.2 3.5.5-2.5 2.4.6 3.4L12 16l-3.2 1.5.6-3.4-2.5-2.4 3.5-.5L12 8z" stroke-linejoin="round"/>
+                      </svg>
+                      <span>Achievement Unlocked: ${m.achievements_unlocked_in_module ?? 0}</span>
+                    </span>
                     ${m.duration_minutes ? `<span>⏱ ${m.duration_minutes} minutes</span>` : ""}
                   </div>
                   <p style="font-size:11px;color:#6b7280;">${d}</p>
@@ -572,9 +705,9 @@ function buildPrintHTML(args: {
       <!-- Module Chart -->
       <div class="chart-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3 style="font-size:14px;font-weight:600;color:#1f2937;">XP Progress Chart</h3>
+          <h3 style="font-size:14px;font-weight:600;color:#1f2937;">Module Completion Chart</h3>
         </div>
-        ${chartData.length > 0 ? svgChart : `<p style="font-size:10px;color:#9ca3af;text-align:center;padding:24px 0;">Chart will appear after completing your first module</p>`}
+        ${chartData.length > 0 ? svgChart : `<p style="font-size:10px;color:#9ca3af;text-align:center;padding:24px 0;">Module completion graph will appear after completing your first module</p>`}
       </div>
     </div>
   </div>
@@ -615,8 +748,10 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
     () => allModules.reduce((s, { module: m }) => s + m.total_attempted_quizzes, 0),
     [allModules]
   );
-  const surveysCompleted =
+  const leaderboardRank = (meta?.leaderboard_rank as number | null | undefined) ?? totalSurveySent;
+  const modulesCompleted =
     (meta?.total_modules_completed as number | undefined) ?? allModules.length;
+  const totalCertificates = (meta?.total_completed_certificates as number | undefined) ?? 0;
   const quizAccuracy = (meta?.quizzes_accuracy_percent as number | undefined) ?? 0;
   const xpLevel = (meta?.user_avatar_level as number | undefined) ?? 0;
   const xpTokens = (meta?.xp_total_tokens as number | undefined) ?? 0;
@@ -629,43 +764,55 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
     [allModules]
   );
 
-  const chartData = allModules.slice(-6).map(({ module: m }) => m.achieved_xp_tokens);
-  const chartLabels = allModules.slice(-6).map(({ module: m }) => {
-    if (!m.module_completion_date) return "—";
-    const parts = m.module_completion_date.split("-");
-    const months = [
-      "",
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
+  const completionChart = useMemo(() => {
+    const countByDate = new Map<string, number>();
 
-    return parts.length >= 2
-      ? `${parts[0]} ${months[parseInt(parts[1], 10)] ?? parts[1]}`
-      : m.module_completion_date.substring(0, 6);
-  });
+    allModules.forEach(({ module }) => {
+      if (!module.module_completion_date) return;
+      const current = countByDate.get(module.module_completion_date) ?? 0;
+      countByDate.set(module.module_completion_date, current + 1);
+    });
+
+    const datedEntries = Array.from(countByDate.entries())
+      .map(([rawDate, count]) => ({ rawDate, count, date: parseModuleCompletionDate(rawDate) }))
+      .filter((item): item is { rawDate: string; count: number; date: Date } => !!item.date)
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    let runningCount = 0;
+    const data: number[] = [];
+    const labels: string[] = [];
+
+    datedEntries.forEach((entry) => {
+      runningCount += entry.count;
+      data.push(runningCount);
+      labels.push(formatChartDateLabel(entry.date));
+    });
+
+    return { data, labels };
+  }, [allModules]);
+
+  const chartData = completionChart.data;
+  const chartLabels = completionChart.labels;
 
   const anyUser = user as any;
   const userName: string = anyUser?.name ?? anyUser?.username ?? user?.email ?? "User";
+  const reportOwner: string = anyUser?.email ?? userName;
+  const userAvatarUrl = getContentAssetUrl(
+    `/images/avatars/${AVATAR_IMAGE_BY_LEVEL[xpLevel] ?? AVATAR_IMAGE_BY_LEVEL[1]}`
+  );
 
   function handleDownload() {
     const html = buildPrintHTML({
       userName,
-      totalSurveySent,
-      surveysCompleted,
+      reportOwner,
+      leaderboardRank,
+      modulesCompleted,
+      certificates: totalCertificates,
       quizAccuracy,
       xpLevel,
       xpTokens,
       studyTime,
+      userAvatarUrl,
       riskBadge,
       campaigns,
       chartData,
@@ -726,27 +873,27 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
             <div className="col-span-12 md:col-span-8 md:row-span-2">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <div className="bg-white rounded-2xl p-5">
-                  <p className="text-gray-600 text-sm">Total Survey Sent</p>
+                  <p className="text-gray-600 text-sm">Leaderboard Rank</p>
                   <div className="flex justify-between items-center mt-2">
-                    <h3 className="text-3xl font-semibold">{totalSurveySent}</h3>
+                    <h3 className="text-3xl font-semibold">{leaderboardRank}</h3>
                     <div className="w-11 h-11 rounded-full bg-amber-50 flex items-center justify-center">
                       <Clock className="w-5 h-5 text-amber-400" />
                     </div>
                   </div>
                 </div>
                 <div className="bg-white rounded-2xl p-5">
-                  <p className="text-gray-600 text-sm">Surveys Completed</p>
+                  <p className="text-gray-600 text-sm">Modules Completed</p>
                   <div className="flex justify-between items-center mt-2">
-                    <h3 className="text-3xl font-semibold">{surveysCompleted}</h3>
+                    <h3 className="text-3xl font-semibold">{modulesCompleted}</h3>
                     <div className="w-11 h-11 rounded-full bg-teal-50 flex items-center justify-center">
                       <Clock className="w-5 h-5 text-teal-400" />
                     </div>
                   </div>
                 </div>
                 <div className="bg-white rounded-2xl p-5">
-                  <p className="text-gray-600 text-sm">Response Rate</p>
+                  <p className="text-gray-600 text-sm">Certificates</p>
                   <div className="flex justify-between items-center mt-2">
-                    <h3 className="text-3xl font-semibold">{quizAccuracy.toFixed(0)}%</h3>
+                    <h3 className="text-3xl font-semibold">{totalCertificates}</h3>
                     <div className="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center">
                       <svg
                         className="w-5 h-5 text-red-400"
@@ -786,7 +933,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                         Security Awareness Report
                       </h2>
                       <p className="text-[11px] text-gray-500 mt-0.5">
-                        {userName}&apos;s comprehensive progress report
+                        {reportOwner}&apos;s comprehensive progress report
                       </p>
                       <div className="flex items-center gap-1 text-[11px] text-gray-500 mt-1.5">
                         <svg
@@ -807,13 +954,18 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-3">
-                    <div className="w-5 h-5 rounded-md bg-teal-500 flex items-center justify-center">
-                      <TrendingUp className="w-3 h-3 text-white" />
+                  <div className="flex items-center justify-between gap-2 mt-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md bg-teal-500 flex items-center justify-center">
+                        <TrendingUp className="w-3 h-3 text-white" />
+                      </div>
+                      <p className="text-xs font-medium text-gray-900">
+                        Level <span className="font-semibold">{xpLevel}</span>
+                      </p>
                     </div>
-                    <p className="text-xs font-medium text-gray-900">
-                      Level <span className="font-semibold">{xpLevel}</span>
-                    </p>
+                    <div className="w-[25px] h-[25px] rounded-full overflow-hidden border border-gray-200 bg-slate-100">
+                      <img alt={`Level ${xpLevel}`} className="w-full h-full object-cover" src={userAvatarUrl} />
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mt-3">
@@ -1049,7 +1201,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                 ) : (
                   <div className="flex-1 flex items-center justify-center py-4">
                     <p className="text-[10px] text-gray-400 text-center">
-                      XP chart will appear after completing your first module
+                      Module completion graph will appear after completing your first module
                     </p>
                   </div>
                 )}

@@ -151,17 +151,18 @@ function getActionButton(
     <Link href={`/module/${moduleSlug}?campaign_id=${campaign.campaign_id}`}>
       <button
         className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
-        onClick={() => {
-          // simply hit report endpoint; ignore response for now
-          campaignService
-            .getModuleReport(campaign.id)
-            .then((res) => {
-              console.log("[campaign-assignments] getModuleReport", res);
-            })
-            .catch((err) => {
-              console.error("[campaign-assignments] getModuleReport error", err);
-            });
-        }}
+        // Commented out useless API call - response was being ignored
+        // onClick={() => {
+        //   // simply hit report endpoint; ignore response for now
+        //   campaignService
+        //     .getModuleReport(campaign.id)
+        //     .then((res) => {
+        //       console.log("[campaign-assignments] getModuleReport", res);
+        //     })
+        //     .catch((err) => {
+        //       console.error("[campaign-assignments] getModuleReport error", err);
+        //     });
+        // }}
       >
         <span>{t("assignmentPage.actions.view")}</span>
       </button>
