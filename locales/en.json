@@ -337,6 +337,7 @@
 			"logout": "Logout",
 			"smtpNotifications": "SMTP Notifications",
 			"notificationTemplates": "Notification Templates",
+			"notificationMailLog": "Notification Mail Log",
 			"bulkImportJobs": "Bulk import jobs"
 		}
 	},
@@ -871,7 +872,11 @@
 		"labelChooseProduct": "Choose Product",
 		"labelEnterUserDetails": "Enter User Details",
 		"labelSave": "Save",
-		"labelAvailableUsersLicense": "Available Users License"
+		"labelAvailableUsersLicense": "Available Users License",
+		"suiteUsersSearchLabel": "Search",
+		"suiteUsersPageSizeLabel": "Page Size",
+		"suiteUsersSearchSubmit": "Submit",
+		"suiteUsersNext": "Next"
 	},
 	"system_template": {
 		"stepper1": "Template Details",

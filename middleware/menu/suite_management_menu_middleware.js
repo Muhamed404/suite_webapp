@@ -106,6 +106,13 @@ function generateSuiteManagementMenu(req, organization) {
       allowedRoles: [enums.userType.OrgSuperAdmin, enums.userType.OrgSubAdmin]
     },
     {
+      module: "Notification Mail Log",
+      labelKey: "menu.suite.notificationMailLog",
+      link: "/notification-mail",
+      img_path: "/securemagnus_2025/images/icons/second-menu-template.svg",
+      allowedRoles: [enums.userType.OrgSuperAdmin, enums.userType.OrgSubAdmin]
+    },
+    {
       module: "Settings",
       labelKey: "menu.suite.settings",
       allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin],
@@ -122,6 +129,10 @@ function generateSuiteManagementMenu(req, organization) {
         {
           labelKey: "menu.suite.notificationTemplates",
           link: "/notification-template/"
+        },
+        {
+          labelKey: "menu.suite.notificationMailLog",
+          link: "/notification-mail"
         }
       ]
     }

@@ -207,7 +207,7 @@
                         </li> -->
                         <li>
                           <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
-                            data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
+                            data-user-id="<%= u?.user_id || "" %>" data-status="unlicensed">
                             <%= __("user.btnSetAsUnlicensed") %>
                           </a>
                         </li>
@@ -226,7 +226,7 @@
                           class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
                           <li>
                             <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
-                              data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
+                              data-user-id="<%= u?.user_id || "" %>" data-status="licensed">
                               <%= __("user.btnSetAsLicensed") %>
                             </a>
                           </li>
@@ -259,7 +259,7 @@
 
                         <li>
                           <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 change-status"
-                            data-user-id="<%= u?.userProfileId || "" %>" data-status="unlicensed">
+                            data-user-id="<%= u?.user_id || "" %>" data-status="unlicensed">
                             <%= __("user.btnSetAsUnlicensed") %>
                           </a>
                         </li>
@@ -278,7 +278,7 @@
                           class="licenseDropdownMenu hidden absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded shadow-lg z-10">
                           <li>
                             <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 change-status"
-                              data-user-id="<%= u?.userProfileId || "" %>" data-status="licensed">
+                              data-user-id="<%= u?.user_id || "" %>" data-status="licensed">
                               <%= __("user.btnSetAsLicensed") %>
                             </a>
                           </li>
@@ -318,17 +318,15 @@
                     </svg>
                   </button>
                   <ul class="fixed w-40 bg-white border border-gray-200 rounded shadow-lg z-[9999] hidden actionDropdownMenu">
-                    <% if(u.user.status === true || u.user.status === "true"){ %>
                     <li>
-                      <a href="/user/delete/<%= u.userProfileId || "" %>"
+                      <a href="/user/delete/<%= u.user_id || "" %>"
                         class="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 rounded transition">
                         <i class="ion-android-trash mr-2"></i>
                         <%= __("user.btnDelete") %>
                       </a>
                     </li>
-                    <% } %>
                     <li>
-                      <a href="/user/show/<%= u.userProfileId || "" %>"
+                      <a href="/user/show/<%= u.user_id || "" %>"
                         class="flex items-center px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 rounded transition">
                         <i class="ion-edit mr-2"></i>
                         <%= __("user.btnEdit") %>

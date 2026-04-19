@@ -346,7 +346,8 @@
 			"products": "المنتجات",
 			"logout": "تسجيل الخروج",
 			"smtpNotifications": "menu.suite.smtpNotifications",
-			"bulkImportJobs": "وظائف الاستيراد المجمع"
+			"bulkImportJobs": "وظائف الاستيراد المجمع",
+			"notificationMailLog": "سجل بريد الإشعارات"
 		}
 	},
 	"org_domain": {

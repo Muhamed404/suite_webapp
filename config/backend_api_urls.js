@@ -105,6 +105,9 @@ module.exports = {
             UPDATE: (id) => `/notification_template/${id}/edit`,
             DELETE: (id, name) => `/notification_template/${id}/delete/${name}/name`,
         },
+        Notification_Mail: {
+            LIST_BY_ORGANIZATION: (organizationId) => `/notification_mail/${organizationId}/organization`,
+        },
 
     },
     PHISHMAGNUS: {

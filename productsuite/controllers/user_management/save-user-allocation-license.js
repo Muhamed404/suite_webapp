@@ -10,7 +10,6 @@ async function saveUserAllocationLicense(req, res, next) {
         logger.info("Controller - Save User Allocation License: Incoming request.");
         const { selectedUsers } = req.body;
         const productName = req.body?.productId || req.query?.actionProduct || null;
-        console.log("Product Name in Save User Allocation License Controller:" + productName);
         // if user clicked on unenroll button, then param will be 'true'
         const hasRequestedToUnenroll = req.params?.hasRequestedToUnenroll === 'true';
 

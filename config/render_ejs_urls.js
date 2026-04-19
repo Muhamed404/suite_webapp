@@ -96,6 +96,9 @@ module.exports = {
             CREATE: 'pages/notification_template/create-notification-template',
             EDIT: 'pages/notification_template/edit-notification-template',
         },
+        Notification_Mail: {
+            LIST: 'pages/notification_mail/list-notification-mails',
+        },
         Package_Management: {
             CREATE: 'pages/package/create_package',
         },
