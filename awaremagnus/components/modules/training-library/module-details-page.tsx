@@ -870,7 +870,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                   // TODO: Make sure we have a proper route for quizzes specific to a content item
                                   // Usually /quizzes?content_id=...
                                   className="bg-[#3FB6F7] hover:bg-[#33A7E6] text-white rounded-full text-[10px] font-semibold min-w-[82px] px-4 h-7"
-                                  href={`${basePath}/${moduleId}/quizzes?content_id=${item.content_id ?? item.id}`}
+                                  href={`${basePath}/${moduleId}/quizzes?content_id=${item.content_id ?? item.id}${languageFilter ? `&lang_id=${languageFilter}` : ""}`}
                                   size="sm"
                                 >
                                   {isOrgUserView && itemQuizzes.status === "passed" ? t("moduleDetails.review", { defaultValue: "Review" }) : t("moduleDetails.start")}

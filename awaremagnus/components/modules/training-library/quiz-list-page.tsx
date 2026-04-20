@@ -10,7 +10,8 @@ import { Select, SelectItem } from "@heroui/select";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { Spinner } from "@heroui/spinner";
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import { Search, ChevronsUpDown, Pencil, Trash2, SearchX, Plus } from "lucide-react";
 
@@ -49,23 +50,35 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
   const basePath = `/dashboard/training-library/${libraryType}`;
   const createPath = `${basePath}/${moduleId}/quizzes/create`;
 
+  const searchParams = useSearchParams();
+  const urlLang = searchParams.get("lang_id");
+  const urlContentId = searchParams.get("content_id");
+
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState("");
-  const [languageFilter, setLanguageFilter] = useState<string>("en");
+  const [languageFilter, setLanguageFilter] = useState<string>("all");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Sync language filter from URL on mount
+  useEffect(() => {
+    if (urlLang === "1") setLanguageFilter("en");
+    else if (urlLang === "2") setLanguageFilter("ar");
+  }, [urlLang]);
+
+  const langIdForApi = languageFilter === "en" ? 1 : languageFilter === "ar" ? 2 : undefined;
+
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
-  const { data: quizzesRes, isLoading } = useQuizzesByModule(moduleId, !!moduleId);
+  const { data: quizzesRes, isLoading } = useQuizzesByModule(moduleId, langIdForApi, !!moduleId);
   const { data: quizTypesRes } = useQuizTypes();
   const deleteQuizMutation = useDeleteQuiz();
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
   const allQuizzes: Quiz[] =
     quizzesRes?.success && Array.isArray(quizzesRes.data) ? (quizzesRes.data as Quiz[]) : [];
-  const contentMap: Record<number, string> =
-    (quizzesRes as { contentMap?: Record<number, string> })?.contentMap ?? {};
+  const contentMap: Record<number, { name: string; language?: string }> =
+    (quizzesRes as { contentMap?: Record<number, { name: string; language?: string }> })?.contentMap ?? {};
   const quizTypes = quizTypesRes?.success ? (quizTypesRes.data ?? []) : [];
 
   // Get answer text from API answer (handles both answer and answer_text fields)
@@ -91,7 +104,7 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
         (quiz as unknown as { con_id?: number }).con_id ?? quiz.mod_content_id ?? quiz.content_id;
 
       if (contentId && contentMap[contentId]) {
-        return contentMap[contentId];
+        return contentMap[contentId].name;
       }
 
       return "—";
@@ -99,9 +112,32 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
     [contentMap]
   );
 
+  const getQuizLanguage = useCallback(
+    (quiz: Quiz): string => {
+      const contentId =
+        (quiz as unknown as { con_id?: number }).con_id ?? quiz.mod_content_id ?? quiz.content_id;
+
+      if (contentId && contentMap[contentId]) {
+        const lang = contentMap[contentId].language || "English";
+        return lang.toUpperCase().substring(0, 2);
+      }
+
+      return "EN";
+    },
+    [contentMap]
+  );
+
   // Filtered & sorted quizzes
   const filteredQuizzes = useMemo(() => {
     let result = [...allQuizzes];
+
+    // Content ID filter (from URL)
+    if (urlContentId) {
+      const cid = parseInt(urlContentId, 10);
+      result = result.filter(q => 
+        ((q as any).con_id ?? q.mod_content_id ?? q.content_id) === cid
+      );
+    }
 
     // Search filter
     if (searchQuery.trim()) {
@@ -293,9 +329,13 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                     onSelectionChange={(keys) => {
                       const value = Array.from(keys as Set<string>)[0];
 
-                      if (value) setLanguageFilter(value);
+                      if (value) {
+                        setLanguageFilter(value);
+                        setCurrentPage(1);
+                      }
                     }}
                   >
+                    <SelectItem key="all">All Languages</SelectItem>
                     <SelectItem key="en">English</SelectItem>
                     <SelectItem key="ar">عربي</SelectItem>
                   </Select>
@@ -382,7 +422,9 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                             <TableCell className="text-gray-600">
                               {getAnswerText(quiz.answers as ApiAnswer[], 3)}
                             </TableCell>
-                            <TableCell className="text-gray-600">EN</TableCell>
+                            <TableCell className="text-gray-600">
+                              {getQuizLanguage(quiz)}
+                            </TableCell>
                             <TableCell className="text-green-600 font-medium">
                               {getCorrectAnswer(quiz.answers as ApiAnswer[])}
                             </TableCell>
