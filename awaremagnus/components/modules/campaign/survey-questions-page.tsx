@@ -449,14 +449,16 @@ export function SurveyQuestionsPage() {
                               </td>
                               <td className="px-4 py-3">
                                 <div className="flex items-center gap-1">
-                                  <Button
-                                    isIconOnly
-                                    className="text-gray-400 hover:text-blue-500"
-                                    size="sm"
-                                    variant="light"
-                                  >
-                                    <Edit3 className="w-3.5 h-3.5" />
-                                  </Button>
+                                    <Button
+                                      isIconOnly
+                                      as={Link}
+                                      className="text-gray-400 hover:text-blue-500"
+                                      href={`/dashboard/survey/questions/edit/${q.id}`}
+                                      size="sm"
+                                      variant="light"
+                                    >
+                                      <Edit3 className="w-3.5 h-3.5" />
+                                    </Button>
                                   <Button
                                     isIconOnly
                                     className="text-gray-400 hover:text-red-500"

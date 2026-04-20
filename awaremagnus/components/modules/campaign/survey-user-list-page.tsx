@@ -30,6 +30,7 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useSurvey, useSurveyUsers, useRetrySurveyUserFetch } from "@/hooks/useSurvey";
+import { addToast } from "@heroui/toast";
 
 type SortField = "name" | "submission_date" | "risk_level";
 type SortDirection = "asc" | "desc";
@@ -612,8 +613,21 @@ export function SurveyUserListPage() {
                                       const url = `${origin}${basePath}/survey/${surveyId}?invitation_id=${user.invite_id}&survey_code=${encodeURIComponent(
                                         survey.survey_unique_code!,
                                       )}`;
+
                                       if (navigator.clipboard?.writeText) {
-                                        navigator.clipboard.writeText(url);
+                                        navigator.clipboard.writeText(url).then(() => {
+                                          addToast({
+                                            title: "Link Copied",
+                                            description: "Survey link copied to clipboard",
+                                            color: "success",
+                                          });
+                                        }).catch(() => {
+                                          addToast({
+                                            title: "Copy Failed",
+                                            description: "Unable to copy link",
+                                            color: "danger",
+                                          });
+                                        });
                                       }
                                     }}
                                   >
