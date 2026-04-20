@@ -108,6 +108,7 @@
 		"entries": "الإدخالات",
 		"to": "إلى",
 		"no_entries_found": "لم يتم العثور على إدخالات",
+		"no_results_match_search": "لا توجد نتائج تطابق استعلام البحث الخاص بك",
 		"people": "الأشخاص",
 		"InProgress": "قيد التقدم",
 		"completed": "مكتمل",
@@ -126,6 +127,7 @@
 		"end_time_required": "تاريخ ووقت الانتهاء مطلوبان.",
 		"no_departments_groups": "لا توجد أقسام أو مجموعات متاحة. يرجى إضافة مستخدمين إلى الأقسام أو المجموعات قبل إنشاء حملة.",
 		"select_department_group": "يرجى اختيار قسم واحد على الأقل أو مجموعة للاستهداف.",
+		"select_at_least_one_option": "يرجى اختيار خيار واحد على الأقل.",
 		"validation_error": "خطأ في التحقق:",
 		"no_members_in_selection": "الأقسام/المجموعات المختارة لا تحتوي على أعضاء. يرجى اختيار أقسام أو مجموعات تحتوي على أعضاء، أو إضافة أعضاء إلى المختارة.",
 		"some_empty_selections": "تحذير: بعض الاختيارات لا تحتوي على أعضاء. ستستهدف الحملة فقط الأقسام/المجموعات التي تحتوي على أعضاء.",
@@ -195,7 +197,21 @@
 		"smtp_configured_successfully": "تم تكوين SMTP بنجاح"
 	},
 	"topnavbar": {
-		"welcome": "مرحباً"
+		"welcome": "مرحباً",
+		"organizationSettings": "إعدادات المؤسسة",
+		"addUser": "إضافة مستخدم",
+		"importUser": "استيراد مستخدم",
+		"dashboard": "لوحة التحكم",
+		"campaigns": "الحملات",
+		"reports": "التقارير",
+		"organizations": "المؤسسات",
+		"packages": "الحزم",
+		"users": "المستخدمون",
+		"auditLogs": "سجلات التدقيق",
+		"systemTemplate": "قالب النظام",
+		"phishingSmtp": "SMTP التصيد",
+		"createPackage": "إنشاء حزمة",
+		"simulatorEmails": "رسائل المحاكي"
 	},
 	"breadcrumbs": {
 		"home": "الرئيسية",
@@ -212,6 +228,7 @@
 		"groupCreate": "إنشاء مجموعة",
 		"smtp": "إعدادات SMTP",
 		"serviceRegistry": "سجل الخدمات",
+		"notificationTemplates": "قوالب الإشعارات",
 		"audit": "سجل التدقيق",
 		"subscriptionHistory": "سجل الاشتراكات",
 		"createSubscription": "إنشاء اشتراك",
@@ -288,6 +305,11 @@
 		},
 		"messages": {
 			"noActiveSubscriptionMessage": "لا يوجد لديك اشتراك نشط أو انتهت صلاحية اشتراكك. يرجى الاتصال بالمسؤول أو زيارة صفحة الاشتراك للتجديد."
+		},
+		"alerts": {
+			"alert": "تنبيه!",
+			"phishMagnusLicenseExpired": "انتهت صلاحية ترخيص PhishMagnus.",
+			"awareMagnusLicenseExpired": "انتهت صلاحية ترخيص AwareMagnus."
 		}
 	},
 	"menu": {
@@ -300,10 +322,10 @@
 			"reports": "التقارير",
 			"campaigns": "الحملات",
 			"campaignEmail": "البريد الإلكتروني",
-			"campaignQR": "QR",
-			"campaignNFC": "NFC",
-			"campaignUSB": "USB",
-			"campaignSMS": "SMS",
+			"campaignQR": "رمز الاستجابة السريعة (QR)",
+			"campaignNFC": "الاتصال قريب المدى (NFC)",
+			"campaignUSB": "منافذ USB",
+			"campaignSMS": "رسالة نصية",
 			"campaignWhatsapp": "واتساب",
 			"simulatorEmails": "رسائل المحاكاة"
 		},
@@ -323,7 +345,9 @@
 			"subscriptionHistory": "سجل الاشتراكات",
 			"products": "المنتجات",
 			"logout": "تسجيل الخروج",
-			"smtpNotifications": "menu.suite.smtpNotifications"
+			"smtpNotifications": "menu.suite.smtpNotifications",
+			"bulkImportJobs": "وظائف الاستيراد المجمع",
+			"notificationMailLog": "سجل بريد الإشعارات"
 		}
 	},
 	"org_domain": {
@@ -505,6 +529,35 @@
 			"labelUserRangeFrom": "عدد المستخدمين من",
 			"labelUserRangeTo": "عدد المستخدمين إلى",
 			"labelLicenseDuration": "المدة (بالأيام)",
+			"placeholderPackageName": "أدخل اسم الباقة",
+			"placeholderLicenseCost": "أدخل تكلفة الترخيص",
+			"placeholderDescription": "أدخل الوصف",
+			"validationSelectProduct": "يرجى اختيار منتج/تطبيق",
+			"validationSelectPackageType": "يرجى اختيار نوع الباقة (محلي أو سحابي)",
+			"validationEnterPackageName": "اسم الباقة مطلوب",
+			"validationPackageNameMinLength": "يجب أن يكون اسم الباقة على الأقل 3 أحرف",
+			"validationPackageNameMaxLength": "لا يمكن أن يتجاوز اسم الباقة 100 حرف",
+			"validationEnterDescription": "وصف الباقة مطلوب",
+			"validationDescriptionMinLength": "يجب أن يكون الوصف على الأقل حرف واحد",
+			"validationDescriptionMaxLength": "لا يمكن أن يتجاوز الوصف 500 حرف",
+			"validationEnterLicenseCost": "تكلفة الترخيص مطلوبة",
+			"validationLicenseCostNumber": "يرجى إدخال رقم صحيح",
+			"validationLicenseCostMin": "يجب أن تكون تكلفة الترخيص على الأقل 1",
+			"validationLicenseCostMax": "تكلفة الترخيص كبيرة جداً",
+			"validationEnterDuration": "مدة الترخيص مطلوبة",
+			"validationDurationDigits": "يرجى إدخال عدد أيام صحيح",
+			"validationDurationMin": "يجب أن تكون المدة على الأقل يوم واحد",
+			"validationDurationMax": "لا يمكن أن تتجاوز المدة 3650 يوم (10 سنوات)",
+			"validationEnterRangeFrom": "نطاق المستخدمين (من) مطلوب",
+			"validationRangeFromDigits": "يرجى إدخال رقم صحيح",
+			"validationRangeFromMin": "يجب أن يكون الحد الأدنى لنطاق المستخدمين على الأقل 1",
+			"validationRangeFromMax": "القيمة كبيرة جداً",
+			"validationEnterRangeTo": "نطاق المستخدمين (إلى) مطلوب",
+			"validationRangeToDigits": "يرجى إدخال رقم صحيح",
+			"validationRangeToMin": "يجب أن يكون الحد الأقصى لنطاق المستخدمين على الأقل 1",
+			"validationRangeToMax": "القيمة كبيرة جداً",
+			"validationRangeToGreaterThanFrom": "يجب أن يكون نطاق المستخدمين \"إلى\" أكبر من أو يساوي \"من\"",
+			"successMessage": "تم إنشاء الباقة بنجاح.",
 			"btnBack": "رجوع",
 			"btnNext": "التالي",
 			"btnSubmit": "إرسال",
@@ -514,6 +567,7 @@
 	"appservice": {
 		"homescreen": {
 			"title": "إدارة خدمات التطبيق",
+			"serviceManagement": "إدارة الخدمات",
 			"productName": "اسم المنتج",
 			"serviceName": "اسم الخدمة",
 			"serviceType": "نوع الخدمة",
@@ -535,12 +589,95 @@
 			"labelServiceName": "اسم الخدمة",
 			"labelDescription": "التفاصيل",
 			"labelServiceCost": "تكلفة الخدمة (دولار)",
+			"placeholderServiceName": "أدخل اسم الخدمة",
+			"placeholderServiceCost": "أدخل تكلفة الخدمة",
+			"placeholderDescription": "أدخل التفاصيل",
+			"successMessage": "تم إنشاء الخدمة بنجاح.",
+			"validationSelectProduct": "يرجى اختيار منتج.",
+			"validationEnterServiceName": "يرجى إدخال اسم الخدمة.",
+			"validationServiceNameMinLength": "يجب أن يكون اسم الخدمة على الأقل حرفين.",
+			"validationEnterServiceCost": "يرجى إدخال تكلفة الخدمة.",
+			"validationValidNumber": "يرجى إدخال رقم صحيح.",
+			"validationServiceCostMin": "يجب أن تكون تكلفة الخدمة على الأقل 1.",
+			"validationSelectServiceType": "يرجى اختيار نوع الخدمة.",
+			"validationEnterDescription": "يرجى إدخال التفاصيل.",
+			"validationDescriptionMinLength": "يجب أن تكون التفاصيل على الأقل حرفين.",
+			"errorUnableToCreate": "تعذر إنشاء الخدمة. يرجى المحاولة مرة أخرى.",
+			"errorCouldNotLoadApplications": "تعذر تحميل التطبيقات.",
 			"btnBack": "رجوع",
 			"btnSubmit": "إرسال",
 			"btnCancel": "إلغاء"
 		}
 	},
 	"settings": {
+		"notificationTemplate": {
+			"create": {
+				"title": "إنشاء قالب إشعار",
+				"subtitle": "أضف قالب إشعار جديدًا لمؤسستك",
+				"tabs": {
+					"english": "الإنجليزية",
+					"arabic": "العربية"
+				},
+				"fields": {
+					"notificationType": "نوع الإشعار",
+					"notificationTypePlaceholder": "اختر نوع الإشعار",
+					"isActive": "نشط",
+					"isSystem": "قالب نظامي",
+					"name": "اسم القالب",
+					"namePlaceholder": "أدخل اسم القالب",
+					"subject": "الموضوع",
+					"subjectPlaceholder": "أدخل موضوع البريد الإلكتروني (اختياري)",
+					"body": "المحتوى",
+					"bodyPlaceholder": "أدخل محتوى القالب"
+				},
+				"btnSubmit": "إنشاء القالب",
+				"btnCancel": "إلغاء",
+				"success": "تم إنشاء قالب (قوالب) الإشعار بنجاح.",
+				"error": "فشل إنشاء قالب الإشعار.",
+				"validation": {
+					"typeRequired": "يرجى اختيار نوع الإشعار.",
+					"atLeastOne": "يرجى ملء قالب لغة واحد على الأقل (الاسم والمحتوى مطلوبان).",
+					"nameRequired": "اسم القالب مطلوب.",
+					"bodyRequired": "محتوى القالب مطلوب."
+				}
+			},
+			"edit": {
+				"title": "تعديل قالب الإشعار",
+				"subtitle": "تحديث تفاصيل قالب الإشعار",
+				"btnSubmit": "حفظ التغييرات",
+				"btnCancel": "إلغاء",
+				"success": "تم تحديث قالب الإشعار بنجاح.",
+				"error": "فشل تحديث قالب الإشعار."
+			},
+			"delete": {
+				"success": "تم حذف قالب الإشعار بنجاح.",
+				"error": "فشل حذف قالب الإشعار.",
+				"confirmTitle": "حذف القالب",
+				"confirmMessage": "هل أنت متأكد من حذف هذا القالب؟ لا يمكن التراجع عن هذا الإجراء."
+			},
+			"list": {
+				"title": "قوالب الإشعارات",
+				"subtitle": "إدارة قوالب الإشعارات الخاصة بمؤسستك",
+				"columns": {
+					"name": "الاسم",
+					"type": "النوع",
+					"language": "اللغة",
+					"subject": "الموضوع",
+					"status": "الحالة",
+					"system": "النظام",
+					"createdAt": "تاريخ الإنشاء",
+					"actions": "الإجراءات"
+				},
+				"badge": {
+					"active": "نشط",
+					"inactive": "غير نشط",
+					"system": "نظامي",
+					"custom": "مخصص"
+				},
+				"empty": "لا توجد قوالب إشعارات.",
+				"search": "بحث في القوالب..."
+			}
+		},
 		"serviceRegistry": {
 			"homescreen": {
 				"title": "إدارة سجل الخدمات",
@@ -617,7 +754,21 @@
 		"labelServiceAccount": "حساب الخدمة",
 		"labelPassword": "كلمة المرور",
 		"btnTestConfiguration": "اختبار الإعدادات",
-		"btnSaveSettings": "حفظ الإعدادات"
+		"btnSaveSettings": "حفظ الإعدادات",
+		"labelSenderEmail": "البريد الإلكتروني المرسل",
+		"labelDetails": "التفاصيل",
+		"enableStartTLS": "تفعيل STARTTLS",
+		"enableStartTLSDesc": "استخدام STARTTLS لترقية الاتصال العادي إلى اتصال آمن.",
+		"enableSSL": "تفعيل SSL",
+		"enableSSLDesc": "استخدام SSL/TLS لاتصال مشفر بالكامل من البداية.",
+		"enableSMTPEncryption": "تفعيل التشفير",
+		"enableSMTPEncryptionDesc": "تشفير رسائل البريد الإلكتروني قبل إرسالها عبر هذا الاتصال.",
+		"enableMFA": "تفعيل المصادقة متعددة العوامل",
+		"enableMFADesc": "إرسال كلمات المرور المؤقتة عبر هذا الاتصال.",
+		"selectOrganization": "اختر المؤسسة",
+		"default": "افتراضي",
+		"enabled": "مفعل",
+		"disabled": "معطل"
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "إدارة مستخدمي سيكماجنوس",
@@ -676,6 +827,35 @@
 		"validationEmailRequired": "يرجى إدخال عنوان بريد إلكتروني صالح مع النطاق الكامل (مثل user@example.com).",
 		"validationPasswordRequired": "يجب أن تكون كلمة المرور 8 أحرف على الأقل وتشمل حرفاً كبيراً وحرفاً صغيراً ورقماً وحرفاً خاصاً.",
 		"labelBulkUploadUsers": "تحميل مستخدمين مجمع",
+		"labelBulkImportJobs": "وظائف الاستيراد المجمع",
+		"bulkImportJobsSubtitle": "أحدث مهام استيراد CSV لهذه المؤسسة. تُحدَّث الصفحة تلقائياً أثناء انتظار المعالجة أو أثناءها.",
+		"bulkImportViewJobHistory": "عرض سجل وظائف الاستيراد المجمع",
+		"bulkImportQueuedShort": "تمت جدولة الملف للاستيراد. تابع التقدم أدناه.",
+		"bulkImportSelectOrganization": "اختر مؤسسة أولاً، ثم افتح وظائف الاستيراد المجمع من قائمة مستخدمي تلك المؤسسة.",
+		"bulkImportInvalidOrganization": "حسابك غير مرتبط بمؤسسة صالحة لهذه الصفحة.",
+		"bulkImportJobsLoadError": "تعذّر تحميل وظائف الاستيراد المجمع. حاول لاحقاً.",
+		"bulkImportRefresh": "تحديث",
+		"bulkImportColId": "المعرّف",
+		"bulkImportColCreatedBy": "أنشأه (معرّف المستخدم)",
+		"bulkImportColSkippedJson": "تم التخطي (JSON)",
+		"bulkImportColResultJson": "النتيجة (JSON)",
+		"bulkImportColFile": "الملف",
+		"bulkImportColProduct": "المنتج",
+		"bulkImportColStatus": "الحالة",
+		"bulkImportColInserted": "المُدرَجون",
+		"bulkImportColStarted": "بدء",
+		"bulkImportColCompleted": "اكتمال",
+		"bulkImportColError": "خطأ",
+		"bulkImportNoJobs": "لا توجد وظائف استيراد مجمع بعد.",
+		"bulkImportTotalListed": "الوظائف المعروضة",
+		"bulkImportAutoRefreshNote": "أثناء وجود وظيفة قيد الانتظار أو المعالجة، تُعاد تحميل هذه الصفحة كل 10 ثوانٍ.",
+		"btnBulkImportJobs": "وظائف الاستيراد",
+		"suiteUsersSearchLabel": "بحث المستخدمين",
+		"suiteUsersPageSizeLabel": "صفوف لكل صفحة",
+		"suiteUsersSearchSubmit": "بحث",
+		"suiteUsersClearSearch": "مسح",
+		"suiteUsersPrev": "السابق",
+		"suiteUsersNext": "التالي",
 		"stepChooseProduct": "اختر المنتج",
 		"stepChooseFile": "اختر الملف",
 		"labelChooseTheProduct": "اختر المنتج",
@@ -1537,7 +1717,7 @@
 		"totalPayable": "اجمالي المبلغ المستحق",
 		"back": "رجوع",
 		"downloadAsPdf": "تحميل كملف PDF",
-		"email": "Invoice.email"
+		"email": "البريد الإلكتروني"
 	},
 	"CS-Add": "إضافة فئة",
 	"btn-CS-Save": "حفظ",
@@ -2136,7 +2316,7 @@
 			"yes": "نعم",
 			"no": "لا",
 			"sent_at": "وقت الإرسال",
-			"email_headers": "مصدر الرسالة",
+			"magnus_email_headers": "مصدر الرسالة",
 			"no_headers": "لا توجد ترويسات متاحة.",
 			"real_phishing_email": "رسالة تصيد احتيالي حقيقية",
 			"real_phishing_email_desc": "لم يتم إنشاء هذه الرسالة بواسطة PhishMagnus. قد تكون محاولة تصيد احتيالي حقيقية.",
@@ -2146,5 +2326,37 @@
 			"suspicious_content": "محتوى مشبوه",
 			"not_found": "لم يتم العثور على البلاغ."
 		}
+	},
+	"mfa": {
+		"create": "إعدادات SMTP للمصادقة متعددة العوامل",
+		"host": {
+			"name": "اسم المضيف"
+		},
+		"port": "المنفذ",
+		"service": {
+			"account": "حساب الخدمة"
+		},
+		"password": "كلمة المرور",
+		"connectionName": "اسم الاتصال",
+		"secureConnection": "استخدام اتصال آمن",
+		"enableMFA": "تفعيل المصادقة متعددة العوامل",
+		"subtitle": "قم بإعداد خادم SMTP المستخدم لإرسال كلمات المرور المؤقتة.",
+		"placeholderConnectionName": "مثال: البريد المؤسسي",
+		"placeholderHost": "مثال: smtp.company.com",
+		"placeholderPort": "مثال: 587",
+		"placeholderAccount": "مثال: noreply@company.com",
+		"placeholderPassword": "أدخل كلمة مرور الحساب",
+		"secureConnectionDesc": "تفعيل تشفير TLS/SSL لاتصال SMTP.",
+		"enableEncryption": "تفعيل التشفير",
+		"enableEncryptionDesc": "تشفير رسائل البريد الإلكتروني قبل إرسالها عبر هذا الاتصال.",
+		"enableMFADesc": "إرسال كلمات المرور المؤقتة عبر هذا الاتصال.",
+		"testConnection": "اختبار الاتصال",
+		"save": "حفظ",
+		"loginTitle": "التحقق بخطوتين",
+		"loginSubtitle": "أدخل الرمز المؤقت المرسل إلى بريدك الإلكتروني أو تطبيق المصادقة.",
+		"loginLabel": "رمز التحقق",
+		"loginPlaceholder": "أدخل الرمز المكون من 6 أرقام",
+		"loginBtn": "تحقق والمتابعة",
+		"loginBack": "العودة إلى تسجيل الدخول"
 	}
 }
