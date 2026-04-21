@@ -108,10 +108,12 @@
     "eslint-plugin-react-hooks": "5.2.0",
     "eslint-plugin-unused-imports": "4.1.4",
     "globals": "16.0.0",
+    "javascript-obfuscator": "^5.4.1",
     "postcss": "8.5.6",
     "prettier": "3.5.3",
     "tailwind-variants": "3.2.2",
     "tailwindcss": "4.1.11",
-    "typescript": "5.6.3"
+    "typescript": "5.6.3",
+    "webpack-obfuscator": "^3.6.1"
   }
 }
