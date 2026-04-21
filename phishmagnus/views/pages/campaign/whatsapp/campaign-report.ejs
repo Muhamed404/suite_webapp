@@ -77,19 +77,34 @@
                                 <%= __("whatsapp.campaign_report.template") || "Template" %>
                             </th>
                             <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap text-center">
-                                <%= __("whatsapp.campaign_report.total_invitees") || "Total Invitees" %>
+                                <div class="flex items-center justify-center gap-2">
+                                    <i class="fas fa-users text-green-600 text-sm"></i>
+                                    <%= __("whatsapp.campaign_report.total_invitees") || "Total Invitees" %>
+                                </div>
                             </th>
                             <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap text-center">
-                                <%= __("whatsapp.campaign_report.delivered") || "Delivered" %>
+                                <div class="flex items-center justify-center gap-2">
+                                    <i class="fas fa-check-circle text-green-600 text-sm"></i>
+                                    <%= __("whatsapp.campaign_report.delivered") || "Delivered" %>
+                                </div>
                             </th>
                             <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap text-center">
-                                <%= __("whatsapp.campaign_report.delivery_rate") || "Delivery Rate" %>
+                                <div class="flex items-center justify-center gap-2">
+                                    <i class="fas fa-chart-line text-blue-600 text-sm"></i>
+                                    <%= __("whatsapp.campaign_report.delivery_rate") || "Delivery Rate" %>
+                                </div>
                             </th>
                             <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
-                                <%= __("whatsapp.campaign_report.status") || "Status" %>
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-info-circle text-yellow-600 text-sm"></i>
+                                    <%= __("whatsapp.campaign_report.status") || "Status" %>
+                                </div>
                             </th>
                             <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
-                                <%= __("whatsapp.campaign_report.activity") || "Activity" %>
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-chart-bar text-orange-600 text-sm"></i>
+                                    <%= __("whatsapp.campaign_report.activity") || "Activity" %>
+                                </div>
                             </th>
                             <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap text-center">
                                 <%= __("whatsapp.campaign_report.actions") || "Actions" %>
@@ -316,7 +331,7 @@
         const tabs = [
             { key: 'all', label: '<%= __("generic_label.all") || "All" %>' },
             { key: 'active', label: '<%= __("whatsapp.campaign_report.active") || "Active" %>' },
-            { key: 'inactive', label: 'InActive' }
+            { key: 'inactive', label: '<%= __("whatsapp.campaign_report.inactive") || "Inactive" %>' }
         ];
 
         statusTabs.innerHTML = tabs.map(tab => {
