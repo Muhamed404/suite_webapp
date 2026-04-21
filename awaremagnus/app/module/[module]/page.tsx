@@ -976,25 +976,37 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                         {paginatedItems.map((item, index) => {
                           const iconMap: Record<string, string> = {
                             "Video Training": "🎥",
+                            "Motion Videos": "🎥",
                             "Interactive Lesson": "📘",
+                            "Interactive Contents": "📘",
                             Quizzes: "💡",
+                            Quiz: "💡",
                             Posters: "🖼",
+                            Brochures: "📄",
+                            Documents: "📄",
                             Survey: "📊",
+                            "Screen Savers": "💻",
                           };
                           const colorMap: Record<string, string> = {
                             "Video Training": "bg-red-100 text-red-600",
+                            "Motion Videos": "bg-red-100 text-red-600",
                             "Interactive Lesson": "bg-cyan-100 text-cyan-600",
+                            "Interactive Contents": "bg-cyan-100 text-cyan-600",
                             Quizzes: "bg-blue-100 text-blue-600",
+                            Quiz: "bg-blue-100 text-blue-600",
                             Posters: "bg-orange-100 text-orange-600",
+                            Brochures: "bg-gray-100 text-gray-600",
+                            Documents: "bg-gray-100 text-gray-600",
                             Survey: "bg-purple-100 text-purple-600",
+                            "Screen Savers": "bg-slate-100 text-slate-600",
                           };
                           const langMap: Record<string, { label: string; flag: string }> = {
                             en: { label: "English", flag: "us" },
                             ar: { label: "Arabic", flag: "sa" },
                           };
 
-                          const icon = iconMap[item.title] || "📘";
-                          const color = colorMap[item.title] || "bg-cyan-100 text-cyan-600";
+                          const icon = iconMap[item.type] || iconMap[item.title] || "📘";
+                          const color = colorMap[item.type] || colorMap[item.title] || "bg-cyan-100 text-cyan-600";
                           const langChips = (item.languages || []).map((code: string) => {
                             const cfg = langMap[code];
 
@@ -1184,38 +1196,13 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                           console.error("[module] getContents error", err);
                                         });
                                     }
-                                    if (item.title === "Video Training") {
-                                      const vtParams = new URLSearchParams();
+                                    // Navigation Logic Based on Content Type ID or Type Name
+                                    const isVideo = item.content_type_id === 2 || item.type === "Motion Videos" || item.type === "Video Training";
+                                    const isInteractive = item.content_type_id === 1 || item.type === "Interactive Lesson" || item.type === "Interactive Contents";
+                                    const isQuiz = item.type === "Quiz" || item.title === "Quizzes";
 
-                                      vtParams.set("campaign_id", String(campaignId));
-                                      if (item.id && !String(item.id).startsWith("agg_")) {
-                                        vtParams.set("content_id", String(item.id));
-                                      }
-                                      router.push(
-                                        `/module/${module}/video-training?${vtParams.toString()}`
-                                      );
-                                    } else if (
-                                      item.title === "Interactive Contents" ||
-                                      item.title === "Interactive Lesson" ||
-                                      item.content_type_id === 1
-                                    ) {
-                                      // Dedicated org-user interactive content page
-                                      router.push(
-                                        `/module/${module}/interactive-content/${item.id}?campaign_id=${campaignId}&module_id=${moduleId}`
-                                      );
-                                    } else if (item.title === "Quizzes") {
-                                      const quizParams = new URLSearchParams();
-
-                                      quizParams.set("campaign_id", String(campaignId));
-                                      if (item.contentIds && item.contentIds.length > 0) {
-                                        quizParams.set("content_id", String(item.contentIds[0]));
-                                      }
-                                      router.push(
-                                        `/module/${module}/quizzes?${quizParams.toString()}`
-                                      );
-                                    } else if (item.title === "Motion Videos") {
+                                    if (isVideo) {
                                       const videoParams = new URLSearchParams();
-
                                       videoParams.set("campaign_id", String(campaignId));
                                       if (item.id && !String(item.id).startsWith("agg_")) {
                                         videoParams.set("content_id", String(item.id));
@@ -1223,8 +1210,23 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                       router.push(
                                         `/module/${module}/video-training?${videoParams.toString()}`
                                       );
+                                    } else if (isInteractive) {
+                                      // Dedicated org-user interactive content page
+                                      router.push(
+                                        `/module/${module}/interactive-content/${item.id}?campaign_id=${campaignId}&module_id=${moduleId}`
+                                      );
+                                    } else if (isQuiz) {
+                                      const quizParams = new URLSearchParams();
+                                      quizParams.set("campaign_id", String(campaignId));
+                                      if (item.contentIds && item.contentIds.length > 0) {
+                                        quizParams.set("content_id", String(item.contentIds[0]));
+                                      }
+                                      router.push(
+                                        `/module/${module}/quizzes?${quizParams.toString()}`
+                                      );
                                     } else {
-                                      const contentTypes = [
+                                      // Gallery / Aggregated Content Types (Posters, Brochures, etc.)
+                                      const galleryTypes = [
                                         "Posters",
                                         "Brochures",
                                         "Documents",
@@ -1233,12 +1235,15 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                         "Misc",
                                       ];
 
+                                      const type = item.type || item.title || "";
                                       if (
-                                        contentTypes.some(
-                                          (ct) => ct.toLowerCase() === item.title?.toLowerCase()
-                                        )
+                                        galleryTypes.some(
+                                          (ct) => ct.toLowerCase() === type.toLowerCase()
+                                        ) ||
+                                        [3, 4, 5, 8].includes(item.content_type_id)
                                       ) {
-                                        const typeSlug = item.title
+                                        const typeName = item.type || item.title || "content";
+                                        const typeSlug = typeName
                                           .toLowerCase()
                                           .replace(/\s+/g, "-");
                                         const ctParams = new URLSearchParams();
@@ -1251,8 +1256,6 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                         router.push(
                                           `/module/${module}/content/${typeSlug}?${ctParams.toString()}`
                                         );
-                                      } else {
-                                        // Handle other types
                                       }
                                     }
                                   }}

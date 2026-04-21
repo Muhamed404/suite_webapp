@@ -252,7 +252,14 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
                           <ul className="space-y-0.5">
                             {item.children!.map((child) => {
                               const isChildActive =
-                                pathname === child.href || isPathUnder(child.href, pathname ?? "");
+                                pathname === child.href ||
+                                (isPathUnder(child.href, pathname ?? "") &&
+                                  !item.children!.some(
+                                    (sibling) =>
+                                      sibling.href !== child.href &&
+                                      sibling.href.length > child.href.length &&
+                                      isPathUnder(sibling.href, pathname ?? "")
+                                  ));
 
                               return (
                                 <li key={child.href}>
@@ -282,7 +289,14 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
                     >
                       {item.children!.map((child) => {
                         const isChildActive =
-                          pathname === child.href || isPathUnder(child.href, pathname ?? "");
+                          pathname === child.href ||
+                          (isPathUnder(child.href, pathname ?? "") &&
+                            !item.children!.some(
+                              (sibling) =>
+                                sibling.href !== child.href &&
+                                sibling.href.length > child.href.length &&
+                                isPathUnder(sibling.href, pathname ?? "")
+                            ));
 
                         return (
                           <li key={child.href}>
