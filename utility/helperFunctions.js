@@ -287,7 +287,16 @@ function getPasswordStrength(password) {
   };
 }
 
-// append FileFetcher to exports
+function cleanEmail(email) {
+  if (!email || typeof email !== 'string') return '';
+  return email
+    .normalize('NFKC')
+    .replace(/[\u200B-\u200D\uFEFF\u2060\u00AD]/g, '')
+    .replace(/[\u00A0\u202F\u2007]/g, '')
+    .trim()
+    .toLowerCase();
+}
+
 module.exports = {
   formatDate,
   extractAttachmentInfo,
@@ -297,6 +306,7 @@ module.exports = {
   fetchHtmlFromUrl,
   validatePasswordComplexity,
   isStrongPassword,
-  getPasswordStrength
+  getPasswordStrength,
+  cleanEmail,
 };
 
