@@ -60,6 +60,10 @@ exports.renderWhatsappCampaignReport = async (req, res) => {
         // Validate and sanitize query parameters
         const page = Math.max(1, parseInt(req.query.page) || 1);
         const pageSize = Math.min(100, Math.max(1, parseInt(req.query.pageSize) || 10));
+        const searchQuery = (req.query.searchQuery || '').toString().trim();
+        const isActiveFilter = req.query.isActive === 'true' || req.query.isActive === 'false'
+            ? req.query.isActive
+            : '';
 
         logger.info(`[SMS Campaign Report] Page: ${page}, PageSize: ${pageSize}`);
 
@@ -70,6 +74,14 @@ exports.renderWhatsappCampaignReport = async (req, res) => {
             page: page.toString(),
             pageSize: pageSize.toString()
         });
+
+        if (searchQuery) {
+            queryParams.append('searchQuery', searchQuery);
+        }
+
+        if (isActiveFilter) {
+            queryParams.append('isActive', isActiveFilter);
+        }
 
         // FIXED: Call the function with queryParams as argument
         const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.Whatsapp.RENDER_REPORT(queryParams);
@@ -87,9 +99,34 @@ exports.renderWhatsappCampaignReport = async (req, res) => {
         const rawCampaigns = Array.isArray(backendData.campaigns) ? backendData.campaigns : [];
         const paginationData = backendData.pagination || {};
 
+
+        let statsData = backendData.stats || {};
+        if (isActiveFilter) {
+            const statsQueryParams = new URLSearchParams({
+                page: page.toString(),
+                pageSize: pageSize.toString()
+            });
+
+            if (searchQuery) {
+                statsQueryParams.append('searchQuery', searchQuery);
+            }
+
+            const statsUrl = backend_api_urls.PHISHMAGNUS.CAMPAIGN.Whatsapp.RENDER_REPORT(statsQueryParams);
+            const statsResponse = await apiClient.get(statsUrl, {
+                headers: { 'Accept': 'application/json' }
+            });
+
+            const statsBackendData = statsResponse?.data?.data || {};
+            statsData = statsBackendData.stats || statsData;
+        }
+
         // Transform campaign data
         const campaigns = transformCampaignData(rawCampaigns);
         const pagination = preparePaginationData(paginationData);
+        const stats = {
+            active: Number(statsData.active || 0),
+            inactive: Number(statsData.inactive || 0)
+        };
 
         logger.info(`[SMS Campaign Report] Retrieved ${campaigns.length} campaigns`);
         logger.info(`[SMS Campaign Report] Total campaigns: ${pagination.totalCampaigns}`);
@@ -98,6 +135,9 @@ exports.renderWhatsappCampaignReport = async (req, res) => {
         const templateData = {
             campaigns: campaigns,
             pagination: pagination,
+            stats: stats,
+            searchQuery: searchQuery,
+            isActiveFilter: isActiveFilter,
             user: req.user,
             message: req.flash('message')[0] || null,
             alertType: req.flash('alertType')[0] || null,

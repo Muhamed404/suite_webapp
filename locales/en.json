@@ -1399,7 +1399,8 @@
 			"opened": "Opened",
 			"no_interaction": "No Interaction",
 			"no_invitees": "No invitee responses yet",
-			"invalid_id": "Invalid campaign ID"
+			"invalid_id": "Invalid campaign ID",
+			"invitee_email": "Invitee Email"
 		}
 	},
 	"qr_campaign": {
