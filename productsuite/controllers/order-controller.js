@@ -1,5 +1,5 @@
 
- 
+
 const { logger } = require("../../logger/logger");
 const enums = require("../../contants/enum");
 const { getUserInfo, canAccessOrganization, logAuthResult } = require("../../utility/authorization-helper");
@@ -39,7 +39,7 @@ async function displayInvoice(req, res) {
       // console.log(response)
       let invoiceData = response.data.message;
       logger.info(`received invoice data is \n ${JSON.stringify(invoiceData)}`);
-      res.render("pages/order/invoice", { invoiceData, enums: enums,enableSuiteManagementLeftMenu: true, });
+      res.render("pages/order/invoice", { invoiceData, enums: enums, enableSuiteManagementLeftMenu: true, });
     } catch (error) {
       logger.error(`exception in displayInvoice \n`, error);
       const errMessage = "Error in Request, Contact to Administrator";
@@ -83,17 +83,17 @@ async function updateInvoice(req, res) {
     //   `/organization/?message=${message}&alertType=${alertType}`
     // );
     res.redirect(
-      `/organization/profile/${orgId}?message=${message}&alertType=${alertType}`
+      `/organization/profile/${orgId}?message=${message}&alertType=${alertType}&tab=subscription`
     );
   } catch (error) {
     logger.error(`Exception in updateInvoice \n` + error);
     const errMessage = "Error in Request, Contact Administrator";
-    res.redirect(`/organization/profile/${orgId}?message=${errMessage}&alertType=error`);
+    res.redirect(`/organization/profile/${orgId}?message=${errMessage}&alertType=error&tab=subscription`);
   }
 }
 
 module.exports = {
-  
+
   displayInvoice,
   updateInvoice,
 };

@@ -42,13 +42,13 @@ function generateSuiteManagementMenu(req, organization) {
       img_path: "/securemagnus_2025/images/icons/primary-uses.svg",
       allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin]
     },
-    {
-      module: "Categories",
-      labelKey: "menu.suite.cybersecurityCategories",
-      link: "/cybersecurity/categories/list",
-      img_path: "/securemagnus_2025/images/icons/Icon_Cybersecurity_Categories.svg",
-      allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin]
-    },
+    // {
+    //   module: "Categories",
+    //   labelKey: "menu.suite.cybersecurityCategories",
+    //   link: "/cybersecurity/categories/list",
+    //   img_path: "/securemagnus_2025/images/icons/Icon_Cybersecurity_Categories.svg",
+    //   allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin]
+    // },
     {
       module: "Organization Settings",
       labelKey: "menu.suite.organizationSettings",

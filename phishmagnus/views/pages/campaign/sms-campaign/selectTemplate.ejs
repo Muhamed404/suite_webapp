@@ -82,6 +82,73 @@
 
         </div>
             <!-- Preview -->
+        <div class="md:col-span-1">
+            <label class="block text-gray-700 font-medium mb-3">
+                <%= __("generic_label.preview") %>
+            </label>
+
+            <div id="template-preview-container" class="border border-gray-300 rounded-lg bg-white overflow-hidden">
+                <!-- Loading State -->
+                <div id="preview-loading" class="hidden text-center py-20">
+                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-teal-500"></div>
+                    <p class="text-gray-500 mt-2 text-sm">Loading preview...</p>
+                </div>
+
+                <!-- Empty State -->
+                <div id="preview-empty" class="text-center py-20 bg-gray-50">
+                    <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p class="text-gray-500"><%= __("generic_label.select_template_to_preview") || "Select a template to see preview" %></p>
+                </div>
+
+                <!-- Preview Content -->
+                <div id="preview-content" class="hidden flex flex-col h-[400px]">
+                    <!-- Preview Header -->
+                    <div class="bg-gray-100 px-4 py-2 border-b">
+                        <h4 id="preview-title" class="text-sm font-semibold text-gray-700">Template Content</h4>
+                    </div>
+
+                    <!-- Preview Frame Area -->
+                    <div class="flex-1 overflow-auto bg-white">
+                        <iframe id="preview-iframe" class="w-full h-full border-0"></iframe>
+                        <div id="preview-attachment-info" class="hidden p-8 text-center">
+                            <svg class="w-16 h-16 mx-auto text-teal-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                            </svg>
+                            <p class="text-gray-700 font-medium mb-2" id="attachment-name">File Attachment</p>
+                            <button type="button" id="btn-download-attachment-inline" class="mt-3 px-6 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition">
+                                <%= __("generic_label.download") || "Download File" %>
+                            </button>
+                        </div>
+                        <div id="preview-no-content" class="hidden p-8 text-center text-gray-500">
+                            <p>No content available for this section.</p>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="bg-gray-50 px-4 py-3 border-t flex gap-2 justify-center flex-wrap">
+                        <button type="button" data-preview-tab="email" class="preview-nav-btn px-4 py-2 text-sm font-medium rounded-lg border-2 transition-all bg-teal-500 text-white border-teal-500">
+                            <%= __("campaign.email_create_campaign.email_content") || "Message Content" %>
+                        </button>
+                        <button type="button" data-preview-tab="landing" class="preview-nav-btn px-4 py-2 text-sm font-medium rounded-lg border-2 border-gray-300 text-gray-700 hover:border-teal-400 hover:text-teal-600 transition-all" disabled>
+                            <%= __("campaign.email_create_campaign.landing_page") || "Landing Page" %>
+                        </button>
+                        <button type="button" data-preview-tab="redirect" class="preview-nav-btn px-4 py-2 text-sm font-medium rounded-lg border-2 border-gray-300 text-gray-700 hover:border-teal-400 hover:text-teal-600 transition-all" disabled>
+                            <%= __("campaign.email_create_campaign.redirect_page") || "Redirect Page" %>
+                        </button>
+                        <button type="button" data-preview-tab="attachment" class="preview-nav-btn px-4 py-2 text-sm font-medium rounded-lg border-2 border-gray-300 text-gray-700 hover:border-teal-400 hover:text-teal-600 transition-all" disabled>
+                            <%= __("campaign.email_create_campaign.attachment") || "Attachment" %>
+                        </button>
+                    </div>
+
+                    <div id="preview-error" class="hidden p-4 bg-red-50 border-t border-red-200">
+                        <p class="text-red-700 text-sm text-center"></p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     
     </div>
 </div>
