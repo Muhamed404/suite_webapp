@@ -175,6 +175,42 @@ npm run development
 npm start
 ```
 
+### Obfuscated Build And Deployment
+
+Generate deployable obfuscated output:
+
+```bash
+npm run build:obfuscate
+```
+
+Important:
+
+- Run this command from `suite_webapp` root, not from `suite_webapp/obfuscated`.
+- The output is generated in `suite_webapp/obfuscated`.
+
+Expected deployment structure:
+
+```text
+suite_webapp/obfuscated/
+|- awaremagnus/
+|- phishmagnus/
+|- productsuite/
+|- routes/
+|- middleware/
+|- utility/
+|- views/
+|- public/
+|- .env
+|- server.js
+|- package.json
+|- nodemon.json
+```
+
+1. Copy only `suite_webapp/obfuscated` to target server.
+2. Edit `.env` with client endpoint and Redis values.
+3. Run `npm install --omit=dev`.
+4. Run `npm start`.
+
 ### Health Check
 
 The application exposes a health check endpoint at `/health` that returns the service status and environment information.
