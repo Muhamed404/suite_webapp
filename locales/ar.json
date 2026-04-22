@@ -96,6 +96,11 @@
 		"enterPassword": "أدخل كلمة المرور",
 		"enterNewPassword": "أدخل كلمة المرور الجديدة",
 		"login": "تسجيل الدخول",
+		"invalid_credentials": "بيانات الاعتماد غير صالحة.",
+		"user_not_found": "المستخدم غير موجود أو غير نشط.",
+		"no_access_permissions": "ليس لدى المستخدم أذونات وصول.",
+		"no_portal_access": "ليس لدى المستخدم حق الوصول إلى البوابة.",
+		"unexpected_error": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
 		"welcomeToPhishMagnus": "مرحباً بك في PhishMagnus",
 		"welcomeToAwareMagnus": "مرحباً بك في AwareMagnus",
 		"emailAddress": "عنوان البريد الإلكتروني",
@@ -2359,5 +2364,6 @@
 		"loginPlaceholder": "أدخل الرمز المكون من 6 أرقام",
 		"loginBtn": "تحقق والمتابعة",
 		"loginBack": "العودة إلى تسجيل الدخول"
-	}
+	},
+	"user_not_found": "user_not_found"
 }
