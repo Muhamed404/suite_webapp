@@ -21,6 +21,16 @@ $(document).ready(function () {
     },
     messages: window.organizationValidationMessages,
     errorClass: "text-red-500 text-sm mt-1",
+    errorElement: "div",
+    errorPlacement: function (error, element) {
+      const errorId = element.attr("id") + "-error";
+      if ($("#" + errorId).length) {
+        $("#" + errorId).html(error.html());
+      } else {
+        error.attr("id", errorId);
+        error.insertAfter(element);
+      }
+    },
     highlight: function (element) {
       $(element).addClass("border-red-500");
     },

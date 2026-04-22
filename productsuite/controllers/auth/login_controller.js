@@ -68,7 +68,7 @@ exports.postLogin = async (req, res) => {
 
         if (!userToken) {
             logger.error(`[PSuite Login Controller]: POST: Incomplete login response: ${JSON.stringify(data)}`);
-            return res.redirect(`/login?message=Unexpected error&alertType=error`);
+            return res.redirect(`/login?message=${req.__('generic_label.unexpected_error')}&alertType=error`);
         }
 
         // 🚨 MFA required → Temporarily store pending session
@@ -89,7 +89,26 @@ exports.postLogin = async (req, res) => {
         }
 
     } catch (err) {
-        const message = err?.response?.data?.message || "Invalid Credentials";
+        const rawMessage = err?.response?.data?.message;
+        let message;
+
+        if (rawMessage && typeof rawMessage === 'string') {
+            const norm = rawMessage.trim().toLowerCase();
+            if (norm.includes('invalid') || norm.includes('credential')) {
+                message = req.__('generic_label.invalid_credentials');
+            } else if (norm.includes('user not found') || norm.includes('inactive')) {
+                message = req.__('generic_label.user_not_found');
+            } else if (norm.includes('permissions')) {
+                message = req.__('generic_label.no_access_permissions');
+            } else if (norm.includes('portal access')) {
+                message = req.__('generic_label.no_portal_access');
+            } else {
+                message = rawMessage;
+            }
+        } else {
+            message = req.__('generic_label.unexpected_error');
+        }
+
         logger.error(`[PSuite Login Controller]: POST: Authentication failed for ${email}: ${message}`);
         logger.error(err);
         logger.error(err.stack);
