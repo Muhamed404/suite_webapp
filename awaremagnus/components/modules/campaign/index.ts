@@ -13,3 +13,4 @@ export { NewSurveyForm } from "./new-survey-form";
 export { SurveyQuestionsPage } from "./survey-questions-page";
 export { CreateSurveyQuestionForm } from "./create-survey-question-form";
 export { ReportCardPage } from "./report-card-page";
+export { CertificationReportPage } from "./certification-report-page";
