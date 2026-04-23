@@ -96,6 +96,12 @@ class EmailCampaignStepper {
       if (hiddenTemplateId.length) {
         hiddenTemplateId.valid();
       }
+
+      const errorEl = document.getElementById('templateSelectError');
+      if (this.value && errorEl) {
+        errorEl.remove();
+        $(this).removeClass('border-red-500');
+      }
     });
   }
 
@@ -506,10 +512,13 @@ class EmailCampaignStepper {
   async validateForm() {
     if (!this.form) return true;
 
-    // Step 1: Validate campaign name
+    // Step 1: Validate campaign name and template selection
     if (this.currentStep === 0) {
       const nameInput = document.getElementById('name');
+      const templateSelect = document.getElementById('templateSelect');
+      const hiddenTemplateId = document.querySelector('input[name="templateId"]');
       const validator = $(this.form).validate();
+      let isValid = true;
 
       if (nameInput && !nameInput.value.trim()) {
         validator.showErrors({
@@ -518,11 +527,34 @@ class EmailCampaignStepper {
         $(nameInput).addClass('border-red-500');
         nameInput.focus();
         nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return false;
+        isValid = false;
       } else {
-        validator.resetForm();
         $(nameInput).removeClass('border-red-500');
       }
+
+      const selectedTemplateId = templateSelect?.value?.trim() || hiddenTemplateId?.value?.trim() || '';
+      if (!selectedTemplateId && templateSelect) {
+        this.showFieldError(
+          templateSelect,
+          window.i18n?.validation_messages?.template_required || "Please select a template.",
+          'templateSelectError'
+        );
+
+        if (isValid) {
+          templateSelect.focus();
+          templateSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        isValid = false;
+      } else if (templateSelect) {
+        this.clearFieldError(templateSelect, 'templateSelectError');
+      }
+
+      if (!isValid) {
+        return false;
+      }
+
+      validator.resetForm();
     }
 
     // Step 2: Validate department or group selection
@@ -609,6 +641,31 @@ class EmailCampaignStepper {
 
     // console.log('All validations passed for step:', this.currentStep);
     return true;
+  }
+
+  showFieldError(field, message, errorId) {
+    if (!field) return;
+
+    this.clearFieldError(field, errorId);
+
+    const error = document.createElement('span');
+    error.id = errorId;
+    error.className = 'text-red-500 text-sm mt-1 block';
+    error.textContent = message;
+
+    field.classList.add('border-red-500');
+    field.insertAdjacentElement('afterend', error);
+  }
+
+  clearFieldError(field, errorId) {
+    if (field) {
+      field.classList.remove('border-red-500');
+    }
+
+    const existingError = document.getElementById(errorId);
+    if (existingError) {
+      existingError.remove();
+    }
   }
 
   async validateMemberCount(departmentIds, groupIds) {
