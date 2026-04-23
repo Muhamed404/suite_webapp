@@ -1911,7 +1911,7 @@
 			"select_date_time": "اختر التاريخ والوقت",
 			"start_time": "وقت البدء *",
 			"end_time": "وقت الانتهاء",
-			"fb_account_required": "whatsapp.create.fb_account_required"
+			"fb_account_required": "لإطلاق حملة واتساب، يلزم وجود حساب أعمال فيسبوك (Meta) مسجل."
 		},
 		"campaign_report": {
 			"title": "تقارير حملات واتساب",
