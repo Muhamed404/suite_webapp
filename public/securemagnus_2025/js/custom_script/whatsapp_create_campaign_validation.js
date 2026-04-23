@@ -31,7 +31,8 @@ $(document).ready(function () {
   $('#name').on('blur', function () { $(this).valid(); });
   $('input[name="templateOption"]').on('change', function () { $(this).valid(); });
   $('#templateSelect').on('change', function () {
-    $(this).valid();
+    clearTemplateError();
+    $(this).removeClass('border-red-500');
     const templateId = this.value;
     if (templateId) {
       loadTemplatePreview(templateId);
@@ -45,10 +46,10 @@ $(document).ready(function () {
   initTemplateOptionToggle();
 
   // Add custom validation for department/group selection on Next button
-  if (window.nextBtn) {
-    window.nextBtn.addEventListener('click', function(e) {
-      // Get current step
-      const steps = document.querySelectorAll('.step');
+  const nextBtn = document.getElementById('nextBtn');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function(e) {
+      const steps = document.querySelectorAll('#steps > .step');
       let currentStep = 0;
       steps.forEach((step, index) => {
         if (!step.classList.contains('hidden')) {
@@ -56,17 +57,74 @@ $(document).ready(function () {
         }
       });
 
+      if (currentStep === 0) {
+        const validator = $("#whatsappCampaignForm").validate();
+        const nameInput = document.getElementById('name');
+        const templateSelect = document.getElementById('templateSelect');
+        const trimmedName = nameInput?.value?.trim() || '';
+        const selectedTemplateId = templateSelect?.value?.trim() || '';
+        let isValid = true;
+
+        if (trimmedName.length < 2) {
+          validator.showErrors({
+            name: window.i18n.validation.campaign_name_required
+          });
+          $(nameInput).addClass('border-red-500');
+          nameInput?.focus();
+          isValid = false;
+        }
+
+        if (!selectedTemplateId && templateSelect) {
+          showTemplateError(window.i18n.validation.template_required);
+          templateSelect.classList.add('border-red-500');
+          if (isValid) {
+            templateSelect.focus();
+          }
+          isValid = false;
+        } else {
+          clearTemplateError();
+          templateSelect?.classList.remove('border-red-500');
+        }
+
+        if (!isValid) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          return false;
+        }
+
+        return;
+      }
+
       // Step 2: Validate department or group selection
       if (currentStep === 1) {
         if (!validateDepartmentGroupSelection()) {
           e.preventDefault();
           e.stopPropagation();
+          e.stopImmediatePropagation();
           return false;
         }
       }
     }, true); // Use capture phase to intercept before other handlers
   }
 });
+
+function showTemplateError(message) {
+  clearTemplateError();
+
+  const templateSelect = document.getElementById('templateSelect');
+  if (!templateSelect) return;
+
+  const error = document.createElement('span');
+  error.id = 'templateSelectError';
+  error.className = 'text-red-500 text-sm mt-1 block';
+  error.textContent = message;
+  templateSelect.insertAdjacentElement('afterend', error);
+}
+
+function clearTemplateError() {
+  document.getElementById('templateSelectError')?.remove();
+}
 
 // Validate department or group selection
 function validateDepartmentGroupSelection() {
