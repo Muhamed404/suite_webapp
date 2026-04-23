@@ -991,7 +991,10 @@
 			"whatsappAttachUrlTitle": "إرفاق رابط",
 			"whatsappAttachUrlDescription": "تضمين رابط قابل للنقر في الرسالة القصيرة.",
 			"whatsappDownloadTemplateTitle": "تحميل القالب",
-			"whatsappDownloadTemplateDescription": "استخدام قالب رسائل قصيرة جاهز."
+			"whatsappDownloadTemplateDescription": "استخدام قالب رسائل قصيرة جاهز.",
+			"email_domain": "نطاق البريد الإلكتروني",
+			"select_email_domain": "اختر نطاق البريد الإلكتروني",
+			"failed_to_load_smtp_configurations": "فشل تحميل نطاقات البريد الإلكتروني."
 		},
 		"stepper8": "محتوى قالب الرسائل النصية"
 	},
@@ -1106,7 +1109,8 @@
 			"select_template": "اختر القالب",
 			"select_target_audience": "اختر الجمهور المستهدف",
 			"select_department": "اختر القسم",
-			"select_group": "اختر المجموعة"
+			"select_group": "اختر المجموعة",
+			"fb_account_required": "لإطلاق حملة رسائل قصيرة، يلزم وجود حساب مزود خدمة رسائل قصيرة مسجل."
 		},
 		"validation_messages": {
 			"campaign_name_required": "اسم الحملة مطلوب (حد أدنى حرفين).",
@@ -1731,7 +1735,12 @@
 		"sms_content": "محتوى قالب الرسائل النصية",
 		"sms_message": "نص الرسالة القصيرة",
 		"sms_placeholder": "نص الرسالة",
-		"tracking_header": "هذا القالب سيسمح لك بتتبع العناصر التالية:"
+		"tracking_header": "هذا القالب سيسمح لك بتتبع العناصر التالية:",
+		"tracking_email_message_opened": "تتبع فتح البريد الإلكتروني/الرسالة",
+		"tracking_link_clicked": "تتبع النقر على رابط التصيد الاحتيالي",
+		"tracking_file_downloaded": "تتبع تحميل ملف التصيد الاحتيالي (من البريد الإلكتروني/الرسالة أو صفحة الهبوط)",
+		"tracking_form_submitted": "تتبع البيانات المرسلة من خلال نموذج التصيد الاحتيالي",
+		"tracking_form_interaction": "تتبع تفاعل المستخدم مع نموذج التصيد الاحتيالي"
 	},
 	"common": {
 		"search_here": "ابحث هنا",
@@ -1797,7 +1806,8 @@
 		"totalQRImages": "إجمالي صور QR",
 		"created": "تم الإنشاء",
 		"unsent": "غير مرسل",
-		"totalCampaigns": "إجمالي الحملات"
+		"totalCampaigns": "إجمالي الحملات",
+		"reported_emails": "رسائل البريد الإلكتروني المبلغ عنها"
 	},
 	"reports": {
 		"campaignReports": "تقارير الحملات",
@@ -1900,7 +1910,8 @@
 			"select_group": "اختر المجموعة",
 			"select_date_time": "اختر التاريخ والوقت",
 			"start_time": "وقت البدء *",
-			"end_time": "وقت الانتهاء"
+			"end_time": "وقت الانتهاء",
+			"fb_account_required": "whatsapp.create.fb_account_required"
 		},
 		"campaign_report": {
 			"title": "تقارير حملات واتساب",

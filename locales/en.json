@@ -1751,7 +1751,12 @@
 		"sms_content": "template.sms_content",
 		"sms_message": "template.sms_message",
 		"sms_placeholder": "template.sms_placeholder",
-		"tracking_header": "This template will allow you to track the following items:"
+		"tracking_header": "This template will allow you to track the following items:",
+		"tracking_email_message_opened": "Track email/message opened",
+		"tracking_link_clicked": "Track phishing simulation link clicked",
+		"tracking_file_downloaded": "Track phishing simulation file downloaded (from email/message or landing page)",
+		"tracking_form_submitted": "Track data submitted through the phishing simulation form",
+		"tracking_form_interaction": "Track user interaction with the phishing simulation form"
 	},
 	"common": {
 		"search_here": "common.search_here",
