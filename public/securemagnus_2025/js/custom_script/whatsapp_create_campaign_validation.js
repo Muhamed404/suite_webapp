@@ -370,23 +370,23 @@ function updateTrackingInfo() {
 
   const trackingItems = [
     {
-      text: 'Track email/message opened',
+      text: window.i18n?.template?.tracking_email_message_opened || 'Track email/message opened',
       available: hasEmailContent
     },
     {
-      text: 'Track phishing simulation link clicked',
+      text: window.i18n?.template?.tracking_link_clicked || 'Track phishing simulation link clicked',
       available: hasLandingPage || hasRedirectPage
     },
     {
-      text: 'Track phishing simulation file downloaded (from email/message or landing page)',
+      text: window.i18n?.template?.tracking_file_downloaded || 'Track phishing simulation file downloaded (from email/message or landing page)',
       available: hasAttachment
     },
     {
-      text: 'Track data submitted through the phishing simulation form',
+      text: window.i18n?.template?.tracking_form_submitted || 'Track data submitted through the phishing simulation form',
       available: hasLandingPage
     },
     {
-      text: 'Track user interaction with the phishing simulation form',
+      text: window.i18n?.template?.tracking_form_interaction || 'Track user interaction with the phishing simulation form',
       available: hasLandingPage
     }
   ];
@@ -394,11 +394,11 @@ function updateTrackingInfo() {
   const trackingDiv = document.createElement('div');
   trackingDiv.className = 'tracking-info mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg';
   trackingDiv.innerHTML = `
-    <h4 class="text-sm font-semibold text-blue-800 mb-2">This template will allow you to track the following items:</h4>
+    <h4 class="text-sm font-semibold text-blue-800 mb-2">${window.i18n?.template?.tracking_header || 'This template will allow you to track the following items:'}</h4>
     <ul class="text-sm text-black space-y-1">
       ${trackingItems.map((item) => `
-        <li class="flex items-center">
-          <span class="mr-2 flex-shrink-0">${item.available ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>'}</span>
+        <li class="flex items-center gap-3">
+          <span class="flex-shrink-0">${item.available ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>'}</span>
           ${item.text}
         </li>
       `).join('')}
