@@ -520,7 +520,9 @@ class EmailCampaignStepper {
       const validator = $(this.form).validate();
       let isValid = true;
 
-      if (nameInput && !nameInput.value.trim()) {
+      const trimmedName = nameInput?.value?.trim() || '';
+
+      if (nameInput && trimmedName.length < 2) {
         validator.showErrors({
           "name": window.i18n?.validation_messages?.campaign_name_required || "Campaign name is required (minimum 2 characters)."
         });
