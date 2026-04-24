@@ -195,7 +195,7 @@ export const GamificationStats = () => {
       Number(stats?.total_unique_achievements_locked ?? 0);
     const fallbackCount = Number.isFinite(totalUniqueAchievements) && totalUniqueAchievements > 0
       ? Math.floor(totalUniqueAchievements)
-      : 16;
+      : 32;
 
     return Array.from({ length: fallbackCount }, (_, index) => index + 1);
   }, [achievementsData, stats]);
@@ -212,7 +212,7 @@ export const GamificationStats = () => {
       }
     }
 
-    return [...unlocked, ...locked].slice(0, 16);
+    return [...unlocked, ...locked].slice(0, 32);
   }, [allAchievementIds, unlockedAchievementIds]);
 
   const achievementById = useMemo(() => {
@@ -269,6 +269,12 @@ export const GamificationStats = () => {
       .sort((a, b) => a.level_number - b.level_number);
   }, [avatars]);
 
+  const highestUnlockedLevel = useMemo(() => {
+    const unlocked = avatarStats.filter((avatar) => (avatar.employee_count ?? 0) > 0);
+    if (unlocked.length === 0) return 0;
+    return Math.max(...unlocked.map((a) => a.level_number));
+  }, [avatarStats]);
+
   // Main slot should always show the highest unlocked level avatar.
   const mainAvatar = useMemo(() => {
     if (avatarStats.length === 0) {
@@ -294,7 +300,7 @@ export const GamificationStats = () => {
   }, [avatarStats]);
 
   // Check if main avatar is unlocked (has employee_count > 0)
-  const isMainAvatarUnlocked = (mainAvatar?.employee_count ?? 0) > 0;
+  const isMainAvatarUnlocked = (mainAvatar?.level_number ?? 0) <= highestUnlockedLevel && highestUnlockedLevel > 0;
   
   // Get the actual image filename for the main avatar from API response
   const mainAvatarImageName = useMemo(() => resolveAvatarImage(mainAvatar), [mainAvatar]);
@@ -354,7 +360,7 @@ export const GamificationStats = () => {
         </div>
 
         {/* Achievement Gallery */}
-        <div className="col-span-6 col-start-7 row-span-3 bg-[linear-gradient(114.67deg,#FFFEFC_5.61%,#FDECE0_98.45%)] rounded-xl p-5">
+        <div className="col-span-6 col-start-7 row-span-4 bg-[linear-gradient(114.67deg,#FFFEFC_5.61%,#FDECE0_98.45%)] rounded-xl p-5">
           <div className="flex items-start justify-between">
             <div>
               <h2 className="font-semibold text-gray-900 text-md flex items-center gap-2">
@@ -415,15 +421,15 @@ export const GamificationStats = () => {
                 <Tooltip key={achievementId} content={tooltipContent} placement="top">
                   <div
                     aria-disabled={!isUnlocked}
-                    className={`w-14 h-14 rounded-full flex items-center justify-center relative cursor-default ${isUnlocked ? "" : "opacity-40"}`}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center relative cursor-default ${isUnlocked ? "" : "opacity-40"}`}
                   >
                     <Image
                       unoptimized
                       alt={meta?.achievement_name ?? `Achievement ${achievementId}`}
-                      className="w-14 h-14"
-                      height={56}
+                      className="w-12 h-12"
+                      height={48}
                       src={getContentAssetUrl(`/images/achivement/${imageFileName}`)}
-                      width={56}
+                      width={48}
                     />
                   </div>
                 </Tooltip>
@@ -451,13 +457,9 @@ export const GamificationStats = () => {
           </div>
         </div>
 
-        {/* Employee Avatar Level */}
-        <div className="col-span-6 row-span-2 row-start-2 bg-white rounded-xl p-5">
+        <div className="col-span-6 row-span-3 row-start-2 bg-white rounded-xl p-5">
           <div className="flex justify-between items-center">
             <h2 className="text-md font-semibold">{t("gamification.employeeAvatarLevel")}</h2>
-            <Link className="text-blue-600 text-xs font-medium" href="#">
-              {t("cards.viewAll")}
-            </Link>
           </div>
 
           <div className="flex mt-5 gap-8">
@@ -507,14 +509,12 @@ export const GamificationStats = () => {
             </div>
 
             {/* Levels Grid — show 8 remaining avatars excluding the one in main slot */}
-            <div className="grid grid-cols-4 gap-5 flex-1 pl-5 border-l border-[#E6E6E6]">
+            <div className="grid grid-cols-5 gap-5 flex-1 pl-5 border-l border-[#E6E6E6]">
               {(() => {
-                const availableAvatars = avatarStats
-                  .filter((avatar) => avatar.level_number !== mainAvatar?.level_number)
-                  .slice(0, 8);
+                const availableAvatars = avatarStats;
 
                 return (availableAvatars as AvatarStat[]).map((avatar) => {
-                  const isUnlocked = avatar.employee_count > 0;
+                  const isUnlocked = avatar.level_number <= highestUnlockedLevel && highestUnlockedLevel > 0;
                   const avatarImageName = resolveAvatarImage(avatar);
 
                   const tooltipContent = (
