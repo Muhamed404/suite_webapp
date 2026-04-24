@@ -31,7 +31,8 @@ $(document).ready(function () {
   $('#name').on('blur', function () { $(this).valid(); });
   $('input[name="templateOption"]').on('change', function () { $(this).valid(); });
   $('#templateSelect').on('change', function () {
-    $(this).valid();
+    clearTemplateError();
+    $(this).removeClass('border-red-500');
     const templateId = this.value;
     if (templateId) {
       loadTemplatePreview(templateId);
@@ -45,10 +46,10 @@ $(document).ready(function () {
   initTemplateOptionToggle();
 
   // Add custom validation for department/group selection on Next button
-  if (window.nextBtn) {
-    window.nextBtn.addEventListener('click', function(e) {
-      // Get current step
-      const steps = document.querySelectorAll('.step');
+  const nextBtn = document.getElementById('nextBtn');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function(e) {
+      const steps = document.querySelectorAll('#steps > .step');
       let currentStep = 0;
       steps.forEach((step, index) => {
         if (!step.classList.contains('hidden')) {
@@ -56,17 +57,74 @@ $(document).ready(function () {
         }
       });
 
+      if (currentStep === 0) {
+        const validator = $("#whatsappCampaignForm").validate();
+        const nameInput = document.getElementById('name');
+        const templateSelect = document.getElementById('templateSelect');
+        const trimmedName = nameInput?.value?.trim() || '';
+        const selectedTemplateId = templateSelect?.value?.trim() || '';
+        let isValid = true;
+
+        if (trimmedName.length < 2) {
+          validator.showErrors({
+            name: window.i18n.validation.campaign_name_required
+          });
+          $(nameInput).addClass('border-red-500');
+          nameInput?.focus();
+          isValid = false;
+        }
+
+        if (!selectedTemplateId && templateSelect) {
+          showTemplateError(window.i18n.validation.template_required);
+          templateSelect.classList.add('border-red-500');
+          if (isValid) {
+            templateSelect.focus();
+          }
+          isValid = false;
+        } else {
+          clearTemplateError();
+          templateSelect?.classList.remove('border-red-500');
+        }
+
+        if (!isValid) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          return false;
+        }
+
+        return;
+      }
+
       // Step 2: Validate department or group selection
       if (currentStep === 1) {
         if (!validateDepartmentGroupSelection()) {
           e.preventDefault();
           e.stopPropagation();
+          e.stopImmediatePropagation();
           return false;
         }
       }
     }, true); // Use capture phase to intercept before other handlers
   }
 });
+
+function showTemplateError(message) {
+  clearTemplateError();
+
+  const templateSelect = document.getElementById('templateSelect');
+  if (!templateSelect) return;
+
+  const error = document.createElement('span');
+  error.id = 'templateSelectError';
+  error.className = 'text-red-500 text-sm mt-1 block';
+  error.textContent = message;
+  templateSelect.insertAdjacentElement('afterend', error);
+}
+
+function clearTemplateError() {
+  document.getElementById('templateSelectError')?.remove();
+}
 
 // Validate department or group selection
 function validateDepartmentGroupSelection() {
@@ -312,23 +370,23 @@ function updateTrackingInfo() {
 
   const trackingItems = [
     {
-      text: 'Track email/message opened',
+      text: window.i18n?.template?.tracking_email_message_opened || 'Track email/message opened',
       available: hasEmailContent
     },
     {
-      text: 'Track phishing simulation link clicked',
+      text: window.i18n?.template?.tracking_link_clicked || 'Track phishing simulation link clicked',
       available: hasLandingPage || hasRedirectPage
     },
     {
-      text: 'Track phishing simulation file downloaded (from email/message or landing page)',
+      text: window.i18n?.template?.tracking_file_downloaded || 'Track phishing simulation file downloaded (from email/message or landing page)',
       available: hasAttachment
     },
     {
-      text: 'Track data submitted through the phishing simulation form',
+      text: window.i18n?.template?.tracking_form_submitted || 'Track data submitted through the phishing simulation form',
       available: hasLandingPage
     },
     {
-      text: 'Track user interaction with the phishing simulation form',
+      text: window.i18n?.template?.tracking_form_interaction || 'Track user interaction with the phishing simulation form',
       available: hasLandingPage
     }
   ];
@@ -336,11 +394,11 @@ function updateTrackingInfo() {
   const trackingDiv = document.createElement('div');
   trackingDiv.className = 'tracking-info mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg';
   trackingDiv.innerHTML = `
-    <h4 class="text-sm font-semibold text-blue-800 mb-2">This template will allow you to track the following items:</h4>
+    <h4 class="text-sm font-semibold text-blue-800 mb-2">${window.i18n?.template?.tracking_header || 'This template will allow you to track the following items:'}</h4>
     <ul class="text-sm text-black space-y-1">
       ${trackingItems.map((item) => `
-        <li class="flex items-center">
-          <span class="mr-2 flex-shrink-0">${item.available ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>'}</span>
+        <li class="flex items-center gap-3">
+          <span class="flex-shrink-0">${item.available ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>'}</span>
           ${item.text}
         </li>
       `).join('')}

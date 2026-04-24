@@ -39,7 +39,10 @@ $(document).ready(function () {
   // Validate on change/blur for better UX
   $('#name').on('blur', function () { $(this).valid(); });
   $('input[name="templateOption"]').on('change', function () { $(this).valid(); });
-  // $('#templateSelect').on('change', function () { $(this).valid(); });
+  $('#templateSelect').on('change', function () {
+    clearTemplateError();
+    $(this).removeClass('border-red-500');
+  });
   $('#noOfQRTags').on('blur', function () { $(this).valid(); });
   $('#qrImage').on('change', function () { $(this).valid(); });
   $('#startTime, #endTime').on('change', function () { $(this).valid(); });
@@ -47,31 +50,97 @@ $(document).ready(function () {
   // Initialize template option toggle
   initTemplateOptionToggle();
 
-  // Add custom validation for department/group selection on Next button
-  if (window.nextBtn) {
-    window.nextBtn.addEventListener('click', function(e) {
-      // Get current step
-      const steps = document.querySelectorAll('.step');
+  const nextBtn = document.getElementById('nextBtn');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function (e) {
+      const steps = document.querySelectorAll('#steps > .step');
       let currentStep = 0;
+
       steps.forEach((step, index) => {
         if (!step.classList.contains('hidden')) {
           currentStep = index;
         }
       });
 
-      // Note: QR campaign has different step order, adjust step number if needed
-      // Check which step has department/group selection
-      const currentStepElement = Array.from(steps).find(step => !step.classList.contains('hidden'));
-      if (currentStepElement && currentStepElement.querySelector('.tag-selector')) {
-        if (!validateDepartmentGroupSelection()) {
+      if (currentStep === 0) {
+        const validator = $("#qrCampaignForm").validate();
+        const nameInput = document.getElementById('name');
+        const templateSelect = document.getElementById('templateSelect');
+        const trimmedName = nameInput?.value?.trim() || '';
+        const selectedTemplateId = templateSelect?.value?.trim() || '';
+        let isValid = true;
+
+        if (trimmedName.length < 2) {
+          validator.showErrors({
+            name: window.i18n.validation.campaign_name_required
+          });
+          $(nameInput).addClass('border-red-500');
+          nameInput?.focus();
+          isValid = false;
+        }
+
+        if (!selectedTemplateId && templateSelect) {
+          showTemplateError(window.i18n.validation.template_required);
+          templateSelect.classList.add('border-red-500');
+          if (isValid) {
+            templateSelect.focus();
+          }
+          isValid = false;
+        } else {
+          clearTemplateError();
+          templateSelect?.classList.remove('border-red-500');
+        }
+
+        if (!isValid) {
           e.preventDefault();
           e.stopPropagation();
+          e.stopImmediatePropagation();
           return false;
         }
+
+        return;
       }
-    }, true); // Use capture phase to intercept before other handlers
+
+      if (currentStep === 1) {
+        const validator = $("#qrCampaignForm").validate();
+        const tagInput = document.getElementById('noOfQRTags');
+        const tagValue = tagInput?.value?.trim() || '';
+        const tagCount = Number(tagValue);
+
+        if (!tagValue || !Number.isInteger(tagCount) || tagCount < 1) {
+          validator.showErrors({
+            noOfQRTags: window.i18n.validation.qr_quantity_required
+          });
+          $(tagInput).addClass('border-red-500');
+          tagInput?.focus();
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          return false;
+        }
+
+        $(tagInput).removeClass('border-red-500');
+      }
+    }, true);
   }
 });
+
+function showTemplateError(message) {
+  clearTemplateError();
+
+  const templateSelect = document.getElementById('templateSelect');
+  if (!templateSelect) return;
+
+  const error = document.createElement('span');
+  error.id = 'templateSelectError';
+  error.className = 'text-red-500 text-sm mt-1 block';
+  error.textContent = message;
+  templateSelect.insertAdjacentElement('afterend', error);
+}
+
+function clearTemplateError() {
+  document.getElementById('templateSelectError')?.remove();
+}
 
 // Validate department or group selection
 function validateDepartmentGroupSelection() {
