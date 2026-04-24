@@ -53,7 +53,7 @@ exports.viewQRCampaignDetails = async (req, res) => {
     const formSubmittedSegmentStats = apiResponseCampaignReport?.data?.message.submittedSegmentStats || {};
     const formInteractionSegmentStats = apiResponseCampaignReport?.data?.message.interactedSegmentStats || {};
     const uniqueIpCount = apiResponseCampaignReport?.data?.message.uniqueIpCount || 0;
-
+    const search = req.query.search || '';
     let qrImageUrls = apiResponseCampaignReport?.data?.message.qrTagScanReport || [];
     logger.info(`Parsed qrImageUrls: ${JSON.stringify(qrImageUrls, null, 2)}`);
 
@@ -61,10 +61,25 @@ exports.viewQRCampaignDetails = async (req, res) => {
       logger.warn(`No QR images found for campaign ID: ${campId}`);
       qrImageUrls = [];
     } else {
+      // Filter by search query if provided
+      if (search) {
+        qrImageUrls = qrImageUrls.filter(img => 
+          (img.qr_code && img.qr_code.toLowerCase().includes(search.toLowerCase()))
+        );
+      }
+
       qrImageUrls = qrImageUrls.map(img => ({
         ...img,
         download_url: frontend_api_urls.PHISHMAGNUS.Campaign.QR.DOWNLOAD_QR_URL(img.qr_code)
       }));
+    }
+
+    // Handle AJAX request for search
+    if (req.query.ajax) {
+      return res.json({
+        success: true,
+        qrImageUrls: qrImageUrls
+      });
     }
 
     logger.info('QR Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));
@@ -78,7 +93,8 @@ exports.viewQRCampaignDetails = async (req, res) => {
       formInteractionSegmentStats,
       qrImageUrls,
       tvbs_backend_url: config.BACKEND_TVBS_URL || '',
-      uniqueIpCount
+      uniqueIpCount,
+      search // Pass search back to view
     });
 
 
