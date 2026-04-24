@@ -64,6 +64,7 @@ const AVATAR_IMAGE_BY_LEVEL: Record<number, string> = {
 interface AreaChartProps {
   data: number[];
   labels: string[];
+  dates?: Date[];
 }
 
 function buildCountTicks(maxValue: number): number[] {
@@ -123,7 +124,7 @@ function formatChartDateLabel(date: Date): string {
   return `${day} ${month}`;
 }
 
-function AreaChart({ data, labels }: AreaChartProps) {
+function AreaChart({ data, labels, dates }: AreaChartProps) {
   const color = "#38bdf8";
   const W = 300,
     H = 140,
@@ -133,10 +134,27 @@ function AreaChart({ data, labels }: AreaChartProps) {
     pL = 32;
   const iW = W - pL - pR,
     iH = H - pT - pB,
-    maxY = Math.max(...data, 1);
+    maxY = Math.max(...data, 5);
   const yTicks = buildCountTicks(maxY);
+
+  // Use date-proportional X so points aren't stretched across the full width
+  const today = new Date();
+  today.setHours(23, 59, 59, 999);
+  const startTime = dates && dates.length > 0 ? dates[0].getTime() : null;
+  const endTime = dates && dates.length > 0
+    ? Math.max(today.getTime(), dates[dates.length - 1].getTime())
+    : null;
+  const timeRange = startTime !== null && endTime !== null ? endTime - startTime : null;
+
+  const getX = (i: number): number => {
+    if (timeRange && timeRange > 0 && dates && dates[i]) {
+      return pL + ((dates[i].getTime() - startTime!) / timeRange) * iW;
+    }
+    return pL + (i / Math.max(data.length - 1, 1)) * iW;
+  };
+
   const pts = data.map((v, i) => ({
-    x: pL + (i / Math.max(data.length - 1, 1)) * iW,
+    x: getX(i),
     y: pT + iH - (Math.min(v, maxY) / maxY) * iH,
   }));
   const line = pts
@@ -179,7 +197,7 @@ function AreaChart({ data, labels }: AreaChartProps) {
           fill="#94a3b8"
           fontSize="7"
           textAnchor="middle"
-          x={pL + (i / Math.max(labels.length - 1, 1)) * iW}
+          x={getX(i)}
           y={H - 5}
         >
           {l}
@@ -340,6 +358,7 @@ function buildPrintHTML(args: {
   campaigns: Array<{ campaign_name: string; completed_modules: ReportCardModuleResult[] }>;
   chartData: number[];
   chartLabels: string[];
+  chartDates: Date[];
   totalComplianceScore: number;
 }): string {
   const {
@@ -357,6 +376,7 @@ function buildPrintHTML(args: {
     campaigns,
     chartData,
     chartLabels,
+    chartDates,
     totalComplianceScore,
   } = args;
   const today = formatToday();
@@ -431,9 +451,22 @@ function buildPrintHTML(args: {
     pL = 32;
   const iW = W - pL - pR,
     iH = H - pT - pB,
-    maxY = Math.max(...chartData, 1);
+    maxY = Math.max(...chartData, 5);
+  const pdfToday = new Date();
+  pdfToday.setHours(23, 59, 59, 999);
+  const pdfStartTime = chartDates.length > 0 ? chartDates[0].getTime() : null;
+  const pdfEndTime = chartDates.length > 0
+    ? Math.max(pdfToday.getTime(), chartDates[chartDates.length - 1].getTime())
+    : null;
+  const pdfTimeRange = pdfStartTime !== null && pdfEndTime !== null ? pdfEndTime - pdfStartTime : null;
+  const getPdfX = (i: number): number => {
+    if (pdfTimeRange && pdfTimeRange > 0 && chartDates[i]) {
+      return pL + ((chartDates[i].getTime() - pdfStartTime!) / pdfTimeRange) * iW;
+    }
+    return pL + (i / Math.max(chartData.length - 1, 1)) * iW;
+  };
   const pts = chartData.map((v, i) => ({
-    x: pL + (i / Math.max(chartData.length - 1, 1)) * iW,
+    x: getPdfX(i),
     y: pT + iH - (Math.min(v, maxY) / maxY) * iH,
   }));
   const linePath = pts
@@ -462,7 +495,7 @@ function buildPrintHTML(args: {
     ${pts.map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.5" fill="#38bdf8" stroke="white" stroke-width="1.5"/>`).join("")}
     ${chartLabels
       .map((l, i) => {
-        const x = pL + (i / Math.max(chartLabels.length - 1, 1)) * iW;
+        const x = getPdfX(i);
 
         return `<text x="${x.toFixed(1)}" y="${H - 4}" text-anchor="middle" font-size="7" fill="#94a3b8">${l}</text>`;
       })
@@ -611,13 +644,13 @@ function buildPrintHTML(args: {
             </div>
             <div style="position:relative;padding-left:32px;">
               ${campaign.completed_modules.map((m, idx) => {
-                const t = m.module_name || "Module";
-                const b = m.quiz_percentage !== undefined ? m.quiz_percentage >= 90 ? null : m.quiz_percentage >= 70 ? "Good Score" : null : null;
-                const r = m.achievements_unlocked_in_module >= 3 ? "Rare" : m.achievements_unlocked_in_module >= 1 ? "Common" : null;
-                const rBg = r === "Rare" ? "#ffedd5" : "#e0f2fe";
-                const rFg = r === "Rare" ? "#ea580c" : "#0284c7";
-                const d = m.quiz_percentage !== undefined ? `Scored ${m.quiz_percentage.toFixed(0)}% on the module quiz assessment` : "Completed and achieved full module progress";
-                return `
+    const t = m.module_name || "Module";
+    const b = m.quiz_percentage !== undefined ? m.quiz_percentage >= 90 ? null : m.quiz_percentage >= 70 ? "Good Score" : null : null;
+    const r = m.achievements_unlocked_in_module >= 3 ? "Rare" : m.achievements_unlocked_in_module >= 1 ? "Common" : null;
+    const rBg = r === "Rare" ? "#ffedd5" : "#e0f2fe";
+    const rFg = r === "Rare" ? "#ea580c" : "#0284c7";
+    const d = m.quiz_percentage !== undefined ? `Scored ${m.quiz_percentage.toFixed(0)}% on the module quiz assessment` : "Completed and achieved full module progress";
+    return `
               <div style="position:relative;margin-bottom:16px;">
                 ${idx < campaign.completed_modules.length - 1 ? `<span style="position:absolute;left:-19px;top:24px;height:100%;width:1.5px;background:#34d399;display:block;"></span>` : ""}
                 <span style="position:absolute;left:-28px;top:4px;width:20px;height:20px;border-radius:50%;background:#10b981;color:white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">✓</span>
@@ -656,7 +689,7 @@ function buildPrintHTML(args: {
                   </div>
                 </div>
               </div>`;
-              }).join("")}
+  }).join("")}
             </div>
           </div>
         `).join("")}
@@ -720,7 +753,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
   useTranslations("dashboard");
   useI18n();
   const { user } = useAuthStore();
-  
+
   // Use useUserReportCard if userId is provided, otherwise use useMyReportCard
   const { data: response, isLoading, isError } = userId
     ? useUserReportCard(userId)
@@ -781,18 +814,30 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
     let runningCount = 0;
     const data: number[] = [];
     const labels: string[] = [];
+    const dates: Date[] = [];
+
+    // Prepend a starting zero point (one day before first completion) so the line draws from 0
+    if (datedEntries.length > 0) {
+      const firstDate = new Date(datedEntries[0].date);
+      firstDate.setDate(firstDate.getDate() - 1);
+      data.push(0);
+      labels.push(""); // No label for the synthetic baseline point
+      dates.push(new Date(firstDate));
+    }
 
     datedEntries.forEach((entry) => {
       runningCount += entry.count;
       data.push(runningCount);
       labels.push(formatChartDateLabel(entry.date));
+      dates.push(new Date(entry.date));
     });
 
-    return { data, labels };
+    return { data, labels, dates };
   }, [allModules]);
 
   const chartData = completionChart.data;
   const chartLabels = completionChart.labels;
+  const chartDates = completionChart.dates;
 
   const anyUser = user as any;
   const userName: string = anyUser?.name ?? anyUser?.username ?? user?.email ?? "User";
@@ -817,6 +862,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
       campaigns,
       chartData,
       chartLabels,
+      chartDates,
       totalComplianceScore,
     });
     const win = window.open("", "_blank", "width=1000,height=800");
@@ -1196,7 +1242,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                 </div>
                 {chartData.length > 0 ? (
                   <div className="flex-1 min-h-[120px]">
-                    <AreaChart data={chartData} labels={chartLabels} />
+                    <AreaChart data={chartData} labels={chartLabels} dates={chartDates} />
                   </div>
                 ) : (
                   <div className="flex-1 flex items-center justify-center py-4">
