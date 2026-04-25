@@ -30,6 +30,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { isOrgUser } from "@/utils/roles";
 import { getContentAssetUrl } from "@/services/awmStorage";
 import { LANGUAGE_COUNTRY_CODES, SUPPORTED_LANGUAGES } from "@/utils/supportedLanguages";
+import { formatNumber, formatNumberGrouped } from "@/utils/localeNumber";
 
 // Maps URL slug → contype_id (matches API content_type_id values)
 const CONTENT_TYPE_ID: Record<string, number> = {
@@ -53,6 +54,12 @@ function toLangCode(name?: string): string {
   if (n.includes("english")) return "en";
 
   return "en";
+}
+
+function toLangId(code: string): number | undefined {
+  if (!code || code === "all") return undefined;
+  const lang = SUPPORTED_LANGUAGES.find((item) => toLangCode(item.name) === code);
+  return lang?.id;
 }
 
 export default function ContentPage() {
@@ -90,6 +97,7 @@ export default function ContentPage() {
   const [reportContentsData, setReportContentsData] = useState<any>(null);
   const requestLimit = 10;
   const itemsPerPage = apiPagination?.per_page ?? requestLimit;
+  const selectedLangId = useMemo(() => toLangId(languageFilter), [languageFilter]);
 
   // Read mod_id and contype_id directly from URL query params
   const moduleId = searchParams?.get("mod_id") ? Number(searchParams.get("mod_id")) : 1;
@@ -108,7 +116,13 @@ export default function ContentPage() {
     }
     setIsLoading(true);
     quizService
-      .getContents({ mod_id: moduleId, contype_id, page: currentPage, limit: requestLimit })
+      .getContents({
+        mod_id: moduleId,
+        contype_id,
+        lang_id: selectedLangId,
+        page: currentPage,
+        limit: requestLimit,
+      })
       .then((res) => {
         if (res.success) {
           const raw = res.data as any;
@@ -142,7 +156,7 @@ export default function ContentPage() {
         setApiItems([]);
       })
       .finally(() => setIsLoading(false));
-  }, [type, moduleId, contypeIdFromUrl, currentPage]);
+  }, [type, moduleId, contypeIdFromUrl, currentPage, selectedLangId]);
 
   useEffect(() => {
     setLanguageFilter(locale === "ar" ? "ar" : "all");
@@ -151,6 +165,10 @@ export default function ContentPage() {
   useEffect(() => {
     setCurrentPage(1);
   }, [type, contypeIdFromUrl]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [languageFilter, searchQuery, sortBy, sortOrder]);
 
   // items are populated via API; legacy static array removed
 
@@ -201,6 +219,12 @@ export default function ContentPage() {
   }, [filteredItems]);
 
   const totalPages = (apiPagination?.total_pages ?? Math.ceil(filteredItems.length / itemsPerPage)) || 1;
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -858,6 +882,11 @@ export default function ContentPage() {
                             <thead className="bg-gray-50 text-gray-600 border-b sticky top-0 z-10">
                               <tr>
                                 <th
+                                  className={`px-4 py-3.5 ${isRtl ? "text-right" : "text-left"} font-semibold w-12`}
+                                >
+                                  #
+                                </th>
+                                <th
                                   className={`px-4 py-3.5 ${isRtl ? "text-right" : "text-left"} font-semibold cursor-pointer hover:bg-gray-100 transition-colors`}
                                   onClick={() => handleSort("title")}
                                 >
@@ -901,8 +930,16 @@ export default function ContentPage() {
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100" id="tableBody">
-                              {paginatedItems.map((item) => (
+                              {paginatedItems.map((item, index) => {
+                                const baseIdx = apiPagination
+                                  ? (apiPagination.current_page - 1) * apiPagination.per_page
+                                  : (currentPage - 1) * itemsPerPage;
+
+                                return (
                                 <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                                  <td className={`px-4 py-3 text-gray-500 font-medium ${isRtl ? "text-right" : "text-left"}`}>
+                                    {formatNumber(baseIdx + index + 1, locale)}
+                                  </td>
                                   <td className={`px-4 py-3 font-medium text-gray-700 ${isRtl ? "text-right" : "text-left"}`}>
                                     {item.title}
                                   </td>
@@ -933,7 +970,8 @@ export default function ContentPage() {
                                     </div>
                                   </td>
                                 </tr>
-                              ))}
+                                );
+                              })}
                             </tbody>
                           </table>
                         ) : (
@@ -1022,18 +1060,31 @@ export default function ContentPage() {
                       {/* Pagination */}
                       <div className="mt-4 flex items-center justify-between px-4 pb-4">
                         <p className="text-xs text-gray-600">
-                          Showing{" "}
-                          {apiPagination
-                            ? (apiPagination.current_page - 1) * apiPagination.per_page + 1
-                            : (currentPage - 1) * itemsPerPage + 1}
-                          –
-                          {apiPagination
-                            ? Math.min(
-                                apiPagination.current_page * apiPagination.per_page,
-                                apiPagination.total_items
-                              )
-                            : Math.min(currentPage * itemsPerPage, filteredItems.length)} of{" "}
-                          {apiPagination ? apiPagination.total_items : filteredItems.length} Entries
+                          {(() => {
+                            const totalEntries = apiPagination
+                              ? apiPagination.total_items
+                              : filteredItems.length;
+                            const fromIdx =
+                              filteredItems.length === 0
+                                ? 0
+                                : apiPagination
+                                  ? (apiPagination.current_page - 1) * apiPagination.per_page + 1
+                                  : (currentPage - 1) * itemsPerPage + 1;
+                            const toIdx =
+                              filteredItems.length === 0
+                                ? 0
+                                : apiPagination
+                                  ? Math.min(
+                                      apiPagination.current_page * apiPagination.per_page,
+                                      apiPagination.total_items
+                                    )
+                                  : Math.min(currentPage * itemsPerPage, filteredItems.length);
+
+                            return `Showing ${formatNumber(fromIdx, locale)}-${formatNumber(
+                              toIdx,
+                              locale
+                            )} of ${formatNumberGrouped(totalEntries, locale)} Entries`;
+                          })()}
                         </p>
                         <div className="flex items-center gap-1">
                           <button
@@ -1054,7 +1105,7 @@ export default function ContentPage() {
                               }`}
                               onClick={() => changePage(page)}
                             >
-                              {page}
+                              {formatNumber(page, locale)}
                             </button>
                           ))}
 

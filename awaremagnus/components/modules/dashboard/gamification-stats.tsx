@@ -75,7 +75,7 @@ export const GamificationStats = () => {
 
   const studyTimeHours =
     dashboardData && "total_study_time" in dashboardData
-      ? Math.floor(dashboardData.total_study_time / 3600)
+      ? Math.floor(dashboardData.total_study_time / 60)
       : 0;
 
   const { data: achievementData } = useAchievementStatistics();

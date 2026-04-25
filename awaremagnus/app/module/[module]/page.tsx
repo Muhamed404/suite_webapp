@@ -20,6 +20,42 @@ import { isOrgUser } from "@/utils/roles";
 import { quizService } from "@/services/quizService";
 import { SUPPORTED_LANGUAGES, LANGUAGE_COUNTRY_CODES } from "@/utils/supportedLanguages";
 import { getModuleAssetUrl } from "@/utils/contentAssetUrl";
+import { formatNumber } from "@/utils/localeNumber";
+
+function normalizeContentType(value?: string): string {
+  return (value ?? "").toLowerCase().trim();
+}
+
+function getContentTypeEmoji(typeName?: string): string {
+  const n = normalizeContentType(typeName);
+
+  if (n.includes("interactive") || n === "ispring") return "📘";
+  if (n.includes("quiz")) return "💡";
+  if (n.includes("poster")) return "🖼";
+  if (n.includes("survey")) return "📊";
+  if (n.includes("video") || n.includes("motion")) return "🎬";
+  if (n.includes("game") && !n.includes("vr")) return "🎮";
+  if (n.includes("vr")) return "🥽";
+  if (n.includes("document") || n.includes("pdf") || n.includes("brochure")) return "📄";
+  if (n.includes("screen saver")) return "💻";
+
+  return "📎";
+}
+
+function getContentTypeColorClass(typeName?: string): string {
+  const n = normalizeContentType(typeName);
+
+  if (n.includes("interactive") || n === "ispring") return "bg-cyan-100 text-cyan-600";
+  if (n.includes("quiz")) return "bg-blue-100 text-blue-600";
+  if (n.includes("poster")) return "bg-orange-100 text-orange-600";
+  if (n.includes("survey")) return "bg-purple-100 text-purple-600";
+  if (n.includes("video") || n.includes("motion")) return "bg-blue-100 text-blue-600";
+  if (n.includes("game") || n.includes("vr")) return "bg-emerald-100 text-emerald-600";
+  if (n.includes("document") || n.includes("pdf") || n.includes("brochure")) return "bg-gray-100 text-gray-600";
+  if (n.includes("screen saver")) return "bg-slate-100 text-slate-600";
+
+  return "bg-gray-100 text-gray-600";
+}
 
 export default function PhysicalSecurityPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -486,6 +522,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
     return filteredItems.slice(start, start + rowsPerPage);
   }, [filteredItems, currentPage, rowsPerPage]);
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / rowsPerPage));
 
   const tabCounts = useMemo(() => {
     return {
@@ -562,6 +599,16 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   useEffect(() => {
     updateTabIndicator();
   }, [statusFilter]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [language, searchQuery, statusFilter]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -949,7 +996,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                               {isOrgUserView && moduleLogoUrl ? (
                                 <img
                                   alt={`${moduleInfo.name} logo`}
-                                  className="mt-3 w-full h-auto max-h-40 object-cover rounded-md border border-gray-200"
+                                  className="mt-3 w-full h-auto max-h-40 object-contain rounded-md border border-gray-200 bg-white"
                                   src={moduleLogoUrl}
                                 />
                               ) : null}
@@ -973,40 +1020,26 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
                     <div className="col-span-9 flex flex-col justify-between">
                       <div className="space-y-2 w-full">
-                        {paginatedItems.map((item, index) => {
-                          const iconMap: Record<string, string> = {
-                            "Video Training": "🎥",
-                            "Motion Videos": "🎥",
-                            "Interactive Lesson": "📘",
-                            "Interactive Contents": "📘",
-                            Quizzes: "💡",
-                            Quiz: "💡",
-                            Posters: "🖼",
-                            Brochures: "📄",
-                            Documents: "📄",
-                            Survey: "📊",
-                            "Screen Savers": "💻",
-                          };
-                          const colorMap: Record<string, string> = {
-                            "Video Training": "bg-red-100 text-red-600",
-                            "Motion Videos": "bg-red-100 text-red-600",
-                            "Interactive Lesson": "bg-cyan-100 text-cyan-600",
-                            "Interactive Contents": "bg-cyan-100 text-cyan-600",
-                            Quizzes: "bg-blue-100 text-blue-600",
-                            Quiz: "bg-blue-100 text-blue-600",
-                            Posters: "bg-orange-100 text-orange-600",
-                            Brochures: "bg-gray-100 text-gray-600",
-                            Documents: "bg-gray-100 text-gray-600",
-                            Survey: "bg-purple-100 text-purple-600",
-                            "Screen Savers": "bg-slate-100 text-slate-600",
-                          };
+                        {(() => {
+                          const baseIdx = (currentPage - 1) * rowsPerPage;
+                          let runningContentNumber = baseIdx;
+
+                          return paginatedItems.map((item, index) => {
+                          const contentTypeKey = item.type || item.title || "";
                           const langMap: Record<string, { label: string; flag: string }> = {
                             en: { label: "English", flag: "us" },
                             ar: { label: "Arabic", flag: "sa" },
                           };
 
-                          const icon = iconMap[item.type] || iconMap[item.title] || "📘";
-                          const color = colorMap[item.type] || colorMap[item.title] || "bg-cyan-100 text-cyan-600";
+                          const icon = getContentTypeEmoji(contentTypeKey);
+                          const color = getContentTypeColorClass(contentTypeKey);
+                          const isQuizSubItem = item.type === "Quiz" && !item.isQuizSummary;
+                          let contentNumberLabel: string | null = null;
+
+                          if (!isQuizSubItem) {
+                            runningContentNumber += 1;
+                            contentNumberLabel = formatNumber(runningContentNumber, locale);
+                          }
                           const langChips = (item.languages || []).map((code: string) => {
                             const cfg = langMap[code];
 
@@ -1075,6 +1108,11 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                 </div>
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
+                                    {contentNumberLabel && (
+                                      <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-[10px] font-semibold text-gray-600">
+                                        {contentNumberLabel}
+                                      </span>
+                                    )}
                                     <h3 className="text-base font-semibold text-gray-900">
                                       {item.title}
                                     </h3>
@@ -1265,16 +1303,28 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                               </div>
                             </div>
                           );
-                        })}
+                          });
+                        })()}
                       </div>
                       <div className="mt-4 flex items-center justify-between">
                          <p className="text-xs text-gray-600">
-                          {t("moduleDetails.showingEntries", {
-                            from: (currentPage - 1) * rowsPerPage + 1,
-                            to: Math.min(currentPage * rowsPerPage, filteredItems.length),
-                            total: filteredItems.length,
-                          }) ??
-                            `Showing ${(currentPage - 1) * rowsPerPage + 1}–${Math.min(currentPage * rowsPerPage, filteredItems.length)} of ${filteredItems.length} Entries`}
+                          {(() => {
+                            const fromIdx =
+                              filteredItems.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+                            const toIdx = Math.min(
+                              currentPage * rowsPerPage,
+                              filteredItems.length
+                            );
+
+                            return (
+                              t("moduleDetails.showingEntries", {
+                                from: formatNumber(fromIdx, locale),
+                                to: formatNumber(toIdx, locale),
+                                total: formatNumber(filteredItems.length, locale),
+                              }) ??
+                              `Showing ${formatNumber(fromIdx, locale)}–${formatNumber(toIdx, locale)} of ${formatNumber(filteredItems.length, locale)} Entries`
+                            );
+                          })()}
                         </p>
                         <div className="flex items-center gap-1">
                           <button
@@ -1298,13 +1348,13 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                               }`}
                               onClick={() => setCurrentPage(page)}
                             >
-                              {page}
+                              {formatNumber(page, locale)}
                             </button>
                           ))}
 
                           <button
                             className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                            disabled={currentPage === Math.ceil(filteredItems.length / rowsPerPage)}
+                            disabled={currentPage === totalPages}
                             onClick={() => setCurrentPage(currentPage + 1)}
                           >
                             <ChevronRight className="w-4 h-4" />
