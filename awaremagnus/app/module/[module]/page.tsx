@@ -1021,7 +1021,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                     <div className="col-span-9 flex flex-col justify-between">
                       <div className="space-y-2 w-full">
                         {(() => {
-                          const baseIdx = (currentPage - 1) * rowsPerPage;
+                          const baseIdx = filteredItems
+                            .slice(0, (currentPage - 1) * rowsPerPage)
+                            .filter(item => !(item.type === "Quiz" && !item.isQuizSummary))
+                            .length;
                           let runningContentNumber = baseIdx;
 
                           return paginatedItems.map((item, index) => {
