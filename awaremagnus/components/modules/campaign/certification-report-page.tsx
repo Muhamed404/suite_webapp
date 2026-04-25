@@ -639,7 +639,7 @@ export function CertificationReportPage() {
                           <SortableHeader field="name" label="User" />
                         </th>
                         <th className="px-4 py-3.5 text-center font-semibold">
-                          Progress
+                          Engagement Rate
                         </th>
                         <th className="px-4 py-3.5 text-center font-semibold">
                           Modules
