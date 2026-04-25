@@ -137,20 +137,50 @@ function AreaChart({ data, labels, dates }: AreaChartProps) {
     maxY = Math.max(...data, 5);
   const yTicks = buildCountTicks(maxY);
 
-  // Use date-proportional X so points aren't stretched across the full width
-  const today = new Date();
-  today.setHours(23, 59, 59, 999);
-  const startTime = dates && dates.length > 0 ? dates[0].getTime() : null;
-  const endTime = dates && dates.length > 0
-    ? Math.max(today.getTime(), dates[dates.length - 1].getTime())
-    : null;
-  const timeRange = startTime !== null && endTime !== null ? endTime - startTime : null;
+  const dateIndices = useMemo(() => {
+    const indices: Record<number, number[]> = {};
+
+    (dates || []).forEach((d, idx) => {
+      const t = d.getTime();
+
+      if (!indices[t]) indices[t] = [];
+      indices[t].push(idx);
+    });
+
+    return indices;
+  }, [dates]);
+
+  const uniqueTimes = useMemo(() =>
+    Array.from(new Set((dates || []).map((d) => d.getTime()))).sort((a, b) => a - b),
+  [dates]);
 
   const getX = (i: number): number => {
-    if (timeRange && timeRange > 0 && dates && dates[i]) {
-      return pL + ((dates[i].getTime() - startTime!) / timeRange) * iW;
-    }
-    return pL + (i / Math.max(data.length - 1, 1)) * iW;
+    if (!dates || dates.length === 0) return pL + (i / Math.max(data.length - 1, 1)) * iW;
+    const t = dates[i].getTime();
+    const dateIdx = uniqueTimes.indexOf(t);
+    const baseX = pL + (dateIdx / Math.max(uniqueTimes.length - 1, 1)) * iW;
+
+    if (dateIdx === 0) return baseX;
+
+    const currentIndices = dateIndices[t];
+    const isLastForDate = i === currentIndices[currentIndices.length - 1];
+
+    if (isLastForDate) return baseX;
+
+    const prevT = uniqueTimes[dateIdx - 1];
+    const prevIndices = dateIndices[prevT];
+    const prevLastIdx = prevIndices[prevIndices.length - 1];
+    const prevX = pL + ((dateIdx - 1) / Math.max(uniqueTimes.length - 1, 1)) * iW;
+
+    const yStart = data[prevLastIdx];
+    const yEnd = data[currentIndices[currentIndices.length - 1]];
+    const yCurrent = data[i];
+
+    if (yEnd === yStart) return baseX;
+
+    const ratio = (yCurrent - yStart) / (yEnd - yStart);
+
+    return prevX + ratio * (baseX - prevX);
   };
 
   const pts = data.map((v, i) => ({
@@ -464,18 +494,43 @@ function buildPrintHTML(args: {
   const iW = W - pL - pR,
     iH = H - pT - pB,
     maxY = Math.max(...chartData, 5);
-  const pdfToday = new Date();
-  pdfToday.setHours(23, 59, 59, 999);
-  const pdfStartTime = chartDates.length > 0 ? chartDates[0].getTime() : null;
-  const pdfEndTime = chartDates.length > 0
-    ? Math.max(pdfToday.getTime(), chartDates[chartDates.length - 1].getTime())
-    : null;
-  const pdfTimeRange = pdfStartTime !== null && pdfEndTime !== null ? pdfEndTime - pdfStartTime : null;
+  const dateIndices: Record<number, number[]> = {};
+
+  chartDates.forEach((d, idx) => {
+    const t = d.getTime();
+
+    if (!dateIndices[t]) dateIndices[t] = [];
+    dateIndices[t].push(idx);
+  });
+  const uniqueTimes = Array.from(new Set(chartDates.map((d) => d.getTime()))).sort((a, b) => a - b);
+
   const getPdfX = (i: number): number => {
-    if (pdfTimeRange && pdfTimeRange > 0 && chartDates[i]) {
-      return pL + ((chartDates[i].getTime() - pdfStartTime!) / pdfTimeRange) * iW;
-    }
-    return pL + (i / Math.max(chartData.length - 1, 1)) * iW;
+    if (chartDates.length === 0) return pL + (i / Math.max(chartData.length - 1, 1)) * iW;
+    const t = chartDates[i].getTime();
+    const dateIdx = uniqueTimes.indexOf(t);
+    const baseX = pL + (dateIdx / Math.max(uniqueTimes.length - 1, 1)) * iW;
+
+    if (dateIdx === 0) return baseX;
+
+    const currentIndices = dateIndices[t];
+    const isLastForDate = i === currentIndices[currentIndices.length - 1];
+
+    if (isLastForDate) return baseX;
+
+    const prevT = uniqueTimes[dateIdx - 1];
+    const prevIndices = dateIndices[prevT];
+    const prevLastIdx = prevIndices[prevIndices.length - 1];
+    const prevX = pL + ((dateIdx - 1) / Math.max(uniqueTimes.length - 1, 1)) * iW;
+
+    const yStart = chartData[prevLastIdx];
+    const yEnd = chartData[currentIndices[currentIndices.length - 1]];
+    const yCurrent = chartData[i];
+
+    if (yEnd === yStart) return baseX;
+
+    const ratio = (yCurrent - yStart) / (yEnd - yStart);
+
+    return prevX + ratio * (baseX - prevX);
   };
   const pts = chartData.map((v, i) => ({
     x: getPdfX(i),
@@ -811,17 +866,12 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
   );
 
   const completionChart = useMemo(() => {
-    const countByDate = new Map<string, number>();
-
-    allModules.forEach(({ module }) => {
-      if (!module.module_completion_date) return;
-      const current = countByDate.get(module.module_completion_date) ?? 0;
-      countByDate.set(module.module_completion_date, current + 1);
-    });
-
-    const datedEntries = Array.from(countByDate.entries())
-      .map(([rawDate, count]) => ({ rawDate, count, date: parseModuleCompletionDate(rawDate) }))
-      .filter((item): item is { rawDate: string; count: number; date: Date } => !!item.date)
+    const allDatedModules = allModules
+      .map(({ module }) => ({
+        date: parseModuleCompletionDate(module.module_completion_date),
+        rawDate: module.module_completion_date,
+      }))
+      .filter((item): item is { date: Date; rawDate: string } => !!item.date)
       .sort((a, b) => a.date.getTime() - b.date.getTime());
 
     let runningCount = 0;
@@ -830,19 +880,23 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
     const dates: Date[] = [];
 
     // Prepend a starting zero point (one day before first completion) so the line draws from 0
-    if (datedEntries.length > 0) {
-      const firstDate = new Date(datedEntries[0].date);
+    if (allDatedModules.length > 0) {
+      const firstDate = new Date(allDatedModules[0].date);
       firstDate.setDate(firstDate.getDate() - 1);
       data.push(0);
-      labels.push(""); // No label for the synthetic baseline point
+      labels.push("");
       dates.push(new Date(firstDate));
     }
 
-    datedEntries.forEach((entry) => {
-      runningCount += entry.count;
+    allDatedModules.forEach((m, idx) => {
+      runningCount += 1;
       data.push(runningCount);
-      labels.push(formatChartDateLabel(entry.date));
-      dates.push(new Date(entry.date));
+
+      // Only show the date label for the last module of each day to avoid overlap
+      const nextM = allDatedModules[idx + 1];
+      const isLastForDay = !nextM || nextM.date.getTime() !== m.date.getTime();
+      labels.push(isLastForDay ? formatChartDateLabel(m.date) : "");
+      dates.push(new Date(m.date));
     });
 
     return { data, labels, dates };
