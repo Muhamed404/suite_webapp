@@ -121,7 +121,8 @@
 		"show": "عرض",
 		"select_template_to_preview": "اختر قالبًا للمعاينة",
 		"emailOpened": "تتبع فتح البريد الإلكتروني",
-		"fileDownloaded": "generic_label.fileDownloaded"
+		"fileDownloaded": "generic_label.fileDownloaded",
+		"sr_no": "الرقم التسلسلي"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",

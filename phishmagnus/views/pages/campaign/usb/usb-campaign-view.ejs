@@ -1,16 +1,20 @@
-<div class="flex flex-col  p-6 pt-0">
-
-
+<div class="flex flex-col p-6 pt-0">
+    <!-- Breadcrumb -->
+    <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4 mt-3">
+        <nav class="flex items-center text-sm text-gray-500 gap-2" aria-label="Breadcrumb">
+            <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+            <span class="text-gray-400">&rsaquo;</span>
+            <a href="/phm/campaign/reports" class="hover:text-gray-700 transition"><%= __("breadcrumbs.reports") %></a>
+            <span class="text-gray-400">&rsaquo;</span>
+            <a href="/phm/campaign/usb/report" class="hover:text-gray-700 transition"><%= __("breadcrumbs.usbCampaignReport") %></a>
+            <span class="text-gray-400">&rsaquo;</span>
+            <span class="font-semibold text-gray-900"><%= campaigns.campaign_name || __('usb_campaign.report.view_report_title') %></span>
+        </nav>
+        <h1 class="text-3xl font-medium text-gray-900"><%= campaigns.campaign_name || __('usb_campaign.report.view_report_title') %></h1>
+    </div>
 
     <!-- first section  -->
-
-    <div class="flex flex-col gap-4 mt-3">
-
-
-
-
-        <!-- Title -->
-        <h1 class="text-2xl font-semibold my-2"><%= __('usb_campaign.report.view_report_title') %></h1>
+    <div class="flex flex-col gap-4">
 
         <!-- Top Metrics -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -100,34 +104,21 @@
 
 
                 <div class="flex gap-4">
-
-
-
-
-                    <button class="hidden lg:block ms-auto">
+                    <form method="get" class="hidden lg:block ms-auto" id="usbSearchForm">
+                        <input type="hidden" name="page" value="1">
                         <div class="relative">
-                        <input type="text" placeholder="<%= __("generic_label.search_here") || 'Search here...' %>"
-                            class="pl-10 pr-4 py-3 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-                        <img src="/securemagnus_2025/images/img/search.svg"
-                            class="absolute w-5 h-5 text-gray-400 transform -translate-y-[49%] left-3 top-1/2" alt="">
+                            <input type="text" name="search" id="usbSearchInput"
+                                value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+                                placeholder="<%= __('generic_label.search_here') || 'Search here...' %>"
+                                class="pl-10 pr-4 py-3 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+                            <button type="submit"
+                                class="absolute inset-y-0 left-3 flex items-center justify-center text-gray-400"
+                                aria-label="Search">
+                                <img src="/securemagnus_2025/images/img/search.svg" class="block w-5 h-5" alt="">
+                            </button>
                         </div>
-
-                    </button>
-                    <button class="hidden lg:block ms-auto">
-                        <a href=""
-                            class=" flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
-
-                            <%= __("generic_label.sort_by") %>
-                            <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
-                        </a>
-
-                    </button>
+                    </form>
                 </div>
-
-
-                <a href="" class="block lg:hidden">
-                    <img src="/securemagnus_2025/images/img/sortby.svg" class="size-9" alt="">
-                </a>
             </div>
 
 
@@ -136,32 +127,51 @@
 
 
             <div class="bg-white rounded-xl shadow mt-8">
-                <table dir="ltr" class="min-w-full divide-y divide-gray-200">
+                <table dir="ltr" class="min-w-full divide-y divide-gray-200" id="usbPackageTable">
                     <thead class="bg-gray-50">
                         <tr>
                             <th
                                 class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                #</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                <%= __("usb_campaign.device_code") %>
+                                <span class="inline-flex items-center gap-2">
+                                    <%= __("generic_label.sr_no") %>
+                                </span>
                             </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                <%= __("usb_campaign.description") %>
+                                <span class="inline-flex items-center gap-2">
+                                    <img src="/securemagnus_2025/images/img/c-usb.svg" class="w-5 h-5" alt="">
+                                    <%= __("usb_campaign.device_code") %>
+                                </span>
                             </th>
                             <th
                                 class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                <%= __("usb_campaign.start_date") %>
+                                <span class="inline-flex items-center gap-2">
+                                    <img src="/securemagnus_2025/images/img/form.svg" class="w-5 h-5" alt="">
+                                    <%= __("usb_campaign.description") %>
+                                </span>
+                            </th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                                <span class="inline-flex items-center gap-2">
+                                    <img src="/securemagnus_2025/images/img/calendar.svg" class="w-4 h-4" alt="">
+                                    <%= __("usb_campaign.start_date") %>
+                                </span>
                             </th>
                             
                             <th
                                 class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                <%= __('usb_campaign.report.download') %>
+                                <span class="inline-flex items-center gap-2">
+                                    <svg class="w-4 h-4 <%= locals.locale === 'ar' ? '' : 'translate-x-1' %>" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                        stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v10m0 0l-4-4m4 4l4-4" />
+                                    </svg>
+                                    <%= __('usb_campaign.report.download') %>
+                                </span>
                             </th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-100">
+                    <tbody class="bg-white divide-y divide-gray-100" id="usbPackageTableBody">
                         <% if (paginatedDevices.length) { %>
                             <% paginatedDevices.forEach((device, idx)=> { %>
                                 <tr class="hover:bg-gray-50 transition">
@@ -178,7 +188,7 @@
                                         <%= device.creation_date ? new Date(device.creation_date).toLocaleString() : 'N/A' %>
                                     </td>
                                      
-                                    <td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-800">
                                         <button type="button" title="Download"
                                             data-url="/phm/campaign/usb/package/download/<%= device.campaign_id %>/<%= device.usb_code %>">
                                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -191,51 +201,23 @@
                                     </td>
                                 </tr>
                                 <% }) %>
-                                    <% } else { %>
+                    <% } else { %>
                                         <tr>
                                             <td colspan="5" class="px-6 py-8 text-center text-gray-500">
-                                                <%= __("usb_campaign.no_records") %>
+                                                <%= (searchQuery && searchQuery.length) ? (__("generic_label.no_results_match_search") || __("usb_campaign.no_records")) : __("usb_campaign.no_records") %>
                                             </td>
                                         </tr>
                                         <% } %>
                     </tbody>
                 </table>
-                <!-- Pagination Controls -->
-                <div class="flex justify-center items-center py-6 gap-2">
-                    <% if (currentPage> 1) { %>
-                        <form method="get" class="inline">
-                            <input type="hidden" name="page" value="<%= currentPage - 1 %>">
-                            <button type="submit"
-                                class="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:text-white hover:bg-teal-600 duration-300">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
-                                </svg>
-                            </button>
-                        </form>
-                        <% } %>
-                            <% for (let i=1; i <=totalPages; i++) { %>
-                                <form method="get" class="inline">
-                                    <input type="hidden" name="page" value="<%= i %>">
-                                    <button type="submit"
-                                        class="w-8 h-8 rounded-full flex items-center justify-center <%= currentPage === i ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-teal-50 hover:text-teal-700' %> duration-300">
-                                        <%= i %>
-                                    </button>
-                                </form>
-                                <% } %>
-                                    <% if (currentPage < totalPages) { %>
-                                        <form method="get" class="inline">
-                                            <input type="hidden" name="page" value="<%= currentPage + 1 %>">
-                                            <button type="submit"
-                                                class="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100 text-gray-500 hover:text-white hover:bg-teal-600 duration-300">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        d="M9 5l7 7-7 7"></path>
-                                                </svg>
-                                            </button>
-                                        </form>
-                                        <% } %>
+                <div id="paginationContainer" class="flex items-center justify-between px-6 py-6 mt-2">
+                    <select id="rowsPerPage" dir="<%= locale === 'ar' ? 'rtl' : 'ltr' %>"
+                        class="<%= locale === 'ar' ? 'pl-8 pr-4' : 'pl-4 pr-8' %> py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="5" <%= Number(pageSize) === 5 ? 'selected' : '' %>>5</option>
+                        <option value="10" <%= Number(pageSize) === 10 ? 'selected' : '' %>>10</option>
+                        <option value="20" <%= Number(pageSize) === 20 ? 'selected' : '' %>>20</option>
+                    </select>
+                    <div id="usbPaginationControls" class="space-x-2 <%= locale === 'ar' ? 'pl-3' : '' %>"></div>
                 </div>
             </div>
 
@@ -409,15 +391,260 @@ window.i18n = {
 };
 </script>
 <script src="/securemagnus_2025/js/JQuery_usb_phishing_campaign_report.js"></script>
+<script>
+    (function () {
+        var searchInput = document.getElementById('usbSearchInput');
+        var searchForm = document.getElementById('usbSearchForm');
+        var tableBody = document.getElementById('usbPackageTableBody');
+        var paginationControls = document.getElementById('usbPaginationControls');
+        var rowsPerPageSelect = document.getElementById('rowsPerPage');
+        if (!searchInput || !searchForm || !tableBody || !paginationControls || !rowsPerPageSelect) return;
+
+        var currentSearch = (searchInput.value || '').trim();
+        var currentPageSize = Number(rowsPerPageSelect.value || <%= Number(pageSize || 5) %>);
+        var translations = {
+            showingResults: '<%= __("all_campaigns.showingResults") %>'
+        };
+        var noRecordsText = '<%= __("usb_campaign.no_records") %>';
+        var noSearchResultsText = '<%= __("generic_label.no_results_match_search") || __("usb_campaign.no_records") %>';
+        var naText = 'N/A';
+        var locale = '<%= locals.locale || "en" %>';
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function formatDate(value) {
+            if (!value) return naText;
+            var d = new Date(value);
+            if (isNaN(d.getTime())) return naText;
+            return d.toLocaleString(locale);
+        }
+
+        function buildRow(device, idx, startIdx) {
+            var rowNumber = startIdx + idx + 1;
+            var usbCode = escapeHtml(device && device.usb_code ? device.usb_code : '');
+            var description = escapeHtml(device && device.description ? device.description : '');
+            var creationDate = escapeHtml(formatDate(device && device.creation_date ? device.creation_date : null));
+            var campaignId = device && device.campaign_id ? encodeURIComponent(device.campaign_id) : '';
+            var usbCodeForUrl = device && device.usb_code ? encodeURIComponent(device.usb_code) : '';
+
+            return `
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-800 font-medium">${rowNumber}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-800">${usbCode}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-800">${description}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-800">${creationDate}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-800">
+                        <button type="button" title="Download"
+                            data-url="/phm/campaign/usb/package/download/${campaignId}/${usbCodeForUrl}">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-6 w-6 text-yellow-500 cursor-pointer" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
+                            </svg>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function buildEmptyRow(searchValue) {
+            var text = searchValue ? noSearchResultsText : noRecordsText;
+            return `
+                <tr>
+                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">${escapeHtml(text)}</td>
+                </tr>
+            `;
+        }
+
+        function buildQuery(page, pageSize, searchValue) {
+            var params = new URLSearchParams();
+            params.set('page', String(page || 1));
+            params.set('pageSize', String(pageSize || currentPageSize || 5));
+            if (searchValue) {
+                params.set('search', searchValue);
+            }
+            return '?' + params.toString();
+        }
+
+        function buildPaginationHtml(currentPage, totalPages, pageSize, totalCount, searchValue) {
+            if (totalPages <= 1) {
+                return '';
+            }
+
+            var html = `
+                <div class="flex items-center justify-between w-full ${locale === 'ar' ? 'pl-2' : ''}">
+                    <div>
+                        <p class="text-sm text-gray-700 ${locale === 'ar' ? 'ml-2' : 'mr-2'}">
+                            ${translations.showingResults
+                                .replace('{start}', ((currentPage - 1) * pageSize) + 1)
+                                .replace('{end}', Math.min(currentPage * pageSize, totalCount))
+                                .replace('{total}', totalCount)}
+                        </p>
+                    </div>
+                    <div class="flex space-x-2">
+            `;
+
+            if (currentPage > 1) {
+                html += `
+                    <a href="${buildQuery(currentPage - 1, pageSize, searchValue)}" data-page="${currentPage - 1}" class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">&lsaquo;</a>
+                `;
+            }
+
+            var maxVisiblePages = 3;
+            var startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+            var endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            for (var i = startPage; i <= endPage; i++) {
+                var isActive = i === currentPage;
+                var activeClass = isActive
+                    ? 'bg-teal-50 text-[var(--teal)] border border-[var(--teal)]'
+                    : 'border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300';
+                html += `
+                    <a href="${buildQuery(i, pageSize, searchValue)}" data-page="${i}" class="px-3 py-1 rounded-full ${activeClass}">${i}</a>
+                `;
+            }
+
+            if (currentPage < totalPages) {
+                html += `
+                    <a href="${buildQuery(currentPage + 1, pageSize, searchValue)}" data-page="${currentPage + 1}" class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">&rsaquo;</a>
+                `;
+            }
+
+            html += `
+                    </div>
+                </div>
+            `;
+            return html;
+        }
+
+        function renderAjaxResponse(result, searchValue) {
+            var payload = result && result.data ? result.data : {};
+            var rows = payload.paginatedDevices || [];
+            var pagination = payload.pagination || {};
+            var startIdx = pagination.startIdx || 0;
+            var currentPage = pagination.currentPage || 1;
+            var totalPages = pagination.totalPages || 1;
+            var pageSize = Number(pagination.pageSize || currentPageSize || 5);
+            var totalCount = Number(pagination.filteredDevicesCount || 0);
+            currentPageSize = pageSize;
+            rowsPerPageSelect.value = String(pageSize);
+
+            if (!rows.length) {
+                tableBody.innerHTML = buildEmptyRow(searchValue);
+            } else {
+                tableBody.innerHTML = rows.map(function (device, idx) {
+                    return buildRow(device, idx, startIdx);
+                }).join('');
+            }
+
+            paginationControls.innerHTML = buildPaginationHtml(currentPage, totalPages, pageSize, totalCount, searchValue);
+        }
+
+        function buildAjaxUrl(page, searchValue, pageSize) {
+            var url = new URL(window.location.href);
+            url.searchParams.set('ajax', '1');
+            url.searchParams.set('page', String(page || 1));
+            url.searchParams.set('pageSize', String(pageSize || currentPageSize || 5));
+
+            if (searchValue) {
+                url.searchParams.set('search', searchValue);
+            } else {
+                url.searchParams.delete('search');
+            }
+            return url;
+        }
+
+        function updateBrowserUrl(page, searchValue, pageSize) {
+            var url = new URL(window.location.href);
+            url.searchParams.delete('ajax');
+            url.searchParams.set('page', String(page || 1));
+            url.searchParams.set('pageSize', String(pageSize || currentPageSize || 5));
+            if (searchValue) {
+                url.searchParams.set('search', searchValue);
+            } else {
+                url.searchParams.delete('search');
+            }
+            window.history.replaceState({}, '', url.toString());
+        }
+
+        function fetchTableData(page, searchValue, pageSize) {
+            var normalizedPageSize = Number(pageSize || currentPageSize || 5);
+            currentPageSize = normalizedPageSize;
+            var ajaxUrl = buildAjaxUrl(page, searchValue, normalizedPageSize);
+            fetch(ajaxUrl.toString())
+                .then(function (response) {
+                    if (!response.ok) throw new Error('Failed to fetch USB devices');
+                    return response.json();
+                })
+                .then(function (result) {
+                    renderAjaxResponse(result, searchValue);
+                    var nextPage = result && result.data && result.data.pagination
+                        ? result.data.pagination.currentPage
+                        : (page || 1);
+                    updateBrowserUrl(nextPage, searchValue, normalizedPageSize);
+                })
+                .catch(function (error) {
+                    console.error('Error fetching USB table data:', error);
+                });
+        }
+
+        searchForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            currentSearch = (searchInput.value || '').trim();
+            fetchTableData(1, currentSearch, currentPageSize);
+        });
+
+        paginationControls.addEventListener('click', function (e) {
+            var target = e.target.closest('a[data-page]');
+            if (!target) return;
+            e.preventDefault();
+            var page = parseInt(target.getAttribute('data-page') || '1', 10);
+            fetchTableData(page, currentSearch, currentPageSize);
+        });
+
+        rowsPerPageSelect.addEventListener('change', function (e) {
+            var pageSize = Number(e.target.value || 5);
+            fetchTableData(1, currentSearch, pageSize);
+        });
+
+        var debounceTimer = null;
+        searchInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(function () {
+                currentSearch = (searchInput.value || '').trim();
+                fetchTableData(1, currentSearch, currentPageSize);
+            }, 500);
+        });
+
+        paginationControls.innerHTML = buildPaginationHtml(
+            <%= Number(currentPage || 1) %>,
+            <%= Number(totalPages || 1) %>,
+            <%= Number(pageSize || 5) %>,
+            <%= Number(filteredDevicesCount || 0) %>,
+            currentSearch
+        );
+    })();
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-
-        document.querySelectorAll('button[data-url]').forEach(btn => {
-            btn.addEventListener('click', function () {
-                const url = this.getAttribute('data-url');
+        document.addEventListener('click', function (event) {
+            const btn = event.target.closest('button[data-url]');
+            if (!btn) return;
+                const url = btn.getAttribute('data-url');
                 let fileName = 'default-name.zip';
-                this.style.opacity = '0.5'; // Optional: show loading
+                btn.style.opacity = '0.5';
 
                 fetch(url)
                     .then(response => {
@@ -444,11 +671,8 @@ window.i18n = {
                         alert('Could not download the file.');
                     })
                     .finally(() => {
-                        this.style.opacity = '1'; // Reset loading
+                        btn.style.opacity = '1';
                     });
-            });
         });
-
-
     });
 </script>

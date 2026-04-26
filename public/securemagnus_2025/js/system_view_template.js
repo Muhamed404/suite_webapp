@@ -264,7 +264,7 @@ let currentStep = 0;
     if (!stepEl) return;
     const inputs = Array.from(stepEl.querySelectorAll('input, textarea, select'));
     const key = `step${idx + 1}`;
-    formData[key] = formData[key] || {};
+    formData[key] = {};
     inputs.forEach(inp => {
       const name = inp.name || `_anon_${idx}`;
       if (inp.type === 'radio') {
@@ -324,6 +324,16 @@ let currentStep = 0;
       // fallthrough
     }
     return s.split(',').map(x => x.trim()).filter(Boolean).map(String);
+  }
+
+  function getPersistedDifficultyLevels() {
+    const form = document.getElementById('templateCreationForm');
+    let raw = (form && form.dataset && form.dataset.difficulty) || '';
+    if (!raw) {
+      const hid = document.querySelector('input[name="hidDifficultyLevel"]');
+      raw = hid ? hid.value : '';
+    }
+    return parseSelectedLevels(raw);
   }
 
   function renderOptions(type) {
@@ -412,7 +422,9 @@ let currentStep = 0;
         return;
       }
       selectedPhishType = sel;
-      activeFlow = getBaseFlowForType(selectedPhishType);
+      const selectedLevels = getPersistedDifficultyLevels();
+      const matched = computeMatchingRule(selectedPhishType, selectedLevels);
+      activeFlow = matched ? buildActiveFlow(matched, selectedPhishType) : getBaseFlowForType(selectedPhishType);
 
       if ((selectedPhishType === 'nfc' || selectedPhishType === 'qr') && emailContent) {
         emailContent.style.display = 'none';
@@ -425,7 +437,13 @@ let currentStep = 0;
     }
 
     if (currentStep === 1) {
-      const selectedOptions = (formData.step2 && formData.step2.options) ? formData.step2.options : [];
+      let selectedOptions = (formData.step2 && formData.step2.options) ? formData.step2.options : [];
+      if (!Array.isArray(selectedOptions)) {
+        selectedOptions = selectedOptions ? [selectedOptions] : [];
+      }
+      if (!selectedOptions.length) {
+        selectedOptions = getPersistedDifficultyLevels();
+      }
       if (selectedOptions.length === 0) {
         alert('Please select at least one option.');
         return;
@@ -470,7 +488,9 @@ let currentStep = 0;
     const preselectedPhishType = document.querySelector('input[name="phishType"]:checked');
     if (preselectedPhishType) {
       selectedPhishType = preselectedPhishType.value;
-      activeFlow = getBaseFlowForType(selectedPhishType);
+      const selectedLevels = getPersistedDifficultyLevels();
+      const matched = computeMatchingRule(selectedPhishType, selectedLevels);
+      activeFlow = matched ? buildActiveFlow(matched, selectedPhishType) : getBaseFlowForType(selectedPhishType);
     }
     renderProgressBar();
     showStep(0);

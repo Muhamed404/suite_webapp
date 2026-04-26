@@ -111,7 +111,8 @@
 		"emailOpened": "Track email opened",
 		"fileDownloaded": "Download",
 		"qrScanned": "Scanned",
-		"select": "Select"
+		"select": "Select",
+		"sr_no": "Sr. No"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
