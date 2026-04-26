@@ -1,59 +1,390 @@
-<div class="container mx-auto px-4 py-8">
-  <!-- Breadcrumb -->
-  <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-4" aria-label="Breadcrumb">
-    <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
-    <span class="text-gray-400">›</span>
-    <a href="/phm/campaign/reports" class="hover:text-gray-700 transition"><%= __("breadcrumbs.reports") %></a>
-    <span class="text-gray-400">›</span>
-    <span class="font-semibold text-gray-900"><%= __("breadcrumbs.usbCampaignReport") %></span>
-  </nav>
-
-  <h1 class="text-2xl font-bold text-teal-700 mb-6"><%= __("usb_campaign.report.title") %></h1>
-  <div class="overflow-x-auto bg-white rounded-xl shadow">
-    <table class="min-w-full divide-y divide-gray-200 text-start">
-      <thead class="bg-gray-50">
-        <tr>
-          <th class="px-6 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider"><%= __("usb_campaign.report.header.campaign_name") %></th>
-          <th class="px-6 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider"><%= __("usb_campaign.report.header.total_usb") %></th>
-          <th class="px-6 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider"><%= __("usb_campaign.report.header.start_date") %></th>
-          <th class="px-6 py-3 text-start text-xs font-semibold text-gray-600 uppercase tracking-wider"><%= __("usb_campaign.report.header.actions") %></th>
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-100">
-        <% if (campaigns && campaigns.length) { %>
-          <% campaigns.forEach(campaign => { %>
-            <tr class="hover:bg-gray-50 transition">
-              <td class="px-6 py-4 whitespace-nowrap text-gray-800 font-medium"><%= campaign.campaign_name %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-800"><%= campaign.total_usb_created %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-gray-800"><%= campaign.start_date %></td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <a href="/phm/campaign/usb/report-view/<%= campaign.campaign_identifier %>" 
-                   class="inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded shadow hover:bg-teal-700 transition text-sm font-semibold">
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
-                </a>
-              </td>
-            </tr>
-          <% }) %>
-        <% } else { %>
-          <tr>
-            <td colspan="4" class="px-6 py-8 text-center text-gray-500"><%= __("generic_label.no_data") %></td>
-          </tr>
-        <% } %>
-      </tbody>
-    </table>
-  </div>
-  <!-- Pagination -->
-  <div class="flex justify-center mt-8">
-    <% for (let i = 1; i <= totalPages; i++) { %>
-      <form method="get" action="/phm/campaign/usb/report" class="inline">
-        <input type="hidden" name="page" value="<%= i %>">
-        <button type="submit" class="mx-1 px-4 py-2 rounded 
-          <%= page === i ? 'bg-teal-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' %>">
-          <%= i %>
-        </button>
-      </form>
-    <% } %>
-  </div>
+<div class="flex flex-col p-6 gap">
+    <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+        <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+            <a href="/home" class="hover:text-gray-700 transition">
+                <%= __("breadcrumbs.home") %>
+            </a>
+            <span class="text-gray-400">›</span>
+            <a href="/phm/campaign/reports" class="hover:text-gray-700 transition">
+                <%= __("breadcrumbs.reports") %>
+            </a>
+            <span class="text-gray-400">›</span>
+            <span class="font-semibold text-gray-900">
+                <%= __("breadcrumbs.usbCampaignReport") %>
+            </span>
+        </nav>
+        <h3 class="text-3xl font-medium text-gray-900">
+            <%= __("breadcrumbs.usbCampaignReport") %>
+        </h3>
+    </div>
 </div>
+
+<div class="flex flex-col p-6 pt-0">
+    <div class="">
+        <div class="flex flex-row justify-between w-full gap-6 mb-6">
+            <!-- Tabs with counts -->
+            <div id="statusTabs"
+                class="flex items-center justify-start gap-4 p-1 text-sm font-medium bg-white rounded-full w-fit">
+            </div>
+
+            <!-- Search field -->
+            <div class="flex items-center justify-between">
+                <div class="relative">
+                    <input id="searchInput" type="text" placeholder="<%= __("generic_label.search_here") %>"
+                        value="<%= search || '' %>"
+                        class="pl-14 pr-10 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-4">
+                        <img src="/securemagnus_2025/images/img/search.svg" class="w-5 h-5 text-gray-400" alt="">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto bg-white hide-scrollbar rounded-2xl shadow-sm">
+            <table class="min-w-full text-sm text-left">
+                <thead class="bg-[#FAFBFC]">
+                    <tr>
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-2">
+                                <%= __("usb_campaign.report.header.campaign_name") %>
+                            </span>
+                        </th>
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-2">
+                                <img src="/securemagnus_2025/images/img/c-usb.svg" class="w-5 h-5" alt="">
+                                <%= __("usb_campaign.report.header.total_usb") %>
+                            </span>
+                        </th>
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-2">
+                                <img src="/securemagnus_2025/images/img/calendar.svg" class="w-5 h-5" alt="">
+                                <%= __("usb_campaign.report.header.start_date") %>
+                            </span>
+                        </th>
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap">
+                            <span class="inline-flex items-center gap-2">
+                                <%= __("usb_campaign.report.header.actions") %>
+                            </span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody" class="bg-white">
+                    <!-- Table rows will be rendered via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div id="paginationContainer" class="flex items-center justify-between mt-4">
+            <select id="rowsPerPage" dir="<%= locale === 'ar' ? 'rtl' : 'ltr' %>"
+                class="<%= locale === 'ar' ? 'pl-8 pr-4' : 'pl-4 pr-8' %> py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+            </select>
+            <div id="pagination" class="space-x-2"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Pass server data to JavaScript
+    window.campaignsData = {
+        campaigns: <%- JSON.stringify(campaigns) %>,
+        pagination: <%- JSON.stringify(pagination || { currentPage: page || 1, pageSize: 10, totalCount: campaigns?.length || 0, totalPages: totalPages || 1 }) %>
+    };
+    window.currentSearchQuery = <%- JSON.stringify(search || '') %>;
+
+    window.translations = {
+        filterAll: "<%= __("all_campaigns.filterAll") %>",
+        filterActive: "<%= __("all_campaigns.filterActive") %>",
+        filterScheduled: "<%= __("all_campaigns.filterScheduled") %>",
+        filterCompleted: "<%= __("all_campaigns.filterCompleted") %>",
+        filterDraft: "<%= __("all_campaigns.filterDraft") %>",
+        InProgress: "<%= __("InProgress") === "InProgress" ? "In Progress" : __("InProgress") %>",
+        showingResults: "<%= __("all_campaigns.showingResults") %>",
+        noData: "<%= __("generic_label.no_data") %>",
+        noResults: "<%= __("generic_label.no_results_match_search") %>"
+    };
+
+    let currentTab = "All";
+    let data = window.campaignsData.campaigns || [];
+    const tableBody = document.getElementById('tableBody');
+    const statusTabs = document.getElementById('statusTabs');
+    const searchInput = document.getElementById('searchInput');
+    const pagination = document.getElementById('pagination');
+    const rowsSelect = document.getElementById('rowsPerPage');
+    let serverPagination = window.campaignsData.pagination || {};
+
+    function renderTabs() {
+        // Standard statuses to always show
+        const standardStatuses = ["draft", "scheduled", "inprogress", "completed"];
+        
+        // Find unique statuses present in the data that are not in the standard list
+        const extraStatuses = [...new Set(data.filter(d => d.status && !standardStatuses.includes(d.status)).map(d => d.status))];
+        
+        const tabsToRender = ["All", ...standardStatuses, ...extraStatuses];
+
+        const counts = { All: data.length };
+        tabsToRender.forEach(st => {
+            if (st !== "All") {
+                counts[st] = data.filter(d => d.status === st).length;
+            }
+        });
+
+        const statusLabels = {
+            All: window.translations.filterAll,
+            active: window.translations.filterActive,
+            inprogress: window.translations.InProgress || "In Progress",
+            scheduled: window.translations.filterScheduled,
+            completed: window.translations.filterCompleted,
+            draft: window.translations.filterDraft
+        };
+
+        statusTabs.innerHTML = tabsToRender.map(status => {
+            const isActive = currentTab === status;
+            const count = counts[status] || 0;
+            const label = statusLabels[status] || (status.charAt(0).toUpperCase() + status.slice(1));
+
+            if (isActive) {
+                return `
+                    <button class="flex items-center gap-1 px-4 py-2 text-white transition-all duration-300 bg-gray-900 rounded-full"
+                            onclick="setTab('${status}')">
+                        ${label}
+                        <span class="bg-gray-700 text-white text-xs px-2 py-0.5 rounded-full">
+                            ${count}
+                        </span>
+                    </button>`;
+            }
+
+            return `
+                <button class="flex items-center gap-1 px-4 py-2 text-gray-600 transition-all duration-300 rounded-full hover:text-black"
+                        onclick="setTab('${status}')">
+                    ${label}
+                    <span class="text-green-500 bg-green-500/15 text-xs px-2 py-0.5 rounded-full">
+                        ${count}
+                    </span>
+                </button>`;
+        }).join("");
+    }
+
+    function renderTable() {
+        let filtered = data;
+
+        // 1. Tab filter
+        if (currentTab !== "All") {
+            filtered = filtered.filter(d => d.status === currentTab);
+        }
+
+        if (filtered.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+                        ${window.currentSearchQuery ? window.translations.noResults : window.translations.noData}
+                    </td>
+                </tr>`;
+            renderPagination();
+            return;
+        }
+
+        tableBody.innerHTML = filtered.map(campaign => `
+            <tr class="transition-colors border-t hover:bg-blue-50">
+                <td class="px-6 py-6 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900">${campaign.campaign_name}</div>
+                    <div class="text-xs text-gray-500">#${campaign.campaign_identifier}</div>
+                </td>
+                <td class="px-6 py-6 whitespace-nowrap text-gray-800">
+                    ${campaign.total_usb_created}
+                </td>
+                <td class="px-6 py-6 whitespace-nowrap text-gray-800">
+                    ${campaign.start_date}
+                </td>
+                <td class="px-6 py-6 whitespace-nowrap">
+                    <div class="flex gap-2">
+                        <a href="/phm/campaign/usb/report-view/${campaign.campaign_identifier}" 
+                           class="p-2 rounded-full hover:bg-blue-50" title="View Details">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-blue-600 hover:text-blue-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+
+        renderPagination();
+    }
+
+    function buildQuery(pageNumber, pageSize, searchTerm) {
+        const params = new URLSearchParams();
+        params.set('page', String(pageNumber));
+        params.set('pageSize', String(pageSize));
+        if (searchTerm) {
+            params.set('search', searchTerm);
+        }
+        return `?${params.toString()}`;
+    }
+
+    function getCurrentApiUrl(pageNumber, pageSize, searchTerm) {
+        return `${window.location.pathname}${buildQuery(pageNumber, pageSize, searchTerm)}`;
+    }
+
+    async function fetchAndRender(pageNumber, pageSize, searchTerm) {
+        const url = getCurrentApiUrl(pageNumber, pageSize, searchTerm);
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch USB campaign report');
+            }
+
+            const result = await response.json();
+            data = result.campaigns || [];
+            serverPagination = result.pagination || {
+                currentPage: pageNumber,
+                pageSize: pageSize,
+                totalCount: data.length,
+                totalPages: 1
+            };
+
+            window.currentSearchQuery = result.search || '';
+            searchInput.value = window.currentSearchQuery;
+
+            const historyUrl = `${window.location.pathname}${buildQuery(
+                Number(serverPagination.currentPage || pageNumber),
+                Number(serverPagination.pageSize || pageSize),
+                window.currentSearchQuery
+            )}`;
+            window.history.replaceState({}, '', historyUrl);
+
+            renderTabs();
+            renderTable();
+        } catch (error) {
+            console.error('Error loading report data:', error);
+        }
+    }
+
+    function renderPagination() {
+        const currentPageNum = Number(serverPagination.currentPage || 1);
+        const totalPages = Number(serverPagination.totalPages || 1);
+        const pageSize = Number(serverPagination.pageSize || 10);
+        const totalCount = Number(serverPagination.totalCount || 0);
+        const searchTerm = (window.currentSearchQuery || '').trim();
+
+        if (rowsSelect) {
+            rowsSelect.value = String(pageSize);
+        }
+
+        if (totalPages <= 1) {
+            pagination.innerHTML = '';
+            return;
+        }
+
+        let paginationHTML = `
+            <div class="flex items-center justify-between w-full">
+                <div>
+                    <p class="text-sm text-gray-700 mr-2">
+                        ${window.translations.showingResults
+                            .replace('{start}', ((currentPageNum - 1) * pageSize) + 1)
+                            .replace('{end}', Math.min(currentPageNum * pageSize, totalCount))
+                            .replace('{total}', totalCount)}
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+        `;
+
+        if (currentPageNum > 1) {
+            paginationHTML += `
+                <a href="${buildQuery(currentPageNum - 1, pageSize, searchTerm)}" data-page="${currentPageNum - 1}"
+                    class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">
+                    ‹
+                </a>
+            `;
+        }
+
+        const maxVisiblePages = 3;
+        let startPage = Math.max(1, currentPageNum - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            const isActive = i === currentPageNum;
+            paginationHTML += `
+                <a href="${buildQuery(i, pageSize, searchTerm)}" data-page="${i}" 
+                    class="px-3 py-1 rounded-full ${isActive ? 'bg-teal-50 text-[var(--teal)] border border-[var(--teal)]' : 'border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300'}">
+                    ${i}
+                </a>
+            `;
+        }
+
+        if (currentPageNum < totalPages) {
+            paginationHTML += `
+                <a href="${buildQuery(currentPageNum + 1, pageSize, searchTerm)}" data-page="${currentPageNum + 1}"
+                    class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">
+                    ›
+                </a>
+            `;
+        }
+
+        paginationHTML += `
+                </div>
+            </div>
+        `;
+
+        pagination.innerHTML = paginationHTML;
+    }
+
+    function setTab(status) {
+        currentTab = status;
+        renderTabs();
+        renderTable();
+    }
+
+    // Event listeners
+    searchInput.addEventListener('keydown', function(event) {
+        if (event.key !== 'Enter') {
+            return;
+        }
+        event.preventDefault();
+        const searchTerm = searchInput.value.trim();
+        const pageSize = Number((serverPagination && serverPagination.pageSize) || 10);
+        fetchAndRender(1, pageSize, searchTerm);
+    });
+
+    if (rowsSelect) {
+        rowsSelect.addEventListener('change', function(e) {
+            const pageSize = Number(e.target.value || 10);
+            const searchTerm = searchInput.value.trim();
+            fetchAndRender(1, pageSize, searchTerm);
+        });
+    }
+
+    if (pagination) {
+        pagination.addEventListener('click', function(event) {
+            const target = event.target.closest('a[data-page]');
+            if (!target) return;
+            event.preventDefault();
+            const pageNumber = Number(target.getAttribute('data-page') || 1);
+            const pageSize = Number((serverPagination && serverPagination.pageSize) || 10);
+            const searchTerm = searchInput.value.trim();
+            fetchAndRender(pageNumber, pageSize, searchTerm);
+        });
+    }
+
+    // Initial render
+    renderTabs();
+    renderTable();
+
+    // Re-render pagination correctly if needed (currently using server-side pagination)
+    // Note: Tab filtering on client side only affects current page data.
+</script>
+
