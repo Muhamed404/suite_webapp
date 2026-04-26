@@ -289,7 +289,7 @@
         let paginationHTML = `
             <div class="flex items-center justify-between w-full">
                 <div>
-                    <p class="text-sm text-gray-700 mr-2">
+                    <p class="text-sm text-gray-700 <%= locale === 'ar' ? 'ml-2' : 'mr-2' %>">
                         ${window.translations.showingResults
                             .replace('{start}', ((currentPageNum - 1) * pageSize) + 1)
                             .replace('{end}', Math.min(currentPageNum * pageSize, totalCount))

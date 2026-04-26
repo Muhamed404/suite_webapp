@@ -419,29 +419,54 @@
         totalNFCDevices: <%= typeof scannedNotScannedStats !== 'undefined' && scannedNotScannedStats?.totalDevices || 0 %>,
     };
 
-    // Search functionality
-    $('#interactionSearch').on('keypress', function (e) {
-        if (e.which === 13) { // Enter key
-            const search = $(this).val();
-            const url = new URL(window.location.href);
-            url.searchParams.set('ajax', '1');
-            if (search) {
-                url.searchParams.set('search', search);
-            } else {
-                url.searchParams.delete('search');
-            }
+    // Search functionality (calls backend with debounce as user types)
+    let interactionSearchTimer = null;
+    const interactionSearchDelay = 350;
 
-            $.ajax({
-                url: url.toString(),
-                method: 'GET',
-                success: function (response) {
-                    renderInteractionTable(response.nfcDevices);
-                },
-                error: function (error) {
-                    console.error('Error fetching search results:', error);
-                    showCustomToast('error', 'Failed to fetch search results');
+    function fetchInteractionSearchResults(rawSearch) {
+        const search = (rawSearch || '').trim();
+        const url = new URL(window.location.href);
+        url.searchParams.set('ajax', '1');
+
+        if (search) {
+            url.searchParams.set('search', search);
+        } else {
+            url.searchParams.delete('search');
+        }
+
+        $.ajax({
+            url: url.toString(),
+            method: 'GET',
+            success: function (response) {
+                renderInteractionTable(response.nfcDevices);
+                const stateUrl = new URL(window.location.href);
+                if (search) {
+                    stateUrl.searchParams.set('search', search);
+                } else {
+                    stateUrl.searchParams.delete('search');
                 }
-            });
+                history.replaceState({}, '', stateUrl.toString());
+            },
+            error: function (error) {
+                console.error('Error fetching search results:', error);
+                showCustomToast('error', 'Failed to fetch search results');
+            }
+        });
+    }
+
+    $('#interactionSearch').on('input', function () {
+        const search = $(this).val();
+        clearTimeout(interactionSearchTimer);
+        interactionSearchTimer = setTimeout(function () {
+            fetchInteractionSearchResults(search);
+        }, interactionSearchDelay);
+    });
+
+    $('#interactionSearch').on('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            clearTimeout(interactionSearchTimer);
+            fetchInteractionSearchResults($(this).val());
         }
     });
 

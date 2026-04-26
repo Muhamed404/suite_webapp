@@ -133,7 +133,7 @@
                             <th
                                 class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                                 <span class="inline-flex items-center gap-2">
-                                    #
+                                    <%= __("generic_label.sr_no") %>
                                 </span>
                             </th>
                             <th
@@ -217,7 +217,7 @@
                         <option value="10" <%= Number(pageSize) === 10 ? 'selected' : '' %>>10</option>
                         <option value="20" <%= Number(pageSize) === 20 ? 'selected' : '' %>>20</option>
                     </select>
-                    <div id="usbPaginationControls" class="space-x-2"></div>
+                    <div id="usbPaginationControls" class="space-x-2 <%= locale === 'ar' ? 'pl-3' : '' %>"></div>
                 </div>
             </div>
 
@@ -480,9 +480,9 @@ window.i18n = {
             }
 
             var html = `
-                <div class="flex items-center justify-between w-full">
+                <div class="flex items-center justify-between w-full ${locale === 'ar' ? 'pl-2' : ''}">
                     <div>
-                        <p class="text-sm text-gray-700 mr-2">
+                        <p class="text-sm text-gray-700 ${locale === 'ar' ? 'ml-2' : 'mr-2'}">
                             ${translations.showingResults
                                 .replace('{start}', ((currentPage - 1) * pageSize) + 1)
                                 .replace('{end}', Math.min(currentPage * pageSize, totalCount))
