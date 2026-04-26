@@ -96,6 +96,11 @@
 		"enterPassword": "أدخل كلمة المرور",
 		"enterNewPassword": "أدخل كلمة المرور الجديدة",
 		"login": "تسجيل الدخول",
+		"invalid_credentials": "بيانات الاعتماد غير صالحة.",
+		"user_not_found": "المستخدم غير موجود أو غير نشط.",
+		"no_access_permissions": "ليس لدى المستخدم أذونات وصول.",
+		"no_portal_access": "ليس لدى المستخدم حق الوصول إلى البوابة.",
+		"unexpected_error": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
 		"welcomeToPhishMagnus": "مرحباً بك في PhishMagnus",
 		"welcomeToAwareMagnus": "مرحباً بك في AwareMagnus",
 		"emailAddress": "عنوان البريد الإلكتروني",
@@ -228,6 +233,7 @@
 		"groupCreate": "إنشاء مجموعة",
 		"smtp": "إعدادات SMTP",
 		"serviceRegistry": "سجل الخدمات",
+		"notificationTemplates": "قوالب الإشعارات",
 		"audit": "سجل التدقيق",
 		"subscriptionHistory": "سجل الاشتراكات",
 		"createSubscription": "إنشاء اشتراك",
@@ -344,7 +350,9 @@
 			"subscriptionHistory": "سجل الاشتراكات",
 			"products": "المنتجات",
 			"logout": "تسجيل الخروج",
-			"smtpNotifications": "menu.suite.smtpNotifications"
+			"smtpNotifications": "menu.suite.smtpNotifications",
+			"bulkImportJobs": "وظائف الاستيراد المجمع",
+			"notificationMailLog": "سجل بريد الإشعارات"
 		}
 	},
 	"org_domain": {
@@ -416,7 +424,10 @@
 			"validationOrgNameRequired": "اسم المؤسسة مطلوب.",
 			"validationOrgAddressRequired": "العنوان مطلوب.",
 			"validationOrgPostalCodeRequired": "الرمز البريدي مطلوب ويجب أن يكون أرقاماً.",
-			"validationOrgContactRequired": "رقم الاتصال مطلوب ويجب أن يكون أرقاماً.",
+			"validationOrgContactRequired": "رقم الاتصال مطلوب.",
+			"validationOrgContactDigits": "يجب أن يحتوي رقم الاتصال على أرقام فقط.",
+			"validationOrgContactMinLength": "يجب أن يكون رقم الاتصال 7 أرقام على الأقل.",
+			"validationOrgContactMaxLength": "يجب ألا يتجاوز رقم الاتصال 15 رقم.",
 			"validationOrgCountryRequired": "الدولة مطلوبة.",
 			"validationOrgStateRequired": "الولاية مطلوبة.",
 			"validationOrgCityRequired": "المدينة مطلوبة.",
@@ -607,6 +618,74 @@
 		}
 	},
 	"settings": {
+		"notificationTemplate": {
+			"create": {
+				"title": "إنشاء قالب إشعار",
+				"subtitle": "أضف قالب إشعار جديدًا لمؤسستك",
+				"tabs": {
+					"english": "الإنجليزية",
+					"arabic": "العربية"
+				},
+				"fields": {
+					"notificationType": "نوع الإشعار",
+					"notificationTypePlaceholder": "اختر نوع الإشعار",
+					"isActive": "نشط",
+					"isSystem": "قالب نظامي",
+					"name": "اسم القالب",
+					"namePlaceholder": "أدخل اسم القالب",
+					"subject": "الموضوع",
+					"subjectPlaceholder": "أدخل موضوع البريد الإلكتروني (اختياري)",
+					"body": "المحتوى",
+					"bodyPlaceholder": "أدخل محتوى القالب"
+				},
+				"btnSubmit": "إنشاء القالب",
+				"btnCancel": "إلغاء",
+				"success": "تم إنشاء قالب (قوالب) الإشعار بنجاح.",
+				"error": "فشل إنشاء قالب الإشعار.",
+				"validation": {
+					"typeRequired": "يرجى اختيار نوع الإشعار.",
+					"atLeastOne": "يرجى ملء قالب لغة واحد على الأقل (الاسم والمحتوى مطلوبان).",
+					"nameRequired": "اسم القالب مطلوب.",
+					"bodyRequired": "محتوى القالب مطلوب."
+				}
+			},
+			"edit": {
+				"title": "تعديل قالب الإشعار",
+				"subtitle": "تحديث تفاصيل قالب الإشعار",
+				"btnSubmit": "حفظ التغييرات",
+				"btnCancel": "إلغاء",
+				"success": "تم تحديث قالب الإشعار بنجاح.",
+				"error": "فشل تحديث قالب الإشعار."
+			},
+			"delete": {
+				"success": "تم حذف قالب الإشعار بنجاح.",
+				"error": "فشل حذف قالب الإشعار.",
+				"confirmTitle": "حذف القالب",
+				"confirmMessage": "هل أنت متأكد من حذف هذا القالب؟ لا يمكن التراجع عن هذا الإجراء."
+			},
+			"list": {
+				"title": "قوالب الإشعارات",
+				"subtitle": "إدارة قوالب الإشعارات الخاصة بمؤسستك",
+				"columns": {
+					"name": "الاسم",
+					"type": "النوع",
+					"language": "اللغة",
+					"subject": "الموضوع",
+					"status": "الحالة",
+					"system": "النظام",
+					"createdAt": "تاريخ الإنشاء",
+					"actions": "الإجراءات"
+				},
+				"badge": {
+					"active": "نشط",
+					"inactive": "غير نشط",
+					"system": "نظامي",
+					"custom": "مخصص"
+				},
+				"empty": "لا توجد قوالب إشعارات.",
+				"search": "بحث في القوالب..."
+			}
+		},
 		"serviceRegistry": {
 			"homescreen": {
 				"title": "إدارة سجل الخدمات",
@@ -756,6 +835,35 @@
 		"validationEmailRequired": "يرجى إدخال عنوان بريد إلكتروني صالح مع النطاق الكامل (مثل user@example.com).",
 		"validationPasswordRequired": "يجب أن تكون كلمة المرور 8 أحرف على الأقل وتشمل حرفاً كبيراً وحرفاً صغيراً ورقماً وحرفاً خاصاً.",
 		"labelBulkUploadUsers": "تحميل مستخدمين مجمع",
+		"labelBulkImportJobs": "وظائف الاستيراد المجمع",
+		"bulkImportJobsSubtitle": "أحدث مهام استيراد CSV لهذه المؤسسة. تُحدَّث الصفحة تلقائياً أثناء انتظار المعالجة أو أثناءها.",
+		"bulkImportViewJobHistory": "عرض سجل وظائف الاستيراد المجمع",
+		"bulkImportQueuedShort": "تمت جدولة الملف للاستيراد. تابع التقدم أدناه.",
+		"bulkImportSelectOrganization": "اختر مؤسسة أولاً، ثم افتح وظائف الاستيراد المجمع من قائمة مستخدمي تلك المؤسسة.",
+		"bulkImportInvalidOrganization": "حسابك غير مرتبط بمؤسسة صالحة لهذه الصفحة.",
+		"bulkImportJobsLoadError": "تعذّر تحميل وظائف الاستيراد المجمع. حاول لاحقاً.",
+		"bulkImportRefresh": "تحديث",
+		"bulkImportColId": "المعرّف",
+		"bulkImportColCreatedBy": "أنشأه (معرّف المستخدم)",
+		"bulkImportColSkippedJson": "تم التخطي (JSON)",
+		"bulkImportColResultJson": "النتيجة (JSON)",
+		"bulkImportColFile": "الملف",
+		"bulkImportColProduct": "المنتج",
+		"bulkImportColStatus": "الحالة",
+		"bulkImportColInserted": "المُدرَجون",
+		"bulkImportColStarted": "بدء",
+		"bulkImportColCompleted": "اكتمال",
+		"bulkImportColError": "خطأ",
+		"bulkImportNoJobs": "لا توجد وظائف استيراد مجمع بعد.",
+		"bulkImportTotalListed": "الوظائف المعروضة",
+		"bulkImportAutoRefreshNote": "أثناء وجود وظيفة قيد الانتظار أو المعالجة، تُعاد تحميل هذه الصفحة كل 10 ثوانٍ.",
+		"btnBulkImportJobs": "وظائف الاستيراد",
+		"suiteUsersSearchLabel": "بحث المستخدمين",
+		"suiteUsersPageSizeLabel": "صفوف لكل صفحة",
+		"suiteUsersSearchSubmit": "بحث",
+		"suiteUsersClearSearch": "مسح",
+		"suiteUsersPrev": "السابق",
+		"suiteUsersNext": "التالي",
 		"stepChooseProduct": "اختر المنتج",
 		"stepChooseFile": "اختر الملف",
 		"labelChooseTheProduct": "اختر المنتج",
@@ -886,7 +994,10 @@
 			"whatsappAttachUrlTitle": "إرفاق رابط",
 			"whatsappAttachUrlDescription": "تضمين رابط قابل للنقر في الرسالة القصيرة.",
 			"whatsappDownloadTemplateTitle": "تحميل القالب",
-			"whatsappDownloadTemplateDescription": "استخدام قالب رسائل قصيرة جاهز."
+			"whatsappDownloadTemplateDescription": "استخدام قالب رسائل قصيرة جاهز.",
+			"email_domain": "نطاق البريد الإلكتروني",
+			"select_email_domain": "اختر نطاق البريد الإلكتروني",
+			"failed_to_load_smtp_configurations": "فشل تحميل نطاقات البريد الإلكتروني."
 		},
 		"stepper8": "محتوى قالب الرسائل النصية"
 	},
@@ -1001,7 +1112,8 @@
 			"select_template": "اختر القالب",
 			"select_target_audience": "اختر الجمهور المستهدف",
 			"select_department": "اختر القسم",
-			"select_group": "اختر المجموعة"
+			"select_group": "اختر المجموعة",
+			"fb_account_required": "لإطلاق حملة رسائل قصيرة، يلزم وجود حساب مزود خدمة رسائل قصيرة مسجل."
 		},
 		"validation_messages": {
 			"campaign_name_required": "اسم الحملة مطلوب (حد أدنى حرفين).",
@@ -1626,7 +1738,12 @@
 		"sms_content": "محتوى قالب الرسائل النصية",
 		"sms_message": "نص الرسالة القصيرة",
 		"sms_placeholder": "نص الرسالة",
-		"tracking_header": "هذا القالب سيسمح لك بتتبع العناصر التالية:"
+		"tracking_header": "هذا القالب سيسمح لك بتتبع العناصر التالية:",
+		"tracking_email_message_opened": "تتبع فتح البريد الإلكتروني/الرسالة",
+		"tracking_link_clicked": "تتبع النقر على رابط التصيد الاحتيالي",
+		"tracking_file_downloaded": "تتبع تحميل ملف التصيد الاحتيالي (من البريد الإلكتروني/الرسالة أو صفحة الهبوط)",
+		"tracking_form_submitted": "تتبع البيانات المرسلة من خلال نموذج التصيد الاحتيالي",
+		"tracking_form_interaction": "تتبع تفاعل المستخدم مع نموذج التصيد الاحتيالي"
 	},
 	"common": {
 		"search_here": "ابحث هنا",
@@ -1692,7 +1809,8 @@
 		"totalQRImages": "إجمالي صور QR",
 		"created": "تم الإنشاء",
 		"unsent": "غير مرسل",
-		"totalCampaigns": "إجمالي الحملات"
+		"totalCampaigns": "إجمالي الحملات",
+		"reported_emails": "رسائل البريد الإلكتروني المبلغ عنها"
 	},
 	"reports": {
 		"campaignReports": "تقارير الحملات",
@@ -1795,7 +1913,8 @@
 			"select_group": "اختر المجموعة",
 			"select_date_time": "اختر التاريخ والوقت",
 			"start_time": "وقت البدء *",
-			"end_time": "وقت الانتهاء"
+			"end_time": "وقت الانتهاء",
+			"fb_account_required": "لإطلاق حملة واتساب، يلزم وجود حساب أعمال فيسبوك (Meta) مسجل."
 		},
 		"campaign_report": {
 			"title": "تقارير حملات واتساب",
@@ -1872,6 +1991,7 @@
 			"file_download": "تحميل الملف",
 			"invitee_responses": "ردود المدعوين",
 			"invitee_name": "اسم المدعو",
+			"invitee_email": "بريد المدعو الإلكتروني",
 			"form_interacted": "تفاعل مع النموذج",
 			"opened": "مفتوح",
 			"no_interaction": "لا توجد تفاعلات",
@@ -2258,5 +2378,6 @@
 		"loginPlaceholder": "أدخل الرمز المكون من 6 أرقام",
 		"loginBtn": "تحقق والمتابعة",
 		"loginBack": "العودة إلى تسجيل الدخول"
-	}
+	},
+	"user_not_found": "user_not_found"
 }

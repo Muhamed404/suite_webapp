@@ -1,3 +1,4 @@
+<% const isArabic = (locals.locale || (typeof locale !== 'undefined' ? locale : 'en')) === 'ar'; %>
 <div class="flex flex-col  p-6">
   <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
     <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
@@ -169,8 +170,27 @@
                 <label class="block text-gray-700 font-medium mb-3">
                   <%= __("organization.create.labelAdminPassword") %> *
                 </label>
-                <input type="password" value="" id="password" name="password"
-                  class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+                <div class="relative h-10">
+                  <input type="password" value="" id="password" name="password"
+                    class="w-full <%= isArabic ? 'pl-10' : 'pr-10' %> px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
+                  <button type="button" id="toggleOrganizationPassword"
+                    class="absolute inset-y-0 <%= isArabic ? 'left-3' : 'right-3' %> flex items-center text-gray-500 hover:text-[var(--teal)] transition-colors duration-200"
+                    aria-label="Show password"
+                    aria-pressed="false">
+                    <svg id="toggleOrganizationPasswordIconEye" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"></path>
+                      <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <svg id="toggleOrganizationPasswordIconEyeOff" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 hidden" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20C5 20 1 12 1 12a21.77 21.77 0 0 1 5.06-6.94"></path>
+                      <path d="M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a21.9 21.9 0 0 1-3.17 4.83"></path>
+                      <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+                      <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
             </div>
@@ -221,11 +241,34 @@
       label.classList.replace('text-gray-400', 'text-teal-600');
     }
   }
+
+  (function () {
+    var toggleBtn = document.getElementById('toggleOrganizationPassword');
+    var passwordInput = document.getElementById('password');
+    var eyeIcon = document.getElementById('toggleOrganizationPasswordIconEye');
+    var eyeOffIcon = document.getElementById('toggleOrganizationPasswordIconEyeOff');
+    if (!toggleBtn || !passwordInput || !eyeIcon || !eyeOffIcon) return;
+
+    toggleBtn.addEventListener('click', function () {
+      var isHidden = passwordInput.type === 'password';
+      passwordInput.type = isHidden ? 'text' : 'password';
+      eyeIcon.classList.toggle('hidden', isHidden);
+      eyeOffIcon.classList.toggle('hidden', !isHidden);
+      toggleBtn.setAttribute('aria-label', isHidden ? 'Hide password' : 'Show password');
+      toggleBtn.setAttribute('aria-pressed', isHidden ? 'true' : 'false');
+    });
+  })();
+
   window.organizationValidationMessages = {
     name: "<%= __('organization.create.validationOrgNameRequired') %>",
     address: "<%= __('organization.create.validationOrgAddressRequired') %>",
     postalCode: "<%= __('organization.create.validationOrgPostalCodeRequired') %>",
-    contact: "<%= __('organization.create.validationOrgContactRequired') %>",
+    contact: {
+      required: "<%= __('organization.create.validationOrgContactRequired') %>",
+      digits: "<%= __('organization.create.validationOrgContactDigits') %>",
+      minlength: "<%= __('organization.create.validationOrgContactMinLength') %>",
+      maxlength: "<%= __('organization.create.validationOrgContactMaxLength') %>"
+    },
     country: "<%= __('organization.create.validationOrgCountryRequired') %>",
     state: "<%= __('organization.create.validationOrgStateRequired') %>",
     city: "<%= __('organization.create.validationOrgCityRequired') %>",

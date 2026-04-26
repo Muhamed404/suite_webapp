@@ -60,6 +60,9 @@ module.exports = {
             SAVE_ENROLLMENT: (hasRequestedToUnenroll) => `/user/update-license-status/${hasRequestedToUnenroll}`,
             DELETE: (userId) => `/user/delete/${userId}`,
             LIST_SUITE_USERS: (organization) => `/user/suite-users/${organization}`,
+            BULK_IMPORT_LIST: (organizationId) => `/user/bulk-import/list/${organizationId}`,
+            BULK_IMPORT_STATUS: (organizationId, jobId) =>
+              `/user/bulk-import/${organizationId}/${jobId}`,
             RETRIEVE_USER_BY_ID: (userId) => `/user/show/${userId}`,
             SAVE_EDIT_USER: (userId) => `/user/update/${userId}`,
             LICENSED_USERS_BY_PRODUCT: (productId) => `/user/licensed-users/${productId}`,
@@ -94,7 +97,17 @@ module.exports = {
         SMS: {
             CREATE: (organizationId) => `/sms/settings/create/${organizationId}`,
             UPDATE: (organizationId) => `/sms/settings/${organizationId}`,
-        }
+        },
+        Notification_Template: {
+            LIST_BY_ORGANIZATION: (organizationId) => `/notification_template/${organizationId}/organization`,
+            CREATE: `/notification_template/create`,
+            GET_BY_ID: (id) => `/notification_template/${id}`,
+            UPDATE: (id) => `/notification_template/${id}/edit`,
+            DELETE: (id, name) => `/notification_template/${id}/delete/${name}/name`,
+        },
+        Notification_Mail: {
+            LIST_BY_ORGANIZATION: (organizationId) => `/notification_mail/${organizationId}/organization`,
+        },
 
     },
     PHISHMAGNUS: {

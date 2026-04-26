@@ -126,11 +126,11 @@ export function useQuizzesByContent(contentId: number, enabled = true) {
 }
 
 /** Fetches all quizzes for a module by first getting contents then quizzes per content */
-export function useQuizzesByModule(moduleId: number, enabled = true) {
+export function useQuizzesByModule(moduleId: number, langId?: number, enabled = true) {
   return useQuery({
-    queryKey: [...QUIZ_KEYS.contents(moduleId), "quizzes"],
+    queryKey: [...QUIZ_KEYS.contents(moduleId), "quizzes", { langId }],
     queryFn: async () => {
-      const contentsRes = await quizService.getContentsByModule(moduleId);
+      const contentsRes = await quizService.getContentsByModule(moduleId, langId != null ? { lang_id: langId } : undefined);
       const contents =
         contentsRes?.success && Array.isArray(contentsRes.data) ? contentsRes.data : [];
       const contentIds = contents.map((c: { id: number }) => c.id);
@@ -139,11 +139,15 @@ export function useQuizzesByModule(moduleId: number, enabled = true) {
       );
       const all = results.flatMap((r) => (r?.success && Array.isArray(r?.data) ? r.data : []));
 
-      // Create a map of content_id to content name for category display
-      const contentMap: Record<number, string> = {};
+      // Create a map of content_id to content info (name, language) for table display
+      const contentMap: Record<number, { name: string; language?: string; lang_id?: number }> = {};
 
-      contents.forEach((c: { id: number; title?: string; name?: string }) => {
-        contentMap[c.id] = c.title || (c as { name?: string }).name || `Content ${c.id}`;
+      contents.forEach((c: any) => {
+        contentMap[c.id] = {
+          name: c.title || c.name || `Content ${c.id}`,
+          language: c.language?.name || c.language_name || (c.lang_id === 2 ? "Arabic" : "English"),
+          lang_id: c.lang_id ?? c.language?.id,
+        };
       });
 
       return { success: true, data: all, contentMap };

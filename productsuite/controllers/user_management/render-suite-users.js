@@ -18,16 +18,36 @@ exports.renderSuiteUsers = async (req, res) => {
 
     let url = backend_api_urls.PRODUCT_SUITE.User_Management.LIST_SUITE_USERS(organization);
 
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const pageSize = Math.min(100, Math.max(5, parseInt(req.query.pageSize, 10) || 25));
+    const search = (req.query.search || req.query.q || "").trim();
+
     const apiClient = getApiClient(req);
-    const response = await apiClient.get(url);
+    const response = await apiClient.get(url, {
+      params: { page, pageSize, search },
+    });
 
     const data = response.data;
-    const combinedUsers = [
-      ...(data.object.mergedUsers || []),
-      ...(data.object.UnlicensedUsers || [])
-    ];
+    const obj = data.object || {};
+    const combinedUsers = Array.isArray(obj.users)
+      ? obj.users
+      : [...(obj.mergedUsers || []), ...(obj.UnlicensedUsers || [])];
 
-    logger.info(`Controller - Render Suite Users: Combined users count: ${combinedUsers.length}`);
+    const suitePagination = {
+      page: obj.page != null ? obj.page : page,
+      pageSize: obj.pageSize != null ? obj.pageSize : pageSize,
+      total: obj.total != null ? obj.total : combinedUsers.length,
+      totalPages: obj.totalPages != null ? obj.totalPages : 1,
+      search: obj.search != null ? obj.search : search,
+      basePath:
+        req.params.organizationId !== undefined &&
+        req.params.organizationId !== null &&
+        String(req.params.organizationId).trim() !== ""
+          ? `/user/suite-users/${organization}`
+          : "/user/suite-users",
+    };
+
+    logger.info(`Controller - Render Suite Users: Users on page: ${combinedUsers.length}, total: ${suitePagination.total}`);
 
 
     let hasCreatePermission = Boolean(false);
@@ -49,13 +69,22 @@ exports.renderSuiteUsers = async (req, res) => {
       logger.info(`[Organization User List] Setting read-only mode for user: ` + userSession.email + ` - viewing different organization`)
     }
     
+    const showBulkImportJobsNav = hasAccess(req, enums.ModuleNames.User_Management, [
+      enums.Access_Types.RWD_O,
+      enums.Access_Types.RWD_ALL,
+      enums.Access_Types.R_ALL,
+    ]);
+
     logger.info(`Controller - Render Suite Users: Rendering user list view with hasCreatePermission: ${hasCreatePermission}, isReadOnly: ${isReadOnly}`);
     return res.render(render_ejs_urls.ProductSuiteManagement.User_Management.LIST, {
       enableSuiteManagementLeftMenu: true,
       users: combinedUsers,
       hasCreatePermission,
       isReadOnly,
-      locale: req.getLocale()
+      locale: req.getLocale(),
+      suiteListOrganizationId: organization,
+      showBulkImportJobsNav,
+      suitePagination,
     });
 
   } catch (error) {

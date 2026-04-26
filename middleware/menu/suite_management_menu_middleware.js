@@ -42,13 +42,13 @@ function generateSuiteManagementMenu(req, organization) {
       img_path: "/securemagnus_2025/images/icons/primary-uses.svg",
       allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin]
     },
-    {
-      module: "Categories",
-      labelKey: "menu.suite.cybersecurityCategories",
-      link: "/cybersecurity/categories/list",
-      img_path: "/securemagnus_2025/images/icons/Icon_Cybersecurity_Categories.svg",
-      allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin]
-    },
+    // {
+    //   module: "Categories",
+    //   labelKey: "menu.suite.cybersecurityCategories",
+    //   link: "/cybersecurity/categories/list",
+    //   img_path: "/securemagnus_2025/images/icons/Icon_Cybersecurity_Categories.svg",
+    //   allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin]
+    // },
     {
       module: "Organization Settings",
       labelKey: "menu.suite.organizationSettings",
@@ -60,6 +60,13 @@ function generateSuiteManagementMenu(req, organization) {
       module: "Users",
       labelKey: "menu.suite.users",
       link: "/user/suite-users",
+      img_path: "/securemagnus_2025/images/icons/primary-uses.svg",
+      allowedRoles: [enums.userType.OrgSuperAdmin, enums.userType.OrgSubAdmin]
+    },
+    {
+      module: "Bulk import jobs",
+      labelKey: "menu.suite.bulkImportJobs",
+      link: "/user/bulk-import/jobs",
       img_path: "/securemagnus_2025/images/icons/primary-uses.svg",
       allowedRoles: [enums.userType.OrgSuperAdmin, enums.userType.OrgSubAdmin]
     },
@@ -92,6 +99,13 @@ function generateSuiteManagementMenu(req, organization) {
       allowedRoles: [enums.userType.OrgSuperAdmin, enums.userType.OrgSubAdmin]
     },
     {
+      module: "Notification Mail Log",
+      labelKey: "menu.suite.notificationMailLog",
+      link: "/notification-mail",
+      img_path: "/securemagnus_2025/images/icons/second-menu-template.svg",
+      allowedRoles: [enums.userType.OrgSuperAdmin, enums.userType.OrgSubAdmin]
+    },
+    {
       module: "Settings",
       labelKey: "menu.suite.settings",
       allowedRoles: [enums.userType.MagSuperAdmin, enums.userType.MagSubAdmin],
@@ -104,6 +118,14 @@ function generateSuiteManagementMenu(req, organization) {
         {
           labelKey: "menu.suite.smtpNotifications",
           link: "/settings/smtp/"
+        },
+        {
+          labelKey: "menu.suite.notificationTemplates",
+          link: "/notification-template/"
+        },
+        {
+          labelKey: "menu.suite.notificationMailLog",
+          link: "/notification-mail"
         }
       ]
     }

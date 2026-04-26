@@ -292,6 +292,7 @@ export interface SurveyQuestionUpdatePayload {
   question?: {
     question?: string;
     category_id?: number;
+    ques_type_id?: number;
   };
   answers?: Array<{
     answer: string;

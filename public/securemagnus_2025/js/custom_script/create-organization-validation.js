@@ -19,8 +19,30 @@ $(document).ready(function () {
       email: { required: true, email: true },
       password: { required: true, strongPassword: true }
     },
-    messages: window.organizationValidationMessages,
+    messages: {
+      name: window.organizationValidationMessages.name,
+      address: window.organizationValidationMessages.address,
+      postalCode: window.organizationValidationMessages.postalCode,
+      contact: window.organizationValidationMessages.contact,
+      country: window.organizationValidationMessages.country,
+      state: window.organizationValidationMessages.state,
+      city: window.organizationValidationMessages.city,
+      firstName: window.organizationValidationMessages.firstName,
+      lastName: window.organizationValidationMessages.lastName,
+      email: window.organizationValidationMessages.email,
+      password: window.organizationValidationMessages.password
+    },
     errorClass: "text-red-500 text-sm mt-1",
+    errorElement: "div",
+    errorPlacement: function (error, element) {
+      const errorId = element.attr("id") + "-error";
+      if ($("#" + errorId).length) {
+        $("#" + errorId).html(error.html());
+      } else {
+        error.attr("id", errorId);
+        error.insertAfter(element);
+      }
+    },
     highlight: function (element) {
       $(element).addClass("border-red-500");
     },

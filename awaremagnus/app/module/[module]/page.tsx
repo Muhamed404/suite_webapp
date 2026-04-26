@@ -20,6 +20,42 @@ import { isOrgUser } from "@/utils/roles";
 import { quizService } from "@/services/quizService";
 import { SUPPORTED_LANGUAGES, LANGUAGE_COUNTRY_CODES } from "@/utils/supportedLanguages";
 import { getModuleAssetUrl } from "@/utils/contentAssetUrl";
+import { formatNumber } from "@/utils/localeNumber";
+
+function normalizeContentType(value?: string): string {
+  return (value ?? "").toLowerCase().trim();
+}
+
+function getContentTypeEmoji(typeName?: string): string {
+  const n = normalizeContentType(typeName);
+
+  if (n.includes("interactive") || n === "ispring") return "📘";
+  if (n.includes("quiz")) return "💡";
+  if (n.includes("poster")) return "🖼";
+  if (n.includes("survey")) return "📊";
+  if (n.includes("video") || n.includes("motion")) return "🎬";
+  if (n.includes("game") && !n.includes("vr")) return "🎮";
+  if (n.includes("vr")) return "🥽";
+  if (n.includes("document") || n.includes("pdf") || n.includes("brochure")) return "📄";
+  if (n.includes("screen saver")) return "💻";
+
+  return "📎";
+}
+
+function getContentTypeColorClass(typeName?: string): string {
+  const n = normalizeContentType(typeName);
+
+  if (n.includes("interactive") || n === "ispring") return "bg-cyan-100 text-cyan-600";
+  if (n.includes("quiz")) return "bg-blue-100 text-blue-600";
+  if (n.includes("poster")) return "bg-orange-100 text-orange-600";
+  if (n.includes("survey")) return "bg-purple-100 text-purple-600";
+  if (n.includes("video") || n.includes("motion")) return "bg-blue-100 text-blue-600";
+  if (n.includes("game") || n.includes("vr")) return "bg-emerald-100 text-emerald-600";
+  if (n.includes("document") || n.includes("pdf") || n.includes("brochure")) return "bg-gray-100 text-gray-600";
+  if (n.includes("screen saver")) return "bg-slate-100 text-slate-600";
+
+  return "bg-gray-100 text-gray-600";
+}
 
 export default function PhysicalSecurityPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
@@ -52,6 +88,18 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const tabIndicatorRef = useRef<HTMLDivElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
+  
+  const generateModuleSlug = useCallback(
+    (name: string) =>
+      (name || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, ""),
+    []
+  );
+
   // Get module ID from slug
   const { data: modulesRes } = useModules({ filter: module });
 
@@ -63,15 +111,18 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
         const translationMatch = m.translations?.some(
           (t) => t.name.toLowerCase() === slugDerivedName.toLowerCase()
         );
+        const slugMatch = m.translations?.some(
+          (t) => generateModuleSlug(t.name) === module
+        );
 
-        return codeMatch || titleMatch || translationMatch;
+        return codeMatch || titleMatch || translationMatch || slugMatch;
       });
 
       return found?.id ?? null;
     }
 
     return null; // Not yet resolved — prevents premature API calls with wrong default ID
-  }, [modulesRes, module, slugDerivedName]);
+  }, [modulesRes, module, slugDerivedName, generateModuleSlug]);
 
   // Get module basic info
   const { data: moduleRes } = useModule(moduleId ?? 1, !!moduleId);
@@ -178,18 +229,6 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   // fetch list of modules that belong to this campaign so we can wire up "next module" navigation
   const { data: campaignModulesRes } = useCampaignModules(campaignId ?? 0, !!campaignId);
 
-  // helper for slugs (same as dashboard and campaign assignments)
-  const generateModuleSlug = useCallback(
-    (name: string) =>
-      (name || "")
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .replace(/^-|-$/g, ""),
-    []
-  );
-
   const nextModuleSlug = useMemo(() => {
     if (!campaignModulesRes?.success || !moduleId) return null;
     const list = campaignModulesRes.data || [];
@@ -261,7 +300,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
         transformedItems.push({
           id: content.content_id,
-          title: content.content_type,
+          title: content.name || content.title || content.content_type,
           status: statusValue,
           statusLabel,
           date: content.created_date
@@ -279,6 +318,34 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
           type: content.content_type,
           content_type_id: content.content_type_id,
         });
+
+        if (content.quizzes && content.quizzes.total_count > 0) {
+          const qStatus = content.quizzes.status || "not_started";
+          const qLabel = qStatus.replace(/_/g, " ").replace(/\b\w/g, (l: string) => l.toUpperCase());
+
+          transformedItems.push({
+            id: `quiz-${content.content_id ?? content.id}`,
+            title: "Quizzes",
+            status: qStatus,
+            statusLabel: qLabel,
+            date: content.created_date
+              ? new Date(content.created_date).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })
+              : "—",
+            chapters: `${content.quizzes.total_count} Quizzes`,
+            lessons: `${content.quizzes.total_count} questions`,
+            languages: content.language_name
+              ? [content.language_name.toLowerCase() === "arabic" ? "ar" : "en"]
+              : ["en"],
+            type: "Quiz",
+            isQuizSummary: false,
+            contentIds: [content.content_id ?? content.id],
+            parentId: content.content_id ?? content.id,
+          });
+        }
       });
 
       // push a single card for each gallery type collected above
@@ -417,40 +484,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
       });
     }
 
-    // Add user progress summary if available for quizzes
-    if (data.user_progress_summary?.quizzes?.total > 0) {
-      // Collect content_ids from non_aggregated_contents that have quizzes
-      const quizContents = (data.non_aggregated_contents ?? []).filter(
-        (c: any) => (c.quizzes?.total_count ?? 0) > 0
-      );
-
-      const quizContentIds = quizContents.map((c: any) => c.content_id ?? c.id).filter(Boolean);
-
-      // Find the latest created_date from quiz contents
-      const latestQuizDate = quizContents
-        .map((c: any) => c.created_date)
-        .filter(Boolean)
-        .sort((a: string, b: string) => new Date(b).getTime() - new Date(a).getTime())[0];
-
-      transformedItems.push({
-        id: "quizzes",
-        title: "Quizzes",
-        status: data.user_progress_summary.quizzes.status,
-        date: latestQuizDate
-          ? new Date(latestQuizDate).toLocaleDateString("en-GB", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })
-          : "—",
-        chapters: `${data.user_progress_summary.quizzes.total} Quizzes`,
-        lessons: `${data.user_progress_summary.quizzes.total} questions`,
-        languages: ["en", "ar"],
-        type: "Quiz",
-        isQuizSummary: true,
-        contentIds: quizContentIds,
-      });
-    }
+    // Global quizzes aggregate block has been removed in favor of inline quizzes per content.
 
     return transformedItems;
   }, [contentsWithProgressRes, moduleRes, reportContentsData, reportContentsLoading]);
@@ -488,6 +522,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
     return filteredItems.slice(start, start + rowsPerPage);
   }, [filteredItems, currentPage, rowsPerPage]);
+  const totalPages = Math.max(1, Math.ceil(filteredItems.length / rowsPerPage));
 
   const tabCounts = useMemo(() => {
     return {
@@ -564,6 +599,16 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   useEffect(() => {
     updateTabIndicator();
   }, [statusFilter]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [language, searchQuery, statusFilter]);
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+  }, [currentPage, totalPages]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -951,7 +996,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                               {isOrgUserView && moduleLogoUrl ? (
                                 <img
                                   alt={`${moduleInfo.name} logo`}
-                                  className="mt-3 w-full h-auto max-h-40 object-cover rounded-md border border-gray-200"
+                                  className="mt-3 w-full h-auto max-h-40 object-contain rounded-md border border-gray-200 bg-white"
                                   src={moduleLogoUrl}
                                 />
                               ) : null}
@@ -975,28 +1020,29 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
 
                     <div className="col-span-9 flex flex-col justify-between">
                       <div className="space-y-2 w-full">
-                        {paginatedItems.map((item, index) => {
-                          const iconMap: Record<string, string> = {
-                            "Video Training": "🎥",
-                            "Interactive Lesson": "📘",
-                            Quizzes: "💡",
-                            Posters: "🖼",
-                            Survey: "📊",
-                          };
-                          const colorMap: Record<string, string> = {
-                            "Video Training": "bg-red-100 text-red-600",
-                            "Interactive Lesson": "bg-cyan-100 text-cyan-600",
-                            Quizzes: "bg-blue-100 text-blue-600",
-                            Posters: "bg-orange-100 text-orange-600",
-                            Survey: "bg-purple-100 text-purple-600",
-                          };
+                        {(() => {
+                          const baseIdx = filteredItems
+                            .slice(0, (currentPage - 1) * rowsPerPage)
+                            .filter(item => !(item.type === "Quiz" && !item.isQuizSummary))
+                            .length;
+                          let runningContentNumber = baseIdx;
+
+                          return paginatedItems.map((item, index) => {
+                          const contentTypeKey = item.type || item.title || "";
                           const langMap: Record<string, { label: string; flag: string }> = {
                             en: { label: "English", flag: "us" },
                             ar: { label: "Arabic", flag: "sa" },
                           };
 
-                          const icon = iconMap[item.title] || "📘";
-                          const color = colorMap[item.title] || "bg-cyan-100 text-cyan-600";
+                          const icon = getContentTypeEmoji(contentTypeKey);
+                          const color = getContentTypeColorClass(contentTypeKey);
+                          const isQuizSubItem = item.type === "Quiz" && !item.isQuizSummary;
+                          let contentNumberLabel: string | null = null;
+
+                          if (!isQuizSubItem) {
+                            runningContentNumber += 1;
+                            contentNumberLabel = formatNumber(runningContentNumber, locale);
+                          }
                           const langChips = (item.languages || []).map((code: string) => {
                             const cfg = langMap[code];
 
@@ -1051,7 +1097,11 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                           return (
                             <div
                               key={`${item.id}-${index}`}
-                              className="item bg-white rounded-2xl p-4 flex justify-between items-center border border-gray-100 hover:border-blue-200 transition-all hover:shadow-sm"
+                              className={`item bg-white rounded-2xl p-4 flex justify-between items-center border transition-all hover:shadow-sm relative z-10 ${
+                                item.type === "Quiz" && !item.isQuizSummary
+                                  ? "ml-8 -mt-2 border-blue-100 bg-slate-50 hover:border-blue-300 shadow-sm"
+                                  : "border-gray-100 hover:border-blue-200"
+                              }`}
                             >
                               <div className="flex gap-4 flex-1">
                                 <div
@@ -1061,6 +1111,11 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                 </div>
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
+                                    {contentNumberLabel && (
+                                      <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-[10px] font-semibold text-gray-600">
+                                        {contentNumberLabel}
+                                      </span>
+                                    )}
                                     <h3 className="text-base font-semibold text-gray-900">
                                       {item.title}
                                     </h3>
@@ -1182,38 +1237,13 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                           console.error("[module] getContents error", err);
                                         });
                                     }
-                                    if (item.title === "Video Training") {
-                                      const vtParams = new URLSearchParams();
+                                    // Navigation Logic Based on Content Type ID or Type Name
+                                    const isVideo = item.content_type_id === 2 || item.type === "Motion Videos" || item.type === "Video Training";
+                                    const isInteractive = item.content_type_id === 1 || item.type === "Interactive Lesson" || item.type === "Interactive Contents";
+                                    const isQuiz = item.type === "Quiz" || item.title === "Quizzes";
 
-                                      vtParams.set("campaign_id", String(campaignId));
-                                      if (item.id && !String(item.id).startsWith("agg_")) {
-                                        vtParams.set("content_id", String(item.id));
-                                      }
-                                      router.push(
-                                        `/module/${module}/video-training?${vtParams.toString()}`
-                                      );
-                                    } else if (
-                                      item.title === "Interactive Contents" ||
-                                      item.title === "Interactive Lesson" ||
-                                      item.content_type_id === 1
-                                    ) {
-                                      // Dedicated org-user interactive content page
-                                      router.push(
-                                        `/module/${module}/interactive-content/${item.id}?campaign_id=${campaignId}&module_id=${moduleId}`
-                                      );
-                                    } else if (item.title === "Quizzes") {
-                                      const quizParams = new URLSearchParams();
-
-                                      quizParams.set("campaign_id", String(campaignId));
-                                      if (item.contentIds && item.contentIds.length > 0) {
-                                        quizParams.set("content_id", String(item.contentIds[0]));
-                                      }
-                                      router.push(
-                                        `/module/${module}/quizzes?${quizParams.toString()}`
-                                      );
-                                    } else if (item.title === "Motion Videos") {
+                                    if (isVideo) {
                                       const videoParams = new URLSearchParams();
-
                                       videoParams.set("campaign_id", String(campaignId));
                                       if (item.id && !String(item.id).startsWith("agg_")) {
                                         videoParams.set("content_id", String(item.id));
@@ -1221,8 +1251,23 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                       router.push(
                                         `/module/${module}/video-training?${videoParams.toString()}`
                                       );
+                                    } else if (isInteractive) {
+                                      // Dedicated org-user interactive content page
+                                      router.push(
+                                        `/module/${module}/interactive-content/${item.id}?campaign_id=${campaignId}&module_id=${moduleId}`
+                                      );
+                                    } else if (isQuiz) {
+                                      const quizParams = new URLSearchParams();
+                                      quizParams.set("campaign_id", String(campaignId));
+                                      if (item.contentIds && item.contentIds.length > 0) {
+                                        quizParams.set("content_id", String(item.contentIds[0]));
+                                      }
+                                      router.push(
+                                        `/module/${module}/quizzes?${quizParams.toString()}`
+                                      );
                                     } else {
-                                      const contentTypes = [
+                                      // Gallery / Aggregated Content Types (Posters, Brochures, etc.)
+                                      const galleryTypes = [
                                         "Posters",
                                         "Brochures",
                                         "Documents",
@@ -1231,12 +1276,15 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                         "Misc",
                                       ];
 
+                                      const type = item.type || item.title || "";
                                       if (
-                                        contentTypes.some(
-                                          (ct) => ct.toLowerCase() === item.title?.toLowerCase()
-                                        )
+                                        galleryTypes.some(
+                                          (ct) => ct.toLowerCase() === type.toLowerCase()
+                                        ) ||
+                                        [3, 4, 5, 8].includes(item.content_type_id)
                                       ) {
-                                        const typeSlug = item.title
+                                        const typeName = item.type || item.title || "content";
+                                        const typeSlug = typeName
                                           .toLowerCase()
                                           .replace(/\s+/g, "-");
                                         const ctParams = new URLSearchParams();
@@ -1249,8 +1297,6 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                         router.push(
                                           `/module/${module}/content/${typeSlug}?${ctParams.toString()}`
                                         );
-                                      } else {
-                                        // Handle other types
                                       }
                                     }
                                   }}
@@ -1260,16 +1306,28 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                               </div>
                             </div>
                           );
-                        })}
+                          });
+                        })()}
                       </div>
                       <div className="mt-4 flex items-center justify-between">
                          <p className="text-xs text-gray-600">
-                          {t("moduleDetails.showingEntries", {
-                            from: (currentPage - 1) * rowsPerPage + 1,
-                            to: Math.min(currentPage * rowsPerPage, filteredItems.length),
-                            total: filteredItems.length,
-                          }) ??
-                            `Showing ${(currentPage - 1) * rowsPerPage + 1}–${Math.min(currentPage * rowsPerPage, filteredItems.length)} of ${filteredItems.length} Entries`}
+                          {(() => {
+                            const fromIdx =
+                              filteredItems.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
+                            const toIdx = Math.min(
+                              currentPage * rowsPerPage,
+                              filteredItems.length
+                            );
+
+                            return (
+                              t("moduleDetails.showingEntries", {
+                                from: formatNumber(fromIdx, locale),
+                                to: formatNumber(toIdx, locale),
+                                total: formatNumber(filteredItems.length, locale),
+                              }) ??
+                              `Showing ${formatNumber(fromIdx, locale)}–${formatNumber(toIdx, locale)} of ${formatNumber(filteredItems.length, locale)} Entries`
+                            );
+                          })()}
                         </p>
                         <div className="flex items-center gap-1">
                           <button
@@ -1293,13 +1351,13 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                               }`}
                               onClick={() => setCurrentPage(page)}
                             >
-                              {page}
+                              {formatNumber(page, locale)}
                             </button>
                           ))}
 
                           <button
                             className="min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all bg-white text-gray-700 border-gray-300 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                            disabled={currentPage === Math.ceil(filteredItems.length / rowsPerPage)}
+                            disabled={currentPage === totalPages}
                             onClick={() => setCurrentPage(currentPage + 1)}
                           >
                             <ChevronRight className="w-4 h-4" />

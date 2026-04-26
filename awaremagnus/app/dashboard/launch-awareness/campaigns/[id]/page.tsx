@@ -55,54 +55,55 @@ export default function CampaignDetailsPage() {
   const achievementPercent =
     achievementTotal > 0 ? Math.round((achievementUnlocked / achievementTotal) * 100) : 0;
 
-  // Set of achievement numbers (1-16) present in the backend response. We
-  // parse the leading number from `image_small_url` (e.g. "1-quick-learner.png").
-  const unlockedAchievementNumbers = useMemo(() => {
+  const achievementStatsList = useMemo(() => {
+    return Array.isArray(achievementData?.object?.achievement_statistics)
+      ? achievementData.object.achievement_statistics
+      : [];
+  }, [achievementData]);
+
+  // Use backend ids directly so achieved badges (e.g. 18, 47) always appear.
+  const unlockedAchievementIds = useMemo(() => {
     const set = new Set<number>();
-    const items = achievementData?.object?.achievement_statistics ?? [];
 
-    for (const a of items) {
-      const img = a?.image_small_url ?? "";
-      const m = img.trim().match(/^(\d{1,2})/);
+    for (const achievement of achievementStatsList) {
+      const id = Number(achievement?.achievement_id);
 
-      if (!m) continue;
-      const n = Number(m[1]);
-
-      if (n >= 1 && n <= 16) set.add(n);
+      if (!Number.isFinite(id) || id <= 0) continue;
+      if (Number(achievement?.employee_count ?? 0) > 0) set.add(id);
     }
 
     return set;
-  }, [achievementData]);
+  }, [achievementStatsList]);
 
-  // Map: achievement number → full stats object (for tooltip data)
-  const achievementByNumber = useMemo(() => {
+  const achievementById = useMemo(() => {
     const map = new Map<number, any>();
-    const items = achievementData?.object?.achievement_statistics ?? [];
 
-    for (const a of items) {
-      const img = a?.image_small_url ?? "";
-      const m = img.trim().match(/^(\d{1,2})/);
+    for (const achievement of achievementStatsList) {
+      const id = Number(achievement?.achievement_id);
 
-      if (!m) continue;
-      const n = Number(m[1]);
-
-      if (n >= 1 && n <= 16) map.set(n, a);
+      if (!Number.isFinite(id) || id <= 0) continue;
+      map.set(id, achievement);
     }
 
     return map;
-  }, [achievementData]);
+  }, [achievementStatsList]);
 
-  // Display order: unlocked achievements first, then locked — capped at 16
+  // Keep 16 slots, but guarantee all unlocked ids are visible first.
   const achievementDisplayOrder = useMemo(() => {
-    const all = Array.from({ length: 16 }, (_, i) => i + 1);
+    const unlockedIds = Array.from(unlockedAchievementIds).sort((a, b) => a - b);
+    const defaultIds = Array.from({ length: Math.max(16, Number(achievementTotal) || 0) }, (_, i) => i + 1);
+    const order: number[] = [];
 
-    return all.sort((a, b) => {
-      const aUnlocked = unlockedAchievementNumbers.has(a) ? 0 : 1;
-      const bUnlocked = unlockedAchievementNumbers.has(b) ? 0 : 1;
+    for (const id of unlockedIds) {
+      if (!order.includes(id)) order.push(id);
+    }
 
-      return aUnlocked - bUnlocked;
-    });
-  }, [unlockedAchievementNumbers]);
+    for (const id of defaultIds) {
+      if (!order.includes(id)) order.push(id);
+    }
+
+    return order.slice(0, 16);
+  }, [unlockedAchievementIds, achievementTotal]);
 
   const avatarImageByLevel: Record<number, string> = {
     1: "Vulnerablenewbe_Level1_Robot.png",
@@ -121,21 +122,67 @@ export default function CampaignDetailsPage() {
     14: "UltimateCyberSentinel_Level14_Robot.png",
   };
 
+  const avatarNameByLevel: Record<number, string> = {
+    1: "Vulnerable Newbie",
+    2: "Alert Apprentice",
+    3: "Cautious Learner",
+    4: "Informed Defender",
+    5: "Vigilant Guardian",
+    6: "Skilled Sentinel",
+    7: "Resilient Protector",
+    8: "Advanced Watchman",
+    9: "Expert Enforcer",
+    10: "Master Strategist",
+    11: "Elite Vanguard",
+    12: "Legendary Shieldbearer",
+    13: "Supreme Cyber Knight",
+    14: "Ultimate Cyber Sentinel",
+  };
+
+  const inferAvatarNameFromImage = (imageName?: string) => {
+    if (!imageName) return "";
+
+    const fileName = imageName.split("/").pop() ?? imageName;
+    const withoutExtension = fileName.replace(/\.[^/.]+$/, "");
+    const withoutSuffix = withoutExtension.replace(/_Level\d+_Robot$/i, "").replace(/_Robot$/i, "");
+
+    return withoutSuffix
+      .replace(/_/g, " ")
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .trim();
+  };
+
   const resolveAvatarImage = (avatar?: any) => {
     if (!avatar) return "1.png";
     return avatarImageByLevel[avatar.level_number] ?? avatar.image_small_url ?? "1.png";
   };
 
+  const resolveAvatarName = (avatar?: any) => {
+    if (!avatar) return "Vulnerable Newbie";
+
+    const levelName = String(avatar.level_name ?? "").trim();
+    const genericLevelLabel = `Level ${avatar.level_number}`;
+
+    if (levelName && !/^Level\s+\d+$/i.test(levelName)) return levelName;
+
+    const inferredName = inferAvatarNameFromImage(avatar.image_small_url);
+
+    if (inferredName) return inferredName;
+
+    return avatarNameByLevel[avatar.level_number] ?? genericLevelLabel;
+  };
+
+  const formatUsersOnText = (count?: number) => {
+    const safeCount = Number(count ?? 0);
+    return safeCount === 1 ? "1 user is on" : `${safeCount} users are on`;
+  };
+
   // Find the unlocked avatar with the highest level to show in the main slot
   const avatarStats = useMemo(() => {
     const items = (avatarData?.object?.avatar_statistics ?? []) as any[];
-    return [...items].sort((a, b) => {
-      const aUnlocked = (a.employee_count ?? 0) > 0 ? 0 : 1;
-      const bUnlocked = (b.employee_count ?? 0) > 0 ? 0 : 1;
-
-      if (aUnlocked !== bUnlocked) return aUnlocked - bUnlocked;
-      return b.level_number - a.level_number;
-    });
+    return [...items]
+      .filter((avatar) => (avatar.level_number ?? 0) > 0)
+      .sort((a, b) => a.level_number - b.level_number);
   }, [avatarData]);
 
   const mainAvatar = useMemo(() => {
@@ -150,7 +197,15 @@ export default function CampaignDetailsPage() {
       };
     }
 
-    return avatarStats[0];
+    const unlockedAvatars = avatarStats.filter((avatar) => (avatar.employee_count ?? 0) > 0);
+
+    if (unlockedAvatars.length > 0) {
+      return unlockedAvatars.reduce((highest, current) =>
+        current.level_number > highest.level_number ? current : highest,
+      );
+    }
+
+    return avatarStats[avatarStats.length - 1];
   }, [avatarStats]);
 
   // Check if main avatar is unlocked (has employee_count > 0)
@@ -1048,14 +1103,15 @@ export default function CampaignDetailsPage() {
                   </a>
                 </div>
                 <div className="grid grid-cols-8 gap-3 gap-y-4 mt-8">
-                  {achievementDisplayOrder.map((num) => {
-                    const isUnlocked = unlockedAchievementNumbers.has(num);
-                    const meta = achievementByNumber.get(num);
+                  {achievementDisplayOrder.map((achievementId) => {
+                    const isUnlocked = unlockedAchievementIds.has(achievementId);
+                    const meta = achievementById.get(achievementId);
+                    const imageFileName = meta?.image_small_url ?? `${achievementId}.png`;
 
                     const tooltipContent = (
                       <div className="flex flex-col gap-1 max-w-[200px] p-1">
                         <p className="font-semibold text-sm text-gray-900">
-                          {meta?.achievement_name ?? `Achievement #${num}`}
+                          {meta?.achievement_name ?? `Achievement #${achievementId}`}
                         </p>
                         {meta?.achievement_description && (
                           <p className="text-xs text-gray-600 leading-tight">
@@ -1080,7 +1136,7 @@ export default function CampaignDetailsPage() {
                     );
 
                     return (
-                      <Tooltip key={num} content={tooltipContent} placement="top">
+                      <Tooltip key={achievementId} content={tooltipContent} placement="top">
                         <div
                           aria-disabled={!isUnlocked}
                           className={`w-12 h-12 rounded-full flex items-center justify-center relative cursor-default ${
@@ -1088,9 +1144,9 @@ export default function CampaignDetailsPage() {
                           }`}
                         >
                           <img
-                            alt={meta?.achievement_name ?? `Achievement ${num}`}
+                            alt={meta?.achievement_name ?? `Achievement ${achievementId}`}
                             className="w-full h-full"
-                            src={`/awm/images/achivement/${num}.png`}
+                            src={`/awm/images/achivement/${imageFileName}`}
                           />
                         </div>
                       </Tooltip>
@@ -1130,25 +1186,17 @@ export default function CampaignDetailsPage() {
                       content={
                         <div className="flex flex-col gap-1 max-w-[200px] p-1">
                           <p className="font-semibold text-sm text-gray-900">
-                            Level {mainAvatar?.level_number ?? 1}
+                            {resolveAvatarName(mainAvatar)}
                           </p>
-                          <p className="text-xs text-gray-600 leading-tight">
-                            {mainAvatar?.level_name ?? "Vulnerable Newbie"}
-                          </p>
-                          <div className="flex items-center justify-between mt-1 gap-2">
-                            <span
-                              className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
-                                isMainAvatarUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                              }`}
-                            >
-                              {isMainAvatarUnlocked ? "Unlocked" : "Locked"}
-                            </span>
-                            {mainAvatar?.employee_count != null && (
-                              <span className="text-xs text-gray-500">
-                                {mainAvatar.employee_count}x
-                              </span>
-                            )}
-                          </div>
+                          <p className="text-xs text-gray-500">{formatUsersOnText(mainAvatar?.employee_count)}</p>
+                          <p className="text-xs text-gray-500">Level {mainAvatar?.level_number ?? 1}</p>
+                          <span
+                            className={`w-fit text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                              isMainAvatarUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                            }`}
+                          >
+                            {isMainAvatarUnlocked ? "Unlocked" : "Locked"}
+                          </span>
                         </div>
                       }
                       placement="top"
@@ -1165,7 +1213,7 @@ export default function CampaignDetailsPage() {
                       </div>
                     </Tooltip>
                     <p className="text-[12px] leading-tight text-gray-700 mt-4 w-full max-w-[120px] whitespace-normal break-keep text-center">
-                      {mainAvatar?.level_name ?? "Vulnerable Newbie"}
+                      {resolveAvatarName(mainAvatar)}
                     </p>
                   </div>
 
@@ -1187,25 +1235,17 @@ export default function CampaignDetailsPage() {
                           content={
                             <div className="flex flex-col gap-1 max-w-[200px] p-1">
                               <p className="font-semibold text-sm text-gray-900">
-                                Level {avatar.level_number}
+                                {resolveAvatarName(avatar)}
                               </p>
-                              <p className="text-xs text-gray-600 leading-tight">
-                                {avatar.level_name}
-                              </p>
-                              <div className="flex items-center justify-between mt-1 gap-2">
-                                <span
-                                  className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
-                                    isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                                  }`}
-                                >
-                                  {isUnlocked ? "Unlocked" : "Locked"}
-                                </span>
-                                {avatar.employee_count != null && (
-                                  <span className="text-xs text-gray-500">
-                                    {avatar.employee_count}x
-                                  </span>
-                                )}
-                              </div>
+                              <p className="text-xs text-gray-500">{formatUsersOnText(avatar.employee_count)}</p>
+                              <p className="text-xs text-gray-500">Level {avatar.level_number}</p>
+                              <span
+                                className={`w-fit text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                                  isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                                }`}
+                              >
+                                {isUnlocked ? "Unlocked" : "Locked"}
+                              </span>
                             </div>
                           }
                           placement="top"
@@ -1227,7 +1267,7 @@ export default function CampaignDetailsPage() {
                                 isUnlocked ? "text-gray-700" : "text-gray-400"
                               }`}
                             >
-                              {avatar.level_name}
+                              {resolveAvatarName(avatar)}
                             </p>
                           </div>
                         </Tooltip>

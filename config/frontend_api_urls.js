@@ -24,6 +24,13 @@ module.exports = {
             CREATE_USER: '/user/create',
             // LIST_USERS: '/user/list',
             SUITE_USERS: '/user/suite-users',
+            BULK_IMPORT_JOBS: (organizationId) =>
+              organizationId !== undefined &&
+              organizationId !== null &&
+              !Number.isNaN(Number(organizationId)) &&
+              Number(organizationId) > 0
+                ? `/user/bulk-import/jobs/${organizationId}`
+                : '/user/bulk-import/jobs',
             SECUREMAGNUS_USERS_LIST: '/user/securemagnus-users',
             CREATE_SECUREMAGNUS_USER: '/user/securemagnus-users/create',
             EDIT_USER: (userId) => `/user/show/${userId}`,
@@ -32,6 +39,11 @@ module.exports = {
             CREATE: '/service-registry/create',
             LIST: '/service-registry/',
             EDIT_SERVICE: (serviceId) => `/service-registry/update/${serviceId}`,
+        },
+        Notification_Template: {
+            LIST: '/notification-template',
+            CREATE: '/notification-template/create',
+            EDIT: (id) => `/notification-template/${id}/edit`,
         },
         Subscription: {
             CREATE: (organizationId) => `/subscription/create/${organizationId}`,

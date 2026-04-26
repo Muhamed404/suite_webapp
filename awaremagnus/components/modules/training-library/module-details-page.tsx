@@ -138,6 +138,7 @@ type ContentTypeCardItem =
         earliest_created?: string;
         latest_created?: string;
       } | null;
+      languagesSupported?: string[];
       items: ModuleContent[];
     }
   | { kind: "quizzes"; count: number };
@@ -290,27 +291,16 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
           typeName: agg.content_type,
           count: agg.total_count,
           dateRange: agg.date_range,
+          languagesSupported: agg.languages_supported,
           // We don't have individual items here, just the summary
           items: [],
         });
       }
     });
 
-    // 3. Quizzes (Aggregated count from response or separate check)
-    // If using contents-with-progress, we have userProgress.quizzes
-    if (userProgress?.quizzes) {
-      cards.push({ kind: "quizzes", count: userProgress.quizzes.total });
-    }
-    // If Admin view, we might need to rely on what the API returns.
-    // The current API response for contents-with-quizzes doesn't explicitly give a global quiz count in root,
-    // but individual items have quiz data.
-    // Assuming for now Quizzes are treated as a separate card if we want to list them all,
-    // OR they are attached to content. The requirement said "render quiz card next to that... content".
-    // AND "In case of the non aggregated content... render quiz card next to...".
-
-    // Let's stick to the card list for now. The previous implementation had a "Quizzes" card.
-    // We can keep it if there are quizzes associated with the module globally.
-
+    // Quizzes are rendered individually beneath their respective non-aggregated content cards.
+    // We no longer display a global aggregated quizzes card at the end.
+    
     return cards;
   }, [nonAggregatedContents, aggregatedContents, userProgress]);
 
@@ -324,9 +314,6 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
       }
       if (card.kind === "grouped") {
         return card.typeName.toLowerCase().includes(q);
-      }
-      if (card.kind === "quizzes") {
-        return t("moduleDetails.quizzes").toLowerCase().includes(q);
       }
 
       return false;
@@ -662,7 +649,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     <div className="flex flex-col items-start gap-3">
                       <div 
                         className={clsx(
-                          "w-50 h-50 overflow-hidden shrink-0",
+                          "w-full max-w-[220px] h-[140px] overflow-hidden shrink-0 bg-white",
                           locale === "ar" && "translate-x-4"
                         )}
                         style={{ borderRadius: 12 }}
@@ -670,7 +657,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                         {moduleLogoUrl ? (
                           <img
                             alt={moduleTitle}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                             src={moduleLogoUrl}
                           />
                         ) : (
@@ -769,32 +756,60 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-semibold text-base text-gray-900 leading-5">
-                                  {contentTitle(item)}
+                                  {item.name || contentTitle(item) || displayName}
                                 </p>
                                 <p className="text-[10px] text-gray-500 mt-1">
                                   {t("moduleDetails.created")} {createdStr}
                                 </p>
-                                <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                  {lid != null && (
-                                    <div
-                                      className="flex items-center gap-1"
-                                      title={getLanguageName(lid)}
-                                    >
-                                      <ReactCountryFlag
-                                        svg
-                                        countryCode={getLanguageCountryCode(lid)}
-                                        style={{ fontSize: "1em", lineHeight: "1em" }}
-                                      />
-                                      <span className="text-[10px] text-gray-600">
+                                {item.description && (
+                                  <p className="text-xs text-gray-600 mt-1.5 leading-relaxed">
+                                    <span className="font-semibold text-gray-700">{getContentTypeDisplayName(typeName)}</span><span className="mx-1.5 text-gray-300">•</span>{item.description}
+                                  </p>
+                                )}
+                                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                  <span className="text-[10px] text-gray-500 font-medium">
+                                    {t("moduleDetails.supportedLanguages", { defaultValue: "Supported Languages" })}
+                                  </span>
+                                  {item.languages_supported && item.languages_supported.length > 0 ? (
+                                    <>
+                                      <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-semibold">
+                                        {item.languages_supported.length}
+                                      </span>
+                                      {item.languages_supported.map((langName: string, idx: number) => {
+                                         const langEntry = SUPPORTED_LANGUAGES.find(sl => sl.name === langName);
+                                         const countryCode = langEntry ? getLanguageCountryCode(langEntry.id) : null;
+                                         return (
+                                           <span key={idx} className="text-[10px] text-gray-600 flex items-center gap-1">
+                                              {countryCode && (
+                                                <ReactCountryFlag
+                                                  svg
+                                                  countryCode={countryCode}
+                                                  style={{ fontSize: "1em" }}
+                                                />
+                                              )}
+                                              {langName}
+                                           </span>
+                                         );
+                                      })}
+                                    </>
+                                  ) : lid != null ? (
+                                    <>
+                                      <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-semibold">
+                                        1
+                                      </span>
+                                      <span className="text-[10px] text-gray-600 flex items-center gap-1">
+                                        <ReactCountryFlag
+                                          svg
+                                          countryCode={getLanguageCountryCode(lid)}
+                                          style={{ fontSize: "1em" }}
+                                        />
                                         {getLanguageName(lid)}
                                       </span>
-                                    </div>
-                                  )}
-                                  <span className="text-[10px] text-gray-600">
-                                    1 {displayName.toLowerCase()}
-                                  </span>
+                                    </>
+                                  ) : null}
+                                  
                                   {item.user_completion_status === "completed" && (
-                                    <span className="text-[10px] text-green-600 bg-green-100 px-3 py-1 rounded-full">
+                                    <span className="text-[10px] text-green-600 bg-green-100 px-3 py-1 rounded-full ml-auto">
                                       {t("moduleDetails.completed")}
                                     </span>
                                   )}
@@ -819,22 +834,46 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                   💡
                                 </div>
                                 <div className="flex-1">
-                                  <p className="font-semibold text-base text-gray-900 leading-5">
-                                    {t("moduleDetails.quizzes")}
-                                  </p>
-                                  <p className="text-[10px] text-gray-500 mt-1">
-                                    {itemQuizzes.total_count} {t("moduleDetails.quizzesCount")}
-                                  </p>
+                                  <div className="flex items-center gap-2">
+                                    <p className="font-semibold text-base text-gray-900 leading-5">
+                                      {t("moduleDetails.quizzes")}
+                                    </p>
+                                    {isOrgUserView && itemQuizzes.status && itemQuizzes.status !== "not_started" && (
+                                      <span 
+                                        className={clsx(
+                                          "text-[10px] px-2 py-0.5 rounded-full font-medium",
+                                          itemQuizzes.status === "passed" ? "bg-green-100 text-green-700" :
+                                          itemQuizzes.status === "failed" ? "bg-red-100 text-red-700" :
+                                          "bg-orange-100 text-orange-700"
+                                        )}
+                                      >
+                                        {itemQuizzes.status === "passed" ? t("moduleDetails.passed", { defaultValue: "Passed" }) : 
+                                         itemQuizzes.status === "failed" ? t("moduleDetails.failed", { defaultValue: "Failed" }) : 
+                                         t("moduleDetails.inProgress", { defaultValue: "In Progress" })}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-[10px] text-gray-500 mt-1 flex items-center gap-2 flex-wrap">
+                                    <span>{itemQuizzes.total_count} {t("moduleDetails.quizzesCount")}</span>
+                                    {isOrgUserView && itemQuizzes.status !== undefined && (
+                                      <>
+                                        <span className="text-gray-300">•</span>
+                                        <span>{t("moduleDetails.score", { defaultValue: "Score" })}: {itemQuizzes.percentage}%</span>
+                                        <span className="text-gray-300">•</span>
+                                        <span>{t("moduleDetails.attempts", { defaultValue: "Attempts" })}: {itemQuizzes.retries_used} / {itemQuizzes.retry_limit}</span>
+                                      </>
+                                    )}
+                                  </div>
                                 </div>
                                 <Button
                                   as={Link}
                                   // TODO: Make sure we have a proper route for quizzes specific to a content item
                                   // Usually /quizzes?content_id=...
                                   className="bg-[#3FB6F7] hover:bg-[#33A7E6] text-white rounded-full text-[10px] font-semibold min-w-[82px] px-4 h-7"
-                                  href={`${basePath}/${moduleId}/quizzes?content_id=${item.content_id ?? item.id}`}
+                                  href={`${basePath}/${moduleId}/quizzes?content_id=${item.content_id ?? item.id}${languageFilter ? `&lang_id=${languageFilter}` : ""}`}
                                   size="sm"
                                 >
-                                  {t("moduleDetails.start")}
+                                  {isOrgUserView && itemQuizzes.status === "passed" ? t("moduleDetails.review", { defaultValue: "Review" }) : t("moduleDetails.start")}
                                 </Button>
                               </CardBody>
                             </Card>
@@ -872,10 +911,36 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                               <p className="text-[10px] text-gray-500 mt-1">
                                 {t("moduleDetails.created")} {createdStr}
                               </p>
-                              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                <span className="text-[10px] text-gray-600">
+                              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                <span className="text-[10px] text-gray-700 font-semibold mr-2 border-r border-gray-300 pr-2">
                                   {count} {displayName}
                                 </span>
+                                <span className="text-[10px] text-gray-500 font-medium">
+                                  {t("moduleDetails.supportedLanguages", { defaultValue: "Supported Languages" })}
+                                </span>
+                                {card.languagesSupported && card.languagesSupported.length > 0 && (
+                                  <>
+                                    <span className="text-[10px] text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-semibold">
+                                      {card.languagesSupported.length}
+                                    </span>
+                                    {card.languagesSupported.map((langName: string, idx: number) => {
+                                      const langEntry = SUPPORTED_LANGUAGES.find(sl => sl.name === langName);
+                                      const countryCode = langEntry ? getLanguageCountryCode(langEntry.id) : null;
+                                      return (
+                                        <span key={idx} className="text-[10px] text-gray-600 flex items-center gap-1">
+                                          {countryCode && (
+                                            <ReactCountryFlag
+                                              svg
+                                              countryCode={countryCode}
+                                              style={{ fontSize: "1em" }}
+                                            />
+                                          )}
+                                          {langName}
+                                        </span>
+                                      );
+                                    })}
+                                  </>
+                                )}
                               </div>
                             </div>
                             <Button
@@ -885,47 +950,6 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                               size="sm"
                             >
                               {t("moduleDetails.viewDetails")}
-                            </Button>
-                          </CardBody>
-                        </Card>
-                      );
-                    }
-
-                    // --- 3. GENERAL QUIZZES CARD ---
-                    if (card.kind === "quizzes") {
-                      const quizzesHref = `${basePath}/${moduleId}/quizzes`;
-
-                      return (
-                        <Card key="quizzes-row" className="rounded-2xl border border-gray-100 bg-white hover:border-blue-200 hover:shadow-sm transition-all">
-                          <CardBody className="p-4 flex flex-row items-center gap-3">
-                            <div
-                              className={clsx(
-                                "w-16 h-16 rounded-xl flex items-center justify-center shrink-0 overflow-hidden text-2xl font-bold",
-                                getIconBgClass("Quiz")
-                              )}
-                            >
-                              💡
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-base text-gray-900 leading-5">
-                                {t("moduleDetails.quizzes")}
-                              </p>
-                              <p className="text-[10px] text-gray-500 mt-1">
-                                {t("moduleDetails.created")} —
-                              </p>
-                              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                                <span className="text-[10px] text-gray-600">
-                                  {card.count} {t("moduleDetails.quizzesCount")}
-                                </span>
-                              </div>
-                            </div>
-                            <Button
-                              as={Link}
-                              className="bg-[#3FB6F7] hover:bg-[#33A7E6] text-white rounded-full text-[10px] font-semibold min-w-[82px] px-4 h-7"
-                              href={quizzesHref}
-                              size="sm"
-                            >
-                              {t("moduleDetails.start")}
                             </Button>
                           </CardBody>
                         </Card>

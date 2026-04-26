@@ -3,7 +3,7 @@
 import type { ReportCardModuleResult } from "@/types/reportCard";
 
 import { useMemo } from "react";
-import { Shield, Clock, TrendingUp, Download, Share2 } from "lucide-react";
+import { Shield, Clock, TrendingUp, Download, Share2, BadgeCheck, Medal } from "lucide-react";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -11,6 +11,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useMyReportCard, useUserReportCard } from "@/hooks/useReportCard";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 /* ─── Helpers ─── */
 function formatStudyTime(minutes: number): string {
@@ -32,30 +33,158 @@ function getRiskBadge(level: string | null): { text: string; bg: string } {
   if (!level) return { text: "Unknown", bg: "#6b7280" };
   const l = level.toLowerCase();
 
-  if (l.includes("very high") || l.includes("high")) return { text: "In Risk", bg: "#dc2626" };
-  if (l.includes("medium")) return { text: "At Risk", bg: "#f59e0b" };
+  if (l.includes("not evaluated")) return { text: "Not Evaluated", bg: "#6b7280" };
+  if (l.includes("very high")) return { text: "Very High", bg: "#b91c1c" };
+  if (l.includes("high")) return { text: "High", bg: "#dc2626" };
+  if (l.includes("medium")) return { text: "Medium", bg: "#f59e0b" };
+  if (l.includes("very low")) return { text: "Very Low", bg: "#15803d" };
+  if (l.includes("low")) return { text: "Low", bg: "#16a34a" };
 
-  return { text: "Low Risk", bg: "#16a34a" };
+  return { text: level, bg: "#6b7280" };
 }
+
+const AVATAR_IMAGE_BY_LEVEL: Record<number, string> = {
+  1: "Vulnerablenewbe_Level1_Robot.png",
+  2: "AlertApprentice_Level2_Robot.png",
+  3: "CautiousLearner_Level3_Robot.png",
+  4: "InformedDefender_Level4_Robot.png",
+  5: "VigilantGuardian_Level5_Robot.png",
+  6: "SkilledSentinel._Level6_Robot.png",
+  7: "ResilientProtector_Level7_Robot.png",
+  8: "AdvancedWatchman_Level8_Robot.png",
+  9: "ExpertEnforcer_Level9_Robot.png",
+  10: "MasterStrategist_Level10_Robot.png",
+  11: "EliteVanguard_Level11_Robot.png",
+  12: "LegendaryShieldbearer_Level12_Robot.png",
+  13: "SupremeCyberKnight_Level13_Robot.png",
+  14: "UltimateCyberSentinel_Level14_Robot.png",
+};
 
 /* ─── SVG Area Chart ─── */
 interface AreaChartProps {
   data: number[];
   labels: string[];
+  dates?: Date[];
 }
-function AreaChart({ data, labels }: AreaChartProps) {
+
+function buildCountTicks(maxValue: number): number[] {
+  const safeMax = Math.max(1, Math.ceil(maxValue));
+  const step = safeMax <= 6 ? 1 : Math.ceil(safeMax / 6);
+  const ticks: number[] = [];
+
+  for (let t = 0; t <= safeMax; t += step) {
+    ticks.push(t);
+  }
+  if (ticks[ticks.length - 1] !== safeMax) {
+    ticks.push(safeMax);
+  }
+
+  return ticks;
+}
+
+function parseModuleCompletionDate(dateStr: string | null | undefined): Date | null {
+  if (!dateStr) return null;
+
+  const trimmed = dateStr.trim();
+  const match = /^(\d{1,2})-([A-Za-z]{3})-(\d{4})$/.exec(trimmed);
+
+  if (match) {
+    const day = parseInt(match[1], 10);
+    const monthMap: Record<string, number> = {
+      jan: 0,
+      feb: 1,
+      mar: 2,
+      apr: 3,
+      may: 4,
+      jun: 5,
+      jul: 6,
+      aug: 7,
+      sep: 8,
+      oct: 9,
+      nov: 10,
+      dec: 11,
+    };
+    const month = monthMap[match[2].toLowerCase()];
+    const year = parseInt(match[3], 10);
+
+    if (month !== undefined) {
+      return new Date(year, month, day);
+    }
+  }
+
+  const fallback = new Date(trimmed);
+
+  return Number.isNaN(fallback.getTime()) ? null : fallback;
+}
+
+function formatChartDateLabel(date: Date): string {
+  const day = date.getDate();
+  const month = date.toLocaleDateString("en-GB", { month: "short" });
+
+  return `${day} ${month}`;
+}
+
+function AreaChart({ data, labels, dates }: AreaChartProps) {
   const color = "#38bdf8";
   const W = 300,
-    H = 130,
+    H = 140,
     pT = 16,
     pR = 12,
-    pB = 32,
+    pB = 40,
     pL = 32;
   const iW = W - pL - pR,
     iH = H - pT - pB,
-    maxY = 40;
+    maxY = Math.max(...data, 5);
+  const yTicks = buildCountTicks(maxY);
+
+  const dateIndices = useMemo(() => {
+    const indices: Record<number, number[]> = {};
+
+    (dates || []).forEach((d, idx) => {
+      const t = d.getTime();
+
+      if (!indices[t]) indices[t] = [];
+      indices[t].push(idx);
+    });
+
+    return indices;
+  }, [dates]);
+
+  const uniqueTimes = useMemo(() =>
+    Array.from(new Set((dates || []).map((d) => d.getTime()))).sort((a, b) => a - b),
+  [dates]);
+
+  const getX = (i: number): number => {
+    if (!dates || dates.length === 0) return pL + (i / Math.max(data.length - 1, 1)) * iW;
+    const t = dates[i].getTime();
+    const dateIdx = uniqueTimes.indexOf(t);
+    const baseX = pL + (dateIdx / Math.max(uniqueTimes.length - 1, 1)) * iW;
+
+    if (dateIdx === 0) return baseX;
+
+    const currentIndices = dateIndices[t];
+    const isLastForDate = i === currentIndices[currentIndices.length - 1];
+
+    if (isLastForDate) return baseX;
+
+    const prevT = uniqueTimes[dateIdx - 1];
+    const prevIndices = dateIndices[prevT];
+    const prevLastIdx = prevIndices[prevIndices.length - 1];
+    const prevX = pL + ((dateIdx - 1) / Math.max(uniqueTimes.length - 1, 1)) * iW;
+
+    const yStart = data[prevLastIdx];
+    const yEnd = data[currentIndices[currentIndices.length - 1]];
+    const yCurrent = data[i];
+
+    if (yEnd === yStart) return baseX;
+
+    const ratio = (yCurrent - yStart) / (yEnd - yStart);
+
+    return prevX + ratio * (baseX - prevX);
+  };
+
   const pts = data.map((v, i) => ({
-    x: pL + (i / Math.max(data.length - 1, 1)) * iW,
+    x: getX(i),
     y: pT + iH - (Math.min(v, maxY) / maxY) * iH,
   }));
   const line = pts
@@ -68,14 +197,14 @@ function AreaChart({ data, labels }: AreaChartProps) {
   ].join(" ");
 
   return (
-    <svg className="w-full h-full" viewBox={`0 0 ${W} ${H}`}>
+    <svg className="w-full h-full overflow-visible" viewBox={`0 0 ${W} ${H}`}>
       <defs>
         <linearGradient id="rcGrad" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0%" stopColor={color} stopOpacity="0.25" />
           <stop offset="100%" stopColor={color} stopOpacity="0.02" />
         </linearGradient>
       </defs>
-      {[0, 10, 20, 30, 40].map((t) => {
+      {yTicks.map((t) => {
         const cy = pT + iH - (t / maxY) * iH;
 
         return (
@@ -98,25 +227,36 @@ function AreaChart({ data, labels }: AreaChartProps) {
           fill="#94a3b8"
           fontSize="7"
           textAnchor="middle"
-          x={pL + (i / Math.max(labels.length - 1, 1)) * iW}
+          x={getX(i)}
           y={H - 5}
         >
           {l}
         </text>
       ))}
+      <text fill="#6b7280" fontSize="8" textAnchor="middle" x={pL + iW / 2} y={H + 3}>
+        Module Completion Dates
+      </text>
+      <text
+        fill="#6b7280"
+        fontSize="8"
+        textAnchor="middle"
+        transform={`translate(8 ${pT + iH / 2}) rotate(-90)`}
+      >
+        Module Counts
+      </text>
     </svg>
   );
 }
 
 /* ─── Timeline Item ─── */
-function TimelineItem({ module: m, isLast }: { module: ReportCardModuleResult; isLast: boolean }) {
+function TimelineItem({ module: m, isLast, t }: { module: ReportCardModuleResult; isLast: boolean; t: any }) {
   const title = m.module_name || "Module";
   const badge =
     m.quiz_percentage !== undefined
       ? m.quiz_percentage >= 90
         ? null
         : m.quiz_percentage >= 70
-          ? "Good Score"
+          ? t("reportCard.goodScore")
           : null
       : null;
   const rarity =
@@ -125,10 +265,12 @@ function TimelineItem({ module: m, isLast }: { module: ReportCardModuleResult; i
       : m.achievements_unlocked_in_module >= 1
         ? "Common"
         : null;
+  const rarityText = rarity ? t(rarity === "Rare" ? "reportCard.rare" : "reportCard.common") : null;
+  const rawScoredStr = t("reportCard.scoredOnQuiz") || "Scored {score}% on the module quiz assessment";
   const desc =
     m.quiz_percentage !== undefined
-      ? `Scored ${m.quiz_percentage.toFixed(0)}% on the module quiz assessment`
-      : "Completed and achieved full module progress";
+      ? rawScoredStr.replace("{score}", m.quiz_percentage.toFixed(0))
+      : t("reportCard.completedFullProgress");
 
   return (
     <div className="relative">
@@ -144,7 +286,7 @@ function TimelineItem({ module: m, isLast }: { module: ReportCardModuleResult; i
               <span
                 className={`px-2 py-0.5 text-[10px] rounded-full ${rarity === "Rare" ? "bg-orange-100 text-orange-600" : "bg-sky-100 text-sky-600"}`}
               >
-                {rarity}
+                {rarityText}
               </span>
             )}
           </div>
@@ -158,15 +300,29 @@ function TimelineItem({ module: m, isLast }: { module: ReportCardModuleResult; i
           </span>
         )}
         <div className="flex items-center gap-3 text-[10px] text-gray-500 mb-1 flex-wrap">
-          <span className="text-orange-500">⭐ +{m.achieved_xp_tokens} XP</span>          <span className="text-purple-500">🏆 {m.achieved_compliance_score} pts</span>          {m.quiz_percentage !== undefined && (
-            <span>📘 {m.quiz_percentage.toFixed(0)}% Quiz Score</span>
+          <span className="text-orange-500">⭐ +{m.achieved_xp_tokens} XP</span>
+          <span className="text-purple-500">🏆 {m.achieved_compliance_score} pts</span>
+          {m.quiz_percentage !== undefined && (
+            <span>📘 {m.quiz_percentage.toFixed(0)}% {t("reportCard.quizScore")}</span>
           )}
-          {m.duration_minutes && <span>⏱ {m.duration_minutes} minutes</span>}
+          <span className="inline-flex items-center gap-1 text-emerald-600">
+            <BadgeCheck className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-gray-600">
+              {t("reportCard.certificateIssue")}: {m.certificate_issued || t("reportCard.notApplicable")}
+            </span>
+          </span>
+          <span className="inline-flex items-center gap-1 text-fuchsia-600">
+            <Medal className="w-3.5 h-3.5 text-fuchsia-500" />
+            <span className="text-gray-600">
+              {t("reportCard.achievementUnlocked")}: {m.achievements_unlocked_in_module ?? 0}
+            </span>
+          </span>
+          {m.duration_minutes && <span>⏱ {m.duration_minutes} {t("reportCard.minutes")}</span>}
         </div>
         <p className="text-[11px] text-gray-500">{desc}</p>
         <div className="mt-1.5">
           <span className="px-2.5 py-0.5 text-[10px] rounded-full bg-emerald-100 text-emerald-600">
-            Completed
+            {t("reportCard.completed")}
           </span>
         </div>
       </div>
@@ -197,12 +353,12 @@ function LoadingSkeleton() {
   );
 }
 
-function NoCompletedModules() {
+function NoCompletedModules({ t }: { t: any }) {
   return (
     <div className="flex flex-col items-center justify-center py-10 gap-3">
-      <p className="text-sm font-medium text-gray-700">No completed modules yet</p>
+      <p className="text-sm font-medium text-gray-700">{t("reportCard.noCompletedModules")}</p>
       <p className="text-[11px] text-gray-400 text-center max-w-xs leading-relaxed">
-        Complete a module in one of your campaigns to see your journey here.
+        {t("reportCard.noCompletedModulesDesc")}
       </p>
     </div>
   );
@@ -221,31 +377,47 @@ const SEG_COLORS = [
 /* ─── PDF Print: build standalone HTML document ─── */
 function buildPrintHTML(args: {
   userName: string;
-  totalSurveySent: number;
-  surveysCompleted: number;
+  userEmail: string;
+  reportOwner: string;
+  leaderboardRank: number;
+  modulesCompleted: number;
+  certificates: number;
   quizAccuracy: number;
   xpLevel: number;
   xpTokens: number;
   studyTime: number;
+  userAvatarUrl: string;
   riskBadge: { text: string; bg: string };
   campaigns: Array<{ campaign_name: string; completed_modules: ReportCardModuleResult[] }>;
   chartData: number[];
   chartLabels: string[];
+  chartDates: Date[];
   totalComplianceScore: number;
+  t: any;
+  dir?: "ltr" | "rtl";
+  locale?: string;
 }): string {
   const {
     userName,
-    totalSurveySent,
-    surveysCompleted,
+    userEmail,
+    reportOwner,
+    leaderboardRank,
+    modulesCompleted,
+    certificates,
     quizAccuracy,
     xpLevel,
     xpTokens,
     studyTime,
+    userAvatarUrl,
     riskBadge,
     campaigns,
     chartData,
     chartLabels,
+    chartDates,
     totalComplianceScore,
+    t,
+    dir = "ltr",
+    locale = "en",
   } = args;
   const today = formatToday();
   const studyStr = formatStudyTime(studyTime);
@@ -266,7 +438,7 @@ function buildPrintHTML(args: {
           ? m.quiz_percentage >= 90
             ? null
             : m.quiz_percentage >= 70
-              ? "Good Score"
+              ? t("reportCard.goodScore")
               : null
           : null;
       const rarity =
@@ -275,10 +447,12 @@ function buildPrintHTML(args: {
           : m.achievements_unlocked_in_module >= 1
             ? "Common"
             : null;
+      const rarityText = rarity ? t(rarity === "Rare" ? "reportCard.rare" : "reportCard.common") : null;
+      const rawScoredStr = t("reportCard.scoredOnQuiz") || "Scored {score}% on the module quiz assessment";
       const desc =
         m.quiz_percentage !== undefined
-          ? `Scored ${m.quiz_percentage.toFixed(0)}% on the module quiz assessment`
-          : "Completed and achieved full module progress";
+          ? rawScoredStr.replace("{score}", m.quiz_percentage.toFixed(0))
+          : t("reportCard.completedFullProgress");
       const rarityBg = rarity === "Rare" ? "#ffedd5" : "#e0f2fe";
       const rarityFg = rarity === "Rare" ? "#ea580c" : "#0284c7";
 
@@ -290,7 +464,7 @@ function buildPrintHTML(args: {
           <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
               <span style="font-weight:500;font-size:12px;">${title}</span>
-              ${rarity ? `<span style="padding:2px 8px;font-size:10px;border-radius:9999px;background:${rarityBg};color:${rarityFg};">${rarity}</span>` : ""}
+              ${rarity ? `<span style="padding:2px 8px;font-size:10px;border-radius:9999px;background:${rarityBg};color:${rarityFg};">${rarityText}</span>` : ""}
             </div>
             ${m.module_completion_date ? `<span style="font-size:10px;color:#9ca3af;">📅 ${m.module_completion_date}</span>` : ""}
           </div>
@@ -298,12 +472,12 @@ function buildPrintHTML(args: {
           <div style="display:flex;align-items:center;gap:12px;font-size:10px;color:#6b7280;margin-bottom:4px;flex-wrap:wrap;">
             <span style="color:#f97316;">⭐ +${m.achieved_xp_tokens} XP</span>
             <span style="color:#a855f7;">🏆 ${m.achieved_compliance_score} pts</span>
-            ${m.quiz_percentage !== undefined ? `<span>📘 ${m.quiz_percentage.toFixed(0)}% Quiz Score</span>` : ""}
-            ${m.duration_minutes ? `<span>⏱ ${m.duration_minutes} minutes</span>` : ""}
+            ${m.quiz_percentage !== undefined ? `<span>📘 ${m.quiz_percentage.toFixed(0)}% ${t("reportCard.quizScore")}</span>` : ""}
+            ${m.duration_minutes ? `<span>⏱ ${m.duration_minutes} ${t("reportCard.minutes")}</span>` : ""}
           </div>
           <p style="font-size:11px;color:#6b7280;">${desc}</p>
           <div style="margin-top:6px;">
-            <span style="padding:2px 10px;font-size:10px;border-radius:9999px;background:#d1fae5;color:#059669;">Completed</span>
+            <span style="padding:2px 10px;font-size:10px;border-radius:9999px;background:#d1fae5;color:#059669;">${t("reportCard.completed")}</span>
           </div>
         </div>
       </div>`;
@@ -312,16 +486,54 @@ function buildPrintHTML(args: {
 
   /* SVG area chart */
   const W = 280,
-    H = 140,
+    H = 150,
     pT = 16,
     pR = 12,
-    pB = 36,
+    pB = 44,
     pL = 32;
   const iW = W - pL - pR,
     iH = H - pT - pB,
-    maxY = Math.max(...chartData, 40);
+    maxY = Math.max(...chartData, 5);
+  const dateIndices: Record<number, number[]> = {};
+
+  chartDates.forEach((d, idx) => {
+    const t = d.getTime();
+
+    if (!dateIndices[t]) dateIndices[t] = [];
+    dateIndices[t].push(idx);
+  });
+  const uniqueTimes = Array.from(new Set(chartDates.map((d) => d.getTime()))).sort((a, b) => a - b);
+
+  const getPdfX = (i: number): number => {
+    if (chartDates.length === 0) return pL + (i / Math.max(chartData.length - 1, 1)) * iW;
+    const t = chartDates[i].getTime();
+    const dateIdx = uniqueTimes.indexOf(t);
+    const baseX = pL + (dateIdx / Math.max(uniqueTimes.length - 1, 1)) * iW;
+
+    if (dateIdx === 0) return baseX;
+
+    const currentIndices = dateIndices[t];
+    const isLastForDate = i === currentIndices[currentIndices.length - 1];
+
+    if (isLastForDate) return baseX;
+
+    const prevT = uniqueTimes[dateIdx - 1];
+    const prevIndices = dateIndices[prevT];
+    const prevLastIdx = prevIndices[prevIndices.length - 1];
+    const prevX = pL + ((dateIdx - 1) / Math.max(uniqueTimes.length - 1, 1)) * iW;
+
+    const yStart = chartData[prevLastIdx];
+    const yEnd = chartData[currentIndices[currentIndices.length - 1]];
+    const yCurrent = chartData[i];
+
+    if (yEnd === yStart) return baseX;
+
+    const ratio = (yCurrent - yStart) / (yEnd - yStart);
+
+    return prevX + ratio * (baseX - prevX);
+  };
   const pts = chartData.map((v, i) => ({
-    x: pL + (i / Math.max(chartData.length - 1, 1)) * iW,
+    x: getPdfX(i),
     y: pT + iH - (Math.min(v, maxY) / maxY) * iH,
   }));
   const linePath = pts
@@ -332,8 +544,8 @@ function buildPrintHTML(args: {
     ...pts.map((p) => `L ${p.x.toFixed(1)},${p.y.toFixed(1)}`),
     `L ${(pts[pts.length - 1]?.x ?? pL + iW).toFixed(1)},${(pT + iH).toFixed(1)} Z`,
   ].join(" ");
-  const yTicks = [0, 10, 20, 30, 40].filter((t) => t <= maxY || t === 0);
-  const svgChart = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:140px;">
+  const yTicks = buildCountTicks(maxY);
+  const svgChart = `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:150px;overflow:visible;">
     <defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.25"/>
       <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.02"/>
@@ -350,18 +562,20 @@ function buildPrintHTML(args: {
     ${pts.map((p) => `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.5" fill="#38bdf8" stroke="white" stroke-width="1.5"/>`).join("")}
     ${chartLabels
       .map((l, i) => {
-        const x = pL + (i / Math.max(chartLabels.length - 1, 1)) * iW;
+        const x = getPdfX(i);
 
         return `<text x="${x.toFixed(1)}" y="${H - 4}" text-anchor="middle" font-size="7" fill="#94a3b8">${l}</text>`;
       })
       .join("")}
+    <text x="${(pL + iW / 2).toFixed(1)}" y="${H + 3}" text-anchor="middle" font-size="8" fill="#6b7280">Module Completion Dates</text>
+    <text x="8" y="${(pT + iH / 2).toFixed(1)}" text-anchor="middle" font-size="8" fill="#6b7280" transform="rotate(-90 8 ${(pT + iH / 2).toFixed(1)})">Module Counts</text>
   </svg>`;
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="${locale}" dir="${dir}">
 <head>
   <meta charset="UTF-8"/>
-  <title>Report Card – ${userName}</title>
+  <title>${t("reportCard.pageTitle")} – ${userName}</title>
   <style>
     *{box-sizing:border-box;}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#F1F5F8;margin:0;padding:20px;color:#111827;}
@@ -397,33 +611,33 @@ function buildPrintHTML(args: {
   </style>
 </head>
 <body>
-  <h3 class="page-title">Report Card</h3>
+  <h3 class="page-title">${t("reportCard.pageTitle")}</h3>
 
   <!-- Top row: 3 stat cards + summary card -->
   <div class="row">
     <div class="stat-cards">
       <div class="stat-card">
-        <p class="stat-label">Total Survey Sent</p>
+        <p class="stat-label">${t("reportCard.leaderboardRank")}</p>
         <div class="stat-row">
-          <span class="stat-value">${totalSurveySent}</span>
+          <span class="stat-value">${leaderboardRank}</span>
           <div class="icon-circle" style="background:#fffbeb;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#facc15" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
         </div>
       </div>
       <div class="stat-card">
-        <p class="stat-label">Surveys Completed</p>
+        <p class="stat-label">${t("reportCard.modulesCompleted")}</p>
         <div class="stat-row">
-          <span class="stat-value">${surveysCompleted}</span>
+          <span class="stat-value">${modulesCompleted}</span>
           <div class="icon-circle" style="background:#f0fdfa;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#2dd4bf" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
         </div>
       </div>
       <div class="stat-card">
-        <p class="stat-label">Response Rate</p>
+        <p class="stat-label">${t("reportCard.certificates")}</p>
         <div class="stat-row">
-          <span class="stat-value">${quizAccuracy.toFixed(0)}%</span>
+          <span class="stat-value">${certificates}</span>
           <div class="icon-circle" style="background:#fef2f2;">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#f87171" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
           </div>
@@ -438,19 +652,25 @@ function buildPrintHTML(args: {
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
           </div>
           <div>
-            <h2 style="font-size:13px;font-weight:600;color:#111827;line-height:1.3;">Security Awareness Report</h2>
-            <p style="font-size:11px;color:#6b7280;margin-top:2px;">${userName}'s comprehensive progress report</p>
+            <h2 style="font-size:13px;font-weight:600;color:#111827;line-height:1.3;">${t("reportCard.securityAwarenessReport")}</h2>
+            <p style="font-size:11px;color:#111827;margin-top:2px;">${userName}</p>
+            <p style="font-size:11px;color:#6b7280;margin-top:2px;">${userEmail || reportOwner}</p>
             <div style="display:flex;align-items:center;gap:4px;font-size:11px;color:#6b7280;margin-top:6px;">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              <span>Generated on: ${today}</span>
+              <span>${t("reportCard.generatedOn", { date: today }).replace("{date}", today)}</span>
             </div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-top:12px;">
-          <div style="width:20px;height:20px;border-radius:4px;background:#14b8a6;display:flex;align-items:center;justify-content:center;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8M3 17l6-6"/></svg>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:20px;height:20px;border-radius:4px;background:#14b8a6;display:flex;align-items:center;justify-content:center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8M3 17l6-6"/></svg>
+            </div>
+            <p style="font-size:12px;font-weight:500;color:#111827;">${t("reportCard.level")} <strong>${xpLevel}</strong></p>
           </div>
-          <p style="font-size:12px;font-weight:500;color:#111827;">Level <strong>${xpLevel}</strong></p>
+          <div style="width:25px;height:25px;border-radius:9999px;overflow:hidden;border:1px solid #e5e7eb;flex-shrink:0;">
+            <img src="${userAvatarUrl}" alt="Level ${xpLevel}" style="width:100%;height:100%;object-fit:cover;" />
+          </div>
         </div>
       </div>
     </div>
@@ -460,7 +680,7 @@ function buildPrintHTML(args: {
   <div class="posture-row">
     <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#6b7280" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-      <span style="font-size:12px;white-space:nowrap;">Security Posture</span>
+      <span style="font-size:12px;white-space:nowrap;">${t("reportCard.securityPosture")}</span>
     </div>
     <div class="seg-bar">
       <div class="seg" style="background:#9EC232;"></div>
@@ -479,12 +699,12 @@ function buildPrintHTML(args: {
     <div class="timeline-card">
       <div class="tl-header">
         <div style="display:flex;align-items:center;gap:8px;">
-          <h2 style="font-size:14px;font-weight:600;">Learning Journey Timeline</h2>
-          <span class="badge-pill">${campaigns.reduce((sum, c) => sum + c.completed_modules.length, 0)} Task</span>
+          <h2 style="font-size:14px;font-weight:600;">${t("reportCard.learningJourneyTimeline")}</h2>
+          <span class="badge-pill">${campaigns.reduce((sum, c) => sum + c.completed_modules.length, 0)} ${t("reportCard.task")}</span>
         </div>
       </div>
       <div class="timeline-inner">
-        ${campaigns.length === 0 ? `<p style="font-size:13px;color:#6b7280;text-align:center;padding:32px 0;">No completed modules yet</p>` : campaigns.map(campaign => `
+        ${campaigns.length === 0 ? `<p style="font-size:13px;color:#6b7280;text-align:center;padding:32px 0;">${t("reportCard.noCompletedModules")}</p>` : campaigns.map(campaign => `
           <div style="margin-bottom:24px;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
               <span style="font-size:11px;color:#166534;background:#d1fae5;padding:2px 10px;border-radius:9999px;border:1px solid #a7f3d0;">${campaign.campaign_name}</span>
@@ -492,13 +712,13 @@ function buildPrintHTML(args: {
             </div>
             <div style="position:relative;padding-left:32px;">
               ${campaign.completed_modules.map((m, idx) => {
-                const t = m.module_name || "Module";
-                const b = m.quiz_percentage !== undefined ? m.quiz_percentage >= 90 ? null : m.quiz_percentage >= 70 ? "Good Score" : null : null;
-                const r = m.achievements_unlocked_in_module >= 3 ? "Rare" : m.achievements_unlocked_in_module >= 1 ? "Common" : null;
-                const rBg = r === "Rare" ? "#ffedd5" : "#e0f2fe";
-                const rFg = r === "Rare" ? "#ea580c" : "#0284c7";
-                const d = m.quiz_percentage !== undefined ? `Scored ${m.quiz_percentage.toFixed(0)}% on the module quiz assessment` : "Completed and achieved full module progress";
-                return `
+    const t = m.module_name || "Module";
+    const b = m.quiz_percentage !== undefined ? m.quiz_percentage >= 90 ? null : m.quiz_percentage >= 70 ? "Good Score" : null : null;
+    const r = m.achievements_unlocked_in_module >= 3 ? "Rare" : m.achievements_unlocked_in_module >= 1 ? "Common" : null;
+    const rBg = r === "Rare" ? "#ffedd5" : "#e0f2fe";
+    const rFg = r === "Rare" ? "#ea580c" : "#0284c7";
+    const d = m.quiz_percentage !== undefined ? `Scored ${m.quiz_percentage.toFixed(0)}% on the module quiz assessment` : "Completed and achieved full module progress";
+    return `
               <div style="position:relative;margin-bottom:16px;">
                 ${idx < campaign.completed_modules.length - 1 ? `<span style="position:absolute;left:-19px;top:24px;height:100%;width:1.5px;background:#34d399;display:block;"></span>` : ""}
                 <span style="position:absolute;left:-28px;top:4px;width:20px;height:20px;border-radius:50%;background:#10b981;color:white;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">✓</span>
@@ -515,6 +735,20 @@ function buildPrintHTML(args: {
                     <span style="color:#f97316;">⭐ +${m.achieved_xp_tokens} XP</span>
                     <span style="color:#a855f7;">🏆 ${m.achieved_compliance_score} pts</span>
                     ${m.quiz_percentage !== undefined ? `<span>📘 ${m.quiz_percentage.toFixed(0)}% Quiz Score</span>` : ""}
+                    <span style="display:inline-flex;align-items:center;gap:4px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#10b981" stroke-width="2">
+                        <circle cx="12" cy="12" r="9" fill="#d1fae5" stroke="none"/>
+                        <path d="M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span>Certificate Issue: ${m.certificate_issued || "Not applicable"}</span>
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:4px;">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#d946ef" stroke-width="2">
+                        <circle cx="12" cy="12" r="9" fill="#f5d0fe" stroke="none"/>
+                        <path d="M12 8l1.6 3.2 3.5.5-2.5 2.4.6 3.4L12 16l-3.2 1.5.6-3.4-2.5-2.4 3.5-.5L12 8z" stroke-linejoin="round"/>
+                      </svg>
+                      <span>Achievement Unlocked: ${m.achievements_unlocked_in_module ?? 0}</span>
+                    </span>
                     ${m.duration_minutes ? `<span>⏱ ${m.duration_minutes} minutes</span>` : ""}
                   </div>
                   <p style="font-size:11px;color:#6b7280;">${d}</p>
@@ -523,7 +757,7 @@ function buildPrintHTML(args: {
                   </div>
                 </div>
               </div>`;
-              }).join("")}
+  }).join("")}
             </div>
           </div>
         `).join("")}
@@ -538,8 +772,8 @@ function buildPrintHTML(args: {
               <svg width="16" height="16" fill="none" stroke="#f97316" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
             <div>
-              <p style="font-size:12px;font-weight:500;color:#111827;">XP Tokens Earned</p>
-              <p style="font-size:11px;color:#6b7280;">Total across all campaigns</p>
+              <p style="font-size:12px;font-weight:500;color:#111827;">${t("reportCard.xpTokensEarned")}</p>
+              <p style="font-size:11px;color:#6b7280;">${t("reportCard.totalAcrossAllCampaigns")}</p>
             </div>
           </div>
           <span class="stat-val" style="color:#f97316;">${xpTokens.toFixed(2)}</span>
@@ -550,8 +784,8 @@ function buildPrintHTML(args: {
               <svg width="16" height="16" fill="none" stroke="#a855f7" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m7.228-4.228A10 10 0 1121.213 21.213a10 10 0 01-12.485-14.228z" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
             <div>
-              <p style="font-size:12px;font-weight:500;color:#111827;">Compliance Score</p>
-              <p style="font-size:11px;color:#6b7280;">Total points earned</p>
+              <p style="font-size:12px;font-weight:500;color:#111827;">${t("reportCard.complianceScore")}</p>
+              <p style="font-size:11px;color:#6b7280;">${t("reportCard.totalPointsEarned")}</p>
             </div>
           </div>
           <span class="stat-val" style="color:#a855f7;">${totalComplianceScore}</span>
@@ -562,8 +796,8 @@ function buildPrintHTML(args: {
               <svg width="16" height="16" fill="none" stroke="#2dd4bf" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
             </div>
             <div>
-              <p style="font-size:12px;font-weight:500;color:#111827;">Avg Quiz Score</p>
-              <p style="font-size:11px;color:#6b7280;">Performance across all quizzes</p>
+              <p style="font-size:12px;font-weight:500;color:#111827;">${t("reportCard.avgQuizScore")}</p>
+              <p style="font-size:11px;color:#6b7280;">${t("reportCard.performanceAcrossQuizzes")}</p>
             </div>
           </div>
           <span class="stat-val" style="color:#2dd4bf;">${quizAccuracy.toFixed(0)}%</span>
@@ -572,9 +806,9 @@ function buildPrintHTML(args: {
       <!-- Module Chart -->
       <div class="chart-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-          <h3 style="font-size:14px;font-weight:600;color:#1f2937;">XP Progress Chart</h3>
+          <h3 style="font-size:14px;font-weight:600;color:#1f2937;">${t("reportCard.moduleChart")}</h3>
         </div>
-        ${chartData.length > 0 ? svgChart : `<p style="font-size:10px;color:#9ca3af;text-align:center;padding:24px 0;">Chart will appear after completing your first module</p>`}
+        ${chartData.length > 0 ? svgChart : `<p style="font-size:10px;color:#9ca3af;text-align:center;padding:24px 0;">${t("reportCard.moduleChartDesc")}</p>`}
       </div>
     </div>
   </div>
@@ -584,10 +818,10 @@ function buildPrintHTML(args: {
 
 /* ─── Main Page ─── */
 export function ReportCardPage({ userId }: { userId?: number } = {}) {
-  useTranslations("dashboard");
-  useI18n();
+  const t = useTranslations("dashboard");
+  const { dir, locale } = useI18n();
   const { user } = useAuthStore();
-  
+
   // Use useUserReportCard if userId is provided, otherwise use useMyReportCard
   const { data: response, isLoading, isError } = userId
     ? useUserReportCard(userId)
@@ -615,8 +849,10 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
     () => allModules.reduce((s, { module: m }) => s + m.total_attempted_quizzes, 0),
     [allModules]
   );
-  const surveysCompleted =
+  const leaderboardRank = (meta?.leaderboard_rank as number | null | undefined) ?? totalSurveySent;
+  const modulesCompleted =
     (meta?.total_modules_completed as number | undefined) ?? allModules.length;
+  const totalCertificates = (meta?.total_completed_certificates as number | undefined) ?? 0;
   const quizAccuracy = (meta?.quizzes_accuracy_percent as number | undefined) ?? 0;
   const xpLevel = (meta?.user_avatar_level as number | undefined) ?? 0;
   const xpTokens = (meta?.xp_total_tokens as number | undefined) ?? 0;
@@ -629,48 +865,86 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
     [allModules]
   );
 
-  const chartData = allModules.slice(-6).map(({ module: m }) => m.achieved_xp_tokens);
-  const chartLabels = allModules.slice(-6).map(({ module: m }) => {
-    if (!m.module_completion_date) return "—";
-    const parts = m.module_completion_date.split("-");
-    const months = [
-      "",
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
+  const completionChart = useMemo(() => {
+    const allDatedModules = allModules
+      .map(({ module }) => ({
+        date: parseModuleCompletionDate(module.module_completion_date),
+        rawDate: module.module_completion_date,
+      }))
+      .filter((item): item is { date: Date; rawDate: string } => !!item.date)
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
 
-    return parts.length >= 2
-      ? `${parts[0]} ${months[parseInt(parts[1], 10)] ?? parts[1]}`
-      : m.module_completion_date.substring(0, 6);
-  });
+    let runningCount = 0;
+    const data: number[] = [];
+    const labels: string[] = [];
+    const dates: Date[] = [];
+
+    // Prepend a starting zero point (one day before first completion) so the line draws from 0
+    if (allDatedModules.length > 0) {
+      const firstDate = new Date(allDatedModules[0].date);
+      firstDate.setDate(firstDate.getDate() - 1);
+      data.push(0);
+      labels.push("");
+      dates.push(new Date(firstDate));
+    }
+
+    allDatedModules.forEach((m, idx) => {
+      runningCount += 1;
+      data.push(runningCount);
+
+      // Only show the date label for the last module of each day to avoid overlap
+      const nextM = allDatedModules[idx + 1];
+      const isLastForDay = !nextM || nextM.date.getTime() !== m.date.getTime();
+      labels.push(isLastForDay ? formatChartDateLabel(m.date) : "");
+      dates.push(new Date(m.date));
+    });
+
+    return { data, labels, dates };
+  }, [allModules]);
+
+  const chartData = completionChart.data;
+  const chartLabels = completionChart.labels;
+  const chartDates = completionChart.dates;
 
   const anyUser = user as any;
-  const userName: string = anyUser?.name ?? anyUser?.username ?? user?.email ?? "User";
+  const responseUser = (result?.user ?? {}) as Record<string, unknown>;
+  const responseFirstName = String(responseUser?.first_name ?? "").trim();
+  const responseLastName = String(responseUser?.last_name ?? "").trim();
+  const responseFullName = `${responseFirstName} ${responseLastName}`.trim();
+  const responseEmail = String(responseUser?.email ?? "").trim();
+  const responseDisplayName = String(responseUser?.name ?? responseUser?.username ?? "").trim();
+  const fallbackName = String(anyUser?.name ?? anyUser?.username ?? "").trim();
+  const fallbackEmail = String(anyUser?.email ?? user?.email ?? "").trim();
+
+  const userName: string = responseFullName || responseDisplayName || fallbackName || responseEmail || fallbackEmail || "User";
+  const userEmail: string = responseEmail || fallbackEmail || "";
+  const reportOwner: string = userEmail || userName;
+  const userAvatarUrl = getContentAssetUrl(
+    `/images/avatars/${AVATAR_IMAGE_BY_LEVEL[xpLevel] ?? AVATAR_IMAGE_BY_LEVEL[1]}`
+  );
 
   function handleDownload() {
     const html = buildPrintHTML({
       userName,
-      totalSurveySent,
-      surveysCompleted,
+      userEmail,
+      reportOwner,
+      leaderboardRank,
+      modulesCompleted,
+      certificates: totalCertificates,
       quizAccuracy,
       xpLevel,
       xpTokens,
       studyTime,
+      userAvatarUrl,
       riskBadge,
       campaigns,
       chartData,
       chartLabels,
+      chartDates,
       totalComplianceScore,
+      t,
+      dir,
+      locale,
     });
     const win = window.open("", "_blank", "width=1000,height=800");
 
@@ -703,7 +977,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
       <ProtectedRoute>
         <DashboardLayout>
           <div className="p-3 flex items-center justify-center h-64">
-            <p className="text-sm text-gray-600">Failed to load report card. Please try again.</p>
+            <p className="text-sm text-gray-600">{t("reportCard.loading")}</p>
           </div>
         </DashboardLayout>
       </ProtectedRoute>
@@ -716,7 +990,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
         {/* ── Page Title ── */}
         <div className="flex flex-col p-3 pb-0 gap-1">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-medium">Report Card</h3>
+            <h3 className="text-xl font-medium">{t("reportCard.pageTitle")}</h3>
           </div>
         </div>
 
@@ -726,27 +1000,27 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
             <div className="col-span-12 md:col-span-8 md:row-span-2">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                 <div className="bg-white rounded-2xl p-5">
-                  <p className="text-gray-600 text-sm">Total Survey Sent</p>
+                  <p className="text-gray-600 text-sm">{t("reportCard.leaderboardRank")}</p>
                   <div className="flex justify-between items-center mt-2">
-                    <h3 className="text-3xl font-semibold">{totalSurveySent}</h3>
+                    <h3 className="text-3xl font-semibold">{leaderboardRank}</h3>
                     <div className="w-11 h-11 rounded-full bg-amber-50 flex items-center justify-center">
                       <Clock className="w-5 h-5 text-amber-400" />
                     </div>
                   </div>
                 </div>
                 <div className="bg-white rounded-2xl p-5">
-                  <p className="text-gray-600 text-sm">Surveys Completed</p>
+                  <p className="text-gray-600 text-sm">{t("reportCard.modulesCompleted")}</p>
                   <div className="flex justify-between items-center mt-2">
-                    <h3 className="text-3xl font-semibold">{surveysCompleted}</h3>
+                    <h3 className="text-3xl font-semibold">{modulesCompleted}</h3>
                     <div className="w-11 h-11 rounded-full bg-teal-50 flex items-center justify-center">
                       <Clock className="w-5 h-5 text-teal-400" />
                     </div>
                   </div>
                 </div>
                 <div className="bg-white rounded-2xl p-5">
-                  <p className="text-gray-600 text-sm">Response Rate</p>
+                  <p className="text-gray-600 text-sm">{t("reportCard.certificates")}</p>
                   <div className="flex justify-between items-center mt-2">
-                    <h3 className="text-3xl font-semibold">{quizAccuracy.toFixed(0)}%</h3>
+                    <h3 className="text-3xl font-semibold">{totalCertificates}</h3>
                     <div className="w-11 h-11 rounded-full bg-red-50 flex items-center justify-center">
                       <svg
                         className="w-5 h-5 text-red-400"
@@ -783,10 +1057,13 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-gray-900 leading-tight">
-                        Security Awareness Report
+                        {t("reportCard.securityAwarenessReport")}
                       </h2>
+                      <p className="text-[11px] text-gray-900 mt-0.5">
+                        {userName}
+                      </p>
                       <p className="text-[11px] text-gray-500 mt-0.5">
-                        {userName}&apos;s comprehensive progress report
+                        {userEmail || reportOwner}
                       </p>
                       <div className="flex items-center gap-1 text-[11px] text-gray-500 mt-1.5">
                         <svg
@@ -803,17 +1080,22 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                             strokeLinejoin="round"
                           />
                         </svg>
-                        <span>Generated on: {formatToday()}</span>
+                        <span>{t("reportCard.generatedOn", { date: formatToday() }).replace("{date}", formatToday())}</span>
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-3">
-                    <div className="w-5 h-5 rounded-md bg-teal-500 flex items-center justify-center">
-                      <TrendingUp className="w-3 h-3 text-white" />
+                  <div className="flex items-center justify-between gap-2 mt-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md bg-teal-500 flex items-center justify-center">
+                        <TrendingUp className="w-3 h-3 text-white" />
+                      </div>
+                      <p className="text-xs font-medium text-gray-900">
+                        {t("reportCard.level")} <span className="font-semibold">{xpLevel}</span>
+                      </p>
                     </div>
-                    <p className="text-xs font-medium text-gray-900">
-                      Level <span className="font-semibold">{xpLevel}</span>
-                    </p>
+                    <div className="w-[25px] h-[25px] rounded-full overflow-hidden border border-gray-200 bg-slate-100">
+                      <img alt={`Level ${xpLevel}`} className="w-full h-full object-cover" src={userAvatarUrl} />
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mt-3">
@@ -822,8 +1104,8 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                     onClick={() => {
                       if (navigator.share)
                         navigator.share({
-                          title: "Security Awareness Report",
-                          text: "Check out my security awareness progress report!",
+                          title: t("reportCard.securityAwarenessReport"),
+                          text: t("reportCard.comprehensiveProgressReport", { name: "Me" }).replace("{name}", "Me"),
                         });
                       else alert("Share feature not available on this device.");
                     }}
@@ -836,7 +1118,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                     onClick={handleDownload}
                   >
                     <Download className="w-3.5 h-3.5" />
-                    Download
+                    {t("reportCard.download")}
                   </button>
                 </div>
               </div>
@@ -847,7 +1129,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
               <div className="bg-white rounded-xl p-3 flex items-center gap-4 w-full">
                 <div className="relative flex gap-2 items-center flex-shrink-0">
                   <Shield className="w-3 h-3 text-gray-500" />
-                  <h3 className="text-xs whitespace-nowrap">Security Posture</h3>
+                  <h3 className="text-xs whitespace-nowrap">{t("reportCard.securityPosture")}</h3>
                   <div className="relative group">
                     <svg
                       className="w-3 h-3 text-gray-400 cursor-pointer hover:text-gray-600"
@@ -880,12 +1162,10 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                               strokeLinejoin="round"
                             />
                           </svg>
-                          <h3 className="font-medium">Security Posture Info</h3>
+                          <h3 className="font-medium">{t("reportCard.securityPostureInfo")}</h3>
                         </div>
                         <p className="leading-relaxed text-gray-600">
-                          The 7-segment bar represents your organization&apos;s overall security
-                          posture. Green indicates low risk, transitioning through yellow to red for
-                          higher risk levels.
+                          {t("reportCard.securityPostureDesc")}
                         </p>
                       </div>
                     </div>
@@ -912,15 +1192,15 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
               <div className="bg-white rounded-2xl p-4">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <h2 className="text-sm font-semibold">Learning Journey Timeline</h2>
+                    <h2 className="text-sm font-semibold">{t("reportCard.learningJourneyTimeline")}</h2>
                     <span className="px-2 py-0.5 text-[11px] rounded-full bg-gray-100 text-gray-600">
-                      {allModules.length} Task
+                      {allModules.length} {t("reportCard.task")}
                     </span>
                   </div>
-                  <button className="text-xs text-sky-500 hover:underline">View All</button>
+                  <button className="text-xs text-sky-500 hover:underline">{t("reportCard.viewAll")}</button>
                 </div>
                 {campaigns.length === 0 ? (
-                  <NoCompletedModules />
+                  <NoCompletedModules t={t} />
                 ) : (
                   <div className="space-y-4">
                     {campaigns.map((campaign) => (
@@ -930,18 +1210,19 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                             {campaign.campaign_name}
                           </span>
                           <span className="text-[10px] text-gray-400">
-                            {campaign.completed_modules.length} Task
+                            {campaign.completed_modules.length} {t("reportCard.task")}
                           </span>
                         </div>
                         <div className="relative pl-8">
                           {campaign.completed_modules.length === 0 ? (
-                            <NoCompletedModules />
+                            <NoCompletedModules t={t} />
                           ) : (
                             campaign.completed_modules.map((module, i) => (
                               <TimelineItem
                                 key={`${module.module_id}-${i}`}
                                 isLast={i === campaign.completed_modules.length - 1}
                                 module={module}
+                                t={t}
                               />
                             ))
                           )}
@@ -965,8 +1246,8 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-gray-900">XP Tokens Earned</p>
-                        <p className="text-[11px] text-gray-500">Total across all campaigns</p>
+                        <p className="text-xs font-medium text-gray-900">{t("reportCard.xpTokensEarned")}</p>
+                        <p className="text-[11px] text-gray-500">{t("reportCard.totalAcrossAllCampaigns")}</p>
                       </div>
                     </div>
                     <span className="text-lg font-semibold text-orange-400">{xpTokens.toFixed(2)}</span>
@@ -979,8 +1260,8 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-gray-900">Compliance Score</p>
-                        <p className="text-[11px] text-gray-500">Total points earned</p>
+                        <p className="text-xs font-medium text-gray-900">{t("reportCard.complianceScore")}</p>
+                        <p className="text-[11px] text-gray-500">{t("reportCard.totalPointsEarned")}</p>
                       </div>
                     </div>
                     <span className="text-lg font-semibold text-purple-400">{totalComplianceScore}</span>
@@ -999,8 +1280,8 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-gray-900">Avg Quiz Score</p>
-                        <p className="text-[11px] text-gray-500">Performance across all quizzes</p>
+                        <p className="text-xs font-medium text-gray-900">{t("reportCard.avgQuizScore")}</p>
+                        <p className="text-[11px] text-gray-500">{t("reportCard.performanceAcrossQuizzes")}</p>
                       </div>
                     </div>
                     <span className="text-lg font-semibold text-teal-400">
@@ -1021,8 +1302,8 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-gray-900">Total Learning Time</p>
-                        <p className="text-[11px] text-gray-500">{xpTokens} total XP learned</p>
+                        <p className="text-xs font-medium text-gray-900">{t("reportCard.totalLearningTime")}</p>
+                        <p className="text-[11px] text-gray-500">{t("reportCard.totalXpLearned", { xp: xpTokens }).replace("{xp}", String(xpTokens))}</p>
                       </div>
                     </div>
                     <span className="text-lg font-semibold text-blue-400">
@@ -1037,19 +1318,19 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
             <div className="col-span-12 md:col-span-4 md:row-span-4 md:col-start-9 md:row-start-7">
               <div className="bg-white rounded-xl p-4 flex flex-col h-full">
                 <div className="flex justify-between items-center mb-1">
-                  <h3 className="text-sm font-semibold text-gray-800">Module Chart</h3>
+                  <h3 className="text-sm font-semibold text-gray-800">{t("reportCard.moduleChart")}</h3>
                   <button className="text-blue-600 text-xs font-medium hover:underline">
-                    View All
+                    {t("reportCard.viewAll")}
                   </button>
                 </div>
                 {chartData.length > 0 ? (
                   <div className="flex-1 min-h-[120px]">
-                    <AreaChart data={chartData} labels={chartLabels} />
+                    <AreaChart data={chartData} labels={chartLabels} dates={chartDates} />
                   </div>
                 ) : (
                   <div className="flex-1 flex items-center justify-center py-4">
                     <p className="text-[10px] text-gray-400 text-center">
-                      XP chart will appear after completing your first module
+                      {t("reportCard.moduleChartDesc")}
                     </p>
                   </div>
                 )}

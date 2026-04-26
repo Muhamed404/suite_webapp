@@ -1,0 +1,97 @@
+<div class="flex flex-col p-6 gap">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex-1">
+      <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
+        <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+        <span class="text-gray-400">›</span>
+        <a href="/user/suite-users<%= typeof organizationId !== 'undefined' && organizationId ? '/' + organizationId : '' %>" class="hover:text-gray-700 transition"><%= __("user.labelSecureMagnusUsers") %></a>
+        <span class="text-gray-400">›</span>
+        <span class="font-semibold text-gray-900"><%= __("user.labelBulkImportJobs") %></span>
+      </nav>
+      <h3 class="text-3xl font-medium">
+        <%= __("user.labelBulkImportJobs") %>
+      </h3>
+      <p class="text-gray-600 mt-2 text-sm"><%= __("user.bulkImportJobsSubtitle") %></p>
+    </div>
+    <div class="flex flex-row gap-3 flex-wrap items-center">
+      <a href="/user/create/bulk"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-teal-600 text-white font-semibold border border-teal-600 shadow hover:bg-teal-700 transition text-sm">
+        <%= __("user.labelBulkUploadUsers") %>
+      </a>
+      <button type="button" id="bulkImportRefreshBtn"
+        class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 text-gray-800 font-medium border border-gray-200 hover:bg-gray-200 transition text-sm">
+        <%= __("user.bulkImportRefresh") %>
+      </button>
+    </div>
+  </div>
+
+  <div class="rounded-3xl bg-white shadow-sm border border-gray-100 overflow-hidden mt-2">
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="bg-gray-50 text-gray-600 uppercase text-xs tracking-wide">
+          <tr>
+            <th class="px-4 py-3"><%= __("user.bulkImportColId") %></th>
+            <th class="px-4 py-3"><%= __("user.bulkImportColCreatedBy") %></th>
+            <th class="px-4 py-3"><%= __("user.bulkImportColFile") %></th>
+            <th class="px-4 py-3"><%= __("user.bulkImportColProduct") %></th>
+            <th class="px-4 py-3"><%= __("user.bulkImportColStatus") %></th>
+            <th class="px-4 py-3"><%= __("user.bulkImportColInserted") %></th>
+            <th class="px-4 py-3"><%= __("user.bulkImportColSkippedJson") %></th>
+            <th class="px-4 py-3"><%= __("user.bulkImportColStarted") %></th>
+            <th class="px-4 py-3"><%= __("user.bulkImportColCompleted") %></th>
+            <th class="px-4 py-3"><%= __("user.bulkImportColError") %></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <% if (!jobs || jobs.length === 0) { %>
+            <tr>
+              <td colspan="10" class="px-4 py-8 text-center text-gray-500"><%= __("user.bulkImportNoJobs") %></td>
+            </tr>
+          <% } else { %>
+            <% jobs.forEach(function (job) { %>
+              <% const rowHighlight = typeof highlightJobId !== 'undefined' && highlightJobId !== null && Number(job.id) === Number(highlightJobId); %>
+              <% const creatorId = job.created_by_user_id; const creatorDisplay = (creatorId != null && creatorId !== 0 && creatorId !== '') ? creatorId : '—'; %>
+              <% const skippedCell = (job.skipped_json != null && String(job.skipped_json).trim() !== '') ? String(job.skipped_json) : (job.skipped != null ? JSON.stringify(job.skipped, null, 2) : '—'); %>
+              <tr class="<%= rowHighlight ? 'bg-amber-50' : 'hover:bg-gray-50' %>">
+                <td class="px-4 py-3 font-mono text-gray-800"><%= job.id %></td>
+                <td class="px-4 py-3 font-mono text-gray-700 whitespace-nowrap"><%= creatorDisplay %></td>
+                <td class="px-4 py-3 text-gray-800 max-w-xs truncate" title="<%= job.original_filename || '' %>"><%= job.original_filename || "—" %></td>
+                <td class="px-4 py-3 text-gray-600"><%= job.selected_product_key || "—" %></td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+                    <%= job.status === 'completed' ? 'bg-green-100 text-green-800' : '' %>
+                    <%= job.status === 'failed' ? 'bg-red-100 text-red-800' : '' %>
+                    <%= (job.status === 'pending' || job.status === 'processing') ? 'bg-amber-100 text-amber-900' : '' %>
+                  "><%= job.status %></span>
+                </td>
+                <td class="px-4 py-3 text-gray-700"><%= job.total_users_inserted != null ? job.total_users_inserted : "—" %></td>
+                <td class="px-4 py-3 align-top text-gray-700 max-w-[14rem]">
+                  <pre class="text-xs font-mono whitespace-pre-wrap break-words max-h-48 overflow-auto bg-gray-50 border border-gray-100 rounded p-2 m-0"><%= skippedCell %></pre>
+                </td>
+                <td class="px-4 py-3 text-gray-600 whitespace-nowrap"><%= job.started_at || "—" %></td>
+                <td class="px-4 py-3 text-gray-600 whitespace-nowrap"><%= job.completed_at || "—" %></td>
+                <td class="px-4 py-3 text-red-700 max-w-md truncate" title="<%= job.error_message || '' %>"><%= job.error_message || "—" %></td>
+              </tr>
+            <% }); %>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+    <% if (typeof total !== 'undefined' && total > 0) { %>
+      <p class="text-xs text-gray-500 px-4 py-2 border-t border-gray-100"><%= __("user.bulkImportTotalListed") %>: <%= (jobs || []).length %> / <%= total %></p>
+    <% } %>
+  </div>
+
+  <p class="text-xs text-gray-500"><%= __("user.bulkImportAutoRefreshNote") %></p>
+</div>
+
+<script>
+(function () {
+  var btn = document.getElementById('bulkImportRefreshBtn');
+  if (btn) btn.addEventListener('click', function () { window.location.reload(); });
+  var hasActive = <%- JSON.stringify((jobs || []).some(function (j) { return j.status === 'pending' || j.status === 'processing'; })) %>;
+  if (hasActive) {
+    window.setTimeout(function () { window.location.reload(); }, 10000);
+  }
+})();
+</script>

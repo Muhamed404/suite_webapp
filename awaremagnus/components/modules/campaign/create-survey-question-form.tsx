@@ -2,7 +2,7 @@
 
 import type { SupportedLanguageId } from "@/utils/supportedLanguages";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@heroui/button";
@@ -27,9 +27,10 @@ import {
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
-import { useCreateSurveyQuestion, useImportSurveyQuestions } from "@/hooks/useSurvey";
+import { useCreateSurveyQuestion, useUpdateSurveyQuestion, useImportSurveyQuestions, useSurveyQuestion } from "@/hooks/useSurvey";
 import { useCategories } from "@/hooks/useSuiteAwm";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { addToast } from "@heroui/toast";
 import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS } from "@/utils/supportedLanguages";
 
 const STEPS = [
@@ -50,12 +51,21 @@ function createAnswer(text = "", isCorrect = false): AnswerItem {
   return { id: `ans_${++answerId}`, text, isCorrect };
 }
 
-export function CreateSurveyQuestionForm() {
+export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }) {
+  const isEditMode = !!questionId;
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
   const router = useRouter();
   const createQuestion = useCreateSurveyQuestion();
+  const updateQuestion = useUpdateSurveyQuestion();
   const importQuestions = useImportSurveyQuestions();
+  
+  // Fetch question if in edit mode
+  const { data: existingQuestion, isLoading: loadingQuestion } = useSurveyQuestion(
+    questionId!,
+    isEditMode
+  );
+
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const { user } = useAuthStore();
 
@@ -83,6 +93,34 @@ export function CreateSurveyQuestionForm() {
   const [csvStatus, setCsvStatus] = useState<"idle" | "uploading" | "success" | "error">("idle");
   const [csvMessage, setCsvMessage] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Pre-fill state if editing
+  const [hasPreFilled, setHasPreFilled] = useState(false);
+
+  useEffect(() => {
+    if (isEditMode && existingQuestion && !hasPreFilled) {
+      setQuesTypeId(existingQuestion.ques_type_id);
+      setCategoryId(String(existingQuestion.category_id || ""));
+      setQuestionText(existingQuestion.question || "");
+      
+      if (existingQuestion.answers && existingQuestion.answers.length > 0) {
+        if (existingQuestion.ques_type_id === 1) {
+          // True/False
+          const trueAns = existingQuestion.answers.find(a => a.answer === "True" && a.validity);
+          setTrueFalseAnswer(trueAns ? "true" : "false");
+        } else {
+          // Single/Multiple Choice
+          const mappedAnswers = existingQuestion.answers.map(a => ({
+            id: `ans_${a.id || Math.random()}`,
+            text: a.answer || "",
+            isCorrect: !!a.validity
+          }));
+          setAnswers(mappedAnswers);
+        }
+      }
+      setHasPreFilled(true);
+    }
+  }, [existingQuestion, isEditMode, hasPreFilled]);
 
   const isTrueFalse = quesTypeId === 1;
   const isSingleChoice = quesTypeId === 2;
@@ -253,23 +291,56 @@ export function CreateSurveyQuestionForm() {
           .map((a) => ({ answer: a.text.trim(), validity: a.isCorrect }));
       }
 
-      await createQuestion.mutateAsync({
-        question: {
-          ques_type_id: quesTypeId,
-          category_id: categoryId ? Number(categoryId) : undefined,
-          question: questionText.trim(),
-        },
-        answers: apiAnswers,
+      if (isEditMode && questionId) {
+        await updateQuestion.mutateAsync({
+          id: questionId,
+          payload: {
+            question: {
+              ques_type_id: quesTypeId,
+              category_id: categoryId ? Number(categoryId) : undefined,
+              question: questionText.trim(),
+            },
+            answers: apiAnswers,
+          },
+        });
+        setFormSuccess("Question updated successfully! Redirecting...");
+      } else {
+        await createQuestion.mutateAsync({
+          question: {
+            ques_type_id: quesTypeId,
+            category_id: categoryId ? Number(categoryId) : undefined,
+            question: questionText.trim(),
+          },
+          answers: apiAnswers,
+        });
+        setFormSuccess("Question created successfully! Redirecting...");
+      }
+
+      addToast({
+        title: isEditMode ? "Question Updated" : "Question Created",
+        description: isEditMode ? "The survey question has been updated" : "A new survey question has been created",
+        color: "success",
       });
 
-      setFormSuccess("Question created successfully! Redirecting...");
       setTimeout(() => router.push("/dashboard/survey/questions"), 1500);
     } catch (err: any) {
-      setFormError(err?.message ?? "Failed to create question");
+      setFormError(err?.message ?? `Failed to ${isEditMode ? "update" : "create"} question`);
     }
   };
 
-  const isSubmitting = createQuestion.isPending;
+  const isSubmitting = createQuestion.isPending || updateQuestion.isPending;
+
+  if (isEditMode && loadingQuestion && !hasPreFilled) {
+    return (
+      <ProtectedRoute>
+        <DashboardLayout>
+          <div className="flex items-center justify-center h-96">
+            <Spinner color="primary" label="Loading question data..." />
+          </div>
+        </DashboardLayout>
+      </ProtectedRoute>
+    );
+  }
 
   return (
     <ProtectedRoute>
@@ -288,7 +359,9 @@ export function CreateSurveyQuestionForm() {
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
-            <h2 className="text-xl font-bold text-gray-900">Create New Quiz / Question</h2>
+            <h2 className="text-xl font-bold text-gray-900">
+              {isEditMode ? "Edit Quiz / Question" : "Create New Quiz / Question"}
+            </h2>
           </div>
 
           {/* ── Stepper */}
@@ -678,10 +751,15 @@ export function CreateSurveyQuestionForm() {
                 className="bg-green-500 hover:bg-green-600 text-white px-8"
                 isLoading={isSubmitting}
                 radius="full"
-                startContent={!isSubmitting && <Check className="w-4 h-4" />}
                 onPress={handleSubmit}
               >
-                {isSubmitting ? "Creating..." : "Finish"}
+                {isSubmitting
+                  ? isEditMode
+                    ? "Updating..."
+                    : "Creating..."
+                  : isEditMode
+                    ? "Update"
+                    : "Finish"}
               </Button>
             )}
           </div>

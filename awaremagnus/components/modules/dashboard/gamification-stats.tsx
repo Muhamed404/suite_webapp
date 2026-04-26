@@ -8,6 +8,7 @@ import { useMemo } from "react";
 import { useTranslations } from "@/i18n/useTranslations";
 import {
   useAchievementStatistics,
+  useAchievements,
   useAvatarStatistics,
   useSystemOverview,
   useOrganizationDashboards,
@@ -74,10 +75,16 @@ export const GamificationStats = () => {
 
   const studyTimeHours =
     dashboardData && "total_study_time" in dashboardData
-      ? Math.floor(dashboardData.total_study_time / 3600)
+      ? Math.floor(dashboardData.total_study_time / 60)
       : 0;
 
   const { data: achievementData } = useAchievementStatistics();
+  const { data: achievementsData } = useAchievements({
+    limit: 500,
+    offset: 0,
+    sortBy: "id",
+    sortOrder: "ASC",
+  });
   const { data: avatarData } = useAvatarStatistics();
 
   const stats = (achievementData as any)?.object ?? (achievementData as any)?.data;
@@ -100,62 +107,149 @@ export const GamificationStats = () => {
     14: "UltimateCyberSentinel_Level14_Robot.png",
   };
 
+  const avatarNameByLevel: Record<number, string> = {
+    1: "Vulnerable Newbie",
+    2: "Alert Apprentice",
+    3: "Cautious Learner",
+    4: "Informed Defender",
+    5: "Vigilant Guardian",
+    6: "Skilled Sentinel",
+    7: "Resilient Protector",
+    8: "Advanced Watchman",
+    9: "Expert Enforcer",
+    10: "Master Strategist",
+    11: "Elite Vanguard",
+    12: "Legendary Shieldbearer",
+    13: "Supreme Cyber Knight",
+    14: "Ultimate Cyber Sentinel",
+  };
+
+  const inferAvatarNameFromImage = (imageName?: string) => {
+    if (!imageName) return "";
+
+    const fileName = imageName.split("/").pop() ?? imageName;
+    const withoutExtension = fileName.replace(/\.[^/.]+$/, "");
+    const withoutSuffix = withoutExtension.replace(/_Level\d+_Robot$/i, "").replace(/_Robot$/i, "");
+    const withSpaces = withoutSuffix
+      .replace(/_/g, " ")
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .trim();
+
+    return withSpaces;
+  };
+
   const resolveAvatarImage = (avatar?: AvatarStat) => {
     if (!avatar) return "1.png";
     return avatarImageByLevel[avatar.level_number] ?? avatar.image_small_url ?? "1.png";
   };
 
+  const resolveAvatarName = (avatar?: AvatarStat) => {
+    if (!avatar) return "Vulnerable Newbie";
 
+    const levelName = avatar.level_name?.trim();
+    const genericLevelLabel = `Level ${avatar.level_number}`;
 
+    if (levelName && !/^Level\s+\d+$/i.test(levelName)) return levelName;
 
-  // Set of achievement numbers (1-16) present in the backend response. We
-  // parse the leading number from `image_small_url` (e.g. "1-quick-learner.png").
-  const unlockedAchievementNumbers = useMemo(() => {
+    const inferredName = inferAvatarNameFromImage(avatar.image_small_url);
+
+    if (inferredName) return inferredName;
+
+    return avatarNameByLevel[avatar.level_number] ?? genericLevelLabel;
+  };
+
+  const formatUsersOnText = (count?: number) => {
+    const safeCount = Number(count ?? 0);
+    return safeCount === 1 ? "1 user is on" : `${safeCount} users are on`;
+  };
+  const achievementStatsList = useMemo(() => {
+    return Array.isArray(stats?.achievement_statistics) ? stats.achievement_statistics : [];
+  }, [stats]);
+
+  const unlockedAchievementIds = useMemo(() => {
     const set = new Set<number>();
-    const items = stats?.achievement_statistics ?? [];
 
-    for (const a of items) {
-      const img = a?.image_small_url ?? "";
-      const m = img.trim().match(/^(\d{1,2})/);
+    for (const achievement of achievementStatsList) {
+      const id = Number(achievement?.achievement_id);
 
-      if (!m) continue;
-      const n = Number(m[1]);
-
-      if (n >= 1 && n <= 16) set.add(n);
+      if (!Number.isFinite(id) || id <= 0) continue;
+      if (Number(achievement?.employee_count ?? 0) > 0) set.add(id);
     }
 
     return set;
-  }, [stats]);
+  }, [achievementStatsList]);
 
-  // Map: achievement number → full stats object (for tooltip data)
-  const achievementByNumber = useMemo(() => {
+  const allAchievementIds = useMemo(() => {
+    const catalogAchievements = Array.isArray(achievementsData?.object?.achievements)
+      ? achievementsData.object.achievements
+      : [];
+    const idsFromApi = catalogAchievements
+      .map((achievement: any) => Number(achievement?.id))
+      .filter((id: number) => Number.isFinite(id) && id > 0);
+
+    if (idsFromApi.length > 0) {
+      return Array.from(new Set(idsFromApi)).sort((a, b) => a - b);
+    }
+
+    const totalUniqueAchievements = Number(stats?.total_unique_achievements_unlocked ?? 0) +
+      Number(stats?.total_unique_achievements_locked ?? 0);
+    const fallbackCount = Number.isFinite(totalUniqueAchievements) && totalUniqueAchievements > 0
+      ? Math.floor(totalUniqueAchievements)
+      : 32;
+
+    return Array.from({ length: fallbackCount }, (_, index) => index + 1);
+  }, [achievementsData, stats]);
+
+  const orderedGalleryAchievementIds = useMemo(() => {
+    const unlocked: number[] = [];
+    const locked: number[] = [];
+
+    for (const achievementId of allAchievementIds) {
+      if (unlockedAchievementIds.has(achievementId)) {
+        unlocked.push(achievementId);
+      } else {
+        locked.push(achievementId);
+      }
+    }
+
+    return [...unlocked, ...locked].slice(0, 32);
+  }, [allAchievementIds, unlockedAchievementIds]);
+
+  const achievementById = useMemo(() => {
     const map = new Map<number, any>();
-    const items = stats?.achievement_statistics ?? [];
 
-    for (const a of items) {
-      const img = a?.image_small_url ?? "";
-      const m = img.trim().match(/^(\d{1,2})/);
+    const catalogAchievements = Array.isArray(achievementsData?.object?.achievements)
+      ? achievementsData.object.achievements
+      : [];
 
-      if (!m) continue;
-      const n = Number(m[1]);
+    for (const achievement of catalogAchievements) {
+      const id = Number(achievement?.id);
 
-      if (n >= 1 && n <= 16) map.set(n, a);
+      if (!Number.isFinite(id) || id <= 0) continue;
+      map.set(id, {
+        achievement_id: id,
+        achievement_name: achievement?.name,
+        achievement_description: achievement?.description,
+        achievement_category: achievement?.formula,
+        image_small_url: achievement?.image_small_url,
+      });
+    }
+
+    for (const achievement of achievementStatsList) {
+      const id = Number(achievement?.achievement_id);
+
+      if (!Number.isFinite(id) || id <= 0) continue;
+      const existing = map.get(id) || {};
+
+      map.set(id, {
+        ...existing,
+        ...achievement,
+        achievement_id: id,
+      });
     }
 
     return map;
-  }, [stats]);
-
-  // Display order: unlocked achievements first, then locked — capped at 16
-  const achievementDisplayOrder = useMemo(() => {
-    const all = Array.from({ length: 16 }, (_, i) => i + 1);
-
-    return all.sort((a, b) => {
-      const aUnlocked = unlockedAchievementNumbers.has(a) ? 0 : 1;
-      const bUnlocked = unlockedAchievementNumbers.has(b) ? 0 : 1;
-
-      return aUnlocked - bUnlocked;
-    });
-  }, [unlockedAchievementNumbers]);
+  }, [achievementsData, achievementStatsList]);
 
   const unlockedAchievements = stats?.total_unique_achievements_unlocked || 0;
   const totalUniqueAchievements =
@@ -167,18 +261,21 @@ export const GamificationStats = () => {
       ? Math.round((unlockedAchievements / totalUniqueAchievements) * 100)
       : 0;
 
-  // Find the unlocked avatar with the highest level to show in the main slot
+  // Keep grid order predictable from lowest level to highest level.
   const avatarStats = useMemo(() => {
     const items = (avatars?.avatar_statistics ?? []) as AvatarStat[];
-    return [...items].sort((a, b) => {
-      const aUnlocked = (a.employee_count ?? 0) > 0 ? 0 : 1;
-      const bUnlocked = (b.employee_count ?? 0) > 0 ? 0 : 1;
-
-      if (aUnlocked !== bUnlocked) return aUnlocked - bUnlocked;
-      return b.level_number - a.level_number;
-    });
+    return [...items]
+      .filter((avatar) => (avatar.level_number ?? 0) > 0)
+      .sort((a, b) => a.level_number - b.level_number);
   }, [avatars]);
 
+  const highestUnlockedLevel = useMemo(() => {
+    const unlocked = avatarStats.filter((avatar) => (avatar.employee_count ?? 0) > 0);
+    if (unlocked.length === 0) return 0;
+    return Math.max(...unlocked.map((a) => a.level_number));
+  }, [avatarStats]);
+
+  // Main slot should always show the highest unlocked level avatar.
   const mainAvatar = useMemo(() => {
     if (avatarStats.length === 0) {
       return {
@@ -191,11 +288,19 @@ export const GamificationStats = () => {
       } as AvatarStat;
     }
 
-    return avatarStats[0];
+    const unlockedAvatars = avatarStats.filter((avatar) => (avatar.employee_count ?? 0) > 0);
+
+    if (unlockedAvatars.length > 0) {
+      return unlockedAvatars.reduce((highest, current) =>
+        current.level_number > highest.level_number ? current : highest,
+      );
+    }
+
+    return avatarStats[avatarStats.length - 1];
   }, [avatarStats]);
 
   // Check if main avatar is unlocked (has employee_count > 0)
-  const isMainAvatarUnlocked = (mainAvatar?.employee_count ?? 0) > 0;
+  const isMainAvatarUnlocked = (mainAvatar?.level_number ?? 0) <= highestUnlockedLevel && highestUnlockedLevel > 0;
   
   // Get the actual image filename for the main avatar from API response
   const mainAvatarImageName = useMemo(() => resolveAvatarImage(mainAvatar), [mainAvatar]);
@@ -255,7 +360,7 @@ export const GamificationStats = () => {
         </div>
 
         {/* Achievement Gallery */}
-        <div className="col-span-6 col-start-7 row-span-3 bg-[linear-gradient(114.67deg,#FFFEFC_5.61%,#FDECE0_98.45%)] rounded-xl p-5">
+        <div className="col-span-6 col-start-7 row-span-4 bg-[linear-gradient(114.67deg,#FFFEFC_5.61%,#FDECE0_98.45%)] rounded-xl p-5">
           <div className="flex items-start justify-between">
             <div>
               <h2 className="font-semibold text-gray-900 text-md flex items-center gap-2">
@@ -282,14 +387,15 @@ export const GamificationStats = () => {
               with that number, show the `achived.svg` overlay. Unlocked badges
               are shown first; tooltip shows name, description, count & status. */}
           <div className="grid grid-cols-8 gap-4 gap-y-5 mt-10">
-            {achievementDisplayOrder.map((num) => {
-              const isUnlocked = unlockedAchievementNumbers.has(num);
-              const meta = achievementByNumber.get(num);
+            {orderedGalleryAchievementIds.map((achievementId) => {
+              const isUnlocked = unlockedAchievementIds.has(achievementId);
+              const meta = achievementById.get(achievementId);
+              const imageFileName = meta?.image_small_url || `${achievementId}.png`;
 
               const tooltipContent = (
                 <div className="flex flex-col gap-1 max-w-[200px] p-1">
                   <p className="font-semibold text-sm text-gray-900">
-                    {meta?.achievement_name ?? `Achievement #${num}`}
+                    {meta?.achievement_name ?? `Achievement #${achievementId}`}
                   </p>
                   {meta?.achievement_description && (
                     <p className="text-xs text-gray-600 leading-tight">
@@ -312,18 +418,18 @@ export const GamificationStats = () => {
               );
 
               return (
-                <Tooltip key={num} content={tooltipContent} placement="top">
+                <Tooltip key={achievementId} content={tooltipContent} placement="top">
                   <div
                     aria-disabled={!isUnlocked}
-                    className={`w-14 h-14 rounded-full flex items-center justify-center relative cursor-default ${isUnlocked ? "" : "opacity-40"}`}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center relative cursor-default ${isUnlocked ? "" : "opacity-40"}`}
                   >
                     <Image
                       unoptimized
-                      alt={meta?.achievement_name ?? `Achievement ${num}`}
-                      className="w-14 h-14"
-                      height={56}
-                      src={getContentAssetUrl(`/images/achivement/${num}.png`)}
-                      width={56}
+                      alt={meta?.achievement_name ?? `Achievement ${achievementId}`}
+                      className="w-12 h-12"
+                      height={48}
+                      src={getContentAssetUrl(`/images/achivement/${imageFileName}`)}
+                      width={48}
                     />
                   </div>
                 </Tooltip>
@@ -351,13 +457,9 @@ export const GamificationStats = () => {
           </div>
         </div>
 
-        {/* Employee Avatar Level */}
-        <div className="col-span-6 row-span-2 row-start-2 bg-white rounded-xl p-5">
+        <div className="col-span-6 row-span-3 row-start-2 bg-white rounded-xl p-5">
           <div className="flex justify-between items-center">
             <h2 className="text-md font-semibold">{t("gamification.employeeAvatarLevel")}</h2>
-            <Link className="text-blue-600 text-xs font-medium" href="#">
-              {t("cards.viewAll")}
-            </Link>
           </div>
 
           <div className="flex mt-5 gap-8">
@@ -367,25 +469,17 @@ export const GamificationStats = () => {
                 content={
                   <div className="flex flex-col gap-1 max-w-[200px] p-1">
                     <p className="font-semibold text-sm text-gray-900">
-                      Level {mainAvatar?.level_number ?? 1}
+                      {resolveAvatarName(mainAvatar)}
                     </p>
-                    <p className="text-xs text-gray-600 leading-tight">
-                      {mainAvatar?.level_name ?? "Vulnerable Newbie"}
-                    </p>
-                    <div className="flex items-center justify-between mt-1 gap-2">
-                      <span
-                        className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
-                          isMainAvatarUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                        }`}
-                      >
-                        {isMainAvatarUnlocked ? "Unlocked" : "Locked"}
-                      </span>
-                      {mainAvatar?.employee_count != null && (
-                        <span className="text-xs text-gray-500">
-                          {mainAvatar.employee_count}x
-                        </span>
-                      )}
-                    </div>
+                    <p className="text-xs text-gray-500">{formatUsersOnText(mainAvatar?.employee_count)}</p>
+                    <p className="text-xs text-gray-500">Level {mainAvatar?.level_number ?? 1}</p>
+                    <span
+                      className={`w-fit text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                        isMainAvatarUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                      }`}
+                    >
+                      {isMainAvatarUnlocked ? "Unlocked" : "Locked"}
+                    </span>
                   </div>
                 }
                 placement="top"
@@ -410,41 +504,33 @@ export const GamificationStats = () => {
               </Tooltip>
 
               <p className="mt-5 text-gray-700 text-xs text-center leading-tight whitespace-pre-line break-keep max-w-[11rem]">
-                {mainAvatar?.level_name ?? "Vulnerable\nNewbie"}
+                {resolveAvatarName(mainAvatar)}
               </p>
             </div>
 
             {/* Levels Grid — show 8 remaining avatars excluding the one in main slot */}
-            <div className="grid grid-cols-4 gap-5 flex-1 pl-5 border-l border-[#E6E6E6]">
+            <div className="grid grid-cols-5 gap-5 flex-1 pl-5 border-l border-[#E6E6E6]">
               {(() => {
-                const availableAvatars = avatarStats
-                  .filter((avatar) => avatar.level_number !== mainAvatar?.level_number)
-                  .slice(0, 8);
+                const availableAvatars = avatarStats;
 
                 return (availableAvatars as AvatarStat[]).map((avatar) => {
-                  const isUnlocked = avatar.employee_count > 0;
+                  const isUnlocked = avatar.level_number <= highestUnlockedLevel && highestUnlockedLevel > 0;
                   const avatarImageName = resolveAvatarImage(avatar);
 
                   const tooltipContent = (
                     <div className="flex flex-col gap-1 max-w-[200px] p-1">
                       <p className="font-semibold text-sm text-gray-900">
-                        Level {avatar.level_number}
+                        {resolveAvatarName(avatar)}
                       </p>
-                      <p className="text-xs text-gray-600 leading-tight">
-                        {avatar.level_name}
-                      </p>
-                      <div className="flex items-center justify-between mt-1 gap-2">
-                        <span
-                          className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
-                            isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                          }`}
-                        >
-                          {isUnlocked ? "Unlocked" : "Locked"}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {avatar.employee_count}x
-                        </span>
-                      </div>
+                      <p className="text-xs text-gray-500">{formatUsersOnText(avatar.employee_count)}</p>
+                      <p className="text-xs text-gray-500">Level {avatar.level_number}</p>
+                      <span
+                        className={`w-fit text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                          isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                        }`}
+                      >
+                        {isUnlocked ? "Unlocked" : "Locked"}
+                      </span>
                     </div>
                   );
 
@@ -474,7 +560,7 @@ export const GamificationStats = () => {
                         <p
                           className="text-[10px] leading-tight mt-2 w-[90%] whitespace-pre-wrap break-keep max-w-full text-gray-700"
                         >
-                          {avatar.level_name}
+                          {resolveAvatarName(avatar)}
                         </p>
                       </div>
                     </Tooltip>

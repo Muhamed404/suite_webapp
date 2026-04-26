@@ -85,6 +85,11 @@
 		"type_your_message_here": "Type your message here...",
 		"templateName": "Template Name",
 		"login": "Login",
+		"invalid_credentials": "Invalid credentials.",
+		"user_not_found": "User not found or inactive.",
+		"no_access_permissions": "User has no access permissions.",
+		"no_portal_access": "User has no portal access.",
+		"unexpected_error": "An unexpected error occurred. Please try again.",
 		"welcomeToSecureMagnus": "Welcome to SecureMagnus",
 		"welcomeToPhishMagnus": "Welcome to PhishMagnus",
 		"welcomeToAwareMagnus": "Welcome to AwareMagnus",
@@ -218,6 +223,7 @@
 		"groupCreate": "Create Group",
 		"smtp": "SMTP Settings",
 		"serviceRegistry": "Service Registry",
+		"notificationTemplates": "Notification Templates",
 		"audit": "Audit Log",
 		"subscriptionHistory": "Subscription History",
 		"createSubscription": "Create Subscription",
@@ -334,7 +340,10 @@
 			"subscriptionHistory": "Subscription History",
 			"products": "Products",
 			"logout": "Logout",
-			"smtpNotifications": "SMTP Notifications"
+			"smtpNotifications": "SMTP Notifications",
+			"notificationTemplates": "Notification Templates",
+			"notificationMailLog": "Notification Mail Log",
+			"bulkImportJobs": "Bulk import jobs"
 		}
 	},
 	"org_domain": {
@@ -406,7 +415,10 @@
 			"validationOrgNameRequired": "Organization name is required.",
 			"validationOrgAddressRequired": "Address is required.",
 			"validationOrgPostalCodeRequired": "Postal code is required and must be digits.",
-			"validationOrgContactRequired": "Contact number is required and must be digits.",
+			"validationOrgContactRequired": "Contact number is required.",
+			"validationOrgContactDigits": "Contact number must contain digits only.",
+			"validationOrgContactMinLength": "Contact number must be at least 7 digits.",
+			"validationOrgContactMaxLength": "Contact number must not exceed 15 digits.",
 			"validationOrgCountryRequired": "Country is required.",
 			"validationOrgStateRequired": "State is required.",
 			"validationOrgCityRequired": "City is required.",
@@ -597,6 +609,74 @@
 		}
 	},
 	"settings": {
+		"notificationTemplate": {
+			"create": {
+				"title": "Create Notification Template",
+				"subtitle": "Add a new notification template for your organization",
+				"tabs": {
+					"english": "English",
+					"arabic": "Arabic"
+				},
+				"fields": {
+					"notificationType": "Notification Type",
+					"notificationTypePlaceholder": "Select notification type",
+					"isActive": "Active",
+					"isSystem": "System Template",
+					"name": "Template Name",
+					"namePlaceholder": "Enter template name",
+					"subject": "Subject",
+					"subjectPlaceholder": "Enter email subject (optional)",
+					"body": "Body",
+					"bodyPlaceholder": "Enter template body content"
+				},
+				"btnSubmit": "Create Template",
+				"btnCancel": "Cancel",
+				"success": "Notification template(s) created successfully.",
+				"error": "Failed to create notification template.",
+				"validation": {
+					"typeRequired": "Please select a notification type.",
+					"atLeastOne": "Please fill in at least one language template (name and body required).",
+					"nameRequired": "Template name is required.",
+					"bodyRequired": "Template body is required."
+				}
+			},
+			"edit": {
+				"title": "Edit Notification Template",
+				"subtitle": "Update the notification template details",
+				"btnSubmit": "Save Changes",
+				"btnCancel": "Cancel",
+				"success": "Notification template updated successfully.",
+				"error": "Failed to update notification template."
+			},
+			"delete": {
+				"success": "Notification template deleted successfully.",
+				"error": "Failed to delete notification template.",
+				"confirmTitle": "Delete Template",
+				"confirmMessage": "Are you sure you want to delete this template? This action cannot be undone."
+			},
+			"list": {
+				"title": "Notification Templates",
+				"subtitle": "Manage your organization's notification templates",
+				"columns": {
+					"name": "Name",
+					"type": "Type",
+					"language": "Language",
+					"subject": "Subject",
+					"status": "Status",
+					"system": "System",
+					"createdAt": "Created At",
+					"actions": "Actions"
+				},
+				"badge": {
+					"active": "Active",
+					"inactive": "Inactive",
+					"system": "System",
+					"custom": "Custom"
+				},
+				"empty": "No notification templates found.",
+				"search": "Search templates..."
+			}
+		},
 		"serviceRegistry": {
 			"homescreen": {
 				"title": "Service Registry Management",
@@ -737,6 +817,35 @@
 		"validationEmailRequired": "Please enter a valid email address with full domain (e.g., user@example.com).",
 		"validationPasswordRequired": "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
 		"labelBulkUploadUsers": "Bulk Upload Users",
+		"labelBulkImportJobs": "Bulk import jobs",
+		"bulkImportJobsSubtitle": "Recent CSV import jobs for this organization. Rows refresh automatically while a job is pending or processing.",
+		"bulkImportViewJobHistory": "View bulk import job history",
+		"bulkImportQueuedShort": "Your file was queued for import. Track progress below.",
+		"bulkImportSelectOrganization": "Choose an organization first, then open bulk import jobs from that organization’s user list.",
+		"bulkImportInvalidOrganization": "Your account is not linked to a valid organization for this page.",
+		"bulkImportJobsLoadError": "Could not load bulk import jobs. Try again later.",
+		"bulkImportRefresh": "Refresh",
+		"bulkImportColId": "Job",
+		"bulkImportColCreatedBy": "Created by (user id)",
+		"bulkImportColSkippedJson": "Skipped (JSON)",
+		"bulkImportColResultJson": "Result (JSON)",
+		"bulkImportColFile": "File",
+		"bulkImportColProduct": "Product",
+		"bulkImportColStatus": "Status",
+		"bulkImportColInserted": "Inserted",
+		"bulkImportColStarted": "Started",
+		"bulkImportColCompleted": "Completed",
+		"bulkImportColError": "Error",
+		"bulkImportNoJobs": "No bulk import jobs yet.",
+		"bulkImportTotalListed": "Jobs shown",
+		"bulkImportAutoRefreshNote": "While any job is pending or processing, this page reloads every 10 seconds.",
+		"btnBulkImportJobs": "Import jobs",
+		"suiteUsersSearchLabel": "Search users",
+		"suiteUsersPageSizeLabel": "Rows per page",
+		"suiteUsersSearchSubmit": "Search",
+		"suiteUsersClearSearch": "Clear",
+		"suiteUsersPrev": "Previous",
+		"suiteUsersNext": "Next",
 		"stepChooseProduct": "Choose Product",
 		"stepChooseFile": "Choose File",
 		"labelChooseTheProduct": "Choose the Product",
@@ -771,7 +880,11 @@
 		"labelChooseProduct": "Choose Product",
 		"labelEnterUserDetails": "Enter User Details",
 		"labelSave": "Save",
-		"labelAvailableUsersLicense": "Available Users License"
+		"labelAvailableUsersLicense": "Available Users License",
+		"suiteUsersSearchLabel": "Search",
+		"suiteUsersPageSizeLabel": "Page Size",
+		"suiteUsersSearchSubmit": "Submit",
+		"suiteUsersNext": "Next"
 	},
 	"system_template": {
 		"stepper1": "Template Details",
@@ -1294,7 +1407,8 @@
 			"opened": "Opened",
 			"no_interaction": "No Interaction",
 			"no_invitees": "No invitee responses yet",
-			"invalid_id": "Invalid campaign ID"
+			"invalid_id": "Invalid campaign ID",
+			"invitee_email": "Invitee Email"
 		}
 	},
 	"qr_campaign": {
@@ -1384,7 +1498,7 @@
 		"interactForm": "Interact Form",
 		"formSubmitted": "Form Submitted",
 		"attachmentOpened": "Attachment Opened",
-		"interactionReport": "Interaction report",
+		"interactionReport": "Interaction Report",
 		"tagNumber": "Tag Number",
 		"nfcCode": "NFC Code",
 		"copyUrl": "Copy URL",
@@ -1640,7 +1754,12 @@
 		"sms_content": "template.sms_content",
 		"sms_message": "template.sms_message",
 		"sms_placeholder": "template.sms_placeholder",
-		"tracking_header": "This template will allow you to track the following items:"
+		"tracking_header": "This template will allow you to track the following items:",
+		"tracking_email_message_opened": "Track email/message opened",
+		"tracking_link_clicked": "Track phishing simulation link clicked",
+		"tracking_file_downloaded": "Track phishing simulation file downloaded (from email/message or landing page)",
+		"tracking_form_submitted": "Track data submitted through the phishing simulation form",
+		"tracking_form_interaction": "Track user interaction with the phishing simulation form"
 	},
 	"common": {
 		"search_here": "common.search_here",
