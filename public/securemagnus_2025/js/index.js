@@ -75,7 +75,11 @@ function showCustomToast(alertType, alertMessage = null) {
 
   const lang = document.documentElement.lang;
   let title = alertType === 'error' ? 'Error' : 'Success!';
-  let message = alertMessage;
+  let message = typeof alertMessage === 'string' ? alertMessage.trim() : '';
+
+  if (!message) {
+    message = alertType === 'error' ? 'An unexpected error occurred.' : 'Operation completed successfully.';
+  }
 
   if (lang === 'ar') {
     if (alertType === 'error') {

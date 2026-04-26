@@ -19,6 +19,11 @@ function getApiClient(req) {
         timeout: 300000,
     });
 
+    const rawForwardedFor = req?.headers?.['x-forwarded-for'] || req?.headers?.['x-real-ip'] || req?.headers?.['cf-connecting-ip'] || req?.ip || req?.socket?.remoteAddress || '';
+    const forwardedFor = Array.isArray(rawForwardedFor)
+        ? rawForwardedFor.join(', ')
+        : String(rawForwardedFor);
+
     // Attach JWT token to Authorization header if it exists
     if (token) {
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -31,6 +36,10 @@ function getApiClient(req) {
     apiClient.interceptors.request.use(config => {
         //console.log('[apiClient] Request Headers:', config.headers); // ✅ Log outgoing headers
         config.headers['X-Session-ID'] = sessionID;
+        if (forwardedFor) {
+            config.headers['X-Forwarded-For'] = forwardedFor;
+            config.headers['X-Real-IP'] = forwardedFor.split(',')[0].trim();
+        }
 
         // if (req.session?.user?.id) {
         //     config.headers['X-User-ID'] = req.user.id;
