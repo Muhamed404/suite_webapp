@@ -108,7 +108,7 @@ $(document).ready(function () {
 
 
   $('#email').on('blur', function () {
-    const email = $(this).val();
+    const email = $(this).val().trim();
     if (email) {
       $.ajax({
         url: '/phm/commons/check-duplicate-user?email=' + email,
@@ -130,8 +130,8 @@ $(document).ready(function () {
   });
 
   $('#name').on('blur', function () {
-    const name = $(this).val();
-    if (email) {
+    const name = $(this).val().trim();
+    if (name) {
       $.ajax({
         url: '/phm/commons/check-duplicate-organization?name=' + name,
         method: 'GET',
