@@ -13,6 +13,7 @@ exports.createSMSSettings = async (req, res) => {
             base_url,
             api_key,
             sender_id,
+            from_number,
             account_sid,
             auth_token,
             is_active
@@ -40,7 +41,7 @@ exports.createSMSSettings = async (req, res) => {
                 finalPayload = {
                     account_sid,
                     auth_token,
-                    sender_id
+                    sender_id: sender_id || from_number
                 };
                 break;
 
