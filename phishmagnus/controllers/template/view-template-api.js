@@ -70,6 +70,16 @@ exports.viewTemplateApi = async (req, res) => {
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
 
+    // Replace <%=web_bucket%> placeholder with actual bucket URL so the client receives real URLs
+    const webBucket = process.env.WEB_TEMPLATE_BUCKET || '';
+    if (webBucket) {
+      ['phishing_content', 'phishing_page_content', 'landing_page_content'].forEach(field => {
+        if (tpl[field] && tpl[field].includes('<%=web_bucket%>')) {
+          tpl[field] = tpl[field].split('<%=web_bucket%>').join(webBucket);
+        }
+      });
+    }
+
     // Log what content fields are available
     logger.info('API - View Template: content availability', {
       phishing_content: !!tpl.phishing_content,

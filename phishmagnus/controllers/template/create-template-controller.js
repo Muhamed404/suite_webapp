@@ -35,7 +35,7 @@ exports.renderCreateTemplate = async (req, res) => {
       fileTypes,
       campaignTypes: filteredData,
       phishTypeMap: enums.phishingType,
-
+      webTemplateBucket: process.env.WEB_TEMPLATE_BUCKET,
     });
     logger.info('Controller - Create Template: Rendered create_template page successfully');
   } catch (error) {
@@ -130,6 +130,12 @@ exports.createTemplate = async (req, res) => {
       }
     });
 
+    // Normalize relative image paths in phishing_content to <%=web_bucket%> placeholder
+    payload.phishing_content = normalizeImageBucketRefs(payload.phishing_content);
+
+    // Replace placeholder/empty anchor hrefs with <%=phishing_url%>
+    payload.phishing_content = normalizeAnchorPhishingUrl(payload.phishing_content);
+
     // Optionally inject interaction script for DataEntryBasedPhishing when creating a new template
     if (
       payload.phishing_page_content &&
@@ -202,6 +208,28 @@ exports.createTemplate = async (req, res) => {
   }
 };
 
+
+function normalizeAnchorPhishingUrl(content) {
+  if (!content) return content;
+
+  if (!/<a[\s>]/i.test(content)) return content;
+
+  // Replace href="{{website_url}}" or href="#" with href="<%=phishing_url%>"
+  return content
+    .replace(/(<a\b[^>]*\bhref=["'])\{\{website_url\}\}(["'])/gi, '$1<%=phishing_url%>$2')
+    .replace(/(<a\b[^>]*\bhref=["'])#(["'])/gi, '$1<%=phishing_url%>$2');
+}
+
+function normalizeImageBucketRefs(content) {
+  if (!content) return content;
+
+  const bucket = process.env.WEB_TEMPLATE_BUCKET || '';
+  if (!bucket) return content;
+
+  if (content.indexOf(bucket) === -1) return content;
+
+  return content.split(bucket).join('<%=web_bucket%>');
+}
 
 function interactionScript() {
   const script = `
