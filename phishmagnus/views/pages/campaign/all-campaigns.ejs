@@ -123,33 +123,23 @@
   </div>
 </div>
 
-<div id="campaignsData" 
-  data-campaigns='<%- JSON.stringify(campaigns || []) %>'
-  data-type-options='<%- JSON.stringify(typeOptions || []) %>'
-  style="display: none;"></div>
-
 <script>
   (function() {
-    const dataEl = document.getElementById('campaignsData');
-    if (dataEl) {
-      window.allCampaignsData = {
-        campaigns: JSON.parse(dataEl.getAttribute('data-campaigns') || '[]'),
-        typeOptions: JSON.parse(dataEl.getAttribute('data-type-options') || '[]'),
-        translations: {
-          noCampaignsFound: "<%= __("all_campaigns.noCampaignsFound") %>",
-          createFirstCampaign: "<%= __("all_campaigns.createFirstCampaign") %>",
-          filterAll: "<%= __("all_campaigns.filterAll") %>",
-          filterActive: "<%= __("all_campaigns.filterActive") %>",
-          filterScheduled: "<%= __("all_campaigns.filterScheduled") %>",
-          filterCompleted: "<%= __("all_campaigns.filterCompleted") %>",
-          filterDraft: "<%= __("all_campaigns.filterDraft") %>",
-          viewDetails: "<%= __("all_campaigns.viewDetails") %>",
-          showingResults: "<%= __("all_campaigns.showingResults") %>"
-        }
-      };
-    } else {
-      window.allCampaignsData = { campaigns: [], typeOptions: [], translations: {} };
-    }
+    window.allCampaignsData = {
+      campaigns: <%- JSON.stringify(campaigns || []).replace(/<\/script>/g, '<\\/script') %>,
+      typeOptions: <%- JSON.stringify(typeOptions || []).replace(/<\/script>/g, '<\\/script') %>,
+      translations: {
+        noCampaignsFound: "<%= __("all_campaigns.noCampaignsFound") %>",
+        createFirstCampaign: "<%= __("all_campaigns.createFirstCampaign") %>",
+        filterAll: "<%= __("all_campaigns.filterAll") %>",
+        filterActive: "<%= __("all_campaigns.filterActive") %>",
+        filterScheduled: "<%= __("all_campaigns.filterScheduled") %>",
+        filterCompleted: "<%= __("all_campaigns.filterCompleted") %>",
+        filterDraft: "<%= __("all_campaigns.filterDraft") %>",
+        viewDetails: "<%= __("all_campaigns.viewDetails") %>",
+        showingResults: "<%= __("all_campaigns.showingResults") %>"
+      }
+    };
   })();
 </script>
 <script src="/securemagnus_2025/js/all_campaigns_table.js"></script>
