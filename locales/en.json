@@ -841,9 +841,9 @@
 		"bulkImportTotalListed": "Jobs shown",
 		"bulkImportAutoRefreshNote": "While any job is pending or processing, this page reloads every 10 seconds.",
 		"btnBulkImportJobs": "Import jobs",
-		"suiteUsersSearchLabel": "Search users",
-		"suiteUsersPageSizeLabel": "Rows per page",
-		"suiteUsersSearchSubmit": "Search",
+		"suiteUsersSearchLabel": "Search",
+		"suiteUsersPageSizeLabel": "Page Size",
+		"suiteUsersSearchSubmit": "Submit",
 		"suiteUsersClearSearch": "Clear",
 		"suiteUsersPrev": "Previous",
 		"suiteUsersNext": "Next",
@@ -881,11 +881,7 @@
 		"labelChooseProduct": "Choose Product",
 		"labelEnterUserDetails": "Enter User Details",
 		"labelSave": "Save",
-		"labelAvailableUsersLicense": "Available Users License",
-		"suiteUsersSearchLabel": "Search",
-		"suiteUsersPageSizeLabel": "Page Size",
-		"suiteUsersSearchSubmit": "Submit",
-		"suiteUsersNext": "Next"
+		"labelAvailableUsersLicense": "Available Users License"
 	},
 	"system_template": {
 		"stepper1": "Template Details",
