@@ -28,6 +28,7 @@ import {
 import type { InvitationLogItem } from "@/types/invitation";
 
 type InvitationTypeFilter = "all" | "campaign" | "survey";
+type CampaignOption = { id: number; name: string };
 
 const ROWS_PER_PAGE = 10;
 
@@ -135,7 +136,7 @@ export function InvitationLogPage() {
   const totalPages = Math.max(1, activeQuery.data?.total_pages ?? 1);
   const isLoading = activeQuery.isLoading;
 
-  const campaignOptions = useMemo(() => {
+  const campaignOptions = useMemo<CampaignOption[]>(() => {
     const source = Array.isArray(campaignsData)
       ? campaignsData
       : campaignsData?.campaigns ?? campaignsData?.object?.campaigns ?? [];
@@ -145,7 +146,7 @@ export function InvitationLogPage() {
         id: Number(campaign.id),
         name: campaign.name ?? `Campaign ${campaign.id}`,
       }))
-      .filter((item: { id: number }) => Number.isFinite(item.id));
+      .filter((item: CampaignOption): item is CampaignOption => Number.isFinite(item.id));
   }, [campaignsData]);
 
   const surveyOptions = useMemo(
