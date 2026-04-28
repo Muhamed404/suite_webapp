@@ -115,5 +115,77 @@
     "buttons": {
       "view": "عرض"
     }
+  },
+  "invitationLog": {
+    "title": "سجل الدعوات",
+    "actions": {
+      "sendReminder": "إرسال تذكير",
+      "reminder": "تذكير"
+    },
+    "cards": {
+      "totalInvitations": "إجمالي الدعوات",
+      "campaignInvitations": "دعوات الحملات",
+      "surveyInvitations": "دعوات الاستبيانات",
+      "reminderAttempts": "محاولات التذكير"
+    },
+    "filters": {
+      "searchPlaceholder": "ابحث باسم المدعو أو البريد الإلكتروني أو الحملة أو الاستبيان...",
+      "invitationType": "نوع الدعوة",
+      "allTypes": "كل الأنواع",
+      "campaign": "حملة",
+      "survey": "استبيان",
+      "campaignFilter": "تصفية حسب الحملة",
+      "filterByCampaign": "تصفية حسب الحملة",
+      "surveyFilter": "تصفية حسب الاستبيان",
+      "filterBySurvey": "تصفية حسب الاستبيان",
+      "statusFilter": "تصفية الحالة",
+      "reminderFilter": "تصفية التذكير",
+      "reminder": "تذكير",
+      "reminderOnly": "التذكيرات فقط",
+      "initialInvite": "دعوة أولية"
+    },
+    "states": {
+      "emptyTitle": "لم يتم العثور على دعوات",
+      "emptyDescription": "حاول تغيير عوامل التصفية أو عبارة البحث."
+    },
+    "table": {
+      "invitee": "المدعو",
+      "type": "النوع",
+      "campaignOrSurvey": "الحملة / الاستبيان",
+      "status": "الحالة",
+      "attempts": "المحاولات",
+      "lastAttempt": "آخر محاولة",
+      "invitationTime": "وقت الدعوة",
+      "action": "الإجراء"
+    },
+    "status": {
+      "completed": "مكتمل",
+      "failed": "فشل",
+      "pending": "قيد الانتظار",
+      "retry": "إعادة المحاولة",
+      "unknown": "غير معروف"
+    },
+    "pagination": {
+      "totalRecords": "إجمالي سجلات الدعوات: {total}"
+    },
+    "fallback": {
+      "campaignWithId": "حملة رقم {id}",
+      "surveyWithId": "استبيان رقم {id}"
+    },
+    "toast": {
+      "remindersQueuedTitle": "تمت جدولة التذكيرات",
+      "campaignRemindersQueuedDescription": "تمت جدولة {count} تذكير للحملة بنجاح.",
+      "surveyRemindersQueuedDescription": "تمت جدولة {count} تذكير للاستبيان بنجاح.",
+      "selectTargetTitle": "اختر الهدف",
+      "selectTargetDescription": "يرجى اختيار حملة أو استبيان قبل إرسال التذكيرات الجماعية.",
+      "reminderFailedTitle": "فشل إرسال التذكير",
+      "unableToQueueReminders": "تعذر جدولة التذكيرات.",
+      "reminderQueuedTitle": "تمت جدولة التذكير",
+      "userReminderQueuedDescription": "تمت جدولة {count} تذكير للمستخدم {email}.",
+      "reminderUnavailableTitle": "التذكير غير متاح",
+      "reminderUnavailableDescription": "بيانات الهدف لهذه الدعوة غير مكتملة.",
+      "unableToQueueUserReminder": "تعذر جدولة تذكير لهذا المستخدم."
+    },
+    "userFallback": "المستخدم"
   }
 }
