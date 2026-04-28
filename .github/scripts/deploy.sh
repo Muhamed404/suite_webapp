@@ -115,7 +115,7 @@ LOGS_FILENAME=${LOGS_FILENAME:-suite_webapp}
 BACKEND_SUITE_PUBLIC_KEY_PATH=${BACKEND_SUITE_PUBLIC_KEY_PATH:-/opt/secure-magnus/secure_magnus_workspace/keys/public.pem}
 
 AWAREMAGNUS_DASHBOARD_URL=${AWAREMAGNUS_DASHBOARD_URL:-https://dev-machine.securemagnus.com/awm/}
-
+WEB_TEMPLATE_BUCKET=https://objectstorage.me-riyadh-1.oraclecloud.com/p/BkQ_y6F4662nrplQlfSp6LPCf7XJnLHNfVIHd27_9VF-RjVQK5yL6KgjorPYWD_y/n/axqfg50971fp/b/PHM_Templates/o/
 
 EOF
 
