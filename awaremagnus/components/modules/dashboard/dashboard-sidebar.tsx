@@ -102,6 +102,11 @@ export const DashboardSidebar = ({
           icon: "",
           label: t("menu.campaigns"),
         },
+        {
+          href: "/dashboard/launch-awareness/invitations",
+          icon: "",
+          label: t("menu.invitationLog"),
+        },
       ],
     },
     {
