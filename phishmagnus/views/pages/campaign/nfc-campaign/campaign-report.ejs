@@ -101,9 +101,9 @@
             <div class="flex items-center gap-2 text-sm">
                 <span class="text-gray-500"><%= __("all_campaigns.rowsPerPage") %></span>
                 <select id="rowsPerPage" class="<%= locals.locale === 'ar' ? 'pr-2 pl-8' : 'pl-2 pr-8' %> py-1 border rounded">
-                    <option value="5">5</option>
-                    <option value="10" selected>10</option>
-                    <option value="20">20</option>
+                    <% for (var i = 5; i <= 20; i += 5) { %>
+                        <option value="<%= i %>" <%= pagination.pageSize === i ? 'selected' : '' %>><%= i %></option>
+                    <% } %>
                 </select>
             </div>
             <div id="pagination" class="space-x-2"></div>
