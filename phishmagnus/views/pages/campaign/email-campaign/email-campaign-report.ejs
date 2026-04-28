@@ -1,14 +1,22 @@
 <div class="flex flex-col p-6 gap">
-  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
-    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
-      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
-      <span class="text-gray-400">›</span>
-      <a href="/phm/campaign/reports" class="hover:text-gray-700 transition"><%= __("breadcrumbs.reports") %></a>
-      <span class="text-gray-400">›</span>
-      <span class="font-semibold text-gray-900"><%= __("breadcrumbs.emailCampaignReport") %></span>
-    </nav>
-    <h3 class="text-3xl font-medium text-gray-900"><%= __("breadcrumbs.emailCampaignReport") %></h3>
-  </div>
+    <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
+        <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
+            <a href="/home" class="hover:text-gray-700 transition">
+                <%= __("breadcrumbs.home") %>
+            </a>
+            <span class="text-gray-400">›</span>
+            <a href="/phm/campaign/reports" class="hover:text-gray-700 transition">
+                <%= __("breadcrumbs.reports") %>
+            </a>
+            <span class="text-gray-400">›</span>
+            <span class="font-semibold text-gray-900">
+                <%= __("breadcrumbs.emailCampaignReport") %>
+            </span>
+        </nav>
+        <h3 class="text-3xl font-medium text-gray-900">
+            <%= __("breadcrumbs.emailCampaignReport") %>
+        </h3>
+    </div>
 </div>
 
 
@@ -25,12 +33,11 @@
                     <input id="searchInput" type="text" placeholder="<%= translations.search_here %>"
                         class="pl-14 pr-10 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-4">
-                        <img src="/securemagnus_2025/images/img/search.svg"
-                            class="w-5 h-5 text-gray-400" alt="">
+                        <img src="/securemagnus_2025/images/img/search.svg" class="w-5 h-5 text-gray-400" alt="">
                     </div>
                 </div>
 
-                
+
             </div>
 
 
@@ -50,22 +57,19 @@
                         </th>
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="purchase_Date">
                             <span class="inline-flex items-center gap-2">
-                                <img src="/securemagnus_2025/images/subscription_history/subscription_history_purchase_date.svg"
-                                    alt="">
+                                <img src="/securemagnus_2025/images/img/form.svg" class="w-5 h-5" alt="">
                                 <%= __("generic_label.templateName") %>
                             </span>
                         </th>
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
                             <span class="inline-flex items-center gap-2">
-                                <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg"
-                                    alt="">
+                                <img src="/securemagnus_2025/images/img/calendar.svg" class="w-5 h-5" alt="">
                                 <%= __("generic_label.start_date") %>
                             </span>
                         </th>
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
                             <span class="inline-flex items-center gap-2">
-                                <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg"
-                                    alt="">
+                                <img src="/securemagnus_2025/images/img/calendar.svg" class="w-5 h-5" alt="">
                                 <%= __("generic_label.end_date") %>
                             </span>
                         </th>
@@ -82,22 +86,21 @@
                                 <%= translations.total_invitees %>
                             </span>
                         </th>
-                                                <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
                             <span class="inline-flex items-center gap-2">
 
                                 <%= translations.unsent %>
                             </span>
                         </th>
-                                                <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
+                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
                             <span class="inline-flex items-center gap-2">
 
-                            <%= translations.sent %>
+                                <%= translations.sent %>
                             </span>
                         </th>
 
                         <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="action">
                             <span class="inline-flex items-center gap-2">
-
                                 <%= __("generic_label.action") %>
                             </span>
                         </th>
@@ -114,7 +117,8 @@
 
         <!-- Pagination -->
         <div class="flex items-center justify-between mt-4">
-            <select id="rowsSelect" dir="<%= locale === 'ar' ? 'rtl' : 'ltr' %>" class="<%= locale === 'ar' ? 'pl-8 pr-4' : 'pl-4 pr-8' %> py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select id="rowsPerPage" dir="<%= locale === 'ar' ? 'rtl' : 'ltr' %>"
+                class="<%= locale === 'ar' ? 'pl-8 pr-4' : 'pl-4 pr-8' %> py-2 border border-gray-300 rounded-md text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="5">5</option>
                 <option value="10" selected>10</option>
                 <option value="20">20</option>

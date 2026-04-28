@@ -19,12 +19,15 @@ import { suiteAwmService } from "@/services/suiteAwmService";
 import { quizService } from "@/services/quizService";
 import { breadcrumbLinkClassName } from "@/components/modules/training-library/shared-styles";
 import { getModuleAssetUrl } from "@/utils/contentAssetUrl";
+import { formatNumber, padNumber } from "@/utils/localeNumber";
+import { getLanguageCountryCode, getLanguageName } from "@/utils/supportedLanguages";
+import ReactCountryFlag from "react-country-flag";
 
 export default function QuizzesPage({ params }: { params: Promise<{ module: string }> }) {
   const { module } = use(params);
   const moduleName = module.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()); // Convert slug to title
   const t = useTranslations("module");
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
   const { user } = useAuthStore();
   const router = useRouter();
@@ -82,18 +85,32 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     ? getModuleAssetUrl(moduleTranslation.logo_banner_url)
     : "/images/hero.svg";
 
-  // Keep original quiz data for submission
-  const originalQuizzes = useMemo(() => {
+  // Shuffle quizzes once per attempt so questions appear in random order.
+  // We also reset/reshuffle when the user goes back from the completion screen
+  // to retake the quiz (handled in goBackToQuiz via setShuffleSeed).
+  const [shuffleSeed, setShuffleSeed] = useState(() => Date.now());
+
+  // Both originalQuizzes (used for submission) and quizData (used for UI)
+  // share the same shuffled order so savedAnswers[index] stays consistent
+  // between the displayed question and the quiz_id sent to the backend.
+  const shuffledQuizzes = useMemo(() => {
     if (!quizzesRes?.success || !Array.isArray(quizzesRes.data)) return [];
+    const arr = [...quizzesRes.data];
 
-    return quizzesRes.data;
-  }, [quizzesRes]);
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
 
-  // Transform API data into the shape used by the UI
+    return arr;
+    // shuffleSeed intentionally invalidates the memo to reshuffle on retake
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizzesRes, shuffleSeed]);
+
+  const originalQuizzes = shuffledQuizzes;
+
   const quizData = useMemo(() => {
-    if (!quizzesRes?.success || !Array.isArray(quizzesRes.data)) return [];
-
-    return quizzesRes.data.map((q, idx) => ({
+    return shuffledQuizzes.map((q, idx) => ({
       lesson: idx + 1,
       question: q.question,
       options: (q.answers ?? []).map((a) => a.answer_text),
@@ -101,7 +118,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
       quizTypeName: q.quizType?.name ?? "Single Choice",
       quizTypeId: q.quiz_type_id,
     }));
-  }, [quizzesRes]);
+  }, [shuffledQuizzes]);
 
   const threshold: number | null = (campaignRes as any)?.quiz_retry_threshold ?? null;
 
@@ -227,6 +244,8 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     setShowCompletion(false);
     setAnswerStatusMsg("");
     setIsSubmitting(false);
+    // Reshuffle question order for the next attempt
+    setShuffleSeed(Date.now());
   };
 
   const handleCompletionGoBack = () => {
@@ -510,12 +529,38 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                   </div>
                 ) : !showCompletion ? (
                   <div className="bg-white rounded-2xl p-3 w-full" id="quizContainer">
-                    <div className="mb-2 flex items-center gap-3">
+                    <div className="mb-2 flex items-center gap-3 flex-wrap">
                       <p className="text-[10px] text-blue-500" id="lessonInfo">
-                        Lesson {quiz.lesson} Of {quizData.length}
+                        Lesson {formatNumber(quiz.lesson, locale)} Of{" "}
+                        {formatNumber(quizData.length, locale)}
                       </p>
                       <p className="text-sm text-gray-300 font-light">|</p>
                       <p className="text-[10px] text-green-500">{quiz.quizTypeName}</p>
+                      {(() => {
+                        const langId =
+                          (contentRes?.data as any)?.lang_id ??
+                          (contentRes?.data as any)?.language?.id;
+
+                        if (!langId) return null;
+
+                        return (
+                          <>
+                            <p className="text-sm text-gray-300 font-light">|</p>
+                            <span className="inline-flex items-center gap-1.5 text-[10px] text-gray-700 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-full">
+                              <span className="w-3.5 h-3.5 rounded-full overflow-hidden border border-gray-100 flex items-center justify-center">
+                                <ReactCountryFlag
+                                  svg
+                                  className="w-full h-full object-cover"
+                                  countryCode={getLanguageCountryCode(langId)}
+                                  style={{ fontSize: "1.2em", lineHeight: "1.2em" }}
+                                  title={getLanguageName(langId)}
+                                />
+                              </span>
+                              <span>{getLanguageName(langId)}</span>
+                            </span>
+                          </>
+                        );
+                      })()}
                     </div>
 
                     <h1 className="text-lg font-semibold text-gray-900 mb-3">{moduleName} Quiz</h1>
@@ -530,7 +575,8 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                           />
                         </div>
                         <span className="text-xs font-semibold text-gray-700" id="progressText">
-                          {currentQuestion + 1}/{quizData.length}
+                          {formatNumber(currentQuestion + 1, locale)}/
+                          {formatNumber(quizData.length, locale)}
                         </span>
                       </div>
                     </div>
@@ -870,18 +916,20 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Quiz Status</h3>
                   <div className="text-center py-4 bg-gray-50 rounded-lg">
                     <p className="text-3xl font-semibold text-gray-900">
-                      <span id="statusCount">{String(currentQuestion + 1).padStart(2, "0")}</span>/
-                      <span id="totalCount">{String(quizData.length).padStart(2, "0")}</span>
+                      <span id="statusCount">{padNumber(currentQuestion + 1, 2, locale)}</span>/
+                      <span id="totalCount">{padNumber(quizData.length, 2, locale)}</span>
                     </p>
                     <p className="text-sm text-gray-600 mt-2">
-                      <span id="completedCount">{currentQuestion + 1}</span> out of{" "}
-                      <span id="totalQuizCount">{quizData.length}</span> quizzes are done
+                      <span id="completedCount">{formatNumber(currentQuestion + 1, locale)}</span>{" "}
+                      out of{" "}
+                      <span id="totalQuizCount">{formatNumber(quizData.length, locale)}</span>{" "}
+                      quizzes are done
                     </p>
                     {threshold !== null && threshold > 0 && (
                       <p
                         className={`text-sm mt-2 ${noAttemptsLeft ? "text-red-600 font-semibold" : "text-gray-600"}`}
                       >
-                        Attempts left: {attemptsLeft}
+                        Attempts left: {formatNumber(attemptsLeft ?? 0, locale)}
                       </p>
                     )}
                   </div>

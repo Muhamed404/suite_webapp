@@ -33,7 +33,7 @@ exports.renderBulkImportJobs = async (req, res) => {
     const apiClient = getApiClient(req);
     const listUrl = backend_api_urls.PRODUCT_SUITE.User_Management.BULK_IMPORT_LIST(organizationId);
     const response = await apiClient.get(listUrl, { params: { limit: 100, offset: 0 } });
-    const payload = response.data?.object || { total: 0, jobs: [] };
+    const payload = response.data?.data || response.data?.object || { total: 0, jobs: [] };
 
     const highlightJobIdRaw = req.query.jobId;
     const highlightJobId =

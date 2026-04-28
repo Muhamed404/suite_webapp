@@ -268,7 +268,18 @@ function setPage(p) {
 // ===============================
 // Search input
 if (searchInput) {
-  searchInput.addEventListener("input", renderTable);
+  searchInput.addEventListener("input", () => {
+    renderTable();
+    // Update URL without reload
+    const url = new URL(window.location.href);
+    const query = searchInput.value;
+    if (query) {
+      url.searchParams.set('search', query);
+    } else {
+      url.searchParams.delete('search');
+    }
+    window.history.pushState({}, '', url);
+  });
 }
 
 // Dropdown filter
@@ -303,6 +314,13 @@ document.querySelectorAll("th[data-sort]").forEach(th => {
 // Initialize table + tabs (only if data exists)
 // ===============================
 if (data.length > 0) {
+  // Map search param from URL on load
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchParam = urlParams.get('search');
+  if (searchParam && searchInput) {
+    searchInput.value = searchParam;
+  }
+
   renderTabs();
   renderTable();
 } else {

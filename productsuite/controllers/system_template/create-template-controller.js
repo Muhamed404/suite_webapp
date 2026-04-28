@@ -28,7 +28,6 @@ exports.renderCreateTemplate = async (req, res) => {
     const filteredData = campaignTypesData.filter(item => item.name !== "USB");
 
     logger.info(`[System Template] Filtered campaign types count: ${filteredData.length}`);
-
     res.render("pages/system_template/create-template", {
       // enableSuiteManagementLeftMenu: true,
       postMethodUrl: frontend_api_urls.PRODUCT_SUITE.System_Template.CREATE,
@@ -36,6 +35,8 @@ exports.renderCreateTemplate = async (req, res) => {
       campaignTypes: filteredData,
       phishTypeMap: enums.phishingType,
       isSystemTemplate: true,
+      webTemplateBucket: process.env.WEB_TEMPLATE_BUCKET,
+
 
     });
     logger.info('[System Template] Rendered create_template page successfully');
@@ -130,6 +131,14 @@ exports.createTemplate = async (req, res) => {
       }
     });
 
+    // Normalize relative image paths in phishing_content and phishing_page_content to web_bucket placeholder
+    payload.phishing_content = normalizeImageBucketRefs(payload.phishing_content);
+    payload.phishing_page_content = normalizeImageBucketRefs(payload.phishing_page_content);
+
+
+    // Replace placeholder/empty anchor hrefs with <%=phishing_url%>
+    // payload.phishing_content = normalizeAnchorPhishingUrl(payload.phishing_content);
+
     // Optionally inject interaction script for DataEntryBasedPhishing when creating a new template
     if (
       payload.phishing_page_content &&
@@ -137,8 +146,6 @@ exports.createTemplate = async (req, res) => {
       payload.category == enums.phishingCategories.DataEntryBasedPhishing
     ) {
       logger.info('[Create System Template] Adding interaction script to phishing_page_content');
-      const scriptStart = '<script>';
-      const scriptEnd = '</script>';
       const newScript = interactionScript();
 
       // Remove any existing interactionScript
@@ -147,6 +154,11 @@ exports.createTemplate = async (req, res) => {
       if (scriptRegex.test(content)) {
         content = content.replace(scriptRegex, '');
       }
+
+      // Inject phishing_url_submit into every <form> action automatically
+      content = injectPhishingFormWebAction(content);
+      logger.info('[Create System Template] Injected phishing_url_submit into form action(s)');
+
       payload.phishing_page_content = content + newScript;
     }
 
@@ -179,6 +191,36 @@ exports.createTemplate = async (req, res) => {
 
 
 
+
+function normalizeAnchorPhishingUrl(content) {
+  if (!content) return content;
+
+  if (!/<a[\s>]/i.test(content)) return content;
+
+  // Replace href="{{website_url}}" or href="#" with href="<%=phishing_url%>"
+  return content
+    .replace(/(<a\b[^>]*\bhref=["'])\{\{website_url\}\}(["'])/gi, '$1<%=phishing_url%>$2')
+    .replace(/(<a\b[^>]*\bhref=["'])#(["'])/gi, '$1<%=phishing_url%>$2');
+}
+
+function normalizeImageBucketRefs(content) {
+  if (!content) return content;
+
+  const bucket = process.env.WEB_TEMPLATE_BUCKET || '';
+  if (!bucket) return content;
+
+  if (content.indexOf(bucket) === -1) return content;
+
+  return content.split(bucket).join('<%=web_bucket%>');
+}
+
+function injectPhishingFormWebAction(content) {
+  // Replace or add action="<%-phishing_url_submit%>" on every <form> tag
+  return content.replace(/<form(\b[^>]*)>/gi, (match, attrs) => {
+    const cleanedAttrs = (attrs || '').replace(/\s*action\s*=\s*(["'])[^"']*\1/gi, '');
+    return `<form${cleanedAttrs} action="<%-phishing_url_submit%>">`;
+  });
+}
 
 function interactionScript() {
   const script = `

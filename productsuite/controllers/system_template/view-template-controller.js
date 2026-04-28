@@ -76,6 +76,20 @@ exports.viewTemplate = async (req, res) => {
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
     tpl.phishing_smtp = tpl.phishing_smtp_id;
+
+    // Resolve <%=web_bucket%> placeholder in all HTML fields so images load in the editor
+    const phishingOCIBucketURL = (process.env.WEB_TEMPLATE_BUCKET || '').replace(/\/$/, '');
+    if (phishingOCIBucketURL) {
+      if (tpl.phishing_content) {
+        tpl.phishing_content = tpl.phishing_content.replaceAll('<%=web_bucket%>', phishingOCIBucketURL);
+      }
+      if (tpl.phishing_page_content) {
+        tpl.phishing_page_content = tpl.phishing_page_content.replaceAll('<%=web_bucket%>', phishingOCIBucketURL);
+      }
+      if (tpl.landing_page_content) {
+        tpl.landing_page_content = tpl.landing_page_content.replaceAll('<%=web_bucket%>', phishingOCIBucketURL);
+      }
+    }
     if(tpl.PhishingCampaignType && tpl.PhishingCampaignType.name === enums.phishingTypeByNames.SMS) {
       tpl.sms_content = tpl?.phishing_content || '';
     }

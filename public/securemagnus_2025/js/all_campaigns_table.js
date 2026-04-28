@@ -41,6 +41,16 @@ const filterType  = document.getElementById("filterType");
 const rowsSelect  = document.getElementById("rowsPerPage");
 
 // ===============================
+// HTML escape function 
+// ===============================
+function escapeHtml(text) {
+  if (text === null || text === undefined) return '';
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ===============================
 // Get display name for status
 // ===============================
 function getStatusDisplayName(status) {
@@ -160,21 +170,21 @@ function renderTable() {
     return `
     <tr class="transition-colors border-t hover:bg-blue-50">
       <td class="px-6 py-6 whitespace-nowrap">
-        <div class="text-sm font-medium text-gray-900">${campaign.name}</div>
-        <div class="text-xs text-gray-500">#${campaign.campaignIdentifier}</div>
+        <div class="text-sm font-medium text-gray-900">${escapeHtml(campaign.name)}</div>
+        <div class="text-xs text-gray-500">#${escapeHtml(campaign.campaignIdentifier)}</div>
       </td>
       <td class="px-6 py-6 whitespace-nowrap">
         <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-          ${campaign.typeLabel}
+          ${escapeHtml(campaign.typeLabel)}
         </span>
       </td>
-      <td class="px-6 py-6 whitespace-nowrap text-sm text-gray-900">${campaign.templateName}</td>
-      <td class="px-6 py-6 whitespace-nowrap text-sm text-gray-900">${campaign.startDate || 'N/A'}</td>
-      <td class="px-6 py-6 whitespace-nowrap text-sm text-gray-900">${campaign.endDate || 'N/A'}</td>
+      <td class="px-6 py-6 whitespace-nowrap text-sm text-gray-900">${escapeHtml(campaign.templateName)}</td>
+      <td class="px-6 py-6 whitespace-nowrap text-sm text-gray-900">${escapeHtml(campaign.startDate) || 'N/A'}</td>
+      <td class="px-6 py-6 whitespace-nowrap text-sm text-gray-900">${escapeHtml(campaign.endDate) || 'N/A'}</td>
       <td class="px-6 py-6 whitespace-nowrap">
-        <span class="${statusClass}">${campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}</span>
+        <span class="${statusClass}">${escapeHtml(campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1))}</span>
       </td>
-      <td class="px-6 py-6 whitespace-nowrap text-sm text-gray-900">${campaign.totalTargets || 0}</td>
+      <td class="px-6 py-6 whitespace-nowrap text-sm text-gray-900">${escapeHtml(campaign.totalTargets) || 0}</td>
       <td class="px-6 py-6 whitespace-nowrap text-right">${actionButton}</td>
     </tr>`;
   }).join("");

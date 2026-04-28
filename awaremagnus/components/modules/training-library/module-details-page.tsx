@@ -649,7 +649,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     <div className="flex flex-col items-start gap-3">
                       <div 
                         className={clsx(
-                          "w-50 h-50 overflow-hidden shrink-0",
+                          "w-full max-w-[220px] h-[140px] overflow-hidden shrink-0 bg-white",
                           locale === "ar" && "translate-x-4"
                         )}
                         style={{ borderRadius: 12 }}
@@ -657,7 +657,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                         {moduleLogoUrl ? (
                           <img
                             alt={moduleTitle}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-contain"
                             src={moduleLogoUrl}
                           />
                         ) : (
