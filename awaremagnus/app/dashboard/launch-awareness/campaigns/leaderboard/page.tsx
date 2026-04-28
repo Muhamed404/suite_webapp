@@ -554,11 +554,11 @@ export default function CampaignLeaderboardPage() {
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-full transition-colors"
                             onClick={() =>
                               router.push(
-                                `/dashboard/launch-awareness/campaigns/${campaignId}/user/${user.user_id}/report`
+                                `/dashboard/my-report-card?userId=${user.user_id}`
                               )
                             }
                           >
-                            View Report
+                            Full Report
                           </button>
                         </td>
                       </tr>

@@ -15,6 +15,8 @@ interface SemiCircleChartProps {
   labels?: string[];
   showLegend?: boolean;
   hideZeroLegendEntries?: boolean;
+  showLowRiskCounter?: boolean;
+  lowRiskCounterLabel?: string;
 }
 
 export const SemiCircleChart = ({
@@ -27,6 +29,8 @@ export const SemiCircleChart = ({
   labels = ["Sent", "Opened", "Admin"],
   showLegend = true,
   hideZeroLegendEntries = false,
+  showLowRiskCounter = false,
+  lowRiskCounterLabel = "Low risk employees",
 }: SemiCircleChartProps) => {
   const total = sent + opened + admin;
   const sentPercent = total === 0 ? 0 : (sent / total) * 100;
@@ -43,6 +47,9 @@ export const SemiCircleChart = ({
         pie: {
           donut: {
             size: "70%",
+            labels: {
+              show: !showLowRiskCounter,
+            },
           },
           startAngle: -90,
           endAngle: 90,
@@ -73,10 +80,19 @@ export const SemiCircleChart = ({
         },
       },
     }),
-    [sent, opened, admin, color1, color2, color3, labels]
+    [sent, opened, admin, color1, color2, color3, labels, showLowRiskCounter]
   );
 
   const series = [sentPercent, openedPercent, adminPercent];
 
-  return <Chart options={chartOptions} series={series} type="donut" />;
+  return (
+    <div className="w-full flex flex-col items-center">
+      {showLowRiskCounter && (
+        <p className="text-sm font-medium text-gray-700 mb-2">
+          {lowRiskCounterLabel}: {sent}
+        </p>
+      )}
+      <Chart options={chartOptions} series={series} type="donut" />
+    </div>
+  );
 };

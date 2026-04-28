@@ -324,6 +324,20 @@ const SEG_COLORS = [
   "#D1132A",
 ] as const;
 
+function getRiskSegmentCount(level: string | null): number {
+  if (!level) return 0;
+  const normalized = level.toLowerCase().trim();
+
+  if (normalized.includes("not evaluated") || normalized.includes("unknown")) return 0;
+  if (normalized.includes("very low")) return 1;
+  if (normalized.includes("low")) return 2;
+  if (normalized.includes("medium")) return 4;
+  if (normalized.includes("high") && !normalized.includes("very")) return 6;
+  if (normalized.includes("very high")) return 7;
+
+  return 0;
+}
+
 /* ─── PDF Print: build standalone HTML document ─── */
 function buildPrintHTML(args: {
   userName: string;
@@ -341,6 +355,7 @@ function buildPrintHTML(args: {
   chartData: number[];
   chartLabels: string[];
   totalComplianceScore: number;
+  riskSegmentsFilled: number;
 }): string {
   const {
     userName,
@@ -358,6 +373,7 @@ function buildPrintHTML(args: {
     chartData,
     chartLabels,
     totalComplianceScore,
+    riskSegmentsFilled,
   } = args;
   const today = formatToday();
   const studyStr = formatStudyTime(studyTime);
@@ -582,13 +598,10 @@ function buildPrintHTML(args: {
       <span style="font-size:12px;white-space:nowrap;">Security Posture</span>
     </div>
     <div class="seg-bar">
-      <div class="seg" style="background:#9EC232;"></div>
-      <div class="seg" style="background:#C1C625;"></div>
-      <div class="seg" style="background:#EACB16;"></div>
-      <div class="seg" style="background:#FFCD0F;"></div>
-      <div class="seg" style="background:#EBA75C;"></div>
-      <div class="seg" style="background:#E4590F;"></div>
-      <div class="seg" style="background:#D1132A;"></div>
+      ${SEG_COLORS.map((color, idx) => {
+        const active = idx < riskSegmentsFilled;
+        return `<div class="seg" style="background:${active ? color : "#E5E7EB"};"></div>`;
+      }).join("")}
     </div>
     <span style="background:${riskBadge.bg};color:white;padding:2px 10px;border-radius:9999px;font-size:12px;white-space:nowrap;">${riskBadge.text}</span>
   </div>
@@ -758,6 +771,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
   const studyTime = (meta?.total_study_time as number | undefined) ?? 0;
   const riskLevel = (meta?.user_risk_level as string | null | undefined) ?? null;
   const riskBadge = getRiskBadge(riskLevel);
+  const riskSegmentsFilled = getRiskSegmentCount(riskLevel);
 
   const totalComplianceScore = useMemo(
     () => allModules.reduce((s, { module: m }) => s + (m.achieved_compliance_score || 0), 0),
@@ -818,6 +832,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
       chartData,
       chartLabels,
       totalComplianceScore,
+      riskSegmentsFilled,
     });
     const win = window.open("", "_blank", "width=1000,height=800");
 
@@ -1045,8 +1060,12 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                 </div>
                 <div className="flex-1">
                   <div className="flex overflow-hidden rounded-lg w-full">
-                    {SEG_COLORS.map((c) => (
-                      <div key={c} className="h-3 w-full" style={{ backgroundColor: c }} />
+                    {SEG_COLORS.map((c, idx) => (
+                      <div
+                        key={c}
+                        className="h-3 w-full transition-colors duration-300"
+                        style={{ backgroundColor: idx < riskSegmentsFilled ? c : "#E5E7EB" }}
+                      />
                     ))}
                   </div>
                 </div>

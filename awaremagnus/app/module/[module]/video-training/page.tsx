@@ -35,6 +35,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   }>({});
   const [sendingProgress, setSendingProgress] = useState<Set<number>>(new Set());
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+  const videoContainerRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const lastSentPercentRef = useRef<{ [key: number]: number }>({});
   const videoIntervals = useRef<{ [key: number]: ReturnType<typeof setInterval> | null }>({});
   const moduleIdRef = useRef<number | null>(null);
@@ -290,6 +291,28 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     }
   };
 
+  const openVideoFullscreen = async (contentId: number) => {
+    const container = videoContainerRefs.current[contentId];
+    if (!container) return;
+
+    const fsElement = container as HTMLDivElement & {
+      webkitRequestFullscreen?: () => Promise<void> | void;
+      msRequestFullscreen?: () => Promise<void> | void;
+    };
+
+    try {
+      if (fsElement.requestFullscreen) {
+        await fsElement.requestFullscreen();
+      } else if (fsElement.webkitRequestFullscreen) {
+        fsElement.webkitRequestFullscreen();
+      } else if (fsElement.msRequestFullscreen) {
+        fsElement.msRequestFullscreen();
+      }
+    } catch (error) {
+      console.error("Failed to enter fullscreen mode:", error);
+    }
+  };
+
   const campaignId = useMemo(() => {
     const campaignIdFromUrl = searchParams?.get("campaign_id");
 
@@ -409,7 +432,13 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                     key={content.id || index}
                     className="bg-white rounded-xl overflow-hidden mb-4"
                   >
-                    <div className="relative bg-black" style={{ height: "60vh" }}>
+                    <div
+                      ref={(el) => {
+                        videoContainerRefs.current[content.id] = el;
+                      }}
+                      className="relative bg-black"
+                      style={{ height: "60vh" }}
+                    >
                       <video
                         ref={(el) => {
                           videoRefs.current[content.id] = el;
@@ -482,6 +511,12 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         >
                           {t("videoTraining.restart")}
                         </button>
+                        <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                          onClick={() => openVideoFullscreen(content.id)}
+                        >
+                          {t("videoTraining.openFullScreen")}
+                        </button>
                         <span className="ml-1 text-sm text-gray-700">
                           {formatTime(videoProgress[content.id]?.currentTime ?? 0)} /{" "}
                           {formatTime(videoProgress[content.id]?.duration ?? 0)}
@@ -542,36 +577,6 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                       </p>
                     </div>
 
-                    {(() => {
-                      const fullUrl = !content.source_url
-                        ? undefined
-                        : getContentAssetUrl(content.source_url) || undefined;
-
-                      return fullUrl ? (
-                        <div className="p-4 flex items-center gap-3 flex-wrap">
-                          <a
-                            className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
-                            href={fullUrl}
-                            rel="noopener noreferrer"
-                            target="_blank"
-                          >
-                            <svg
-                              fill="none"
-                              height="14"
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              viewBox="0 0 24 24"
-                              width="14"
-                            >
-                              <polygon points="5 3 19 12 5 21 5 3" />
-                            </svg>
-                            {t("videoTraining.openFullScreen")}
-                          </a>
-                        </div>
-                      ) : null;
-                    })()}
                   </div>
                 ))
               ) : (
