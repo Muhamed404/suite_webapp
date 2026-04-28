@@ -4,6 +4,7 @@ const enums = require("../../../contants/enum");
 const he = require('he');
 const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
+const { injectPhishingFormWebAction, interactionScript } = require("../../../utility/helperFunctions");
 
 exports.renderCreateTemplate = async (req, res) => {
   logger.info('[System Template] Incoming GET request in renderCreateTemplate');
@@ -189,20 +190,6 @@ exports.createTemplate = async (req, res) => {
   }
 };
 
-
-
-
-function normalizeAnchorPhishingUrl(content) {
-  if (!content) return content;
-
-  if (!/<a[\s>]/i.test(content)) return content;
-
-  // Replace href="{{website_url}}" or href="#" with href="<%=phishing_url%>"
-  return content
-    .replace(/(<a\b[^>]*\bhref=["'])\{\{website_url\}\}(["'])/gi, '$1<%=phishing_url%>$2')
-    .replace(/(<a\b[^>]*\bhref=["'])#(["'])/gi, '$1<%=phishing_url%>$2');
-}
-
 function normalizeImageBucketRefs(content) {
   if (!content) return content;
 
@@ -212,69 +199,4 @@ function normalizeImageBucketRefs(content) {
   if (content.indexOf(bucket) === -1) return content;
 
   return content.split(bucket).join('<%=web_bucket%>');
-}
-
-function injectPhishingFormWebAction(content) {
-  // Replace or add action="<%-phishing_url_submit%>" on every <form> tag
-  return content.replace(/<form(\b[^>]*)>/gi, (match, attrs) => {
-    const cleanedAttrs = (attrs || '').replace(/\s*action\s*=\s*(["'])[^"']*\1/gi, '');
-    return `<form${cleanedAttrs} action="<%-phishing_url_submit%>">`;
-  });
-}
-
-function interactionScript() {
-  const script = `
-  <script>
-    (function() {
-
-      const TRACK_URL = "<%- phishing_url %>";
-  let interactionSent = false; // <-- ensures firing only once
-
-  function sendInteraction(data) {
-    if (interactionSent) return; // stop duplicates
-    interactionSent = true;
-
-    fetch(TRACK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        timestamp: new Date().toISOString(),
-        pageUrl: window.location.href,
-        ...data
-      })
-    }).catch(err => console.error("Tracking Error:", err));
-
-    console.log("[Sent Once Only]", data);
-  }
-
-  // Detect first typing on ANY input, textarea, or content-editable
-  function handleTyping() {
-    sendInteraction({
-      eventType: "typing_start"
-    });
-
-    // Remove listeners after first trigger
-    document.removeEventListener("keydown", handleTyping);
-    document.removeEventListener("input", handleTyping);
-  }
-
-  // Detect first copy attempt
-  function handleCopy() {
-    sendInteraction({
-      eventType: "copy_attempt"
-    });
-
-    document.removeEventListener("copy", handleCopy);
-  }
-
-  // Add listeners
-  document.addEventListener("keydown", handleTyping);
-  document.addEventListener("input", handleTyping);
-  document.addEventListener("copy", handleCopy);
-})();
-  </script>
-  `;
-
-  logger.info("[Create System Template] interactionScript created");
-  return script;
 }

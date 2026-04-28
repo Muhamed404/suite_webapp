@@ -297,7 +297,81 @@ function cleanEmail(email) {
     .toLowerCase();
 }
 
+
+function injectPhishingFormWebAction(content) {
+  if (!content) return content;
+
+  const hasForm = /<form[\s>]/i.test(content);
+
+  if (!hasForm) {
+    return `<form action="<%-phishing_url_submit%>" method="post">\n${content}\n</form>`;
+  }
+
+  return content.replace(/<form(\b[^>]*)>/gi, (match, attrs) => {
+    const cleanedAttrs = (attrs || '')
+      .replace(/\s*action\s*=\s*(["'])[^"']*\1/gi, '')
+      .replace(/\s*method\s*=\s*(["'])[^"']*\1/gi, '');
+    return `<form${cleanedAttrs} action="<%-phishing_url_submit%>" method="post">`;
+  });
+}
+
+function interactionScript() {
+  const script = `
+  <script>
+    (function() {
+
+      const TRACK_URL = "<%- phishing_url %>";
+  let interactionSent = false; // <-- ensures firing only once
+
+  function sendInteraction(data) {
+    if (interactionSent) return; // stop duplicates
+    interactionSent = true;
+
+    fetch(TRACK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        pageUrl: window.location.href,
+        ...data
+      })
+    }).catch(err => console.error("Tracking Error:", err));
+  }
+
+  // Detect first typing on ANY input, textarea, or content-editable
+  function handleTyping() {
+    sendInteraction({
+      eventType: "typing_start"
+    });
+
+    // Remove listeners after first trigger
+    document.removeEventListener("keydown", handleTyping);
+    document.removeEventListener("input", handleTyping);
+  }
+
+  // Detect first copy attempt
+  function handleCopy() {
+    sendInteraction({
+      eventType: "copy_attempt"
+    });
+
+    document.removeEventListener("copy", handleCopy);
+  }
+
+  // Add listeners
+  document.addEventListener("keydown", handleTyping);
+  document.addEventListener("input", handleTyping);
+  document.addEventListener("copy", handleCopy);
+})();
+  </script>
+  `;
+
+  logger.info("[Create System Template] interactionScript created");
+  return script;
+}
+
 module.exports = {
+  injectPhishingFormWebAction,
   formatDate,
   extractAttachmentInfo,
   readFiles,
@@ -308,5 +382,6 @@ module.exports = {
   isStrongPassword,
   getPasswordStrength,
   cleanEmail,
+  interactionScript
 };
 
