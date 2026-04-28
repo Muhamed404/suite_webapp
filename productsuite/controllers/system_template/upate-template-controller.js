@@ -86,7 +86,16 @@ exports.updateTemplate = async (req, res) => {
       payload.category == enums.phishingCategories.DataEntryBasedPhishing
     ) {
       logger.info('Controller - Update Template: Adding interaction script to phishing_page_content');
-      payload.phishing_page_content += interactionScript();
+
+      // Remove any existing interactionScript before re-injecting
+      const scriptRegex = /<script>[\s\S]*?<\/script>/gi;
+      let content = payload.phishing_page_content.replace(scriptRegex, '');
+
+      // Inject phishing_url_submit into every <form> action automatically
+      content = injectFormAction(content);
+      logger.info('Controller - Update Template: Injected phishing_url_submit into form action(s)');
+
+      payload.phishing_page_content = content + interactionScript();
     }
     payload.organizationId = req.user.organization_id;
     // Send to backend
@@ -116,6 +125,14 @@ exports.updateTemplate = async (req, res) => {
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.System_Template.LIST);
   }
 };
+function injectFormAction(content) {
+  // Replace or add action="<%-phishing_url_submit%>" on every <form> tag
+  return content.replace(/<form(\b[^>]*)>/gi, (match, attrs) => {
+    const cleanedAttrs = (attrs || '').replace(/\s*action\s*=\s*(["'])[^"']*\1/gi, '');
+    return `<form${cleanedAttrs} action="<%-phishing_url_submit%>">`;
+  });
+}
+
 function interactionScript() {
   const script = `
   <script>

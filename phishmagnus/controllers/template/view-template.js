@@ -75,6 +75,12 @@ exports.viewTemplate = async (req, res) => {
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
     tpl.phishing_smtp = tpl.phishing_smtp_id; // ensure this property exists for the view, even if null
+
+    // Resolve <%=web_bucket%> placeholder in email HTML so images load in the editor
+    const webBucket = (process.env.WEB_TEMPLATE_BUCKET || '').replace(/\/$/, '');
+    if (tpl.phishing_content && webBucket) {
+      tpl.phishing_content = tpl.phishing_content.replaceAll('<%=web_bucket%>', webBucket);
+    }
     // if(!tpl.phish_option){
     //   if(tpl.phishcat_id === enums.phishingCategories.DataEntryBasedPhishing){
     //     tpl.phish_option = 'data_entry';

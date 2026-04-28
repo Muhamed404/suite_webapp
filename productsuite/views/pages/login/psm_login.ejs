@@ -128,7 +128,7 @@
 
 
       <!-- Login Form -->
-      <form id="loginForm" action="/login" method="POST">
+      <form id="loginForm" action="/login<%= locals.locale ? ('?lang=' + locals.locale) : '' %>" method="POST">
         <input type="hidden" name="userTimezone" id="userTimezone">
 
         <div class="flex items-center justify-center">

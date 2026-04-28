@@ -22,10 +22,11 @@
             <!-- Search + Filter -->
             <div class="flex items-center justify-between">
                 <div class="relative">
-                    <input id="searchInput" type="text" placeholder="<%= __('nfc_campaign.searchHere') %>"
-                        class="<%= locals.locale === 'ar' ? 'pr-10 pl-4' : 'pl-10 pr-4' %> py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)] <%= locals.locale === 'ar' ? 'text-right' : '' %>"
-                        <%= locals.locale === 'ar' ? 'dir="rtl"' : '' %>>
-                    <i class="fas fa-search absolute <%= locals.locale === 'ar' ? 'right-3' : 'left-3' %> top-1/2 transform -translate-y-[49%] text-gray-400"></i>
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <img src="/securemagnus_2025/images/img/search.svg" class="w-4 h-4 text-gray-400" alt="">
+                    </div>
+                    <input id="searchInput" type="text" placeholder="<%= __('nfc_campaign.searchHere') %>" value="<%= typeof search !== 'undefined' ? search : '' %>"
+                        class="pl-9 pr-4 py-3 w-[345px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
                 </div>
             </div>
 
@@ -38,52 +39,49 @@
             <table class="min-w-full text-sm text-left">
                 <thead class="bg-[#FAFBFC]">
                     <tr>
-                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="name">
+                        <th class="px-6 py-6 font-semibold text-gray-900 whitespace-nowrap" data-sort="name">
                             <span class="inline-flex items-center gap-2">
-
+                                <img src="/securemagnus_2025/images/img/form.svg" class="w-5 h-5" alt="">
                                 <%= __("nfc_campaign.name") %>
                             </span>
                         </th>
-                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="purchase_Date">
+                        <th class="px-6 py-6 font-semibold text-gray-900 whitespace-nowrap" data-sort="purchase_Date">
                             <span class="inline-flex items-center gap-2">
-                                <img src="/securemagnus_2025/images/subscription_history/subscription_history_purchase_date.svg"
-                                    alt="">
+                                <img src="/securemagnus_2025/images/img/form.svg" class="w-5 h-5" alt="">
                                 <%= __("nfc_campaign.templateName") %>
                             </span>
                         </th>
-                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
+                        <th class="px-6 py-6 font-semibold text-gray-900 whitespace-nowrap" data-sort="start_Date">
                             <span class="inline-flex items-center gap-2">
-                                <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg"
-                                    alt="">
+                                <img src="/securemagnus_2025/images/img/calendar.svg" class="w-5 h-5" alt="">
                                 <%= __("nfc_campaign.startDate") %>
                             </span>
                         </th>
-                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="start_Date">
+                        <th class="px-6 py-6 font-semibold text-gray-900 whitespace-nowrap" data-sort="start_Date">
                             <span class="inline-flex items-center gap-2">
-                                <img src="/securemagnus_2025/images/subscription_history/subscription_history_start_date.svg"
-                                    alt="">
+                                <img src="/securemagnus_2025/images/img/calendar.svg" class="w-5 h-5" alt="">
                                 <%= __("nfc_campaign.endDate") %>
                             </span>
                         </th>
 
-                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
+                        <th class="px-6 py-6 font-semibold text-gray-900 whitespace-nowrap" data-sort="status">
                             <span class="inline-flex items-center gap-2">
-
+                                <img src="/securemagnus_2025/images/nfc-opened.svg" class="w-5 h-5" alt="">
                                 <%= __("nfc_campaign.status") %>
                             </span>
                         </th>
-                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="status">
+                        <th class="px-6 py-6 font-semibold text-gray-900 whitespace-nowrap" data-sort="status">
                             <span class="inline-flex items-center gap-2">
-
+                                <img src="/securemagnus_2025/images/nfc-people.svg" class="w-5 h-5" alt="">
                                 <%= __("nfc_campaign.totalNFCDevices") %>
                             </span>
                         </th>
                                                  
                                                  
 
-                        <th class="px-6 py-6 font-semibold text-gray-700 whitespace-nowrap" data-sort="action">
+                        <th class="px-6 py-6 font-semibold text-gray-900 whitespace-nowrap" data-sort="action">
                             <span class="inline-flex items-center gap-2">
-
+                                <img src="/securemagnus_2025/images/eye.svg" class="w-5 h-5" alt="">
                                 <%= __("nfc_campaign.action") %>
                             </span>
                         </th>

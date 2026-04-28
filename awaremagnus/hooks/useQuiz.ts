@@ -139,13 +139,14 @@ export function useQuizzesByModule(moduleId: number, langId?: number, enabled = 
       );
       const all = results.flatMap((r) => (r?.success && Array.isArray(r?.data) ? r.data : []));
 
-      // Create a map of content_id to content info (name and language) for table display
-      const contentMap: Record<number, { name: string, language?: string }> = {};
+      // Create a map of content_id to content info (name, language) for table display
+      const contentMap: Record<number, { name: string; language?: string; lang_id?: number }> = {};
 
       contents.forEach((c: any) => {
         contentMap[c.id] = {
-           name: c.title || c.name || `Content ${c.id}`,
-           language: c.language?.name || c.language_name || (c.lang_id === 2 ? "Arabic" : "English")
+          name: c.title || c.name || `Content ${c.id}`,
+          language: c.language?.name || c.language_name || (c.lang_id === 2 ? "Arabic" : "English"),
+          lang_id: c.lang_id ?? c.language?.id,
         };
       });
 

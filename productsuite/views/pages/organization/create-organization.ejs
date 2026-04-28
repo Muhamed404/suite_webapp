@@ -263,7 +263,12 @@
     name: "<%= __('organization.create.validationOrgNameRequired') %>",
     address: "<%= __('organization.create.validationOrgAddressRequired') %>",
     postalCode: "<%= __('organization.create.validationOrgPostalCodeRequired') %>",
-    contact: "<%= __('organization.create.validationOrgContactRequired') %>",
+    contact: {
+      required: "<%= __('organization.create.validationOrgContactRequired') %>",
+      digits: "<%= __('organization.create.validationOrgContactDigits') %>",
+      minlength: "<%= __('organization.create.validationOrgContactMinLength') %>",
+      maxlength: "<%= __('organization.create.validationOrgContactMaxLength') %>"
+    },
     country: "<%= __('organization.create.validationOrgCountryRequired') %>",
     state: "<%= __('organization.create.validationOrgStateRequired') %>",
     city: "<%= __('organization.create.validationOrgCityRequired') %>",
@@ -273,6 +278,7 @@
     password: "<%= __('organization.create.validationAdminPasswordRequired') %>",
     nameTaken: "<%= __('organization.create.validationOrgNameTaken') %>",
     emailTaken: "<%= __('organization.create.validationEmailTaken') %>",
+    errorOccurred: "<%= __('organization.create.validationErrorOccurred') %>",
   };
 </script>
 <script src="/securemagnus_2025/js/custom_script/create-organization-validation.js"></script>

@@ -1,6 +1,6 @@
 const { logger } = require("../../../logger/logger");
 const { getFilteredRolesByOrganizationLevel } = require("../../../commons/commons");
-const { hasAccess } = require("../../../utility/helperFunctions");
+const { hasAccess, cleanEmail } = require("../../../utility/helperFunctions");
 const ICONSTANTS = require("../../../contants/ICONSTANTS");
 const enums = require('../../../contants/enum')
 const getApiClient = require('../../../utility/api-client');
@@ -77,7 +77,7 @@ exports.submitCreationForm = async (req, res, next) => {
   logger.info(`[UserCreationSubmit] Incoming request for user:${JSON.stringify(req.body.email, null, 2)}`);
   try {
     if (req.method === "POST") {
-      const email = req.body?.email || null;
+      const email = cleanEmail(req.body?.email || '')  || null;
       const first_name = req.body?.first_name || null;
       const last_name = req.body?.last_name || null;
       const password = req.body?.password || null;

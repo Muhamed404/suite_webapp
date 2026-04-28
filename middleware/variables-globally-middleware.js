@@ -18,6 +18,7 @@ function setGlobalUserVariables(req, res, next) {
     } else {
       res.locals.magnusAdmin = false
     }
+    res.locals.isSubAdmin = Number(roleId) === Number(enums.userType.MagSubAdmin);
 
     logger.info(`User ${req.user.email} has permission for phm ${req.user?.phm_license || false} and awm ${req.user?.awm_license || false}`);
     res.locals.locals_phm_subscription = req.user?.phm_license || false;

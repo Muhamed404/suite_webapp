@@ -13,7 +13,7 @@ $(document).ready(function () {
     },
     messages: {
       name: window.i18n.validation_messages.campaign_name_required,
- 
+      templateId: window.i18n.validation_messages.template_required,
       noOfTags: window.i18n.validation_messages.tag_quantity_required
   
     },
@@ -29,31 +29,110 @@ $(document).ready(function () {
   // Validate on change/blur for better UX
   $('#name').on('blur', function () { $(this).valid(); });
   $('#noOfTags').on('blur', function () { $(this).valid(); });
+  $('#templateSelect').on('change', function () {
+    clearTemplateError();
+    $(this).removeClass('border-red-500');
+  });
 
-  // Add custom validation for department/group selection on Next button
-  if (window.nextBtn) {
-    window.nextBtn.addEventListener('click', function(e) {
-      // Get current step
-      const steps = document.querySelectorAll('.step');
+  // Validate mandatory first-step fields before the shared stepper advances.
+  const nextBtn = document.getElementById('nextBtn');
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function (e) {
+      const steps = document.querySelectorAll('#steps > .step');
       let currentStep = 0;
+
       steps.forEach((step, index) => {
         if (!step.classList.contains('hidden')) {
           currentStep = index;
         }
       });
 
-      // Check which step has department/group selection
-      const currentStepElement = Array.from(steps).find(step => !step.classList.contains('hidden'));
-      if (currentStepElement && currentStepElement.querySelector('.tag-selector')) {
-        if (!validateDepartmentGroupSelection()) {
+      if (currentStep === 1) {
+        const validator = $("#nfcCampaignForm").validate();
+        const tagInput = document.getElementById('noOfTags');
+        const tagValue = tagInput?.value?.trim() || '';
+        const tagCount = Number(tagValue);
+
+        if (!tagValue || !Number.isInteger(tagCount) || tagCount < 1) {
+          validator.showErrors({
+            noOfTags: window.i18n.validation_messages.tag_quantity_required
+          });
+          $(tagInput).addClass('border-red-500');
+          tagInput?.focus();
           e.preventDefault();
           e.stopPropagation();
+          e.stopImmediatePropagation();
           return false;
         }
+
+        $(tagInput).removeClass('border-red-500');
+        return;
       }
-    }, true); // Use capture phase to intercept before other handlers
+
+      if (currentStep !== 0) {
+        return;
+      }
+
+      const validator = $("#nfcCampaignForm").validate();
+      const nameInput = document.getElementById('name');
+      const templateSelect = document.getElementById('templateSelect');
+      const hiddenTemplateId = document.querySelector('input[name="templateId"]');
+      const trimmedName = nameInput?.value?.trim() || '';
+      const selectedTemplateId = hiddenTemplateId?.value?.trim() || templateSelect?.value?.trim() || '';
+
+      let isValid = true;
+
+      if (trimmedName.length < 2) {
+        validator.showErrors({
+          name: window.i18n.validation_messages.campaign_name_required
+        });
+        $(nameInput).addClass('border-red-500');
+        if (isValid) {
+          nameInput.focus();
+          nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        isValid = false;
+      }
+
+      if (!selectedTemplateId && templateSelect) {
+        showTemplateError(window.i18n.validation_messages.template_required);
+        templateSelect.classList.add('border-red-500');
+        if (isValid) {
+          templateSelect.focus();
+          templateSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        isValid = false;
+      } else {
+        clearTemplateError();
+        templateSelect?.classList.remove('border-red-500');
+      }
+
+      if (!isValid) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
+    }, true);
   }
 });
+
+function showTemplateError(message) {
+  clearTemplateError();
+
+  const templateSelect = document.getElementById('templateSelect');
+  if (!templateSelect) return;
+
+  const error = document.createElement('span');
+  error.id = 'templateSelectError';
+  error.className = 'text-red-500 text-sm mt-1 block';
+  error.textContent = message;
+  templateSelect.insertAdjacentElement('afterend', error);
+}
+
+function clearTemplateError() {
+  document.getElementById('templateSelectError')?.remove();
+}
 
 // Validate department or group selection
 function validateDepartmentGroupSelection() {

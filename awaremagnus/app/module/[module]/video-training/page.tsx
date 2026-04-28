@@ -38,6 +38,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   const videoContainerRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const lastSentPercentRef = useRef<{ [key: number]: number }>({});
   const videoIntervals = useRef<{ [key: number]: ReturnType<typeof setInterval> | null }>({});
+  const hasSoughtRef = useRef<Set<number>>(new Set());
   const moduleIdRef = useRef<number | null>(null);
   const campaignIdRef = useRef<number>(
     (() => {
@@ -143,10 +144,13 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   useEffect(() => {
     savedProgressMap.forEach((savedPct, contentId) => {
       if (savedPct <= 0 || savedPct >= 100) return;
+      if (hasSoughtRef.current.has(contentId)) return;
+
       const video = videoRefs.current[contentId];
 
       if (video && video.readyState >= 1 && isFinite(video.duration)) {
         video.currentTime = (savedPct / 100) * video.duration;
+        hasSoughtRef.current.add(contentId);
       }
     });
   }, [savedProgressMap]);
@@ -165,6 +169,8 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     }));
 
     // Seek to saved position (only when partially watched, not completed)
+    if (hasSoughtRef.current.has(contentId)) return;
+
     const savedPct = savedProgressMap.get(contentId);
 
     if (savedPct != null && savedPct > 0 && savedPct < 100) {
@@ -172,6 +178,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
 
       if (isFinite(seekTime)) {
         video.currentTime = seekTime;
+        hasSoughtRef.current.add(contentId);
       }
     }
   };

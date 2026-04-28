@@ -53,11 +53,17 @@ document.addEventListener('DOMContentLoaded', function () {
   const filter = document.getElementById('filter');
   filter.addEventListener('change', function () {
     const value = this.value;
+    const normalizedValueMap = {
+      AWM: 'AwareMagnus',
+      Awaremagnus: 'AwareMagnus',
+      awaremagnus: 'AwareMagnus'
+    };
+    const normalizedValue = normalizedValueMap[value] || value;
 
-    if (value === '') {
+    if (normalizedValue === '') {
       dataTable.search(''); // Clear filter
     } else {
-      dataTable.search(value); // Search all columns
+      dataTable.search(normalizedValue); // Search all columns
     }
   });
 });

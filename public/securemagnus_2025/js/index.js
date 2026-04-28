@@ -75,7 +75,11 @@ function showCustomToast(alertType, alertMessage = null) {
 
   const lang = document.documentElement.lang;
   let title = alertType === 'error' ? 'Error' : 'Success!';
-  let message = alertMessage;
+  let message = typeof alertMessage === 'string' ? alertMessage.trim() : '';
+
+  if (!message) {
+    message = alertType === 'error' ? 'An unexpected error occurred.' : 'Operation completed successfully.';
+  }
 
   if (lang === 'ar') {
     if (alertType === 'error') {
@@ -100,7 +104,8 @@ function showCustomToast(alertType, alertMessage = null) {
       '! Success': '! نجاح',
       'Success !': 'نجاح !',
       'Delete Successfully': 'تم الحذف بنجاح',
-      'Successfully': 'بنجاح'
+      'Successfully': 'بنجاح',
+      'Order Payment has updated': 'تم تحديث دفع الطلب'
     };
     for (const [en, ar] of Object.entries(translations)) {
       message = message.replaceAll(en, ar);
@@ -398,6 +403,19 @@ btns.forEach(button => {
 
 
 // Full JS — paste this in place of your old scripts
+
+// Check for toast message on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const message = urlParams.get('message');
+  const alertType = urlParams.get('alertType');
+  if (message && alertType && typeof showCustomToast === 'function') {
+    showCustomToast(alertType, message);
+    // Remove the params from URL without reloading
+    const newUrl = window.location.pathname + window.location.hash;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+});
 document.addEventListener('DOMContentLoaded', () => {
   // ===== Modal close/open logic =====
   const outerOverlay = document.getElementById('rightModalOverlay'); // outer wrapper

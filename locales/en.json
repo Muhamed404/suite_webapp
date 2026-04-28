@@ -9,6 +9,7 @@
 		"view": "View",
 		"Finish": "Finish",
 		"create": "Create",
+		"update": "Update",
 		"download": "Download",
 		"active": "Active",
 		"inactive": "Inactive",
@@ -85,6 +86,11 @@
 		"type_your_message_here": "Type your message here...",
 		"templateName": "Template Name",
 		"login": "Login",
+		"invalid_credentials": "Invalid credentials.",
+		"user_not_found": "User not found or inactive.",
+		"no_access_permissions": "User has no access permissions.",
+		"no_portal_access": "User has no portal access.",
+		"unexpected_error": "An unexpected error occurred. Please try again.",
 		"welcomeToSecureMagnus": "Welcome to SecureMagnus",
 		"welcomeToPhishMagnus": "Welcome to PhishMagnus",
 		"welcomeToAwareMagnus": "Welcome to AwareMagnus",
@@ -106,7 +112,8 @@
 		"emailOpened": "Track email opened",
 		"fileDownloaded": "Download",
 		"qrScanned": "Scanned",
-		"select": "Select"
+		"select": "Select",
+		"sr_no": "Sr. No"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -410,7 +417,10 @@
 			"validationOrgNameRequired": "Organization name is required.",
 			"validationOrgAddressRequired": "Address is required.",
 			"validationOrgPostalCodeRequired": "Postal code is required and must be digits.",
-			"validationOrgContactRequired": "Contact number is required and must be digits.",
+			"validationOrgContactRequired": "Contact number is required.",
+			"validationOrgContactDigits": "Contact number must contain digits only.",
+			"validationOrgContactMinLength": "Contact number must be at least 7 digits.",
+			"validationOrgContactMaxLength": "Contact number must not exceed 15 digits.",
 			"validationOrgCountryRequired": "Country is required.",
 			"validationOrgStateRequired": "State is required.",
 			"validationOrgCityRequired": "City is required.",
@@ -1197,6 +1207,9 @@
 			"api_key_minlength": "Please enter at least 8 characters.",
 			"create_success": "SMS Configuration created successfully.",
 			"create_failed": "SMS creation failed.",
+			"edit_description": "Update your SMS provider configuration.",
+			"update_success": "SMS configuration updated successfully.",
+			"update_failed": "Failed to update SMS configuration.",
 			"create_description": "Description"
 		},
 		"create_campaign": {
@@ -1399,7 +1412,8 @@
 			"opened": "Opened",
 			"no_interaction": "No Interaction",
 			"no_invitees": "No invitee responses yet",
-			"invalid_id": "Invalid campaign ID"
+			"invalid_id": "Invalid campaign ID",
+			"invitee_email": "Invitee Email"
 		}
 	},
 	"qr_campaign": {
@@ -1489,7 +1503,7 @@
 		"interactForm": "Interact Form",
 		"formSubmitted": "Form Submitted",
 		"attachmentOpened": "Attachment Opened",
-		"interactionReport": "Interaction report",
+		"interactionReport": "Interaction Report",
 		"tagNumber": "Tag Number",
 		"nfcCode": "NFC Code",
 		"copyUrl": "Copy URL",
@@ -1745,7 +1759,12 @@
 		"sms_content": "template.sms_content",
 		"sms_message": "template.sms_message",
 		"sms_placeholder": "template.sms_placeholder",
-		"tracking_header": "This template will allow you to track the following items:"
+		"tracking_header": "This template will allow you to track the following items:",
+		"tracking_email_message_opened": "Track email/message opened",
+		"tracking_link_clicked": "Track phishing simulation link clicked",
+		"tracking_file_downloaded": "Track phishing simulation file downloaded (from email/message or landing page)",
+		"tracking_form_submitted": "Track data submitted through the phishing simulation form",
+		"tracking_form_interaction": "Track user interaction with the phishing simulation form"
 	},
 	"common": {
 		"search_here": "common.search_here",

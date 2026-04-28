@@ -4,13 +4,13 @@ import type { Quiz } from "@/types/quiz";
 import type { LibraryType } from "./library-page";
 
 import Link from "next/link";
+import ReactCountryFlag from "react-country-flag";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
-import { Select, SelectItem } from "@heroui/select";
 import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from "@heroui/table";
 import { Pagination } from "@heroui/pagination";
 import { Spinner } from "@heroui/spinner";
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import clsx from "clsx";
 import { Search, ChevronsUpDown, Pencil, Trash2, SearchX, Plus } from "lucide-react";
@@ -22,6 +22,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useModule, useQuizzesByModule, useQuizTypes, useDeleteQuiz } from "@/hooks/useQuiz";
+import { getLanguageCountryCode, getLanguageName } from "@/utils/supportedLanguages";
 
 // API answer structure from the backend
 interface ApiAnswer {
@@ -51,34 +52,25 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
   const createPath = `${basePath}/${moduleId}/quizzes/create`;
 
   const searchParams = useSearchParams();
-  const urlLang = searchParams.get("lang_id");
   const urlContentId = searchParams.get("content_id");
 
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState("");
-  const [languageFilter, setLanguageFilter] = useState<string>("all");
   const [sortField, setSortField] = useState<SortField | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Sync language filter from URL on mount
-  useEffect(() => {
-    if (urlLang === "1") setLanguageFilter("en");
-    else if (urlLang === "2") setLanguageFilter("ar");
-  }, [urlLang]);
-
-  const langIdForApi = languageFilter === "en" ? 1 : languageFilter === "ar" ? 2 : undefined;
-
   const { data: moduleRes } = useModule(moduleId, !!moduleId);
-  const { data: quizzesRes, isLoading } = useQuizzesByModule(moduleId, langIdForApi, !!moduleId);
+  const { data: quizzesRes, isLoading } = useQuizzesByModule(moduleId, undefined, !!moduleId);
   const { data: quizTypesRes } = useQuizTypes();
   const deleteQuizMutation = useDeleteQuiz();
 
   const moduleData = moduleRes?.success ? moduleRes.data : null;
   const allQuizzes: Quiz[] =
     quizzesRes?.success && Array.isArray(quizzesRes.data) ? (quizzesRes.data as Quiz[]) : [];
-  const contentMap: Record<number, { name: string; language?: string }> =
-    (quizzesRes as { contentMap?: Record<number, { name: string; language?: string }> })?.contentMap ?? {};
+  const contentMap: Record<number, { name: string; language?: string; lang_id?: number }> =
+    (quizzesRes as { contentMap?: Record<number, { name: string; language?: string; lang_id?: number }> })
+      ?.contentMap ?? {};
   const quizTypes = quizTypesRes?.success ? (quizTypesRes.data ?? []) : [];
 
   // Get answer text from API answer (handles both answer and answer_text fields)
@@ -112,17 +104,29 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
     [contentMap]
   );
 
-  const getQuizLanguage = useCallback(
-    (quiz: Quiz): string => {
+  const getQuizLanguageInfo = useCallback(
+    (quiz: Quiz): { langId: number; name: string; code: string } => {
       const contentId =
         (quiz as unknown as { con_id?: number }).con_id ?? quiz.mod_content_id ?? quiz.content_id;
+      const entry = contentId ? contentMap[contentId] : undefined;
+      let langId = entry?.lang_id;
 
-      if (contentId && contentMap[contentId]) {
-        const lang = contentMap[contentId].language || "English";
-        return lang.toUpperCase().substring(0, 2);
+      if (langId == null && entry?.language) {
+        const langName = entry.language.toLowerCase();
+        if (langName.includes("arab")) langId = 2;
+        else if (langName.includes("urdu")) langId = 3;
+        else if (langName.includes("french")) langId = 4;
+        else if (langName.includes("mandarin") || langName.includes("chinese")) langId = 5;
+        else if (langName.includes("turk")) langId = 6;
+        else langId = 1;
       }
+      const resolvedId = langId ?? 1;
 
-      return "EN";
+      return {
+        langId: resolvedId,
+        name: getLanguageName(resolvedId),
+        code: getLanguageCountryCode(resolvedId),
+      };
     },
     [contentMap]
   );
@@ -166,6 +170,10 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
             aVal = a.question || "";
             bVal = b.question || "";
             break;
+          case "language":
+            aVal = getQuizLanguageInfo(a).name;
+            bVal = getQuizLanguageInfo(b).name;
+            break;
           case "quizType":
             aVal = a.quizType?.name || "";
             bVal = b.quizType?.name || "";
@@ -187,7 +195,16 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
     }
 
     return result;
-  }, [allQuizzes, searchQuery, sortField, sortDirection, getContentName, getCorrectAnswer]);
+  }, [
+    allQuizzes,
+    searchQuery,
+    sortField,
+    sortDirection,
+    getContentName,
+    getCorrectAnswer,
+    getQuizLanguageInfo,
+    urlContentId,
+  ]);
 
   // Pagination
   const totalItems = filteredQuizzes.length;
@@ -315,31 +332,6 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                     }}
                   />
                 </div>
-                {/* Language Filter */}
-                <div className="flex items-center gap-2">
-                  <Select
-                    aria-label="Language filter"
-                    classNames={{
-                      base: "w-40",
-                      trigger:
-                        "h-10 bg-white border border-gray-200 rounded-full hover:border-gray-300 data-[focus=true]:border-blue-500",
-                      value: "text-xs",
-                    }}
-                    selectedKeys={[languageFilter]}
-                    onSelectionChange={(keys) => {
-                      const value = Array.from(keys as Set<string>)[0];
-
-                      if (value) {
-                        setLanguageFilter(value);
-                        setCurrentPage(1);
-                      }
-                    }}
-                  >
-                    <SelectItem key="all">All Languages</SelectItem>
-                    <SelectItem key="en">English</SelectItem>
-                    <SelectItem key="ar">عربي</SelectItem>
-                  </Select>
-                </div>
               </div>
             </div>
 
@@ -382,6 +374,7 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                       }}
                     >
                       <TableHeader>
+                        <TableColumn>#</TableColumn>
                         <TableColumn>
                           <SortableHeader field="category" label="Category" />
                         </TableColumn>
@@ -404,8 +397,16 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                         <TableColumn>Action</TableColumn>
                       </TableHeader>
                       <TableBody items={paginatedQuizzes}>
-                        {(quiz) => (
+                        {(quiz) => {
+                          const langInfo = getQuizLanguageInfo(quiz);
+                          const rowIndex = paginatedQuizzes.indexOf(quiz);
+                          const displayIndex = startIndex + rowIndex + 1;
+
+                          return (
                           <TableRow key={quiz.id}>
+                            <TableCell className="text-gray-500 font-medium">
+                              {displayIndex}
+                            </TableCell>
                             <TableCell className="text-gray-600">{getContentName(quiz)}</TableCell>
                             <TableCell className="text-gray-900 max-w-xs">
                               <span className="truncate block">{quiz.question || "—"}</span>
@@ -423,7 +424,18 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                               {getAnswerText(quiz.answers as ApiAnswer[], 3)}
                             </TableCell>
                             <TableCell className="text-gray-600">
-                              {getQuizLanguage(quiz)}
+                              <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full border border-gray-200 bg-white">
+                                <span className="w-4 h-4 rounded-full overflow-hidden border border-gray-100 flex items-center justify-center">
+                                  <ReactCountryFlag
+                                    svg
+                                    className="w-full h-full object-cover"
+                                    countryCode={langInfo.code}
+                                    style={{ fontSize: "1.4em", lineHeight: "1.4em" }}
+                                    title={langInfo.name}
+                                  />
+                                </span>
+                                <span className="text-xs">{langInfo.name}</span>
+                              </span>
                             </TableCell>
                             <TableCell className="text-green-600 font-medium">
                               {getCorrectAnswer(quiz.answers as ApiAnswer[])}
@@ -460,7 +472,8 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                               </div>
                             </TableCell>
                           </TableRow>
-                        )}
+                          );
+                        }}
                       </TableBody>
                     </Table>
                   </div>

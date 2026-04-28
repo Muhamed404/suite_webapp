@@ -37,7 +37,10 @@ exports.viewCampaignDetails = async (req, res) => {
     // Format the campaign start datetime for display (avoid raw ISO string)
     try {
       if (campaignDetails && campaignDetails.start_datetime) {
-        campaignDetails.start_datetime = moment(campaignDetails.start_datetime).format('DD-MMM-YYYY hh:mm A');
+        const m = moment(campaignDetails.start_datetime, [moment.ISO_8601, 'DD-MMM-YYYY hh:mm A']);
+        if (m.isValid()) {
+          campaignDetails.start_datetime = m.format('DD-MMM-YYYY hh:mm A');
+        }
       }
     } catch (err) {
       logger.warn('Failed to format campaignDetails.start_datetime', err);
@@ -66,7 +69,10 @@ exports.viewCampaignDetails = async (req, res) => {
         usersDetail.Phishing_Invities.forEach((invite) => {
           try {
             if (invite && invite.CampaignSchedule && invite.CampaignSchedule.start_datetime) {
-              invite.CampaignSchedule.start_datetime = moment(invite.CampaignSchedule.start_datetime).format('DD-MMM-YYYY hh:mm A');
+              const m = moment(invite.CampaignSchedule.start_datetime, [moment.ISO_8601, 'DD-MMM-YYYY hh:mm A']);
+              if (m.isValid()) {
+                invite.CampaignSchedule.start_datetime = m.format('DD-MMM-YYYY hh:mm A');
+              }
             }
           } catch (e) {
             // ignore formatting errors per-invite

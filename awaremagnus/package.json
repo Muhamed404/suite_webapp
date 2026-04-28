@@ -77,7 +77,10 @@
     "react-player": "^3.4.0",
     "react-quill-new": "^3.8.3",
     "zod": "^4.3.5",
-    "zustand": "^5.0.10"
+    "zustand": "^5.0.10",
+    "javascript-obfuscator": "^5.4.1",
+    "webpack-obfuscator": "^3.6.1"
+
   },
   "overrides": {
     "@heroui/calendar": {

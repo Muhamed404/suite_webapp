@@ -140,16 +140,41 @@ const customRules = [
 ];
 
 
+// beforeSetMode fires on the editor object before any mode switch.
+// evt.data is the mode being switched TO; editor.mode is still the current (old) mode.
+// This is the only reliable hook where we can rewrite the source textarea before
+// CKEditor reads it to build the WYSIWYG HTML.
+function _attachBucketSourceRewrite(editor) {
+  editor.on('beforeSetMode', function (evt) {
+    if (evt.data !== 'wysiwyg') return;
+    if (editor.mode !== 'source') return;
+    var editable = editor.editable();
+    if (!editable || typeof editable.getValue !== 'function') return;
+    var src = editable.getValue();
+    if (!src) return;
+
+    // Only replace <%=web_bucket%> with the real URL so images render in the preview.
+    // All other <%=PLACEHOLDER%> tags are left untouched — he.decode() in the save
+    // controller restores them if CKEditor encodes the < > as HTML entities.
+    var bucket = window.WEB_TEMPLATE_BUCKET;
+    if (bucket && src.indexOf('<%=web_bucket%>') !== -1) {
+      editable.setValue(src.split('<%=web_bucket%>').join(bucket));
+    }
+  });
+}
+
 CKEDITOR.replace('phishing_content', {
   height: 400,
   width: '100%',
   resize_enabled: true,
+  on: {
+    instanceReady: function (evt) { _attachBucketSourceRewrite(evt.editor); }
+  }
 });
 
 CKEDITOR.instances.phishing_content.on('mode', function () {
-  // alert('Mode changed to: ' + this.mode);
   if (this.mode === 'source') {
-    this.resize(this.container.$.offsetWidth, 700); // Keep width/height same
+    this.resize(this.container.$.offsetWidth, 700);
   }
 });
 
@@ -159,12 +184,14 @@ CKEDITOR.replace('phishing_page_content', {
   height: 400,
   width: '100%',
   resize_enabled: true,
+  on: {
+    instanceReady: function (evt) { _attachBucketSourceRewrite(evt.editor); }
+  }
 });
 
 CKEDITOR.instances.phishing_page_content.on('mode', function () {
-  // alert('Mode changed to: ' + this.mode);
   if (this.mode === 'source') {
-    this.resize(this.container.$.offsetWidth, 700); // Keep width/height same
+    this.resize(this.container.$.offsetWidth, 700);
   }
 });
 
@@ -173,12 +200,14 @@ CKEDITOR.replace('landing_page_content', {
   height: 400,
   width: '100%',
   resize_enabled: true,
+  on: {
+    instanceReady: function (evt) { _attachBucketSourceRewrite(evt.editor); }
+  }
 });
 
 CKEDITOR.instances.landing_page_content.on('mode', function () {
-  // alert('Mode changed to: ' + this.mode);
   if (this.mode === 'source') {
-    this.resize(this.container.$.offsetWidth, 700); // Keep width/height same
+    this.resize(this.container.$.offsetWidth, 700);
   }
 });
 
@@ -526,6 +555,17 @@ let currentStep = 0;
       showStep(nextStepIndex);
       return;
     }
+    // Restore real bucket URL → <%=web_bucket%> before saving
+    ['phishing_content', 'phishing_page_content', 'landing_page_content'].forEach(function (editorId) {
+      const editor = CKEDITOR.instances[editorId];
+      if (!editor) return;
+      editor.updateElement();
+      const textarea = document.getElementById(editorId);
+      if (!textarea || !window.WEB_TEMPLATE_BUCKET) return;
+      if (textarea.value.includes(window.WEB_TEMPLATE_BUCKET)) {
+        textarea.value = textarea.value.split(window.WEB_TEMPLATE_BUCKET).join('<%=web_bucket%>');
+      }
+    });
     document.getElementById('templateCreationForm').submit();
 
   }
