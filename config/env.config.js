@@ -48,4 +48,8 @@ module.exports = {
   AWAREMAGNUS_DASHBOARD_URL: process.env.AWAREMAGNUS_DASHBOARD_URL
     ? process.env.AWAREMAGNUS_DASHBOARD_URL.replace(/\/$/, '')
     : '',
+
+  WEB_TEMPLATE_BUCKET: process.env.WEB_TEMPLATE_BUCKET
+    ? process.env.WEB_TEMPLATE_BUCKET.replace(/\/$/, '')
+    : '',
 };

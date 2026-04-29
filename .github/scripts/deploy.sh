@@ -5,7 +5,6 @@
 set -e
 
 DEPLOY_DIR="/opt/secure-magnus/suite_webapp"
-BACKUP_DIR="/opt/secure-magnus-backups/suite_webapp"
 WORKSPACE_DIR="/opt/secure-magnus/secure_magnus_workspace"
 LOGS_DIR_PATH="/opt/secure-magnus/logs"
 KEYS_DIR="/opt/secure-magnus/secure_magnus_workspace/keys"
@@ -17,7 +16,6 @@ echo "Starting Suite Webapp deployment..."
 
 # Create all required directories
 echo "Creating required directories..."
-sudo mkdir -p "$BACKUP_DIR"
 sudo mkdir -p "$WORKSPACE_DIR"
 sudo mkdir -p "$LOGS_DIR_PATH"
 sudo mkdir -p "$KEYS_DIR"
@@ -25,35 +23,20 @@ mkdir -p "$TEMP_DIR"
 
 # Set ownership for directories
 sudo chown -R $SERVICE_USER:$SERVICE_USER /opt/secure-magnus
-sudo chown -R $SERVICE_USER:$SERVICE_USER "$BACKUP_DIR"
 
-# Backup and remove existing deployment if exists
+# Remove existing deployment if exists
 if [ -d "$DEPLOY_DIR" ]; then
-    echo "Backing up existing deployment to $BACKUP_DIR/suite_webapp_$TIMESTAMP..."
-
-    # Stop the service first to ensure clean backup
     echo "Stopping suite_webapp service if running..."
     sudo systemctl stop suite_webapp 2>/dev/null || true
 
-    # Create backup by copying (to preserve original in case of issues)
-    sudo cp -r "$DEPLOY_DIR" "$BACKUP_DIR/suite_webapp_$TIMESTAMP"
+    echo "Removing existing deployment directory..."
+    sudo rm -rf "$DEPLOY_DIR"
 
-    if [ -d "$BACKUP_DIR/suite_webapp_$TIMESTAMP" ]; then
-        echo "Backup created successfully at $BACKUP_DIR/suite_webapp_$TIMESTAMP"
-
-        # Now completely remove the existing deployment
-        echo "Removing existing deployment directory..."
-        sudo rm -rf "$DEPLOY_DIR"
-
-        if [ -d "$DEPLOY_DIR" ]; then
-            echo "ERROR: Failed to remove existing deployment directory"
-            exit 1
-        fi
-        echo "Existing deployment removed successfully"
-    else
-        echo "ERROR: Backup failed - aborting deployment"
+    if [ -d "$DEPLOY_DIR" ]; then
+        echo "ERROR: Failed to remove existing deployment directory"
         exit 1
     fi
+    echo "Existing deployment removed successfully"
 else
     echo "No existing deployment found at $DEPLOY_DIR - fresh installation"
 fi
@@ -132,7 +115,7 @@ LOGS_FILENAME=${LOGS_FILENAME:-suite_webapp}
 BACKEND_SUITE_PUBLIC_KEY_PATH=${BACKEND_SUITE_PUBLIC_KEY_PATH:-/opt/secure-magnus/secure_magnus_workspace/keys/public.pem}
 
 AWAREMAGNUS_DASHBOARD_URL=${AWAREMAGNUS_DASHBOARD_URL:-https://dev-machine.securemagnus.com/awm/}
-
+WEB_TEMPLATE_BUCKET=https://objectstorage.me-riyadh-1.oraclecloud.com/p/BkQ_y6F4662nrplQlfSp6LPCf7XJnLHNfVIHd27_9VF-RjVQK5yL6KgjorPYWD_y/n/axqfg50971fp/b/PHM_Templates/o/
 
 EOF
 
