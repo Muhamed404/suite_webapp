@@ -446,9 +446,16 @@ export default function DashboardPage() {
   const totalCompletedModules = userDashboardData?.total_completed_modules || 0;
   const totalCertificatesAvailable = userDashboardData?.total_certificates_available || 0;
   const totalCompletedCertificates = userDashboardData?.total_completed_certificates || 0;
-  const totalStudyTimeHours = userDashboardData
-    ? Math.floor(userDashboardData.total_study_time / 60)
-    : 0; // Convert minutes to hours
+  const formatStudyTimeHMS = (minutes?: number) => {
+    const totalSeconds = Math.max(0, Math.floor((Number(minutes) || 0) * 60));
+    const hours = Math.floor(totalSeconds / 3600);
+    const remainingSeconds = totalSeconds % 3600;
+    const mins = Math.floor(remainingSeconds / 60);
+    const secs = remainingSeconds % 60;
+    return `${hours}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  };
+
+  const totalStudyTimeDisplay = formatStudyTimeHMS(userDashboardData?.total_study_time);
   const levelNumber = userDashboardData?.level_number ?? 1;
   const xpTotalTokens = parseFloat(userDashboardData?.xp_total_tokens ?? "0");
 
@@ -850,7 +857,7 @@ export default function DashboardPage() {
                       </div>
                       <div>
                         <p className="text-gray-500 text-[10px] font-medium">{t("gamification.studyTime")}</p>
-                        <p className="text-gray-900 text-lg font-bold">{totalStudyTimeHours}h</p>
+                        <p className="text-gray-900 text-lg font-bold">{totalStudyTimeDisplay}</p>
                       </div>
                     </div>
                   </div>
@@ -1110,9 +1117,7 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-gray-500 text-[10px]">{t("gamification.studyTime")}</span>
                         <span className="text-gray-900 text-sm font-bold">
-                          {(dashboardData as any)?.total_study_time
-                            ? ((dashboardData as any).total_study_time / 60).toFixed(1) + "h"
-                            : "0h"}
+                          {formatStudyTimeHMS((dashboardData as any)?.total_study_time)}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -2040,6 +2045,8 @@ export default function DashboardPage() {
                       opened={riskStats.medium}
                       sent={riskStats.low}
                       labels={[t("cards.lowRisk"), t("cards.mediumRisk"), t("cards.highRisk")]}
+                      lowRiskCounterLabel="Low risk employees"
+                      showLowRiskCounter
                     />
                   </div>
                 </div>
