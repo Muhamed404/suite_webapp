@@ -390,6 +390,9 @@ function getRiskSegmentCount(level: string | null): number {
 
 /* ─── PDF Print: build standalone HTML document ─── */
 function buildPrintHTML(args: {
+  t: (key: string, values?: Record<string, unknown>) => string;
+  locale: string;
+  dir: string;
   userName: string;
   userEmail: string;
   reportOwner: string;
@@ -410,6 +413,9 @@ function buildPrintHTML(args: {
   riskSegmentsFilled: number;
 }): string {
   const {
+    t,
+    locale,
+    dir,
     userName,
     userEmail,
     reportOwner,
@@ -933,6 +939,9 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
 
   function handleDownload() {
     const html = buildPrintHTML({
+      t,
+      locale,
+      dir,
       userName,
       userEmail,
       reportOwner,
