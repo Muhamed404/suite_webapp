@@ -32,6 +32,11 @@ interface WizardStep5Props {
 export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
   const t = useTranslations("campaigns");
   const prevFieldsKey = useRef<string>("");
+  const parseWeightValue = (value: string): number => {
+    const parsedValue = Number.parseInt(value, 10);
+    if (Number.isNaN(parsedValue)) return 0;
+    return Math.min(100, Math.max(0, parsedValue));
+  };
 
   // Auto-distribute weights equally only for the 3 main content types.
   useEffect(() => {
@@ -221,7 +226,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                   min={0}
                   type="number"
                   value={formData.motionVideoWeight}
-                  onChange={(e) => onChange("motionVideoWeight", parseInt(e.target.value) || 0)}
+                  onChange={(e) => onChange("motionVideoWeight", parseWeightValue(e.target.value))}
                 />
               </div>
             )}
@@ -236,9 +241,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                   min={0}
                   type="number"
                   value={formData.interactiveContentWeight}
-                  onChange={(e) =>
-                    onChange("interactiveContentWeight", parseInt(e.target.value) || 0)
-                  }
+                  onChange={(e) => onChange("interactiveContentWeight", parseWeightValue(e.target.value))}
                 />
               </div>
             )}
@@ -253,7 +256,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                   min={0}
                   type="number"
                   value={formData.quizProgressWeight}
-                  onChange={(e) => onChange("quizProgressWeight", parseInt(e.target.value) || 0)}
+                  onChange={(e) => onChange("quizProgressWeight", parseWeightValue(e.target.value))}
                 />
               </div>
             )}
@@ -268,7 +271,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                   min={0}
                   type="number"
                   value={formData.documentWeight}
-                  onChange={(e) => onChange("documentWeight", parseInt(e.target.value) || 0)}
+                  onChange={(e) => onChange("documentWeight", parseWeightValue(e.target.value))}
                 />
               </div>
             )}
@@ -283,7 +286,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                   min={0}
                   type="number"
                   value={formData.gameWeight}
-                  onChange={(e) => onChange("gameWeight", parseInt(e.target.value) || 0)}
+                  onChange={(e) => onChange("gameWeight", parseWeightValue(e.target.value))}
                 />
               </div>
             )}
@@ -299,7 +302,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                     min={0}
                     type="number"
                     value={formData.brochureWeight}
-                    onChange={(e) => onChange("brochureWeight", parseInt(e.target.value) || 0)}
+                    onChange={(e) => onChange("brochureWeight", parseWeightValue(e.target.value))}
                   />
                 </div>
                 <div className="input-group">
@@ -312,7 +315,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                     min={0}
                     type="number"
                     value={formData.posterWeight}
-                    onChange={(e) => onChange("posterWeight", parseInt(e.target.value) || 0)}
+                    onChange={(e) => onChange("posterWeight", parseWeightValue(e.target.value))}
                   />
                 </div>
                 <div className="input-group">
@@ -325,7 +328,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                     min={0}
                     type="number"
                     value={formData.screensaverWeight}
-                    onChange={(e) => onChange("screensaverWeight", parseInt(e.target.value) || 0)}
+                    onChange={(e) => onChange("screensaverWeight", parseWeightValue(e.target.value))}
                   />
                 </div>
                 <div className="input-group">
@@ -338,7 +341,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                     min={0}
                     type="number"
                     value={formData.vrGameWeight}
-                    onChange={(e) => onChange("vrGameWeight", parseInt(e.target.value) || 0)}
+                    onChange={(e) => onChange("vrGameWeight", parseWeightValue(e.target.value))}
                   />
                 </div>
               </>

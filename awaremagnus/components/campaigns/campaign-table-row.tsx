@@ -100,7 +100,7 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
               title={t("viewReport")}
             >
               <FileText className="w-3.5 h-3.5" />
-              View Report
+              {t("viewReport")}
             </Link>
           )}
 
@@ -112,7 +112,7 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
               title={t("viewReport")}
             >
               <FileText className="w-3.5 h-3.5" />
-              View Report
+              {t("viewReport")}
             </Link>
           )}
 
