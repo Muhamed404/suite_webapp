@@ -26,6 +26,7 @@ const generateMenuMiddleware = require('./middleware/menu/session-menu-middlewar
 global.logger = logger;
 
 const app = express();
+const bodyLimit = '25mb';
 
 // Health check endpoint (before other routes)
 app.get("/health", (req, res) => {
@@ -59,8 +60,8 @@ app.get('/favicon.ico', (req, res) => {
 /**
  * Body parser
  */
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: bodyLimit }));
+app.use(bodyParser.json({ limit: bodyLimit }));
 
 /**
  * Cookie parser and session middleware

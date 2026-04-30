@@ -111,7 +111,7 @@ async function generateReport(req, campId, search) {
     const apiClient = getApiClient(req);
     let url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.NFC.CAMPAIGN_REPORT_DETAILS(campId);
     if (search) {
-      url += `?search=${search}`;
+      url += `?search=${encodeURIComponent(search)}`;
     }
     logger.info('Start Fetching NFC Campaign Report Details: ' + url);
     const response = await apiClient.get(url);

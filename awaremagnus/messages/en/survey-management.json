@@ -115,5 +115,77 @@
     "buttons": {
       "view": "View"
     }
+  },
+  "invitationLog": {
+    "title": "Invitation Log",
+    "actions": {
+      "sendReminder": "Send Reminder",
+      "reminder": "Reminder"
+    },
+    "cards": {
+      "totalInvitations": "Total Invitations",
+      "campaignInvitations": "Campaign Invitations",
+      "surveyInvitations": "Survey Invitations",
+      "reminderAttempts": "Reminder Attempts"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by invitee, email, campaign or survey...",
+      "invitationType": "Invitation type",
+      "allTypes": "All Types",
+      "campaign": "Campaign",
+      "survey": "Survey",
+      "campaignFilter": "Campaign filter",
+      "filterByCampaign": "Filter by campaign",
+      "surveyFilter": "Survey filter",
+      "filterBySurvey": "Filter by survey",
+      "statusFilter": "Status filter",
+      "reminderFilter": "Reminder filter",
+      "reminder": "Reminder",
+      "reminderOnly": "Reminder only",
+      "initialInvite": "Initial invite"
+    },
+    "states": {
+      "emptyTitle": "No Invitations Found",
+      "emptyDescription": "Try changing your filters or search query."
+    },
+    "table": {
+      "invitee": "Invitee",
+      "type": "Type",
+      "campaignOrSurvey": "Campaign / Survey",
+      "status": "Status",
+      "attempts": "Attempts",
+      "lastAttempt": "Last Attempt",
+      "invitationTime": "Invitation Time",
+      "action": "Action"
+    },
+    "status": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "pending": "Pending",
+      "retry": "Retry",
+      "unknown": "Unknown"
+    },
+    "pagination": {
+      "totalRecords": "Total {total} invitation records"
+    },
+    "fallback": {
+      "campaignWithId": "Campaign #{id}",
+      "surveyWithId": "Survey #{id}"
+    },
+    "toast": {
+      "remindersQueuedTitle": "Reminders queued",
+      "campaignRemindersQueuedDescription": "{count} campaign reminders queued successfully.",
+      "surveyRemindersQueuedDescription": "{count} survey reminders queued successfully.",
+      "selectTargetTitle": "Select a target",
+      "selectTargetDescription": "Please choose a campaign or survey before sending bulk reminders.",
+      "reminderFailedTitle": "Reminder failed",
+      "unableToQueueReminders": "Unable to queue reminders.",
+      "reminderQueuedTitle": "Reminder queued",
+      "userReminderQueuedDescription": "{count} reminder queued for {email}.",
+      "reminderUnavailableTitle": "Reminder unavailable",
+      "reminderUnavailableDescription": "Missing invitation target data for this row.",
+      "unableToQueueUserReminder": "Unable to queue reminder for user."
+    },
+    "userFallback": "user"
   }
 }

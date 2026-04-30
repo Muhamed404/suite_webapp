@@ -15,6 +15,11 @@ exports.usbCampaignViewReport = async (req, res) => {
   try {
     logger.info(`Controller - USB Campaign View Report - Start`);
     const campaignIdentifier = req.params.campaignIdentifier;
+    const searchQuery = (req.query.search || "").toString().trim();
+    const allowedPageSizes = [5, 10, 20];
+    const requestedPageSize = parseInt(req.query.pageSize, 10) || 5;
+    const pageSize = allowedPageSizes.includes(requestedPageSize) ? requestedPageSize : 5;
+    const requestedPage = Math.max(parseInt(req.query.page, 10) || 1, 1);
     if (!campaignIdentifier) {
       throw new Error("Campaign ID is required");
     }
@@ -32,13 +37,50 @@ exports.usbCampaignViewReport = async (req, res) => {
       campaigns.start_datetime = moment(campaigns.start_datetime).format('DD-MMM-YYYY hh:mm A');
     }
 
-    const pageSize = 5;
-    const currentPage = 1;
-    const totalDevices = campaigns.usb_devices.length;
-    const totalPages = Math.ceil(totalDevices / pageSize);
+    const allUsbDevices = Array.isArray(campaigns.usb_devices) ? campaigns.usb_devices : [];
+    const totalDevices = allUsbDevices.length;
+    const normalizedSearch = searchQuery.toLowerCase();
+    const filteredUsbDevices = normalizedSearch
+      ? allUsbDevices.filter((device) => {
+          const usbCode = (device?.usb_code || "").toString().toLowerCase();
+          const description = (device?.description || "").toString().toLowerCase();
+          const creationDate = device?.creation_date
+            ? moment(device.creation_date).format("DD-MMM-YYYY hh:mm A").toLowerCase()
+            : "";
+
+          return (
+            usbCode.includes(normalizedSearch) ||
+            description.includes(normalizedSearch) ||
+            creationDate.includes(normalizedSearch)
+          );
+        })
+      : allUsbDevices;
+
+    const filteredDevicesCount = filteredUsbDevices.length;
+    const totalPages = Math.max(Math.ceil(filteredDevicesCount / pageSize), 1);
+    const currentPage = Math.min(requestedPage, totalPages);
     const startIdx = (currentPage - 1) * pageSize;
-    const endIdx = Math.min(startIdx + pageSize, totalDevices);
-    const paginatedDevices = campaigns.usb_devices.slice(startIdx, endIdx);
+    const endIdx = Math.min(startIdx + pageSize, filteredDevicesCount);
+    const paginatedDevices = filteredUsbDevices.slice(startIdx, endIdx);
+
+    if (req.query.ajax === "1") {
+      return res.json({
+        success: true,
+        data: {
+          paginatedDevices,
+          pagination: {
+            currentPage,
+            totalPages,
+            pageSize,
+            totalDevices,
+            filteredDevicesCount,
+            startIdx,
+            endIdx
+          },
+          searchQuery
+        }
+      });
+    }
 
     res.render(render_ejs_urls.PhishMagnus.Campaign.USB.CAMPAIGN_VIEW_REPORT, {
       campaigns,
@@ -47,6 +89,14 @@ exports.usbCampaignViewReport = async (req, res) => {
       totalPages,
       paginatedDevices,
       totalDevices,
+      filteredDevicesCount,
+      pagination: {
+        currentPage,
+        totalPages,
+        pageSize,
+        totalCount: filteredDevicesCount
+      },
+      searchQuery,
       startIdx,
       endIdx
 

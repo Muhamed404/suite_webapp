@@ -73,10 +73,20 @@ export const GamificationStats = () => {
       ? Math.round((totalCompletedEmployeesModules / totalEmployeesModulesEnrolled) * 100)
       : 0;
 
-  const studyTimeHours =
+  const totalStudyTimeMinutes =
     dashboardData && "total_study_time" in dashboardData
-      ? Math.floor(dashboardData.total_study_time / 60)
+      ? Number(dashboardData.total_study_time) || 0
       : 0;
+
+  const formatStudyTimeHMS = (minutes: number): string => {
+    const totalSeconds = Math.max(0, Math.floor(minutes * 60));
+    const hours = Math.floor(totalSeconds / 3600);
+    const remainingSeconds = totalSeconds % 3600;
+    const mins = Math.floor(remainingSeconds / 60);
+    const secs = remainingSeconds % 60;
+
+    return `${hours}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  };
 
   const { data: achievementData } = useAchievementStatistics();
   const { data: achievementsData } = useAchievements({
@@ -354,7 +364,9 @@ export const GamificationStats = () => {
             />
             <div>
               {t("gamification.studyTime")}
-              <div className="text-base font-semibold text-gray-900">{studyTimeHours}h</div>
+              <div className="text-base font-semibold text-gray-900">
+                {formatStudyTimeHMS(totalStudyTimeMinutes)}
+              </div>
             </div>
           </div>
         </div>

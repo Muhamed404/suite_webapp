@@ -62,7 +62,10 @@ export const authService = {
   async login(
     payload: LoginPayload
   ): Promise<{ user: AuthUser; token: string | null; mfaRequired: boolean }> {
-    const response = await suiteClient.post<LoginResponse>("/login", payload);
+    const response = await suiteClient.post<LoginResponse>("/login", {
+      ...payload,
+      product: "awm",
+    });
 
     const token = response.data.object?.userToken ?? null;
     const mfaRequired = response.data.object?.mfaRequired ?? false;

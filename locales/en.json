@@ -9,6 +9,7 @@
 		"view": "View",
 		"Finish": "Finish",
 		"create": "Create",
+		"update": "Update",
 		"download": "Download",
 		"active": "Active",
 		"inactive": "Inactive",
@@ -111,7 +112,8 @@
 		"emailOpened": "Track email opened",
 		"fileDownloaded": "Download",
 		"qrScanned": "Scanned",
-		"select": "Select"
+		"select": "Select",
+		"sr_no": "Sr. No"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -1205,6 +1207,9 @@
 			"api_key_minlength": "Please enter at least 8 characters.",
 			"create_success": "SMS Configuration created successfully.",
 			"create_failed": "SMS creation failed.",
+			"edit_description": "Update your SMS provider configuration.",
+			"update_success": "SMS configuration updated successfully.",
+			"update_failed": "Failed to update SMS configuration.",
 			"create_description": "Description"
 		},
 		"create_campaign": {

@@ -5,7 +5,6 @@
 set -e
 
 DEPLOY_DIR="/opt/secure-magnus/suite_webapp/awaremagnus"
-BACKUP_DIR="/opt/secure-magnus-backups/awaremagnus"
 LOGS_DIR_PATH="/opt/secure-magnus/logs"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 TEMP_DIR="/tmp/awaremagnus_deploy_$$"
@@ -17,27 +16,19 @@ echo "Starting AwareMagnus (Next.js) deployment..."
 
 # Create all required directories
 echo "Creating required directories..."
-sudo mkdir -p "$BACKUP_DIR"
 sudo mkdir -p "$LOGS_DIR_PATH"
 sudo mkdir -p "$DEPLOY_DIR"
 mkdir -p "$TEMP_DIR"
 
 # Set ownership for directories
 sudo chown -R $SERVICE_USER:$SERVICE_USER /opt/secure-magnus
-sudo chown -R $SERVICE_USER:$SERVICE_USER "$BACKUP_DIR"
 
 # Stop the service if running
 echo "Stopping $SERVICE_NAME service if running..."
 sudo systemctl stop $SERVICE_NAME 2>/dev/null || true
 
-# Backup existing deployment if exists
+# Remove existing deployment if exists
 if [ -d "$DEPLOY_DIR" ] && [ "$(ls -A $DEPLOY_DIR)" ]; then
-    echo "Backing up existing deployment to $BACKUP_DIR/awaremagnus_$TIMESTAMP..."
-# Stopping of taking backup for awm webapp
-#    sudo cp -r "$DEPLOY_DIR" "$BACKUP_DIR/awaremagnus_$TIMESTAMP"
-#    echo "Backup created successfully"
-
-    # Remove existing deployment
     echo "Removing existing deployment..."
     sudo rm -rf "$DEPLOY_DIR"
     sudo mkdir -p "$DEPLOY_DIR"
