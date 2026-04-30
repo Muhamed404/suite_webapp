@@ -343,46 +343,87 @@ export default function CampaignDetailsPage() {
   const spanDays = dateSpanMs > 0 ? Math.ceil(dateSpanMs / oneDayMs) : 0;
   const xAxisTickAmount = hasSingleDate ? 3 : spanDays > 0 ? Math.min(7, spanDays + 1) : undefined;
 
-  // Transform completion data for ApexCharts
+  // Transform completion data for ApexCharts as cumulative completed modules over time.
+  // This ensures the chart always starts from 0 and avoids single floating points.
   const completionGraphPoints: Array<{
     x: number;
     y: number;
-    moduleId: number;
-    moduleName: string;
-    userName: string;
+    completionCount?: number;
+    moduleNames?: string[];
+    userNames?: string[];
     formattedDate: string;
-  }> = completedModuleRows
-    .map((row: any) => {
-      const moduleId = Number(row?.module_id || 0);
+    isBaseline?: boolean;
+  }> = useMemo(() => {
+    const dayBuckets = new Map<number, { count: number; moduleNames: Set<string>; userNames: Set<string> }>();
+    const dayStart = (d: Date) => {
+      const x = new Date(d);
+      x.setHours(0, 0, 0, 0);
+      return x;
+    };
+
+    for (const row of completedModuleRows) {
       const completionDate = parseYmdDate(row?.module_completion_date);
-      if (!moduleId || !completionDate) return null;
+      if (!completionDate) continue;
 
-      const moduleName = row?.module_name || modules.find((m) => m.moduleId === moduleId)?.moduleName || `Module ${moduleId}`;
-      const fullName = `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
-      const formattedDate = completionDate.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
-
-      return {
-        x: completionDate.getTime(),
-        y: modules.findIndex((m) => m.moduleId === moduleId) + 1,
-        moduleId,
-        moduleName,
-        userName: fullName || `User ${row?.user_id || "-"}`,
-        formattedDate,
+      const bucketTime = dayStart(completionDate).getTime();
+      const bucket = dayBuckets.get(bucketTime) ?? {
+        count: 0,
+        moduleNames: new Set<string>(),
+        userNames: new Set<string>(),
       };
-    })
-    .filter((item: any): item is {
+
+      bucket.count += 1;
+      bucket.moduleNames.add(row?.module_name || `Module ${row?.module_id || "-"}`);
+      const fullName = `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
+      bucket.userNames.add(fullName || `User ${row?.user_id || "-"}`);
+      dayBuckets.set(bucketTime, bucket);
+    }
+
+    const sortedDays = Array.from(dayBuckets.entries()).sort((a, b) => a[0] - b[0]);
+    if (sortedDays.length === 0) return [];
+
+    const baselineX = sortedDays[0][0] - oneDayMs;
+    const points: Array<{
       x: number;
       y: number;
-      moduleId: number;
-      moduleName: string;
-      userName: string;
+      completionCount?: number;
+      moduleNames?: string[];
+      userNames?: string[];
       formattedDate: string;
-    } => item !== null)
-    .sort((a: { x: number; y: number }, b: { x: number; y: number }) => a.x - b.x); // Sort by date for line chart
+      isBaseline?: boolean;
+    }> = [
+      {
+        x: baselineX,
+        y: 0,
+        formattedDate: new Date(baselineX).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+        isBaseline: true,
+      },
+    ];
+
+    let cumulative = 0;
+    for (const [time, bucket] of sortedDays) {
+      cumulative += bucket.count;
+      points.push({
+        x: time,
+        y: cumulative,
+        completionCount: bucket.count,
+        moduleNames: Array.from(bucket.moduleNames),
+        userNames: Array.from(bucket.userNames),
+        formattedDate: new Date(time).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+      });
+    }
+
+    return points;
+  }, [completedModuleRows, locale]);
+
   // Chart data (only x and y for ApexCharts)
   const completionGraphData = completionGraphPoints.map(
     (point: { x: number; y: number }) => ({ x: point.x, y: point.y })
@@ -622,7 +663,9 @@ export default function CampaignDetailsPage() {
                   <div className="flex justify-between items-center mb-3">
                     <div>
                       <h3 className="text-gray-800 text-sm font-bold">Module Completion Timeline</h3>
-                      <p className="text-gray-500 text-xs mt-0.5">{completionGraphPoints.length} completions • {modules.length} modules</p>
+                      <p className="text-gray-500 text-xs mt-0.5">
+                        {completedModuleRows.length} completions • {modules.length} modules
+                      </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1.5 text-xs text-gray-600">
@@ -701,11 +744,14 @@ export default function CampaignDetailsPage() {
                           },
                           yaxis: {
                             min: 0,
-                            max: Math.max(1, modules.length) + 1,
-                            tickAmount: Math.max(1, modules.length) + 1,
+                            max: Math.max(1, completionGraphPoints[completionGraphPoints.length - 1]?.y ?? 1),
+                            tickAmount: Math.min(
+                              6,
+                              Math.max(2, completionGraphPoints[completionGraphPoints.length - 1]?.y ?? 2)
+                            ),
                             decimalsInFloat: 0,
                             title: {
-                              text: "Modules",
+                              text: "Completed Modules",
                               style: {
                                 fontSize: "12px",
                                 fontWeight: 600,
@@ -755,12 +801,20 @@ export default function CampaignDetailsPage() {
                           tooltip: {
                             theme: "dark",
                             custom: function ({ dataPointIndex }: any) {
-                              const point = completionGraphPoints[dataPointIndex];
+                                const point = completionGraphPoints[dataPointIndex];
                               if (!point) return "";
+                                if (point.isBaseline) {
+                                  return `
+                                <div style="background: linear-gradient(to bottom right, #1e40af, #1e3a8a); color: white; border-radius: 8px; padding: 10px 14px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(147, 197, 253, 0.3);">
+                                  <div style="font-size: 12px; font-weight: 600; color: #dbeafe;">Starting point</div>
+                                  <div style="color: #93c5fd; font-size: 11px; margin-top: 4px;">${point.formattedDate}</div>
+                                </div>
+                              `;
+                                }
                               return `
                                 <div style="background: linear-gradient(to bottom right, #1e40af, #1e3a8a); color: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(147, 197, 253, 0.3);">
-                                  <div style="font-size: 13px; font-weight: bold; color: #dbeafe;">${point.moduleName}</div>
-                                  <div style="color: #bfdbfe; margin-top: 6px; font-weight: 500; font-size: 12px;">${point.userName}</div>
+                                  <div style="font-size: 13px; font-weight: bold; color: #dbeafe;">${point.completionCount || 0} completion(s)</div>
+                                  <div style="color: #bfdbfe; margin-top: 6px; font-weight: 500; font-size: 12px;">Cumulative: ${point.y}</div>
                                   <div style="color: #93c5fd; font-size: 11px; margin-top: 4px;">${point.formattedDate}</div>
                                 </div>
                               `;
