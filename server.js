@@ -59,8 +59,8 @@ app.get('/favicon.ico', (req, res) => {
 /**
  * Body parser
  */
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+app.use(bodyParser.json({ limit: '10mb' }));
 
 /**
  * Cookie parser and session middleware
