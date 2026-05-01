@@ -2,7 +2,7 @@
 
 import type { AwarenessReportParams } from "@/types/certificationReport";
 
-import { useState, useCallback, useMemo } from "react";
+import { Fragment, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
@@ -31,6 +31,7 @@ import {
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
 import { useAwarenessReportUsers } from "@/hooks/useCertificationReport";
 import { useUserReportCard } from "@/hooks/useReportCard";
 
@@ -53,9 +54,9 @@ function formatStudyTime(minutes: number): string {
   return `${h}h ${m}m`;
 }
 
-function getRiskBadge(riskLevel?: string | null) {
+function getRiskBadge(riskLevel?: string | null, naLabel = "N/A") {
   if (!riskLevel)
-    return <span className="text-[10px] text-gray-400 italic">N/A</span>;
+    return <span className="text-[10px] text-gray-400 italic">{naLabel}</span>;
 
   const lower = riskLevel.toLowerCase();
 
@@ -175,6 +176,7 @@ function StatMiniCard({
 
 /* ─── Expandable Report Card Row ─── */
 function UserReportCardPanel({ userId, onClose }: { userId: number; onClose: () => void }) {
+  const t = useTranslations("dashboard");
   const { data: reportRes, isLoading } = useUserReportCard(userId, true);
   const result: any = reportRes?.success ? reportRes.data : undefined;
   const meta = result?.meta_statistics as Record<string, unknown> | undefined;
@@ -206,7 +208,7 @@ function UserReportCardPanel({ userId, onClose }: { userId: number; onClose: () 
         <td colSpan={7} className="px-4 py-8">
           <div className="flex items-center justify-center gap-3">
             <Spinner color="primary" size="sm" />
-            <span className="text-xs text-gray-500">Loading report card…</span>
+            <span className="text-xs text-gray-500">{t("certificationReport.loadingReportCard")}</span>
           </div>
         </td>
       </tr>
@@ -218,9 +220,7 @@ function UserReportCardPanel({ userId, onClose }: { userId: number; onClose: () 
       <tr>
         <td colSpan={7} className="px-4 py-6">
           <div className="flex items-center justify-between">
-            <p className="text-xs text-gray-500 italic">
-              No report card data available for this user.
-            </p>
+            <p className="text-xs text-gray-500 italic">{t("certificationReport.noReportCardForUser")}</p>
             <button
               className="text-gray-400 hover:text-gray-600 transition"
               onClick={onClose}
@@ -243,9 +243,11 @@ function UserReportCardPanel({ userId, onClose }: { userId: number; onClose: () 
               <div className="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center">
                 <BarChart3 className="w-3.5 h-3.5 text-white" />
               </div>
-              <h4 className="text-sm font-semibold text-gray-800">Report Card</h4>
+              <h4 className="text-sm font-semibold text-gray-800">{t("reportCard.pageTitle")}</h4>
               <span className="px-2 py-0.5 text-[10px] rounded-full bg-blue-100 text-blue-600 font-medium">
-                {campaigns.length} Campaign{campaigns.length !== 1 && "s"}
+                {campaigns.length === 1
+                  ? t("certificationReport.oneCampaign")
+                  : t("certificationReport.manyCampaigns", { count: campaigns.length })}
               </span>
             </div>
             <button
@@ -258,12 +260,48 @@ function UserReportCardPanel({ userId, onClose }: { userId: number; onClose: () 
 
           {/* Statistics Grid */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 mb-4">
-            <StatMiniCard icon={GraduationCap} label="Modules Completed" value={modulesCompleted} iconBg="#dbeafe" iconColor="#3b82f6" />
-            <StatMiniCard icon={Award} label="Certificates" value={totalCertificates} iconBg="#fef3c7" iconColor="#f59e0b" />
-            <StatMiniCard icon={Target} label="Quiz Accuracy" value={`${quizAccuracy.toFixed(0)}%`} iconBg="#d1fae5" iconColor="#10b981" />
-            <StatMiniCard icon={Star} label="XP Tokens" value={xpTokens.toLocaleString()} iconBg="#fee2e2" iconColor="#ef4444" />
-            <StatMiniCard icon={Clock} label="Study Time" value={formatStudyTime(studyTime)} iconBg="#e0e7ff" iconColor="#6366f1" />
-            <StatMiniCard icon={TrendingUp} label="Global Progress" value={`${globalProgress.toFixed(0)}%`} iconBg="#fce7f3" iconColor="#ec4899" />
+            <StatMiniCard
+              icon={GraduationCap}
+              label={t("reportCard.modulesCompleted")}
+              value={modulesCompleted}
+              iconBg="#dbeafe"
+              iconColor="#3b82f6"
+            />
+            <StatMiniCard
+              icon={Award}
+              label={t("reportCard.certificates")}
+              value={totalCertificates}
+              iconBg="#fef3c7"
+              iconColor="#f59e0b"
+            />
+            <StatMiniCard
+              icon={Target}
+              label={t("cards.quizAccuracy")}
+              value={`${quizAccuracy.toFixed(0)}%`}
+              iconBg="#d1fae5"
+              iconColor="#10b981"
+            />
+            <StatMiniCard
+              icon={Star}
+              label={t("cards.totalXpTokens")}
+              value={xpTokens.toLocaleString()}
+              iconBg="#fee2e2"
+              iconColor="#ef4444"
+            />
+            <StatMiniCard
+              icon={Clock}
+              label={t("userCards.studyTime")}
+              value={formatStudyTime(studyTime)}
+              iconBg="#e0e7ff"
+              iconColor="#6366f1"
+            />
+            <StatMiniCard
+              icon={TrendingUp}
+              label={t("cards.globalProgress")}
+              value={`${globalProgress.toFixed(0)}%`}
+              iconBg="#fce7f3"
+              iconColor="#ec4899"
+            />
           </div>
 
           {/* Campaign Modules */}
@@ -276,7 +314,11 @@ function UserReportCardPanel({ userId, onClose }: { userId: number; onClose: () 
                       {campaign.campaign_name}
                     </span>
                     <span className="text-[10px] text-gray-400">
-                      {campaign.completed_modules.length} module{campaign.completed_modules.length !== 1 && "s"}
+                      {campaign.completed_modules.length === 1
+                        ? t("certificationReport.oneModule")
+                        : t("certificationReport.manyModules", {
+                            count: campaign.completed_modules.length,
+                          })}
                     </span>
                   </div>
                   <div className="space-y-1.5">
@@ -296,7 +338,7 @@ function UserReportCardPanel({ userId, onClose }: { userId: number; onClose: () 
                         </span>
                         {mod.quiz_percentage !== undefined && (
                           <span className="text-blue-600">
-                            📘 {mod.quiz_percentage.toFixed(0)}% Quiz
+                            📘 {mod.quiz_percentage.toFixed(0)}% {t("certificationReport.quizShort")}
                           </span>
                         )}
                         {mod.module_completion_date && (
@@ -304,14 +346,14 @@ function UserReportCardPanel({ userId, onClose }: { userId: number; onClose: () 
                             📅 {mod.module_completion_date}
                           </span>
                         )}
-                        <span className="ml-auto">
+                        <span className="ms-auto">
                           {mod.status?.toLowerCase() === "completed" ? (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-medium">
-                              <CheckCircle2 className="w-3 h-3" /> Completed
+                              <CheckCircle2 className="w-3 h-3" /> {t("reportCard.completed")}
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-600 text-[10px] font-medium">
-                              <Clock className="w-3 h-3" /> {mod.status || "In Progress"}
+                              <Clock className="w-3 h-3" /> {mod.status || t("certificationReport.inProgress")}
                             </span>
                           )}
                         </span>
@@ -323,7 +365,7 @@ function UserReportCardPanel({ userId, onClose }: { userId: number; onClose: () 
             </div>
           ) : (
             <div className="text-center py-4">
-              <p className="text-xs text-gray-500 italic">No completed campaigns yet.</p>
+              <p className="text-xs text-gray-500 italic">{t("certificationReport.noCompletedCampaigns")}</p>
             </div>
           )}
         </div>
@@ -335,6 +377,7 @@ function UserReportCardPanel({ userId, onClose }: { userId: number; onClose: () 
 /* ─── Main Component ─── */
 export function CertificationReportPage() {
   const { dir } = useI18n();
+  const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
 
   // Table state
@@ -429,21 +472,21 @@ export function CertificationReportPage() {
   const handleExportCSV = useCallback(() => {
     if (!users.length) return;
     const headers = [
-      "User ID",
-      "Name",
-      "Email",
-      "Global Progress",
-      "Modules Enrolled",
-      "Modules Completed",
-      "Certificates Earned",
-      "Quizzes Passed",
-      "Quiz Accuracy",
-      "XP Tokens",
-      "Compliance Score",
-      "Risk Level",
-      "Level",
-      "Study Time (min)",
-      "Streak Days",
+      t("certificationReport.csvUserId"),
+      t("certificationReport.csvName"),
+      t("certificationReport.csvEmail"),
+      t("certificationReport.csvGlobalProgress"),
+      t("certificationReport.csvModulesEnrolled"),
+      t("certificationReport.csvModulesCompleted"),
+      t("certificationReport.csvCertificatesEarned"),
+      t("certificationReport.csvQuizzesPassed"),
+      t("certificationReport.csvQuizAccuracy"),
+      t("certificationReport.csvXpTokens"),
+      t("certificationReport.csvComplianceScore"),
+      t("certificationReport.csvRiskLevel"),
+      t("certificationReport.csvLevel"),
+      t("certificationReport.csvStudyTimeMin"),
+      t("certificationReport.csvStreakDays"),
     ];
     const rows = users.map((u) => {
       const d = u.dashboard;
@@ -479,7 +522,7 @@ export function CertificationReportPage() {
     a.download = `certification-report-users.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [users]);
+  }, [users, t]);
 
   const startIndex = totalItems > 0 ? (currentPage - 1) * perPage + 1 : 0;
   const endIndex = Math.min(currentPage * perPage, totalItems);
@@ -508,10 +551,10 @@ export function CertificationReportPage() {
           {/* Breadcrumb */}
           <nav className="flex items-center text-xs text-gray-500 gap-1.5 p-3 pb-0">
             <Link className="hover:text-gray-700 transition" href="/dashboard">
-              Dashboard
+              {t("certificationReport.breadcrumbDashboard")}
             </Link>
             <span className="text-gray-400">›</span>
-            <span className="font-semibold text-gray-900">Certification Report</span>
+            <span className="font-semibold text-gray-900">{t("menu.certificationReport")}</span>
           </nav>
 
           <div className="flex flex-col px-3 gap-3 mt-2">
@@ -522,10 +565,8 @@ export function CertificationReportPage() {
                   <Award className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold">Certification Report</h3>
-                  <p className="text-xs text-gray-500">
-                    Awareness report users with progress tracking and report cards
-                  </p>
+                  <h3 className="text-lg font-semibold">{t("certificationReport.pageTitle")}</h3>
+                  <p className="text-xs text-gray-500">{t("certificationReport.subtitle")}</p>
                 </div>
               </div>
               <Button
@@ -536,14 +577,14 @@ export function CertificationReportPage() {
                 variant="bordered"
                 onPress={handleExportCSV}
               >
-                Export CSV
+                {t("certificationReport.exportCsv")}
               </Button>
             </div>
 
             {/* Summary Cards */}
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-white rounded-2xl p-4 border border-gray-100">
-                <p className="text-gray-500 text-xs">Total Users</p>
+                <p className="text-gray-500 text-xs">{t("certificationReport.totalUsers")}</p>
                 <div className="flex justify-between items-center mt-1.5">
                   <h3 className="text-2xl font-semibold">{totalItems}</h3>
                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
@@ -552,7 +593,7 @@ export function CertificationReportPage() {
                 </div>
               </div>
               <div className="bg-white rounded-2xl p-4 border border-gray-100">
-                <p className="text-gray-500 text-xs">Total Certificates Earned</p>
+                <p className="text-gray-500 text-xs">{t("certificationReport.totalCertificatesEarned")}</p>
                 <div className="flex justify-between items-center mt-1.5">
                   <h3 className="text-2xl font-semibold text-amber-600">
                     {summaryStats.totalCerts}
@@ -563,7 +604,7 @@ export function CertificationReportPage() {
                 </div>
               </div>
               <div className="bg-white rounded-2xl p-4 border border-gray-100">
-                <p className="text-gray-500 text-xs">Avg Progress (Page)</p>
+                <p className="text-gray-500 text-xs">{t("certificationReport.avgProgressPage")}</p>
                 <div className="flex justify-between items-center mt-1.5">
                   <h3 className="text-2xl font-semibold text-emerald-600">
                     {summaryStats.avgProgress.toFixed(1)}%
@@ -578,7 +619,7 @@ export function CertificationReportPage() {
             {/* Filters Bar */}
             <div className="flex flex-wrap items-center justify-between gap-3 bg-white px-4 py-3 rounded-t-xl border border-gray-100">
               <div className="flex flex-wrap gap-2 items-center">
-                <h3 className="text-sm font-medium text-gray-900 mr-2">User List</h3>
+                <h3 className="text-sm font-medium text-gray-900 me-2">{t("certificationReport.userList")}</h3>
                 <Input
                   classNames={{
                     base: "w-64",
@@ -586,7 +627,7 @@ export function CertificationReportPage() {
                       "h-9 bg-white border border-gray-200 rounded-full hover:border-gray-300 focus-within:!border-blue-500",
                     input: "text-xs",
                   }}
-                  placeholder="Search by name or email..."
+                  placeholder={t("certificationReport.searchPlaceholder")}
                   startContent={<Search className="text-gray-400 w-4 h-4" />}
                   type="text"
                   value={searchQuery}
@@ -605,7 +646,7 @@ export function CertificationReportPage() {
                   <div className="absolute inset-0 flex items-center justify-center bg-white">
                     <div className="text-center py-12">
                       <Spinner className="mb-4" color="primary" size="lg" />
-                      <p className="text-sm text-gray-500">Loading users...</p>
+                      <p className="text-sm text-gray-500">{t("certificationReport.loadingUsers")}</p>
                     </div>
                   </div>
                 ) : users.length === 0 ? (
@@ -615,46 +656,42 @@ export function CertificationReportPage() {
                         <Users className="w-10 h-10 text-gray-400" />
                       </div>
                       <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                        No Users Found
+                        {t("certificationReport.noUsersFound")}
                       </h3>
                       {debouncedSearch ? (
-                        <p className="text-sm text-gray-500">
-                          Try adjusting your search query.
-                        </p>
+                        <p className="text-sm text-gray-500">{t("certificationReport.adjustSearch")}</p>
                       ) : (
-                        <p className="text-sm text-gray-500">
-                          No awareness report data is available yet.
-                        </p>
+                        <p className="text-sm text-gray-500">{t("certificationReport.noAwarenessData")}</p>
                       )}
                     </div>
                   </div>
                 ) : (
                   <table
                     className="w-full text-xs whitespace-nowrap"
-                    aria-label="Certification report users table"
+                    aria-label={`${t("certificationReport.pageTitle")} — ${t("certificationReport.userList")}`}
                   >
                     <thead className="bg-gray-50 text-gray-600 border-b sticky top-0 z-10">
                       <tr>
-                        <th className="px-4 py-3.5 text-left font-semibold">
-                          <SortableHeader field="name" label="User" />
+                        <th className="px-4 py-3.5 text-start font-semibold">
+                          <SortableHeader field="name" label={t("certificationReport.colUser")} />
                         </th>
                         <th className="px-4 py-3.5 text-center font-semibold">
-                          Engagement Rate
+                          {t("certificationReport.colEngagementRate")}
                         </th>
                         <th className="px-4 py-3.5 text-center font-semibold">
-                          Modules
+                          {t("certificationReport.colModules")}
                         </th>
                         <th className="px-4 py-3.5 text-center font-semibold">
-                          Certificates
+                          {t("certificationReport.colCertificates")}
                         </th>
                         <th className="px-4 py-3.5 text-center font-semibold">
-                          Quiz Accuracy
+                          {t("certificationReport.colQuizAccuracy")}
                         </th>
                         <th className="px-4 py-3.5 text-center font-semibold">
-                          Risk Level
+                          {t("certificationReport.colRiskLevel")}
                         </th>
                         <th className="px-4 py-3.5 text-center font-semibold">
-                          Actions
+                          {t("certificationReport.colActions")}
                         </th>
                       </tr>
                     </thead>
@@ -673,9 +710,8 @@ export function CertificationReportPage() {
                         const isExpanded = expandedUserId === user.user_id;
 
                         return (
-                          <>
+                          <Fragment key={user.user_id}>
                             <tr
-                              key={user.user_id}
                               className={clsx(
                                 "hover:bg-gray-50 transition-colors cursor-pointer",
                                 isExpanded && "bg-blue-50/50"
@@ -706,7 +742,7 @@ export function CertificationReportPage() {
                                   </div>
                                 ) : (
                                   <span className="text-gray-400 text-[10px] italic">
-                                    N/A
+                                    {t("certificationReport.notAvailable")}
                                   </span>
                                 )}
                               </td>
@@ -717,7 +753,7 @@ export function CertificationReportPage() {
                                       {modulesCompleted}/{modulesEnrolled}
                                     </span>
                                     <span className="text-[9px] text-gray-400">
-                                      completed
+                                      {t("certificationReport.completedLabel")}
                                     </span>
                                   </div>
                                 ) : (
@@ -733,7 +769,7 @@ export function CertificationReportPage() {
                                       {certs}/{certsAvail}
                                     </span>
                                     <span className="text-[9px] text-gray-400">
-                                      earned
+                                      {t("certificationReport.earnedLabel")}
                                     </span>
                                   </div>
                                 ) : (
@@ -763,7 +799,7 @@ export function CertificationReportPage() {
                                 )}
                               </td>
                               <td className="px-4 py-3.5 text-center">
-                                {getRiskBadge(d?.user_risk_level)}
+                                {getRiskBadge(d?.user_risk_level, t("certificationReport.notAvailable"))}
                               </td>
                               <td className="px-4 py-3.5 text-center">
                                 <button
@@ -781,7 +817,9 @@ export function CertificationReportPage() {
                                   }}
                                 >
                                   <BarChart3 className="w-3 h-3" />
-                                  {isExpanded ? "Close" : "Report Card"}
+                                  {isExpanded
+                                    ? t("certificationReport.closeReportCard")
+                                    : t("certificationReport.openReportCard")}
                                 </button>
                               </td>
                             </tr>
@@ -792,7 +830,7 @@ export function CertificationReportPage() {
                                 onClose={() => setExpandedUserId(null)}
                               />
                             )}
-                          </>
+                          </Fragment>
                         );
                       })}
                     </tbody>
@@ -805,11 +843,15 @@ export function CertificationReportPage() {
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2 text-[10px] text-gray-400 font-medium">
                     <span>
-                      Showing {startIndex}–{endIndex} out of {totalItems} Entries
+                      {t("certificationReport.showingEntries", {
+                        start: startIndex,
+                        end: endIndex,
+                        total: totalItems,
+                      })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-gray-400">Per page:</span>
+                    <span className="text-[10px] text-gray-400">{t("certificationReport.perPage")}</span>
                     <select
                       className="text-xs border border-gray-200 rounded px-2 py-1 bg-white"
                       value={perPage}

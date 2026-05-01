@@ -5,6 +5,12 @@ import Link from "next/link";
 import { Tooltip } from "@heroui/tooltip";
 import { useMemo } from "react";
 
+import type { Locale } from "@/i18n/config";
+import { useI18n } from "@/i18n/I18nProvider";
+import {
+  formatLocaleDigitsInString,
+  formatLocaleInteger,
+} from "@/i18n/localeFormat";
 import { useTranslations } from "@/i18n/useTranslations";
 import {
   useAchievementStatistics,
@@ -25,6 +31,8 @@ import { AvatarStat } from "@/types/dashboard";
 
 export const GamificationStats = () => {
   const t = useTranslations("dashboard");
+  const { locale } = useI18n();
+  const loc = (locale === "ar" ? "ar" : "en") as Locale;
   const { user: _user } = useAuthStore();
 
   // Determine dashboard source (system / organization / user) and map module stats
@@ -85,7 +93,10 @@ export const GamificationStats = () => {
     const mins = Math.floor(remainingSeconds / 60);
     const secs = remainingSeconds % 60;
 
-    return `${hours}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    return formatLocaleDigitsInString(
+      loc,
+      `${hours}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`
+    );
   };
 
   const { data: achievementData } = useAchievementStatistics();
@@ -133,6 +144,26 @@ export const GamificationStats = () => {
     13: "Supreme Cyber Knight",
     14: "Ultimate Cyber Sentinel",
   };
+  const avatarNameByLevelAr: Record<number, string> = {
+    1: "مبتدئ معرّض للخطر",
+    2: "متدرّب يقظ",
+    3: "متعلّم حذر",
+    4: "مدافع مطّلع",
+    5: "حارس يقظ",
+    6: "مراقب ماهر",
+    7: "حامٍ صامد",
+    8: "مراقب متقدّم",
+    9: "منفّذ خبير",
+    10: "استراتيجي بارع",
+    11: "طليعي نخبة",
+    12: "حامل الدرع الأسطوري",
+    13: "فارس الأمن السيبراني الأعلى",
+    14: "حارس الأمن السيبراني المطلق",
+  };
+  const unlockedLabel = locale === "ar" ? "مفتوح" : "Unlocked";
+  const lockedLabel = locale === "ar" ? "مغلق" : "Locked";
+  const levelLabel = locale === "ar" ? "المستوى" : "Level";
+  const achievementFallbackLabel = locale === "ar" ? "إنجاز" : "Achievement";
 
   const inferAvatarNameFromImage = (imageName?: string) => {
     if (!imageName) return "";
@@ -154,23 +185,45 @@ export const GamificationStats = () => {
   };
 
   const resolveAvatarName = (avatar?: AvatarStat) => {
-    if (!avatar) return "Vulnerable Newbie";
+    if (!avatar) return locale === "ar" ? avatarNameByLevelAr[1] : "Vulnerable Newbie";
 
     const levelName = avatar.level_name?.trim();
     const genericLevelLabel = `Level ${avatar.level_number}`;
+    const genericLevelLabelAr = `المستوى ${formatLocaleInteger(loc, avatar.level_number)}`;
 
-    if (levelName && !/^Level\s+\d+$/i.test(levelName)) return levelName;
+    // If API already returns a localized name, use it as-is.
+    if (levelName && !/^Level\s+\d+$/i.test(levelName) && levelName !== avatarNameByLevel[avatar.level_number]) {
+      return levelName;
+    }
 
     const inferredName = inferAvatarNameFromImage(avatar.image_small_url);
 
+    if (locale === "ar") {
+      return avatarNameByLevelAr[avatar.level_number] ?? genericLevelLabelAr;
+    }
     if (inferredName) return inferredName;
 
     return avatarNameByLevel[avatar.level_number] ?? genericLevelLabel;
   };
 
+  const resolveAchievementName = (meta: any, achievementId: number) => {
+    const localizedName =
+      meta?.achievement_name_ar ??
+      meta?.achievement_name_arabic ??
+      meta?.name_ar ??
+      meta?.name_arabic;
+
+    if (locale === "ar" && localizedName) return localizedName;
+    if (meta?.achievement_name) return meta.achievement_name;
+
+    return `${achievementFallbackLabel} #${formatLocaleInteger(loc, achievementId)}`;
+  };
+
   const formatUsersOnText = (count?: number) => {
     const safeCount = Number(count ?? 0);
-    return safeCount === 1 ? "1 user is on" : `${safeCount} users are on`;
+    return safeCount === 1
+      ? `${formatLocaleInteger(loc, 1)} user is on`
+      : `${formatLocaleInteger(loc, safeCount)} users are on`;
   };
   const achievementStatsList = useMemo(() => {
     return Array.isArray(stats?.achievement_statistics) ? stats.achievement_statistics : [];
@@ -340,7 +393,8 @@ export const GamificationStats = () => {
             <div>
               {t("gamification.courseCompleted")}
               <div className="text-base font-semibold text-gray-900">
-                {totalCompletedEmployeesModules}/{totalEmployeesModulesEnrolled}
+                {formatLocaleInteger(loc, totalCompletedEmployeesModules)}/
+                {formatLocaleInteger(loc, totalEmployeesModulesEnrolled)}
               </div>
             </div>
           </div>
@@ -407,7 +461,7 @@ export const GamificationStats = () => {
               const tooltipContent = (
                 <div className="flex flex-col gap-1 max-w-[200px] p-1">
                   <p className="font-semibold text-sm text-gray-900">
-                    {meta?.achievement_name ?? `Achievement #${achievementId}`}
+                    {resolveAchievementName(meta, achievementId)}
                   </p>
                   {meta?.achievement_description && (
                     <p className="text-xs text-gray-600 leading-tight">
@@ -418,11 +472,11 @@ export const GamificationStats = () => {
                     <span
                       className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
                     >
-                      {isUnlocked ? "Unlocked" : "Locked"}
+                      {isUnlocked ? unlockedLabel : lockedLabel}
                     </span>
                     {isUnlocked && meta?.employee_count != null && (
                       <span className="text-xs text-gray-500">
-                        {meta.employee_count}x
+                        {formatLocaleInteger(loc, meta.employee_count)}×
                       </span>
                     )}
                   </div>
@@ -435,9 +489,9 @@ export const GamificationStats = () => {
                     aria-disabled={!isUnlocked}
                     className={`w-12 h-12 rounded-full flex items-center justify-center relative cursor-default ${isUnlocked ? "" : "opacity-40"}`}
                   >
-                    <Image
+                      <Image
                       unoptimized
-                      alt={meta?.achievement_name ?? `Achievement ${achievementId}`}
+                        alt={resolveAchievementName(meta, achievementId)}
                       className="w-12 h-12"
                       height={48}
                       src={getContentAssetUrl(`/images/achivement/${imageFileName}`)}
@@ -455,9 +509,11 @@ export const GamificationStats = () => {
               <span>{t("gamification.achievements")}</span>
               <div>
                 <span className="text-gray-700 text-base font-semibold">
-                  {unlockedAchievements}/
+                  {formatLocaleInteger(loc, unlockedAchievements)}/
                 </span>
-                <span className="text-gray-700 text-base">{totalUniqueAchievements}</span>
+                <span className="text-gray-700 text-base">
+                  {formatLocaleInteger(loc, totalUniqueAchievements)}
+                </span>
               </div>
             </div>
             <div className="w-full h-2.5 bg-gray-200 rounded-full">
@@ -484,13 +540,15 @@ export const GamificationStats = () => {
                       {resolveAvatarName(mainAvatar)}
                     </p>
                     <p className="text-xs text-gray-500">{formatUsersOnText(mainAvatar?.employee_count)}</p>
-                    <p className="text-xs text-gray-500">Level {mainAvatar?.level_number ?? 1}</p>
+                    <p className="text-xs text-gray-500">
+                      {levelLabel} {formatLocaleInteger(loc, mainAvatar?.level_number ?? 1)}
+                    </p>
                     <span
                       className={`w-fit text-xs font-medium px-1.5 py-0.5 rounded-full ${
                         isMainAvatarUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
                       }`}
                     >
-                      {isMainAvatarUnlocked ? "Unlocked" : "Locked"}
+                      {isMainAvatarUnlocked ? unlockedLabel : lockedLabel}
                     </span>
                   </div>
                 }
@@ -535,13 +593,15 @@ export const GamificationStats = () => {
                         {resolveAvatarName(avatar)}
                       </p>
                       <p className="text-xs text-gray-500">{formatUsersOnText(avatar.employee_count)}</p>
-                      <p className="text-xs text-gray-500">Level {avatar.level_number}</p>
+                      <p className="text-xs text-gray-500">
+                        {levelLabel} {formatLocaleInteger(loc, avatar.level_number)}
+                      </p>
                       <span
                         className={`w-fit text-xs font-medium px-1.5 py-0.5 rounded-full ${
                           isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
                         }`}
                       >
-                        {isUnlocked ? "Unlocked" : "Locked"}
+                        {isUnlocked ? unlockedLabel : lockedLabel}
                       </span>
                     </div>
                   );

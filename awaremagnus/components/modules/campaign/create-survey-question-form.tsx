@@ -2,7 +2,7 @@
 
 import type { SupportedLanguageId } from "@/utils/supportedLanguages";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@heroui/button";
@@ -27,17 +27,13 @@ import {
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
+import { formatLocaleInteger } from "@/i18n/localeFormat";
 import { useCreateSurveyQuestion, useUpdateSurveyQuestion, useImportSurveyQuestions, useSurveyQuestion } from "@/hooks/useSurvey";
 import { useCategories } from "@/hooks/useSuiteAwm";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { addToast } from "@heroui/toast";
 import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS } from "@/utils/supportedLanguages";
-
-const STEPS = [
-  { id: 1, label: "Question Type", icon: ClipboardList },
-  { id: 2, label: "Add Question", icon: FileText },
-  { id: 3, label: "Add Answers", icon: HelpCircle },
-];
 
 interface AnswerItem {
   id: string;
@@ -53,8 +49,39 @@ function createAnswer(text = "", isCorrect = false): AnswerItem {
 
 export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }) {
   const isEditMode = !!questionId;
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
+  const t = useTranslations("surveyManagement");
   const isRtl = dir === "rtl";
+
+  const steps = useMemo(
+    () => [
+      { id: 1, label: t("surveyQuestionForm.step1"), icon: ClipboardList },
+      { id: 2, label: t("surveyQuestionForm.step2"), icon: FileText },
+      { id: 3, label: t("surveyQuestionForm.step3"), icon: HelpCircle },
+    ],
+    [t]
+  );
+
+  const questionTypeOptions = useMemo(
+    () => [
+      {
+        id: 1,
+        name: t("surveyQuestionForm.quizTrueFalseName"),
+        desc: t("surveyQuestionForm.quizTrueFalseDesc"),
+      },
+      {
+        id: 3,
+        name: t("surveyQuestionForm.quizMultiName"),
+        desc: t("surveyQuestionForm.quizMultiDesc"),
+      },
+      {
+        id: 2,
+        name: t("surveyQuestionForm.quizSingleName"),
+        desc: t("surveyQuestionForm.quizSingleDesc"),
+      },
+    ],
+    [t]
+  );
   const router = useRouter();
   const createQuestion = useCreateSurveyQuestion();
   const updateQuestion = useUpdateSurveyQuestion();
@@ -135,7 +162,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
       switch (step) {
         case 1:
           if (!categoryId) {
-            setFormError("Please select a category");
+            setFormError(t("surveyQuestionForm.errors.categoryRequired"));
 
             return false;
           }
@@ -143,7 +170,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
           return true;
         case 2:
           if (!questionText.trim()) {
-            setFormError("Question text is required");
+            setFormError(t("surveyQuestionForm.errors.questionRequired"));
 
             return false;
           }
@@ -154,12 +181,12 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
             const validAnswers = answers.filter((a) => a.text.trim());
 
             if (validAnswers.length < 2) {
-              setFormError("At least 2 answers are required");
+              setFormError(t("surveyQuestionForm.errors.minAnswers"));
 
               return false;
             }
             if (!validAnswers.some((a) => a.isCorrect)) {
-              setFormError("At least one answer must be marked as correct");
+              setFormError(t("surveyQuestionForm.errors.oneCorrect"));
 
               return false;
             }
@@ -170,7 +197,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
           return true;
       }
     },
-    [categoryId, questionText, answers, isTrueFalse]
+    [categoryId, questionText, answers, isTrueFalse, t]
   );
 
   const handleNext = () => {
@@ -231,13 +258,13 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
     try {
       await importQuestions.mutateAsync(formData);
       setCsvStatus("success");
-      setCsvMessage("Questions imported successfully! Redirecting...");
+      setCsvMessage(t("surveyQuestionForm.csvSuccessRedirect"));
       setTimeout(() => {
         router.push("/dashboard/survey/questions");
       }, 2000);
     } catch (err: any) {
       setCsvStatus("error");
-      setCsvMessage(err?.message ?? "Import failed. Please check your CSV format.");
+      setCsvMessage(err?.message ?? t("surveyQuestionForm.csvImportError"));
     }
   };
 
@@ -303,7 +330,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
             answers: apiAnswers,
           },
         });
-        setFormSuccess("Question updated successfully! Redirecting...");
+        setFormSuccess(t("surveyQuestionForm.successUpdate"));
       } else {
         await createQuestion.mutateAsync({
           question: {
@@ -313,18 +340,23 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
           },
           answers: apiAnswers,
         });
-        setFormSuccess("Question created successfully! Redirecting...");
+        setFormSuccess(t("surveyQuestionForm.successCreate"));
       }
 
       addToast({
-        title: isEditMode ? "Question Updated" : "Question Created",
-        description: isEditMode ? "The survey question has been updated" : "A new survey question has been created",
+        title: isEditMode ? t("surveyQuestionForm.toastUpdatedTitle") : t("surveyQuestionForm.toastCreatedTitle"),
+        description: isEditMode
+          ? t("surveyQuestionForm.toastUpdatedDesc")
+          : t("surveyQuestionForm.toastCreatedDesc"),
         color: "success",
       });
 
       setTimeout(() => router.push("/dashboard/survey/questions"), 1500);
     } catch (err: any) {
-      setFormError(err?.message ?? `Failed to ${isEditMode ? "update" : "create"} question`);
+      setFormError(
+        err?.message ??
+          (isEditMode ? t("surveyQuestionForm.submitErrorUpdate") : t("surveyQuestionForm.submitErrorCreate"))
+      );
     }
   };
 
@@ -335,7 +367,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
       <ProtectedRoute>
         <DashboardLayout>
           <div className="flex items-center justify-center h-96">
-            <Spinner color="primary" label="Loading question data..." />
+            <Spinner color="primary" label={t("surveyQuestionForm.loading")} />
           </div>
         </DashboardLayout>
       </ProtectedRoute>
@@ -357,16 +389,16 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
               size="sm"
               variant="flat"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className={clsx("w-4 h-4", isRtl && "rotate-180")} />
             </Button>
             <h2 className="text-xl font-bold text-gray-900">
-              {isEditMode ? "Edit Quiz / Question" : "Create New Quiz / Question"}
+              {isEditMode ? t("surveyQuestionForm.titleEdit") : t("surveyQuestionForm.titleCreate")}
             </h2>
           </div>
 
           {/* ── Stepper */}
           <div className="flex items-center justify-center mb-8">
-            {STEPS.slice(0, totalSteps).map((step, index) => {
+            {steps.slice(0, totalSteps).map((step, index) => {
               const Icon = step.icon;
               const isCompleted = currentStep > step.id;
               const isActive = currentStep === step.id;
@@ -430,30 +462,28 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
               <div className="space-y-6">
                 <div>
                   <h3 className="text-lg font-semibold text-gray-800 mb-1">
-                    Select Type of Quiz or Question
+                    {t("surveyQuestionForm.step1Heading")}
                   </h3>
-                  <p className="text-xs text-gray-500 mb-5">
-                    Choose the question type and category for your survey question
-                  </p>
+                  <p className="text-xs text-gray-500 mb-5">{t("surveyQuestionForm.step1Intro")}</p>
                 </div>
 
                 {/* Category */}
                 <div>
                   <label className="text-xs font-medium text-gray-700 mb-1 block">
-                    Category <span className="text-red-500">*</span>
+                    {t("surveyQuestionForm.category")} <span className="text-red-500">*</span>
                   </label>
                   {categoriesLoading ? (
                     <Spinner size="sm" />
                   ) : (
                     <Select
-                      aria-label="Category"
+                      aria-label={t("surveyQuestionForm.category")}
                       classNames={{
                         base: "w-full max-w-sm",
                         trigger:
                           "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300",
                         value: "text-sm",
                       }}
-                      placeholder="Select a category"
+                      placeholder={t("surveyQuestionForm.categoryPlaceholder")}
                       selectedKeys={categoryId ? [categoryId] : []}
                       onSelectionChange={(keys) => {
                         const v = Array.from(keys as Set<string>)[0];
@@ -473,18 +503,14 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                 {/* Question Type */}
                 <div>
                   <label className="text-xs font-medium text-gray-700 mb-3 block">
-                    Question Type
+                    {t("surveyQuestionForm.questionType")}
                   </label>
                   <div className="space-y-3">
-                    {[
-                      { id: 1, name: "True or False", desc: "Simple true/false question" },
-                      { id: 3, name: "Multi Answer", desc: "Multiple correct answers" },
-                      { id: 2, name: "Single Answer", desc: "One correct answer" },
-                    ].map((qt) => (
+                    {questionTypeOptions.map((qt) => (
                       <button
                         key={qt.id}
                         className={clsx(
-                          "w-full p-4 rounded-xl border-2 text-left transition-all duration-200 flex items-center gap-3",
+                          "w-full p-4 rounded-xl border-2 text-start transition-all duration-200 flex items-center gap-3",
                           quesTypeId === qt.id
                             ? "border-blue-500 bg-blue-50"
                             : "border-gray-200 bg-white hover:border-gray-300"
@@ -516,15 +542,15 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
             {/* STEP 2: Add Question */}
             {currentStep === 2 && (
               <div className="space-y-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">Add Question</h3>
-                <p className="text-xs text-gray-500 mb-4">
-                  Upload a CSV to bulk import questions, or add a question manually below.
-                </p>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                  {t("surveyQuestionForm.step2Heading")}
+                </h3>
+                <p className="text-xs text-gray-500 mb-4">{t("surveyQuestionForm.step2Intro")}</p>
 
                 {/* CSV Upload Button */}
                 <div>
                   <p className="text-[10px] text-gray-500 mb-1">
-                    Upload a CSV or Excel file to import questions in bulk
+                    {t("surveyQuestionForm.csvBulkLine")}
                   </p>
                   <button
                     className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-dashed border-[#3FBDFF] rounded-lg text-xs font-medium text-[#3FBDFF] bg-[#E8F5FF] hover:bg-[#D0ECFF] transition w-full"
@@ -532,7 +558,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                     onClick={() => setShowCsvModal(true)}
                   >
                     <Upload className="w-4 h-4" />
-                    <span>Upload CSV / Excel</span>
+                    <span>{t("surveyQuestionForm.uploadCsvExcel")}</span>
                   </button>
 
                   {csvStatus === "success" && (
@@ -548,14 +574,16 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                     <div className="w-full border-t border-gray-200" />
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="bg-white px-2 text-gray-400 font-medium">or</span>
+                    <span className="bg-white px-2 text-gray-400 font-medium">
+                      {t("surveyQuestionForm.or")}
+                    </span>
                   </div>
                 </div>
 
                 {/* Manual Question Entry */}
                 <div>
                   <label className="text-xs font-medium text-gray-700 mb-1 block">
-                    Question <span className="text-red-500">*</span>
+                    {t("surveyQuestionForm.question")} <span className="text-red-500">*</span>
                   </label>
                   <Textarea
                     classNames={{
@@ -564,16 +592,18 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                       input: "text-sm placeholder:text-gray-400",
                     }}
                     minRows={3}
-                    placeholder="Enter your question here..."
+                    placeholder={t("surveyQuestionForm.questionPlaceholder")}
                     value={questionText}
                     onValueChange={setQuestionText}
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-gray-700 mb-1 block">Language</label>
+                  <label className="text-xs font-medium text-gray-700 mb-1 block">
+                    {t("surveyQuestionForm.language")}
+                  </label>
                   <Select
-                    aria-label="Language"
+                    aria-label={t("surveyQuestionForm.language")}
                     classNames={{
                       base: "w-48",
                       trigger:
@@ -602,7 +632,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                 {isTrueFalse && (
                   <div>
                     <label className="text-xs font-medium text-gray-700 mb-2 block">
-                      Correct Answer
+                      {t("surveyQuestionForm.correctAnswer")}
                     </label>
                     <RadioGroup
                       classNames={{
@@ -613,10 +643,10 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                       onValueChange={setTrueFalseAnswer}
                     >
                       <Radio classNames={{ label: "text-sm text-gray-700" }} value="true">
-                        True
+                        {t("surveyQuestionForm.true")}
                       </Radio>
                       <Radio classNames={{ label: "text-sm text-gray-700" }} value="false">
-                        False
+                        {t("surveyQuestionForm.false")}
                       </Radio>
                     </RadioGroup>
                   </div>
@@ -627,11 +657,13 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
             {/* STEP 3: Add Answers (Single/Multiple only) */}
             {currentStep === 3 && !isTrueFalse && (
               <div className="space-y-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-1">Add Answers</h3>
+                <h3 className="text-lg font-semibold text-gray-800 mb-1">
+                  {t("surveyQuestionForm.step3Heading")}
+                </h3>
                 <p className="text-xs text-gray-500 mb-4">
                   {isSingleChoice
-                    ? "Add answer options and select the correct one"
-                    : "Add answer options and check all correct answers"}
+                    ? t("surveyQuestionForm.step3HelpSingle")
+                    : t("surveyQuestionForm.step3HelpMulti")}
                 </p>
 
                 <div className="space-y-2">
@@ -639,7 +671,9 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                     <div key={answer.id} className="flex items-center gap-2.5">
                       <input
                         className="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg outline-none focus:border-[#3FBDFF] focus:ring-1 focus:ring-[#3FBDFF]/10 transition-all placeholder:text-gray-400"
-                        placeholder={`Answer ${idx + 1}`}
+                        placeholder={t("surveyQuestionForm.answerPlaceholder", {
+                          n: formatLocaleInteger(locale, idx + 1),
+                        })}
                         type="text"
                         value={answer.text}
                         onChange={(e) => updateAnswerText(answer.id, e.target.value)}
@@ -693,7 +727,9 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                             />
                           )}
                         </span>
-                        <span className="text-[10px] text-gray-700 font-medium">Correct</span>
+                        <span className="text-[10px] text-gray-700 font-medium">
+                          {t("surveyQuestionForm.correct")}
+                        </span>
                       </label>
 
                       {/* Remove answer */}
@@ -717,7 +753,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                     onClick={addAnswer}
                   >
                     <Plus className="w-3 h-3" />
-                    Add New Answer
+                    {t("surveyQuestionForm.addNewAnswer")}
                   </button>
                 )}
               </div>
@@ -730,21 +766,25 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
               className="border-gray-200 text-gray-600 px-6"
               isDisabled={currentStep === 1 || isSubmitting}
               radius="full"
-              startContent={<ArrowLeft className="w-4 h-4" />}
+              startContent={
+                <ArrowLeft className={clsx("w-4 h-4", isRtl && "rotate-180")} />
+              }
               variant="bordered"
               onPress={handleBack}
             >
-              Back
+              {t("surveyQuestionForm.back")}
             </Button>
 
             {currentStep < totalSteps ? (
               <Button
                 className="bg-blue-500 hover:bg-blue-600 text-white px-8"
-                endContent={<ArrowRight className="w-4 h-4" />}
+                endContent={
+                  <ArrowRight className={clsx("w-4 h-4", isRtl && "rotate-180")} />
+                }
                 radius="full"
                 onPress={handleNext}
               >
-                Next
+                {t("surveyQuestionForm.next")}
               </Button>
             ) : (
               <Button
@@ -755,11 +795,11 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
               >
                 {isSubmitting
                   ? isEditMode
-                    ? "Updating..."
-                    : "Creating..."
+                    ? t("surveyQuestionForm.updating")
+                    : t("surveyQuestionForm.creating")
                   : isEditMode
-                    ? "Update"
-                    : "Finish"}
+                    ? t("surveyQuestionForm.update")
+                    : t("surveyQuestionForm.finish")}
               </Button>
             )}
           </div>
@@ -770,7 +810,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
               <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 m-4 relative">
                 {/* Close Button */}
                 <button
-                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+                  className="absolute top-4 end-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
                   type="button"
                   onClick={resetCsvModal}
                 >
@@ -779,10 +819,10 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
 
                 {/* Modal Header */}
                 <div className="mb-5">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Upload CSV / Excel</h3>
-                  <p className="text-xs text-gray-500 mb-3">
-                    Import survey questions from a CSV file. The question type and category selected in Step 1 will be used.
-                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    {t("surveyQuestionForm.csvModalTitle")}
+                  </h3>
+                  <p className="text-xs text-gray-500 mb-3">{t("surveyQuestionForm.csvModalIntro")}</p>
 
                   <button
                     className="text-xs text-[#3FBDFF] font-medium hover:underline flex items-center gap-1"
@@ -790,7 +830,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                     onClick={handleDownloadTemplate}
                   >
                     <Download className="w-3.5 h-3.5" />
-                    Download Template
+                    {t("surveyQuestionForm.downloadTemplate")}
                   </button>
                 </div>
 
@@ -816,9 +856,9 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-700 mb-0.5">
-                            {csvFile ? csvFile.name : "Click to upload"}
+                            {csvFile ? csvFile.name : t("surveyQuestionForm.clickToUpload")}
                           </p>
-                          <p className="text-xs text-gray-500">CSV or Excel files only</p>
+                          <p className="text-xs text-gray-500">{t("surveyQuestionForm.csvExcelOnly")}</p>
                         </div>
                       </div>
                     </div>
@@ -840,7 +880,7 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                     type="button"
                     onClick={resetCsvModal}
                   >
-                    Cancel
+                    {t("surveyQuestionForm.cancel")}
                   </button>
                   <button
                     className="px-4 py-2 rounded-full bg-[#3FBDFF] text-white text-xs font-medium hover:bg-[#29AAE8] transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -848,7 +888,9 @@ export function CreateSurveyQuestionForm({ questionId }: { questionId?: number }
                     type="button"
                     onClick={handleUploadCsv}
                   >
-                    {csvStatus === "uploading" ? "Uploading..." : "Confirm Upload"}
+                    {csvStatus === "uploading"
+                      ? t("surveyQuestionForm.uploading")
+                      : t("surveyQuestionForm.confirmUpload")}
                   </button>
                 </div>
               </div>
