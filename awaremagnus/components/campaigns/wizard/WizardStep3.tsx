@@ -70,14 +70,14 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
       module.name ||
       module.translations?.[0]?.name ||
       module.code ||
-      `Module ${module.id}`
+      t("form.moduleFallback", { id: module.id })
     );
   };
 
   const getSelectedModuleName = (id: number): string => {
-    const m = modules.find((mod: any) => mod.id === id);
+    const m = modules.find((mod: any) => Number(mod.id) === Number(id));
 
-    return m ? getModuleName(m) : `Module ${id}`;
+    return m ? getModuleName(m) : t("form.moduleFallback", { id });
   };
 
   const filteredModules = modules.filter((m: any) =>
@@ -120,13 +120,13 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
           <div ref={moduleDropdownRef} className="relative">
             {/* Trigger button showing selected chips */}
             <button
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-start"
               type="button"
               onClick={() => setModuleDropdownOpen(!moduleDropdownOpen)}
             >
               <div className="flex flex-wrap gap-2 flex-1">
                 {isLoading ? (
-                  <span className="text-gray-400 text-xs">Loading modules...</span>
+                  <span className="text-gray-400 text-xs">{t("form.loadingModules")}</span>
                 ) : formData.modules.length === 0 ? (
                   <span className="text-gray-500 text-sm">{t("form.selectModules")}</span>
                 ) : (
@@ -172,7 +172,7 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
                   <input
                     autoFocus
                     className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                    placeholder="Search modules..."
+                    placeholder={t("form.searchModulesPlaceholder")}
                     type="text"
                     value={moduleSearch}
                     onChange={(e) => setModuleSearch(e.target.value)}
@@ -181,18 +181,18 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
                 </div>
                 <div className="max-h-64 overflow-y-auto">
                   {isLoading ? (
-                    <p className="text-gray-400 text-xs text-center py-4">Loading modules...</p>
+                    <p className="text-gray-400 text-xs text-center py-4">{t("form.loadingModules")}</p>
                   ) : error ? (
                     <p className="text-red-500 text-xs px-4 py-2">{(error as any).message}</p>
                   ) : filteredModules.length === 0 ? (
-                    <p className="text-gray-400 text-xs text-center py-4">No modules found</p>
+                    <p className="text-gray-400 text-xs text-center py-4">{t("form.noModulesFound")}</p>
                   ) : (
                     <>
                       {myModules.length > 0 && (
                         <>
                           <div className="px-3 py-1.5 bg-blue-50 border-b border-blue-100 sticky top-0">
                             <span className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide">
-                              My Modules
+                              {t("form.sectionMyModules")}
                             </span>
                           </div>
                           {myModules.map((module: any) => (
@@ -234,7 +234,7 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
                         <>
                           <div className="px-3 py-1.5 bg-gray-50 border-b border-gray-200 sticky top-0">
                             <span className="text-[10px] font-semibold text-gray-500 uppercase tracking-wide">
-                              Core Modules
+                              {t("form.sectionCoreModules")}
                             </span>
                           </div>
                           {coreModules.map((module: any) => (

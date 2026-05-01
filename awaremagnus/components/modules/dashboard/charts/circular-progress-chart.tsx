@@ -9,9 +9,16 @@ interface CircularProgressChartProps {
   value: number;
   color: string;
   size?: number;
+  /** Radial center label; receives chart value (0–100). Default: `${val}%`. */
+  formatRadialValue?: (val: number) => string;
 }
 
-export const CircularProgressChart = ({ value, color, size = 128 }: CircularProgressChartProps) => {
+export const CircularProgressChart = ({
+  value,
+  color,
+  size = 128,
+  formatRadialValue,
+}: CircularProgressChartProps) => {
   const chartOptions = useMemo(
     () => ({
       chart: {
@@ -32,7 +39,7 @@ export const CircularProgressChart = ({ value, color, size = 128 }: CircularProg
               fontSize: "14px",
               fontWeight: 500,
               color: "#474646",
-              formatter: (val: number) => `${val}%`,
+              formatter: (val: number) => (formatRadialValue ? formatRadialValue(val) : `${val}%`),
               offsetY: 8,
             },
           },
@@ -49,7 +56,7 @@ export const CircularProgressChart = ({ value, color, size = 128 }: CircularProg
       },
       labels: [""],
     }),
-    [color, size]
+    [color, size, formatRadialValue]
   );
 
   const series = [value];

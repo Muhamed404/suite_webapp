@@ -3,6 +3,9 @@
 import dynamic from "next/dynamic";
 import { useMemo } from "react";
 
+import type { Locale } from "@/i18n/config";
+import { useI18n } from "@/i18n/I18nProvider";
+import { formatLocaleInteger } from "@/i18n/localeFormat";
 import { useTranslations } from "@/i18n/useTranslations";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
@@ -21,6 +24,8 @@ export const AreaChart = ({
   yLabel = "Topics",
 }: AreaChartProps) => {
   const t = useTranslations("dashboard");
+  const { locale } = useI18n();
+  const loc = (locale === "ar" ? "ar" : "en") as Locale;
   const maxDataValue = useMemo(() => Math.max(0, ...data), [data]);
   const yAxisMax = useMemo(() => {
     if (maxDataValue <= 1) return 2;
@@ -115,7 +120,7 @@ export const AreaChart = ({
         tickAmount: yAxisTickAmount,
         decimalsInFloat: 0,
         labels: {
-          formatter: (val: number) => String(Math.round(val)),
+          formatter: (val: number) => formatLocaleInteger(loc, Math.round(val)),
           style: { colors: "#9CA3AF", fontSize: "12px" },
         },
       },
@@ -123,12 +128,12 @@ export const AreaChart = ({
         theme: "light",
         style: { fontSize: "12px" },
         y: {
-          formatter: (val: number) => `${Math.round(val)} ${yLabel}`,
+          formatter: (val: number) => `${formatLocaleInteger(loc, Math.round(val))} ${yLabel}`,
         },
       },
       colors: ["#4BA6FF"],
     }),
-    [labels, seriesName, yLabel, data, yAxisMax, yAxisTickAmount]
+    [labels, seriesName, yLabel, data, yAxisMax, yAxisTickAmount, loc]
   );
 
   const series = [

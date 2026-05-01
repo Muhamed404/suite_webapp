@@ -171,19 +171,19 @@ export default function QuizListPage() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <Table removeWrapper aria-label="Quizzes">
+                    <Table removeWrapper aria-label={t("listTitle")}>
                       <TableHeader>
                         <TableColumn key="question" className="text-sm">
-                          Question
+                          {t("tableQuestion")}
                         </TableColumn>
                         <TableColumn key="type" className="text-sm">
-                          Type
+                          {t("tableType")}
                         </TableColumn>
                         <TableColumn key="content" className="text-sm">
-                          Content ID
+                          {t("tableContentId")}
                         </TableColumn>
                         <TableColumn key="actions" className="text-sm w-24">
-                          Actions
+                          {t("tableActions")}
                         </TableColumn>
                       </TableHeader>
                       <TableBody items={quizzes}>

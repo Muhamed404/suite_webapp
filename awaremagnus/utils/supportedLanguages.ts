@@ -45,3 +45,32 @@ export function getLanguageName(languageId: number): string {
 
   return lang?.name ?? `Lang ${languageId}`;
 }
+
+/** BCP 47 tags for Intl.DisplayNames (aligned with SUPPORTED_LANGUAGES ids). */
+const LANGUAGE_BCP47: Record<SupportedLanguageId, string> = {
+  1: "en",
+  2: "ar",
+  3: "ur",
+  4: "fr",
+  5: "zh",
+  6: "tr",
+};
+
+/**
+ * Language label for the current UI locale (e.g. Arabic names when locale is `ar`).
+ * Falls back to {@link getLanguageName} if Intl is unavailable.
+ */
+export function getLocalizedLanguageName(languageId: number, locale: string): string {
+  const id = languageId as SupportedLanguageId;
+  const code = LANGUAGE_BCP47[id];
+
+  if (!code) return getLanguageName(languageId);
+
+  try {
+    const display = new Intl.DisplayNames([locale, "en"], { type: "language" });
+
+    return display.of(code) ?? getLanguageName(languageId);
+  } catch {
+    return getLanguageName(languageId);
+  }
+}

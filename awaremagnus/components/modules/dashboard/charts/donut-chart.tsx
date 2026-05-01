@@ -11,6 +11,7 @@ interface DonutChartProps {
   labels: string[];
   centerLabel?: string;
   height?: number;
+  formatTooltipValue?: (val: number) => string;
 }
 
 export const DonutChart = ({
@@ -19,6 +20,7 @@ export const DonutChart = ({
   labels,
   centerLabel = "",
   height = 200,
+  formatTooltipValue,
 }: DonutChartProps) => {
   const chartOptions = useMemo(
     () => ({
@@ -68,11 +70,11 @@ export const DonutChart = ({
       },
       tooltip: {
         y: {
-          formatter: (val: number) => `${val}`,
+          formatter: (val: number) => (formatTooltipValue ? formatTooltipValue(val) : `${val}`),
         },
       },
     }),
-    [colors, labels, centerLabel, height]
+    [colors, labels, centerLabel, height, formatTooltipValue]
   );
 
   return <Chart height={height} options={chartOptions} series={values} type="donut" />;

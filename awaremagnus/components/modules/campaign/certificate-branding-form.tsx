@@ -21,6 +21,7 @@ import { addToast } from "@heroui/toast";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { certificateService } from "@/services/certificateService";
 import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
@@ -42,19 +43,36 @@ interface ImageUploadPillProps {
   icon: React.ReactNode;
   initialUrl?: string | null;
   onImageChange: (file: File | null, previewUrl: string | null) => void;
+  chooseFileText: string;
+  existingAssetText: string;
+  noFileChosenText: string;
 }
 
-function ImageUploadPill({ label, icon, initialUrl, onImageChange }: ImageUploadPillProps) {
+function ImageUploadPill({
+  label,
+  icon,
+  initialUrl,
+  onImageChange,
+  chooseFileText,
+  existingAssetText,
+  noFileChosenText,
+}: ImageUploadPillProps) {
   const [preview, setPreview] = useState<string | null>(initialUrl || null);
-  const [fileName, setFileName] = useState(initialUrl ? "Existing asset" : "No file chosen");
+  const [fileName, setFileName] = useState(initialUrl ? existingAssetText : noFileChosenText);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (initialUrl) {
       setPreview(initialUrl);
-      setFileName("Existing asset");
+      setFileName(existingAssetText);
     }
-  }, [initialUrl]);
+  }, [initialUrl, existingAssetText]);
+
+  useEffect(() => {
+    if (!preview) {
+      setFileName(noFileChosenText);
+    }
+  }, [noFileChosenText, preview]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -71,7 +89,7 @@ function ImageUploadPill({ label, icon, initialUrl, onImageChange }: ImageUpload
       };
       reader.readAsDataURL(file);
     } else {
-      setFileName("No file chosen");
+      setFileName(noFileChosenText);
       setPreview(null);
       onImageChange(null, null);
     }
@@ -102,11 +120,11 @@ function ImageUploadPill({ label, icon, initialUrl, onImageChange }: ImageUpload
 
         {/* file pill */}
         <div className="flex-1 flex items-center justify-between rounded-full border border-slate-200 bg-slate-50 pl-4 pr-2 py-2 min-w-0">
-          <span className="text-[11px] text-slate-400 truncate mr-2">{fileName}</span>
+          <span className="text-[11px] text-slate-400 truncate me-2">{fileName}</span>
 
           <label className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-[11px] font-semibold text-slate-700 border border-slate-200 shadow-sm cursor-pointer hover:bg-slate-50 shrink-0">
             <Upload size={12} />
-            <span>Choose File</span>
+            <span>{chooseFileText}</span>
             <input
               ref={fileInputRef}
               accept="image/*"
@@ -122,19 +140,23 @@ function ImageUploadPill({ label, icon, initialUrl, onImageChange }: ImageUpload
 }
 
 export function CertificateBrandingForm() {
+  const { locale, dir } = useI18n();
   const tMenu = useTranslations("dashboard");
   const params = useParams();
   const router = useRouter();
   const certificateId = params?.id ? parseInt(params.id as string) : null;
   const isEdit = !!certificateId;
 
+  const DEFAULT_TEMPLATE_EN =
+    "<p>This is to certify that <strong>&lt;%first_name%&gt; &lt;%last_name%&gt;</strong></p><br/><p>has successfully completed <strong>&lt;%content_name%&gt;</strong> on <strong>&lt;%completion_date%&gt;</strong></p>";
+  const DEFAULT_TEMPLATE_AR =
+    "<p>هذا يشهد بأن <strong>&lt;%first_name%&gt; &lt;%last_name%&gt;</strong></p><br/><p>قد أتم بنجاح <strong>&lt;%content_name%&gt;</strong> بتاريخ <strong>&lt;%completion_date%&gt;</strong></p>";
+
   const [isLoading, setIsLoading] = useState(isEdit);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [language, setLanguage] = useState("1"); // Use numeric ID as string for select
   const [bgColor, setBgColor] = useState("#ffffff");
-  const [templateText, setTemplateText] = useState(
-    "<p>This is to certify that <strong>&lt;%first_name%&gt; &lt;%last_name%&gt;</strong></p><br/><p>has successfully completed <strong>&lt;%content_name%&gt;</strong> on <strong>&lt;%completion_date%&gt;</strong></p>"
-  );
+  const [templateText, setTemplateText] = useState(DEFAULT_TEMPLATE_EN);
 
   const [assets, setAssets] = useState({
     logo: null as string | null,
@@ -195,6 +217,71 @@ export function CertificateBrandingForm() {
       fetchCertificate();
     }
   }, [isEdit, certificateId]);
+
+  /** Certificate template language (API `lang_id`); drives default Quill HTML only. */
+  const isArabicCertificate = language === "2";
+  /** Form chrome labels: follow app UI language or Arabic certificate mode. */
+  const useArabicFormLabels = locale === "ar" || isArabicCertificate;
+
+  const labels = useMemo(
+    () =>
+      useArabicFormLabels
+        ? {
+            pageTitle: "إعدادات تخصيص الشهادة",
+            language: "اللغة",
+            backgroundColor: "لون الخلفية",
+            white: "أبيض",
+            logo: "الشعار",
+            bottomLogo: "الشعار السفلي",
+            borderImage: "صورة الإطار",
+            backgroundWatermark: "العلامة المائية للخلفية",
+            stampLogo: "ختم الشهادة",
+            signatureImage: "صورة التوقيع",
+            cancel: "إلغاء",
+            preview: "معاينة",
+            update: "تحديث",
+            create: "إنشاء",
+            templateText: "نص القالب",
+            availableVariables: "المتغيرات المتاحة",
+            chooseFile: "اختر ملف",
+            existingAsset: "ملف موجود",
+            noFileChosen: "لم يتم اختيار ملف",
+          }
+        : {
+            pageTitle: "Certificate Branding Configuration",
+            language: "Language",
+            backgroundColor: "Background Color",
+            white: "White",
+            logo: "Logo",
+            bottomLogo: "Bottom Logo",
+            borderImage: "Border Image",
+            backgroundWatermark: "Background Watermark",
+            stampLogo: "Stamp Logo",
+            signatureImage: "Signature Image",
+            cancel: "Cancel",
+            preview: "Preview",
+            update: "Update",
+            create: "Create",
+            templateText: "Template Text",
+            availableVariables: "Available Variables",
+            chooseFile: "Choose File",
+            existingAsset: "Existing asset",
+            noFileChosen: "No file chosen",
+          },
+    [useArabicFormLabels]
+  );
+
+  useEffect(() => {
+    if (isEdit) return;
+
+    const isDefaultTemplate =
+      templateText.trim() === DEFAULT_TEMPLATE_EN.trim() ||
+      templateText.trim() === DEFAULT_TEMPLATE_AR.trim();
+
+    if (isDefaultTemplate) {
+      setTemplateText(isArabicCertificate ? DEFAULT_TEMPLATE_AR : DEFAULT_TEMPLATE_EN);
+    }
+  }, [isArabicCertificate, isEdit, templateText, DEFAULT_TEMPLATE_EN, DEFAULT_TEMPLATE_AR]);
 
   const quillModules = useMemo(
     () => ({
@@ -287,20 +374,20 @@ export function CertificateBrandingForm() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className="p-3">
+        <div className={`p-3 ${dir === "rtl" ? "text-right" : ""}`}>
           {/* Breadcrumb */}
           <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
-            <span className="hover:text-gray-700 transition cursor-pointer">Awareness Library</span>
+            <span className="hover:text-gray-700 transition cursor-pointer">{tMenu("menu.trainingLibrary")}</span>
             <span className="text-gray-400">›</span>
-            <span className="hover:text-gray-700 transition cursor-pointer">System Library</span>
+            <span className="hover:text-gray-700 transition cursor-pointer">{tMenu("menu.systemLibrary")}</span>
             <span className="text-gray-400">›</span>
-            <span className="hover:text-gray-700 transition cursor-pointer">Branding</span>
+            <span className="hover:text-gray-700 transition cursor-pointer">{tMenu("menu.systemBranding")}</span>
             <span className="text-gray-400">›</span>
-            <span className="font-semibold text-gray-900">Certificate Configuration</span>
+            <span className="font-semibold text-gray-900">{tMenu("menu.certificate")}</span>
           </nav>
 
           <div className="flex flex-col p-3 py-0 gap-0.5 mb-4">
-            <h3 className="text-xl font-semibold">Certificate Branding Configuration</h3>
+            <h3 className="text-xl font-semibold">{labels.pageTitle}</h3>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
@@ -313,7 +400,7 @@ export function CertificateBrandingForm() {
                     <div className="flex items-center justify-between">
                       <span className="text-[13px] font-semibold text-slate-700 flex items-center gap-2">
                         <Languages className="text-sky-500" size={18} />
-                        Language
+                        {labels.language}
                       </span>
 
                       <div className="relative w-48">
@@ -339,10 +426,10 @@ export function CertificateBrandingForm() {
                         <Palette className="text-sky-500" size={18} />
                         <div className="flex flex-col">
                           <span className="text-[13px] font-semibold text-slate-700">
-                            Background Color
+                            {labels.backgroundColor}
                           </span>
                           <span className="text-[11px] text-slate-400 capitalize">
-                            {bgColor === "#ffffff" ? "White" : bgColor}
+                            {bgColor === "#ffffff" ? labels.white : bgColor}
                           </span>
                         </div>
                       </div>
@@ -372,38 +459,56 @@ export function CertificateBrandingForm() {
                   <ImageUploadPill
                     icon={<ImageIcon className="text-sky-500" size={18} />}
                     initialUrl={assets.logo}
-                    label="Logo"
+                    label={labels.logo}
                     onImageChange={handleAssetChange("logo")}
+                    chooseFileText={labels.chooseFile}
+                    existingAssetText={labels.existingAsset}
+                    noFileChosenText={labels.noFileChosen}
                   />
                   <ImageUploadPill
                     icon={<ImageIcon className="text-sky-500" size={18} />}
                     initialUrl={assets.bottom_logo}
-                    label="Bottom Logo"
+                    label={labels.bottomLogo}
                     onImageChange={handleAssetChange("bottom_logo")}
+                    chooseFileText={labels.chooseFile}
+                    existingAssetText={labels.existingAsset}
+                    noFileChosenText={labels.noFileChosen}
                   />
                   <ImageUploadPill
                     icon={<Box className="text-sky-500" size={18} />}
                     initialUrl={assets.border}
-                    label="Border Image"
+                    label={labels.borderImage}
                     onImageChange={handleAssetChange("border")}
+                    chooseFileText={labels.chooseFile}
+                    existingAssetText={labels.existingAsset}
+                    noFileChosenText={labels.noFileChosen}
                   />
                   <ImageUploadPill
                     icon={<Waves className="text-sky-500" size={18} />}
                     initialUrl={assets.watermark}
-                    label="Background Watermark"
+                    label={labels.backgroundWatermark}
                     onImageChange={handleAssetChange("watermark")}
+                    chooseFileText={labels.chooseFile}
+                    existingAssetText={labels.existingAsset}
+                    noFileChosenText={labels.noFileChosen}
                   />
                   <ImageUploadPill
                     icon={<CheckCircle2 className="text-sky-500" size={18} />}
                     initialUrl={assets.stamp}
-                    label="Stamp Logo"
+                    label={labels.stampLogo}
                     onImageChange={handleAssetChange("stamp")}
+                    chooseFileText={labels.chooseFile}
+                    existingAssetText={labels.existingAsset}
+                    noFileChosenText={labels.noFileChosen}
                   />
                   <ImageUploadPill
                     icon={<Pencil className="text-sky-500" size={18} />}
                     initialUrl={assets.signature}
-                    label="Signature Image"
+                    label={labels.signatureImage}
                     onImageChange={handleAssetChange("signature")}
+                    chooseFileText={labels.chooseFile}
+                    existingAssetText={labels.existingAsset}
+                    noFileChosenText={labels.noFileChosen}
                   />
 
                   {/* Footer buttons */}
@@ -413,7 +518,7 @@ export function CertificateBrandingForm() {
                         className="px-7 py-2 rounded-full bg-white border border-slate-200 text-[13px] font-semibold text-slate-500 hover:bg-slate-50 font-sans h-9"
                         type="button"
                       >
-                        Cancel
+                        {labels.cancel}
                       </button>
                     </Link>
                     <button
@@ -422,7 +527,7 @@ export function CertificateBrandingForm() {
                       onClick={handlePreview}
                     >
                       <Eye size={16} />
-                      Preview
+                      {labels.preview}
                     </button>
                     <button
                       className="px-8 py-2 rounded-full bg-sky-500 text-[13px] font-semibold text-white hover:bg-sky-600 flex items-center gap-2 font-sans h-9 disabled:bg-sky-300 disabled:cursor-not-allowed"
@@ -432,9 +537,9 @@ export function CertificateBrandingForm() {
                       {isSubmitting ? (
                         <Spinner color="white" size="sm" />
                       ) : isEdit ? (
-                        "Update"
+                        labels.update
                       ) : (
-                        "Create"
+                        labels.create
                       )}
                     </button>
                   </div>
@@ -447,7 +552,7 @@ export function CertificateBrandingForm() {
               <div className="bg-white rounded-[22px] px-2 py-4 h-full">
                 <div className="space-y-4">
                   <div className="bg-white rounded-3xl px-5 py-4">
-                    <h5 className="text-sm font-semibold text-slate-700 mb-2">Template Text</h5>
+                    <h5 className="text-sm font-semibold text-slate-700 mb-2">{labels.templateText}</h5>
                     <div className="rich-editor-container overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
                       {/* ReactQuill dynamic import */}
                       <ReactQuill
@@ -462,7 +567,7 @@ export function CertificateBrandingForm() {
                     <div className="mt-4 p-3 bg-sky-50 rounded-xl border border-sky-100">
                       <p className="text-[11px] text-sky-700 font-medium mb-2 flex items-center gap-1">
                         <Sparkles size={12} />
-                        Available Variables
+                        {labels.availableVariables}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {[

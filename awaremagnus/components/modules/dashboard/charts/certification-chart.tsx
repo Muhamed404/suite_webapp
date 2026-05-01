@@ -9,12 +9,14 @@ interface CertificationChartProps {
   value: number;
   color: string;
   color2: string;
+  formatRadialValue?: (val: number) => string;
 }
 
 export const CertificationChart = ({
   value = 50,
   color = "#3ACE89",
   color2 = "#FB5050",
+  formatRadialValue,
 }: CertificationChartProps) => {
   const chartOptions = useMemo(
     () => ({
@@ -36,7 +38,7 @@ export const CertificationChart = ({
               fontSize: "28px",
               fontWeight: 200,
               color: "#192030",
-              formatter: (val: number) => `${val}%`,
+              formatter: (val: number) => (formatRadialValue ? formatRadialValue(val) : `${val}%`),
               offsetY: 0,
             },
             total: {
@@ -66,7 +68,7 @@ export const CertificationChart = ({
       },
       labels: [""],
     }),
-    [color, color2]
+    [color, color2, formatRadialValue]
   );
 
   const series = [value];
