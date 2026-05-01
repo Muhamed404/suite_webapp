@@ -194,7 +194,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
     .certificate-bottom-logo {
       position: absolute;
       bottom: 40px;
-      left: calc(50% - 80px);
+      left: 50%;
       transform: translateX(-50%);
       height: 60px;
       z-index: 2;
@@ -263,14 +263,27 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
       margin-bottom: 5px;
     }
 
-    .certificate-stamp {
-      position: absolute;
-      bottom: 20px;
-      left: calc(50% + 80px);
-      transform: translateX(-50%);
-      width: 120px;
-      height: 120px;
-      opacity: 0.85;
+    .certificate-date-area {
+      text-align: center;
+      min-width: 220px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .certificate-date-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      min-height: 18px;
+    }
+
+    .certificate-date-stamp {
+      width: 140px;
+      height: 140px;
+      opacity: 0.9;
       object-fit: contain;
     }
 
@@ -305,17 +318,13 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
           <small>Authorized Signature</small>
         </div>
         
-        <div class="certificate-sign">
-          <!-- secondary signature if needed -->
-          <!-- show issue date above the date label when provided -->
-          ${issueDate ? `<div class="certificate-issue-date" style="font-size:14px;margin-bottom:4px;">${issueDate}</div>` : ""}
+        <div class="certificate-date-area">
+          ${stampLogo ? `<img src="${stampLogo}" alt="Stamp" class="certificate-date-stamp">` : ""}
+          <div class="certificate-date-value">${completionDate || issueDate || "&lt;%completion_date%&gt;"}</div>
           <div class="certificate-sign-line"></div>
           <small>Date</small>
         </div>
       </div>
-      
-      <!-- Stamp in the middle -->
-      ${stampLogo ? `<img src="${stampLogo}" alt="Stamp" class="certificate-stamp">` : ""}
 
     </div>
   </div>

@@ -78,34 +78,51 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
       module?.name ||
       module?.translations?.[0]?.name ||
       module?.code ||
-      `Module ${moduleId}`
+      t("form.moduleFallback", { id: moduleId })
     );
   };
 
   const getDepartmentNames = () => {
-    if (loading) return "Loading...";
-    if (formData.departments.length === 0) return "None";
+    if (loading) return t("form.loading");
+    if (formData.departments.length === 0) return t("form.summaryUsersNone");
 
     return formData.departments
       .map((id) => {
-        const dept = departments.find((d) => d.id === id);
+        const dept = departments.find((d) => Number(d.id) === Number(id));
 
-        return dept?.name || `Department ${id}`;
+        return dept?.name || t("form.deptFallback", { id });
       })
       .join(", ");
   };
 
   const getGroupNames = () => {
-    if (loading) return "Loading...";
-    if (formData.groups.length === 0) return "None";
+    if (loading) return t("form.loading");
+    if (formData.groups.length === 0) return t("form.summaryUsersNone");
 
     return formData.groups
       .map((id) => {
-        const group = groups.find((g) => g.id === id);
+        const group = groups.find((g) => Number(g.id) === Number(id));
 
-        return group?.name || `Group ${id}`;
+        return group?.name || t("form.groupFallback", { id });
       })
       .join(", ");
+  };
+
+  const getUsersSummary = () => {
+    const manualPart = formData.manualUsers
+      .map((u) => `${u.firstName ?? ""} ${u.lastName ?? ""}`.trim())
+      .filter(Boolean)
+      .join(", ");
+    const hasDeptOrGroup =
+      formData.departments.length > 0 || formData.groups.length > 0;
+
+    if (manualPart && hasDeptOrGroup) {
+      return t("form.summaryUsersManualPlusTargets", { names: manualPart });
+    }
+    if (manualPart) return manualPart;
+    if (hasDeptOrGroup) return t("form.summaryUsersViaTargets");
+
+    return t("form.summaryUsersNone");
   };
 
   return (
@@ -116,60 +133,74 @@ export function WizardStep7({ formData, modulesList }: WizardStep7Props) {
           <CheckCircle className="w-6 h-6 text-white" />
         </div>
         <div>
-          <h2 className="text-lg font-semibold text-[#051226]">Campaign Ready to Create!</h2>
-          <p className="text-xs text-gray-500">Review your campaign details before submitting</p>
+          <h2 className="text-lg font-semibold text-[#051226]">{t("form.summaryReadyTitle")}</h2>
+          <p className="text-xs text-gray-500">{t("form.summaryReadySubtitle")}</p>
         </div>
       </div>
 
       {/* Summary Details */}
       <div className="space-y-0">
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">
-          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Name</span>
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
+            {t("form.summaryFieldName")}
+          </span>
           <span className="text-sm text-gray-600 flex-1">{formData.campaignName}</span>
         </div>
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">
           <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
-            Description
+            {t("form.summaryFieldDescription")}
           </span>
-          <span className="text-sm text-gray-600 flex-1">{formData.description || "—"}</span>
-        </div>
-        <div className="flex items-start gap-4 py-2 border-b border-gray-100">
-          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Gamified</span>
-          <span className="text-sm text-gray-600 flex-1">{formData.gamified ? "Yes" : "No"}</span>
+          <span className="text-sm text-gray-600 flex-1">
+            {formData.description || t("form.emDash")}
+          </span>
         </div>
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">
           <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
-            Departments
+            {t("form.summaryFieldGamified")}
+          </span>
+          <span className="text-sm text-gray-600 flex-1">
+            {formData.gamified ? t("form.summaryYes") : t("form.summaryNo")}
+          </span>
+        </div>
+        <div className="flex items-start gap-4 py-2 border-b border-gray-100">
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
+            {t("form.summaryFieldDepartments")}
           </span>
           <span className="text-sm text-gray-600 flex-1">{getDepartmentNames()}</span>
         </div>
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">
-          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Groups</span>
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
+            {t("form.summaryFieldGroups")}
+          </span>
           <span className="text-sm text-gray-600 flex-1">{getGroupNames()}</span>
         </div>
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">
-          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Users</span>
-          <span className="text-sm text-gray-600 flex-1">
-            {formData.manualUsers.length > 0
-              ? formData.manualUsers.map((u) => `${u.firstName} ${u.lastName}`).join(", ")
-              : "None"}
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
+            {t("form.summaryFieldUsers")}
           </span>
+          <span className="text-sm text-gray-600 flex-1">{getUsersSummary()}</span>
         </div>
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">
-          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Topics</span>
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
+            {t("form.summaryFieldTopics")}
+          </span>
           <span className="text-sm text-gray-600 flex-1">
             {formData.modules.length > 0
               ? formData.modules.map((id) => getModuleName(id)).join(", ")
-              : "None"}
+              : t("form.summaryUsersNone")}
           </span>
         </div>
         <div className="flex items-start gap-4 py-2 border-b border-gray-100">
-          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">Start</span>
-          <span className="text-sm text-gray-600 flex-1">{formData.startDate || "—"}</span>
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
+            {t("form.summaryFieldStart")}
+          </span>
+          <span className="text-sm text-gray-600 flex-1">{formData.startDate || t("form.emDash")}</span>
         </div>
         <div className="flex items-start gap-4 py-2">
-          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">End</span>
-          <span className="text-sm text-gray-600 flex-1">{formData.endDate || "—"}</span>
+          <span className="text-sm font-semibold text-[#051226] w-32 flex-shrink-0">
+            {t("form.summaryFieldEnd")}
+          </span>
+          <span className="text-sm text-gray-600 flex-1">{formData.endDate || t("form.emDash")}</span>
         </div>
       </div>
     </div>

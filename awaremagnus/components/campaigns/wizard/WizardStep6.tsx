@@ -42,7 +42,7 @@ export function WizardStep6({
       module?.name ||
       module?.translations?.[0]?.name ||
       module?.code ||
-      `Module ${moduleId}`
+      t("form.moduleFallback", { id: moduleId })
     );
   };
 
@@ -87,9 +87,7 @@ export function WizardStep6({
         {/* Info Alert */}
         <div className="flex items-center gap-2 p-2 bg-blue-50 border border-blue-100 rounded-md">
           <Info className="w-4 h-4 text-blue-600 flex-shrink-0" />
-          <p className="text-[10px] text-blue-700">
-            Dates are set in Step 1. Optionally schedule modules below.
-          </p>
+          <p className="text-[10px] text-blue-700">{t("form.scheduleStepInfo")}</p>
         </div>
 
         {/* Schedule Button */}
@@ -100,14 +98,14 @@ export function WizardStep6({
             onClick={onGenerateSchedule}
           >
             <CalendarCheck className="w-3 h-3" />
-            <span>Schedule</span>
+            <span>{t("form.scheduleApplyButton")}</span>
           </button>
         </div>
 
         {/* Schedule List */}
         {formData.schedules.length > 0 && (
           <div>
-            <h4 className="text-xs font-medium text-gray-700 mb-2">Modules (drag to reorder):</h4>
+            <h4 className="text-xs font-medium text-gray-700 mb-2">{t("form.modulesDragReorder")}</h4>
             <ul className="space-y-1">
               {formData.schedules.map((schedule, index) => (
                 <li
@@ -130,7 +128,7 @@ export function WizardStep6({
                     </span>
                   </div>
                   <DatePicker
-                    aria-label={`Module ${index + 1} Start Date`}
+                    aria-label={t("form.ariaModuleScheduleDate", { n: index + 1 })}
                     className="w-40"
                     classNames={{
                       selectorButton: "h-7 min-w-7",

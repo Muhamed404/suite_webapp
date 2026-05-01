@@ -24,7 +24,17 @@ import {
   isOrgAdmin as getIsOrgAdmin,
   isUser as getIsUser,
 } from "@/utils/roles";
+import type { Locale } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
+import {
+  formatLocaleDecimal,
+  formatLocaleDigitsInString,
+  formatLocaleInteger,
+  formatLocaleMediumDate,
+  formatLocaleMonthYear,
+  formatLocalePercentOf100,
+  formatLocaleShortDayMonth,
+} from "@/i18n/localeFormat";
 import { useTranslations } from "@/i18n/useTranslations";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useAuthStore } from "@/hooks/useAuthStore";
@@ -49,6 +59,7 @@ import { getLanguageId } from "@/utils/languageMapping";
 
 export default function DashboardPage() {
   const { dir, locale } = useI18n();
+  const loc = (locale === "ar" ? "ar" : "en") as Locale;
   const t = useTranslations("dashboard");
   const isRtl = dir === "rtl";
   const languageId = getLanguageId(locale as "en" | "ar");
@@ -199,10 +210,7 @@ export default function DashboardPage() {
         if (!date || Number.isNaN(date.getTime())) return;
 
         const key = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
-        const label = date.toLocaleDateString("en-US", {
-          month: "long",
-          year: "numeric",
-        });
+        const label = formatLocaleMonthYear(loc, date);
 
         const existing = monthMap.get(key);
 
@@ -223,7 +231,7 @@ export default function DashboardPage() {
 
     // No fallback to monthly completion API - return empty data
     return { labels: [], data: [] };
-  }, [orgCampaignCompletions]);
+  }, [orgCampaignCompletions, loc]);
 
   // Campaign Timeline Scatter Chart data (org-admin: all campaigns aggregated)
   const campaignTimelineData = useMemo(() => {
@@ -259,10 +267,7 @@ export default function DashboardPage() {
         if (!completionDate || Number.isNaN(completionDate.getTime())) return;
 
         const userName = `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
-        const formattedDate = completionDate.toLocaleDateString(
-          locale === "ar" ? "ar-EG" : "en-US",
-          { day: "2-digit", month: "short", year: "numeric" }
-        );
+        const formattedDate = formatLocaleMediumDate(loc, completionDate);
 
         // Use date-only key for grouping
         const dateKey = completionDate.toISOString().split("T")[0];
@@ -320,7 +325,7 @@ export default function DashboardPage() {
       maxModules,
       hasData: lineData.length > 0,
     };
-  }, [orgCampaignCompletions, locale]);
+  }, [orgCampaignCompletions, loc]);
 
   const modules = useMemo(() => {
     if (assignmentsData?.object?.assignments && assignmentsData.object.assignments.length > 0) {
@@ -452,7 +457,10 @@ export default function DashboardPage() {
     const remainingSeconds = totalSeconds % 3600;
     const mins = Math.floor(remainingSeconds / 60);
     const secs = remainingSeconds % 60;
-    return `${hours}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    return formatLocaleDigitsInString(
+      loc,
+      `${hours}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`
+    );
   };
 
   const totalStudyTimeDisplay = formatStudyTimeHMS(userDashboardData?.total_study_time);
@@ -696,6 +704,25 @@ export default function DashboardPage() {
     Resourcefulness: { bg: "bg-fuchsia-100", iconBg: "bg-fuchsia-400", icon: "chart-bar" },
     // Add more if needed
   };
+  const unlockedLabel = locale === "ar" ? "مفتوح" : "Unlocked";
+  const lockedLabel = locale === "ar" ? "مغلق" : "Locked";
+  const achievementFallbackLabel = locale === "ar" ? "إنجاز" : "Achievement";
+
+  const resolveAchievementName = useCallback(
+    (meta: any, achievementId: number) => {
+      const localizedName =
+        meta?.achievement_name_ar ??
+        meta?.achievement_name_arabic ??
+        meta?.name_ar ??
+        meta?.name_arabic;
+
+      if (locale === "ar" && localizedName) return localizedName;
+      if (meta?.achievement_name) return meta.achievement_name;
+
+      return `${achievementFallbackLabel} #${formatLocaleInteger(loc, achievementId)}`;
+    },
+    [achievementFallbackLabel, loc, locale]
+  );
 
   return (
     <ProtectedRoute>
@@ -744,20 +771,24 @@ export default function DashboardPage() {
                               </svg>
                               <div className="absolute inset-0 flex items-center justify-center">
                                 <div className="text-center">
-                                  <p className="text-white text-xs">{t("userWelcome.level", { level: levelNumber })}</p>
+                                  <p className="text-white text-xs">
+                                    {t("userWelcome.level", { level: formatLocaleInteger(loc, levelNumber) })}
+                                  </p>
                                 </div>
                               </div>
                             </div>
                             <div>
                               <p className="text-gray-400 text-xs">
-                                {t("userWelcome.xp", { xp: xpTotalTokens.toLocaleString() })}
+                                {t("userWelcome.xp", {
+                                  xp: formatLocaleInteger(loc, Math.round(Number(xpTotalTokens) || 0)),
+                                })}
                               </p>
                             </div>
                           </div>
 
                           <div className="flex flex-col gap-2">
                             <p className="text-white text-base">
-                              {t("userWelcome.streak", { streak: streakDay })}
+                              {t("userWelcome.streak", { streak: formatLocaleInteger(loc, streakDay) })}
                             </p>
                             <button
                               onClick={() => router.push("/dashboard/campaign-assignments")}
@@ -820,7 +851,8 @@ export default function DashboardPage() {
                           {t("gamification.courseCompleted")}
                         </p>
                         <p className="text-gray-900 text-lg font-bold">
-                          {totalCompletedModules}/{totalModulesEnrolled}
+                          {formatLocaleInteger(loc, totalCompletedModules)}/
+                          {formatLocaleInteger(loc, totalModulesEnrolled)}
                         </p>
                       </div>
                     </div>
@@ -840,7 +872,8 @@ export default function DashboardPage() {
                           {t("userCards.certificateCompleted")}
                         </p>
                         <p className="text-gray-900 text-lg font-bold">
-                          {totalCompletedCertificates}/{totalCertificatesAvailable}
+                          {formatLocaleInteger(loc, totalCompletedCertificates)}/
+                          {formatLocaleInteger(loc, totalCertificatesAvailable)}
                         </p>
                       </div>
                     </div>
@@ -913,7 +946,7 @@ export default function DashboardPage() {
                       const tooltipContent = (
                         <div className="flex flex-col gap-1 max-w-[200px] p-1">
                           <p className="font-semibold text-sm text-gray-900">
-                            {meta?.achievement_name ?? `Achievement #${achievementId}`}
+                            {resolveAchievementName(meta, achievementId)}
                           </p>
                           {meta?.achievement_description && (
                             <p className="text-xs text-gray-600 leading-tight">
@@ -924,7 +957,7 @@ export default function DashboardPage() {
                             <span
                               className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}
                             >
-                              {isUnlocked ? "Unlocked" : "Locked"}
+                              {isUnlocked ? unlockedLabel : lockedLabel}
                             </span>
                             {isUnlocked && meta?.employee_count != null && (
                               <span className="text-xs text-gray-500">
@@ -1030,7 +1063,9 @@ export default function DashboardPage() {
                               </svg>
                             </div>
                             <span className="text-gray-900 text-[9px] font-medium">{category}</span>
-                            <span className="text-gray-600 text-[9px]">{count}</span>
+                            <span className="text-gray-600 text-[9px]">
+                              {formatLocaleInteger(loc, count)}
+                            </span>
                           </div>
                         );
                       })}
@@ -1041,9 +1076,14 @@ export default function DashboardPage() {
                       <span className="text-gray-700 text-[10px] font-medium">{t("gamification.achievements")}</span>
                       <div>
                         <span className="text-gray-900 text-sm font-bold">
-                          {achievementStatsData?.object?.total_unique_achievements_unlocked || 0}
+                          {formatLocaleInteger(
+                            loc,
+                            achievementStatsData?.object?.total_unique_achievements_unlocked || 0
+                          )}
                         </span>
-                        <span className="text-gray-400 text-[10px]">/50</span>
+                        <span className="text-gray-400 text-[10px]">
+                          /{formatLocaleInteger(loc, 50)}
+                        </span>
                       </div>
                     </div>
                     <div className="w-full bg-purple-100 rounded-full h-1.5">
@@ -1111,7 +1151,10 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-gray-500 text-[10px]">{t("thisWeek.lessonsCompleted")}</span>
                         <span className="text-gray-900 text-sm font-bold">
-                          {(dashboardData as any)?.total_completed_modules || 0}
+                          {formatLocaleInteger(
+                            loc,
+                            (dashboardData as any)?.total_completed_modules || 0
+                          )}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
@@ -1123,7 +1166,12 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-gray-500 text-[10px]">{t("thisWeek.xpGained")}</span>
                         <span className="text-purple-600 text-sm font-bold">
-                          +{(dashboardData as any)?.xp_total_tokens || 0} XP
+                          +
+                          {formatLocaleInteger(
+                            loc,
+                            Math.round(Number((dashboardData as any)?.xp_total_tokens) || 0)
+                          )}{" "}
+                          XP
                         </span>
                       </div>
                     </div>
@@ -1165,7 +1213,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <span className="text-red-400 text-lg font-bold">
-                        {learningVelocity.toFixed(1)}
+                        {formatLocaleDecimal(loc, learningVelocity, 1, 1)}
                       </span>
                     </div>
 
@@ -1221,10 +1269,7 @@ export default function DashboardPage() {
                         const days = Number.isFinite(remainingDaysRaw)
                           ? Math.max(remainingDaysRaw, 0)
                           : 0;
-                        const assigned = startDate.toLocaleDateString("en-GB", {
-                          day: "numeric",
-                          month: "short",
-                        });
+                        const assigned = formatLocaleShortDayMonth(loc, startDate);
                         const progressRaw = Number(assignment.progress_percentage);
                         const progress = Number.isFinite(progressRaw)
                           ? Math.min(Math.max(progressRaw, 0), 100)
@@ -1245,7 +1290,9 @@ export default function DashboardPage() {
                                 </h3>
                                 <p className="text-[11px] text-gray-400">{t("pendingTasks.assigned", { date: assigned })}</p>
                                 <div className="flex items-center gap-3 text-[11px] text-gray-500">
-                                  <span className="flex items-center gap-1">⏱ {t("pendingTasks.days", { days })}</span>
+                                  <span className="flex items-center gap-1">
+                                    ⏱ {t("pendingTasks.days", { days: formatLocaleInteger(loc, days) })}
+                                  </span>
                                 </div>
                                 <div className="w-36 h-1 bg-gray-200 rounded-full overflow-hidden">
                                   <div
@@ -1270,6 +1317,7 @@ export default function DashboardPage() {
                       <h3 className="text-xs font-semibold mb-1">{t("cards.weeklyProgress")}</h3>
                       <CircularProgressChart
                         color="#00CCC4"
+                        formatRadialValue={(v) => formatLocalePercentOf100(loc, v, 1)}
                         size={128}
                         value={weeklyProgressPercent}
                       />
@@ -1278,6 +1326,7 @@ export default function DashboardPage() {
                       <h3 className="text-xs font-semibold mb-1">{t("cards.quizAccuracy")}</h3>
                       <CircularProgressChart
                         color="#7CC5FA"
+                        formatRadialValue={(v) => formatLocalePercentOf100(loc, v, 1)}
                         size={128}
                         value={quizzesAccuracyPercent}
                       />
@@ -1311,13 +1360,7 @@ export default function DashboardPage() {
                 const formatDate = (dateStr: string) => {
                   const d = new Date(dateStr);
 
-                  return Number.isFinite(d.getTime())
-                    ? d.toLocaleDateString("en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })
-                    : "—";
+                  return Number.isFinite(d.getTime()) ? formatLocaleMediumDate(loc, d) : "—";
                 };
 
                 const statusBadge = (statusName: string) => {
@@ -1455,7 +1498,11 @@ export default function DashboardPage() {
 
                       <div className="flex items-center justify-between">
                         <p className="text-gray-500 text-[10px] whitespace-nowrap">
-                          {t("pendingTasks.pagination.showing", { shown: 1, total: moduleAssignments.length, all: assignmentsData?.object?.count || 0 })}
+                          {t("pendingTasks.pagination.showing", {
+                            shown: formatLocaleInteger(loc, 1),
+                            total: formatLocaleInteger(loc, moduleAssignments.length),
+                            all: formatLocaleInteger(loc, assignmentsData?.object?.count || 0),
+                          })}
                         </p>
                         <Link
                           className="text-[10px] text-blue-600 hover:underline"
@@ -1511,13 +1558,7 @@ export default function DashboardPage() {
                                   const endDate = end ? new Date(end) : null;
 
                                   const formatDateSafe = (d: Date | null) =>
-                                    d && Number.isFinite(d.getTime())
-                                      ? d.toLocaleDateString("en-GB", {
-                                          day: "2-digit",
-                                          month: "short",
-                                          year: "numeric",
-                                        })
-                                      : "—";
+                                    d && Number.isFinite(d.getTime()) ? formatLocaleMediumDate(loc, d) : "—";
 
                                   return (
                                     <tr
@@ -1567,7 +1608,7 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between">
                         <p className="text-gray-500 text-[10px] whitespace-nowrap">
                         {t("pendingTasks.pagination.showingSimple", {
-                          total: pendingSurveys.length,
+                          total: formatLocaleInteger(loc, pendingSurveys.length),
                         })}
                       </p>
                       </div>
@@ -1612,7 +1653,7 @@ export default function DashboardPage() {
                         />
                         <div className="flex flex-col">
                           <h3 className="text-xs">{t("cards.totalUserLicenses")}</h3>
-                          <p className="text-xl">{totalLicenses}</p>
+                          <p className="text-xl">{formatLocaleInteger(loc, totalLicenses)}</p>
                         </div>
                       </div>
                     </div>
@@ -1634,7 +1675,7 @@ export default function DashboardPage() {
                         />
                         <div className="flex flex-col">
                           <h3 className="text-xs">{t("cards.totalConsumedLicenses")}</h3>
-                          <p className="text-xl">{consumedLicenses}</p>
+                          <p className="text-xl">{formatLocaleInteger(loc, consumedLicenses)}</p>
                         </div>
                       </div>
                     </div>
@@ -1749,7 +1790,7 @@ export default function DashboardPage() {
 
                     <div className="flex w-full items-center">
                       <div className={clsx("text-5xl text-gray-900", isRtl ? "ml-4" : "mr-4")}>
-                        {Math.round(compliancePercent / 10)}
+                        {formatLocaleInteger(loc, Math.round(compliancePercent / 10))}
                       </div>
                       <div className="mt-1 flex-1">
                         <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
@@ -1765,7 +1806,7 @@ export default function DashboardPage() {
                           )}
                           style={{ maxWidth: "100%" }}
                         >
-                          {compliancePercent}%
+                          {formatLocalePercentOf100(loc, compliancePercent, 2)}
                         </div>
                       </div>
                     </div>
@@ -1781,7 +1822,15 @@ export default function DashboardPage() {
                         />
                         <div>
                           <div className="text-lg font-semibold text-gray-900">
-                            {globalProgress}%
+                            {formatLocalePercentOf100(
+                              loc,
+                              Number(
+                                typeof globalProgress === "number"
+                                  ? globalProgress
+                                  : parseFloat(String(globalProgress))
+                              ) || 0,
+                              2
+                            )}
                           </div>
                           <p className="text-gray-500 text-xs">{t("cards.globalProgress")}</p>
                         </div>
@@ -1796,7 +1845,9 @@ export default function DashboardPage() {
                           width={24}
                         />
                         <div>
-                          <div className="text-lg font-semibold text-gray-900">{xpTokens}</div>
+                          <div className="text-lg font-semibold text-gray-900">
+                            {formatLocaleInteger(loc, Math.round(Number(xpTokens) || 0))}
+                          </div>
                           <p className="text-gray-500 text-xs">{t("cards.totalXpTokens")}</p>
                         </div>
                       </div>
@@ -1809,7 +1860,9 @@ export default function DashboardPage() {
                           {t("cards.totalAwarenessCampaigns")}
                         </p>
                       </div>
-                      <div className="text-lg font-semibold text-gray-900">{totalCampaigns}</div>
+                      <div className="text-lg font-semibold text-gray-900">
+                        {formatLocaleInteger(loc, totalCampaigns)}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1871,9 +1924,15 @@ export default function DashboardPage() {
                                   },
                                 },
                                 labels: {
-                                  format: "dd MMM",
                                   datetimeUTC: false,
                                   showDuplicates: false,
+                                  formatter: (value: string | number) => {
+                                    const ts = typeof value === "number" ? value : Number(value);
+
+                                    return Number.isFinite(ts)
+                                      ? formatLocaleShortDayMonth(loc, new Date(ts))
+                                      : "";
+                                  },
                                   style: {
                                     fontSize: "11px",
                                     fontWeight: 500,
@@ -1914,7 +1973,7 @@ export default function DashboardPage() {
                                   formatter: (value: number) => {
                                     const rounded = Math.round(value);
                                     return Number.isInteger(rounded) && rounded >= 0
-                                      ? String(rounded)
+                                      ? formatLocaleInteger(loc, rounded)
                                       : "";
                                   },
                                   style: {
@@ -1986,12 +2045,22 @@ export default function DashboardPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 p-3 rounded-xl bg-white gap-3 h-full">
                     <div className="bg-[#F1F5F8] rounded-xl p-4 flex flex-col items-center justify-center">
                       <h3 className="text-sm font-semibold mb-3">{t("cards.weeklyProgress")}</h3>
-                      <CircularProgressChart color="#00CCC4" size={120} value={weeklyProgress} />
+                      <CircularProgressChart
+                        color="#00CCC4"
+                        formatRadialValue={(v) => formatLocalePercentOf100(loc, v, 1)}
+                        size={120}
+                        value={weeklyProgress}
+                      />
                     </div>
 
                     <div className="bg-[#F1F5F8] rounded-xl p-4 flex flex-col items-center justify-center">
                       <h3 className="text-sm font-semibold mb-3">{t("cards.quizAccuracy")}</h3>
-                      <CircularProgressChart color="#7CC5FA" size={120} value={quizAccuracy} />
+                      <CircularProgressChart
+                        color="#7CC5FA"
+                        formatRadialValue={(v) => formatLocalePercentOf100(loc, v, 1)}
+                        size={120}
+                        value={quizAccuracy}
+                      />
                     </div>
                   </div>
                 </div>
@@ -2014,10 +2083,10 @@ export default function DashboardPage() {
                           </h3>
                           <div className="flex items-center gap-1.5">
                             <p className="text-base text-gray-800">
-                              {Number(securityAwarenessScore).toFixed(0)}
+                              {formatLocaleInteger(loc, Math.round(Number(securityAwarenessScore) || 0))}
                             </p>
                             <p className="text-gray-400 text-base font-medium">
-                              /{Number(securityAwarenessMax).toFixed(0)}
+                              /{formatLocaleInteger(loc, Math.round(Number(securityAwarenessMax) || 0))}
                             </p>
                           </div>
                         </div>
@@ -2042,10 +2111,13 @@ export default function DashboardPage() {
                       color1="#3ACE89"
                       color2="#BEC3C7"
                       color3="#FB5050"
+                      formatCount={(n) => formatLocaleInteger(loc, n)}
+                      formatLegendPercent={(v) => formatLocaleDecimal(loc, v, 2, 2)}
+                      formatTooltipPercent={(v) => formatLocalePercentOf100(loc, v, 1)}
                       opened={riskStats.medium}
                       sent={riskStats.low}
                       labels={[t("cards.lowRisk"), t("cards.mediumRisk"), t("cards.highRisk")]}
-                      lowRiskCounterLabel="Low risk employees"
+                      lowRiskCounterLabel={t("cards.lowRiskEmployeesLabel")}
                       showLowRiskCounter
                     />
                   </div>
@@ -2060,6 +2132,9 @@ export default function DashboardPage() {
                     <CertificationChart
                       color="#3ACE89"
                       color2="#FB5050"
+                      formatRadialValue={(v) =>
+                        `${formatLocaleInteger(loc, Math.round(v))}%`
+                      }
                       value={Math.round(
                         (certStats.certified / (certStats.certified + certStats.uncertified || 1)) *
                         100
@@ -2069,11 +2144,13 @@ export default function DashboardPage() {
                     <div className="flex justify-center gap-4 text-xs text-gray-600">
                       <span className="flex items-center gap-1.5">
                         <span className="w-2 h-2 bg-green-400 rounded-full" />
-                        {t("cards.certified", { count: certStats.certified })}
+                        {t("cards.certified", { count: formatLocaleInteger(loc, certStats.certified) })}
                       </span>
                       <span className="flex items-center gap-1.5">
                         <span className="w-2 h-2 bg-red-400 rounded-full" />
-                        {t("cards.notCertified", { count: certStats.uncertified })}
+                        {t("cards.notCertified", {
+                          count: formatLocaleInteger(loc, certStats.uncertified),
+                        })}
                       </span>
                     </div>
                   </div>
@@ -2117,7 +2194,12 @@ export default function DashboardPage() {
                                 </span>
                               </div>
                               <span className="text-xs font-bold text-gray-600">
-                                {topic.failure_rate}% Fail
+                                {formatLocalePercentOf100(
+                                  loc,
+                                  Number(topic.failure_rate) || 0,
+                                  1
+                                )}{" "}
+                                Fail
                               </span>
                             </div>
                           ))
@@ -2144,7 +2226,7 @@ export default function DashboardPage() {
                         <h3 className="text-xs font-medium opacity-90">
                           {t("cards.activeLearnersThisMonth")}
                         </h3>
-                        <p className="text-xl">{activeLearners}</p>
+                        <p className="text-xl">{formatLocaleInteger(loc, activeLearners)}</p>
                       </div>
                       <div className="w-10 h-10">
                         <Image
@@ -2163,7 +2245,13 @@ export default function DashboardPage() {
                         <h3 className="text-xs font-medium opacity-90">
                           {t("cards.trainingCompletionRate")}
                         </h3>
-                        <p className="text-xl">{trainingCompletionRate}%</p>
+                        <p className="text-xl">
+                          {formatLocalePercentOf100(
+                            loc,
+                            Number(trainingCompletionRate) || 0,
+                            1
+                          )}
+                        </p>
                       </div>
                       <div className="relative w-9 h-9">
                         <div className="absolute inset-0 border-2 border-white/30 rounded-full" />

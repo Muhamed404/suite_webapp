@@ -81,7 +81,7 @@ export function WizardStep4({ formData, onChange, errors = {} }: WizardStep4Prop
       <div className="flex flex-col gap-3">
         {/* Options */}
         <div>
-          <label className="block font-medium text-gray-600 mb-2 text-sm">Options</label>
+          <label className="block font-medium text-gray-600 mb-2 text-sm">{t("form.optionsLabel")}</label>
           <div className="flex flex-col gap-2">
             <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all">
               <div
@@ -212,7 +212,9 @@ export function WizardStep4({ formData, onChange, errors = {} }: WizardStep4Prop
                 {errors.totalQuizzesPerModule ? (
                   <small className="text-red-500 text-[10px] mt-0.5 block">{errors.totalQuizzesPerModule}</small>
                 ) : (
-                  <small className="text-gray-500 text-[10px] mt-0.5 block">Max: {getMaxQuizzes()}</small>
+                  <small className="text-gray-500 text-[10px] mt-0.5 block">
+                    {t("form.quizMaxHint", { max: getMaxQuizzes() })}
+                  </small>
                 )}
               </div>
               <div className="input-group">
@@ -235,7 +237,9 @@ export function WizardStep4({ formData, onChange, errors = {} }: WizardStep4Prop
                 {errors.quizPassingThreshold ? (
                   <small className="text-red-500 text-[10px] mt-0.5 block">{errors.quizPassingThreshold}</small>
                 ) : (
-                  <small className="text-gray-500 text-[10px] mt-0.5 block">1-100%</small>
+                  <small className="text-gray-500 text-[10px] mt-0.5 block">
+                    {t("form.quizPercentRangeHint")}
+                  </small>
                 )}
               </div>
               <div className="input-group">
@@ -257,7 +261,9 @@ export function WizardStep4({ formData, onChange, errors = {} }: WizardStep4Prop
                 {errors.quizRetryThreshold ? (
                   <small className="text-red-500 text-[10px] mt-0.5 block">{errors.quizRetryThreshold}</small>
                 ) : (
-                  <small className="text-gray-500 text-[10px] mt-0.5 block">Min: 1</small>
+                  <small className="text-gray-500 text-[10px] mt-0.5 block">
+                    {t("form.quizRetryMinHint")}
+                  </small>
                 )}
               </div>
             </div>

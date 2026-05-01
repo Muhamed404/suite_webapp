@@ -71,7 +71,7 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
               {t("form.startDate")} <span className="text-red-500">*</span>
             </label>
             <DatePicker
-              aria-label="Campaign Start Date"
+              aria-label={t("form.ariaCampaignStartDate")}
               className="w-full"
               classNames={{
                 selectorButton: "h-8 min-w-8",
@@ -90,7 +90,7 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
               {t("form.endDate")} <span className="text-red-500">*</span>
             </label>
             <DatePicker
-              aria-label="Campaign End Date"
+              aria-label={t("form.ariaCampaignEndDate")}
               className="w-full"
               classNames={{
                 selectorButton: "h-8 min-w-8",
@@ -130,7 +130,7 @@ export function WizardStep1({ formData, onChange, errors }: WizardStep1Props) {
                 </svg>
               )}
             </div>
-            <span className="text-xs text-gray-700">Enable Gamification</span>
+            <span className="text-xs text-gray-700">{t("form.gamification")}</span>
           </label>
         </div>
       </div>
