@@ -26,16 +26,24 @@ const AWARENESS_ASSETS = [
     labelKey: "filters.all",
   },
   {
-    id: 4,
-    labelKey: "filters.posters",
-  },
-  {
     id: 5,
     labelKey: "filters.screenSavers",
   },
   {
-    id: 7,
-    labelKey: "filters.documents",
+    id: 3,
+    labelKey: "filters.brochures",
+  },
+  {
+    id: 4,
+    labelKey: "filters.posters",
+  },
+  {
+    id: 2,
+    labelKey: "filters.motionVideos",
+  },
+  {
+    id: 1,
+    labelKey: "filters.interactiveContent",
   },
 ] as const;
 

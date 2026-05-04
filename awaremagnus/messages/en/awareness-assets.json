@@ -3,9 +3,11 @@
   "searchPlaceholder": "Search by title, language, or description",
   "filters": {
     "all": "All",
+    "interactiveContent": "Interactive Content",
+    "motionVideos": "Motion Videos",
+    "brochures": "Brochures",
     "posters": "Posters",
-    "screenSavers": "Screen Savers",
-    "documents": "Documents"
+    "screenSavers": "Screen Savers"
   },
   "actions": {
     "view": "View"

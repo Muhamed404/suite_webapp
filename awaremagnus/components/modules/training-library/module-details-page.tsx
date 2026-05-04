@@ -648,20 +648,16 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     </h4>
                     <div className="flex flex-col items-start gap-3">
                       <div 
-                        className={clsx(
-                          "w-full max-w-[220px] h-[140px] overflow-hidden shrink-0 bg-white",
-                          locale === "ar" && "translate-x-4"
-                        )}
-                        style={{ borderRadius: 12 }}
+                        className="w-full overflow-hidden shrink-0 bg-white rounded-xl"
                       >
                         {moduleLogoUrl ? (
                           <img
                             alt={moduleTitle}
-                            className="w-full h-full object-contain"
+                            className="w-full h-auto object-contain"
                             src={moduleLogoUrl}
                           />
                         ) : (
-                          <div className="w-full h-full bg-white/70" style={{ borderRadius: 12 }} />
+                          <div className="w-full aspect-video bg-gray-200/50 rounded-xl" />
                         )}
                       </div>
                       <div className="min-w-0 w-full">

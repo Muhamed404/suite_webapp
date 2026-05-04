@@ -112,7 +112,7 @@
     "selectUsers": "اختر المستخدمين",
     "enableVisualLearning": "تمكين التعلم المرئي باستخدام",
     "shortVideos": "فيديوهات قصيرة (رسوم متحركة)",
-    "allowSkippingVideos": "السماح بتخطي الفيديوهات",
+    "enableVideoSkipping": "تفعيل تخطي الفيديو",
     "interactiveContent": "محتوى عالي التفاعل (iSpring)",
     "others": "أخرى",
     "enableQuiz": "تفعيل الاختبار",
