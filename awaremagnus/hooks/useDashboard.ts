@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { dashboardService } from "@/services/dashboardService";
 
@@ -132,6 +132,20 @@ export const useOrganizationDashboards = (params?: {
   return useQuery({
     queryKey: DASHBOARD_KEYS.organization.list(params),
     queryFn: () => dashboardService.getOrganizationDashboards(params),
+  });
+};
+
+export const useRecomputeDashboard = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (params?: { orgId?: number }) =>
+      dashboardService.recomputeDashboardOrganizations(params),
+    onSuccess: () => {
+      // Invalidate relevant dashboard queries to refresh data
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_KEYS.organization.list() });
+      queryClient.invalidateQueries({ queryKey: DASHBOARD_KEYS.system.overview });
+    },
   });
 };
 

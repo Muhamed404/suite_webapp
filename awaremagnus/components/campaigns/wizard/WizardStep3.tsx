@@ -11,7 +11,7 @@ interface WizardStep3Props {
   formData: {
     modules: number[];
     visualShortVideos: boolean;
-    allowSkippingVideos: boolean;
+    enableVideoSkipping: boolean;
     visualInteractive: boolean;
     visualOthers: boolean;
   };
@@ -89,7 +89,7 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
 
     onChange("visualShortVideos", nextValue);
     if (!nextValue) {
-      onChange("allowSkippingVideos", false);
+      onChange("enableVideoSkipping", false);
     }
   };
 
@@ -317,17 +317,17 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
             {formData.visualShortVideos && (
               <label
                 className="flex items-center gap-1.5 cursor-pointer group p-2 pl-8 transition-all"
-                onClick={() => onChange("allowSkippingVideos", !formData.allowSkippingVideos)}
+                onClick={() => onChange("enableVideoSkipping", !formData.enableVideoSkipping)}
               >
                 <div
                   className={clsx(
                     "w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all",
-                    formData.allowSkippingVideos
+                    formData.enableVideoSkipping
                       ? "bg-blue-500 border-blue-500"
                       : "border-gray-300 group-hover:border-blue-400"
                   )}
                 >
-                  {formData.allowSkippingVideos && (
+                  {formData.enableVideoSkipping && (
                     <svg
                       className="w-2.5 h-2.5 text-white"
                       fill="none"
@@ -339,7 +339,7 @@ export function WizardStep3({ formData, onChange, errors }: WizardStep3Props) {
                     </svg>
                   )}
                 </div>
-                <span className="text-xs text-gray-700">{t("form.allowSkippingVideos")}</span>
+                <span className="text-xs text-gray-700">{t("form.enableVideoSkipping")}</span>
               </label>
             )}
 
