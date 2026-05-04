@@ -80,14 +80,21 @@ exports.viewTemplate = async (req, res) => {
     // Resolve <%=web_bucket%> placeholder in all HTML fields so images load in the editor
     const phishingOCIBucketURL = (process.env.WEB_TEMPLATE_BUCKET || '').replace(/\/$/, '');
     if (phishingOCIBucketURL) {
+      const bucket = phishingOCIBucketURL;
       if (tpl.phishing_content) {
-        tpl.phishing_content = tpl.phishing_content.replaceAll('<%=web_bucket%>', phishingOCIBucketURL);
+        tpl.phishing_content = tpl.phishing_content
+          .split('<%=web_bucket%>/').join(bucket + '/')
+          .split('<%=web_bucket%>').join(bucket + '/');
       }
       if (tpl.phishing_page_content) {
-        tpl.phishing_page_content = tpl.phishing_page_content.replaceAll('<%=web_bucket%>', phishingOCIBucketURL);
+        tpl.phishing_page_content = tpl.phishing_page_content
+          .split('<%=web_bucket%>/').join(bucket + '/')
+          .split('<%=web_bucket%>').join(bucket + '/');
       }
       if (tpl.landing_page_content) {
-        tpl.landing_page_content = tpl.landing_page_content.replaceAll('<%=web_bucket%>', phishingOCIBucketURL);
+        tpl.landing_page_content = tpl.landing_page_content
+          .split('<%=web_bucket%>/').join(bucket + '/')
+          .split('<%=web_bucket%>').join(bucket + '/');
       }
     }
     if(tpl.PhishingCampaignType && tpl.PhishingCampaignType.name === enums.phishingTypeByNames.SMS) {
@@ -99,7 +106,13 @@ exports.viewTemplate = async (req, res) => {
     if (req.user.organization_id) {
       postMethodUrl = frontend_api_urls.PRODUCT_SUITE.System_Template.CLONE(templateId, req.user.organization_id);
     }
-    return res.render(render_ejs_urls.PhishMagnus.System_Template.SHOW, { postMethodUrl, template: tpl, enableSuiteManagementLeftMenu: false, isSystemTemplate: true });
+    return res.render(render_ejs_urls.PhishMagnus.System_Template.SHOW, { 
+      postMethodUrl, 
+      template: tpl, 
+      enableSuiteManagementLeftMenu: false, 
+      isSystemTemplate: true,
+      webTemplateBucket: process.env.WEB_TEMPLATE_BUCKET 
+    });
   } catch (err) {
     // Detailed logging for different axios failure modes
     logger.error(`[View Template] error fetching template \n ${err.stack}`);

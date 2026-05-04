@@ -76,10 +76,15 @@ exports.viewTemplate = async (req, res) => {
     tpl.landing_page_content = filesData.landing_page?.content || '';
     tpl.phishing_smtp = tpl.phishing_smtp_id; // ensure this property exists for the view, even if null
 
-    // Resolve <%=web_bucket%> placeholder in email HTML so images load in the editor
-    const webBucket = (process.env.WEB_TEMPLATE_BUCKET || '').replace(/\/$/, '');
-    if (tpl.phishing_content && webBucket) {
-      tpl.phishing_content = tpl.phishing_content.replaceAll('<%=web_bucket%>', webBucket);
+    // Enforce exactly one slash after bucket root to avoid malformed .../o... paths.
+    const webBucketRoot = (process.env.WEB_TEMPLATE_BUCKET || '').replace(/\/+$/, '');
+    if (webBucketRoot) {
+      ['phishing_content', 'phishing_page_content', 'landing_page_content'].forEach((field) => {
+        if (!tpl[field] || !tpl[field].includes('<%=web_bucket%>')) return;
+        tpl[field] = tpl[field]
+          .split('<%=web_bucket%>/').join(`${webBucketRoot}/`)
+          .split('<%=web_bucket%>').join(`${webBucketRoot}/`);
+      });
     }
     // if(!tpl.phish_option){
     //   if(tpl.phishcat_id === enums.phishingCategories.DataEntryBasedPhishing){
@@ -91,7 +96,12 @@ exports.viewTemplate = async (req, res) => {
     logger.info('Controller - View Template: rendering view' + JSON.stringify(tpl, null, 2));
     const postMethodUrl = '/phm/template/update/' + tpl?.id;
 
-    return res.render(render_ejs_urls.PhishMagnus.System_Template.SHOW, { template: tpl, enableSuiteManagementLeftMenu: false, postMethodUrl });
+    return res.render(render_ejs_urls.PhishMagnus.System_Template.SHOW, { 
+      template: tpl, 
+      enableSuiteManagementLeftMenu: false, 
+      postMethodUrl,
+      webTemplateBucket: process.env.WEB_TEMPLATE_BUCKET
+    });
   } catch (err) {
     // Detailed logging for different axios failure modes
     logger.error(`Controller - View Template: error fetching template \n ${err.stack}`);

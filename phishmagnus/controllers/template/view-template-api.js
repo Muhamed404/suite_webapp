@@ -70,12 +70,14 @@ exports.viewTemplateApi = async (req, res) => {
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
 
-    // Replace <%=web_bucket%> placeholder with actual bucket URL so the client receives real URLs
-    const webBucket = process.env.WEB_TEMPLATE_BUCKET || '';
-    if (webBucket) {
+    // Enforce exactly one slash after bucket root to avoid malformed .../o... paths.
+    const webBucketRoot = (process.env.WEB_TEMPLATE_BUCKET || '').replace(/\/+$/, '');
+    if (webBucketRoot) {
       ['phishing_content', 'phishing_page_content', 'landing_page_content'].forEach(field => {
         if (tpl[field] && tpl[field].includes('<%=web_bucket%>')) {
-          tpl[field] = tpl[field].split('<%=web_bucket%>').join(webBucket);
+          tpl[field] = tpl[field]
+            .split('<%=web_bucket%>/').join(`${webBucketRoot}/`)
+            .split('<%=web_bucket%>').join(`${webBucketRoot}/`);
         }
       });
     }
