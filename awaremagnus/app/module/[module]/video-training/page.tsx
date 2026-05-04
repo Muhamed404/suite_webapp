@@ -332,7 +332,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   }, [searchParams]);
 
   const { data: campaignRes } = useCampaign(campaignId, !!campaignId);
-  const isVideoSkippingEnabled = campaignRes?.success ? !!campaignRes.data.enable_video_skipping : false;
+  const isVideoSkippingEnabled = campaignRes ? !!(campaignRes.enable_video_skipping ?? campaignRes.data?.enable_video_skipping) : false;
 
   useEffect(() => {
     campaignIdRef.current = campaignId;
