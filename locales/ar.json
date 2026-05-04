@@ -122,7 +122,8 @@
 		"select_template_to_preview": "اختر قالبًا للمعاينة",
 		"emailOpened": "تتبع فتح البريد الإلكتروني",
 		"fileDownloaded": "generic_label.fileDownloaded",
-		"sr_no": "الرقم التسلسلي"
+		"sr_no": "الرقم التسلسلي",
+		"no_data_found": "لا توجد بيانات"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -1055,7 +1056,8 @@
 			"labelSubmitData": "إرسال البيانات",
 			"labelEmailOpenedNotReported": "تم فتح البريد ولكن لم يتم الإبلاغ",
 			"labelEmailOpenedAndReported": "تم فتح البريد وتم الإبلاغ",
-			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ"
+			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ",
+			"scheduleTime": "وقت الجدولة"
 		},
 		"email_create_campaign": {
 			"title": "إنشاء حملة بريد إلكتروني",

@@ -113,7 +113,9 @@
 		"fileDownloaded": "Download",
 		"qrScanned": "Scanned",
 		"select": "Select",
-		"sr_no": "Sr. No"
+		"sr_no": "Sr. No",
+		"rows_per_page": "generic_label.rows_per_page",
+		"no_data_found": "No data found"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
