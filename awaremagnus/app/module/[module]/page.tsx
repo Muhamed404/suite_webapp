@@ -556,13 +556,24 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const moduleLogoUrl = useMemo(() => {
     if (!moduleRes?.success || !moduleRes?.data) return "";
     const currentLangId = language ?? (locale === "ar" ? 2 : 1);
-    const translation = moduleRes.data.translations?.find((t) => t.language_id === currentLangId);
+    const translations = moduleRes.data.translations || [];
 
-    // If logo is null/empty for the current language, don't fall back – show nothing.
-    const logoPath = translation?.logo_banner_url || "";
+    const activeTranslation = translations.find((t: any) => t.language_id === currentLangId) || translations[0];
+    const assignedModule = assignedModulesRes?.success
+      ? (assignedModulesRes.data ?? []).find((m: any) => m.id === Number(moduleId))
+      : null;
+    const assignedTranslation = assignedModule?.translations?.find((t: any) => t.language_id === currentLangId) || assignedModule?.translations?.[0];
+
+    const logoPath =
+      activeTranslation?.logo_banner_url ??
+      translations[0]?.logo_banner_url ??
+      assignedTranslation?.logo_banner_url ??
+      assignedModule?.translations?.[0]?.logo_banner_url ??
+      (moduleRes.data as any)?.logo_banner_url ??
+      (assignedModule as any)?.logo_banner_url || "";
 
     return logoPath ? getModuleAssetUrl(logoPath) : "";
-  }, [moduleRes, language, locale]);
+  }, [moduleRes, assignedModulesRes, moduleId, language, locale]);
 
   // Keep dropdown language in sync when global locale changes elsewhere in the app.
   useEffect(() => {
