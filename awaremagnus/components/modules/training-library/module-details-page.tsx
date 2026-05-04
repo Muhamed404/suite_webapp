@@ -386,9 +386,22 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     moduleData.description ??
     moduleData.translations?.[0]?.description ??
     t("moduleDetails.description");
+  const assignedModule = assignedModulesRes?.success
+    ? assignedModulesRes.data?.find((m: any) => m.id === Number(moduleId))
+    : null;
+
+  const assignedTranslation = languageFilter
+    ? assignedModule?.translations?.find((tr: any) => String(tr.language_id) === languageFilter)
+    : assignedModule?.translations?.[0];
+
   const moduleLogoUrl = (() => {
-    const translation = activeTranslation;
-    const logoPath = translation?.logo_banner_url ?? moduleData.translations?.[0]?.logo_banner_url;
+    const logoPath =
+      activeTranslation?.logo_banner_url ??
+      moduleData.translations?.[0]?.logo_banner_url ??
+      assignedTranslation?.logo_banner_url ??
+      assignedModule?.translations?.[0]?.logo_banner_url ??
+      (moduleData as any)?.logo_banner_url ??
+      (assignedModule as any)?.logo_banner_url;
 
     return logoPath ? getModuleAssetUrl(logoPath) : "";
   })();
