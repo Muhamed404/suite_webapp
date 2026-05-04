@@ -88,7 +88,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const tabIndicatorRef = useRef<HTMLDivElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null);
 
-  
+
   const generateModuleSlug = useCallback(
     (name: string) =>
       (name || "")
@@ -305,10 +305,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
           statusLabel,
           date: content.created_date
             ? new Date(content.created_date).toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })
             : "—",
           chapters: `${content.content_type}`,
           lessons: content.description || `1 ${content.content_type?.toLowerCase()}`,
@@ -330,10 +330,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
             statusLabel: qLabel,
             date: content.created_date
               ? new Date(content.created_date).toLocaleDateString("en-GB", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
               : "—",
             chapters: `${content.quizzes.total_count} Quizzes`,
             lessons: `${content.quizzes.total_count} questions`,
@@ -401,10 +401,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
           statusLabel: aggLabel,
           date: latestDate
             ? new Date(latestDate).toLocaleDateString("en-GB", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })
             : "—",
           chapters: `${count} ${contentTypeName}`,
           lessons: `${count} item${count !== 1 ? "s" : ""}`,
@@ -459,16 +459,16 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
             statusLabel: aggLabel,
             date: agg.date_range?.latest_created
               ? new Date(agg.date_range.latest_created).toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "short",
+                year: "numeric",
+              })
+              : moduleRes?.data?.created_at
+                ? new Date(moduleRes.data.created_at).toLocaleDateString("en-GB", {
                   day: "numeric",
                   month: "short",
                   year: "numeric",
                 })
-              : moduleRes?.data?.created_at
-                ? new Date(moduleRes.data.created_at).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })
                 : "—",
             chapters: `${agg.total_count} ${agg.content_type}`,
             lessons: `${agg.total_count} items`,
@@ -556,24 +556,13 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   const moduleLogoUrl = useMemo(() => {
     if (!moduleRes?.success || !moduleRes?.data) return "";
     const currentLangId = language ?? (locale === "ar" ? 2 : 1);
-    const translations = moduleRes.data.translations || [];
+    const translation = moduleRes.data.translations?.find((t) => t.language_id === currentLangId);
 
-    const activeTranslation = translations.find((t: any) => t.language_id === currentLangId) || translations[0];
-    const assignedModule = assignedModulesRes?.success
-      ? (assignedModulesRes.data ?? []).find((m: any) => m.id === Number(moduleId))
-      : null;
-    const assignedTranslation = assignedModule?.translations?.find((t: any) => t.language_id === currentLangId) || assignedModule?.translations?.[0];
-
-    const logoPath =
-      activeTranslation?.logo_banner_url ??
-      translations[0]?.logo_banner_url ??
-      assignedTranslation?.logo_banner_url ??
-      assignedModule?.translations?.[0]?.logo_banner_url ??
-      (moduleRes.data as any)?.logo_banner_url ??
-      (assignedModule as any)?.logo_banner_url || "";
+    // If logo is null/empty for the current language, don't fall back – show nothing.
+    const logoPath = translation?.logo_banner_url || "";
 
     return logoPath ? getModuleAssetUrl(logoPath) : "";
-  }, [moduleRes, assignedModulesRes, moduleId, language, locale]);
+  }, [moduleRes, language, locale]);
 
   // Keep dropdown language in sync when global locale changes elsewhere in the app.
   useEffect(() => {
@@ -999,19 +988,17 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                       <div>
                         <div className="bg-gray-50 rounded-lg p-3 mb-6">
                           <h4 className="text-xs font-bold text-gray-900 mb-3">{t("moduleDetails.aboutModule") ?? "About The Module"}</h4>
-                          {moduleInfo.description ? (
-                            <>
-                              <p className="text-xs text-gray-600 leading-relaxed">
-                                {moduleInfo.description}
-                              </p>
-                              {isOrgUserView && moduleLogoUrl ? (
-                                <img
-                                  alt={`${moduleInfo.name} logo`}
-                                  className="mt-3 w-full h-auto max-h-40 object-contain rounded-md border border-gray-200 bg-white"
-                                  src={moduleLogoUrl}
-                                />
-                              ) : null}
-                            </>
+                          {moduleInfo.description && (
+                            <p className="text-xs text-gray-600 leading-relaxed mb-3">
+                              {moduleInfo.description}
+                            </p>
+                          )}
+                          {isOrgUserView && moduleLogoUrl ? (
+                            <img
+                              alt={`${moduleInfo.name} logo`}
+                              className="mt-3 w-full h-auto max-h-40 object-contain rounded-md border border-gray-200 bg-white"
+                              src={moduleLogoUrl}
+                            />
                           ) : null}
                         </div>
 
@@ -1039,289 +1026,288 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                           let runningContentNumber = baseIdx;
 
                           return paginatedItems.map((item, index) => {
-                          const contentTypeKey = item.type || item.title || "";
-                          const langMap: Record<string, { label: string; flag: string }> = {
-                            en: { label: "English", flag: "us" },
-                            ar: { label: "Arabic", flag: "sa" },
-                          };
+                            const contentTypeKey = item.type || item.title || "";
+                            const langMap: Record<string, { label: string; flag: string }> = {
+                              en: { label: "English", flag: "us" },
+                              ar: { label: "Arabic", flag: "sa" },
+                            };
 
-                          const icon = getContentTypeEmoji(contentTypeKey);
-                          const color = getContentTypeColorClass(contentTypeKey);
-                          const isQuizSubItem = item.type === "Quiz" && !item.isQuizSummary;
-                          let contentNumberLabel: string | null = null;
+                            const icon = getContentTypeEmoji(contentTypeKey);
+                            const color = getContentTypeColorClass(contentTypeKey);
+                            const isQuizSubItem = item.type === "Quiz" && !item.isQuizSummary;
+                            let contentNumberLabel: string | null = null;
 
-                          if (!isQuizSubItem) {
-                            runningContentNumber += 1;
-                            contentNumberLabel = formatNumber(runningContentNumber, locale);
-                          }
-                          const langChips = (item.languages || []).map((code: string) => {
-                            const cfg = langMap[code];
+                            if (!isQuizSubItem) {
+                              runningContentNumber += 1;
+                              contentNumberLabel = formatNumber(runningContentNumber, locale);
+                            }
+                            const langChips = (item.languages || []).map((code: string) => {
+                              const cfg = langMap[code];
 
-                            if (!cfg) return null;
+                              if (!cfg) return null;
 
-                            return (
-                              <span
-                                key={code}
-                                className="inline-flex items-center gap-1 text-[11px] rounded-full px-2 py-1 bg-white"
-                              >
-                                <span className={`fi fi-${cfg.flag} rounded-full`} />
-                                <span className="text-gray-600">{cfg.label}</span>
-                              </span>
-                            );
-                          });
+                              return (
+                                <span
+                                  key={code}
+                                  className="inline-flex items-center gap-1 text-[11px] rounded-full px-2 py-1 bg-white"
+                                >
+                                  <span className={`fi fi-${cfg.flag} rounded-full`} />
+                                  <span className="text-gray-600">{cfg.label}</span>
+                                </span>
+                              );
+                            });
 
-                          // format status for display (e.g. "not_started" / "in progress" -> "Not Started" / "In Progress")
-                          const displayStatus = item.status
-                            ? item.status
+                            // format status for display (e.g. "not_started" / "in progress" -> "Not Started" / "In Progress")
+                            const displayStatus = item.status
+                              ? item.status
                                 .replace(/_/g, " ")
                                 .split(" ")
                                 .map((s: string) => s ? s[0].toUpperCase() + s.slice(1) : s)
                                 .join(" ")
-                            : "";
+                              : "";
 
-                          let statusLabel = displayStatus;
-                          if (item.status === "completed") statusLabel = t("moduleDetails.completed") ?? "Completed";
-                          else if (item.status === "passed") statusLabel = t("moduleDetails.passed") ?? "Passed";
-                          else if (item.status === "failed") statusLabel = t("moduleDetails.failed") ?? "Failed";
-                          else if (!item.status || item.status === "pending" || item.status === "in_progress" || item.status === "in progress")
-                            statusLabel = t("moduleDetails.pending") ?? "Pending";
+                            let statusLabel = displayStatus;
+                            if (item.status === "completed") statusLabel = t("moduleDetails.completed") ?? "Completed";
+                            else if (item.status === "passed") statusLabel = t("moduleDetails.passed") ?? "Passed";
+                            else if (item.status === "failed") statusLabel = t("moduleDetails.failed") ?? "Failed";
+                            else if (!item.status || item.status === "pending" || item.status === "in_progress" || item.status === "in progress")
+                              statusLabel = t("moduleDetails.pending") ?? "Pending";
 
-                          const statusBadge =
-                            item.status === "loading" ? (
-                              <span className="text-[11px] text-gray-500 bg-gray-100 px-3 py-1 rounded-full animate-pulse">
-                                {t("moduleDetails.statusLoading") ?? "Loading..."}
-                              </span>
-                            ) : item.status === "completed" || item.status === "passed" ? (
-                              <span className="text-[11px] text-green-600 bg-green-100 px-3 py-1 rounded-full">
-                                {statusLabel}
-                              </span>
-                            ) : item.status === "failed" ? (
-                              <span className="text-[11px] text-red-600 bg-red-100 px-3 py-1 rounded-full">
-                                {statusLabel}
-                              </span>
-                            ) : (
-                              <span className="text-[11px] text-amber-600 bg-amber-100 px-3 py-1 rounded-full">
-                                {statusLabel}
-                              </span>
-                            );
+                            const statusBadge =
+                              item.status === "loading" ? (
+                                <span className="text-[11px] text-gray-500 bg-gray-100 px-3 py-1 rounded-full animate-pulse">
+                                  {t("moduleDetails.statusLoading") ?? "Loading..."}
+                                </span>
+                              ) : item.status === "completed" || item.status === "passed" ? (
+                                <span className="text-[11px] text-green-600 bg-green-100 px-3 py-1 rounded-full">
+                                  {statusLabel}
+                                </span>
+                              ) : item.status === "failed" ? (
+                                <span className="text-[11px] text-red-600 bg-red-100 px-3 py-1 rounded-full">
+                                  {statusLabel}
+                                </span>
+                              ) : (
+                                <span className="text-[11px] text-amber-600 bg-amber-100 px-3 py-1 rounded-full">
+                                  {statusLabel}
+                                </span>
+                              );
 
-                          return (
-                            <div
-                              key={`${item.id}-${index}`}
-                              className={`item bg-white rounded-2xl p-4 flex justify-between items-center border transition-all hover:shadow-sm relative z-10 ${
-                                item.type === "Quiz" && !item.isQuizSummary
-                                  ? "ml-8 -mt-2 border-blue-100 bg-slate-50 hover:border-blue-300 shadow-sm"
-                                  : "border-gray-100 hover:border-blue-200"
-                              }`}
-                            >
-                              <div className="flex gap-4 flex-1">
-                                <div
-                                  className={`w-12 h-12 ${color} rounded-lg flex items-center justify-center flex-shrink-0 text-lg`}
-                                >
-                                  {icon}
-                                </div>
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1">
-                                    {contentNumberLabel && (
-                                      <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-[10px] font-semibold text-gray-600">
-                                        {contentNumberLabel}
+                            return (
+                              <div
+                                key={`${item.id}-${index}`}
+                                className={`item bg-white rounded-2xl p-4 flex justify-between items-center border transition-all hover:shadow-sm relative z-10 ${item.type === "Quiz" && !item.isQuizSummary
+                                    ? "ml-8 -mt-2 border-blue-100 bg-slate-50 hover:border-blue-300 shadow-sm"
+                                    : "border-gray-100 hover:border-blue-200"
+                                  }`}
+                              >
+                                <div className="flex gap-4 flex-1">
+                                  <div
+                                    className={`w-12 h-12 ${color} rounded-lg flex items-center justify-center flex-shrink-0 text-lg`}
+                                  >
+                                    {icon}
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      {contentNumberLabel && (
+                                        <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-gray-100 text-[10px] font-semibold text-gray-600">
+                                          {contentNumberLabel}
+                                        </span>
+                                      )}
+                                      <h3 className="text-base font-semibold text-gray-900">
+                                        {item.title}
+                                      </h3>
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 mb-3">
+                                      <span>
+                                        {t("moduleDetails.createdLabel", { date: item.date }) ?? `Created ${item.date}`} &nbsp; &nbsp;·
                                       </span>
-                                    )}
-                                    <h3 className="text-base font-semibold text-gray-900">
-                                      {item.title}
-                                    </h3>
+                                      {langChips}
+                                    </div>
+                                    <p className="text-xs text-gray-600">
+                                      {item.chapters} · {item.lessons}
+                                    </p>
                                   </div>
-                                  <div className="flex flex-wrap items-center gap-2 text-[10px] text-gray-500 mb-3">
-                                    <span>
-                                      {t("moduleDetails.createdLabel", { date: item.date }) ?? `Created ${item.date}`} &nbsp; &nbsp;·
-                                    </span>
-                                    {langChips}
-                                  </div>
-                                  <p className="text-xs text-gray-600">
-                                    {item.chapters} · {item.lessons}
-                                  </p>
                                 </div>
-                              </div>
-                              <div className="ml-4 flex flex-col items-end gap-4">
-                                {statusBadge}
-                                <button
-                                  className="table-btn--primary table-btn"
-                                  onClick={async () => {
-                                    console.log(
-                                      "[module] Start clicked, moduleId:",
-                                      moduleId,
-                                      "campaignId:",
-                                      campaignId,
-                                      "item.id:",
-                                      item.id,
-                                      "typeof item.id:",
-                                      typeof item.id
-                                    );
+                                <div className="ml-4 flex flex-col items-end gap-4">
+                                  {statusBadge}
+                                  <button
+                                    className="table-btn--primary table-btn"
+                                    onClick={async () => {
+                                      console.log(
+                                        "[module] Start clicked, moduleId:",
+                                        moduleId,
+                                        "campaignId:",
+                                        campaignId,
+                                        "item.id:",
+                                        item.id,
+                                        "typeof item.id:",
+                                        typeof item.id
+                                      );
 
-                                    // notify backend that user began this content (skip if already completed or in progress, or aggregated)
-                                    if (
-                                      campaignId != null &&
-                                      moduleId != null &&
-                                      typeof item.id === "number" &&
-                                      !item.isAggregated &&
-                                      item.status !== "completed" &&
-                                      item.status !== "passed" &&
-                                      item.status !== "failed" &&
-                                      item.status !== "in_progress" &&
-                                      item.status !== "in progress"
-                                    ) {
-                                      try {
-                                        await campaignService.beginContent(
-                                          campaignId,
-                                          moduleId,
-                                          item.id
-                                        );
-                                        console.log("[module] beginContent success");
-                                      } catch (err) {
-                                        console.error("[module] beginContent error", err);
-                                      }
-                                    }
-
-                                    // Call the report-actions/begin-content API (skip for aggregated content)
-                                    if (moduleId != null && !item.isAggregated) {
-                                      let contentId: number | null = null;
-
-                                      if (typeof item.id === "number") {
-                                        contentId = item.id;
-                                      } else if (item.isAggregated && item.content_type_id) {
-                                        contentId = item.content_type_id;
-                                      }
+                                      // notify backend that user began this content (skip if already completed or in progress, or aggregated)
                                       if (
-                                        contentId != null &&
-                                        item.status !== "in_progress" &&
-                                        item.status !== "in progress" &&
+                                        campaignId != null &&
+                                        moduleId != null &&
+                                        typeof item.id === "number" &&
+                                        !item.isAggregated &&
                                         item.status !== "completed" &&
                                         item.status !== "passed" &&
-                                        item.status !== "failed"
+                                        item.status !== "failed" &&
+                                        item.status !== "in_progress" &&
+                                        item.status !== "in progress"
                                       ) {
-                                        console.log(
-                                          "[module] Calling report-actions/begin-content with",
-                                          { contentId }
-                                        );
                                         try {
-                                          await awmClient.post(
-                                            `${API_BASE}/useraction/report-actions/begin-content`,
-                                            {
-                                              content_id: contentId,
-                                              module_id: moduleId,
-                                              campaign_id: campaignId,
-                                            }
+                                          await campaignService.beginContent(
+                                            campaignId,
+                                            moduleId,
+                                            item.id
                                           );
-                                          console.log(
-                                            "[module] report-actions begin-content success"
-                                          );
+                                          console.log("[module] beginContent success");
                                         } catch (err) {
-                                          console.error(
-                                            "[module] report-actions begin-content error",
-                                            err
+                                          console.error("[module] beginContent error", err);
+                                        }
+                                      }
+
+                                      // Call the report-actions/begin-content API (skip for aggregated content)
+                                      if (moduleId != null && !item.isAggregated) {
+                                        let contentId: number | null = null;
+
+                                        if (typeof item.id === "number") {
+                                          contentId = item.id;
+                                        } else if (item.isAggregated && item.content_type_id) {
+                                          contentId = item.content_type_id;
+                                        }
+                                        if (
+                                          contentId != null &&
+                                          item.status !== "in_progress" &&
+                                          item.status !== "in progress" &&
+                                          item.status !== "completed" &&
+                                          item.status !== "passed" &&
+                                          item.status !== "failed"
+                                        ) {
+                                          console.log(
+                                            "[module] Calling report-actions/begin-content with",
+                                            { contentId }
+                                          );
+                                          try {
+                                            await awmClient.post(
+                                              `${API_BASE}/useraction/report-actions/begin-content`,
+                                              {
+                                                content_id: contentId,
+                                                module_id: moduleId,
+                                                campaign_id: campaignId,
+                                              }
+                                            );
+                                            console.log(
+                                              "[module] report-actions begin-content success"
+                                            );
+                                          } catch (err) {
+                                            console.error(
+                                              "[module] report-actions begin-content error",
+                                              err
+                                            );
+                                          }
+                                        } else {
+                                          console.log(
+                                            "[module] Skipping report-actions call: no valid contentId or status is in_progress/completed",
+                                            item
                                           );
                                         }
                                       } else {
                                         console.log(
-                                          "[module] Skipping report-actions call: no valid contentId or status is in_progress/completed",
-                                          item
+                                          "[module] Skipping report-actions call: moduleId is",
+                                          moduleId
                                         );
                                       }
-                                    } else {
-                                      console.log(
-                                        "[module] Skipping report-actions call: moduleId is",
-                                        moduleId
-                                      );
-                                    }
 
-                                    // Fetch module contents for this content type before navigating
-                                    if (item.content_type_id != null) {
-                                      quizService
-                                        .getContents({
-                                          mod_id: moduleId ?? undefined,
-                                          contype_id: item.content_type_id,
-                                        })
-                                        .then((res) => {
-                                          console.log("[module] getContents by type", res);
-                                        })
-                                        .catch((err) => {
-                                          console.error("[module] getContents error", err);
-                                        });
-                                    }
-                                    // Navigation Logic Based on Content Type ID or Type Name
-                                    const isVideo = item.content_type_id === 2 || item.type === "Motion Videos" || item.type === "Video Training";
-                                    const isInteractive = item.content_type_id === 1 || item.type === "Interactive Lesson" || item.type === "Interactive Contents";
-                                    const isQuiz = item.type === "Quiz" || item.title === "Quizzes";
-
-                                    if (isVideo) {
-                                      const videoParams = new URLSearchParams();
-                                      videoParams.set("campaign_id", String(campaignId));
-                                      if (item.id && !String(item.id).startsWith("agg_")) {
-                                        videoParams.set("content_id", String(item.id));
+                                      // Fetch module contents for this content type before navigating
+                                      if (item.content_type_id != null) {
+                                        quizService
+                                          .getContents({
+                                            mod_id: moduleId ?? undefined,
+                                            contype_id: item.content_type_id,
+                                          })
+                                          .then((res) => {
+                                            console.log("[module] getContents by type", res);
+                                          })
+                                          .catch((err) => {
+                                            console.error("[module] getContents error", err);
+                                          });
                                       }
-                                      router.push(
-                                        `/module/${module}/video-training?${videoParams.toString()}`
-                                      );
-                                    } else if (isInteractive) {
-                                      // Dedicated org-user interactive content page
-                                      router.push(
-                                        `/module/${module}/interactive-content/${item.id}?campaign_id=${campaignId}&module_id=${moduleId}`
-                                      );
-                                    } else if (isQuiz) {
-                                      const quizParams = new URLSearchParams();
-                                      quizParams.set("campaign_id", String(campaignId));
-                                      if (item.contentIds && item.contentIds.length > 0) {
-                                        quizParams.set("content_id", String(item.contentIds[0]));
-                                      }
-                                      router.push(
-                                        `/module/${module}/quizzes?${quizParams.toString()}`
-                                      );
-                                    } else {
-                                      // Gallery / Aggregated Content Types (Posters, Brochures, etc.)
-                                      const galleryTypes = [
-                                        "Posters",
-                                        "Brochures",
-                                        "Documents",
-                                        "Screen Savers",
-                                        "Screen savers",
-                                        "Misc",
-                                      ];
+                                      // Navigation Logic Based on Content Type ID or Type Name
+                                      const isVideo = item.content_type_id === 2 || item.type === "Motion Videos" || item.type === "Video Training";
+                                      const isInteractive = item.content_type_id === 1 || item.type === "Interactive Lesson" || item.type === "Interactive Contents";
+                                      const isQuiz = item.type === "Quiz" || item.title === "Quizzes";
 
-                                      const type = item.type || item.title || "";
-                                      if (
-                                        galleryTypes.some(
-                                          (ct) => ct.toLowerCase() === type.toLowerCase()
-                                        ) ||
-                                        [3, 4, 5, 8].includes(item.content_type_id)
-                                      ) {
-                                        const typeName = item.type || item.title || "content";
-                                        const typeSlug = typeName
-                                          .toLowerCase()
-                                          .replace(/\s+/g, "-");
-                                        const ctParams = new URLSearchParams();
-
-                                        if (moduleId) ctParams.set("mod_id", String(moduleId));
-                                        if (item.content_type_id != null)
-                                          ctParams.set("contype_id", String(item.content_type_id));
-                                        if (campaignId)
-                                          ctParams.set("campaign_id", String(campaignId));
+                                      if (isVideo) {
+                                        const videoParams = new URLSearchParams();
+                                        videoParams.set("campaign_id", String(campaignId));
+                                        if (item.id && !String(item.id).startsWith("agg_")) {
+                                          videoParams.set("content_id", String(item.id));
+                                        }
                                         router.push(
-                                          `/module/${module}/content/${typeSlug}?${ctParams.toString()}`
+                                          `/module/${module}/video-training?${videoParams.toString()}`
                                         );
+                                      } else if (isInteractive) {
+                                        // Dedicated org-user interactive content page
+                                        router.push(
+                                          `/module/${module}/interactive-content/${item.id}?campaign_id=${campaignId}&module_id=${moduleId}`
+                                        );
+                                      } else if (isQuiz) {
+                                        const quizParams = new URLSearchParams();
+                                        quizParams.set("campaign_id", String(campaignId));
+                                        if (item.contentIds && item.contentIds.length > 0) {
+                                          quizParams.set("content_id", String(item.contentIds[0]));
+                                        }
+                                        router.push(
+                                          `/module/${module}/quizzes?${quizParams.toString()}`
+                                        );
+                                      } else {
+                                        // Gallery / Aggregated Content Types (Posters, Brochures, etc.)
+                                        const galleryTypes = [
+                                          "Posters",
+                                          "Brochures",
+                                          "Documents",
+                                          "Screen Savers",
+                                          "Screen savers",
+                                          "Misc",
+                                        ];
+
+                                        const type = item.type || item.title || "";
+                                        if (
+                                          galleryTypes.some(
+                                            (ct) => ct.toLowerCase() === type.toLowerCase()
+                                          ) ||
+                                          [3, 4, 5, 8].includes(item.content_type_id)
+                                        ) {
+                                          const typeName = item.type || item.title || "content";
+                                          const typeSlug = typeName
+                                            .toLowerCase()
+                                            .replace(/\s+/g, "-");
+                                          const ctParams = new URLSearchParams();
+
+                                          if (moduleId) ctParams.set("mod_id", String(moduleId));
+                                          if (item.content_type_id != null)
+                                            ctParams.set("contype_id", String(item.content_type_id));
+                                          if (campaignId)
+                                            ctParams.set("campaign_id", String(campaignId));
+                                          router.push(
+                                            `/module/${module}/content/${typeSlug}?${ctParams.toString()}`
+                                          );
+                                        }
                                       }
-                                    }
-                                  }}
-                                >
-                                  {t("moduleDetails.start") ?? "Start"}
-                                </button>
+                                    }}
+                                  >
+                                    {t("moduleDetails.start") ?? "Start"}
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          );
+                            );
                           });
                         })()}
                       </div>
                       <div className="mt-4 flex items-center justify-between">
-                         <p className="text-xs text-gray-600">
+                        <p className="text-xs text-gray-600">
                           {(() => {
                             const fromIdx =
                               filteredItems.length === 0 ? 0 : (currentPage - 1) * rowsPerPage + 1;
@@ -1355,11 +1341,10 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                           ).map((page) => (
                             <button
                               key={page}
-                              className={`min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all ${
-                                page === currentPage
+                              className={`min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all ${page === currentPage
                                   ? "bg-blue-50 text-blue-600 border-blue-500 font-semibold"
                                   : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                              }`}
+                                }`}
                               onClick={() => setCurrentPage(page)}
                             >
                               {formatNumber(page, locale)}
