@@ -498,7 +498,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         >
                           {t("videoTraining.back10s")}
                         </button>
-                        {!isVideoSkippingEnabled && (
+                        {isVideoSkippingEnabled && (
                           <button
                             className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                             onClick={() => {
