@@ -49,6 +49,7 @@ import {
   useUserAssignments,
   useAchievementStatistics,
   useAchievements,
+  useRecomputeDashboard,
 } from "@/hooks/useDashboard";
 import { useLicenseInfo } from "@/hooks/useSuiteAwm";
 import { useUserPendingSurveys } from "@/hooks/useSurvey";
@@ -69,6 +70,9 @@ export default function DashboardPage() {
 
   // Track which assignments are currently being started (by `campaign_id-module_id` key)
   const [startingKeys, setStartingKeys] = useState<Set<string>>(new Set());
+
+  // Recompute dashboard mutation
+  const { mutate: recomputeDashboard, isPending: isRecomputing } = useRecomputeDashboard();
 
   // Helper: generate a URL-friendly slug from a module name
   const generateModuleSlug = useCallback(
@@ -1624,6 +1628,16 @@ export default function DashboardPage() {
             <div className="flex flex-col p-1 gap-0">
               <div className="flex items-center justify-between min-w-0 pl-2">
                 <h3 className="text-lg font-medium truncate">{t("page.title")}</h3>
+                <Button
+                  className="bg-blue-600 text-white font-medium shadow hover:bg-blue-700 h-8 text-xs mr-4"
+                  isLoading={isRecomputing}
+                  onPress={() => recomputeDashboard({ orgId: isPlatformAdmin ? undefined : user?.org_id })}
+                >
+                  <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  {locale === "ar" ? "تحديث" : "Refresh"}
+                </Button>
               </div>
             </div>
 

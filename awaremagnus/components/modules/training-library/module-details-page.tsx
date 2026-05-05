@@ -386,9 +386,22 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
     moduleData.description ??
     moduleData.translations?.[0]?.description ??
     t("moduleDetails.description");
+  const assignedModule = assignedModulesRes?.success
+    ? assignedModulesRes.data?.find((m: any) => m.id === Number(moduleId))
+    : null;
+
+  const assignedTranslation = languageFilter
+    ? assignedModule?.translations?.find((tr: any) => String(tr.language_id) === languageFilter)
+    : assignedModule?.translations?.[0];
+
   const moduleLogoUrl = (() => {
-    const translation = activeTranslation;
-    const logoPath = translation?.logo_banner_url ?? moduleData.translations?.[0]?.logo_banner_url;
+    const logoPath =
+      activeTranslation?.logo_banner_url ??
+      moduleData.translations?.[0]?.logo_banner_url ??
+      assignedTranslation?.logo_banner_url ??
+      assignedModule?.translations?.[0]?.logo_banner_url ??
+      (moduleData as any)?.logo_banner_url ??
+      (assignedModule as any)?.logo_banner_url;
 
     return logoPath ? getModuleAssetUrl(logoPath) : "";
   })();
@@ -648,20 +661,16 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                     </h4>
                     <div className="flex flex-col items-start gap-3">
                       <div 
-                        className={clsx(
-                          "w-full max-w-[220px] h-[140px] overflow-hidden shrink-0 bg-white",
-                          locale === "ar" && "translate-x-4"
-                        )}
-                        style={{ borderRadius: 12 }}
+                        className="w-full overflow-hidden shrink-0 bg-white rounded-xl"
                       >
                         {moduleLogoUrl ? (
                           <img
                             alt={moduleTitle}
-                            className="w-full h-full object-contain"
+                            className="w-full h-auto object-contain"
                             src={moduleLogoUrl}
                           />
                         ) : (
-                          <div className="w-full h-full bg-white/70" style={{ borderRadius: 12 }} />
+                          <div className="w-full aspect-video bg-gray-200/50 rounded-xl" />
                         )}
                       </div>
                       <div className="min-w-0 w-full">

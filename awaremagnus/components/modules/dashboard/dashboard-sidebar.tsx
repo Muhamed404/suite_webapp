@@ -75,18 +75,14 @@ export const DashboardSidebar = ({
           icon: getContentAssetUrl("/images/awaremagnus_sidebar/Training_Library_Solid.svg"),
           label: t("menu.myLibrary"),
         },
+        {
+          href: "/dashboard/awareness-assets",
+          icon: getContentAssetUrl("/images/awaremagnus_sidebar/AwarenessAssets_Solid.svg"),
+          label: t("menu.assetsAndMaterials") ?? "Assets & Materials",
+        },
       ],
     },
-    ...(isOrgAdminUser
-      ? [
-          {
-            href: "/dashboard/awareness-assets",
-            icon: getContentAssetUrl("/images/awaremagnus_sidebar/AwarenessAssets_Solid.svg"),
-            activeIcon: getContentAssetUrl("/images/awaremagnus_sidebar/AwarenessAssets_Solid.svg"),
-            label: t("menu.awarenessAssets"),
-          },
-        ]
-      : []),
+
     {
       href: "/dashboard/launch-awareness",
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Awareness_Solid.svg"),
@@ -139,7 +135,6 @@ export const DashboardSidebar = ({
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Report.svg"),
       label: t("menu.myAwareness"),
       children: [
-        { href: "/dashboard/certificates", icon: "", label: t("menu.certificates") },
         { href: "/dashboard/certification-report", icon: "", label: t("menu.certificationReport") },
       ],
     },

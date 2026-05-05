@@ -10,6 +10,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useModules, useContentReportByContentId } from "@/hooks/useQuiz";
+import { useCampaign } from "@/hooks/useCampaigns";
 import { quizService } from "@/services/quizService";
 import { isOrgUser } from "@/utils/roles";
 import { getContentAssetUrl } from "@/services/awmStorage";
@@ -330,6 +331,9 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     return 1; // Default campaign ID
   }, [searchParams]);
 
+  const { data: campaignRes } = useCampaign(campaignId, !!campaignId);
+  const isVideoSkippingEnabled = campaignRes ? !!(campaignRes.enable_video_skipping ?? campaignRes.data?.enable_video_skipping) : false;
+
   useEffect(() => {
     campaignIdRef.current = campaignId;
   }, [campaignId]);
@@ -494,17 +498,19 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         >
                           {t("videoTraining.back10s")}
                         </button>
-                        <button
-                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
-                          onClick={() => {
-                            const v = videoRefs.current[content.id];
+                        {isVideoSkippingEnabled && (
+                          <button
+                            className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                            onClick={() => {
+                              const v = videoRefs.current[content.id];
 
-                            if (v && isFinite(v.duration))
-                              v.currentTime = Math.min(v.duration, v.currentTime + 10);
-                          }}
-                        >
-                          {t("videoTraining.forward10s")}
-                        </button>
+                              if (v && isFinite(v.duration))
+                                v.currentTime = Math.min(v.duration, v.currentTime + 10);
+                            }}
+                          >
+                            {t("videoTraining.forward10s")}
+                          </button>
+                        )}
                         <button
                           className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                           onClick={() => {
