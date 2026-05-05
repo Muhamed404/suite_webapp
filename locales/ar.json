@@ -122,7 +122,8 @@
 		"select_template_to_preview": "اختر قالبًا للمعاينة",
 		"emailOpened": "تتبع فتح البريد الإلكتروني",
 		"fileDownloaded": "generic_label.fileDownloaded",
-		"sr_no": "الرقم التسلسلي"
+		"sr_no": "الرقم التسلسلي",
+		"no_data_found": "لا توجد بيانات"
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -1055,7 +1056,8 @@
 			"labelSubmitData": "إرسال البيانات",
 			"labelEmailOpenedNotReported": "تم فتح البريد ولكن لم يتم الإبلاغ",
 			"labelEmailOpenedAndReported": "تم فتح البريد وتم الإبلاغ",
-			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ"
+			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ",
+			"scheduleTime": "وقت الجدولة"
 		},
 		"email_create_campaign": {
 			"title": "إنشاء حملة بريد إلكتروني",
@@ -1300,6 +1302,8 @@
 			"sortBy": "رتب حسب",
 			"prevPage": "السابق",
 			"nextPage": "التالي",
+			"showingResults": "عرض {start} إلى {end} من {total} نتائج",
+			"noRecords": "لا توجد سجلات",
 			"interactionReportByEachQRCode": "تقرير التفاعل لكل رمز QR",
 			"downloadQRCode": "تنزيل رمز QR",
 			"tagScan": "تم مسح الوسم",
@@ -1882,6 +1886,8 @@
 		"attachmentOpened": "تم فتح المرفق",
 		"interactionReportByEachQRCode": "تقرير التفاعل لكل رمز QR",
 		"sortBy": "ترتيب حسب",
+		"showingResults": "عرض {start} إلى {end} من {total} نتائج",
+		"noRecords": "لا توجد سجلات",
 		"tagSequence": "تسلسل العلامة #",
 		"tagCode": "رمز العلامة",
 		"downloadQRCode": "تحميل رمز QR",

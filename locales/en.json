@@ -113,7 +113,9 @@
 		"fileDownloaded": "Download",
 		"qrScanned": "Scanned",
 		"select": "Select",
-		"sr_no": "Sr. No"
+		"sr_no": "Sr. No",
+		"rows_per_page": "generic_label.rows_per_page",
+		"no_data_found": "No data found"
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -1460,8 +1462,10 @@
 		"viewReport": "View Report",
 		"searchHere": "Search here...",
 		"sortBy": "Sort by",
+		"showingResults": "Showing {start} to {end} of {total} results",
 		"prevPage": "Previous",
 		"nextPage": "Next",
+		"noRecords": "No records found",
 		"interactionReportByEachQRCode": "Interaction Report By Each QR Code",
 		"downloadQRCode": "Download QR Code",
 		"tagScan": "Tag Scan",
