@@ -400,6 +400,7 @@
                     </tbody>
                 </table>
             </div>
+            <div id="qrInteractionPagination" class="px-5 pb-5"></div>
         </div>
     </div>
 </div>
@@ -460,6 +461,8 @@
         uniqueDownloadedCount: <%= typeof downloadSegmentStats !== 'undefined' && downloadSegmentStats?.uniqueDownloadCount || 0 %>,
     };
 
+    window.qrImageUrls = <%- JSON.stringify(qrImageUrls || []) %>;
+
 
 
 
@@ -473,40 +476,170 @@
     });
 </script>
 <script>
-    // Search functionality for QR interaction table
-    $('#qrSearchInput').on('keypress', function (e) {
-        if (e.which === 13) { // Enter key
-            const search = $(this).val();
-            const url = new URL(window.location.href);
-            url.searchParams.set('ajax', '1');
-            if (search) {
-                url.searchParams.set('search', search);
-            } else {
-                url.searchParams.delete('search');
-            }
+    const qrInteractionPagination = document.getElementById('qrInteractionPagination');
+    const qrShowingResultsLabel = '<%= __("qr_campaign.showingResults") %>';
+    const qrInteractionPageState = {
+        page: 1,
+        pageSize: 10,
+        totalPages: 1,
+        totalCount: 0,
+        items: []
+    };
 
-            $.ajax({
-                url: url.toString(),
-                method: 'GET',
-                success: function (response) {
-                    if (response.success) {
-                        renderQRInteractionTable(response.qrImageUrls);
-                        // Update URL without reload to persist search state
-                        const newUrl = new URL(window.location.href);
-                        if (search) {
-                            newUrl.searchParams.set('search', search);
-                        } else {
-                            newUrl.searchParams.delete('search');
-                        }
-                        window.history.pushState({}, '', newUrl);
-                    }
-                },
-                error: function (error) {
-                    console.error('Error fetching search results:', error);
-                    showCustomToast('error', 'Failed to fetch search results');
-                }
-            });
+    function updateQrPagination(items, page) {
+        qrInteractionPageState.items = Array.isArray(items) ? items : [];
+        qrInteractionPageState.totalCount = qrInteractionPageState.items.length;
+        qrInteractionPageState.totalPages = qrInteractionPageState.totalCount === 0
+            ? 0
+            : Math.max(1, Math.ceil(qrInteractionPageState.totalCount / qrInteractionPageState.pageSize));
+        qrInteractionPageState.page = Math.min(Math.max(1, page || 1), qrInteractionPageState.totalPages || 1);
+    }
+
+    function renderQrPagination() {
+        if (!qrInteractionPagination) {
+            return;
         }
+
+        const currentPageNum = qrInteractionPageState.page;
+        const totalPages = qrInteractionPageState.totalPages;
+        const pageSize = qrInteractionPageState.pageSize;
+        const totalCount = qrInteractionPageState.totalCount;
+
+        if (totalPages < 1) {
+            qrInteractionPagination.innerHTML = '';
+            return;
+        }
+
+        const startResult = totalCount === 0 ? 0 : ((currentPageNum - 1) * pageSize) + 1;
+        const endResult = totalCount === 0 ? 0 : Math.min(currentPageNum * pageSize, totalCount);
+
+        let paginationHTML = `
+            <div class="flex items-center justify-between w-full">
+                <div class="${document.dir === "rtl" ? "ml-4 mr-2" : "mr-4"}">
+                    <p class="text-sm text-gray-700">
+                        ${qrShowingResultsLabel
+                            .replace('{start}', startResult)
+                            .replace('{end}', endResult)
+                            .replace('{total}', totalCount)}
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+        `;
+
+        if (currentPageNum > 1) {
+            paginationHTML += `
+                <button type="button" data-page="${currentPageNum - 1}"
+                    class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">
+                    ‹
+                </button>
+            `;
+        }
+
+        let startPage = Math.max(1, currentPageNum - 1);
+        let endPage = Math.min(totalPages, currentPageNum + 1);
+
+        if (endPage - startPage < 2) {
+            if (startPage === 1) {
+                endPage = Math.min(totalPages, 3);
+            } else if (endPage === totalPages) {
+                startPage = Math.max(1, totalPages - 2);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i += 1) {
+            const isActive = i === currentPageNum;
+            paginationHTML += `
+                <button type="button" data-page="${i}"
+                    class="px-3 py-1 rounded-full ${isActive ? "bg-teal-50 text-[var(--teal)] border border-[var(--teal)]" : "border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300"}">
+                    ${i}
+                </button>
+            `;
+        }
+
+        if (currentPageNum < totalPages) {
+            paginationHTML += `
+                <button type="button" data-page="${currentPageNum + 1}"
+                    class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">
+                    ›
+                </button>
+            `;
+        }
+
+        paginationHTML += `
+                </div>
+            </div>
+        `;
+
+        qrInteractionPagination.innerHTML = paginationHTML;
+
+        qrInteractionPagination.querySelectorAll('button[data-page]').forEach(button => {
+            button.addEventListener('click', () => {
+                const nextPage = Number(button.dataset.page || 1);
+                renderQrPage(qrInteractionPageState.items, nextPage);
+            });
+        });
+    }
+
+    function renderQrPage(items, page) {
+        updateQrPagination(items, page);
+        const startIndex = (qrInteractionPageState.page - 1) * qrInteractionPageState.pageSize;
+        const pageItems = qrInteractionPageState.items.slice(
+            startIndex,
+            startIndex + qrInteractionPageState.pageSize
+        );
+        renderQRInteractionTable(pageItems);
+        renderQrPagination();
+    }
+
+    function applyQrFilter(rawSearch) {
+        const search = (rawSearch || '').trim().toLowerCase();
+        if (!search) {
+            return window.qrImageUrls || [];
+        }
+        return (window.qrImageUrls || []).filter(item => {
+            const code = String(item?.qr_code || '').toLowerCase();
+            return code.includes(search);
+        });
+    }
+
+    function debounce(fn, wait) {
+        let timeoutId;
+        return (...args) => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            timeoutId = setTimeout(() => {
+                fn(...args);
+            }, wait);
+        };
+    }
+
+    const applyQrSearch = debounce(() => {
+        const searchValue = $('#qrSearchInput').val();
+        const filtered = applyQrFilter(searchValue);
+        renderQrPage(filtered, 1);
+        const newUrl = new URL(window.location.href);
+        if (searchValue) {
+            newUrl.searchParams.set('search', searchValue);
+        } else {
+            newUrl.searchParams.delete('search');
+        }
+        window.history.pushState({}, '', newUrl);
+    }, 300);
+
+    $('#qrSearchInput').on('input', applyQrSearch);
+
+    $('#qrSearchInput').on('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            applyQrSearch();
+        }
+    });
+
+    $(function () {
+        const initialSearch = $('#qrSearchInput').val();
+        const filtered = applyQrFilter(initialSearch);
+        renderQrPage(filtered, 1);
     });
 
     function renderQRInteractionTable(qrImageUrls) {

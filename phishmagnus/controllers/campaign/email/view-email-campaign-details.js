@@ -63,6 +63,12 @@ exports.viewCampaignDetails = async (req, res) => {
     }
 
     const usersDetail = respPhishingUserDetails?.data?.message || [];
+    const usersDetailPagination = respPhishingUserDetails?.data?.message?.pagination || respPhishingUserDetails?.data?.pagination || {};
+    const userDetailsQuery = {
+      page: req.query?.page || '',
+      pageSize: req.query?.pageSize || '',
+      search: req.query?.search || ''
+    };
     // Format invitee schedule datetimes for display
     try {
       if (usersDetail && Array.isArray(usersDetail.Phishing_Invities)) {
@@ -85,10 +91,20 @@ exports.viewCampaignDetails = async (req, res) => {
     logger.debug('respPhishingUserDetails: user Details ' + JSON.stringify(usersDetail, null, 2));
 
     logger.debug('Email Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));
+
+    if (req.query?.format === 'json' || req.headers?.accept?.includes('application/json')) {
+      return res.json({
+        usersDetail,
+        pagination: usersDetailPagination
+      });
+    }
+
     return res.render(render_ejs_urls.PhishMagnus.Campaign.Email.VIEW_CAMPAIGN, {
       campaignStats,
       campaignDetails,
       usersDetail,
+      usersDetailPagination,
+      userDetailsQuery,
       translations: {
         campaign: {
           email_campaign_detail: {
@@ -167,7 +183,18 @@ async function getPhishingUserDetailsByCampaign(req, campId) {
   try {
     logger.info('GET PHISHING CAMPAIGN::: CALLING CAMPAIGN PHISHING USER DETAILS API');
     const apiClient = getApiClient(req);
-    const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.EMAIL.PHISHING_USER_DETAIL(campId);
+    const baseUrl = backend_api_urls.PHISHMAGNUS.CAMPAIGN.EMAIL.PHISHING_USER_DETAIL(campId);
+    const queryParams = new URLSearchParams();
+    if (req.query?.page) {
+      queryParams.set('page', req.query.page);
+    }
+    if (req.query?.pageSize) {
+      queryParams.set('pageSize', req.query.pageSize);
+    }
+    if (req.query?.search) {
+      queryParams.set('search', req.query.search);
+    }
+    const url = queryParams.toString() ? `${baseUrl}?${queryParams.toString()}` : baseUrl;
     logger.info('URL for phishing user details: ' + url);
     const response = await apiClient.get(url);
     if (!response) {

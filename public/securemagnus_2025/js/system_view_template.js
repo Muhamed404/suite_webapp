@@ -115,6 +115,46 @@ const customRules = [
   },
 ];
 
+function _attachBucketSourceRewrite(editor) {
+  editor.on('beforeSetMode', function (evt) {
+    if (evt.data !== 'wysiwyg') return;
+    if (editor.mode !== 'source') return;
+    var editable = editor.editable();
+    if (!editable || typeof editable.getValue !== 'function') return;
+    var src = editable.getValue();
+    if (!src) return;
+
+    var bucket = window.WEB_TEMPLATE_BUCKET || '';
+    if (bucket && src.indexOf('<%=web_bucket%>') !== -1) {
+      var cleanBucket = bucket.replace(/\/+$/, '');
+      editable.setValue(
+        src.split('<%=web_bucket%>/').join(cleanBucket + '/')
+           .split('<%=web_bucket%>').join(cleanBucket + '/')
+      );
+    }
+  });
+
+  editor.on('setData', function (evt) {
+    var bucket = window.WEB_TEMPLATE_BUCKET || '';
+    if (bucket && evt.data.dataValue && evt.data.dataValue.indexOf('<%=web_bucket%>') !== -1) {
+      var cleanBucket = bucket.replace(/\/+$/, '');
+      evt.data.dataValue = evt.data.dataValue
+        .split('<%=web_bucket%>/').join(cleanBucket + '/')
+        .split('<%=web_bucket%>').join(cleanBucket + '/');
+    }
+  });
+
+  editor.on('paste', function (evt) {
+    var bucket = window.WEB_TEMPLATE_BUCKET || '';
+    if (bucket && evt.data.dataValue && evt.data.dataValue.indexOf('<%=web_bucket%>') !== -1) {
+      var cleanBucket = bucket.replace(/\/+$/, '');
+      evt.data.dataValue = evt.data.dataValue
+        .split('<%=web_bucket%>/').join(cleanBucket + '/')
+        .split('<%=web_bucket%>').join(cleanBucket + '/');
+    }
+  });
+}
+
 // Safe CKEditor init: only if element exists
 (function safeInitCKEditors() {
   if (typeof CKEDITOR === 'undefined') return;
@@ -124,6 +164,9 @@ const customRules = [
       if (!el) return;
       if (!CKEDITOR.instances[id]) {
         const instance = CKEDITOR.replace(id, { height: 400, width: '100%', resize_enabled: true });
+        
+        _attachBucketSourceRewrite(instance);
+
         // ensure the editor receives the server-provided textarea content
         instance.on && instance.on('instanceReady', function () {
           try {
@@ -471,6 +514,21 @@ let currentStep = 0;
       console.warn('[Template] Form submission blocked - disableSaveEdit is true');
       return;
     }
+
+    ['phishing_content', 'phishing_page_content', 'landing_page_content'].forEach(function (editorId) {
+      const editor = (typeof CKEDITOR !== 'undefined') ? CKEDITOR.instances[editorId] : null;
+      if (!editor) return;
+      editor.updateElement();
+      const textarea = document.getElementById(editorId);
+      const bucket = window.WEB_TEMPLATE_BUCKET;
+      if (!textarea || !bucket) return;
+      const cleanBucket = bucket.replace(/\/+$/, '');
+      if (textarea.value.includes(cleanBucket)) {
+        textarea.value = textarea.value
+          .split(cleanBucket + '/').join('<%=web_bucket%>')
+          .split(cleanBucket).join('<%=web_bucket%>');
+      }
+    });
 
     const formEl = document.getElementById('templateCreationForm');
     if (formEl) formEl.submit();

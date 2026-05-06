@@ -292,20 +292,12 @@
 
                     <button class="hidden lg:block ms-auto">
                         <div class="relative">
-                            <input type="text" placeholder="<%= __("generic_label.search_here") || 'Search here...' %>"
+                            <input id="interactionSearchInput" type="text" value="<%= userDetailsQuery?.search || '' %>"
+                                placeholder="<%= __("generic_label.search_here") || 'Search here...' %>"
                                 class="pl-14 pr-10 py-3 h-12 rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
                             <img src="/securemagnus_2025/images/img/search.svg"
                                 class="w-5 h-5 text-gray-400 absolute left-4 top-3.5" alt="">
                         </div>
-
-                    </button>
-                    <button class="hidden lg:block ms-auto">
-                        <a href=""
-                            class=" flex items-center justify-center gap-3 px-6 py-2.5 rounded-full bg-transparent text-gray-900 border border-[var(--strokeGray)] transition-all duration-300 hover:bg-transparent hover:border-[var(--teal)] hover:text-[var(--teal)]">
-
-                            <%= __("generic_label.sort_by") %>
-                            <img src="/securemagnus_2025/images/img/arrow.svg" alt="">
-                        </a>
 
                     </button>
                 </div>
@@ -356,7 +348,7 @@
                             <th class="px-6 py-6 text-gray-700 font-semibold whitespace-nowrap"><%= __("campaign.email_campaign_detail.labelAction") %></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="interactionTableBody">
                         <% if(usersDetail && usersDetail.Phishing_Invities){ %>
     <% usersDetail.Phishing_Invities.forEach((invitee,index)=> { %>
 
@@ -418,6 +410,8 @@
                 </table>
             </div>
 
+            <div id="interactionPagination" class="px-5 pb-5"></div>
+
 
 
 
@@ -467,5 +461,10 @@
         not_opened_but_reported: <%= typeof campaignStats !== 'undefined' && campaignStats.emailOpenAndReportStats?.not_opened_but_reported || 0 %>,
     };
 
+    window.userDetailsPagination = <%- JSON.stringify(usersDetailPagination || {}) %>;
+    window.userDetailsQuery = <%- JSON.stringify(userDetailsQuery || {}) %>;
+    window.campaignDetailsId = <%= campaignDetails?.id || 0 %>;
+
 </script>
 <script src="/securemagnus_2025/js/email_phishing_campaign_report.js"></script>
+<script src="/securemagnus_2025/js/email_phishing_user_report_table.js"></script>
