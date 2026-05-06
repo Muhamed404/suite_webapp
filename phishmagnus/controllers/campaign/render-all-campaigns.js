@@ -216,28 +216,10 @@ function normalizeCampaign(campaign = {}, extras = {}) {
     templateName: extras.templateName || "N/A",
     startDate,
     endDate,
-    status: determineStatus(campaign),
+    is_camp_uploaded: campaign.is_camp_uploaded,
     totalTargets: extras.totalTargets ?? null,
     typeKey: extras.typeKey,
     typeLabel: extras.typeLabel || extras.typeKey || "Campaign",
     detailPath: extras.detailPath || "#",
   };
 }
-
-function determineStatus(campaign = {}) {
-  const now = new Date();
-  const startDate = new Date(campaign.start_datetime || campaign.scheduled_date || campaign.start_date || now);
-  const endDate = new Date(campaign.end_datetime || campaign.scheduled_date || campaign.start_date || now);
-
-  if (!campaign.is_camp_uploaded && campaign.is_camp_uploaded !== undefined) {
-    return "draft";
-  }
-  if (now < startDate) {
-    return "scheduled";
-  }
-  if (now >= startDate && now <= endDate) {
-    return "active";
-  }
-  return "completed";
-}
-
