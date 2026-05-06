@@ -42,7 +42,7 @@ exports.renderLoginPage = (req, res) => {
 
 exports.postLogin = async (req, res) => {
     logger.info(`[PSuite Login Controller]: Original req` + req.originalUrl)
-    logger.info(`[PSuite Login Controller]: POST: Incoming request with values: ${JSON.stringify(req.body, null, 2)}`);
+    // logger.info(`[PSuite Login Controller]: POST: Incoming request with values: ${JSON.stringify(req.body, null, 2)}`);
 
     const { email, password } = req.body;
 
