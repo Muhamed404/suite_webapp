@@ -6,6 +6,22 @@ const originalCampaigns = serverData.campaigns || [];
 const typeOptions = serverData.typeOptions || [];
 const translations = serverData.translations || {};
 
+function determineStatus(campaign) {
+  const now = new Date();
+  const startDate = new Date(campaign.startDate);
+  const endDate = new Date(campaign.endDate);
+
+  if (!campaign.is_camp_uploaded) {
+    return 'draft';
+  } else if (now < startDate) {
+    return 'scheduled';
+  } else if (now >= startDate && now <= endDate) {
+    return 'active';
+  } else {
+    return 'completed';
+  }
+}
+
 // Transform server data for table display
 const data = originalCampaigns.map(campaign => ({
   id: campaign.id,
@@ -14,7 +30,7 @@ const data = originalCampaigns.map(campaign => ({
   templateName: campaign.templateName,
   startDate: campaign.startDate,
   endDate: campaign.endDate,
-  status: campaign.status,
+  status: determineStatus(campaign),
   totalTargets: campaign.totalTargets,
   typeKey: campaign.typeKey,
   typeLabel: campaign.typeLabel,

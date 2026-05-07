@@ -916,8 +916,7 @@ class EmailCampaignStepper {
                             this.currentTemplateData.attachment_url || 
                             this.currentTemplateData.file || 
                             this.currentTemplateData.file_url || 
-                            this.currentTemplateData.file_attachment) &&
-                          !!(this.currentTemplateData.inv && this.currentTemplateData.cid);
+                            this.currentTemplateData.file_attachment);
 
    
     const path = window.location.pathname || '';
@@ -1109,8 +1108,7 @@ class EmailCampaignStepper {
                          this.currentTemplateData.attachment_url || 
                          this.currentTemplateData.file || 
                          this.currentTemplateData.file_url || 
-                         this.currentTemplateData.file_attachment) &&
-                       !!(this.currentTemplateData.inv && this.currentTemplateData.cid);
+                         this.currentTemplateData.file_attachment);
           // console.log(`Attachment available: ${hasContent}`);
           break;
       }
