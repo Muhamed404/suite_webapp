@@ -429,6 +429,7 @@ export function QuizListPage({ moduleId, libraryType }: QuizListPageProps) {
                                   <ReactCountryFlag
                                     svg
                                     className="w-full h-full object-cover"
+                                    cdnUrl="/vendor/flag-icons/flags/4x3/"
                                     countryCode={langInfo.code}
                                     style={{ fontSize: "1.4em", lineHeight: "1.4em" }}
                                     title={langInfo.name}

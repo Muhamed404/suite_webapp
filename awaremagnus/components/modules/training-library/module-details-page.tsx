@@ -632,6 +632,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                           ) : item.flag ? (
                             <ReactCountryFlag
                               svg
+                              cdnUrl="/vendor/flag-icons/flags/4x3/"
                               countryCode={getLanguageCountryCode(item.flag)}
                               style={{
                                 fontSize: "1em",
@@ -792,6 +793,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                               {countryCode && (
                                                 <ReactCountryFlag
                                                   svg
+                                                  cdnUrl="/vendor/flag-icons/flags/4x3/"
                                                   countryCode={countryCode}
                                                   style={{ fontSize: "1em" }}
                                                 />
@@ -809,6 +811,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                       <span className="text-[10px] text-gray-600 flex items-center gap-1">
                                         <ReactCountryFlag
                                           svg
+                                          cdnUrl="/vendor/flag-icons/flags/4x3/"
                                           countryCode={getLanguageCountryCode(lid)}
                                           style={{ fontSize: "1em" }}
                                         />
@@ -940,6 +943,7 @@ export function ModuleDetailsPage({ moduleId, libraryType }: ModuleDetailsPagePr
                                           {countryCode && (
                                             <ReactCountryFlag
                                               svg
+                                              cdnUrl="/vendor/flag-icons/flags/4x3/"
                                               countryCode={countryCode}
                                               style={{ fontSize: "1em" }}
                                             />

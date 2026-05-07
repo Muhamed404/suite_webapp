@@ -629,10 +629,7 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <link
-          href="https://cdn.jsdelivr.net/npm/flag-icons@6.14.0/css/flag-icons.min.css"
-          rel="stylesheet"
-        />
+        <link href="/vendor/flag-icons/css/flag-icons.min.css" rel="stylesheet" />
         <style jsx>{`
           @keyframes slideIn {
             from {

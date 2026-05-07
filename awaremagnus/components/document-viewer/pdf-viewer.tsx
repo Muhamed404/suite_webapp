@@ -9,7 +9,7 @@ import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 pdfjs.GlobalWorkerOptions.workerSrc =
   typeof window !== "undefined"
-    ? `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
+    ? "/vendor/pdfjs/pdf.worker.min.mjs"
     : "";
 
 /** Demo fallback PDF in public folder when content URL fails or is missing. */
