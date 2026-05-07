@@ -247,6 +247,7 @@ export function CertificateManagementListPage() {
                                                             <ReactCountryFlag
                                                                 countryCode={getLanguageCountryCode(cert.lang_id)}
                                                                 svg
+                                                                cdnUrl="/awm/vendor/flag-icons/flags/4x3/"
                                                                 style={{ fontSize: "1.5em", lineHeight: "1.5em" }}
                                                                 title={cert.language?.name || t("unknownLanguage")}
                                                             />

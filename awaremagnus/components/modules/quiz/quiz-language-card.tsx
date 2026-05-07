@@ -215,6 +215,7 @@ export function QuizLanguageCard({
               <ReactCountryFlag
                 svg
                 className="w-full h-full object-cover"
+                cdnUrl="/awm/vendor/flag-icons/flags/4x3/"
                 countryCode={
                   form.langId != null
                     ? getLanguageCountryCode(form.langId)
