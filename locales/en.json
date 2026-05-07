@@ -1070,8 +1070,8 @@
 		"email_create_campaign": {
 			"title": "Create Email Campaign",
 			"email_content": "Email Content",
-			"landing_page": "Landing Page",
-			"redirect_page": "Redirect Page",
+			"landing_page": "Redirect Page",
+			"redirect_page": "Phishing Page",
 			"attachment": "Attachment",
 			"template_tracking_description": "system_template.create.labelTrackingDescription",
 			"tracking_items": {
