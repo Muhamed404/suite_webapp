@@ -21,12 +21,6 @@ const logger = winston.createLogger({
     level: 'info', // Set log level
     format: logFormat,
     transports: [
-        new winston.transports.Console({
-            format: winston.format.combine(
-                winston.format.colorize(),
-                logFormat
-            )
-        }),
         new DailyRotateFile({
             filename: path.join(logDir, logFile+'_logfile-%DATE%.log'),
             datePattern: 'YYYY-MM-DD',
