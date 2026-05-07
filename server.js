@@ -2,6 +2,9 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const expressLayouts = require('express-ejs-layouts');
+const { validateEnv } = require('./config/env-validator');
+validateEnv();
+
 const i18n = require('./middleware/i18n-middleware');
 const { logger } = require('./logger/logger');
 const routes = require('./routes/routes');

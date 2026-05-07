@@ -63,9 +63,16 @@ function getApiClient(req) {
 
 
 
-    // Response error interceptor for logging and session handling
+    // Response interceptor for logging and session handling
     apiClient.interceptors.response.use(
-        response => response,
+        response => {
+            const newToken = response.headers['x-new-token'];
+            if (newToken && req && req.session) {
+                logger.info(`[apiClient] Received refreshed token from backend. Updating session jwtToken.`);
+                req.session.jwtToken = newToken;
+            }
+            return response;
+        },
         error => {
             logger.error(`[apiClient] Error during request: ${error?.response?.data || error?.message || 'Unknown error'}`, {
                 method: error?.config?.method?.toUpperCase(),
