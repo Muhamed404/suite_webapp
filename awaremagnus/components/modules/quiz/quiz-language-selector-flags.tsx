@@ -68,6 +68,7 @@ export function QuizLanguageSelectorFlags({
                 <ReactCountryFlag
                   svg
                   className="w-full h-full object-cover"
+                  cdnUrl="/awm/vendor/flag-icons/flags/4x3/"
                   countryCode={getLanguageCountryCode(lang.id)}
                   style={{
                     fontSize: "1.5em",

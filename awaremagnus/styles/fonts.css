@@ -1,0 +1,210 @@
+/* Local Google Fonts - Self-hosted */
+/* Nunito Sans - Primary font */
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-200-normal.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-200-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-200-italic.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-200-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-300-normal.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-300-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-300-italic.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-300-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-400-normal.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-400-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-400-italic.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-400-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-500-normal.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-500-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-500-italic.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-500-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-600-normal.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-600-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-600-italic.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-600-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-700-normal.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-700-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-700-italic.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-700-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-800-normal.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-800-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: italic;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-800-italic.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-800-italic.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-900-normal.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-900-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Nunito Sans';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url('/awm/fonts/nunito-sans/nunito-sans-latin-900-italic.woff2') format('woff2'),
+       url('/awm/fonts/nunito-sans/nunito-sans-latin-900-italic.woff') format('woff');
+}
+
+/* Fira Code - Monospace font */
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/awm/fonts/fira-code/fira-code-latin-300-normal.woff2') format('woff2'),
+       url('/awm/fonts/fira-code/fira-code-latin-300-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/awm/fonts/fira-code/fira-code-latin-400-normal.woff2') format('woff2'),
+       url('/awm/fonts/fira-code/fira-code-latin-400-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/awm/fonts/fira-code/fira-code-latin-500-normal.woff2') format('woff2'),
+       url('/awm/fonts/fira-code/fira-code-latin-500-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/awm/fonts/fira-code/fira-code-latin-600-normal.woff2') format('woff2'),
+       url('/awm/fonts/fira-code/fira-code-latin-600-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Fira Code';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/awm/fonts/fira-code/fira-code-latin-700-normal.woff2') format('woff2'),
+       url('/awm/fonts/fira-code/fira-code-latin-700-normal.woff') format('woff');
+}
+
+/* Fondamento - Display font */
+@font-face {
+  font-family: 'Fondamento';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/awm/fonts/fondamento/fondamento-latin-400-normal.woff2') format('woff2'),
+       url('/awm/fonts/fondamento/fondamento-latin-400-normal.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Fondamento';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/awm/fonts/fondamento/fondamento-latin-400-italic.woff2') format('woff2'),
+       url('/awm/fonts/fondamento/fondamento-latin-400-italic.woff') format('woff');
+}

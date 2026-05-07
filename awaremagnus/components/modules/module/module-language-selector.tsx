@@ -113,6 +113,7 @@ export function ModuleLanguageSelector({
               <span aria-hidden className="text-base leading-none shrink-0">
                 <ReactCountryFlag
                   svg
+                  cdnUrl="/awm/vendor/flag-icons/flags/4x3/"
                   countryCode={getLanguageCountryCode(id)}
                   style={{
                     fontSize: "1em",
