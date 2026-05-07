@@ -336,7 +336,7 @@ export function CreateQuizForm({
                         <ReactCountryFlag
                           svg
                           className="w-full h-full object-cover"
-                          cdnUrl="/vendor/flag-icons/flags/4x3/"
+                          cdnUrl="/awm/vendor/flag-icons/flags/4x3/"
                           countryCode={getLanguageCountryCode(id)}
                           style={{ fontSize: "1.4em", lineHeight: "1.4em" }}
                           title={getLanguageName(id)}
@@ -361,7 +361,7 @@ export function CreateQuizForm({
                       <ReactCountryFlag
                         svg
                         className="w-full h-full object-cover"
-                        cdnUrl="/vendor/flag-icons/flags/4x3/"
+                        cdnUrl="/awm/vendor/flag-icons/flags/4x3/"
                         countryCode={getLanguageCountryCode(lang.id)}
                         style={{ fontSize: "1.4em", lineHeight: "1.4em" }}
                         title={lang.name}
