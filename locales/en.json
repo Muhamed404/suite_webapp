@@ -977,6 +977,8 @@
 			"labelLandingPage_Title": "Landing Page Settings",
 			"labelLandingPage_radioOption1": "Import Custom Landing Page",
 			"labelLandingPage_radioOption2": "I like to redirect the user to a custom landing page",
+			"labelLandingPage_redirectToCustomWebPage": "I would like to redirect the user to a custom web/STC page",
+			"labelLandingPage_redirectUrl": "Redirect URL",
 			"labelLanguage": "Language",
 			"labelImportHtmlUrl": "Import Landing Page From An External URL",
 			"successMessage": "Created successfully",
@@ -1073,6 +1075,8 @@
 			"landing_page": "Redirect Page",
 			"redirect_page": "Phishing Page",
 			"attachment": "Attachment",
+			"external_landing_page_url": "External landing page URL:",
+			"open_preview": "Open Preview",
 			"template_tracking_description": "system_template.create.labelTrackingDescription",
 			"tracking_items": {
 				"email_opened": "campaign.email_campaign_detail.labelEmailOpen",

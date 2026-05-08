@@ -970,6 +970,8 @@
 			"labelLandingPage_Title": "إعدادات صفحة الهبوط",
 			"labelLandingPage_radioOption1": "أرغب في إعادة توجيه المستخدم إلى رابط",
 			"labelLandingPage_radioOption2": "أرغب في إعادة توجيه المستخدم إلى صفحة هبوط مخصصة",
+			"labelLandingPage_redirectToCustomWebPage": "أرغب في إعادة توجيه المستخدم إلى صفحة ويب/STC مخصصة",
+			"labelLandingPage_redirectUrl": "رابط إعادة التوجيه",
 			"labelLanguage": "اللغة",
 			"labelPhishingWebContentEditor": "محتوى قالب صفحة التصيد الاحتيالي",
 			"successMessage": "تم الإنشاء بنجاح",
@@ -1065,6 +1067,8 @@
 			"landing_page": "صفحة الهبوط",
 			"redirect_page": "صفحة إعادة التوجيه",
 			"attachment": "المرفق",
+			"external_landing_page_url": "رابط صفحة هبوط خارجية:",
+			"open_preview": "فتح المعاينة",
 			"template_tracking_description": "system_template.create.labelTrackingDescription",
 			"tracking_items": {
 				"email_opened": "campaign.email_campaign_detail.labelEmailOpen",

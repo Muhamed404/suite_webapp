@@ -307,12 +307,12 @@
                     <label class="flex items-center custom-radio cursor-pointer">
                         <input type="radio" name="landing_option" value="url" id="landing_option_url" <%= isLandingUrlMode ? 'checked' : '' %> <%= !isLandingUrlMode ? 'disabled' : '' %>>
                         <span class="radio-circle"></span>
-                        <span class="text-gray-700">I would like to redirect the user to a custom web/STC page</span>
+                        <span class="text-gray-700"><%= __("system_template.create.labelLandingPage_redirectToCustomWebPage") %></span>
                     </label>
                 </div>
                 <input type="hidden" name="landing_page_option" id="landing_page_option" value="<%= isLandingUrlMode ? 'url' : 'html' %>">
                 <div id="landing-external-url-container" class="mb-6 <%= isLandingUrlMode ? '' : 'hidden' %>">
-                    <label for="landing_page_external_url" class="block text-gray-700 font-medium mb-2">Redirect URL</label>
+                    <label for="landing_page_external_url" class="block text-gray-700 font-medium mb-2"><%= __("system_template.create.labelLandingPage_redirectUrl") %></label>
                     <input type="url" id="landing_page_external_url" name="landing_page_external_url"
                         value="<%= template?.landing_page_external_url || (isLandingUrlMode ? (template?.landing_page_url || '') : '') %>"
                         placeholder="https://www.youtube.com/"

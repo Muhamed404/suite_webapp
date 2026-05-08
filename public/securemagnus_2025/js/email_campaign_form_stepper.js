@@ -1214,10 +1214,10 @@ class EmailCampaignStepper {
             previewNoContent.classList.remove('hidden');
             previewNoContent.innerHTML = `
               <div class="space-y-3">
-                <p class="text-gray-700">External landing page URL:</p>
+                <p class="text-gray-700">${window.i18n?.campaign?.email_create_campaign?.external_landing_page_url || 'External landing page URL:'}</p>
                 <p class="text-sm break-all text-teal-700">${landingExternalUrl}</p>
                 <button type="button" id="open-landing-preview-btn" class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition">
-                  Open Preview
+                  ${window.i18n?.campaign?.email_create_campaign?.open_preview || 'Open Preview'}
                 </button>
               </div>
             `;
