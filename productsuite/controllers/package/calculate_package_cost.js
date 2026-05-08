@@ -15,7 +15,6 @@ async function calculatePackageCost(req, res) {
     const apiClient = getApiClient(req);
     const response = await apiClient.get(url)
     const { object: cost } = response.data;
-    console.log('[Retrieve Package Cost:]: GET: Cost ' + cost)
     return res.status(200).json({ cost });
   } catch (err) {
     logger.error("[Retrieve Package Cost]: GET:" + err);
