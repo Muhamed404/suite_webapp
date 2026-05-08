@@ -325,11 +325,8 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <link
-          href="https://cdn.jsdelivr.net/npm/flag-icons@6.7.0/css/flag-icons.min.css"
-          rel="stylesheet"
-        />
-        <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" />
+        <link href="/vendor/flag-icons/css/flag-icons.min.css" rel="stylesheet" />
+        <script src="/vendor/lucide.min.js" />
         <style jsx>{`
           @keyframes softPop {
             0% {
@@ -551,6 +548,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                                 <ReactCountryFlag
                                   svg
                                   className="w-full h-full object-cover"
+                                  cdnUrl="/vendor/flag-icons/flags/4x3/"
                                   countryCode={getLanguageCountryCode(langId)}
                                   style={{ fontSize: "1.2em", lineHeight: "1.2em" }}
                                   title={getLanguageName(langId)}

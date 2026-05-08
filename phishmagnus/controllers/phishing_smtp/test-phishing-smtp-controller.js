@@ -26,7 +26,7 @@ exports.testPhishingSMTP = (req, res) => {
     })
     .catch((error) => {
       const errData = error.response?.data;
-      console.error("SMTP TEST ERROR:", error.message, errData ? JSON.stringify(errData, null, 2) : '');
+      logger.error("SMTP TEST ERROR:", error.message, errData ? JSON.stringify(errData, null, 2) : '');
       logger.error(`Test Phishing SMTP Controller: Error testing smtp id ${smtpId}: ${error.message}`);
       logger.error(`Test Phishing SMTP Controller: Backend error response: ${JSON.stringify(errData, null, 2)}`);
       return res.json({ success: false, message: errData?.message || 'SMTP connection failed.' });

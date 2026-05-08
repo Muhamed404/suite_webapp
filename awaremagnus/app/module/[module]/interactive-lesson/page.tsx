@@ -28,11 +28,8 @@ export default function InteractiveLessonPage({ params }: { params: Promise<{ mo
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <link
-          href="https://cdn.jsdelivr.net/npm/flag-icons@6.7.0/css/flag-icons.min.css"
-          rel="stylesheet"
-        />
-        <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" />
+        <link href="/vendor/flag-icons/css/flag-icons.min.css" rel="stylesheet" />
+        <script src="/vendor/lucide.min.js" />
         <div className="flex-1 flex flex-col h-screen bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-r-3xl">
           <main className="flex-1 overflow-y-auto">
             <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
