@@ -23,6 +23,14 @@ import {
   useAvatarStatisticsByCampaign,
 } from "@/hooks/useDashboard";
 import { getLanguageId } from "@/utils/languageMapping";
+import achievementTranslationsAr from "@/messages/ar/gamification_achievements-ar.json";
+import scoreLevelTranslationsAr from "@/messages/ar/gamification_score_levels-ar.json";
+
+type ArabicAchievementTranslation = {
+  name: string;
+  description: string;
+  category: string;
+};
 
 export default function CampaignDetailsPage() {
   const params = useParams();
@@ -30,6 +38,15 @@ export default function CampaignDetailsPage() {
   const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
   const t = useTranslations("dashboard");
+  const isArabic = locale === "ar";
+  const unlockedLabel = isArabic ? "مفتوح" : "Unlocked";
+  const lockedLabel = isArabic ? "مغلق" : "Locked";
+  const levelLabel = isArabic ? "المستوى" : "Level";
+  const achievementFallbackLabel = isArabic ? "إنجاز" : "Achievement";
+  const arabicAchievementMap = achievementTranslationsAr.achievements as Record<
+    string,
+    ArabicAchievementTranslation
+  >;
 
 
   const campaignId = params?.id ? Number(params.id) : 0;
@@ -138,6 +155,22 @@ export default function CampaignDetailsPage() {
     13: "Supreme Cyber Knight",
     14: "Ultimate Cyber Sentinel",
   };
+  const avatarNameByLevelAr: Record<number, string> = {
+    1: scoreLevelTranslationsAr.items["10"],
+    2: scoreLevelTranslationsAr.items["11"],
+    3: scoreLevelTranslationsAr.items["12"],
+    4: scoreLevelTranslationsAr.items["13"],
+    5: scoreLevelTranslationsAr.items["14"],
+    6: scoreLevelTranslationsAr.items["15"],
+    7: scoreLevelTranslationsAr.items["16"],
+    8: scoreLevelTranslationsAr.items["17"],
+    9: scoreLevelTranslationsAr.items["18"],
+    10: scoreLevelTranslationsAr.items["19"],
+    11: scoreLevelTranslationsAr.items["20"],
+    12: scoreLevelTranslationsAr.items["21"],
+    13: scoreLevelTranslationsAr.items["22"],
+    14: scoreLevelTranslationsAr.items["23"],
+  };
 
   const inferAvatarNameFromImage = (imageName?: string) => {
     if (!imageName) return "";
@@ -158,10 +191,19 @@ export default function CampaignDetailsPage() {
   };
 
   const resolveAvatarName = (avatar?: any) => {
-    if (!avatar) return "Vulnerable Newbie";
+    if (!avatar) return isArabic ? avatarNameByLevelAr[1] : "Vulnerable Newbie";
 
     const levelName = String(avatar.level_name ?? "").trim();
     const genericLevelLabel = `Level ${avatar.level_number}`;
+    const genericLevelLabelAr = `${levelLabel} ${avatar.level_number}`;
+
+    const apiArabicLevelName =
+      avatar?.level_name_ar ?? avatar?.level_name_arabic ?? avatar?.name_ar ?? avatar?.name_arabic;
+
+    if (isArabic) {
+      if (apiArabicLevelName) return apiArabicLevelName;
+      return avatarNameByLevelAr[avatar.level_number] ?? genericLevelLabelAr;
+    }
 
     if (levelName && !/^Level\s+\d+$/i.test(levelName)) return levelName;
 
@@ -174,7 +216,43 @@ export default function CampaignDetailsPage() {
 
   const formatUsersOnText = (count?: number) => {
     const safeCount = Number(count ?? 0);
+    if (isArabic) {
+      return safeCount === 1 ? "مستخدم واحد على هذا المستوى" : `${safeCount} مستخدمين على هذا المستوى`;
+    }
     return safeCount === 1 ? "1 user is on" : `${safeCount} users are on`;
+  };
+
+  const resolveAchievementName = (meta: any, achievementId: number) => {
+    if (isArabic) {
+      const mappedArabic = arabicAchievementMap[String(achievementId)]?.name;
+      if (mappedArabic) return mappedArabic;
+
+      const localizedName =
+        meta?.achievement_name_ar ??
+        meta?.achievement_name_arabic ??
+        meta?.name_ar ??
+        meta?.name_arabic;
+      if (localizedName) return localizedName;
+    }
+
+    if (meta?.achievement_name) return meta.achievement_name;
+    return `${achievementFallbackLabel} #${achievementId}`;
+  };
+
+  const resolveAchievementDescription = (meta: any, achievementId: number) => {
+    if (isArabic) {
+      const mappedArabic = arabicAchievementMap[String(achievementId)]?.description;
+      if (mappedArabic) return mappedArabic;
+
+      const localizedDescription =
+        meta?.achievement_description_ar ??
+        meta?.achievement_description_arabic ??
+        meta?.description_ar ??
+        meta?.description_arabic;
+      if (localizedDescription) return localizedDescription;
+    }
+
+    return meta?.achievement_description ?? "";
   };
 
   // Find the unlocked avatar with the highest level to show in the main slot
@@ -1152,9 +1230,6 @@ export default function CampaignDetailsPage() {
                       Organization locked and unlocked badges
                     </p>
                   </div>
-                  <a className="text-blue-600 text-xs font-medium" href="#">
-                    View All
-                  </a>
                 </div>
                 <div className="grid grid-cols-8 gap-3 gap-y-4 mt-8">
                   {achievementDisplayOrder.map((achievementId) => {
@@ -1165,11 +1240,11 @@ export default function CampaignDetailsPage() {
                     const tooltipContent = (
                       <div className="flex flex-col gap-1 max-w-[200px] p-1">
                         <p className="font-semibold text-sm text-gray-900">
-                          {meta?.achievement_name ?? `Achievement #${achievementId}`}
+                          {resolveAchievementName(meta, achievementId)}
                         </p>
-                        {meta?.achievement_description && (
+                        {resolveAchievementDescription(meta, achievementId) && (
                           <p className="text-xs text-gray-600 leading-tight">
-                            {meta.achievement_description}
+                            {resolveAchievementDescription(meta, achievementId)}
                           </p>
                         )}
                         <div className="flex items-center justify-between mt-1 gap-2">
@@ -1178,7 +1253,7 @@ export default function CampaignDetailsPage() {
                               isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
                             }`}
                           >
-                            {isUnlocked ? "Unlocked" : "Locked"}
+                            {isUnlocked ? unlockedLabel : lockedLabel}
                           </span>
                           {isUnlocked && meta?.employee_count != null && (
                             <span className="text-xs text-gray-500">
@@ -1228,9 +1303,6 @@ export default function CampaignDetailsPage() {
               <div className="col-span-6 row-span-2 row-start-2 bg-white rounded-xl p-4">
                 <div className="flex justify-between items-center">
                   <h2 className="text-base font-semibold">{t("gamification.employeeAvatarLevel")}</h2>
-                  <a className="text-blue-600 text-xs font-medium" href="#">
-                    View All
-                  </a>
                 </div>
 
                 <div className="mt-4 flex gap-6 items-start">
@@ -1243,13 +1315,13 @@ export default function CampaignDetailsPage() {
                             {resolveAvatarName(mainAvatar)}
                           </p>
                           <p className="text-xs text-gray-500">{formatUsersOnText(mainAvatar?.employee_count)}</p>
-                          <p className="text-xs text-gray-500">Level {mainAvatar?.level_number ?? 1}</p>
+                              <p className="text-xs text-gray-500">{levelLabel} {mainAvatar?.level_number ?? 1}</p>
                           <span
                             className={`w-fit text-xs font-medium px-1.5 py-0.5 rounded-full ${
                               isMainAvatarUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
                             }`}
                           >
-                            {isMainAvatarUnlocked ? "Unlocked" : "Locked"}
+                                {isMainAvatarUnlocked ? unlockedLabel : lockedLabel}
                           </span>
                         </div>
                       }
@@ -1278,7 +1350,6 @@ export default function CampaignDetailsPage() {
                   <div className="grid grid-cols-4 gap-6 flex-1">
                     {avatarStats
                       .filter((avatar) => avatar.level_number !== mainAvatar?.level_number)
-                      .slice(0, 8)
                       .map((avatar, idx) => {
                         const isUnlocked = (avatar.employee_count ?? 0) > 0;
                         const avatarImage = resolveAvatarImage(avatar);
@@ -1292,13 +1363,13 @@ export default function CampaignDetailsPage() {
                                 {resolveAvatarName(avatar)}
                               </p>
                               <p className="text-xs text-gray-500">{formatUsersOnText(avatar.employee_count)}</p>
-                              <p className="text-xs text-gray-500">Level {avatar.level_number}</p>
+                              <p className="text-xs text-gray-500">{levelLabel} {avatar.level_number}</p>
                               <span
                                 className={`w-fit text-xs font-medium px-1.5 py-0.5 rounded-full ${
                                   isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
                                 }`}
                               >
-                                {isUnlocked ? "Unlocked" : "Locked"}
+                                {isUnlocked ? unlockedLabel : lockedLabel}
                               </span>
                             </div>
                           }

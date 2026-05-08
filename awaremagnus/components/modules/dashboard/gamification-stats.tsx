@@ -28,6 +28,15 @@ import {
 } from "@/utils/roles";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { AvatarStat } from "@/types/dashboard";
+import achievementTranslationsAr from "@/messages/ar/gamification_achievements-ar.json";
+import scoreLevelTranslationsAr from "@/messages/ar/gamification_score_levels-ar.json";
+
+type ArabicAchievementTranslation = {
+  name: string;
+  description: string;
+  category: string;
+};
+
 
 export const GamificationStats = () => {
   const t = useTranslations("dashboard");
@@ -144,21 +153,26 @@ export const GamificationStats = () => {
     13: "Supreme Cyber Knight",
     14: "Ultimate Cyber Sentinel",
   };
+  const arabicAchievementMap = achievementTranslationsAr.achievements as Record<
+    string,
+    ArabicAchievementTranslation
+  >;
+
   const avatarNameByLevelAr: Record<number, string> = {
-    1: "مبتدئ معرّض للخطر",
-    2: "متدرّب يقظ",
-    3: "متعلّم حذر",
-    4: "مدافع مطّلع",
-    5: "حارس يقظ",
-    6: "مراقب ماهر",
-    7: "حامٍ صامد",
-    8: "مراقب متقدّم",
-    9: "منفّذ خبير",
-    10: "استراتيجي بارع",
-    11: "طليعي نخبة",
-    12: "حامل الدرع الأسطوري",
-    13: "فارس الأمن السيبراني الأعلى",
-    14: "حارس الأمن السيبراني المطلق",
+    1: scoreLevelTranslationsAr.items["10"],
+    2: scoreLevelTranslationsAr.items["11"],
+    3: scoreLevelTranslationsAr.items["12"],
+    4: scoreLevelTranslationsAr.items["13"],
+    5: scoreLevelTranslationsAr.items["14"],
+    6: scoreLevelTranslationsAr.items["15"],
+    7: scoreLevelTranslationsAr.items["16"],
+    8: scoreLevelTranslationsAr.items["17"],
+    9: scoreLevelTranslationsAr.items["18"],
+    10: scoreLevelTranslationsAr.items["19"],
+    11: scoreLevelTranslationsAr.items["20"],
+    12: scoreLevelTranslationsAr.items["21"],
+    13: scoreLevelTranslationsAr.items["22"],
+    14: scoreLevelTranslationsAr.items["23"],
   };
   const unlockedLabel = locale === "ar" ? "مفتوح" : "Unlocked";
   const lockedLabel = locale === "ar" ? "مغلق" : "Locked";
@@ -191,33 +205,62 @@ export const GamificationStats = () => {
     const genericLevelLabel = `Level ${avatar.level_number}`;
     const genericLevelLabelAr = `المستوى ${formatLocaleInteger(loc, avatar.level_number)}`;
 
-    // If API already returns a localized name, use it as-is.
+    const apiArabicLevelName =
+      (avatar as any)?.level_name_ar ??
+      (avatar as any)?.level_name_arabic ??
+      (avatar as any)?.name_ar ??
+      (avatar as any)?.name_arabic;
+
+    if (locale === "ar") {
+      if (apiArabicLevelName) return apiArabicLevelName;
+      return avatarNameByLevelAr[avatar.level_number] ?? genericLevelLabelAr;
+    }
+
     if (levelName && !/^Level\s+\d+$/i.test(levelName) && levelName !== avatarNameByLevel[avatar.level_number]) {
       return levelName;
     }
 
     const inferredName = inferAvatarNameFromImage(avatar.image_small_url);
 
-    if (locale === "ar") {
-      return avatarNameByLevelAr[avatar.level_number] ?? genericLevelLabelAr;
-    }
     if (inferredName) return inferredName;
 
     return avatarNameByLevel[avatar.level_number] ?? genericLevelLabel;
   };
 
   const resolveAchievementName = (meta: any, achievementId: number) => {
-    const localizedName =
-      meta?.achievement_name_ar ??
-      meta?.achievement_name_arabic ??
-      meta?.name_ar ??
-      meta?.name_arabic;
+    if (locale === "ar") {
+      const mappedArabic = arabicAchievementMap[String(achievementId)]?.name;
+      if (mappedArabic) return mappedArabic;
 
-    if (locale === "ar" && localizedName) return localizedName;
+      const localizedName =
+        meta?.achievement_name_ar ??
+        meta?.achievement_name_arabic ??
+        meta?.name_ar ??
+        meta?.name_arabic;
+      if (localizedName) return localizedName;
+    }
+
     if (meta?.achievement_name) return meta.achievement_name;
 
     return `${achievementFallbackLabel} #${formatLocaleInteger(loc, achievementId)}`;
   };
+
+  const resolveAchievementDescription = (meta: any, achievementId: number) => {
+    if (locale === "ar") {
+      const mappedArabic = arabicAchievementMap[String(achievementId)]?.description;
+      if (mappedArabic) return mappedArabic;
+
+      const localizedDescription =
+        meta?.achievement_description_ar ??
+        meta?.achievement_description_arabic ??
+        meta?.description_ar ??
+        meta?.description_arabic;
+      if (localizedDescription) return localizedDescription;
+    }
+
+    return meta?.achievement_description ?? "";
+  };
+
 
   const formatUsersOnText = (count?: number) => {
     const safeCount = Number(count ?? 0);
@@ -463,9 +506,9 @@ export const GamificationStats = () => {
                   <p className="font-semibold text-sm text-gray-900">
                     {resolveAchievementName(meta, achievementId)}
                   </p>
-                  {meta?.achievement_description && (
+                  {resolveAchievementDescription(meta, achievementId) && (
                     <p className="text-xs text-gray-600 leading-tight">
-                      {meta.achievement_description}
+                      {resolveAchievementDescription(meta, achievementId)}
                     </p>
                   )}
                   <div className="flex items-center justify-between mt-1 gap-2">

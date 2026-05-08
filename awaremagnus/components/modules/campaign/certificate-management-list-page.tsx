@@ -98,6 +98,7 @@ export function CertificateManagementListPage() {
         const htmlContent = generateCertificateHtml({
             templateText: cert.template_text,
             bgColor: cert.bg_color || "#ffffff",
+            langId: cert.lang_id,
             assets: {
                 logo: cert.top_logo_url ? getCertificateAssetUrl(cert.top_logo_url) : null,
                 bottomLogo: cert.bottom_logo_url ? getCertificateAssetUrl(cert.bottom_logo_url) : null,

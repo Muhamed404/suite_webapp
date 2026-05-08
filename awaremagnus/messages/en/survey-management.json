@@ -316,7 +316,7 @@
       "status": "Status",
       "attempts": "Attempts",
       "lastAttempt": "Last Attempt",
-      "invitationTime": "Invitation Time",
+      "invitationTime": "Schedule Time",
       "action": "Action"
     },
     "status": {
