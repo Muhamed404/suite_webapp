@@ -98,12 +98,12 @@ export const DashboardSidebar = ({
           icon: "",
           label: t("menu.campaigns"),
         },
-        {
-          href: "/dashboard/launch-awareness/invitations",
-          icon: "",
-          label: t("menu.invitationLog"),
-        },
       ],
+    },
+    {
+      href: "/dashboard/launch-awareness/invitations",
+      icon: getContentAssetUrl("/images/mail.svg"),
+      label: t("menu.invitationLog"),
     },
     {
       href: "/dashboard/survey",

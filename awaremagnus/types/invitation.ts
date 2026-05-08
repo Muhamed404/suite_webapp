@@ -42,6 +42,7 @@ export interface InvitationLogItem {
   campaign?: InvitationCampaignRef;
   survey?: InvitationSurveyRef;
   invitee?: InvitationInvitee;
+  surveyInvitation?: InvitationInvitee;
   status?: InvitationStatus;
 }
 
