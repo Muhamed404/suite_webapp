@@ -918,6 +918,13 @@ class EmailCampaignStepper {
                             this.currentTemplateData.file_url || 
                             this.currentTemplateData.file_attachment);
 
+    const phishOption = String(this.currentTemplateData?.phish_option || '').toLowerCase();
+    const isFormBasedByOption = ['data_entry', 'data-entry', 'dataentry'].includes(phishOption);
+    const formRegex = /<form[\s>]/i;
+    const hasFormTagInPages = formRegex.test(String(this.currentTemplateData?.phishing_page_content || '')) ||
+      formRegex.test(String(this.currentTemplateData?.landing_page_content || ''));
+    const hasFormSubmissionTracking = isFormBasedByOption || hasFormTagInPages;
+
    
     const path = window.location.pathname || '';
     let linkText;
@@ -950,15 +957,15 @@ class EmailCampaignStepper {
       },
       {
         text: window.i18n?.generic_label?.formSubmitted || 'Track data submitted through the phishing simulation form',
-        available: hasLandingPage,
-        icon: hasLandingPage ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
-        color: hasLandingPage ? 'green' : 'blue'
+        available: hasFormSubmissionTracking,
+        icon: hasFormSubmissionTracking ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
+        color: hasFormSubmissionTracking ? 'green' : 'blue'
       },
       {
         text: window.i18n?.generic_label?.formInteraction || 'Track user interaction with the phishing simulation form',
-        available: hasLandingPage,
-        icon: hasLandingPage ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
-        color: hasLandingPage ? 'green' : 'blue'
+        available: hasFormSubmissionTracking,
+        icon: hasFormSubmissionTracking ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
+        color: hasFormSubmissionTracking ? 'green' : 'blue'
       }
     ];
 
@@ -1092,7 +1099,8 @@ class EmailCampaignStepper {
         case 'landing':
           hasContent = !!(this.currentTemplateData.landing_page_content || 
                          this.currentTemplateData.landing_page || 
-                         this.currentTemplateData.landing_page_html);
+                         this.currentTemplateData.landing_page_html ||
+                         this.getLandingPageExternalUrl());
           // console.log(`Landing page content available: ${hasContent}`);
           break;
         case 'redirect':
@@ -1188,6 +1196,7 @@ class EmailCampaignStepper {
         if (content && !content.includes('No email content')) {
           if (previewIframe) {
             previewIframe.classList.remove('hidden');
+            previewIframe.removeAttribute('src');
             previewIframe.srcdoc = content;
             console.log('Email content loaded into iframe');
           }
@@ -1199,15 +1208,36 @@ class EmailCampaignStepper {
 
       case 'landing':
         title = 'Landing Page';
-        content = this.getLandingPageContent();
-        console.log('Landing page content length:', content?.length || 0);
-        if (content && !content.includes('No landing page')) {
+        const landingExternalUrl = this.getLandingPageExternalUrl();
+        if (landingExternalUrl) {
+          if (previewNoContent) {
+            previewNoContent.classList.remove('hidden');
+            previewNoContent.innerHTML = `
+              <div class="space-y-3">
+                <p class="text-gray-700">${window.i18n?.campaign?.email_create_campaign?.external_landing_page_url || 'External landing page URL:'}</p>
+                <p class="text-sm break-all text-teal-700">${landingExternalUrl}</p>
+                <button type="button" id="open-landing-preview-btn" class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition">
+                  ${window.i18n?.campaign?.email_create_campaign?.open_preview || 'Open Preview'}
+                </button>
+              </div>
+            `;
+            const openBtn = document.getElementById('open-landing-preview-btn');
+            if (openBtn) {
+              openBtn.onclick = () => window.open(landingExternalUrl, '_blank', 'noopener,noreferrer');
+            }
+          }
+        } else {
+          content = this.getLandingPageContent();
+          console.log('Landing page content length:', content?.length || 0);
+        }
+        if (!landingExternalUrl && content && !content.includes('No landing page')) {
           if (previewIframe) {
             previewIframe.classList.remove('hidden');
+            previewIframe.removeAttribute('src');
             previewIframe.srcdoc = content;
             console.log('Landing page loaded into iframe');
           }
-        } else {
+        } else if (!landingExternalUrl) {
           if (previewNoContent) previewNoContent.classList.remove('hidden');
           console.log('No landing page content available');
         }
@@ -1220,6 +1250,7 @@ class EmailCampaignStepper {
         if (content && !content.includes('No redirection page')) {
           if (previewIframe) {
             previewIframe.classList.remove('hidden');
+            previewIframe.removeAttribute('src');
             previewIframe.srcdoc = content;
             console.log('Redirect page loaded into iframe');
           }
@@ -1292,6 +1323,14 @@ class EmailCampaignStepper {
     
     console.log('getLandingPageContent - landing_page_content:', this.currentTemplateData?.landing_page_content?.substring(0, 100));
     return content || '<p class="text-gray-500 p-4">No landing page available.</p>';
+  }
+
+  getLandingPageExternalUrl() {
+    const url = this.currentTemplateData?.landing_page_external_url || this.currentTemplateData?.landing_page_url;
+    if (typeof url === 'string' && /^https?:\/\//i.test(url.trim())) {
+      return url.trim();
+    }
+    return '';
   }
 
   getRedirectPageContent() {
