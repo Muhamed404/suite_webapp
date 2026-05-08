@@ -293,20 +293,31 @@
                 <!-- Heading -->
                 <h1 class="text-2xl font-semibold mb-1"><%= __("system_template.create.labelLandingPage_Title") %></h1>
                 <p class="text-gray-500 mb-6"><%= __("system_template.create.labelDetails_level3_Description") %></p>
+                <% const landingMode = String(template?.landing_page_option || (template?.landing_page_external_url ? 'url' : (template?.landing_page_url && /^https?:\/\//i.test(String(template.landing_page_url)) ? 'url' : 'html'))).toLowerCase(); %>
+                <% const isLandingUrlMode = landingMode === 'url'; %>
 
                 <!-- Radio Buttons -->
                 <div class="space-y-4 mb-6">
                     <label class="flex items-center custom-radio cursor-pointer">
-                        <input type="radio" name="landing_option" value="link">
-                        <span class="radio-circle"></span>
-                        <span class="text-gray-700"><%= __("system_template.create.labelLandingPage_radioOption1") %></span>
-                    </label>
-
-                    <label class="flex items-center custom-radio cursor-pointer">
-                        <input type="radio" name="landing_option" value="custom" <%=template?.landing_page_content ? 'checked' : '' %>  >
+                        <input type="radio" name="landing_option" value="custom" id="landing_option_custom" <%= !isLandingUrlMode ? 'checked' : '' %> <%= isLandingUrlMode ? 'disabled' : '' %>>
                         <span class="radio-circle"></span>
                         <span class="text-gray-700"><%= __("system_template.create.labelLandingPage_radioOption2") %></span>
                     </label>
+
+                    <label class="flex items-center custom-radio cursor-pointer">
+                        <input type="radio" name="landing_option" value="url" id="landing_option_url" <%= isLandingUrlMode ? 'checked' : '' %> <%= !isLandingUrlMode ? 'disabled' : '' %>>
+                        <span class="radio-circle"></span>
+                        <span class="text-gray-700">I would like to redirect the user to a custom web/STC page</span>
+                    </label>
+                </div>
+                <input type="hidden" name="landing_page_option" id="landing_page_option" value="<%= isLandingUrlMode ? 'url' : 'html' %>">
+                <div id="landing-external-url-container" class="mb-6 <%= isLandingUrlMode ? '' : 'hidden' %>">
+                    <label for="landing_page_external_url" class="block text-gray-700 font-medium mb-2">Redirect URL</label>
+                    <input type="url" id="landing_page_external_url" name="landing_page_external_url"
+                        value="<%= template?.landing_page_external_url || (isLandingUrlMode ? (template?.landing_page_url || '') : '') %>"
+                        placeholder="https://www.youtube.com/"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400"
+                        <%= !isLandingUrlMode ? 'readonly' : '' %>>
                 </div>
 
 
@@ -469,6 +480,7 @@
         }
     };
     window.disableSaveEdit = <%= typeof disableSaveEdit !== 'undefined' ? disableSaveEdit : false %>;
+window.initialLandingPageMode = "<%= isLandingUrlMode ? 'url' : 'html' %>";
 </script>
 
 <script>window.WEB_TEMPLATE_BUCKET = "<%- typeof webTemplateBucket !== 'undefined' ? webTemplateBucket : '' %>";</script>

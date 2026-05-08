@@ -107,6 +107,12 @@ $(document).ready(function () {
           return selectedOptions.includes('3') && phishOption === 'custom-url';
         },
         url: true
+      },
+      landing_page_external_url: {
+        required: function() {
+          return $('input[name="landing_option"]:checked').val() === 'url';
+        },
+        url: true
       }
     },
     messages: {
@@ -161,6 +167,10 @@ $(document).ready(function () {
       
       // Step 6 Messages
       webpage_url: {
+        required: window.i18n?.validation_messages?.urlRequired || "URL is required.",
+        url: window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL."
+      },
+      landing_page_external_url: {
         required: window.i18n?.validation_messages?.urlRequired || "URL is required.",
         url: window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL."
       }
@@ -325,6 +335,11 @@ $(document).ready(function () {
       // If custom landing page is selected, validate content
       if (landingOption === 'custom') {
         if (!validateCKEditor('landing_page_content', 'Landing page content is required.')) {
+          isValid = false;
+        }
+      } else if (landingOption === 'url') {
+        const externalUrlInput = $('#landing_page_external_url');
+        if (externalUrlInput.length && !externalUrlInput.valid()) {
           isValid = false;
         }
       }

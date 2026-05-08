@@ -278,8 +278,15 @@ let currentStep = 0;
 
     const placeholderButtons = document.getElementById('placeholder-buttons');
     const allowedScreens = [phishing_content_screen - 1, phishing_webpage_screen - 1, phishing_landing_page_screen - 1];
+    let showPlaceholders = allowedScreens.includes(index);
+    if (index === (phishing_landing_page_screen - 1)) {
+      const selectedLandingOption = document.querySelector('input[name="landing_option"]:checked');
+      if (!selectedLandingOption || selectedLandingOption.value !== 'custom') {
+        showPlaceholders = false;
+      }
+    }
     if (placeholderButtons) {
-      placeholderButtons.style.display = allowedScreens.includes(index) ? '' : 'none';
+      placeholderButtons.style.display = showPlaceholders ? '' : 'none';
     }
 
     if (allowedScreens.includes(index)) {
@@ -457,6 +464,35 @@ let currentStep = 0;
       if (inlineError) inlineError.remove();
     }
 
+    if (currentStep === (phishing_landing_page_screen - 1)) {
+      const selectedLandingOption = document.querySelector('input[name="landing_option"]:checked');
+      const landingMode = selectedLandingOption ? selectedLandingOption.value : '';
+      const externalUrlInput = document.getElementById('landing_page_external_url');
+      const externalUrl = externalUrlInput ? externalUrlInput.value.trim() : '';
+
+      if (!landingMode) {
+        alert('Please select a landing page option.');
+        return;
+      }
+
+      if (landingMode === 'url') {
+        const isValidHttpUrl = /^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(externalUrl);
+        if (!isValidHttpUrl) {
+          if (externalUrlInput) externalUrlInput.classList.add('border-red-500');
+          alert('Please enter a valid URL.');
+          return;
+        }
+        if (externalUrlInput) externalUrlInput.classList.remove('border-red-500');
+      } else if (landingMode === 'custom') {
+        const landingEditor = (typeof CKEDITOR !== 'undefined') ? CKEDITOR.instances['landing_page_content'] : null;
+        const landingData = landingEditor ? (landingEditor.getData() || '').trim() : '';
+        if (!landingData) {
+          alert('Landing page content is required.');
+          return;
+        }
+      }
+    }
+
     saveDataForStep(currentStep);
     if (currentStep === 0) {
       const sel = formData.step1 && formData.step1.phishType;
@@ -530,6 +566,21 @@ let currentStep = 0;
       }
     });
 
+    const selectedLandingOption = document.querySelector('input[name="landing_option"]:checked');
+    const hiddenLandingPageOption = document.getElementById('landing_page_option');
+    const externalUrlInput = document.getElementById('landing_page_external_url');
+    const landingTextarea = document.getElementById('landing_page_content');
+    const isUrlLandingMode = !!(selectedLandingOption && selectedLandingOption.value === 'url');
+    if (hiddenLandingPageOption) {
+      hiddenLandingPageOption.value = isUrlLandingMode ? 'url' : 'html';
+    }
+    if (isUrlLandingMode && landingTextarea) {
+      landingTextarea.value = '';
+    }
+    if (!isUrlLandingMode && externalUrlInput) {
+      externalUrlInput.value = '';
+    }
+
     const formEl = document.getElementById('templateCreationForm');
     if (formEl) formEl.submit();
   }
@@ -595,77 +646,51 @@ radios.forEach(radio => {
   });
 });
 
-// re-init editors block (ClassicEditor for landing custom)
-let editorInstance = null;
 const editorContainer = document.getElementById('editor-container');
-if (editorContainer) editorContainer.style.display = 'none';
+const externalUrlContainer = document.getElementById('landing-external-url-container');
+const externalUrlInput = document.getElementById('landing_page_external_url');
+const hiddenLandingPageOption = document.getElementById('landing_page_option');
+const initialLandingPageMode = window.initialLandingPageMode || 'html';
+
+function updateLandingModeUI(mode) {
+  const isUrlMode = mode === 'url';
+  if (editorContainer) {
+    editorContainer.style.display = isUrlMode ? 'none' : 'block';
+  }
+  if (externalUrlContainer) {
+    externalUrlContainer.classList.toggle('hidden', !isUrlMode);
+  }
+  if (hiddenLandingPageOption) {
+    hiddenLandingPageOption.value = isUrlMode ? 'url' : 'html';
+  }
+}
 
 document.querySelectorAll('input[name="landing_option"]').forEach(radio => {
   radio.addEventListener('change', function () {
-    if (!editorContainer) return;
-    if (this.value === 'custom') {
-      editorContainer.style.display = 'block';
-      // alert('Show custom landing page editor');
-      if (!editorInstance && typeof ClassicEditor !== 'undefined') {
-        // alert('Initialize ClassicEditor for custom landing page content');
-        ClassicEditor.create(document.querySelector('#editor'), { placeholder: 'Enter custom page HTML here...' })
-          .then(editor => { editorInstance = editor; })
-          .catch(error => console.error('ClassicEditor init error', error));
-      }
-    } else {
-      editorContainer.style.display = 'none';
-    }
+    updateLandingModeUI(this.value);
   });
 });
 
-// --- new: on-load check for pre-checked "custom" radio and init editor ---
-(function initLandingEditorIfPrechecked() {
-  try {
-    const preCheckedCustom = document.querySelector('input[name="landing_option"][value="custom"]:checked');
-    if (!preCheckedCustom || !editorContainer) return;
-    // show container
-    editorContainer.style.display = 'block';
+(function initLandingMode() {
+  const selectedLandingOption = document.querySelector('input[name="landing_option"]:checked');
+  const selectedMode = selectedLandingOption ? selectedLandingOption.value : initialLandingPageMode;
+  updateLandingModeUI(selectedMode);
 
-    // copy textarea content into editor element (ClassicEditor will pick this up)
-    const editorEl = document.querySelector('#editor');
-    const landingContentEl = document.getElementById('landing_page_content');
-    if (landingContentEl && editorEl && !editorEl.value) {
-      editorEl.value = landingContentEl.value || landingContentEl.textContent || '';
-    }
-
-    // disable other landing_option radios so user cannot change selection
-    const radios = Array.from(document.querySelectorAll('input[name="landing_option"]') || []);
-    radios.forEach(r => {
-      if (r !== preCheckedCustom) {
-        r.disabled = true;
-        // also visually indicate disabled state on label if present
-        const lab = r.closest('label') || (r.id ? document.querySelector(`label[for="${r.id}"]`) : null);
-        if (lab) {
-          lab.classList.add('opacity-50', 'pointer-events-none');
-        }
+  const radios = Array.from(document.querySelectorAll('input[name="landing_option"]') || []);
+  radios.forEach(r => {
+    if (r.value !== initialLandingPageMode) {
+      r.disabled = true;
+      const lab = r.closest('label');
+      if (lab) {
+        lab.classList.add('opacity-50', 'pointer-events-none');
       }
-    });
-
-    // initialize ClassicEditor if not already done
-    if (!editorInstance && typeof ClassicEditor !== 'undefined') {
-      ClassicEditor.create(editorEl || document.querySelector('#editor'), { placeholder: 'Enter custom page HTML here...' })
-        .then(editor => {
-          editorInstance = editor;
-          // set initial data if present
-          try {
-            const initial = (landingContentEl && (landingContentEl.value || landingContentEl.textContent)) || '';
-            if (initial) editorInstance.setData(initial);
-          } catch (e) { /* ignore */ }
-        })
-        .catch(err => console.error('ClassicEditor init error (prechecked):', err));
-    } else if (editorInstance) {
-      try {
-        const initial = (landingContentEl && (landingContentEl.value || landingContentEl.textContent)) || '';
-        if (initial) editorInstance.setData(initial);
-      } catch (e) { /* ignore */ }
+    } else {
+      r.checked = true;
     }
-  } catch (e) {
-    console.warn('initLandingEditorIfPrechecked error', e);
+  });
+
+  if (initialLandingPageMode !== 'url' && externalUrlInput) {
+    externalUrlInput.value = '';
   }
 })();
 
