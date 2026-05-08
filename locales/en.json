@@ -1169,7 +1169,15 @@
 		"enterDepartmentName": "Enter Department Name",
 		"enterDescription": "Enter Description",
 		"departmentNameRequired": "Department name is required.",
-		"descriptionRequired": "Description is required (min 5 characters)."
+		"descriptionRequired": "Description is required (min 5 characters).",
+		"delete_confirm_title": "Delete Department",
+		"delete_confirm_message": "Are you sure you want to delete this department?",
+		"btn_cancel": "Cancel",
+		"btn_delete": "Delete",
+		"action_delete": "Delete Department",
+		"group_deleted_successfully": "Department deleted successfully",
+		"department_deleted_successfully": "Department deleted successfully",
+		"delete_error": "Failed to delete department. Please try again."
 	},
 	"group": {
 		"labelGroupManagement": "Group Management",
@@ -1190,7 +1198,15 @@
 		"done": "Done",
 		"viewDetails": "View Details",
 		"noEnrolledUsers": "No enrolled users",
-		"noUnenrolledUsers": "No unenrolled users"
+		"noUnenrolledUsers": "No unenrolled users",
+		"delete_confirm_title": "Delete Group",
+		"delete_confirm_message": "Are you sure you want to delete this group?",
+		"btn_cancel": "Cancel",
+		"btn_delete": "Delete",
+		"action_delete": "Delete Group",
+		"group_deleted_successfully": "Group deleted successfully",
+		"delete_error": "Failed to delete group. Please try again.",
+		"labelActions": "Actions"
 	},
 	"sms": {
 		"settings": {

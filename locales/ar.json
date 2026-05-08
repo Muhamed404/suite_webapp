@@ -2141,7 +2141,15 @@
 		"enterDepartmentName": "أدخل اسم القسم",
 		"enterDescription": "أدخل الوصف",
 		"departmentNameRequired": "اسم القسم مطلوب.",
-		"descriptionRequired": "الوصف مطلوب (حد أدنى 5 أحرف)."
+		"descriptionRequired": "الوصف مطلوب (حد أدنى 5 أحرف).",
+		"delete_confirm_title": "حذف القسم",
+		"delete_confirm_message": "هل أنت متأكد أنك تريد حذف هذا القسم؟",
+		"btn_cancel": "إلغاء",
+		"btn_delete": "حذف",
+		"action_delete": "حذف القسم",
+		"group_deleted_successfully": "تم حذف القسم بنجاح",
+		"delete_error": "فشل في حذف القسم. يرجى المحاولة مرة أخرى.",
+		"department_deleted_successfully": "تم حذف القسم بنجاح"
 	},
 	"group": {
 		"labelGroupManagement": "إدارة المجموعات",
@@ -2162,7 +2170,15 @@
 		"done": "تم",
 		"viewDetails": "عرض التفاصيل",
 		"noEnrolledUsers": "لا يوجد مستخدمون مسجلون",
-		"noUnenrolledUsers": "لا يوجد مستخدمون غير مسجلين"
+		"noUnenrolledUsers": "لا يوجد مستخدمون غير مسجلين",
+		"delete_confirm_title": "حذف المجموعة",
+		"delete_confirm_message": "هل أنت متأكد أنك تريد حذف هذه المجموعة؟",
+		"btn_cancel": "إلغاء",
+		"btn_delete": "حذف",
+		"action_delete": "حذف المجموعة",
+		"group_deleted_successfully": "تم حذف المجموعة بنجاح",
+		"delete_error": "فشل في حذف المجموعة. يرجى المحاولة مرة أخرى.",
+		"labelActions": "الإجراءات"
 	},
 	"Organization": {
 		"SubscriptionHistory": "سجل الاشتراكات",

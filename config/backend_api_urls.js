@@ -116,6 +116,7 @@ module.exports = {
         GROUPS: {
             FIND_GROUP_BY_ORGANIZATION: (orgId) => `/group/findByOrganization/${orgId}`,
             CREATE: '/group/create',
+            DELETE: (groupId) => `/group/delete/${groupId}`,
             ASSIGNED_USERS_BY_GROUP: (groupId) => `/group/assignedUsersByGroup/${groupId}`,
             UNASSIGNED_USERS_BY_GROUP: (groupId) => `/group/getUnassignedUser/${groupId}`,
             EnrolUserToGroup: (groupId, hasRequestedToUnenroll) => `/group/enrolUserToGroup/${groupId}/${hasRequestedToUnenroll}`,
@@ -173,6 +174,7 @@ module.exports = {
         DEPARTMENT: {
             Find_Department_By_Organization: (orgId) => `/department/list/${orgId}`,
             CREATE: '/department/',
+            DELETE: (departmentId) => `/department/delete/${departmentId}`,
             ASSIGNED_USERS_BY_DEPARTMENT: (orgId, deptId) => `/department/assigned-users/${orgId}?department=${deptId}`,
             UNASSIGNED_USERS_BY_ORGANIZATION: (orgId) => `/department/unassigned-users/${orgId}`,
             EnrolUserToDepartment: (departmentId, hasRequestedToUnenroll) => `/department/enrolUserToDepartment/${departmentId}/${hasRequestedToUnenroll}`,
