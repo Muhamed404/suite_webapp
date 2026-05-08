@@ -7,6 +7,14 @@ import { useAchievementStatistics } from "@/hooks/useDashboard";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { useTranslations } from "@/i18n/useTranslations";
 import Image from "next/image";
+import { useI18n } from "@/i18n/I18nProvider";
+import achievementTranslationsAr from "@/messages/ar/gamification_achievements-ar.json";
+
+type ArabicAchievementTranslation = {
+  name: string;
+  description: string;
+  category: string;
+};
 
 interface Achievement {
   achievement_id: number;
@@ -21,6 +29,54 @@ function MyAchievementsContent() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const { data: achievementData } = useAchievementStatistics();
   const t = useTranslations("dashboard");
+  const { locale } = useI18n();
+  const isArabic = locale === "ar";
+  const achievementFallbackLabel = isArabic ? "إنجاز" : "Achievement";
+  const arabicAchievementMap = achievementTranslationsAr.achievements as Record<
+    string,
+    ArabicAchievementTranslation
+  >;
+
+  const resolveAchievementName = (item: Achievement) => {
+    if (isArabic) {
+      const mappedArabic = arabicAchievementMap[String(item.achievement_id)]?.name;
+      if (mappedArabic) return mappedArabic;
+
+      const localizedName =
+        (item as any)?.achievement_name_ar ??
+        (item as any)?.achievement_name_arabic ??
+        (item as any)?.name_ar ??
+        (item as any)?.name_arabic;
+      if (localizedName) return localizedName;
+    }
+
+    if (item.achievement_name) return item.achievement_name;
+    return `${achievementFallbackLabel} #${item.achievement_id}`;
+  };
+
+  const resolveAchievementDescription = (item: Achievement) => {
+    if (isArabic) {
+      const mappedArabic = arabicAchievementMap[String(item.achievement_id)]?.description;
+      if (mappedArabic) return mappedArabic;
+
+      const localizedDescription =
+        (item as any)?.achievement_description_ar ??
+        (item as any)?.achievement_description_arabic ??
+        (item as any)?.description_ar ??
+        (item as any)?.description_arabic;
+      if (localizedDescription) return localizedDescription;
+    }
+
+    return item.achievement_description ?? "";
+  };
+
+  const resolveAchievementCategory = (item: Achievement) => {
+    if (isArabic) {
+      const mappedArabic = arabicAchievementMap[String(item.achievement_id)]?.category;
+      if (mappedArabic) return mappedArabic;
+    }
+    return item.achievement_category;
+  };
 
   const achievements = achievementData?.object?.achievement_statistics || [];
 
@@ -104,7 +160,7 @@ function MyAchievementsContent() {
                     categoryConfig[item.achievement_category]?.bg ?? "bg-gray-100"
                   } ${categoryConfig[item.achievement_category]?.text ?? "text-gray-500"}`}
                 >
-                  {item.achievement_category}
+                  {resolveAchievementCategory(item)}
                 </span>
                 <span className="text-[11px] text-gray-400">{item.employee_count}x</span>
               </div>
@@ -114,7 +170,7 @@ function MyAchievementsContent() {
                 <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center">
                   <Image
                     unoptimized
-                    alt={item.achievement_name}
+                    alt={resolveAchievementName(item)}
                     className="w-14 h-14"
                     height={56}
                     src={getContentAssetUrl(`/images/achivement/${item.image_small_url}`)}
@@ -124,8 +180,8 @@ function MyAchievementsContent() {
               </div>
 
               {/* Content */}
-              <h3 className="text-sm font-semibold text-center">{item.achievement_name}</h3>
-              <p className="text-xs text-gray-500 text-center mb-3">{item.achievement_description}</p>
+              <h3 className="text-sm font-semibold text-center">{resolveAchievementName(item)}</h3>
+              <p className="text-xs text-gray-500 text-center mb-3">{resolveAchievementDescription(item)}</p>
             </div>
           ))}
         </div>

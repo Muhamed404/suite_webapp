@@ -187,6 +187,7 @@ export function CertificateListPage() {
               const htmlContent = generateCertificateHtml({
                 templateText,
                 bgColor,
+                langId: template?.lang_id,
                 assets,
                 firstName,
                 lastName,

@@ -6,6 +6,8 @@ export interface InvitationStatus {
 export interface InvitationCampaignRef {
   id: number;
   name: string;
+  start_date?: string | null;
+  end_date?: string | null;
 }
 
 export interface InvitationSurveyRef {

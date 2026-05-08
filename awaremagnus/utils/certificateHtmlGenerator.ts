@@ -11,6 +11,7 @@ export interface CertificateTemplateData {
   templateText: string;
   bgColor: string;
   assets: CertificateTemplateAssets;
+  langId?: number;
   firstName?: string;
   lastName?: string;
   courseName?: string;
@@ -45,6 +46,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
     templateText,
     bgColor = "#ffffff",
     assets,
+    langId,
     firstName = "John",
     lastName = "Doe",
     courseName = "Cybersecurity Awareness on Physical Security",
@@ -66,13 +68,32 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
     courseName,
     completionDate
   );
+  const hasArabicText = /[\u0600-\u06FF]/.test(templateText ?? "");
+  const isArabicCertificate = langId === 2 || hasArabicText;
+  const pageDir = isArabicCertificate ? "rtl" : "ltr";
+  const pageLang = isArabicCertificate ? "ar" : "en";
+  const labels = isArabicCertificate
+    ? {
+        previewTitle: "معاينة الشهادة",
+        download: "تنزيل الشهادة",
+        certificateTitle: "شهادة إتمام",
+        signature: "التوقيع المعتمد",
+        date: "التاريخ",
+      }
+    : {
+        previewTitle: "Certificate Preview",
+        download: "Download Certificate",
+        certificateTitle: "Certificate of Completion",
+        signature: "Authorized Signature",
+        date: "Date",
+      };
 
   return `
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${pageLang}" dir="${pageDir}">
 <head>
   <meta charset="UTF-8">
-  <title>Certificate Preview</title>
+  <title>${labels.previewTitle}</title>
   <style>
     @media print {
       @page {
@@ -205,7 +226,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
       position: relative;
       z-index: 1;
       padding: 140px 60px 80px 60px;
-      text-align: center;
+      text-align: ${isArabicCertificate ? "right" : "center"};
       height: 100%;
       display: flex;
       flex-direction: column;
@@ -227,6 +248,8 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
       color: #444;
       margin: 20px auto;
       width: 85%;
+      direction: ${pageDir};
+      text-align: ${isArabicCertificate ? "right" : "center"};
     }
     
     /* Handle Quill's p tags inside the templateText */
@@ -242,6 +265,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
+      flex-direction: ${isArabicCertificate ? "row-reverse" : "row"};
       z-index: 2;
     }
 
@@ -291,7 +315,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
 </head>
 <body>
   <div class="certificate-wrapper">
-    <button class="export-btn" onclick="window.print()">Download Certificate</button>
+    <button class="export-btn" onclick="window.print()">${labels.download}</button>
     <div class="certificate-container" style="background-color: ${bgColor};">
       <!-- Watermark -->
       <div class="certificate-watermark"></div>
@@ -304,7 +328,7 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
 
       <!-- Content -->
       <div class="certificate-content">
-        <div class="certificate-title">Certificate of Completion</div>
+        <div class="certificate-title">${labels.certificateTitle}</div>
         <div class="certificate-text">
           ${certificateText}
         </div>
@@ -315,14 +339,14 @@ export const generateCertificateHtml = (data: CertificateTemplateData) => {
         <div class="certificate-sign">
           ${signImage ? `<img src="${signImage}" alt="Signature">` : '<div style="height: 60px;"></div>'}
           <div class="certificate-sign-line"></div>
-          <small>Authorized Signature</small>
+          <small>${labels.signature}</small>
         </div>
         
         <div class="certificate-date-area">
           ${stampLogo ? `<img src="${stampLogo}" alt="Stamp" class="certificate-date-stamp">` : ""}
           <div class="certificate-date-value">${completionDate || issueDate || "&lt;%completion_date%&gt;"}</div>
           <div class="certificate-sign-line"></div>
-          <small>Date</small>
+          <small>${labels.date}</small>
         </div>
       </div>
 

@@ -47,6 +47,13 @@ function formatDate(dateStr?: string | null) {
   }
 }
 
+function getInvitationDisplayTime(row: InvitationLogItem) {
+  if (row.invitation_type === "campaign") {
+    return row.campaign?.start_date ?? row.invitation_time;
+  }
+  return row.invitation_time;
+}
+
 function getStatusTone(statusName?: string) {
   const status = (statusName ?? "").toUpperCase();
 
@@ -494,7 +501,9 @@ export function InvitationLogPage() {
                         </td>
                         <td className="px-4 py-3 text-gray-700">{row.attempt_count}</td>
                         <td className="px-4 py-3 text-gray-700">{formatDate(row.last_attempt_at)}</td>
-                        <td className="px-4 py-3 text-gray-700">{formatDate(row.invitation_time)}</td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {formatDate(getInvitationDisplayTime(row))}
+                        </td>
                         <td className="px-4 py-3 text-center">
                           <Button
                             size="sm"

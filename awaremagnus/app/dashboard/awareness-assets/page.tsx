@@ -48,6 +48,7 @@ const AWARENESS_ASSETS = [
 ] as const;
 
 type AwarenessAssetType = (typeof AWARENESS_ASSETS)[number]["id"];
+type LanguageFilter = number | "all";
 
 function getAssetTitle(
   asset: ModuleContent,
@@ -123,6 +124,7 @@ export default function AwarenessAssetsPage() {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<AwarenessAssetType>(0);
   const [searchText, setSearchText] = useState("");
+  const [languageFilter, setLanguageFilter] = useState<LanguageFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 9;
 
@@ -136,11 +138,15 @@ export default function AwarenessAssetsPage() {
     isError,
     error,
   } = useQuery({
-    queryKey: ["awareness-assets", activeFilter, currentPage],
+    queryKey: ["awareness-assets", activeFilter, currentPage, languageFilter, searchText],
     queryFn: () =>
-      activeFilter === 0
-        ? quizService.getContents({ page: currentPage, limit: 9 })
-        : quizService.getContents({ contype_id: activeFilter, page: currentPage, limit: 9 }),
+      quizService.getContents({
+        ...(activeFilter !== 0 && { contype_id: activeFilter }),
+        ...(languageFilter !== "all" && { lang_id: Number(languageFilter) }),
+        // When searching, fetch a broader dataset so search is meaningful.
+        page: searchText.trim() ? 1 : currentPage,
+        limit: searchText.trim() ? 500 : 9,
+      }),
     enabled: isOrgAdminUser,
     staleTime: 60 * 1000,
   });
@@ -180,14 +186,42 @@ export default function AwarenessAssetsPage() {
     });
   }, [assets, searchText, tAwarenessAssets]);
 
-  const totalPages = pagination?.total_pages ?? 1;
-  const totalItems = pagination?.total_items ?? assets.length;
+  const languageOptions = useMemo(() => {
+    const map = new Map<number, string>();
+    for (const asset of assets) {
+      const id = Number(asset.language?.id ?? asset.language_id);
+      if (!Number.isFinite(id) || id <= 0) continue;
+      const name =
+        asset.language?.name ??
+        tAwarenessAssets("fallback.language", {
+          id,
+        });
+      if (!map.has(id)) map.set(id, name);
+    }
+    return Array.from(map.entries())
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [assets, tAwarenessAssets]);
+  const languageSelectOptions = useMemo(
+    () => [
+      { id: "all", name: tAwarenessAssets("filters.allLanguages") },
+      ...languageOptions.map((language) => ({ id: String(language.id), name: language.name })),
+    ],
+    [languageOptions, tAwarenessAssets]
+  );
 
-  const pageItems = filteredAssets;
+  const totalPages = pagination?.total_pages ?? 1;
+  const totalItems = searchText.trim() ? filteredAssets.length : pagination?.total_items ?? assets.length;
+
+  const pageItems = useMemo(() => {
+    if (!searchText.trim()) return filteredAssets;
+    const start = (currentPage - 1) * pageSize;
+    return filteredAssets.slice(start, start + pageSize);
+  }, [filteredAssets, searchText, currentPage, pageSize]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeFilter, searchText]);
+  }, [activeFilter, searchText, languageFilter]);
 
 
   useEffect(() => {
@@ -229,6 +263,22 @@ export default function AwarenessAssetsPage() {
                 {AWARENESS_ASSETS.map((asset) => (
                   <SelectItem key={asset.id} textValue={tAwarenessAssets(asset.labelKey)}>
                     {tAwarenessAssets(asset.labelKey)}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+            <div className="min-w-[150px]">
+              <Select
+                selectedKeys={[String(languageFilter)]}
+                onSelectionChange={(keys) => {
+                  const selected = String(Array.from(keys as Set<string>)[0] ?? "all");
+                  setLanguageFilter(selected === "all" ? "all" : Number(selected));
+                }}
+                className="rounded-full border border-[var(--strokeGray)] bg-white text-sm text-[var(--mainblue)]"
+              >
+                {languageSelectOptions.map((language) => (
+                  <SelectItem key={language.id} textValue={language.name}>
+                    {language.name}
                   </SelectItem>
                 ))}
               </Select>
@@ -312,14 +362,15 @@ export default function AwarenessAssetsPage() {
 
                     <div className="flex items-center justify-end">
                         {sourceUrl ? (
-                          <a
+                          <button
                             className="inline-flex items-center rounded-md bg-[var(--blue)] px-3 py-1.5 text-xs font-medium text-white"
-                            href={sourceUrl}
-                            rel="noopener noreferrer"
-                            target="_blank"
+                            type="button"
+                            onClick={() => {
+                              router.push(`/dashboard/awareness-assets/${asset.id}`);
+                            }}
                           >
                             {tAwarenessAssets("actions.view")}
-                          </a>
+                          </button>
                         ) : (
                           <span className="inline-flex items-center rounded-md bg-[var(--gray)] px-3 py-1.5 text-xs text-[var(--darkgray)]">
                             {tAwarenessAssets("states.noSource")}
@@ -357,7 +408,11 @@ export default function AwarenessAssetsPage() {
                 page={currentPage}
                 radius="sm"
                 size="sm"
-                total={totalPages}
+                total={
+                  searchText.trim()
+                    ? Math.max(1, Math.ceil(filteredAssets.length / pageSize))
+                    : totalPages
+                }
                 onChange={setCurrentPage}
               />
             </div>
