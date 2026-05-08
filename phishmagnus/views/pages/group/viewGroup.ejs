@@ -57,6 +57,9 @@
                     <%= __("group.labelViewUsers") %>
 
                   </th>
+                  <th class="px-4 py-5">
+                    <%= __('group.labelActions') %>
+                  </th>
 
 
             </tr>
@@ -85,7 +88,21 @@
                         <%= __("group.viewDetails") %>
                       </button>
                     </td>
-
+                    <td class="px-6 py-6 whitespace-nowrap">
+                      <button type="button"
+                        data-url="/group/delete/<%=group.id%>"
+                        data-name="<%= group.name %>"
+                        class="delete-group-btn inline-flex items-center justify-center w-9 h-9 rounded-md bg-amber-500 hover:bg-amber-600 text-white transition"
+                        role="button" data-toggle="tooltip" data-placement="left"
+                        title="<%= __('group.action_delete') %>">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M19 7L5 7M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2">
+                          </path>
+                        </svg>
+                      </button>
+                    </td>
 
               </tr>
 
@@ -190,6 +207,17 @@
 
 
 
+<div id="deleteConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+    <h2 class="text-lg font-semibold mb-4"><%= __('group.delete_confirm_title') %></h2>
+    <p class="mb-6" id="deleteConfirmText" dir="auto"><%= __('group.delete_confirm_message') %></p>
+    <div class="flex justify-end gap-3">
+      <button id="cancelDeleteConfirm" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"><%= __('group.btn_cancel') %></button>
+      <button id="confirmDeleteBtn" class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700"><%= __('group.btn_delete') %></button>
+    </div>
+  </div>
+</div>
+
 <script src="/securemagnus_2025/js/multiselect-encrollment-users.js"></script>
 <script src="/securemagnus_2025/js/custom_script/group-multiselect-jquery.js"></script>
 
@@ -221,4 +249,77 @@
       }
     }
   })();
+
+  document.addEventListener('DOMContentLoaded', function() {
+    let deleteConfirmInfo = { url: null, name: '' };
+    const modal = document.getElementById('deleteConfirmModal');
+    const modalCard = modal ? modal.querySelector('.bg-white') : null;
+    const cancelBtn = document.getElementById('cancelDeleteConfirm');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const textEl = document.getElementById('deleteConfirmText');
+    const deleteConfirmBaseText = '<%= __('group.delete_confirm_message') %>';
+    const isRtl = document.documentElement.getAttribute('dir') === 'rtl' || (document.documentElement.getAttribute('lang') || '').toLowerCase().startsWith('ar');
+
+    if (modalCard) {
+      modalCard.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
+      modalCard.classList.add(isRtl ? 'text-right' : 'text-left');
+    }
+
+    function showDeleteConfirm(url, name) {
+      deleteConfirmInfo = { url, name };
+      if (textEl) {
+        textEl.textContent = name ? `${deleteConfirmBaseText} "${name}"` : deleteConfirmBaseText;
+        textEl.setAttribute('dir', 'auto');
+      }
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function hideDeleteConfirm() {
+      if (modal) modal.classList.add('hidden');
+    }
+
+    async function performDelete() {
+      hideDeleteConfirm();
+      if (deleteConfirmInfo.url) {
+        try {
+          const response = await fetch(deleteConfirmInfo.url, {
+            method: 'DELETE',
+            credentials: 'same-origin',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          });
+
+          const data = await response.json();
+          if (response.ok && data && data.alertType === 'success') {
+            showCustomToast('success', data.message || "<%= __('group.group_deleted_successfully') %>");
+            setTimeout(() => window.location.reload(), 1000);
+          } else {
+            let errorMsg = data && data.message ? data.message : "<%= __('group.delete_error') %>";
+            console.warn('[Delete Group] Error response', response.status, errorMsg, data);
+            showCustomToast('error', errorMsg);
+          }
+        } catch (error) {
+          console.error('[Delete Group] Error:', error);
+          showCustomToast('error', "<%= __('group.delete_error') %>");
+        }
+      }
+    }
+
+    // Event delegation for delete buttons
+    document.addEventListener('click', function(event) {
+      const btn = event.target.closest('.delete-group-btn');
+      if (!btn) return;
+      event.preventDefault();
+      event.stopPropagation();
+
+      const url = btn.getAttribute('data-url');
+      const name = btn.getAttribute('data-name') || '';
+      showDeleteConfirm(url, name);
+    });
+
+    if (cancelBtn) cancelBtn.onclick = hideDeleteConfirm;
+    if (confirmBtn) confirmBtn.onclick = performDelete;
+  });
 </script>
