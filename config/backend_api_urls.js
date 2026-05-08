@@ -58,6 +58,7 @@ module.exports = {
             ENROLLED_PHM_USERS: `/user/retrieved-enrolled-users`,
             UNENROLLED_PHM_USERS: `/user/retrieved-unenrolled-users`,
             SAVE_ENROLLMENT: (hasRequestedToUnenroll) => `/user/update-license-status/${hasRequestedToUnenroll}`,
+            BULK_INVITE_SEND: `/notification/user/invite/bulk/send`,
             DELETE: (userId) => `/user/delete/${userId}`,
             LIST_SUITE_USERS: (organization) => `/user/suite-users/${organization}`,
             BULK_IMPORT_LIST: (organizationId) => `/user/bulk-import/list/${organizationId}`,

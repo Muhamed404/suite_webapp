@@ -69,12 +69,37 @@
     <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
       <form method="get" action="<%= sp.basePath %>" class="flex flex-wrap items-end gap-3 w-full lg:flex-1">
         <input type="hidden" name="page" value="1" />
-        <div class="flex flex-col gap-1 min-w-[12rem] flex-1">
+        <div class="flex flex-col gap-1 w-full sm:w-56">
           <label for="suiteUserSearch" class="text-xs text-gray-500"><%= __("user.suiteUsersSearchLabel") %></label>
           <input id="suiteUserSearch" type="search" name="search" value="<%= sp.search || '' %>"
             placeholder="<%= __("generic_label.search_here") %>"
             autocomplete="off"
             class="w-full min-w-0 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500" />
+        </div>
+        <div class="flex flex-col gap-1 min-w-[14rem]">
+          <label for="userSelectionMode" class="text-xs text-gray-500"><%= __("user.inviteUserSelectionLabel") %></label>
+          <select id="userSelectionMode"
+            class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500">
+            <option value="individual" selected><%= __("user.inviteUserSelectionIndividual") %></option>
+            <option value="all"><%= __("user.inviteUserSelectionAll") %></option>
+          </select>
+        </div>
+        <div class="flex flex-col gap-1 min-w-[16rem]">
+          <label for="inviteModeSelect" class="text-xs text-gray-500"><%= __("user.inviteModeLabel") %></label>
+          <select id="inviteModeSelect"
+            class="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500">
+            <option value="" selected><%= __("user.inviteModePlaceholder") %></option>
+            <option value="invite_only"><%= __("user.inviteModeInviteOnly") %></option>
+            <option value="invite_with_credentials"><%= __("user.inviteModeInviteWithCredentials") %></option>
+          </select>
+          <p class="text-xs text-gray-500"><%= __("user.inviteModeEligibilityHint") %></p>
+        </div>
+        <div class="flex flex-col gap-1">
+          <label for="bulkInviteSubmitBtn" class="text-xs text-transparent select-none">.</label>
+          <button id="bulkInviteSubmitBtn" type="button"
+            class="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700">
+            <%= __("user.inviteSubmitButton") %>
+          </button>
         </div>
         <div class="flex flex-col gap-1">
           <label for="suiteUserPageSize" class="text-xs text-gray-500"><%= __("user.suiteUsersPageSizeLabel") %></label>
@@ -85,8 +110,6 @@
             <% }); %>
           </select>
         </div>
-        <button type="submit"
-          class="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700"><%= __("user.suiteUsersSearchSubmit") %></button>
         <% if (sp.search) { %>
           <a href="<%= sp.basePath %>?page=1&amp;pageSize=<%= sp.pageSize %>" class="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"><%= __("user.suiteUsersClearSearch") %></a>
         <% } %>
@@ -102,6 +125,10 @@
       <table id="suite-users-table" class="min-w-full border-none  text-sm text-left text-gray-700">
         <thead class="bg-gray-50 text-gray-600  text-xs">
           <tr>
+            <th class="px-4 py-5 text-sm font-bold w-14">
+              <input id="selectAllVisibleUsers" type="checkbox" class="h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                title="<%= __('user.inviteSelectAllVisibleTitle') %>" />
+            </th>
 
             <th class="px-4 py-5 text-sm font-bold">
               <%= __("Users.FullName") %>
@@ -166,6 +193,13 @@
           <% if (Array.isArray(users)) { users.forEach(u=> { %>
 
             <tr class="bg-white border-b hover:bg-gray-50">
+              <td class="px-4 py-6 whitespace-nowrap">
+                <input type="checkbox"
+                  class="user-select-checkbox h-4 w-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+                  name="user-select"
+                  value="<%= u?.user_id || '' %>"
+                  aria-label="<%= __('user.inviteSelectUserAriaPrefix') %> <%= (u?.first_name || '') + ' ' + (u?.last_name || '') %>" />
+              </td>
 
               <td class="px-6 py-6 whitespace-nowrap font-bold">
                 <%= u?.first_name %>
@@ -415,6 +449,127 @@
     let pendingLicenseStatus = null;
     let actionProduct = null;
     let saveUserAllocationLicense = `/user/update-license-status/false`;
+    const userSelectionMode = document.getElementById('userSelectionMode');
+    const selectAllVisibleUsers = document.getElementById('selectAllVisibleUsers');
+    const suiteUserPageSize = document.getElementById('suiteUserPageSize');
+    const suiteUserSearchInput = document.getElementById('suiteUserSearch');
+    const bulkInviteSubmitBtn = document.getElementById('bulkInviteSubmitBtn');
+    const searchForm = suiteUserSearchInput ? suiteUserSearchInput.closest('form') : null;
+
+    function getUserSelectionCheckboxes() {
+      return Array.from(document.querySelectorAll('.user-select-checkbox'));
+    }
+
+    function setAllUserCheckboxes(checked) {
+      getUserSelectionCheckboxes().forEach((checkbox) => {
+        checkbox.checked = checked;
+      });
+      if (selectAllVisibleUsers) {
+        selectAllVisibleUsers.checked = checked;
+        selectAllVisibleUsers.indeterminate = false;
+      }
+    }
+
+    function syncHeaderSelectionState() {
+      if (!selectAllVisibleUsers) return;
+      const checkboxes = getUserSelectionCheckboxes();
+      const checkedCount = checkboxes.filter(cb => cb.checked).length;
+      selectAllVisibleUsers.checked = checkboxes.length > 0 && checkedCount === checkboxes.length;
+      selectAllVisibleUsers.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+    }
+
+    if (userSelectionMode) {
+      userSelectionMode.addEventListener('change', function () {
+        if (this.value === 'all') {
+          setAllUserCheckboxes(true);
+        } else {
+          setAllUserCheckboxes(false);
+        }
+      });
+    }
+
+    if (selectAllVisibleUsers) {
+      selectAllVisibleUsers.addEventListener('change', function () {
+        setAllUserCheckboxes(this.checked);
+        if (userSelectionMode) {
+          userSelectionMode.value = this.checked ? 'all' : 'individual';
+        }
+      });
+    }
+
+    document.addEventListener('change', function (e) {
+      if (e.target.classList.contains('user-select-checkbox')) {
+        syncHeaderSelectionState();
+        if (userSelectionMode) {
+          userSelectionMode.value = selectAllVisibleUsers && selectAllVisibleUsers.checked ? 'all' : 'individual';
+        }
+      }
+    });
+
+    if (suiteUserPageSize && searchForm) {
+      suiteUserPageSize.addEventListener('change', function () {
+        const pageInput = searchForm.querySelector('input[name="page"]');
+        if (pageInput) pageInput.value = '1';
+        searchForm.submit();
+      });
+    }
+
+    if (bulkInviteSubmitBtn) {
+      bulkInviteSubmitBtn.addEventListener('click', async function () {
+        const selectedIds = getUserSelectionCheckboxes()
+          .filter((checkbox) => checkbox.checked)
+          .map((checkbox) => Number(checkbox.value))
+          .filter((id) => Number.isInteger(id) && id > 0);
+
+        const inviteModeSelect = document.getElementById('inviteModeSelect');
+        const selectedInviteMode = inviteModeSelect ? inviteModeSelect.value : '';
+
+        if (!selectedInviteMode) {
+          showCustomToast('error', '<%= __("user.inviteModeRequiredError") %>');
+          return;
+        }
+
+        if (selectedIds.length === 0) {
+          showCustomToast('error', '<%= __("user.inviteUsersRequiredError") %>');
+          return;
+        }
+
+        const isInviteWithCredentials = selectedInviteMode === 'invite_with_credentials';
+        bulkInviteSubmitBtn.disabled = true;
+        bulkInviteSubmitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+
+        try {
+          const response = await fetch('/user/invite/bulk/send', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+              user_ids: selectedIds,
+              send_credentials: isInviteWithCredentials,
+              reset_password: isInviteWithCredentials
+            })
+          });
+
+          const data = await response.json();
+          if (!response.ok || !data.success) {
+            showCustomToast('error', data.message || '<%= __("user.inviteSubmitFailed") %>');
+            return;
+          }
+
+          showCustomToast('success', data.message || '<%= __("user.inviteSubmitSuccess") %>');
+          setTimeout(() => {
+            window.location.href = '/notification-mail';
+          }, 700);
+        } catch (error) {
+          showCustomToast('error', '<%= __("user.inviteSubmitFailed") %>');
+        } finally {
+          bulkInviteSubmitBtn.disabled = false;
+          bulkInviteSubmitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+        }
+      });
+    }
 
 
     document.addEventListener('click', function (e) {

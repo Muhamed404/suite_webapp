@@ -12,6 +12,7 @@ const checkPermission = require("../../../utility/check-permission");
 const { renderLicensedUserByProduct } = require("../../controllers/user_management/render-licensed-users-by-product-controller");
 const { renderSecureMagnusUsers } = require("../../controllers/user_management/render-secure-magnus-users-controller");
 const { createSecureMagnusUser, submitSecureMagnusUser } = require("../../controllers/user_management/create-securemagnus-user");
+const { sendBulkUserInvite } = require("../../controllers/user_management/send-bulk-user-invite");
 
 
 
@@ -83,6 +84,12 @@ router.get("/retrieved-unenrolled-phm-users",
 router.post("/update-license-status/:hasRequestedToUnenroll?",
   checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O]),
   userManagement.saveUserAllocationLicense);
+
+router.post(
+  "/invite/bulk/send",
+  checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O, enums.Access_Types.RWD_ALL]),
+  sendBulkUserInvite
+);
 
 router.get(
   "/delete/:userId",
