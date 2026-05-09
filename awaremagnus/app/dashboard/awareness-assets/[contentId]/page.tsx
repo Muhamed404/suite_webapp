@@ -1,13 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useParams } from "next/navigation";
 import clsx from "clsx";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AuthImage } from "@/components/ui/auth-image";
-import { PdfViewer } from "@/components/document-viewer/pdf-viewer";
+
+/** react-pdf/pdfjs uses DOMMatrix — must not load on the Node server bundle. */
+const PdfViewer = dynamic(
+  () => import("@/components/document-viewer/pdf-viewer").then((m) => ({ default: m.PdfViewer })),
+  { ssr: false }
+);
 import { VideoPlayerWithFallback } from "@/components/modules/training-library/content-detail-screens/video-player-with-fallback";
 import { useContent } from "@/hooks/useQuiz";
 import { useI18n } from "@/i18n/I18nProvider";

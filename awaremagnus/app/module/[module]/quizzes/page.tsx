@@ -5,7 +5,7 @@ import { Button } from "@heroui/button";
 import { ArrowLeft } from "lucide-react";
 import clsx from "clsx";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
@@ -14,7 +14,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { isOrgUser } from "@/utils/roles";
-import { useQuizzesByContent, useModule } from "@/hooks/useQuiz";
+import { useQuizzesByContent, useModule, QUIZ_KEYS, quizzesContentQueryParams } from "@/hooks/useQuiz";
 import { suiteAwmService } from "@/services/suiteAwmService";
 import { quizService } from "@/services/quizService";
 import { breadcrumbLinkClassName } from "@/components/modules/training-library/shared-styles";
@@ -32,6 +32,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const { user } = useAuthStore();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
 
   // Read content_id from URL params
   const contentId = useMemo(() => {
@@ -66,10 +67,13 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     enabled: !!campaignId && !!contentRes?.data?.mod_id && !!contentId,
   });
 
-  // Fetch quizzes dynamically from the API
+  const campaignScopedQuizzes = campaignId > 0;
+
+  // Fetch quizzes: with campaign_id + rnd, backend caps count (SERVICE_AWM GET /api/awm/quiz/content/:id)
   const { data: quizzesRes, isLoading: quizzesLoading } = useQuizzesByContent(
     contentId,
-    !!contentId
+    !!contentId,
+    campaignScopedQuizzes ? { campaignId, rnd: true } : undefined
   );
 
   // Get module data for dynamic description
@@ -85,9 +89,8 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     ? getModuleAssetUrl(moduleTranslation.logo_banner_url)
     : "/images/hero.svg";
 
-  // Shuffle quizzes once per attempt so questions appear in random order.
-  // We also reset/reshuffle when the user goes back from the completion screen
-  // to retake the quiz (handled in goBackToQuiz via setShuffleSeed).
+  // Without campaign_id: shuffle in the client once per attempt (retake bumps shuffleSeed).
+  // With campaign_id: order and subset come from the API (rnd=true); retake refetches for a new random set.
   const [shuffleSeed, setShuffleSeed] = useState(() => Date.now());
 
   // Both originalQuizzes (used for submission) and quizData (used for UI)
@@ -97,6 +100,10 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     if (!quizzesRes?.success || !Array.isArray(quizzesRes.data)) return [];
     const arr = [...quizzesRes.data];
 
+    if (campaignScopedQuizzes) {
+      return arr;
+    }
+
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [arr[i], arr[j]] = [arr[j], arr[i]];
@@ -105,7 +112,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     return arr;
     // shuffleSeed intentionally invalidates the memo to reshuffle on retake
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quizzesRes, shuffleSeed]);
+  }, [quizzesRes, shuffleSeed, campaignScopedQuizzes]);
 
   const originalQuizzes = shuffledQuizzes;
 
@@ -244,8 +251,13 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     setShowCompletion(false);
     setAnswerStatusMsg("");
     setIsSubmitting(false);
-    // Reshuffle question order for the next attempt
-    setShuffleSeed(Date.now());
+    if (campaignScopedQuizzes) {
+      void queryClient.invalidateQueries({
+        queryKey: QUIZ_KEYS.quizzes(quizzesContentQueryParams(contentId, { campaignId, rnd: true })),
+      });
+    } else {
+      setShuffleSeed(Date.now());
+    }
   };
 
   const handleCompletionGoBack = () => {

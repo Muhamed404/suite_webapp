@@ -371,10 +371,26 @@ export const quizService = {
     return res as ApiResponse<Quiz>;
   },
 
-  /** API: GET /quiz/content/{contentId} */
-  getQuizzesByContent: async (contentId: number) => {
+  /**
+   * API: GET /quiz/content/{contentId}
+   * Optional campaign_id + rnd (query) — see AWM quiz-service campaign cap rules.
+   */
+  getQuizzesByContent: async (
+    contentId: number,
+    options?: { campaignId?: number; rnd?: boolean }
+  ) => {
+    const params: Record<string, string | number | boolean> = {};
+    if (options?.campaignId != null && options.campaignId > 0) {
+      params.campaign_id = options.campaignId;
+      if (options.rnd === true) {
+        params.rnd = true;
+      }
+    }
+
     const res = await request<Quiz[]>(() =>
-      awmClient.get<AWMResponseBody>(`${API_BASE}/quiz/content/${contentId}`)
+      awmClient.get<AWMResponseBody>(`${API_BASE}/quiz/content/${contentId}`, {
+        params: Object.keys(params).length ? params : undefined,
+      })
     );
 
     if (res.success && Array.isArray(res.data)) {
