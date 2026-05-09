@@ -203,6 +203,10 @@
 		"dashboard": "Dashboard",
 		"campaigns": "Campaigns",
 		"reports": "Reports",
+		"subscriptionHistory": "Subscription History",
+		"groups": "Groups",
+		"department": "Department",
+		"bulkImportUsers": "Bulk Import Users",
 		"organizations": "Organizations",
 		"packages": "Packages",
 		"users": "Users",
@@ -210,7 +214,11 @@
 		"systemTemplate": "System Template",
 		"phishingSmtp": "Phishing SMTP",
 		"createPackage": "Create Package",
-		"simulatorEmails": "Simulator Emails"
+		"simulatorEmails": "Simulator Emails",
+		"smtpNotifications": "SMTP Notifications",
+		"notificationTemplates": "Notification Templates",
+		"createNotificationTemplate": "Create Notification Template",
+		"noModulesFound": "No modules found"
 	},
 	"breadcrumbs": {
 		"home": "Home",

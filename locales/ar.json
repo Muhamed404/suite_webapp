@@ -211,6 +211,10 @@
 		"dashboard": "لوحة التحكم",
 		"campaigns": "الحملات",
 		"reports": "التقارير",
+		"subscriptionHistory": "سجل الاشتراك",
+		"groups": "المجموعات",
+		"department": "القسم",
+		"bulkImportUsers": "استيراد المستخدمين بالجملة",
 		"organizations": "المؤسسات",
 		"packages": "الحزم",
 		"users": "المستخدمون",
@@ -218,7 +222,11 @@
 		"systemTemplate": "قالب النظام",
 		"phishingSmtp": "SMTP التصيد",
 		"createPackage": "إنشاء حزمة",
-		"simulatorEmails": "رسائل المحاكي"
+		"simulatorEmails": "رسائل المحاكي",
+		"smtpNotifications": "إشعارات SMTP",
+		"notificationTemplates": "قوالب الإشعارات",
+		"createNotificationTemplate": "إنشاء قالب إشعار",
+		"noModulesFound": "لم يتم العثور على وحدات"
 	},
 	"breadcrumbs": {
 		"home": "الرئيسية",
@@ -354,7 +362,8 @@
 			"logout": "تسجيل الخروج",
 			"smtpNotifications": "menu.suite.smtpNotifications",
 			"bulkImportJobs": "وظائف الاستيراد المجمع",
-			"notificationMailLog": "سجل بريد الإشعارات"
+			"notificationMailLog": "سجل بريد الإشعارات",
+			"notificationTemplates": "menu.suite.notificationTemplates"
 		}
 	},
 	"org_domain": {
@@ -873,7 +882,7 @@
 		"bulkImportTotalListed": "الوظائف المعروضة",
 		"bulkImportAutoRefreshNote": "أثناء وجود وظيفة قيد الانتظار أو المعالجة، تُعاد تحميل هذه الصفحة كل 10 ثوانٍ.",
 		"btnBulkImportJobs": "وظائف الاستيراد",
-        "inviteUserSelectionLabel": "اختيار المستخدمين",
+		"inviteUserSelectionLabel": "اختيار المستخدمين",
 		"inviteUserSelectionIndividual": "مستخدمون محددون",
 		"inviteUserSelectionAll": "تحديد جميع المستخدمين",
 		"inviteModeLabel": "نوع الدعوة",
