@@ -260,5 +260,47 @@
       "view": "عرض",
       "startModule": "بدء الوحدة"
     }
+  },
+  "leaderboardPage": {
+    "title": "لوحة متصدرين مستخدمي الحملة",
+    "backToCampaign": "← العودة إلى الحملة",
+    "statsCampaignName": "اسم الحملة",
+    "statsTotalAssignedModules": "إجمالي الوحدات المخصّصة",
+    "statsTotalCampaignQuizzes": "إجمالي اختبارات الحملة",
+    "statsCompletionProgress": "تقدّم الإكمال",
+    "tabAll": "الكل",
+    "searchUsersPlaceholder": "البحث عن مستخدمين...",
+    "colFirstName": "الاسم الأول",
+    "colLastName": "اسم العائلة",
+    "colLastLogin": "آخر تسجيل دخول",
+    "colRiskLevel": "مستوى المخاطر",
+    "colComplianceScore": "درجة الالتزام",
+    "colCompletedModule": "الوحدة المكتملة",
+    "colProgress": "التقدّم",
+    "colCompletedCertificates": "الشهادات المكتملة",
+    "colUnlockedAchievements": "الإنجازات المفتوحة",
+    "colAvatarImage": "صورة الصورة الرمزية",
+    "colXpTokens": "رموز الخبرة",
+    "colStatus": "الحالة",
+    "colAction": "الإجراء",
+    "fullReport": "التقرير الكامل",
+    "tokens": "{count} رمزًا",
+    "noUsersTitle": "لم يُعثر على مستخدمين",
+    "noUsersDescription": "جرّب تعديل استعلام البحث",
+    "showingEntries": "عرض {start}–{end} من أصل {total} إدخال",
+    "avatarAlt": "الصورة الرمزية للمستوى {level}",
+    "dateFilter": {
+      "all": "كل الأوقات",
+      "7": "آخر 7 أيام",
+      "30": "آخر 30 يومًا",
+      "90": "آخر 3 أشهر",
+      "180": "آخر 6 أشهر",
+      "365": "هذا العام"
+    },
+    "status": {
+      "active": "نشط",
+      "pending": "قيد الانتظار",
+      "completed": "مكتمل"
+    }
   }
 }

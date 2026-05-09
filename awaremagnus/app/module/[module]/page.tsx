@@ -11,7 +11,7 @@ import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
-import { setLocaleCookie } from "@/i18n/client-locale";
+// import { setLocaleCookie } from "@/i18n/client-locale"; // re-enable if global locale sync from content language is restored
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useContentsWithProgress, useModule, useModules } from "@/hooks/useQuiz";
 import { campaignService } from "@/services/campaignService";
@@ -569,14 +569,17 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
     setLanguage(locale === "ar" ? 2 : null);
   }, [locale]);
 
-  const syncGlobalLocaleWithLanguage = (langId: number) => {
-    const targetLocale = langId === 2 ? "ar" : "en";
-
-    if (targetLocale !== locale) {
-      setLocaleCookie(targetLocale);
-      router.refresh();
-    }
-  };
+  // Disabled: content-language dropdown should only filter module content,
+  // not switch the global UI locale (was causing Arabic UI to flip to English
+  // when the user picked English content while in Arabic).
+  // const syncGlobalLocaleWithLanguage = (langId: number) => {
+  //   const targetLocale = langId === 2 ? "ar" : "en";
+  //
+  //   if (targetLocale !== locale) {
+  //     setLocaleCookie(targetLocale);
+  //     router.refresh();
+  //   }
+  // };
 
 
   const updateTabIndicator = () => {
@@ -933,7 +936,8 @@ export default function PhysicalSecurityPage({ params }: { params: Promise<{ mod
                                   className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2"
                                   onClick={() => {
                                     setLanguage(lang.id);
-                                    syncGlobalLocaleWithLanguage(lang.id);
+                                    // Content language filter should not change the global UI locale.
+                                    // syncGlobalLocaleWithLanguage(lang.id);
                                     setShowLanguageDropdown(false);
                                   }}
                                 >

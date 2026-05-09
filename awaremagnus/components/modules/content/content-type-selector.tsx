@@ -135,6 +135,36 @@ function getIconForApiContentType(name: string): string {
   return API_NAME_TO_ICON[key] ?? DEFAULT_CONTENT_ICON;
 }
 
+/** Map API content type name (case-insensitive) to a translation key under `content.contentTypes.*`.
+ *  Returns undefined when no mapping exists, in which case callers should fall back to the raw API name. */
+const API_NAME_TO_LABEL_KEY: Record<string, string> = {
+  "interactive contents": "contentTypes.interactiveContents",
+  "interactive content": "contentTypes.interactiveContents",
+  "interactive lesson": "contentTypes.iSpring",
+  ispring: "contentTypes.iSpring",
+  "motion videos": "contentTypes.motionVideos",
+  video: "contentTypes.video",
+  brochures: "contentTypes.brochures",
+  brochure: "contentTypes.brochure",
+  posters: "contentTypes.posters",
+  poster: "contentTypes.poster",
+  "screen savers": "contentTypes.screenSavers",
+  "screen saver": "contentTypes.screenSaver",
+  games: "contentTypes.games",
+  game: "contentTypes.game",
+  documents: "contentTypes.documents",
+  document: "contentTypes.documents",
+  pdf: "contentTypes.pdf",
+  misc: "contentTypes.misc",
+  "vr games": "contentTypes.vrGames",
+  quiz: "contentTypes.quiz",
+  "manual quiz": "contentTypes.quiz",
+};
+
+function getLabelKeyForApiContentType(name: string): string | undefined {
+  return API_NAME_TO_LABEL_KEY[name.trim().toLowerCase()];
+}
+
 interface ContentTypeSelectorPropsBase {
   className?: string;
   /** Hide the "Select content type" label (e.g. when used as horizontal strip) */
@@ -223,6 +253,8 @@ export function ContentTypeSelector(props: ContentTypeSelectorProps) {
               .map((ct) => {
                 const isSelected = selectedContentTypeId === ct.id;
                 const icon = getIconForApiContentType(ct.name);
+                const labelKey = getLabelKeyForApiContentType(ct.name);
+                const label = labelKey ? t(labelKey) : ct.name;
 
                 return (
                   <button
@@ -237,13 +269,13 @@ export function ContentTypeSelector(props: ContentTypeSelectorProps) {
                     onClick={() => onSelectContentTypeId(ct.id)}
                   >
                     <Image
-                      alt={ct.name}
+                      alt={label}
                       className="w-6 h-6 mb-1.5 object-contain"
                       height={24}
                       src={icon}
                       width={24}
                     />
-                    <p className="text-[10px] text-center leading-tight text-gray-700">{ct.name}</p>
+                    <p className="text-[10px] text-center leading-tight text-gray-700">{label}</p>
                   </button>
                 );
               })}

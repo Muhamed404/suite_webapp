@@ -35,18 +35,48 @@ function createEmptyAnswer(): QuizAnswer {
   return { id: generateId(), text: "", correct: false };
 }
 
-function createEmptyQuestion(): QuizQuestion {
+/** Localized "True" / "False" labels per quiz language (matches the language the quiz is authored in,
+ *  not the current UI locale). Falls back to English. */
+const TRUE_FALSE_LABELS: Record<number, { yes: string; no: string }> = {
+  1: { yes: "True", no: "False" }, // English
+  2: { yes: "صح", no: "خطأ" }, // Arabic
+  3: { yes: "سچ", no: "جھوٹ" }, // Urdu
+  4: { yes: "Vrai", no: "Faux" }, // French
+  5: { yes: "对", no: "错" }, // Mandarin Chinese
+  6: { yes: "Doğru", no: "Yanlış" }, // Turkish
+};
+
+function getTrueFalseLabels(langId?: number): { yes: string; no: string } {
+  if (langId != null && TRUE_FALSE_LABELS[langId]) return TRUE_FALSE_LABELS[langId]!;
+
+  return TRUE_FALSE_LABELS[1]!;
+}
+
+function createDefaultAnswers(type: QuizCardType, langId?: number): QuizAnswer[] {
+  if (type === "truefalse") {
+    const { yes, no } = getTrueFalseLabels(langId);
+
+    return [
+      { id: generateId(), text: yes, correct: true },
+      { id: generateId(), text: no, correct: false },
+    ];
+  }
+
+  return [createEmptyAnswer()];
+}
+
+function createDefaultQuestion(type: QuizCardType, langId?: number): QuizQuestion {
   return {
     id: generateQuestionId(),
     question: "",
-    answers: [createEmptyAnswer()],
+    answers: createDefaultAnswers(type, langId),
   };
 }
 
-function createLanguageFormByLangId(langId: number): QuizLanguageForm {
+function createLanguageFormByLangId(langId: number, type: QuizCardType): QuizLanguageForm {
   return {
     langId,
-    questions: [createEmptyQuestion()],
+    questions: [createDefaultQuestion(type, langId)],
   };
 }
 
@@ -137,16 +167,37 @@ export function CreateQuizForm({
 
   const createQuiz = useCreateQuiz();
 
-  // Whenever language changes (and content selected), regenerate the form for that language.
+  // Whenever language changes, regenerate the form for that language using the current quiz type.
   useEffect(() => {
     if (langIdNumber != null) {
-      setLanguageForm(createLanguageFormByLangId(langIdNumber));
+      setLanguageForm(createLanguageFormByLangId(langIdNumber, selectedQuizType));
     } else {
       setLanguageForm(null);
     }
     setFormError(null);
     setFormSuccess(null);
+    // Intentionally only on language change; quiz-type changes are handled below so that
+    // the user does not lose their typed question text every time language is re-selected.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [langIdNumber]);
+
+  // When quiz type changes, reset only the answer rows (preserve question text the user typed).
+  // For "truefalse" this seeds the two locked True/False rows; for the others it goes back to
+  // a single empty answer row so the previously-entered (and now-irrelevant) options don't leak.
+  useEffect(() => {
+    setLanguageForm((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        questions: prev.questions.map((q) => ({
+          ...q,
+          answers: createDefaultAnswers(selectedQuizType, prev.langId),
+        })),
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedQuizType]);
 
   const generated = !!languageForm;
 
@@ -172,9 +223,9 @@ export function CreateQuizForm({
   const addQuestion = useCallback(() => {
     updateForm((f) => ({
       ...f,
-      questions: [...f.questions, createEmptyQuestion()],
+      questions: [...f.questions, createDefaultQuestion(selectedQuizType, f.langId)],
     }));
-  }, [updateForm]);
+  }, [updateForm, selectedQuizType]);
 
   const removeQuestion = useCallback(
     (questionIndex: number) => {
@@ -199,11 +250,56 @@ export function CreateQuizForm({
       return;
     }
 
-    const validQuestions = languageForm.questions.filter((q) => {
-      const answers = q.answers.filter((a) => a.text.trim() !== "");
+    const isTrueFalse = selectedQuizType === "truefalse";
 
-      return answers.length > 0 && answers.some((a) => a.correct);
-    });
+    // Validate every question the author has touched. A question is considered "started"
+    // when it has any question text or any non-empty answer text. Started questions must
+    // pass type-specific validation; truly empty questions are skipped silently.
+    const validQuestions: typeof languageForm.questions = [];
+
+    for (let i = 0; i < languageForm.questions.length; i++) {
+      const q = languageForm.questions[i]!;
+      const number = i + 1;
+      const questionText = q.question.trim();
+      const filledAnswers = q.answers.filter((a) => a.text.trim() !== "");
+      const hasAnyCorrect = q.answers.some((a) => a.correct);
+
+      if (isTrueFalse) {
+        // True/False rows are pre-seeded and locked, so the only thing the author has
+        // to do is pick which side is correct.
+        if (!hasAnyCorrect) {
+          setFormError(t("validationQuestionMissingCorrect", { number }));
+
+          return;
+        }
+        validQuestions.push(q);
+        continue;
+      }
+
+      const isStarted = questionText !== "" || filledAnswers.length > 0;
+
+      if (!isStarted) continue;
+
+      if (questionText === "") {
+        setFormError(t("validationQuestionMissingText", { number }));
+
+        return;
+      }
+
+      if (filledAnswers.length === 0) {
+        setFormError(t("validationQuestionMissingAnswers", { number }));
+
+        return;
+      }
+
+      if (!filledAnswers.some((a) => a.correct)) {
+        setFormError(t("validationQuestionMissingCorrect", { number }));
+
+        return;
+      }
+
+      validQuestions.push(q);
+    }
 
     if (validQuestions.length === 0) {
       setFormError(t("validationQuestionAnswers"));
@@ -212,15 +308,30 @@ export function CreateQuizForm({
     }
 
     const selectedQuizTypeId = getTypeIdFromCardType(selectedQuizType);
+    const tfLabels = getTrueFalseLabels(languageForm.langId);
 
     try {
       for (const q of validQuestions) {
-        const answers = q.answers
-          .filter((a) => a.text.trim() !== "")
-          .map((a) => ({
-            answer: a.text.trim(),
-            validity: a.correct,
-          }));
+        let answers: Array<{ answer: string; validity: boolean }>;
+
+        if (isTrueFalse) {
+          // Defensive: always emit both options so the learner sees True AND False, regardless
+          // of any prior buggy state. Determine which side the author marked as correct.
+          const yesRow = q.answers.find((a) => a.text.trim() === tfLabels.yes);
+          const isYesCorrect = yesRow ? yesRow.correct : !!q.answers[0]?.correct;
+
+          answers = [
+            { answer: tfLabels.yes, validity: isYesCorrect },
+            { answer: tfLabels.no, validity: !isYesCorrect },
+          ];
+        } else {
+          answers = q.answers
+            .filter((a) => a.text.trim() !== "")
+            .map((a) => ({
+              answer: a.text.trim(),
+              validity: a.correct,
+            }));
+        }
 
         await createQuiz.mutateAsync({
           quiz: {
@@ -253,7 +364,9 @@ export function CreateQuizForm({
   };
 
   const handleCancel = () => {
-    setLanguageForm(langIdNumber != null ? createLanguageFormByLangId(langIdNumber) : null);
+    setLanguageForm(
+      langIdNumber != null ? createLanguageFormByLangId(langIdNumber, selectedQuizType) : null
+    );
     setFormError(null);
     setFormSuccess(null);
   };
