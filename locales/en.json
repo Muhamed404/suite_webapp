@@ -383,7 +383,20 @@
 		"delete_modal_title": "Delete Domain",
 		"delete_modal_subtitle": "This action cannot be undone.",
 		"confirm_delete": "Are you sure you want to delete the domain:",
-		"modal_edit_title": "Edit Domain"
+		"modal_edit_title": "Edit Domain",
+		"create_success": "Domain added successfully.",
+		"create_error": "Failed to add domain.",
+		"update_success": "Domain updated successfully.",
+		"update_error": "Failed to update domain.",
+		"delete_success": "Domain deleted successfully.",
+		"delete_error": "Failed to delete domain.",
+		"enable_success": "Domain enabled successfully.",
+		"disable_success": "Domain disabled successfully.",
+		"status_update_error": "Failed to update domain status.",
+		"restrict_enable_success": "Domain restriction enabled.",
+		"restrict_disable_success": "Domain restriction disabled.",
+		"restrict_update_error": "Failed to update domain restriction.",
+		"not_authorized": "Not Authorized."
 	},
 	"organization": {
 		"homescreen": {

@@ -10,19 +10,19 @@ exports.deleteDomain = async (req, res) => {
         logger.info(`[DomainManagement] Deleting domainId=${domainId}`);
         const organizationId = req.user.organization_id;
         if (organizationId) {
-            req.flash('message', 'Not Authorized.');
+            req.flash('message', req.__('org_domain.not_authorized'));
             req.flash('alertType', 'error');
             return res.redirect(`/home`);
         }
         const apiClient = getApiClient(req);
         await apiClient.delete(backend_api_urls.PRODUCT_SUITE.DOMAIN_MANAGEMENT.DELETE(domainOrgId, domainId));
 
-        req.flash('message', 'Domain deleted successfully.');
+        req.flash('message', req.__('org_domain.delete_success'));
         req.flash('alertType', 'success');
         return res.redirect(frontend_api_urls.PRODUCT_SUITE.Domain_Management.Render_List_View(domainOrgId));
     } catch (error) {
         logger.error(`[DomainManagement] deleteDomain error: ${error.message}`);
-        req.flash('message', 'Failed to delete domain.');
+        req.flash('message', req.__('org_domain.delete_error'));
         req.flash('alertType', 'error');
         return res.redirect(frontend_api_urls.PRODUCT_SUITE.Domain_Management.Render_List_View(domainOrgId));
     }

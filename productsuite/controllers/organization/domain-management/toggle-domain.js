@@ -13,13 +13,12 @@ exports.toggleDomain = async (req, res) => {
             is_active: isActive === '1',
         });
 
-        req.flash('message', isActive === '1' ? 'Domain enabled successfully.' : 'Domain disabled successfully.');
+        req.flash('message', isActive === '1' ? req.__('org_domain.enable_success') : req.__('org_domain.disable_success'));
         req.flash('alertType', 'success');
         return res.redirect(frontend_api_urls.PRODUCT_SUITE.Domain_Management.Render_List_View(domainOrgId));
     } catch (error) {
         logger.error(`[DomainManagement] toggleDomain error: ${error.message}`);
-        const errMsg = error.response?.data?.message || error.message || 'Failed to update domain status.';
-        req.flash('message', errMsg);
+        req.flash('message', req.__('org_domain.status_update_error'));
         req.flash('alertType', 'error');
         return res.redirect(frontend_api_urls.PRODUCT_SUITE.Domain_Management.Render_List_View(domainOrgId));
     }

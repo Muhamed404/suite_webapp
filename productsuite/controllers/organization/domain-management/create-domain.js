@@ -12,12 +12,12 @@ exports.createDomain = async (req, res) => {
             is_active: req.body.is_active === '1',
         });
 
-        req.flash('message', 'Domain added successfully.');
+        req.flash('message', req.__('org_domain.create_success'));
         req.flash('alertType', 'success');
         return res.redirect(`/dms/${orgId}/organization`);
     } catch (error) {
         logger.error(`[DomainManagement] createDomain error: ${error.message}`);
-        req.flash('message', 'Failed to add domain.');
+        req.flash('message', req.__('org_domain.create_error'));
         req.flash('alertType', 'error');
         return res.redirect(`/dms/domain/${orgId}`);
     }

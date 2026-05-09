@@ -62,19 +62,21 @@ exports.retrieveAllTemplates = async (req, res) => {
     }
     const organizationId = queryParams.organizationId;
     let templateTitleKey = 'system_template.homescreen.labelTitleOrganizationTemplateManagement'
+    const isOrgSubAdmin = req.user?.role?.id === enums.userType.OrgSubAdmin;
+    const canManageTemplates = hasAccess(req, enums.ModuleNames.My_Template, [enums.Access_Types.RWD_O]);
     let disableOption = {
-      disableCreateTemplate: false,
+      disableCreateTemplate: true,
       disableCloneOption: false,
-      disableEdit: false,
-      disableDelete: false,
+      disableEdit: true,
+      disableDelete: true,
       disableView: false
     }
 
     if (organizationId) {
-      disableOption.disableCreateTemplate = false;
+      disableOption.disableCreateTemplate = isOrgSubAdmin || !canManageTemplates;
       disableOption.disableCloneOption = true;
       disableOption.disableEdit = false;
-      disableOption.disableDelete = false;
+      disableOption.disableDelete = isOrgSubAdmin || !canManageTemplates;
       disableOption.disableView = false;
     }
 
