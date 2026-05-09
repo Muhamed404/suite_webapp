@@ -4,7 +4,7 @@ const getApiClient = require("../../../utility/api-client");
 
 async function sendBulkUserInvite(req, res) {
     try {
-        const { user_ids, send_credentials = false, reset_password = false } = req.body || {};
+        const { user_ids, send_credentials = false, reset_password = false, invitation = false } = req.body || {};
 
         const normalizedUserIds = Array.isArray(user_ids)
             ? user_ids.map((id) => Number(id)).filter((id) => Number.isInteger(id) && id > 0)
@@ -21,6 +21,7 @@ async function sendBulkUserInvite(req, res) {
             user_ids: normalizedUserIds,
             send_credentials: Boolean(send_credentials),
             reset_password: Boolean(reset_password),
+            invitation: Boolean(invitation),
         };
 
         const apiClient = getApiClient(req);
