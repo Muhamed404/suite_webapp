@@ -8,6 +8,7 @@ const enums = require('../../../contants/enum')
 const {getUsersByGroup} = require('../../controllers/group/getUsersByGroup')
 const {getUnassignedUserByGroup} = require('../../controllers/group/getUnassignedUserByGroup')
 const {enrolToGroup} = require('../../controllers/group/enrolToGroup')
+const {deleteGroup} = require('../../controllers/group/delete-group-controller')
 
 
 router.get("/list/:organizationId?", checkPermission(enums.ModuleNames.Group_Management, [enums.Access_Types.RWD_O, enums.Access_Types.RW_ALL]), 
@@ -25,5 +26,7 @@ router.get("/getUsersByGroup/:groupId",
 router.get("/getUnassignedUser/:groupId", checkPermission(enums.ModuleNames.Group_Management,
     [enums.Access_Types.RWD_O, enums.Access_Types.RW_ALL]), getUnassignedUserByGroup);
 
+router.delete("/delete/:groupId", checkPermission(enums.ModuleNames.Group_Management, [enums.Access_Types.RWD_O]),
+    deleteGroup);
 
 module.exports = router;

@@ -642,22 +642,35 @@ editors.forEach(id => {
 let editorInstance;
 
 // Hide the editor container on page load
-document.getElementById('editor-container').style.display = 'none';
+const editorContainer = document.getElementById('editor-container');
+if (editorContainer) {
+  editorContainer.style.display = 'block';
+}
 
 document.querySelectorAll('input[name="landing_option"]').forEach(radio => {
   radio.addEventListener('change', function () {
-    // alert('Landing page option changed to: ' + this.value);
-    const editorContainer = document.getElementById('editor-container');
-    const placeholder_buttons_landing_page_content = document.getElementById('placeholder_buttons_landing_page_content');
-    if (this.value === 'custom') {
-      editorContainer.style.display = 'block';
-      placeholder_buttons_landing_page_content.style.display = 'flex';
+    const placeholderButtons = document.getElementById('placeholder_buttons_landing_page_content');
+    const hiddenLandingPageOption = document.getElementById('landing_page_option');
+    const externalUrlContainer = document.getElementById('landing-external-url-container');
+    const externalUrlInput = document.getElementById('landing_page_external_url');
+    const isUrlMode = this.value === 'url';
 
+    if (hiddenLandingPageOption) {
+      hiddenLandingPageOption.value = isUrlMode ? 'url' : 'html';
+    }
+
+    if (isUrlMode) {
+      if (CKEDITOR.instances['landing_page_content']) {
+        CKEDITOR.instances['landing_page_content'].setData('');
+      }
+      if (editorContainer) editorContainer.style.display = 'none';
+      if (placeholderButtons) placeholderButtons.style.display = 'none';
+      if (externalUrlContainer) externalUrlContainer.classList.remove('hidden');
     } else {
-      CKEDITOR.instances['landing_page_content'].setData('');
-
-      editorContainer.style.display = 'none';
-
+      if (editorContainer) editorContainer.style.display = 'block';
+      if (placeholderButtons) placeholderButtons.style.display = 'flex';
+      if (externalUrlContainer) externalUrlContainer.classList.add('hidden');
+      if (externalUrlInput) externalUrlInput.value = '';
     }
   });
 });

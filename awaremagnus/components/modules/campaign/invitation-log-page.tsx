@@ -47,6 +47,13 @@ function formatDate(dateStr?: string | null) {
   }
 }
 
+function getInvitationDisplayTime(row: InvitationLogItem) {
+  if (row.invitation_type === "campaign") {
+    return row.campaign?.start_date ?? row.invitation_time;
+  }
+  return row.invitation_time;
+}
+
 function getStatusTone(statusName?: string) {
   const status = (statusName ?? "").toUpperCase();
 
@@ -183,8 +190,9 @@ export function InvitationLogPage() {
 
     const q = searchQuery.toLowerCase().trim();
     return rows.filter((row) => {
-      const fullName = `${row.invitee?.firstname ?? ""} ${row.invitee?.lastname ?? ""}`.toLowerCase();
-      const email = (row.invitee?.email ?? "").toLowerCase();
+      const activeInvitee = row.invitee || row.surveyInvitation;
+      const fullName = `${activeInvitee?.firstname ?? ""} ${activeInvitee?.lastname ?? ""}`.toLowerCase();
+      const email = (activeInvitee?.email ?? "").toLowerCase();
       const campaignName = (row.campaign?.name ?? "").toLowerCase();
       const surveyName = (row.survey?.name ?? "").toLowerCase();
       return (
@@ -234,6 +242,7 @@ export function InvitationLogPage() {
 
   const handleSendUserReminder = async (row: InvitationLogItem) => {
     try {
+      const activeInvitee = row.invitee || row.surveyInvitation;
       if (row.invitation_type === "campaign" && row.campaign_id && row.user_id) {
         const response = await sendCampaignUserReminder.mutateAsync({
           campaignId: row.campaign_id,
@@ -243,7 +252,7 @@ export function InvitationLogPage() {
           title: t("invitationLog.toast.reminderQueuedTitle"),
           description: t("invitationLog.toast.userReminderQueuedDescription", {
             count: response.reminders_enqueued,
-            email: row.invitee?.email ?? t("invitationLog.userFallback"),
+            email: activeInvitee?.email ?? t("invitationLog.userFallback"),
           }),
           color: "success",
         });
@@ -259,7 +268,7 @@ export function InvitationLogPage() {
           title: t("invitationLog.toast.reminderQueuedTitle"),
           description: t("invitationLog.toast.userReminderQueuedDescription", {
             count: response.reminders_enqueued,
-            email: row.invitee?.email ?? t("invitationLog.userFallback"),
+            email: activeInvitee?.email ?? t("invitationLog.userFallback"),
           }),
           color: "success",
         });
@@ -460,56 +469,61 @@ export function InvitationLogPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {filteredRows.map((row) => (
-                      <tr key={row.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3">
-                          <div>
-                            <p className="font-medium text-gray-800">
-                              {row.invitee?.firstname} {row.invitee?.lastname}
-                            </p>
-                            <p className="text-[10px] text-gray-500">{row.invitee?.email ?? "—"}</p>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 capitalize text-gray-700">{row.invitation_type}</td>
-                        <td className="px-4 py-3 text-gray-700">
-                          {row.invitation_type === "survey"
-                            ? row.survey?.name ??
-                              t("invitationLog.fallback.surveyWithId", {
-                                id: row.survey_id ?? "—",
-                              })
-                            : row.campaign?.name ??
-                              t("invitationLog.fallback.campaignWithId", {
-                                id: row.campaign_id ?? "—",
-                              })}
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={clsx(
-                              "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium",
-                              getStatusTone(row.status?.name)
-                            )}
-                          >
-                            {getStatusLabel(row.status?.name, t)}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-gray-700">{row.attempt_count}</td>
-                        <td className="px-4 py-3 text-gray-700">{formatDate(row.last_attempt_at)}</td>
-                        <td className="px-4 py-3 text-gray-700">{formatDate(row.invitation_time)}</td>
-                        <td className="px-4 py-3 text-center">
-                          <Button
-                            size="sm"
-                            radius="full"
-                            variant="flat"
-                            className="bg-blue-50 text-blue-600"
-                            startContent={<Send className="w-3.5 h-3.5" />}
-                            isLoading={rowReminderLoading}
-                            onPress={() => handleSendUserReminder(row)}
-                          >
-                            {t("invitationLog.actions.reminder")}
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
+                    {filteredRows.map((row) => {
+                      const activeInvitee = row.invitee || row.surveyInvitation;
+                      return (
+                        <tr key={row.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-4 py-3">
+                            <div>
+                              <p className="font-medium text-gray-800">
+                                {activeInvitee ? `${activeInvitee.firstname} ${activeInvitee.lastname}` : "—"}
+                              </p>
+                              <p className="text-[10px] text-gray-500">{activeInvitee?.email ?? "—"}</p>
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 capitalize text-gray-700">{row.invitation_type}</td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {row.invitation_type === "survey"
+                              ? row.survey?.name ??
+                                t("invitationLog.fallback.surveyWithId", {
+                                  id: row.survey_id ?? "—",
+                                })
+                              : row.campaign?.name ??
+                                t("invitationLog.fallback.campaignWithId", {
+                                  id: row.campaign_id ?? "—",
+                                })}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span
+                              className={clsx(
+                                "inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium",
+                                getStatusTone(row.status?.name)
+                              )}
+                            >
+                              {getStatusLabel(row.status?.name, t)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-gray-700">{row.attempt_count}</td>
+                          <td className="px-4 py-3 text-gray-700">{formatDate(row.last_attempt_at)}</td>
+                          <td className="px-4 py-3 text-gray-700">
+                            {formatDate(getInvitationDisplayTime(row))}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <Button
+                              size="sm"
+                              radius="full"
+                              variant="flat"
+                              className="bg-blue-50 text-blue-600"
+                              startContent={<Send className="w-3.5 h-3.5" />}
+                              isLoading={rowReminderLoading}
+                              onPress={() => handleSendUserReminder(row)}
+                            >
+                              {t("invitationLog.actions.reminder")}
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               )}

@@ -18,10 +18,30 @@ export const QUIZ_KEYS = {
   contents: (modId?: number, langId?: number) => ["quiz", "contents", { modId, langId }] as const,
   content: (id: number) => ["quiz", "content", id] as const,
   quizTypes: ["quiz", "quizTypes"] as const,
-  quizzes: (params?: { contentId?: number }) => ["quiz", "quizzes", params] as const,
+  quizzes: (params?: {
+    contentId?: number;
+    campaignId?: number;
+    rnd?: boolean;
+    limit?: number;
+    offset?: number;
+  }) => ["quiz", "quizzes", params] as const,
   quiz: (id: number) => ["quiz", "quiz", id] as const,
   quizAnswers: (quizId: number) => ["quiz", "quiz", quizId, "answers"] as const,
 };
+
+/** Stable React Query key + service options for GET /quiz/content/:contentId */
+export function quizzesContentQueryParams(
+  contentId: number,
+  opts?: { campaignId?: number; rnd?: boolean }
+): { contentId: number; campaignId?: number; rnd?: boolean } {
+  const campaignId = opts?.campaignId;
+  const hasCampaign = !!(campaignId && campaignId > 0);
+  if (!hasCampaign) {
+    return { contentId };
+  }
+  const rnd = opts?.rnd !== false;
+  return { contentId, campaignId, rnd };
+}
 
 export function useModules(
   params?: {
@@ -117,10 +137,19 @@ export function useQuizzes(params?: { contentId?: number; limit?: number; offset
   });
 }
 
-export function useQuizzesByContent(contentId: number, enabled = true) {
+export function useQuizzesByContent(
+  contentId: number,
+  enabled = true,
+  options?: { campaignId?: number; rnd?: boolean }
+) {
+  const keyParams = quizzesContentQueryParams(contentId, options);
   return useQuery({
-    queryKey: QUIZ_KEYS.quizzes({ contentId }),
-    queryFn: () => quizService.getQuizzesByContent(contentId),
+    queryKey: QUIZ_KEYS.quizzes(keyParams),
+    queryFn: () =>
+      quizService.getQuizzesByContent(contentId, {
+        campaignId: keyParams.campaignId,
+        rnd: keyParams.rnd === true ? true : undefined,
+      }),
     enabled: enabled && !!contentId,
   });
 }

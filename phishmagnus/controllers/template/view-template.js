@@ -69,11 +69,15 @@ exports.viewTemplate = async (req, res) => {
       logger.info('Controller - View Template: attachment resolved' + JSON.stringify({ filePathRaw, filename: info.filename, attachmentExt: tpl.attachmentExt, file_extension: tpl.file_extension }));
     }
 
-    const filesData = await readFiles(tpl.phishing_page_url, tpl.landing_page_url);
+    const landingPageUrl = String(tpl.landing_page_url || '').trim();
+    const isExternalLandingPageUrl = /^https?:\/\//i.test(landingPageUrl);
+    const filesData = await readFiles(tpl.phishing_page_url, isExternalLandingPageUrl ? null : tpl.landing_page_url);
     logger.info('Controller - View Template: readFiles result' + JSON.stringify(filesData, null, 2));
 
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
+    tpl.landing_page_option = isExternalLandingPageUrl ? 'url' : 'html';
+    tpl.landing_page_external_url = isExternalLandingPageUrl ? landingPageUrl : '';
     tpl.phishing_smtp = tpl.phishing_smtp_id; // ensure this property exists for the view, even if null
 
     // Enforce exactly one slash after bucket root to avoid malformed .../o... paths.

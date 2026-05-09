@@ -61,7 +61,9 @@ exports.viewTemplateApi = async (req, res) => {
     }
 
     // Read phishing and landing page content
-    const filesData = await readFiles(tpl.phishing_page_url, tpl.landing_page_url);
+    const landingPageUrl = String(tpl.landing_page_url || '').trim();
+    const isExternalLandingPageUrl = /^https?:\/\//i.test(landingPageUrl);
+    const filesData = await readFiles(tpl.phishing_page_url, isExternalLandingPageUrl ? null : tpl.landing_page_url);
     logger.info('API - View Template: readFiles result keys', { 
       hasPhishing: !!filesData.phishing_page?.content,
       hasLanding: !!filesData.landing_page?.content 
@@ -69,6 +71,8 @@ exports.viewTemplateApi = async (req, res) => {
 
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
+    tpl.landing_page_option = isExternalLandingPageUrl ? 'url' : 'html';
+    tpl.landing_page_external_url = isExternalLandingPageUrl ? landingPageUrl : '';
 
     // Enforce exactly one slash after bucket root to avoid malformed .../o... paths.
     const webBucketRoot = (process.env.WEB_TEMPLATE_BUCKET || '').replace(/\/+$/, '');

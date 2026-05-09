@@ -299,7 +299,12 @@ export function CertificateBrandingForm() {
       stamp: assets.stamp,
       signature: assets.signature,
     };
-    const htmlContent = generateCertificateHtml({ templateText, bgColor, assets: previewAssets });
+    const htmlContent = generateCertificateHtml({
+      templateText,
+      bgColor,
+      assets: previewAssets,
+      langId: Number(language),
+    });
     const previewWindow = window.open("", "_blank");
 
     if (previewWindow) {
