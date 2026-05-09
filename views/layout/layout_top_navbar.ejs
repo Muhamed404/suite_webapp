@@ -9,33 +9,17 @@
             <!-- Search Bar -->
             <div class="relative flex items-center w-48 bg-white rounded-full border border-gray-300 focus-within:ring-2 focus-within:ring-[var(--teal)]">
               <img src="/securemagnus_2025/images/img/search.svg" class="w-4 h-4 <%= locals.locale === 'ar' ? 'mr-3' : 'ml-3' %> text-gray-400" alt="">
-              <input type="text" placeholder="<%= __('generic_label.search_here') %>" list="nav-options" onchange="redirectToPage(this.value)" class="flex-1 py-2 <%= locals.locale === 'ar' ? 'pr-2 pl-12' : 'pl-2 pr-12' %> bg-transparent text-sm focus:outline-none <%= locals.locale === 'ar' ? 'text-right' : '' %>" />
+              <input id="nav-search-input" type="text" placeholder="<%= __('generic_label.search_here') %>" autocomplete="off" class="flex-1 py-2 <%= locals.locale === 'ar' ? 'pr-2 pl-12' : 'pl-2 pr-12' %> bg-transparent text-sm focus:outline-none <%= locals.locale === 'ar' ? 'text-right' : '' %>" />
               <span class="pointer-events-none absolute z-10 <%= locals.locale === 'ar' ? 'left-4' : 'right-4' %> top-3/4 -translate-y-1/2 text-gray-400">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                 </svg>
               </span>
-            </div>
 
-            <datalist id="nav-options">
-              <% if (locals.magnusAdmin) { %>
-                <option value="<%= __('topnavbar.organizations') %>">
-                <% if (!locals.isSubAdmin) { %>
-                  <option value="<%= __('topnavbar.createPackage') %>">
-                <% } %>
-                <option value="<%= __('topnavbar.addUser') %>">
-                <option value="<%= __('topnavbar.dashboard') %>">
-                <option value="<%= __('topnavbar.systemTemplate') %>">
-                <option value="<%= __('topnavbar.simulatorEmails') %>">
-              <% } else { %>
-                <option value="<%= __('topnavbar.organizationSettings') %>">
-                <option value="<%= __('topnavbar.addUser') %>">
-                <option value="<%= __('topnavbar.importUser') %>">
-                <option value="<%= __('topnavbar.dashboard') %>">
-                <option value="<%= __('topnavbar.campaigns') %>">
-                <option value="<%= __('topnavbar.reports') %>">
-              <% } %>
-            </datalist>
+              <div id="nav-search-dropdown" class="hidden absolute top-full mt-2 <%= locals.locale === 'ar' ? 'right-0' : 'left-0' %> w-full min-w-[220px] bg-white border border-gray-200 rounded-lg shadow-lg z-40 max-h-56 overflow-y-auto">
+                <ul id="nav-search-list" class="py-1"></ul>
+              </div>
+            </div>
 
             <!-- Two Circle Buttons -->
             <!--
@@ -128,10 +112,6 @@
         </div>
 
         <script>
-          const _datalistStyle = document.createElement('style');
-          _datalistStyle.textContent = 'input[list]::-webkit-calendar-picker-indicator{display:none!important;-webkit-appearance:none;} input[list]::-ms-expand{display:none;}';
-          document.head.appendChild(_datalistStyle);
-
           const navMap = {
             <% if (locals.magnusAdmin) { %>
               "<%= __('topnavbar.organizations') %>": "/organization",
@@ -141,14 +121,20 @@
               "<%= __('topnavbar.addUser') %>": "/user/securemagnus-users/create",
               "<%= __('topnavbar.dashboard') %>": "/suite_management_dashboard",
               "<%= __('topnavbar.systemTemplate') %>": "/template/list",
-              "<%= __('topnavbar.simulatorEmails') %>": "/phm/phishing-smtp/list"
+              "<%= __('topnavbar.simulatorEmails') %>": "/phm/phishing-smtp/list",
+              "<%= __('topnavbar.smtpNotifications') %>": "/settings/smtp/",
+              "<%= __('topnavbar.notificationTemplates') %>": "/notification-template/",
+              "<%= __('topnavbar.createNotificationTemplate') %>": "/notification-template/create"
             <% } else { %>
               "<%= __('topnavbar.organizationSettings') %>": "/organization/profile",
               "<%= __('topnavbar.addUser') %>": "/user/create",
               "<%= __('topnavbar.importUser') %>": "/user/create/bulk",
               "<%= __('topnavbar.dashboard') %>": "/phm/index",
               "<%= __('topnavbar.campaigns') %>": "/phm/campaign/all-campaigns",
-              "<%= __('topnavbar.reports') %>": "/phm/campaign/reports"
+              "<%= __('topnavbar.subscriptionHistory') %>": "/organization/subscription-history",
+              "<%= __('topnavbar.groups') %>": "/group/list",
+              "<%= __('topnavbar.department') %>": "/department/list",
+              "<%= __('topnavbar.bulkImportUsers') %>": "/user/create/bulk"
             <% } %>
           };
 
@@ -156,6 +142,59 @@
             if (navMap[value]) {
               window.location.href = navMap[value];
             }
+          }
+
+          const navSearchInput = document.getElementById('nav-search-input');
+          const navSearchDropdown = document.getElementById('nav-search-dropdown');
+          const navSearchList = document.getElementById('nav-search-list');
+          const navOptions = Object.keys(navMap);
+          const noModulesFoundLabel = "<%= __('topnavbar.noModulesFound') %>";
+
+          function renderNavSearchDropdown(searchText) {
+            const query = (searchText || '').trim().toLowerCase();
+            const filteredOptions = navOptions.filter((option) => option.toLowerCase().includes(query));
+
+            navSearchList.innerHTML = '';
+
+            if (!filteredOptions.length) {
+              const emptyItem = document.createElement('li');
+              emptyItem.className = 'px-3 py-2 text-sm text-gray-500';
+              emptyItem.textContent = noModulesFoundLabel;
+              navSearchList.appendChild(emptyItem);
+              navSearchDropdown.classList.remove('hidden');
+              return;
+            }
+
+            filteredOptions.forEach((option) => {
+              const item = document.createElement('li');
+              const button = document.createElement('button');
+              button.type = 'button';
+              button.className = 'w-full text-left px-3 py-2 text-sm hover:bg-gray-100';
+              button.textContent = option;
+              button.addEventListener('click', () => redirectToPage(option));
+              item.appendChild(button);
+              navSearchList.appendChild(item);
+            });
+
+            navSearchDropdown.classList.remove('hidden');
+          }
+
+          if (navSearchInput && navSearchDropdown && navSearchList) {
+            navSearchInput.addEventListener('focus', () => renderNavSearchDropdown(navSearchInput.value));
+            navSearchInput.addEventListener('input', () => renderNavSearchDropdown(navSearchInput.value));
+            navSearchInput.addEventListener('keydown', (event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                redirectToPage(navSearchInput.value);
+              }
+            });
+
+            document.addEventListener('click', (event) => {
+              const clickedInsideSearch = navSearchInput.contains(event.target) || navSearchDropdown.contains(event.target);
+              if (!clickedInsideSearch) {
+                navSearchDropdown.classList.add('hidden');
+              }
+            });
           }
 
           function toggleMobileMenu() {
