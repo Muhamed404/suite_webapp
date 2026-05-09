@@ -260,5 +260,47 @@
       "view": "View",
       "startModule": "Start Module"
     }
+  },
+  "leaderboardPage": {
+    "title": "Campaign User Leaderboard",
+    "backToCampaign": "← Back to Campaign",
+    "statsCampaignName": "Campaign Name",
+    "statsTotalAssignedModules": "Total Assigned Modules",
+    "statsTotalCampaignQuizzes": "Total Campaign Quizzes",
+    "statsCompletionProgress": "Completion Progress",
+    "tabAll": "All",
+    "searchUsersPlaceholder": "Search users...",
+    "colFirstName": "First Name",
+    "colLastName": "Last Name",
+    "colLastLogin": "Last Login",
+    "colRiskLevel": "Risk Level",
+    "colComplianceScore": "Compliance Score",
+    "colCompletedModule": "Completed Module",
+    "colProgress": "Progress",
+    "colCompletedCertificates": "Completed Certificates",
+    "colUnlockedAchievements": "Unlocked Achievements",
+    "colAvatarImage": "Avatar Image",
+    "colXpTokens": "XP Tokens",
+    "colStatus": "Status",
+    "colAction": "Action",
+    "fullReport": "Full Report",
+    "tokens": "{count} tokens",
+    "noUsersTitle": "No Users Found",
+    "noUsersDescription": "Try adjusting your search query",
+    "showingEntries": "Showing {start}–{end} of {total} Entries",
+    "avatarAlt": "Avatar level {level}",
+    "dateFilter": {
+      "all": "All Time",
+      "7": "Last 7 Days",
+      "30": "Last 30 Days",
+      "90": "Last 3 Months",
+      "180": "Last 6 Months",
+      "365": "This Year"
+    },
+    "status": {
+      "active": "Active",
+      "pending": "Pending",
+      "completed": "Completed"
+    }
   }
 }

@@ -86,23 +86,36 @@ export default function DashboardPage() {
     []
   );
 
-  // Handle Start: call beginCampaign → beginModule, then refresh data
+  // Handle Start: call beginCampaign → beginModule, then navigate the user into the module so
+  // it actually opens (matching the URL the "View" action uses on the same row).
   const handleStartAssignment = useCallback(
     async (assignment: any) => {
       const key = `${assignment.campaign_id}-${assignment.module_id}`;
 
       if (!assignment.campaign_id) return;
       setStartingKeys((prev) => new Set(prev).add(key));
+
+      const goToModule = () => {
+        const slug = generateModuleSlug(assignment.module_name || "");
+
+        if (!slug) return;
+        router.push(`/awm/module/${slug}?campaign_id=${assignment.campaign_id}`);
+      };
+
       try {
         const campaignRes = await campaignService.beginCampaign(assignment.campaign_id);
 
         if (!campaignRes.success) {
           console.error("beginCampaign did not succeed", campaignRes);
+          // Campaign may already be in progress on the backend; still let the user open the
+          // module so the click does something visible instead of silently failing.
+          goToModule();
 
           return;
         }
         await campaignService.beginModule(assignment.campaign_id, assignment.module_id);
         queryClient.invalidateQueries({ queryKey: ["user", "assignments"] });
+        goToModule();
       } catch (error) {
         console.error("Failed to start assignment:", error);
       } finally {
@@ -115,7 +128,7 @@ export default function DashboardPage() {
         });
       }
     },
-    [queryClient]
+    [queryClient, router, generateModuleSlug]
   );
 
   // Decode JWT to extract user details

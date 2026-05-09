@@ -14,7 +14,7 @@ import { useCampaignLeaderboard } from "@/hooks/useCampaigns";
 
 export default function CampaignLeaderboardPage() {
   const t = useTranslations("campaigns");
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -34,7 +34,7 @@ export default function CampaignLeaderboardPage() {
   const itemsPerPage = 8;
 
   // Fetch leaderboard data
-  const { data: leaderboardRes, isLoading } = useCampaignLeaderboard(
+  const { data: leaderboardRes } = useCampaignLeaderboard(
     campaignId ? Number(campaignId) : 0,
     !!campaignId
   );
@@ -147,16 +147,65 @@ export default function CampaignLeaderboardPage() {
     if (!date) return "-";
     try {
       const d = new Date(date);
-      const day = String(d.getDate()).padStart(2, "0");
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const year = d.getFullYear();
-      const hours = String(d.getHours()).padStart(2, "0");
-      const minutes = String(d.getMinutes()).padStart(2, "0");
 
-      return `${day}/${month}/${year} ${hours}:${minutes}`;
+      return d.toLocaleString(locale === "ar" ? "ar-EG" : "en-US", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
     } catch {
       return "-";
     }
+  };
+
+  const statusTabs = useMemo(
+    () => [
+      { value: "all", label: t("leaderboardPage.tabAll"), count: leaderboardData.length },
+      {
+        value: "active",
+        label: t("leaderboardPage.status.active"),
+        count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "active").length,
+      },
+      {
+        value: "pending",
+        label: t("leaderboardPage.status.pending"),
+        count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "pending").length,
+      },
+      {
+        value: "completed",
+        label: t("leaderboardPage.status.completed"),
+        count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "completed").length,
+      },
+    ],
+    [leaderboardData, t]
+  );
+
+  const dateFilterOptions = useMemo(
+    () =>
+      [
+        { value: "all", label: t("leaderboardPage.dateFilter.all") },
+        { value: "7", label: t("leaderboardPage.dateFilter.7") },
+        { value: "30", label: t("leaderboardPage.dateFilter.30") },
+        { value: "90", label: t("leaderboardPage.dateFilter.90") },
+        { value: "180", label: t("leaderboardPage.dateFilter.180") },
+        { value: "365", label: t("leaderboardPage.dateFilter.365") },
+      ] as const,
+    [t]
+  );
+
+  const formatUserStatus = (status?: string) => {
+    const key = (status ?? "active").toLowerCase();
+
+    if (key === "active") return t("leaderboardPage.status.active");
+    if (key === "pending") return t("leaderboardPage.status.pending");
+    if (key === "completed") return t("leaderboardPage.status.completed");
+
+    if (!status?.trim()) return t("leaderboardPage.status.active");
+
+    return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
   const getAvatarImage = (avatarLevel: number) => {
@@ -208,12 +257,12 @@ export default function CampaignLeaderboardPage() {
           {/* Header */}
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h1 className="text-lg font-semibold text-gray-800">Campaign User Leaderboard</h1>
+              <h1 className="text-lg font-semibold text-gray-800">{t("leaderboardPage.title")}</h1>
               <Link
                 className="text-xs text-blue-600 hover:text-blue-700 mt-1 inline-block"
                 href={`/dashboard/launch-awareness/campaigns/${campaignId}`}
               >
-                ← Back to Campaign
+                {t("leaderboardPage.backToCampaign")}
               </Link>
             </div>
           </div>
@@ -222,7 +271,7 @@ export default function CampaignLeaderboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
             <div className="bg-white rounded-2xl p-3 flex justify-between">
               <div>
-                <p className="text-xs text-gray-500">Campaign Name</p>
+                <p className="text-xs text-gray-500">{t("leaderboardPage.statsCampaignName")}</p>
                 <p className="text-lg font-semibold">{campaignStats.campaign_name || "-"}</p>
               </div>
               <div className="w-7 h-7 bg-red-100 rounded-full flex items-center justify-center">
@@ -232,7 +281,7 @@ export default function CampaignLeaderboardPage() {
 
             <div className="bg-white rounded-2xl p-3 flex justify-between">
               <div>
-                <p className="text-xs text-gray-500">Total Assigned Modules</p>
+                <p className="text-xs text-gray-500">{t("leaderboardPage.statsTotalAssignedModules")}</p>
                 <p className="text-lg font-semibold">{campaignStats.total_modules || 0}</p>
               </div>
               <div className="w-7 h-7 bg-green-100 rounded-full flex items-center justify-center">
@@ -242,7 +291,7 @@ export default function CampaignLeaderboardPage() {
 
             <div className="bg-white rounded-2xl p-3 flex justify-between">
               <div>
-                <p className="text-xs text-gray-500">Total Campaign Quizzes</p>
+                <p className="text-xs text-gray-500">{t("leaderboardPage.statsTotalCampaignQuizzes")}</p>
                 <p className="text-lg font-semibold">{campaignStats.total_quizzes || 0}</p>
               </div>
               <div className="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center">
@@ -252,7 +301,7 @@ export default function CampaignLeaderboardPage() {
 
             <div className="bg-white rounded-2xl p-3 flex justify-between">
               <div>
-                <p className="text-xs text-gray-500">Completion Progress</p>
+                <p className="text-xs text-gray-500">{t("leaderboardPage.statsCompletionProgress")}</p>
                 <p className="text-lg font-semibold">
                   {campaignStats.avg_completion_percentage?.toFixed(0) || 0}%
                 </p>
@@ -265,27 +314,7 @@ export default function CampaignLeaderboardPage() {
 
           {/* Status Tabs */}
           <div className="flex gap-2 mb-4 bg-white p-1.5 rounded-full w-fit">
-            {[
-              { value: "all", label: "All", count: leaderboardData.length },
-              {
-                value: "active",
-                label: "Active",
-                count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "active")
-                  .length,
-              },
-              {
-                value: "pending",
-                label: "Pending",
-                count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "pending")
-                  .length,
-              },
-              {
-                value: "completed",
-                label: "Completed",
-                count: leaderboardData.filter((u: any) => u.status?.toLowerCase() === "completed")
-                  .length,
-              },
-            ].map((tab) => (
+            {statusTabs.map((tab) => (
               <button
                 key={tab.value}
                 className={clsx(
@@ -329,7 +358,7 @@ export default function CampaignLeaderboardPage() {
               />
               <input
                 className="w-full pl-10 pr-4 py-2.5 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Search Campaign..."
+                placeholder={t("leaderboardPage.searchUsersPlaceholder")}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => {
@@ -348,12 +377,11 @@ export default function CampaignLeaderboardPage() {
                 setCurrentPage(1);
               }}
             >
-              <option value="all">All Time</option>
-              <option value="7">Last 7 Days</option>
-              <option value="30">Last 30 Days</option>
-              <option value="90">Last 3 Months</option>
-              <option value="180">Last 6 Months</option>
-              <option value="365">This Year</option>
+              {dateFilterOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -372,7 +400,7 @@ export default function CampaignLeaderboardPage() {
                         onClick={() => handleSort("firstname")}
                       >
                         <div className="flex items-center gap-2">
-                          <span>First Name</span>
+                          <span>{t("leaderboardPage.colFirstName")}</span>
                           <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
@@ -381,7 +409,7 @@ export default function CampaignLeaderboardPage() {
                         onClick={() => handleSort("lastname")}
                       >
                         <div className="flex items-center gap-2">
-                          <span>Last Name</span>
+                          <span>{t("leaderboardPage.colLastName")}</span>
                           <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
@@ -390,7 +418,7 @@ export default function CampaignLeaderboardPage() {
                         onClick={() => handleSort("last_login")}
                       >
                         <div className="flex items-center gap-2">
-                          <span>Last Login</span>
+                          <span>{t("leaderboardPage.colLastLogin")}</span>
                           <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
@@ -399,7 +427,7 @@ export default function CampaignLeaderboardPage() {
                         onClick={() => handleSort("risk_level")}
                       >
                         <div className="flex items-center gap-2">
-                          <span>Risk Level</span>
+                          <span>{t("leaderboardPage.colRiskLevel")}</span>
                           <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
@@ -408,48 +436,48 @@ export default function CampaignLeaderboardPage() {
                         onClick={() => handleSort("compliance_score")}
                       >
                         <div className="flex items-center gap-2">
-                          <span>Compliance Score</span>
+                          <span>{t("leaderboardPage.colComplianceScore")}</span>
                           <ChevronsUpDown className="w-3.5 h-3.5 text-gray-400" />
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>Completed Module</span>
+                          <span>{t("leaderboardPage.colCompletedModule")}</span>
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>Progress</span>
+                          <span>{t("leaderboardPage.colProgress")}</span>
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>Completed Certificates</span>
+                          <span>{t("leaderboardPage.colCompletedCertificates")}</span>
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>Unlocked Achievements</span>
+                          <span>{t("leaderboardPage.colUnlockedAchievements")}</span>
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>Avatar Image</span>
+                          <span>{t("leaderboardPage.colAvatarImage")}</span>
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>XP Tokens</span>
+                          <span>{t("leaderboardPage.colXpTokens")}</span>
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>Status</span>
+                          <span>{t("leaderboardPage.colStatus")}</span>
                         </div>
                       </th>
                       <th className="px-4 py-3.5 text-left font-semibold whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <span>Action</span>
+                          <span>{t("leaderboardPage.colAction")}</span>
                         </div>
                       </th>
                     </tr>
@@ -519,7 +547,7 @@ export default function CampaignLeaderboardPage() {
                         <td className="px-4 py-3.5 whitespace-nowrap">
                           <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
                             <img
-                              alt={`Avatar Level ${user.avatar_level}`}
+                              alt={t("leaderboardPage.avatarAlt", { level: user.avatar_level })}
                               className="w-full h-full object-cover"
                               src={getAvatarImage(user.avatar_level)}
                             />
@@ -527,7 +555,7 @@ export default function CampaignLeaderboardPage() {
                         </td>
                         <td className="px-4 py-3.5 text-center whitespace-nowrap">
                           <span className="text-xs font-semibold text-gray-700">
-                            {user.xp_tokens || 0} tokens
+                            {t("leaderboardPage.tokens", { count: user.xp_tokens || 0 })}
                           </span>
                         </td>
                         <td className="px-4 py-3.5 whitespace-nowrap">
@@ -543,10 +571,7 @@ export default function CampaignLeaderboardPage() {
                                     : "bg-green-100 text-green-700 border border-green-200"
                             )}
                           >
-                            <span>
-                              {user.status?.charAt(0).toUpperCase() + user.status?.slice(1) ||
-                                "Active"}
-                            </span>
+                            <span>{formatUserStatus(user.status)}</span>
                           </span>
                         </td>
                         <td className="px-4 py-3.5 whitespace-nowrap">
@@ -558,7 +583,7 @@ export default function CampaignLeaderboardPage() {
                               )
                             }
                           >
-                            Full Report
+                            {t("leaderboardPage.fullReport")}
                           </button>
                         </td>
                       </tr>
@@ -571,8 +596,8 @@ export default function CampaignLeaderboardPage() {
                     <div className="bg-gray-100 p-4 rounded-full inline-block mb-4">
                       <SearchX className="w-10 h-10 text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">No Users Found</h3>
-                    <p className="text-sm text-gray-500">Try adjusting your search query</p>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">{t("leaderboardPage.noUsersTitle")}</h3>
+                    <p className="text-sm text-gray-500">{t("leaderboardPage.noUsersDescription")}</p>
                   </div>
                 </div>
               )}
@@ -582,9 +607,11 @@ export default function CampaignLeaderboardPage() {
             <div className="flex flex-col md:flex-row justify-between items-center px-4 py-3.5 border-t bg-gray-50 gap-3">
               <div className="text-[10px] text-gray-400 font-medium">
                 <span>
-                  Showing {(currentPage - 1) * itemsPerPage + 1}–
-                  {Math.min(currentPage * itemsPerPage, sortedData.length)} of {sortedData.length}{" "}
-                  Entries
+                  {t("leaderboardPage.showingEntries", {
+                    start: sortedData.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1,
+                    end: Math.min(currentPage * itemsPerPage, sortedData.length),
+                    total: sortedData.length,
+                  })}
                 </span>
               </div>
               <div className="flex gap-1.5">

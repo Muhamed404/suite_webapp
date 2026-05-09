@@ -86,6 +86,7 @@ export function QuizLanguageCard({
 
   const singleCorrect = quizType === "single" || quizType === "truefalse";
   const isMultiple = quizType === "multiple";
+  const isTrueFalse = quizType === "truefalse";
 
   // CSV Upload State
   const [showCsvModal, setShowCsvModal] = useState(false);
@@ -339,9 +340,16 @@ export function QuizLanguageCard({
                       key={a.id}
                       answer={a}
                       correctDisabled={
-                        singleCorrect && !!correctAnswerId && a.id !== correctAnswerId && !a.correct
+                        // For True/False, the click handler already auto-toggles the other
+                        // option, so the row should never be disabled (acts like a radio).
+                        !isTrueFalse &&
+                        singleCorrect &&
+                        !!correctAnswerId &&
+                        a.id !== correctAnswerId &&
+                        !a.correct
                       }
                       isMultiple={isMultiple}
+                      locked={isTrueFalse}
                       onCorrectChange={handleCorrectChange(a.id)}
                       onRemove={handleRemoveAnswer(a.id)}
                       onTextChange={handleTextChange(a.id)}

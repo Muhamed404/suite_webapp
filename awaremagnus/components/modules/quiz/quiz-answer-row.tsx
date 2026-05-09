@@ -17,6 +17,9 @@ interface QuizAnswerRowProps {
   onRemove: () => void;
   correctDisabled?: boolean;
   isMultiple?: boolean;
+  /** When true, the answer text is read-only and the remove button is hidden.
+   *  Used for True/False quizzes where the two options are fixed. */
+  locked?: boolean;
 }
 
 export function QuizAnswerRow({
@@ -26,17 +29,28 @@ export function QuizAnswerRow({
   onRemove,
   correctDisabled,
   isMultiple,
+  locked,
 }: QuizAnswerRowProps) {
   const t = useTranslations("quiz");
 
   return (
     <div className="answer flex items-center gap-2.5">
       <input
-        className="ansText w-full px-3 py-2 text-xs border border-gray-200 rounded-lg outline-none focus:border-[#3FBDFF] focus:ring-1 focus:ring-[#3FBDFF]/10 focus:shadow-[0_0_0_3px_rgba(63,189,255,0.1)] transition-all duration-200 placeholder:text-gray-400"
+        className={clsx(
+          "ansText w-full px-3 py-2 text-xs border rounded-lg outline-none transition-all duration-200 placeholder:text-gray-400",
+          locked
+            ? "border-gray-200 bg-gray-50 text-gray-700 cursor-default select-none"
+            : "border-gray-200 bg-white focus:border-[#3FBDFF] focus:ring-1 focus:ring-[#3FBDFF]/10 focus:shadow-[0_0_0_3px_rgba(63,189,255,0.1)]"
+        )}
         placeholder={t("answerPlaceholder")}
+        readOnly={locked}
+        tabIndex={locked ? -1 : undefined}
         type="text"
         value={answer.text}
-        onChange={(e) => onTextChange(e.target.value)}
+        onChange={(e) => {
+          if (locked) return;
+          onTextChange(e.target.value);
+        }}
       />
 
       <label
@@ -97,7 +111,11 @@ export function QuizAnswerRow({
 
       <button
         aria-label="Remove answer"
-        className="remove-ans w-5 h-5 flex items-center justify-center rounded-full border border-red-300 text-red-400 text-[9px] hover:bg-red-50 hover:text-red-500 hover:border-red-400 transition-colors duration-200"
+        className={clsx(
+          "remove-ans w-5 h-5 flex items-center justify-center rounded-full border border-red-300 text-red-400 text-[9px] hover:bg-red-50 hover:text-red-500 hover:border-red-400 transition-colors duration-200",
+          locked && "invisible pointer-events-none"
+        )}
+        tabIndex={locked ? -1 : undefined}
         type="button"
         onClick={onRemove}
       >
