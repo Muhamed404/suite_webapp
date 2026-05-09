@@ -211,6 +211,10 @@
 		"dashboard": "لوحة التحكم",
 		"campaigns": "الحملات",
 		"reports": "التقارير",
+		"subscriptionHistory": "سجل الاشتراك",
+		"groups": "المجموعات",
+		"department": "القسم",
+		"bulkImportUsers": "استيراد المستخدمين بالجملة",
 		"organizations": "المؤسسات",
 		"packages": "الحزم",
 		"users": "المستخدمون",
@@ -218,7 +222,11 @@
 		"systemTemplate": "قالب النظام",
 		"phishingSmtp": "SMTP التصيد",
 		"createPackage": "إنشاء حزمة",
-		"simulatorEmails": "رسائل المحاكي"
+		"simulatorEmails": "رسائل المحاكي",
+		"smtpNotifications": "إشعارات SMTP",
+		"notificationTemplates": "قوالب الإشعارات",
+		"createNotificationTemplate": "إنشاء قالب إشعار",
+		"noModulesFound": "لم يتم العثور على وحدات"
 	},
 	"breadcrumbs": {
 		"home": "الرئيسية",
@@ -354,7 +362,8 @@
 			"logout": "تسجيل الخروج",
 			"smtpNotifications": "menu.suite.smtpNotifications",
 			"bulkImportJobs": "وظائف الاستيراد المجمع",
-			"notificationMailLog": "سجل بريد الإشعارات"
+			"notificationMailLog": "سجل بريد الإشعارات",
+			"notificationTemplates": "menu.suite.notificationTemplates"
 		}
 	},
 	"org_domain": {
@@ -390,7 +399,20 @@
 		"delete_modal_title": "حذف النطاق",
 		"delete_modal_subtitle": "لا يمكن التراجع عن هذا الإجراء.",
 		"confirm_delete": "هل أنت متأكد أنك تريد حذف النطاق:",
-		"modal_edit_title": "تعديل النطاق"
+		"modal_edit_title": "تعديل النطاق",
+		"create_success": "تمت إضافة النطاق بنجاح.",
+		"create_error": "فشل في إضافة النطاق.",
+		"update_success": "تم تحديث النطاق بنجاح.",
+		"update_error": "فشل في تحديث النطاق.",
+		"delete_success": "تم حذف النطاق بنجاح.",
+		"delete_error": "فشل في حذف النطاق.",
+		"enable_success": "تم تفعيل النطاق بنجاح.",
+		"disable_success": "تم تعطيل النطاق بنجاح.",
+		"status_update_error": "فشل في تحديث حالة النطاق.",
+		"restrict_enable_success": "تم تفعيل تقييد النطاق.",
+		"restrict_disable_success": "تم تعطيل تقييد النطاق.",
+		"restrict_update_error": "فشل في تحديث تقييد النطاق.",
+		"not_authorized": "غير مصرح."
 	},
 	"organization": {
 		"homescreen": {

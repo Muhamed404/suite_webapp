@@ -213,7 +213,7 @@ $(document).ready(function () {
         digits: 'Only digits allowed.'
       },
       pymtDesc: {
-        required: 'Payment description is required.'
+        required: 'Package description is required.'
       },
       serviceCost: {
         required: 'Service cost is required.',

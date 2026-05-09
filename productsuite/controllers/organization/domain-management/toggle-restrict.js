@@ -14,12 +14,11 @@ exports.toggleRestrict = async (req, res) => {
             domain_restrict: domainRestrict,
         });
 
-        req.flash('message', domainRestrict ? 'Domain restriction enabled.' : 'Domain restriction disabled.');
+        req.flash('message', domainRestrict ? req.__('org_domain.restrict_enable_success') : req.__('org_domain.restrict_disable_success'));
         req.flash('alertType', 'success');
     } catch (error) {
         logger.error(`[DomainManagement] toggleRestrict error: ${error.message}`);
-        const errMsg = error.response?.data?.message || error.message || 'Failed to update domain restriction.';
-        req.flash('message', errMsg);
+        req.flash('message', req.__('org_domain.restrict_update_error'));
         req.flash('alertType', 'error');
     }
 

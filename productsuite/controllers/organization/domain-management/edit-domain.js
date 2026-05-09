@@ -15,12 +15,12 @@ exports.editDomain = async (req, res) => {
             is_active: is_active === '1',
         });
 
-        req.flash('message', 'Domain updated successfully.');
+        req.flash('message', req.__('org_domain.update_success'));
         req.flash('alertType', 'success');
         return res.redirect(frontend_api_urls.PRODUCT_SUITE.Domain_Management.Render_List_View(domainOrgId));
     } catch (error) {
         logger.error(`[DomainManagement] editDomain error: ${error.message}`);
-        req.flash('message', 'Failed to update domain.');
+        req.flash('message', req.__('org_domain.update_error'));
         req.flash('alertType', 'error');
         return res.redirect(frontend_api_urls.PRODUCT_SUITE.Domain_Management.Render_List_View(domainOrgId));
 

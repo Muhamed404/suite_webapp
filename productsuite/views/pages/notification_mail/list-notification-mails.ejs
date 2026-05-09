@@ -1,128 +1,143 @@
-<div class="flex flex-col p-6 gap">
-  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-    <div class="flex-1">
-      <nav class="flex items-center text-[1rem] text-gray-500 gap-2 pb-0 mb-2" aria-label="Breadcrumb">
-        <a href="/home" class="hover:text-gray-700 transition">Home</a>
-        <span class="text-gray-400">›</span>
-        <span class="font-semibold text-gray-900">Notification Mail Log</span>
+<div class="flex flex-col px-6 pt-6 pb-3">
+  <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+    <div>
+      <nav class="flex items-center text-xs text-gray-400 gap-1.5 mb-1.5" aria-label="Breadcrumb">
+        <a href="/home" class="hover:text-gray-600 transition">Home</a>
+        <span>›</span>
+        <span class="text-gray-600 font-medium">Notification Mail Log</span>
       </nav>
-      <h3 class="text-3xl font-medium">Notification Mail Log</h3>
-      <p class="text-sm text-gray-500 mt-1">View the dispatch status of every outbound notification email.</p>
+      <h3 class="text-xl font-semibold text-gray-900 leading-tight">Notification Mail Log</h3>
+      <p class="text-xs text-gray-400 mt-0.5">Outbound email dispatch history and delivery status.</p>
     </div>
-  </div>
-</div>
 
-<div class="flex flex-col p-6 pt-0">
-
-  <!-- Filters -->
-  <form method="GET" action="/notification-mail" class="flex flex-wrap items-end gap-3 mb-6">
-    <!-- Status filter -->
-    <div class="flex flex-col gap-1">
-      <label class="text-xs font-medium text-gray-500">Status</label>
+    <!-- Inline filters -->
+    <form method="GET" action="/notification-mail" class="flex flex-wrap items-center gap-2">
       <select name="status"
-        class="px-4 py-2.5 rounded-full text-sm border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-        <option value="">All</option>
+        class="px-3 py-1.5 rounded-lg text-xs border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+        <option value="">All Statuses</option>
         <% ['PENDING','PROCESSING','SENT','REJECTED','FAILED'].forEach(function(s) { %>
           <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= s %></option>
         <% }); %>
       </select>
-    </div>
 
-    <!-- Notification type filter -->
-    <div class="flex flex-col gap-1">
-      <label class="text-xs font-medium text-gray-500">Notification Type</label>
       <input type="text" name="notification_type" value="<%= filters.notificationType %>"
-        placeholder="e.g. USER_WELCOME"
-        class="px-4 py-2.5 rounded-full text-sm border border-gray-300 bg-white focus:outline-none focus:ring-2 focus:ring-[var(--teal)] w-52">
-    </div>
+        placeholder="Notification type…"
+        class="px-3 py-1.5 rounded-lg text-xs border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--teal)] w-44">
 
-    <input type="hidden" name="pageSize" value="<%= pagination.pageSize %>">
+      <input type="hidden" name="pageSize" value="<%= pagination.pageSize %>">
 
-    <button type="submit"
-      class="px-5 py-2.5 rounded-full text-sm font-semibold bg-[var(--teal)] text-white hover:opacity-90 transition">
-      Apply
-    </button>
-    <a href="/notification-mail"
-      class="px-5 py-2.5 rounded-full text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-      Clear
-    </a>
-  </form>
+      <button type="submit"
+        class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--teal)] text-white hover:opacity-90 transition">
+        Apply
+      </button>
+      <a href="/notification-mail"
+        class="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+        Clear
+      </a>
+    </form>
+  </div>
+</div>
 
-  <!-- Table -->
-  <div class="overflow-x-auto bg-white hide-scrollbar rounded-2xl">
-    <table class="min-w-full text-sm text-left">
-      <thead class="bg-[#FAFBFC]">
-        <tr>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">#</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">To</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Type</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Priority</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Status</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Retries</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Queued At</th>
-          <th class="px-6 py-5 font-semibold text-gray-700 whitespace-nowrap">Sent At</th>
+<div class="px-6 pb-6">
+
+  <!-- Table card -->
+  <div class="overflow-x-auto bg-white border border-gray-200 rounded-xl shadow-sm hide-scrollbar">
+    <table class="min-w-full text-xs text-left">
+      <thead>
+        <tr class="border-b border-gray-200 bg-gray-50">
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap w-8">#</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Recipient</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Type</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Priority</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap text-center">Retries</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Queued At</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Sent At</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Error</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody class="divide-y divide-gray-100">
         <% if (!mails || mails.length === 0) { %>
           <tr>
-            <td colspan="8" class="px-6 py-12 text-center text-gray-400">No notification mails found.</td>
+            <td colspan="9" class="px-4 py-10 text-center text-gray-400 text-xs">No notification mails found.</td>
           </tr>
         <% } else { %>
           <% mails.forEach(function(mail, index) { %>
-            <tr class="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+            <tr class="hover:bg-gray-50/70 transition-colors">
 
-              <td class="px-6 py-4 text-gray-500 whitespace-nowrap">
+              <td class="px-4 py-2.5 text-gray-400 tabular-nums">
                 <%= ((pagination.currentPage - 1) * pagination.pageSize) + index + 1 %>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="font-medium text-gray-800"><%= mail.to_email %></div>
+              <td class="px-4 py-2.5 whitespace-nowrap">
+                <div class="font-medium text-gray-800 text-xs"><%= mail.to_email %></div>
                 <% if (mail.to_name) { %>
-                  <div class="text-xs text-gray-400"><%= mail.to_name %></div>
+                  <div class="text-gray-400 text-[11px] leading-tight mt-0.5"><%= mail.to_name %></div>
                 <% } %>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+              <td class="px-4 py-2.5 whitespace-nowrap">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-blue-50 text-blue-600 border border-blue-100">
                   <%= mail.notification_type %>
                 </span>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 py-2.5 whitespace-nowrap">
                 <% if (mail.priority === 'HIGH') { %>
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600 border border-red-200">HIGH</span>
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-red-500">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>HIGH
+                  </span>
                 <% } else if (mail.priority === 'LOW') { %>
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 border border-gray-200">LOW</span>
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-400">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-300 inline-block"></span>LOW
+                  </span>
                 <% } else { %>
-                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-600 border border-yellow-200">NORMAL</span>
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-600">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block"></span>NORMAL
+                  </span>
                 <% } %>
               </td>
 
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 py-2.5 whitespace-nowrap">
                 <% if (mail.status === 'SENT') { %>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-600 border border-green-200">SENT</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-emerald-50 text-emerald-600 border border-emerald-100">SENT</span>
                 <% } else if (mail.status === 'PENDING') { %>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-yellow-50 text-yellow-600 border border-yellow-200">PENDING</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-amber-50 text-amber-600 border border-amber-100">PENDING</span>
                 <% } else if (mail.status === 'PROCESSING') { %>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-200">PROCESSING</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-blue-50 text-blue-600 border border-blue-100">PROCESSING</span>
                 <% } else if (mail.status === 'REJECTED') { %>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600 border border-red-200">REJECTED</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-red-50 text-red-600 border border-red-100">REJECTED</span>
+                <% } else if (mail.status === 'FAILED') { %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-rose-50 text-rose-700 border border-rose-100">FAILED</span>
                 <% } else { %>
-                  <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500 border border-gray-200"><%= mail.status %></span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-gray-100 text-gray-500 border border-gray-200"><%= mail.status %></span>
                 <% } %>
               </td>
 
-              <td class="px-6 py-4 text-center text-gray-600 whitespace-nowrap">
-                <%= mail.retry_count %> / 3
+              <td class="px-4 py-2.5 text-center text-gray-600 tabular-nums">
+                <span class="<%= mail.retry_count > 0 ? 'text-orange-500 font-semibold' : 'text-gray-400' %>">
+                  <%= mail.retry_count %>
+                </span>
+                <span class="text-gray-300">/3</span>
               </td>
 
-              <td class="px-6 py-4 text-gray-500 whitespace-nowrap text-xs">
+              <td class="px-4 py-2.5 text-gray-400 whitespace-nowrap tabular-nums">
                 <%= mail.created_at ? new Date(mail.created_at).toLocaleString() : '—' %>
               </td>
 
-              <td class="px-6 py-4 text-gray-500 whitespace-nowrap text-xs">
+              <td class="px-4 py-2.5 text-gray-400 whitespace-nowrap tabular-nums">
                 <%= mail.sent_at ? new Date(mail.sent_at).toLocaleString() : '—' %>
+              </td>
+
+              <td class="px-4 py-2.5 max-w-[180px]">
+                <% if (mail.error_message) { %>
+                  <span class="block truncate text-red-400 cursor-pointer error-tooltip-trigger"
+                    data-msg="<%= mail.error_message %>">
+                    <%= mail.error_message %>
+                  </span>
+                <% } else { %>
+                  <span class="text-gray-300">—</span>
+                <% } %>
               </td>
 
             </tr>
@@ -134,22 +149,22 @@
 
   <!-- Pagination -->
   <% if (pagination.totalPages > 1) { %>
-    <div class="flex items-center justify-between px-2 py-4 mt-2">
-      <span class="text-sm text-gray-500">
-        Page <%= pagination.currentPage %> of <%= pagination.totalPages %>
-        &nbsp;·&nbsp; <%= pagination.totalCount %> total
+    <div class="flex items-center justify-between px-1 pt-3">
+      <span class="text-xs text-gray-400">
+        Page <span class="font-medium text-gray-600"><%= pagination.currentPage %></span> of <%= pagination.totalPages %>
+        &nbsp;·&nbsp; <span class="font-medium text-gray-600"><%= pagination.totalCount %></span> records
       </span>
-      <div class="flex gap-2">
+      <div class="flex gap-1.5">
         <% if (pagination.hasPreviousPage) { %>
           <a href="?page=<%= pagination.previousPage %>&pageSize=<%= pagination.pageSize %>&status=<%= filters.status %>&notification_type=<%= filters.notificationType %>"
-            class="px-4 py-2 text-sm rounded-full font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
-            Previous
+            class="px-3 py-1.5 text-xs rounded-lg font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+            ← Prev
           </a>
         <% } %>
         <% if (pagination.hasNextPage) { %>
           <a href="?page=<%= pagination.nextPage %>&pageSize=<%= pagination.pageSize %>&status=<%= filters.status %>&notification_type=<%= filters.notificationType %>"
-            class="px-4 py-2 text-sm rounded-full font-medium bg-[var(--teal)] text-white hover:opacity-90 transition">
-            Next
+            class="px-3 py-1.5 text-xs rounded-lg font-medium bg-[var(--teal)] text-white hover:opacity-90 transition">
+            Next →
           </a>
         <% } %>
       </div>
@@ -157,3 +172,16 @@
   <% } %>
 
 </div>
+
+<!-- Error message floating tooltip -->
+<div id="error-tooltip"
+  style="display:none;position:fixed;z-index:9999;max-width:320px;pointer-events:none;"
+  class="bg-gray-900 text-white text-xs rounded-lg px-3 py-2.5 shadow-2xl leading-relaxed break-words border border-gray-700">
+  <div class="flex items-start gap-2">
+    <svg class="w-3 h-3 mt-0.5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+    </svg>
+    <span id="error-tooltip-text"></span>
+  </div>
+</div>
+<script src="/securemagnus_2025/js/custom_script/notification-mail-error-tooltip.js"></script>

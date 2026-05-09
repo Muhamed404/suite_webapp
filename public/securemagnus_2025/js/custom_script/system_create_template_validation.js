@@ -1,4 +1,13 @@
 $(document).ready(function () {
+  function getPhishTypeContainer() {
+    return $('input[name="phishType"]').first().closest('.mb-6');
+  }
+
+  $('input[name="phishType"]').on('change', function() {
+    getPhishTypeContainer().find('.validation-error').remove();
+    $(this).valid();
+  });
+
   // Setup validation for the template creation form
   $("#templateCreationForm").validate({
     ignore: [], // Don't ignore hidden fields as they might be in inactive steps
@@ -227,14 +236,14 @@ $(document).ready(function () {
       // Validate phishType
       if (!$('input[name="phishType"]:checked').val()) {
         // Add error message for phishType below the options
-        const phishTypeContainer = $('input[name="phishType"]').closest('div').parent();
+        const phishTypeContainer = getPhishTypeContainer();
         phishTypeContainer.find('.validation-error').remove();
         const errorMessage = window.i18n?.validation_messages?.phishing_type_required || 'Please select a phishing type.';
         phishTypeContainer.append(`<div class="validation-error text-red-500 text-sm mt-2">${errorMessage}</div>`);
         isValid = false;
       } else {
         // Remove error if present
-        $('input[name="phishType"]').closest('div').parent().find('.validation-error').remove();
+        getPhishTypeContainer().find('.validation-error').remove();
       }
     }
     
