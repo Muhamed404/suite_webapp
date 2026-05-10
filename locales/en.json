@@ -355,7 +355,8 @@
 			"smtpNotifications": "SMTP Notifications",
 			"notificationTemplates": "Notification Templates",
 			"notificationMailLog": "Notification Mail Log",
-			"bulkImportJobs": "Bulk import jobs"
+			"bulkImportJobs": "Bulk import jobs",
+			"mfaMailLog": "MFA Notification Mail Log"
 		}
 	},
 	"org_domain": {
@@ -880,9 +881,9 @@
 		"inviteUsersRequiredError": "Please select at least one user.",
 		"inviteSubmitSuccess": "Invite request submitted successfully.",
 		"inviteSubmitFailed": "Failed to submit invite request.",
-		"suiteUsersSearchLabel": "Search users",
-		"suiteUsersPageSizeLabel": "Rows per page",
-		"suiteUsersSearchSubmit": "Search",
+		"suiteUsersSearchLabel": "Search",
+		"suiteUsersPageSizeLabel": "Page Size",
+		"suiteUsersSearchSubmit": "Submit",
 		"suiteUsersClearSearch": "Clear",
 		"suiteUsersPrev": "Previous",
 		"suiteUsersNext": "Next",
