@@ -109,6 +109,9 @@ module.exports = {
         Notification_Mail: {
             LIST_BY_ORGANIZATION: (organizationId) => `/notification_mail/${organizationId}/organization`,
         },
+        MFA_Mail: {
+            LIST: '/mfa-mail',
+        },
 
     },
     PHISHMAGNUS: {

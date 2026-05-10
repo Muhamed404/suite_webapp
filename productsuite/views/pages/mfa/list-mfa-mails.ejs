@@ -1,0 +1,123 @@
+<div class="flex flex-col px-6 pt-6 pb-3">
+  <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+    <div>
+      <nav class="flex items-center text-xs text-gray-400 gap-1.5 mb-1.5" aria-label="Breadcrumb">
+        <a href="/home" class="hover:text-gray-600 transition">Home</a>
+        <span>›</span>
+        <span class="text-gray-600 font-medium">MFA Mail Log</span>
+      </nav>
+      <h3 class="text-xl font-semibold text-gray-900 leading-tight">MFA Mail Log</h3>
+      <p class="text-xs text-gray-400 mt-0.5">Outbound MFA email dispatch history and delivery status.</p>
+    </div>
+
+    <!-- Inline filters -->
+    <form method="GET" action="/mfa/mail-log" class="flex flex-wrap items-center gap-2">
+      <select name="status"
+        class="px-3 py-1.5 rounded-lg text-xs border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+        <option value="">All Statuses</option>
+        <% ['PENDING','PROCESSING','SENT','REJECTED','FAILED'].forEach(function(s) { %>
+          <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= s %></option>
+        <% }); %>
+      </select>
+
+      <input type="hidden" name="pageSize" value="<%= pagination.pageSize %>">
+
+      <button type="submit"
+        class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--teal)] text-white hover:opacity-90 transition">
+        Apply
+      </button>
+      <a href="/mfa/mail-log"
+        class="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+        Clear
+      </a>
+    </form>
+  </div>
+</div>
+
+<div class="px-6 pb-6">
+
+  <!-- Table card -->
+  <div class="overflow-x-auto bg-white border border-gray-200 rounded-xl shadow-sm hide-scrollbar">
+    <table class="min-w-full text-xs text-left">
+      <thead>
+        <tr class="border-b border-gray-200 bg-gray-50">
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap w-8">#</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Recipient</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Subject</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Queued At</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% if (!mails || mails.length === 0) { %>
+          <tr>
+            <td colspan="5" class="px-4 py-10 text-center text-gray-400 text-xs">No MFA mails found.</td>
+          </tr>
+        <% } else { %>
+          <% mails.forEach(function(mail, index) { %>
+            <tr class="hover:bg-gray-50/70 transition-colors">
+
+              <td class="px-4 py-2.5 text-gray-400 tabular-nums">
+                <%= ((pagination.currentPage - 1) * pagination.pageSize) + index + 1 %>
+              </td>
+
+              <td class="px-4 py-2.5 whitespace-nowrap">
+                <div class="font-medium text-gray-800 text-xs"><%= mail.email %></div>
+              </td>
+
+              <td class="px-4 py-2.5 max-w-[280px]">
+                <span class="block truncate text-gray-600"><%= mail.subject || '—' %></span>
+              </td>
+
+              <td class="px-4 py-2.5 whitespace-nowrap">
+                <% if (mail.status === 'SENT') { %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-emerald-50 text-emerald-600 border border-emerald-100">SENT</span>
+                <% } else if (mail.status === 'PENDING') { %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-amber-50 text-amber-600 border border-amber-100">PENDING</span>
+                <% } else if (mail.status === 'PROCESSING') { %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-blue-50 text-blue-600 border border-blue-100">PROCESSING</span>
+                <% } else if (mail.status === 'REJECTED') { %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-red-50 text-red-600 border border-red-100">REJECTED</span>
+                <% } else if (mail.status === 'FAILED') { %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-rose-50 text-rose-700 border border-rose-100">FAILED</span>
+                <% } else { %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-gray-100 text-gray-500 border border-gray-200"><%= mail.status || '—' %></span>
+                <% } %>
+              </td>
+
+              <td class="px-4 py-2.5 text-gray-400 whitespace-nowrap tabular-nums">
+                <%= mail.created_at ? new Date(mail.created_at).toLocaleString() : '—' %>
+              </td>
+
+            </tr>
+          <% }); %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <% if (pagination.totalPages > 1) { %>
+    <div class="flex items-center justify-between px-1 pt-3">
+      <span class="text-xs text-gray-400">
+        Page <span class="font-medium text-gray-600"><%= pagination.currentPage %></span> of <%= pagination.totalPages %>
+        &nbsp;·&nbsp; <span class="font-medium text-gray-600"><%= pagination.totalCount %></span> records
+      </span>
+      <div class="flex gap-1.5">
+        <% if (pagination.hasPreviousPage) { %>
+          <a href="?page=<%= pagination.previousPage %>&pageSize=<%= pagination.pageSize %>&status=<%= filters.status %>"
+            class="px-3 py-1.5 text-xs rounded-lg font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+            ← Prev
+          </a>
+        <% } %>
+        <% if (pagination.hasNextPage) { %>
+          <a href="?page=<%= pagination.nextPage %>&pageSize=<%= pagination.pageSize %>&status=<%= filters.status %>"
+            class="px-3 py-1.5 text-xs rounded-lg font-medium bg-[var(--teal)] text-white hover:opacity-90 transition">
+            Next →
+          </a>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+</div>

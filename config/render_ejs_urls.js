@@ -99,6 +99,9 @@ module.exports = {
         Notification_Mail: {
             LIST: 'pages/notification_mail/list-notification-mails',
         },
+        MFA_Mail: {
+            LIST: 'pages/mfa/list-mfa-mails',
+        },
         Package_Management: {
             CREATE: 'pages/package/create_package',
         },
