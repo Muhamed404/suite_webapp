@@ -1,13 +1,21 @@
 const express = require("express");
 const router = express.Router();
+const checkPermission = require('../../../utility/check-permission');
+const enums = require('../../../contants/enum');
 
 const { verifyOTP } = require('../../controllers/mfa/verify-mfa')
 const { renderCreateForm } = require('../../controllers/mfa/create-mfa-smtp')
 const { createSMTP } = require('../../controllers/mfa/save-mfa-smtp')
+const { listMFAMails } = require('../../controllers/mfa/list-mfa-mails')
 
 
 router.get("/config", renderCreateForm);
 router.post("/create", createSMTP);
+
+router.get(
+  '/mail-log',
+  listMFAMails
+);
 
 router.get('/verify', (req, res) => {
     if (!req.session.mfaPendingUser) {

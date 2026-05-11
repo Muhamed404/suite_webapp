@@ -131,6 +131,7 @@ const ModuleNames = {
   Campaign_SMS: 'Campaign_SMS',
   Campaign_Whatsapp: 'Campaign_Whatsapp',
   Notification_Template: 'Notification_Template',
+  MFA_Logs:'MFA_Logs'
 }
 const Access_Types = {
   RWD_ALL: 'RWD-ALL',

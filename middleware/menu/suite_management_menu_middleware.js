@@ -126,6 +126,10 @@ function generateSuiteManagementMenu(req, organization) {
         {
           labelKey: "menu.suite.notificationMailLog",
           link: "/notification-mail"
+        },
+        {
+        labelKey: "menu.suite.mfaMailLog",
+          link: "/mfa/mail-log"
         }
       ]
     }
