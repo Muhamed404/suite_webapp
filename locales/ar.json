@@ -788,6 +788,7 @@
 		"btnTestConfiguration": "اختبار الإعدادات",
 		"btnSaveSettings": "حفظ الإعدادات",
 		"labelSenderEmail": "البريد الإلكتروني المرسل",
+		"labelSenderDisplayName": "اسم عرض المرسل",
 		"labelDetails": "التفاصيل",
 		"enableStartTLS": "تفعيل STARTTLS",
 		"enableStartTLSDesc": "استخدام STARTTLS لترقية الاتصال العادي إلى اتصال آمن.",
@@ -800,7 +801,9 @@
 		"selectOrganization": "اختر المؤسسة",
 		"default": "افتراضي",
 		"enabled": "مفعل",
-		"disabled": "معطل"
+		"disabled": "معطل",
+		"isAuthenticated": "تم المصادقة",
+		"isAuthenticatedDesc": "وضع علامة على هذا الإعداد بأنه تم التحقق منه ومصادقته."
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "إدارة مستخدمي سيكماجنوس",
