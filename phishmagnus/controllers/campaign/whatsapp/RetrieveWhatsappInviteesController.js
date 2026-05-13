@@ -2,6 +2,7 @@ const config = require("../../../../config/env.config");
 const { logger } = require("../../../../logger/logger");
 const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 
 /**
@@ -58,7 +59,7 @@ exports.generateWhatsappCampaignInviteesReport = async (req, res) => {
         total = response?.data?.total || response?.data?.pagination?.total || invitees.length;
         
         logger.info(`Controller - Whatsapp Invitee Report: Backend returned ${invitees.length} invitees (Total: ${total})`);
-        logger.info(`Controller - Whatsapp Invitee Report: Invitees Data Sample: ${JSON.stringify(invitees.slice(0,2),null,2)}`);
+        logger.info(`Controller - Whatsapp Invitee Report: Invitees Data Sample: ${JSON.stringify(redactLogData(invitees.slice(0, 2)), null, 2)}`);
       } catch (apiError) {
         logger.error(`Controller - Whatsapp Invitee Report: Backend API Error: ${apiError.message}`);
         

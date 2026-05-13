@@ -3,6 +3,7 @@ const { hasAccess } = require("../../../utility/helperFunctions");
 const ICONSTANTS = require("../../../contants/ICONSTANTS");
 const enums = require('../../../contants/enum')
 const getApiClient = require('../../../utility/api-client');
+const { redactEmail, redactLogData } = require("../../../utility/redact");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const backend_api_urls = require("../../../config/backend_api_urls");
@@ -27,12 +28,12 @@ exports.renderSecureMagnusUsers = async (req, res) => {
     let hasCreatePermission = Boolean(true);
     let userSession = req?.user;
     if (!hasAccess(req, enums.ModuleNames.User_Management, [enums.Access_Types.RWD_ALL])) {
-      logger.info(`Controller - Render Securemagnus Users: Disabling Create Button for user: ` + userSession.email)
+      logger.info(`Controller - Render Securemagnus Users: Disabling Create Button for user: ` + redactEmail(userSession.email))
 
       hasCreatePermission = Boolean(false)
     }
     logger.info(`Controller - Render Securemagnus Users: Rendering Securemagnus Users List Page`);
-    logger.info(JSON.stringify(users.slice(0, 2), null, 2))
+    logger.info(JSON.stringify(redactLogData(users.slice(0, 2)), null, 2))
     return res.render(render_ejs_urls.ProductSuiteManagement.User_Management.LIST_SECUREMAGNUS_USERS, {
       enableSuiteManagementLeftMenu: true,
       users: users,

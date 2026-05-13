@@ -7,11 +7,13 @@ const enums = require('../../../contants/enum')
 const { getUsersByDepartment } = require('../../../phishmagnus/controllers/user/getUsersByDepartment')
 const { getUsersByUnAssignedDepartment } = require('../../../phishmagnus/controllers/user/getUsersByUnAssignedDepartment')
 const { deleteDepartment } = require('../../../phishmagnus/controllers/department/delete-department-controller')
+const { logger } = require("../../../logger/logger");
+const { redactLogData } = require("../../../utility/redact");
 
 
 // Logging middleware for all department routes
 router.use((req, res, next) => {
-    logger.info(`[Department Route] ${req.method} ${req.originalUrl}`);
+    logger.info(`[Department Route] ${redactLogData(req.method)} ${redactLogData(req.originalUrl)}`);
     next();
 });
 

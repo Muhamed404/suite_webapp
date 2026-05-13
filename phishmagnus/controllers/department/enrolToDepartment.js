@@ -3,6 +3,7 @@ const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require("../../../utility/api-client");
+const { redactLogData } = require("../../utility/redact");
 
 
 async function enrolToDepartment(req, res) {
@@ -13,7 +14,7 @@ async function enrolToDepartment(req, res) {
         const departmentId = req.params?.departmentId || null;
         const hasRequestedToUnenroll = req.params?.hasRequestedToUnenroll || false;
         logger.info("Incoming request to enrolToDepartment: DEPARTMENT ID " + departmentId);
-        logger.info("Incoming request to enrolToDepartment: SELECTED USERS " + JSON.stringify(selectedUsers, null, 2));
+        logger.info("Incoming request to enrolToDepartment: SELECTED USERS " + JSON.stringify(redactLogData(selectedUsers), null, 2));
         logger.info("Incoming request to enrolToDepartment: HAS REQUESTED TO hasRequestedToUnenroll " + hasRequestedToUnenroll);
         if (!departmentId) {
             logger.error("Incoming request to enrolToDepartment: MISSING DEPARTMENT ID");
@@ -27,7 +28,7 @@ async function enrolToDepartment(req, res) {
         const response = await apiClient.post(url, { selectedUsers })
 
         const message = response.data?.message || 'Error in assigning users to department'
-        logger.info('Incoming request to enrolToDepartment: POST ENROL TO DEPARTMENT ' + JSON.stringify(response.data, null, 2));
+        logger.info('Incoming request to enrolToDepartment: POST ENROL TO DEPARTMENT ' + JSON.stringify(redactLogData(response.data), null, 2));
         return res.status(200).json({ success: true, unassignedUsers: message });
 
     } catch (error) {

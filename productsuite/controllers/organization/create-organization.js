@@ -5,6 +5,7 @@ const enums = require("../../../contants/enum");
 const moment = require("moment");
 const getApiClient = require("../../../utility/api-client");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 
 
@@ -33,7 +34,7 @@ exports.createOrganization = async (req, res) => {
         });
       })
       .catch((error) => {
-        logger.error(`[Create Organization]: GET: Issue in creation.` + error.stack)
+        logger.error(`[Create Organization]: GET: Issue in creation.` + redactLogData(error.stack))
         throw error;
       });
   } else if (req.method === "POST") {
@@ -57,13 +58,13 @@ exports.createOrganization = async (req, res) => {
         // licenseStartDate: req.body.licenseStartDate,
         contact: req.body.contact
       };
-      logger.info(`[CreateOrganization] Posting payload Organization=${req.body.name}`);
+      logger.info(`[CreateOrganization] Posting payload Organization=${redactLogData(req.body.name)}`);
       const apiClient = getApiClient(req);
       const response = await apiClient.post('/organization/', organization);
-      logger.info(`[CreateOrganization] Response has received organization=${req.body.name}`);
+      logger.info(`[CreateOrganization] Response has received organization=${redactLogData(req.body.name)}`);
       res.redirect(`/organization/?message=${response.data.message}&alertType=success&alertSwal=true`);
     } catch (error) {
-      logger.error(`[CreateOrganization]  ${error}`);
+      logger.error(`[CreateOrganization]  ${redactLogData(error)}`);
       res.render("pages/product_suite_management/suite_management", {
         message: "Error in saving",
         alertType: "error",

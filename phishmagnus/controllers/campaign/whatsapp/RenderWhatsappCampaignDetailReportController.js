@@ -5,6 +5,7 @@ const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const { formatDateTimeDDMmmYYYYHHmmAMPM } = require('../../../../utility/date-time-utility');
+const { redactLogData } = require("../../../utility/redact");
 
 
 /**
@@ -90,7 +91,7 @@ function transformInviteeResponses(invitees) {
  * @returns {Object} Formatted campaign object
  */
 function formatCampaignDetails(backendCampaign) {
-  logger.info(`[Format Campaign Details] Formatting campaign: ${JSON.stringify(backendCampaign, null, 2) || 'N/A'}`);
+  logger.info(`[Format Campaign Details] Formatting campaign: ${JSON.stringify(redactLogData(backendCampaign), null, 2) || 'N/A'}`);
   return {
     id: backendCampaign?.campaign.id,
     name: backendCampaign?.campaign.name || 'Unnamed Campaign',
@@ -142,7 +143,7 @@ exports.generateWhatsappCampaignDetails = async (req, res) => {
 
     logger.info(`[Whatsapp Campaign Details] API Response Status: ${campaignResponse.status}`);
     let backendCampaign = campaignResponse?.data?.data || {};
-    logger.info(`[Whatsapp Campaign Details] Backend Campaign Data: ${JSON.stringify(backendCampaign, null, 2) || 'N/A'}`);
+    logger.info(`[Whatsapp Campaign Details] Backend Campaign Data: ${JSON.stringify(redactLogData(backendCampaign), null, 2) || 'N/A'}`);
     const inviteesCountStats = backendCampaign?.totalInviteesCountStats || {};
     // Format campaign data for template
     const campaign = formatCampaignDetails(backendCampaign);

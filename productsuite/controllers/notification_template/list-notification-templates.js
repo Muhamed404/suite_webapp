@@ -2,9 +2,10 @@ const backend_api_urls = require("../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require("../../../utility/api-client");
+const { redactLogData } = require("../../../utility/redact");
 
 exports.listNotificationTemplates = async (req, res) => {
-  logger.info(`Controller - Notification Templates: Incoming request with params: ${JSON.stringify(req.params)}`);
+  logger.info(`Controller - Notification Templates: Incoming request with params: ${JSON.stringify(redactLogData(req.params))}`);
 
   try {
     const organizationId = req.user.organization_id !== null
@@ -24,11 +25,11 @@ exports.listNotificationTemplates = async (req, res) => {
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PRODUCT_SUITE.Notification_Template.LIST_BY_ORGANIZATION(organizationId);
 
-    logger.info(`Controller - Notification Templates: Calling backend API: ${url}`);
+    logger.info(`Controller - Notification Templates: Calling backend API: ${redactLogData(url)}`);
     const response = await apiClient.get(url, { params: { page, pageSize } });
 
     if (!response?.data || !response.data.success) {
-      logger.error(`Controller - Notification Templates: Backend returned failure: ${JSON.stringify(response?.data)}`);
+      logger.error(`Controller - Notification Templates: Backend returned failure: ${JSON.stringify(redactLogData(response?.data))}`);
       req.flash("alertType", "error");
       req.flash("message", response?.data?.message || "Failed to retrieve notification templates");
       return res.redirect("/home");
@@ -52,8 +53,8 @@ exports.listNotificationTemplates = async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error(`Controller - Notification Templates: ${error.message}`);
-    logger.error(`Controller - Notification Templates: ${error.stack}`);
+    logger.error(`Controller - Notification Templates: ${redactLogData(error.message)}`);
+    logger.error(`Controller - Notification Templates: ${redactLogData(error.stack)}`);
     req.flash("alertType", "error");
     req.flash("message", "Failed to retrieve notification templates");
     return res.redirect("/home");

@@ -1,5 +1,6 @@
 const { logger } = require("../logger/logger");
 const enums = require('../contants/enum');
+const { redactEmail } = require("../utility/redact");
 
 function setGlobalUserVariables(req, res, next) {
   // logger.info('VARIABLES GLOBALLY MIDDLEWARE CALLING::::')
@@ -20,7 +21,7 @@ function setGlobalUserVariables(req, res, next) {
     }
     res.locals.isSubAdmin = Number(roleId) === Number(enums.userType.MagSubAdmin);
 
-    logger.info(`User ${req.user.email} has permission for phm ${req.user?.phm_license || false} and awm ${req.user?.awm_license || false}`);
+    logger.info(`User ${redactEmail(req.user.email)} has permission for phm ${req.user?.phm_license || false} and awm ${req.user?.awm_license || false}`);
     res.locals.locals_phm_subscription = req.user?.phm_license || false;
     res.locals.locals_awm_subscription = req.user?.awm_license || false;
 

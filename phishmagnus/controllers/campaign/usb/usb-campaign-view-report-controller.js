@@ -10,6 +10,7 @@ const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const axios = require("axios");
 const moment = require('moment');
+const { redactLogData } = require("../../../utility/redact");
 
 exports.usbCampaignViewReport = async (req, res) => {
   try {
@@ -30,7 +31,7 @@ exports.usbCampaignViewReport = async (req, res) => {
 
     const campaigns = result.data;
     logger.info(`Controller - USB Campaign View Report - Data fetched successfully`);
-    logger.info(`Controller - USB Campaign View Report - ${JSON.stringify(campaigns, null, 2)}`);
+    logger.info(`Controller - USB Campaign View Report - ${JSON.stringify(redactLogData(campaigns), null, 2)}`);
 
     // Format the start_datetime
     if (campaigns && campaigns.start_datetime) {

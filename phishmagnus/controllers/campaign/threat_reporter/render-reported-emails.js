@@ -3,6 +3,7 @@ const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
+const { redactLogData } = require("../../../../utility/redact");
 
 exports.renderReportedEmails = async (req, res) => {
 
@@ -42,7 +43,7 @@ exports.renderReportedEmails = async (req, res) => {
         });
 
     } catch (error) {
-        logger.error(`[Reported Emails]: Error: ${error.message}`);
+        logger.error(`[Reported Emails]: Error: ${redactLogData(error.message)}`);
         req.flash('message', 'Failed to load reported emails.');
         req.flash('alertType', 'error');
         return res.redirect(frontend_api_urls.LOGIN.PHISHMAGNUS);

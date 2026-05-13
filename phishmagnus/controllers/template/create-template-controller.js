@@ -5,6 +5,7 @@ const he = require('he');
 const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const { injectPhishingFormWebAction, interactionScript } = require("../../../utility/helperFunctions");
+const { redactLogData } = require("../../utility/redact");
 
 exports.renderCreateTemplate = async (req, res) => {
   logger.info('Controller - Create Template: Incoming GET request in renderCreateTemplate');
@@ -59,9 +60,9 @@ exports.createTemplate = async (req, res) => {
   // Build immutable payload from request body
   const payload = { ...req.body };
 
-  logger.info(`Create System Template: Initial payload from request body: ${JSON.stringify(payload, null, 2)}`);
+  logger.info(`Create System Template: Initial payload from request body: ${JSON.stringify(redactLogData(payload), null, 2)}`);
 
-  logger.info(`[Create System Template] Raw posted data: ${JSON.stringify(req.body, null, 2)}`);
+  logger.info(`[Create System Template] Raw posted data: ${JSON.stringify(redactLogData(req.body), null, 2)}`);
 
   try {
     try {
@@ -175,11 +176,11 @@ exports.createTemplate = async (req, res) => {
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PRODUCT_SUITE.Template.PHM_CREATE;
     logger.info(`[Create System Template] Posting template to URL: ${url}`);
-    logger.info(`[Create System Template] Final payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`[Create System Template] Final payload: ${JSON.stringify(redactLogData(payload), null, 2)}`);
 
 
     const response = await apiClient.post(url, payload);
-    logger.info(`[Create System Template] Backend response: ${JSON.stringify(response.data)}`);
+    logger.info(`[Create System Template] Backend response: ${JSON.stringify(redactLogData(response.data))}`);
 
     // Handle backend response envelope
     req.flash('message', req.__('system_template.create.successMessage'));

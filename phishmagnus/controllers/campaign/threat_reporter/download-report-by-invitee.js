@@ -2,12 +2,13 @@ const { logger } = require("../../../../logger/logger");
 const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 exports.downloadReportByInvitee = async (req, res) => {
     try {
         const { inviteeId } = req.params;
 
-        logger.info(`[Download Report By Invitee]: Incoming request for inviteeId=${inviteeId}`);
+        logger.info(`[Download Report By Invitee]: Incoming request for inviteeId=${redactLogData(inviteeId)}`);
 
         if (!req.session || !req.user) {
             logger.warn(`[Download Report By Invitee]: No active session - redirecting to login`);
@@ -43,7 +44,7 @@ exports.downloadReportByInvitee = async (req, res) => {
         const json = JSON.stringify(extracted, null, 2);
         const filename = `threat-report-invitee-${extracted.user_email}.json`;
 
-        logger.info(`[Download Report By Invitee]: Sending file ${filename}`);
+        logger.info(`[Download Report By Invitee]: Sending file ${redactLogData(filename)}`);
 
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         res.setHeader('Content-Type', 'application/json');

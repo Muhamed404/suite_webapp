@@ -4,6 +4,7 @@ const render_ejs_urls = require('../../../config/render_ejs_urls');
 const getApiClient = require('../../../utility/api-client');
 const logger = require('../../../logger/logger').logger;
 const { validationResult } = require('express-validator');
+const { redactLogData } = require('../../../utility/redact');
 
 // Render form
 exports.renderCreateForm = async (req, res) => {
@@ -15,7 +16,7 @@ exports.renderCreateForm = async (req, res) => {
     const applications = response.data?.object || [];
 
     logger.info(`[APP SERVICE][GET] Applications fetched: count=${applications.length}`);
-    logger.info(`[APP SERVICE][GET] Applications response: ${JSON.stringify(applications, null, 2)}`);
+    logger.info(`[APP SERVICE][GET] Applications response: ${JSON.stringify(redactLogData(applications), null, 2)}`);
     res.render(render_ejs_urls.ProductSuiteManagement.App_Service.CREATE, {
       enableSuiteManagementLeftMenu: true,
       applications,
@@ -79,12 +80,12 @@ exports.createAppService = async (req, res) => {
       service_type: service_type,
       per_service_cost: cost,
     };
-    logger.info(`[APP SERVICE][POST] Final payload to backend: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`[APP SERVICE][POST] Final payload to backend: ${JSON.stringify(redactLogData(payload), null, 2)}`);
     // Send to backend API via apiClient
     const apiUrl = backend_api_urls.PRODUCT_SUITE.Application_Service.CREATE;
     logger.info(`[APP SERVICE][POST] Sending POST request to: ${apiUrl}`);
     const response = await apiClient.post(apiUrl, payload);
-    logger.info(`[APP SERVICE][POST] Backend response: ${JSON.stringify(response.data)}`);
+    logger.info(`[APP SERVICE][POST] Backend response: ${JSON.stringify(redactLogData(response.data))}`);
 
     if (!response.data.success) {
       logger.error(`[APP SERVICE][POST] Backend returned error status: ${response.data.message}`);
@@ -125,7 +126,7 @@ exports.deleteAppService = async (req, res) => {
     logger.info(`[APP SERVICE][DELETE] Calling DELETE API: ${apiUrl}`);
 
     const response = await apiClient.delete(apiUrl);
-    logger.info(`[APP SERVICE][DELETE] Delete response: ${JSON.stringify(response.data)}`);
+    logger.info(`[APP SERVICE][DELETE] Delete response: ${JSON.stringify(redactLogData(response.data))}`);
 
     const message = response.data?.message || response.data?.msg || 'Service deleted successfully';
     const alertType = response.data?.alertType || 'success';

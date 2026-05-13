@@ -1,13 +1,14 @@
 
 const { logger } = require('../../logger/logger');
 const jwt = require('jsonwebtoken');
+const { redactEmail, redactLogData } = require('../../phishmagnus/utility/redact');
 
 
 const logTxn = 'JWT Auth Middleware ';
 
 module.exports = async function authenticateMiddleware(req, res, next) {
   try {
-    logger.info(`${logTxn} - Incoming request: ${req.method} ${req.originalUrl}`);
+    logger.info(`${logTxn} - Incoming request: ${req.method} ${redactLogData(req.originalUrl)}`);
     // logger.info(`${logTxn} - Checking header ${JSMiddleware - [Verify Service Token] - Checking header ON.stringify(req.headers)}`);
     // logger.info(`${logTxn} - Checking session ${JSON.stringify(req.session)}`);
     const userToken = req.session?.jwtToken || null;
@@ -39,7 +40,7 @@ module.exports = async function authenticateMiddleware(req, res, next) {
     //   req.session.destroy();
     //   return res.redirect('/login');
     // }
-    logger.info(`${logTxn} - Token valid (not expired) for email=${decoded.user?.email}`);
+    logger.info(`${logTxn} - Token valid (not expired) for email=${redactEmail(decoded.user?.email)}`);
     next();
 
   } catch (error) {

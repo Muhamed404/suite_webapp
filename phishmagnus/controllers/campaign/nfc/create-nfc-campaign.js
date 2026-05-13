@@ -4,6 +4,7 @@ const nfcService = require('../../../services/campaign/nfc/nfc_service');
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const TemplateService = require('../../../services/template/template-service');
+const { redactLogData } = require("../../../utility/redact");
 
 
 exports.createNFCCampaign = async (req, res) => {
@@ -52,7 +53,7 @@ exports.createNFCCampaign = async (req, res) => {
       }
     } else if (req.method === "POST") {
       logger.info("NFC CAMPAIGN MODULE::: POST::: CREATE");
-      logger.info("Incoming payload: \n" + JSON.stringify(req.body));
+      logger.info("Incoming payload: \n" + JSON.stringify(redactLogData(req.body)));
       try {
         const data = await nfcService.createCampaign(req);
         if (!data.success) {

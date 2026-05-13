@@ -4,6 +4,7 @@ const enums = require("../../../contants/enum");
 const he = require('he');
 const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 
 
@@ -17,7 +18,7 @@ exports.duplicateTemplate = async (req, res) => {
   // Build immutable payload from request body
   const payload = { ...req.body };
 
-  logger.info(`[Duplicate System Template] Raw posted data: ${JSON.stringify(req.body, null, 2)}`);
+  logger.info(`[Duplicate System Template] Raw posted data: ${JSON.stringify(redactLogData(req.body), null, 2)}`);
 
   try {
     const clonningTemplateId = Number(req.params?.templateId || 0);
@@ -84,7 +85,7 @@ exports.duplicateTemplate = async (req, res) => {
     let url = backend_api_urls.PRODUCT_SUITE.Template.CLONE(clonningTemplateId);
 
     logger.info(`[Duplicate System Template] Posting template to URL: ${url}`);
-    logger.info(`[Duplicate System Template] Final payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`[Duplicate System Template] Final payload: ${JSON.stringify(redactLogData(payload), null, 2)}`);
 
     const queryParams = {
       module: enums.ModuleNames.System_Template
@@ -99,7 +100,7 @@ exports.duplicateTemplate = async (req, res) => {
       params: queryParams
     });
 
-    logger.info(`[Duplicate System Template] Backend response: ${JSON.stringify(response.data)}`);
+    logger.info(`[Duplicate System Template] Backend response: ${JSON.stringify(redactLogData(response.data))}`);
 
     if (response.data.success) {
       req.flash('message', req.__('system_template.duplicate_success'));

@@ -2,6 +2,7 @@ const config = require("../../../config/env.config");
 
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client')
+const { redactLogData } = require("../../../utility/redact");
 
 
 exports.create = async (req, res) => {
@@ -23,9 +24,9 @@ exports.create = async (req, res) => {
       code: req.body.code,
       description: req.body.description,
     };
-    logger.info("Posting payload of cybersecurity " + payload);
+    logger.info("Posting payload of cybersecurity " + JSON.stringify(redactLogData(payload)));
     const url = `/cybersecurity/categories/`;
-    logger.info("url in post create cybersecurity category url " + url);
+    logger.info("url in post create cybersecurity category url " + redactLogData(url));
     return Promise.all([apiClient.post(url, payload)])
       .then(([response]) => {
         let message = response.data.message;
@@ -33,9 +34,9 @@ exports.create = async (req, res) => {
         res.redirect(  `/cybersecurity/categories/list?message=${message}&alertType=${alertType}`);
       })
       .catch((error) => {
-        logger.error(`${error.message}`);
-        logger.error(error);
-        logger.error(error.stack);
+        logger.error(`${redactLogData(error.message)}`);
+        logger.error(redactLogData(error));
+        logger.error(redactLogData(error.stack));
         const errorMessage = error.response?.data?.message || error.message || 'Error creating category';
         const alertType = error.response?.data?.alertType || 'error';
         const queryParams = new URLSearchParams({
@@ -54,7 +55,7 @@ exports.findAllByOrganization = async (req, res) => {
  const apiClient = getApiClient(req);
     logger.info("inside findAllByOrganization method of cybersecurity");
     const url = `/cybersecurity/categories/list`;
-    logger.info("url in cybersecurity category list url " + url);
+    logger.info("url in cybersecurity category list url " + redactLogData(url));
     return Promise.all([apiClient.get(url)])
       .then(([response]) => {
         let categories = response.data.message;
@@ -62,8 +63,8 @@ exports.findAllByOrganization = async (req, res) => {
       })
       .catch((error) => {
         logger.error('Exception in findAllByOrganization')
-        logger.error(`${error.message}`);
-        logger.error(error.stack);
+        logger.error(`${redactLogData(error.message)}`);
+        logger.error(redactLogData(error.stack));
         res.redirect("/?message=Contact to Administrator&alertType=error");
       });
   
@@ -75,7 +76,7 @@ exports.disableCategory = async (req, res) => {
   logger.info("inside disableCategory method of cybersecurity");
   let catId = req.params.catId;
   const url = `/cybersecurity/categories/disableCategory/${catId}`;
-  logger.info("url in cybersecurity category disableCategory url " + url);
+  logger.info("url in cybersecurity category disableCategory url " + redactLogData(url));
   return Promise.all([apiClient.post(url)])
     .then(([response]) => {
 
@@ -83,8 +84,8 @@ exports.disableCategory = async (req, res) => {
     })
     .catch((error) => {
       logger.error('Exception in disableCategory')
-      logger.error(`${error.message}`);
-      logger.error(error.stack);
+      logger.error(`${redactLogData(error.message)}`);
+      logger.error(redactLogData(error.stack));
       res.redirect("/?message=Contact to Administrator&alertType=error");
     });
 

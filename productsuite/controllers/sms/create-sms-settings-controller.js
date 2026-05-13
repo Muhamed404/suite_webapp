@@ -2,6 +2,7 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const { logger } = require("../../../logger/logger");
 const apiClient = require("../../../utility/api-client");
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 
 exports.createSMSSettings = async (req, res) => {
@@ -59,11 +60,11 @@ exports.createSMSSettings = async (req, res) => {
         const apiClientInstance = apiClient(req);
         const url = backend_api_urls.PRODUCT_SUITE.SMS.CREATE(organizationId);
         logger.info(`Controller - SMS Settings: Posting URL: ${url}`);
-        logger.info(`Controller - SMS Settings: Payload: ${JSON.stringify({
+        logger.info(`Controller - SMS Settings: Payload: ${JSON.stringify(redactLogData({
             provider: provider_name,
             config: finalPayload,
             is_active: is_active === "true" || is_active === true
-        }, null, 2)}`);
+        }), null, 2)}`);
         const response = await apiClientInstance.post(url, {
             provider: provider_name,
             config: finalPayload,

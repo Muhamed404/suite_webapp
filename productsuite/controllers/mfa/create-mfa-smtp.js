@@ -1,5 +1,6 @@
  
 const { logger } = require("../../../logger/logger");
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
  
 const MFAService = require('../../services/mfa/mfa-service')
 
@@ -8,7 +9,7 @@ exports.renderCreateForm = async (req, res) => {
   if (req.method === "GET") {
     const mfaSMTP = await MFAService.retrieveMFAConfiguration(req);
 
-    logger.info(`[MFA SMTP]: Printing response ${JSON.stringify(mfaSMTP)}`);
+    logger.info(`[MFA SMTP]: Printing response ${JSON.stringify(redactLogData(mfaSMTP))}`);
 
     return res.render("pages/mfa/create", {
       smtpData: mfaSMTP

@@ -3,11 +3,12 @@ const { logger } = require("../../../logger/logger");
 const ICONSTANTS = require("../../../contants/ICONSTANTS");
 const enums = require("../../../contants/enum");
 const getApiClient = require('../../../utility/api-client')
+const { redactLogData } = require("../../utility/redact");
 exports.testCampaign = async (req, res) => {
   logger.info('TEST CAMPAIGN METHOD::: CAMPAIGN CREATION STARTED')
   try {
     
-      logger.info(`Body ${JSON.stringify(req.body)}`);
+      logger.info(`Body ${JSON.stringify(redactLogData(req.body))}`);
       let user = req.user;
       let payload = req.body;
       if (payload.template === null || payload.template === undefined || payload.template === "") {
@@ -15,7 +16,7 @@ exports.testCampaign = async (req, res) => {
         logger.info('Assigning template of from system template into template field '+payload.template)        
       }
       logger.info('TEST CAMPAIGN METHOD::: Payload data')
-      logger.info( 'Posted Campaign data is '+JSON.stringify(payload));
+      logger.info( 'Posted Campaign data is '+JSON.stringify(redactLogData(payload)));
       const apiClient = getApiClient(req);
       const url = `/phm/campaign/test-campaign/${user.organization_id}/${user.userId}`;
       logger.info('TEST CAMPAIGN METHOD::: URL '+url)

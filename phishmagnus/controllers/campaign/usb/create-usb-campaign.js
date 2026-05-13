@@ -1,6 +1,7 @@
 const config = require("../../../../config/env.config");
 
 const { logger } = require("../../../../logger/logger");
+const { redactEmail, redactLogData } = require("../../../utility/redact");
 const ICONSTANTS = require("../../../../contants/ICONSTANTS");
 
 const getApiClient = require('../../../../utility/api-client')
@@ -14,7 +15,7 @@ exports.createUSBCampaign = async (req, res) => {
   try {
     const user = req.user;
     const orgId = req.params.orgId === undefined ? user.organization_id : req.params.orgId;
-    logger.info(`USB CAMPAIGN::: Request Method: ${req.method}, User: ${user?.email}, Org: ${orgId}`);
+    logger.info(`USB CAMPAIGN::: Request Method: ${req.method}, User: ${redactEmail(user?.email)}, Org: ${orgId}`);
 
     if (req.method === "GET") {
       logger.info("USB CAMPAIGN::: GET - Rendering create USB campaign page");
@@ -26,14 +27,14 @@ exports.createUSBCampaign = async (req, res) => {
 
     if (req.method === "POST") {
       logger.info("USB CAMPAIGN::: POST - Create campaign request received");
-      logger.info("USB CAMPAIGN::: POST - Incoming payload: " + JSON.stringify(req.body));
+      logger.info("USB CAMPAIGN::: POST - Incoming payload: " + JSON.stringify(redactLogData(req.body)));
 
       const payload = req.body;
       const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.USB.CREATE;
       const apiClient = getApiClient(req);
 
       logger.info(`USB CAMPAIGN::: POST - API URL: ${url}`);
-      logger.info(`USB CAMPAIGN::: POST - Final payload: ${JSON.stringify(payload)}`);
+      logger.info(`USB CAMPAIGN::: POST - Final payload: ${JSON.stringify(redactLogData(payload))}`);
 
       try {
         const response = await apiClient.post(url, payload);

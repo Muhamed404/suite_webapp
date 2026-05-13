@@ -4,6 +4,7 @@ const frontend_api_urls = require("../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client')
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 const logTxn = 'Controller - [Service Registry - Retrieve All]';
 
@@ -22,7 +23,7 @@ exports.retrieveServiceList = async (req, res) => {
 
         const result = response.data;
         logger.info(`${logTxn} - Successfully fetched service registry list`);
-        logger.info(`${logTxn} - Response Data: ${JSON.stringify(result, null, 2)}`);
+        logger.info(`${logTxn} - Response Data: ${JSON.stringify(redactLogData(result), null, 2)}`);
 
         res.render(render_ejs_urls.ProductSuiteManagement.Service_Registry.LIST, {
             enableSuiteManagementLeftMenu: true,

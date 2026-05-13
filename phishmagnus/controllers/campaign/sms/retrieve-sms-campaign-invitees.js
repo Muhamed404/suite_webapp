@@ -5,6 +5,7 @@ const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const { formatDateTimeDDMmmYYYYHHmmAMPM } = require('../../../../utility/date-time-utility');
+const { redactLogData } = require("../../../utility/redact");
 
 
 
@@ -89,7 +90,7 @@ exports.getSMSCampaignInvitees = async (req, res) => {
         total = response?.data?.total || response?.data?.pagination?.total || invitees.length;
         
         logger.info(`[SMS Campaign Invitees] Backend returned ${invitees.length} invitees (Total: ${total})`);
-        logger.info(`[SMS Campaign Invitees] Invitees Data Sample: ${JSON.stringify(invitees.slice(0,2),null,2)}`);
+        logger.info(`[SMS Campaign Invitees] Invitees Data Sample: ${JSON.stringify(redactLogData(invitees.slice(0, 2)), null, 2)}`);
       } catch (apiError) {
         logger.error(`[SMS Campaign Invitees] Backend API Error: ${apiError.message}`);
         

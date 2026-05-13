@@ -9,6 +9,7 @@ const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const axios = require("axios");
+const { redactLogData } = require("../../../utility/redact");
 
 exports.usbCampaignReport = async (req, res) => {
   try {
@@ -65,7 +66,7 @@ exports.usbCampaignReport = async (req, res) => {
         campaigns: []
       });
     }
-    logger.info(`USB Report Data: ${JSON.stringify(campaigns.slice(0, 2), null, 2)}`);
+    logger.info(`USB Report Data: ${JSON.stringify(redactLogData(campaigns.slice(0, 2)), null, 2)}`);
 
     res.render(render_ejs_urls.PhishMagnus.Campaign.USB.RENDER_USB_REPORT, payload);
   } catch (err) {

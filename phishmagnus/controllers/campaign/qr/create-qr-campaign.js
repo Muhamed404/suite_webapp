@@ -9,6 +9,7 @@ const getApiClient = require('../../../../utility/api-client');
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const ApplicationConstants = require('../../../../contants/application-constants');
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 
 exports.createCampaign = async (req, res) => {
@@ -70,7 +71,7 @@ exports.submitForm = async (req, res) => {
 
   try {
     if (req.method === "POST") {
-      logger.info(`[QR CAMPAIGN][SUBMIT][POST] Incoming payload: ${JSON.stringify(req.body, null, 2)}`);
+      logger.info(`[QR CAMPAIGN][SUBMIT][POST] Incoming payload: ${JSON.stringify(redactLogData(req.body), null, 2)}`);
 
       let payload = req.body;
 
@@ -145,7 +146,7 @@ exports.submitForm = async (req, res) => {
         filePath: filePath || undefined
       };
 
-      logger.info(`[QR CAMPAIGN][SUBMIT][POST] Final payload to API: ${JSON.stringify(newPayload)}`);
+      logger.info(`[QR CAMPAIGN][SUBMIT][POST] Final payload to API: ${JSON.stringify(redactLogData(newPayload))}`);
 
       const apiClient = getApiClient(req);
       const url = `/phm/campaign/qr/create`;

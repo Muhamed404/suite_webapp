@@ -2,6 +2,7 @@
 const axios = require('axios');
 const config = require("../config/env.config");
 const { logger } = require("../logger/logger");
+const { redactLogData } = require("./redact");
 
 
 /**
@@ -54,9 +55,9 @@ function getApiClient(req) {
         // If there are query params, append them
         if (config.params) {
             const queryParams = new URLSearchParams(config.params).toString();
-            logger.info(`[apiClient] ${method} ${fullUrl}?${queryParams}`);
+            logger.info(`[apiClient] ${method} ${redactLogData(fullUrl)}?${redactLogData(queryParams)}`);
         } else {
-            logger.info(`[apiClient] ${method} ${fullUrl}`);
+            logger.info(`[apiClient] ${method} ${redactLogData(fullUrl)}`);
         }
         return config;
     });
@@ -74,11 +75,11 @@ function getApiClient(req) {
             return response;
         },
         error => {
-            logger.error(`[apiClient] Error during request: ${error?.response?.data || error?.message || 'Unknown error'}`, {
-                method: error?.config?.method?.toUpperCase(),
-                url: `${error?.config?.baseURL || ''}${error?.config?.url || ''}`,
-                status: error?.response?.status,
-                data: error?.response?.data,
+            logger.error(`[apiClient] Error during request: ${redactLogData(error?.response?.data || error?.message || 'Unknown error')}`, {
+                method: redactLogData(error?.config?.method?.toUpperCase()),
+                url: redactLogData(`${error?.config?.baseURL || ''}${error?.config?.url || ''}`),
+                status: redactLogData(error?.response?.status),
+                data: redactLogData(error?.response?.data),
             });
 
             // If token expired or unauthorized due to expired token, clear server session.

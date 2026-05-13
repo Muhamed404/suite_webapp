@@ -2,6 +2,7 @@ const config = require("../../../config/env.config");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require("../../../utility/api-client");
 const BACKEND_URLS = require('../../../config/backend_api_urls')
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 
 async function retrieveSuiteManagementLicenseInformation(req) {
@@ -12,11 +13,11 @@ async function retrieveSuiteManagementLicenseInformation(req) {
         logger.info(`[License Information]: AXIOS URL ${url}`);
         const apiClient = getApiClient(req);
         const response = await apiClient.get(url);
-        logger.info('[License Information]:' + JSON.stringify({
+        logger.info('[License Information]:' + JSON.stringify(redactLogData({
             status: response.status,
             data: response.data,
             headers: response.headers,
-        }, null, 2));
+        }), null, 2));
         return response.data?.message || null;
     } catch (error) {
         logger.error("ERROR: " + error.message);
@@ -33,11 +34,11 @@ async function retrieveAwareMagnusOrganizationLicenseDetails(req) {
         logger.info(`[AWM License Detail]: Backend API URL: ${url}`);
         const apiClient = getApiClient(req);
         const response = await apiClient.get(url);
-        logger.info('[AWM License Detail]: User License Respose Details' + JSON.stringify({
+        logger.info('[AWM License Detail]: User License Respose Details' + JSON.stringify(redactLogData({
             status: response.status,
             data: response.data,
             headers: response.headers,
-        }, null, 2));
+        }), null, 2));
         return response.data?.message || null;
     } catch (error) {
         logger.error("[AWM License Detail]: Err- " + error.message);

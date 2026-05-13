@@ -7,6 +7,7 @@ const getApiClient = require('../../../../utility/api-client')
 const DepartmentService = require('../../../services/department/department-service')
 const GroupService = require('../../../services/group/group-service')
 const TemplateService = require('../../../services/template/template-service');
+const { redactLogData } = require("../../../utility/redact");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const backend_api_urls = require("../../../../config/backend_api_urls");
@@ -93,7 +94,7 @@ exports.submitFormController = async (req, res) => {
   logger.info("Controller - Create WhatsApp Campaign:Incoming request");
   try {
     if (req.method === "POST") {
-      logger.info(`Campaign IncomingBody Request: \n ${JSON.stringify(req.body, null, 2)}`);
+      logger.info(`Campaign IncomingBody Request: \n ${JSON.stringify(redactLogData(req.body), null, 2)}`);
       let payload = req.body;
 
       // normalize arrays (ensure arrays when single values posted)
@@ -135,7 +136,7 @@ exports.submitFormController = async (req, res) => {
       // Add templateId to payload
       payload.templateId = templateId;
       delete payload.templateSelect;
-      logger.info("Payload data " + JSON.stringify(payload));
+      logger.info("Payload data " + JSON.stringify(redactLogData(payload)));
       const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.Whatsapp.CREATE;
       logger.info("Posting Campaign URL " + url);
       const apiClient = getApiClient(req);

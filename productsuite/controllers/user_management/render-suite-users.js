@@ -3,6 +3,7 @@ const { hasAccess } = require("../../../utility/helperFunctions");
 const ICONSTANTS = require("../../../contants/ICONSTANTS");
 const enums = require('../../../contants/enum')
 const getApiClient = require('../../../utility/api-client');
+const { redactEmail } = require("../../../utility/redact");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const backend_api_urls = require("../../../config/backend_api_urls");
@@ -61,12 +62,12 @@ exports.renderSuiteUsers = async (req, res) => {
     
     if (hasAccess(req, enums.ModuleNames.User_Management, [enums.Access_Types.RWD_ALL, enums.Access_Types.RWD_O]) && !isViewingDifferentOrg) {
       hasCreatePermission = Boolean(true);
-      logger.info(`[Organization User List] Enabling Create Button for user: ` + userSession.email)
+      logger.info(`[Organization User List] Enabling Create Button for user: ` + redactEmail(userSession.email))
     }
     
     if (isViewingDifferentOrg) {
       isReadOnly = Boolean(true);
-      logger.info(`[Organization User List] Setting read-only mode for user: ` + userSession.email + ` - viewing different organization`)
+      logger.info(`[Organization User List] Setting read-only mode for user: ` + redactEmail(userSession.email) + ` - viewing different organization`)
     }
     
     const showBulkImportJobsNav = hasAccess(req, enums.ModuleNames.User_Management, [

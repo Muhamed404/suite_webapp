@@ -1,5 +1,6 @@
 const { logger } = require("../../../logger/logger");
 const LicenseService = require('../../services/license/licenseService')
+const { redactLogData } = require("../../../utility/redact");
 
 
 exports.renderProductSuite = async (req, res) => {
@@ -44,9 +45,9 @@ exports.renderProductSuite = async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error("[PSuite Render]: " + error.message);
-    logger.error("[PSuite Render]: " + error);
-    logger.error("[PSuite Render]: " + error.stack);
+    logger.error("[PSuite Render]: " + redactLogData(error.message));
+    logger.error("[PSuite Render]: " + redactLogData(error));
+    logger.error("[PSuite Render]: " + redactLogData(error.stack));
     res.redirect("/psm/?message=Issue in Product Suite Management=error");
   }
 };

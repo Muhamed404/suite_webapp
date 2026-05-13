@@ -4,12 +4,13 @@ const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 /**
  * Controller to render the email campaign details view with statistics and user details.
  */
 exports.generateNFCDeviceReport = async (req, res) => {
-  logger.info(`[NFC Device Report Controller]: Incoming request ${JSON.stringify(req.params)}`);
+  logger.info(`[NFC Device Report Controller]: Incoming request ${JSON.stringify(redactLogData(req.params))}`);
   // return res.render(render_ejs_urls.PhishMagnus.Campaign.QR.RENDER_TAG_REPORT);
   try {
     const nfcDeviceCode = req.params?.qrImageCode;
@@ -30,21 +31,21 @@ exports.generateNFCDeviceReport = async (req, res) => {
     const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.NFC.TAG_REPORT(campaignId, nfcDeviceCode);
     logger.info('Initiation NFC Device Report Controller: Request' + url);
     const response = await apiClient.get(url);
-    logger.info('[NFC Device Report Controller]: Response: ' + JSON.stringify(response.data, null, 2));
+    logger.info('[NFC Device Report Controller]: Response: ' + JSON.stringify(redactLogData(response.data), null, 2));
 
     const campaignDetails = response?.data?.message.campaignDetails || {};
-    logger.info(`[NFC Device Report Controller]: Campaign Details: ${JSON.stringify(campaignDetails, null, 2)}`);
+    logger.info(`[NFC Device Report Controller]: Campaign Details: ${JSON.stringify(redactLogData(campaignDetails), null, 2)}`);
     const interactionStats = response?.data?.message.interactionStats || {};
-    logger.info(`[NFC Device Report Controller]: Interaction Stats: ${JSON.stringify(interactionStats, null, 2)}`);
+    logger.info(`[NFC Device Report Controller]: Interaction Stats: ${JSON.stringify(redactLogData(interactionStats), null, 2)}`);
     const nfcReportProfile = response?.data?.message.nfcReportProfile || {};
-    logger.info(`[NFC Device Report Controller]: NFC Report Profile: ${JSON.stringify(nfcReportProfile, null, 2)}`);
+    logger.info(`[NFC Device Report Controller]: NFC Report Profile: ${JSON.stringify(redactLogData(nfcReportProfile), null, 2)}`);
     // Transform interaction stats into timeline format
     const interactionTimeline = transformInteractionStatsTimeline(nfcReportProfile, req);
-    logger.info(`[NFC Device Report Controller]: Interaction Timeline: ${JSON.stringify(interactionTimeline, null, 2)}`);
+    logger.info(`[NFC Device Report Controller]: Interaction Timeline: ${JSON.stringify(redactLogData(interactionTimeline), null, 2)}`);
 
     // Extract nfc_report_details for the per-IP timeline chart
     const nfcReportDetails = nfcReportProfile?.NFCReport?.[0]?.nfc_report_details || [];
-    logger.info(`[NFC Device Report Controller]: NFC Report Details: ${JSON.stringify(nfcReportDetails, null, 2)}`);
+    logger.info(`[NFC Device Report Controller]: NFC Report Details: ${JSON.stringify(redactLogData(nfcReportDetails), null, 2)}`);
 
     return res.render(render_ejs_urls.PhishMagnus.Campaign.NFC.RENDER_TAG_REPORT, {
       interactionStats,

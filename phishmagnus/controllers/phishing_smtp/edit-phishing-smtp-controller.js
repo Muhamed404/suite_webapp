@@ -2,6 +2,7 @@ const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const { logger } = require("../../../logger/logger");
+const { redactLogData } = require("../../utility/redact");
 const getApiClient = require('../../../utility/api-client');
 
 
@@ -18,7 +19,7 @@ exports.editPhishingSMTP = async (req, res) => {
       .get(url)
       .then((response) => {
         const data = response.data;
-        logger.debug(`[SMTP Configuration] Response ${JSON.stringify(data.host, null, 2)}`);
+        logger.debug(`[SMTP Configuration] Response ${JSON.stringify(redactLogData(data.host), null, 2)}`);
 
         // const smtp = data.smtp ?? data;
         const smtp = { ...data.smtp, encrypt_password: data.smtp.is_encrypted ? true : false }; // Ensure encrypt_password is set for the view
@@ -47,7 +48,7 @@ exports.editPhishingSMTP = async (req, res) => {
       .put(url, smtpObj)
       .then((response) => {
         const data = response.data;
-        logger.debug(`[SMTP Configuration] POST - Response ${JSON.stringify(data, null, 2)}`);
+        logger.debug(`[SMTP Configuration] POST - Response ${JSON.stringify(redactLogData(data), null, 2)}`);
 
         req.flash('message', data.message || 'SMTP configuration updated successfully.');
         req.flash('alertType', data.success ? 'success' : 'error');

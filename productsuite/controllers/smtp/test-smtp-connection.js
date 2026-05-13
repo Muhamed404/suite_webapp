@@ -3,6 +3,7 @@ const config = require("../../../config/env.config");
 const { logger } = require("../../../logger/logger");
 const ICONSTANTS = require("../../../contants/ICONSTANTS");
 const getApiClient = require('../../../utility/api-client')
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 
 exports.testOrganizationSMTPConnection = (req, res) => {
@@ -18,7 +19,7 @@ exports.testOrganizationSMTPConnection = (req, res) => {
   logger.info(`TEST SMTP CONNECTION::: ${url}`);
   apiClient.get(url).then((response) => {
     let data = response.data;
-    logger.info(`TEST SMTP CONNECTION: data is ${JSON.stringify(data)}`);
+    logger.info(`TEST SMTP CONNECTION: data is ${JSON.stringify(redactLogData(data))}`);
     // logger.info(`${JSON.stringify(data.message)}`);
     if (data.success) {
       return res.status(ICONSTANTS.HTTP_OK).json({success: true, message: data.message })

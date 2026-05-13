@@ -1,10 +1,11 @@
 const { logger } = require("../logger/logger");
+const { redactLogData } = require("./redact");
 
 
 const checkPermission = (moduleName, allowedAccessTypes = []) => {
   return async (req, res, next) => {
     try {
-      logger.info(`[CHECK PERMISSION] Module_Name: ${moduleName}, AllowedAccessTypes: ${JSON.stringify(allowedAccessTypes)}`);
+      logger.info(`[CHECK PERMISSION] Module_Name: ${redactLogData(moduleName)}, AllowedAccessTypes: ${JSON.stringify(redactLogData(allowedAccessTypes))}`);
 
       const userPermissions = req?.permissions || [];
 
@@ -35,7 +36,7 @@ const checkPermission = (moduleName, allowedAccessTypes = []) => {
 
       next();
     } catch (error) {
-      logger.error('[CHECK PERMISSION] ' + error);
+      logger.error('[CHECK PERMISSION] ' + redactLogData(error));
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   };

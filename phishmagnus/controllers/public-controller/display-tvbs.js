@@ -6,6 +6,7 @@ const enums = require('../../../contants/enum');
 const config = require("../../../config/env.config");
 const path = require('path');
 const fs = require('fs');
+const { redactLogData } = require("../utility/redact");
 
 
 
@@ -13,7 +14,7 @@ exports.displayPhishingPage = async (req, res) => {
   logger.info(`TVBS DISPLAY PHISHING PAGE::: INCOMING REQUEST`);
   const queryInviteeId = req.query.invitee;
   const queryCampaignUniqueCode = req.query.campaign;
-  logger.info(`TVBS DISPLAY PHISHING PAGE::: INCOMING QUERY PARAMTERS INVITEE : ${queryInviteeId}, CAMPAIGN UNIQUE CODE: ${queryCampaignUniqueCode}`);
+  logger.info(`TVBS DISPLAY PHISHING PAGE::: INCOMING QUERY PARAMTERS INVITEE : ${redactLogData(queryInviteeId)}, CAMPAIGN UNIQUE CODE: ${redactLogData(queryCampaignUniqueCode)}`);
   //const users = await SMApplicationUsers.findAll();
   const baseUrl = config.BACKEND_TVBS_URL;
   const params = {
@@ -29,7 +30,7 @@ exports.displayPhishingPage = async (req, res) => {
   return Promise.all([axios.get(url.toString())])
     .then(([response]) => {
       let campaignDetails = response.data.message;
-      logger.info(`TVBS DISPLAY PHISHING PAGE::: DETAILS OF RESPONSE : ${JSON.stringify(campaignDetails)}`);
+      logger.info(`TVBS DISPLAY PHISHING PAGE::: DETAILS OF RESPONSE : ${JSON.stringify(redactLogData(campaignDetails))}`);
 
       const first_name = campaignDetails.Phishing_Invities[0].User.UserProfile.first_name;
       const last_name = campaignDetails.Phishing_Invities[0].User.UserProfile.last_name;

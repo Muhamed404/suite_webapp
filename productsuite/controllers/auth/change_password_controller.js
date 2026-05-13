@@ -2,6 +2,7 @@
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const { logger } = require("../../../logger/logger"); 
 const getApiClient = require('../../../utility/api-client'); 
+const { redactEmail, redactLogData } = require("../../../utility/redact");
 
 exports.changePassword = async (req, res, next) => {
   logger.info(`Incoming Req received in changePassword`);
@@ -18,20 +19,21 @@ exports.changePassword = async (req, res, next) => {
     try {
       const apiClient = getApiClient(req);
       const { current_password, new_password } = req.body;
-      logger.info(`Req body params values ${JSON.stringify(req.body,null,2)}`);
+      logger.info(`Req body params values ${JSON.stringify(redactLogData(req.body), null, 2)}`);
       let user = req.user;
       let payload = {
         current_password,
         new_password,
         email: user.email,
       };
-      logger.info('Change Password: Sending Payload: ' + JSON.stringify(payload));
+      logger.info('Change Password: Sending Payload: ' + JSON.stringify(redactLogData(payload)));
 
       const orgId = parseInt(req.user.organization_id);
       const email = req.user.email;
-      logger.info('change password user data: '+JSON.stringify(req.user))
+      logger.info('change password user data: ' + JSON.stringify(redactLogData(req.user)))
       let url = `/changePassword/${orgId}/${email}`;
-      logger.info(`submitting url: `+ url);
+      const redactedUrl = `/changePassword/${orgId}/${redactEmail(email)}`;
+      logger.info(`submitting url: ` + redactedUrl);
 
       await apiClient.post(url, payload);
       req.session.destroy((err) => {

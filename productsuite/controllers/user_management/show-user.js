@@ -3,12 +3,13 @@ const getApiClient = require('../../../utility/api-client');
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const backend_api_urls = require("../../../config/backend_api_urls");
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 
 
 
 exports.retrieveUser = async (req, res, next) => {
-  logger.info(`Controller - [Retrieve User]: Incoming request to retrieve user with ID ${JSON.stringify(req.params, null, 2)}`);
+  logger.info(`Controller - [Retrieve User]: Incoming request to retrieve user with ID ${JSON.stringify(redactLogData(req.params), null, 2)}`);
   try {
     const userId = req.params?.userId || null;
 
@@ -21,7 +22,7 @@ exports.retrieveUser = async (req, res, next) => {
 
     const apiClient = getApiClient(req);
     const userResponse = await apiClient.get(backend_api_urls.PRODUCT_SUITE.User_Management.RETRIEVE_USER_BY_ID(userId));
-    logger.info(`Controller - [Retrieve User]: Response from API: ${JSON.stringify(userResponse.data, null, 2)}`);
+    logger.info(`Controller - [Retrieve User]: Response from API: ${JSON.stringify(redactLogData(userResponse.data), null, 2)}`);
 
     // Handle user not found or error from API
     if (!userResponse.data.success) {
@@ -35,7 +36,7 @@ exports.retrieveUser = async (req, res, next) => {
       user: userResponse.data.object,
       enableSuiteManagementLeftMenu: true,
     };
-    logger.info(`Controller - [Retrieve User]: Rendering edit user page for user ID ${JSON.stringify(renderData, null, 2)}`);
+    logger.info(`Controller - [Retrieve User]: Rendering edit user page for user ID ${JSON.stringify(redactLogData(renderData), null, 2)}`);
     res.render(render_ejs_urls.ProductSuiteManagement.User_Management.EDIT_USER, renderData);
   } catch (error) {
     logger.error(`Error Controller - [Retrieve User]: ${error}`);
