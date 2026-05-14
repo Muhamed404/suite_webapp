@@ -1,6 +1,7 @@
 
 const { PDFDocument, rgb } = require('pdf-lib');
 const { logger } = require("../../logger/logger");
+const { redactEmail } = require("./redact");
 
 const getApiClient = require("../../utility/api-client");
 
@@ -189,19 +190,21 @@ async function checkDuplicateUser(req, res) {
   try {
     logger.info("[checkDuplicateUser]: start receving check Duplicate User for email:");
     const email = req.query.email;
-    logger.info(`[checkDuplicateUser]: email: ${email}`);
+    const redactedEmail = redactEmail(email);
+    logger.info(`[checkDuplicateUser]: email: ${redactedEmail}`);
     let url = `/phm/commons/check-duplicate-user?email=` + email;
-    logger.info(`[checkDuplicateUser]: calling url request ${url}`);
+    const redactedUrl = `/phm/commons/check-duplicate-user?email=` + redactedEmail;
+    logger.info(`[checkDuplicateUser]: calling url request ${redactedUrl}`);
 
     const apiClient = getApiClient(req);
     const response = await apiClient.get(url)
     //logger.info(response)
     let isProfileExist = response.data.message;
     if (isProfileExist === 'true') {
-      logger.warn('[checkDuplicateUser]: Email already registerd for the email ' + email)
+      logger.warn('[checkDuplicateUser]: Email already registerd for the email ' + redactedEmail)
       res.json({ isDuplicate: "true" });
     } else {
-      logger.info('[checkDuplicateUser]: Email not registerd for the email ' + email)
+      logger.info('[checkDuplicateUser]: Email not registerd for the email ' + redactedEmail)
       res.json({ isDuplicate: "false" });
     }
   } catch (err) {

@@ -1,12 +1,13 @@
 
 
 const { logger } = require("../../../logger/logger");
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 const MFAService = require('../../services/mfa/mfa-service')
 
 exports.createSMTP = async (req, res) => {
   try {
-    logger.info(`[Save MFA SMTP]: Incoming request for connection: ${JSON.stringify(req.body, null, 2)}`);
+    logger.info(`[Save MFA SMTP]: Incoming request for connection: ${JSON.stringify(redactLogData(req.body), null, 2)}`);
     const { name, smtp_host, smtp_port, smtp_user, smtp_pass, enable_mfa, is_encrypted } = req.body;
 
     const smtpData = {

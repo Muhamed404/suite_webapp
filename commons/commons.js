@@ -2,6 +2,7 @@
 
 const backend_api_urls = require("../config/backend_api_urls");
 const { logger } = require("../logger/logger");
+const { redactLogData } = require("../phishmagnus/utility/redact");
 
 const getApiClient = require('../utility/api-client')
 
@@ -19,9 +20,9 @@ async function getFilteredRolesByOrganizationLevel(req, orgId = 0) {
     return roles;
 
   } catch (error) {
-    logger.error(`Issue in fetching roles` + error);
-    logger.error(error.stack);
-    logger.error(error.message);
+    logger.error(`Issue in fetching roles` + redactLogData(error));
+    logger.error(redactLogData(error.stack));
+    logger.error(redactLogData(error.message));
     throw new Error('Issue in fetching roles');
   }
 }

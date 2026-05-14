@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const envConfig = require('../../config/env.config');
 const ApplicationConstants = require('../../contants/application-constants');
 const { logger } = require('../../logger/logger');
+const { redactSessionId, redactLogData } = require('../../phishmagnus/utility/redact');
 
 // Config
 const config = {
@@ -53,7 +54,7 @@ async function validateSessionMiddleware(req, res, next) {
         }
 
         // Log current Redis session ID
-        logger.info(`Middleware - Session ID: ${req.sessionID}`);
+        logger.info(`Middleware - Session ID: ${redactSessionId(req.sessionID)}`);
 
         // Log session data
         // logger.info(`Middleware - Session Data: ${JSON.stringify(req.session, null, 2)}`);
@@ -87,8 +88,8 @@ async function validateSessionMiddleware(req, res, next) {
         // Continue
         next();
     } catch (err) {
-        logger.error(`Middleware - Session validation failed: ${err.message}`);
-        logger.error(err.stack);
+        logger.error(`Middleware - Session validation failed: ${redactLogData(err.message)}`);
+        logger.error(redactLogData(err.stack));
         req.flash('message', 'Session validation error. Please log in again.');
         req.flash('alertType', 'error');
         return res.redirect('/login');

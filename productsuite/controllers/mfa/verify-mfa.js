@@ -2,10 +2,11 @@
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client')
 const jwt = require('jsonwebtoken');
+const { redactEmail, redactLogData } = require("../../../utility/redact");
 
 
 exports.verifyOTP = async (req, res) => {
-  logger.info(`[Verify OTP]: Incoming request with body values ${JSON.stringify(req.body)}`);
+  logger.info(`[Verify OTP]: Incoming request with body values ${JSON.stringify(redactLogData(req.body))}`);
   const { otp } = req.body;
 
   if (!req.session.mfaPendingUser) {
@@ -54,7 +55,7 @@ exports.verifyOTP = async (req, res) => {
   // Clean up temp session
   delete req.session.mfaPendingUser;
 
-  logger.info(`[MFA CONTROLLER] OTP validated. Session created for ${pendingUser.email}`);
+  logger.info(`[MFA CONTROLLER] OTP validated. Session created for ${redactEmail(pendingUser.email)}`);
   // return res.redirect('/phm/suite/management');
   return res.redirect("/home");
 

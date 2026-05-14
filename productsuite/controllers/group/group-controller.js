@@ -6,6 +6,7 @@ const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client')
 const enums = require("../../../contants/enum");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
+const { redactLogData } = require("../../../utility/redact");
 exports.create = async (req, res) => {
   if (req.user === undefined || req?.user === undefined) {
     logger.warn('User session is undefined');
@@ -44,12 +45,12 @@ exports.create = async (req, res) => {
     const url = backend_api_urls.PHISHMAGNUS.GROUPS.CREATE;
 
     try {
-      logger.info('[Group create]: POST Payload: ' + JSON.stringify(groups, null, 2));
+      logger.info('[Group create]: POST Payload: ' + JSON.stringify(redactLogData(groups), null, 2));
       const response = await apiClient.post(url, groups);
       const { message: message, alertType: alertType } = response.data;
       req.flash('alertType', alertType);
       req.flash('message', message);
-      logger.info(`[Group create]: Response from backend: ${JSON.stringify(response.data, null, 2)}`);
+      logger.info(`[Group create]: Response from backend: ${JSON.stringify(redactLogData(response.data), null, 2)}`);
 
       res.redirect(
         frontend_api_urls.PHISHMAGNUS.Group.List
@@ -66,7 +67,7 @@ exports.create = async (req, res) => {
 };
 
 exports.retrieveAllGroups = async (req, res) => {
-  logger.info(`[Retrieve All Groups]: Incoming request with the params ${JSON.stringify(req.params)}`)
+  logger.info(`[Retrieve All Groups]: Incoming request with the params ${JSON.stringify(redactLogData(req.params))}`)
   if (req.method === "GET") {
     let orgId = req.user.organization_id === null ? parseInt(req.params.organizationId) : parseInt(req.user.organization_id);
     if (orgId === undefined || orgId === null) {
@@ -86,7 +87,7 @@ exports.retrieveAllGroups = async (req, res) => {
         let subscription = subscriptionResponse.data?.object
 
         // console.log('----------- ' + subscriptionOrgId)
-        logger.info(`[Retrieve All Groups]: Subscription Balance ${JSON.stringify(subscription, null, 2)}`)
+        logger.info(`[Retrieve All Groups]: Subscription Balance ${JSON.stringify(redactLogData(subscription), null, 2)}`)
         res.render(render_ejs_urls.PhishMagnus.Group_Management.LIST, {
           enableSuiteManagementLeftMenu: true,
           groups,
@@ -96,7 +97,7 @@ exports.retrieveAllGroups = async (req, res) => {
         });
       })
       .catch((error) => {
-        logger.error(`${error.message}`);
+        logger.error(`${redactLogData(error.message)}`);
         res.redirect("/phm/?message='Error'&alertType='error'");
       });
   } else {

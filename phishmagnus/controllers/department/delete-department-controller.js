@@ -2,6 +2,7 @@ const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client');
+const { redactLogData } = require("../../../utility/redact");
 
 // Helper to check if request is AJAX
 const isAjaxRequest = (req) => {
@@ -44,7 +45,7 @@ exports.deleteDepartment = async (req, res) => {
     }
 
     const url = backend_api_urls.PHISHMAGNUS.DEPARTMENT.DELETE(departmentId);
-    logger.info('Controller - Delete Department: API URL::: ' + url);
+    logger.info('Controller - Delete Department: API URL::: ' + redactLogData(url));
     const response = await apiClient.delete(url, { params: queryParams });
 
     // Backend returns alertType, not success flag
@@ -55,8 +56,8 @@ exports.deleteDepartment = async (req, res) => {
     return sendResponse(req, res, true, req.__('department.department_deleted_successfully') || 'Department deleted successfully', '/department/list');
 
   } catch (error) {
-    logger.error("Controller - Delete Department: Exception in delete department" + error);
-    logger.error(error.stack);
+    logger.error("Controller - Delete Department: Exception in delete department" + redactLogData(error));
+    logger.error(redactLogData(error.stack));
 
     if (error.response && error.response.status === 403) {
       const errorMessage = error.response.data?.message || 'Access Denied';

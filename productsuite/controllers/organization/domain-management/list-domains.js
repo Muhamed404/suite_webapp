@@ -3,13 +3,14 @@ const render_ejs_urls = require('../../../../config/render_ejs_urls');
 const { logger } = require('../../../../logger/logger');
 const getApiClient = require('../../../../utility/api-client');
 const enums = require('../../../../contants/enum');
+const { redactLogData } = require("../../../../utility/redact");
 exports.listDomains = async (req, res) => {
     try {
         const orgId = req.params.orgId;
         const page = parseInt(req.query.page) || 1;
         const pageSize = parseInt(req.query.pageSize) || 10;
 
-        logger.info(`[DomainManagement] Listing domains for orgId=${orgId}, page=${page}`);
+        logger.info(`[DomainManagement] Listing domains for orgId=${redactLogData(orgId)}, page=${page}`);
 
         const apiClient = getApiClient(req);
         const domainsRes = await apiClient.get(backend_api_urls.PRODUCT_SUITE.DOMAIN_MANAGEMENT.LIST_BY_ORGANIZATION(orgId), {
@@ -45,7 +46,7 @@ exports.listDomains = async (req, res) => {
             locale: req.getLocale ? req.getLocale() : 'en',
         });
     } catch (error) {
-        logger.error(`[DomainManagement] listDomains error: ${error.message}`);
+        logger.error(`[DomainManagement] listDomains error: ${redactLogData(error.message)}`);
         req.flash('message', 'Failed to load domains.');
         req.flash('alertType', 'error');
         return res.redirect('/home');

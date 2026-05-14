@@ -1,5 +1,6 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const { logger } = require("../../../logger/logger");
+const { redactString } = require("../../../utility/redact");
 const apiClient = require("../../../utility/api-client");
 
 exports.updateSMSSettings = async (req, res) => {
@@ -74,8 +75,8 @@ exports.updateSMSSettings = async (req, res) => {
         req.flash("alertType", "error");
         return res.redirect(`/sms/settings/${organizationId}`);
     } catch (err) {
-        logger.error(`Update SMS Controller: Error updating SMS for Organization ID ${organizationId} - ${err.message}`);
-        logger.error(err.stack);
+        logger.error(`Update SMS Controller: Error updating SMS for Organization ID ${organizationId} - ${redactString(err.message || String(err))}`);
+        logger.error(redactString(err.stack || ""));
         req.flash("message", req.__("sms.settings.update_failed"));
         req.flash("alertType", "error");
         return res.redirect(`/sms/settings/${organizationId}`);

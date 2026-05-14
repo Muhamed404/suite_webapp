@@ -1,5 +1,6 @@
 const config = require("../../../../config/env.config");
 const { logger } = require("../../../../logger/logger");
+const { redactLogData } = require("../../../utility/redact");
 const enums = require("../../../../contants/enum");
 const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
@@ -44,7 +45,7 @@ exports.renderCampaignReport = async (req, res) => {
 
             // Extract data from your backend response format
             const backendData = response?.data || {};
-            logger.info(`${logContext} Backend response: ${JSON.stringify(backendData, null, 2)}`);
+            logger.info(`${logContext} Backend response: ${JSON.stringify(redactLogData(backendData), null, 2)}`);
             
             // Updated extraction based on your response structure
             let rawCampaigns = [];
@@ -97,7 +98,7 @@ exports.renderCampaignReport = async (req, res) => {
             });
             
             logger.info(`${logContext} Retrieved ${campaigns.length} campaigns from backend`);
-            logger.info(`${logContext} Transformed campaigns: ${JSON.stringify(campaigns, null, 2)}`);
+            logger.info(`${logContext} Transformed campaigns: ${JSON.stringify(redactLogData(campaigns), null, 2)}`);
             
             logger.info(`${logContext} Successfully fetched ${campaigns.length} campaigns (total: ${totalCount})`);
             logger.info(`${logContext} Backend message: ${backendData.message || 'N/A'}`);

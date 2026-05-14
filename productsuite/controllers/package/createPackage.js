@@ -5,6 +5,7 @@ const render_ejs_urls = require("../../../config/render_ejs_urls");
 const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const logger = require("../../../logger/logger").logger;
+const { redactLogData, redactString } = require("../../../utility/redact");
 
 
 
@@ -68,7 +69,7 @@ exports.submitPackageForm = async (req, res) => {
                 const appsRes = await apiClient.get(apiUrl);
                 applications = appsRes.data?.object || [];
             } catch (e) {
-                logger.error(`[PACKAGE CREATE][POST] Error fetching applications: ${e.message}`);
+                logger.error(`[PACKAGE CREATE][POST] Error fetching applications: ${redactString(e.message || String(e))}`);
             }
 
             return res.render(render_ejs_urls.ProductSuiteManagement.Package_Management.CREATE, {
@@ -116,21 +117,21 @@ exports.submitPackageForm = async (req, res) => {
             duration_days: duration_days,
         };
 
-        logger.info(`[PACKAGE CREATE][POST] Payload: ${JSON.stringify(payload, null, 2)}`);
+        logger.info(`[PACKAGE CREATE][POST] Payload: ${JSON.stringify(redactLogData(payload), null, 2)}`);
 
         // Send payload to backend API
         const apiUrl = backend_api_urls.PRODUCT_SUITE.PACKAGE_MANAGEMENT.CREATE;
         const apiClient = getApiClient(req);
         const response = await apiClient.post(apiUrl, payload);
 
-        logger.info(`[PACKAGE CREATE][POST] Backend response: ${JSON.stringify(response.data)}`);
+        logger.info(`[PACKAGE CREATE][POST] Backend response: ${JSON.stringify(redactLogData(response.data))}`);
 
         // Redirect or render success
         req.flash('message', req.__('package.create.successMessage'));
         req.flash('alertType', 'success');
         res.redirect(frontend_api_urls.PRODUCT_SUITE.Package_Management.LIST_PACKAGES);
     } catch (error) {
-        logger.error(`[PACKAGE CREATE][POST] Error: ${error.message || error}`);
+        logger.error(`[PACKAGE CREATE][POST] Error: ${redactString(error.message || String(error))}`);
 
         // Fetch applications again for re-rendering the form with error
         let applications = [];
@@ -140,7 +141,7 @@ exports.submitPackageForm = async (req, res) => {
             const appsRes = await apiClient.get(apiUrl);
             applications = appsRes.data?.object || [];
         } catch (e) {
-            logger.error(`[PACKAGE CREATE][POST] Error fetching applications for error page: ${e.message}`);
+            logger.error(`[PACKAGE CREATE][POST] Error fetching applications for error page: ${redactString(e.message || String(e))}`);
         }
 
         res.render(render_ejs_urls.ProductSuiteManagement.Package_Management.CREATE, {

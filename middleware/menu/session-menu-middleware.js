@@ -1,5 +1,6 @@
 const { logger } = require("../../logger/logger");
-const { generateMenu } = require('./suite_and_product_menu_middleware')
+const { generateMenu } = require('./suite_and_product_menu_middleware');
+const { redactEmail, redactSessionId } = require("../../phishmagnus/utility/redact");
 
 
 
@@ -14,9 +15,9 @@ function generateMenuMiddleware(req, res, next) {
   res.locals.currentPath = path; // For active route styling
 
   if (user) {
-    logger.info(`[SESSION-MIDDLEWARE] SESSION ID: ${req.sessionID}`);
+    logger.info(`[SESSION-MIDDLEWARE] SESSION ID: ${redactSessionId(req.sessionID)}`);
 
-    logger.info(`Middleware - Generating menu for user ${user.email} in organization ${user.organization_id}`);
+    logger.info(`Middleware - Generating menu for user ${redactEmail(user.email)} in organization ${user.organization_id}`);
     const orgId = user.organization_id;
 
     if (req.path.startsWith('/phm') || (req.path.startsWith('/awm') || req.path.startsWith('/')) && (user.phm_license || user.awm_license)) {
@@ -40,7 +41,7 @@ function generateMenuMiddleware(req, res, next) {
 
     // Allow MFA pending users through — they are mid-authentication
     if (req.session && req.session.mfaPendingUser) {
-      logger.info(`[SESSION-MIDDLEWARE] mfaPendingUser found, allowing MFA flow for: ${url}`);
+      logger.info(`[SESSION-MIDDLEWARE] mfaPendingUser found, allowing MFA flow for: ${redactLogData(url)}`);
       return next();
     }
 
@@ -54,7 +55,7 @@ function generateMenuMiddleware(req, res, next) {
     }
 
     if (isAllowed) {
-      logger.info(`[SESSION-MIDDLEWARE] Public access route: ${url}`);
+      logger.info(`[SESSION-MIDDLEWARE] Public access route: ${redactLogData(url)}`);
       return next();
     }
 

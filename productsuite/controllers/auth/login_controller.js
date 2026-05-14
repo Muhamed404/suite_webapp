@@ -1,6 +1,7 @@
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client');
 const RENDER_PAGE_URLS = require('../../../config/render_ejs_urls');
+const { redactEmail } = require("../../../utility/redact");
 
 exports.renderLoginPage = (req, res) => {
     logger.info('[Render Login Page]: Product Suite Incoming request' + req.originalUrl)
@@ -63,7 +64,7 @@ exports.postLogin = async (req, res) => {
         // logger.info(`[PSuite Login Controller]: POST: Received login response: ${JSON.stringify(data, null, 2)}`);
         const userToken = data?.object?.userToken || null;
         const mfaRequired = data?.object?.mfaRequired || false;
-        logger.info(`[PSuite Login Controller]: POST: MFA Required: ${mfaRequired} for user ${email}`);
+        logger.info(`[PSuite Login Controller]: POST: MFA Required: ${mfaRequired} for user ${redactEmail(email)}`);
 
 
         if (!userToken) {
@@ -76,15 +77,15 @@ exports.postLogin = async (req, res) => {
             // console.log(`[PSuite Login Controller]: POST: MFA required for ${email}, ${JSON.stringify(userToken, null, 2)}`);
             req.session.mfaPendingUser = { userToken };
 
-            logger.info(`[PSuite Login Controller]: POST: MFA required for ${email}, redirecting to MFA screen`);
+            logger.info(`[PSuite Login Controller]: POST: MFA required for ${redactEmail(email)}, redirecting to MFA screen`);
             return res.redirect("/mfa/verify");
         } else {
-            logger.info(`[PSuite Login Controller]: POST: No MFA required for ${email}, proceeding with login`);
+            logger.info(`[PSuite Login Controller]: POST: No MFA required for ${redactEmail(email)}, proceeding with login`);
             // ✅ Set full session for authenticated user
             // req.user = userData;
             req.session.jwtToken = userToken;
 
-            logger.info(`[PSuite Login Controller]: POST: Session created for ${email}`);
+            logger.info(`[PSuite Login Controller]: POST: Session created for ${redactEmail(email)}`);
             return res.redirect("/home");
         }
 
@@ -109,7 +110,7 @@ exports.postLogin = async (req, res) => {
             message = req.__('generic_label.unexpected_error');
         }
 
-        logger.error(`[PSuite Login Controller]: POST: Authentication failed for ${email}: ${message}`);
+        logger.error(`[PSuite Login Controller]: POST: Authentication failed for ${redactEmail(email)}: ${message}`);
         logger.error(err);
         logger.error(err.stack);
         req.flash("message", message);

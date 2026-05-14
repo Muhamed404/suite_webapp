@@ -2,6 +2,7 @@
 const { logger } = require("../../../logger/logger");
  
  const getApiClient = require('../../../utility/api-client')
+const { redactLogData } = require("../../utility/redact");
 
 exports.phishingCampaignTypes = async (req, res) => {
   logger.info('PHISHING CAMPAIGN TYPES::: GETTING PHISHING CAMPAIGN TYPES ');
@@ -28,7 +29,7 @@ exports.phishingCampaignTypes = async (req, res) => {
         });
       } else if (req.method === "POST") {
         const payload = req.body;
-        logger.info(`Posted Template data is ${JSON.stringify(payload)}`);
+        logger.info(`Posted Template data is ${JSON.stringify(redactLogData(payload))}`);
     
         try {
           let paramOrg = req.params.orgId;

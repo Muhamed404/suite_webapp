@@ -781,6 +781,7 @@
 		"btnTestConfiguration": "Test Configuration",
 		"btnSaveSettings": "Save Settings",
 		"labelSenderEmail": "Sender Email",
+		"labelSenderDisplayName": "Sender Display Name",
 		"labelDetails": "Details",
 		"enableStartTLS": "Enable STARTTLS",
 		"enableStartTLSDesc": "Use STARTTLS to upgrade a plain connection to secure.",
@@ -794,7 +795,9 @@
 		"selectOrganization": "Select Organization",
 		"default": "Default",
 		"enabled": "Enabled",
-		"disabled": "Disabled"
+		"disabled": "Disabled",
+		"isAuthenticated": "Is Authenticated",
+		"isAuthenticatedDesc": "Mark this SMTP configuration as authenticated and verified."
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "Secmagnus User Management",
@@ -921,11 +924,7 @@
 		"labelChooseProduct": "Choose Product",
 		"labelEnterUserDetails": "Enter User Details",
 		"labelSave": "Save",
-		"labelAvailableUsersLicense": "Available Users License",
-		"suiteUsersSearchLabel": "Search",
-		"suiteUsersPageSizeLabel": "Page Size",
-		"suiteUsersSearchSubmit": "Submit",
-		"suiteUsersNext": "Next"
+		"labelAvailableUsersLicense": "Available Users License"
 	},
 	"system_template": {
 		"stepper1": "Template Details",

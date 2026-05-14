@@ -4,6 +4,7 @@ const { hasAccess } = require("../../../utility/helperFunctions");
 const ICONSTANTS = require("../../../contants/ICONSTANTS");
 const enums = require('../../../contants/enum')
 const getApiClient = require('../../../utility/api-client');
+const { redactLogData } = require("../../../utility/redact");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const backend_api_urls = require("../../../config/backend_api_urls");
@@ -44,7 +45,7 @@ exports.createSecureMagnusUser = async (req, res, next) => {
 
 
 exports.submitSecureMagnusUser = async (req, res, next) => {
-  logger.info(`Controller - Create Securemagnus User: Incoming body ${JSON.stringify(req.body, null, 2)}`);
+  logger.info(`Controller - Create Securemagnus User: Incoming body ${JSON.stringify(redactLogData(req.body), null, 2)}`);
   try {
     const email = req.body?.email || null;
     const first_name = req.body?.first_name || null;
@@ -75,12 +76,12 @@ exports.submitSecureMagnusUser = async (req, res, next) => {
       contact,
       role_id: role
     };
-    logger.info('Controller - Create Securemagnus User: Posting user payload ' + JSON.stringify(user, null, 2))
+    logger.info('Controller - Create Securemagnus User: Posting user payload ' + JSON.stringify(redactLogData(user), null, 2))
 
     const url = backend_api_urls.PRODUCT_SUITE.User_Management.CREATE_SECUREMAGNUS_USER;
     const apiClient = getApiClient(req);
     const response = await apiClient.post(url, user);
-    logger.info(`Controller - Create Securemagnus User: Received response with status ${response.status} and data: ${JSON.stringify(response.data, null, 2)}`);
+    logger.info(`Controller - Create Securemagnus User: Received response with status ${response.status} and data: ${JSON.stringify(redactLogData(response.data), null, 2)}`);
 
     if (!response.data.success) {
       req.flash("message", response.data.message || 'Unable to Create Securemagnus User');

@@ -2,6 +2,7 @@ const { logger } = require("../../../logger/logger");
 const enums = require("../../../contants/enum");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 exports.renderAllReports = async (req, res) => {
   const logCtx = "[All Reports]";
@@ -21,8 +22,8 @@ exports.renderAllReports = async (req, res) => {
       magnusAdmin: typeof res.locals.magnusAdmin !== "undefined" ? res.locals.magnusAdmin : (req.user?.organization_id === null)
     });
   } catch (error) {
-    logger.error(`${logCtx} Error rendering reports page: ${error.message}`);
-    logger.error(error.stack);
+    logger.error(`${logCtx} Error rendering reports page: ${redactLogData(error.message)}`);
+    logger.error(redactLogData(error.stack));
 
     req.flash("message", "Unable to load reports. Please try again.");
     req.flash("alertType", "error");

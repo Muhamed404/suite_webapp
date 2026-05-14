@@ -1,6 +1,7 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require("../../../utility/api-client");
+const { redactLogData } = require("../../../utility/redact");
 
 async function sendBulkUserInvite(req, res) {
     try {
@@ -43,8 +44,8 @@ async function sendBulkUserInvite(req, res) {
             error.message ||
             "Failed to submit bulk invite request.";
 
-        logger.error(`Controller - [SendBulkUserInvite]: ${backendMessage}`);
-        logger.error(error.stack);
+        logger.error(`Controller - [SendBulkUserInvite]: ${redactLogData(backendMessage)}`);
+        logger.error(redactLogData(error.stack));
 
         return res.status(500).json({
             success: false,

@@ -5,6 +5,7 @@ const { hasAccess } = require("../../../utility/helperFunctions");
 const backend_api_urls = require("../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 const PHISH_TYPE_OPTIONS = [
   { key: 'email', label: 'Email', id: 2 },
@@ -62,7 +63,7 @@ exports.showTemplate = async (req, res) => {
       disableOption.disableDelete = true;
       disableOption.disableView = false;
     }
-    logger.info(`Organization Id is ${organizationId} and disable options are ${JSON.stringify(disableOption, null, 2)}`)
+    logger.info(`Organization Id is ${organizationId} and disable options are ${JSON.stringify(redactLogData(disableOption), null, 2)}`)
 
     return res.render(render_ejs_urls.PhishMagnus.System_Template.VIEW, {
       // enableSuiteManagementLeftMenu: true,

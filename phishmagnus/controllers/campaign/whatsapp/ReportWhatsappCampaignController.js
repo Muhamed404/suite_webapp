@@ -6,6 +6,7 @@ const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const {getStatusBadgeColor} = require('../../../../utility/helperFunctions');
+const { redactLogData } = require("../../../utility/redact");
 /**
  * Transform raw campaign data from backend
  * @param {Array} rawCampaigns - Raw campaigns array from backend
@@ -196,6 +197,7 @@ exports.getCampaignDetails = async (req, res) => {
         const response = await apiClient.get(`${backend_api_urls.PHISHMAGNUS.CAMPAIGN.Whatsapp.VIEW}/${campaignId}`);
 
         const campaign = response?.data?.data || {};
+        logger.info(`[SMS Campaign Details] Backend campaign data: ${JSON.stringify(redactLogData(campaign), null, 2)}`);
 
         const templateData = {
             campaign: campaign,

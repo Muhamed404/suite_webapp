@@ -5,6 +5,7 @@ const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 exports.renderCampaignReport = async (req, res) => {
     try {
@@ -33,7 +34,7 @@ exports.renderCampaignReport = async (req, res) => {
                 campaignFilters: JSON.stringify(campaignFilters)
             });
 
-            logger.info(`[NFC Campaign Report]: Fetching campaigns with filters: ${JSON.stringify(campaignFilters)}`);
+            logger.info(`[NFC Campaign Report]: Fetching campaigns with filters: ${JSON.stringify(redactLogData(campaignFilters))}`);
 
             const apiClient = getApiClient(req);
             const response = await apiClient.get(backend_api_urls.PHISHMAGNUS.CAMPAIGN.NFC.RENDER_REPORT(queryParams), {
@@ -42,7 +43,7 @@ exports.renderCampaignReport = async (req, res) => {
 
             // Extract data from your backend response format
             const backendData = response?.data || {};
-            logger.info(`[NFC Campaign Report]: Backend response: ${JSON.stringify(backendData, null, 2)}`);
+            logger.info(`[NFC Campaign Report]: Backend response: ${JSON.stringify(redactLogData(backendData), null, 2)}`);
 
             // Updated extraction based on your response structure
             const campaignsData = backendData.data || {};
@@ -72,7 +73,7 @@ exports.renderCampaignReport = async (req, res) => {
             });
 
             logger.info(`[NFC Campaign Report]: Retrieved ${campaigns.length} campaigns from backend`);
-            logger.info(`[NFC Campaign Report]: Transformed campaigns: ${JSON.stringify(campaigns, null, 2)}`);
+            logger.info(`[NFC Campaign Report]: Transformed campaigns: ${JSON.stringify(redactLogData(campaigns), null, 2)}`);
 
             // Use pagination info from backend response
             const totalCount = campaignsData.totalCampaigns || campaigns.length;

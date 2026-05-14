@@ -1,5 +1,6 @@
 const { logger } = require("../logger/logger");
 const enums = require("../contants/enum");
+const { redactLogData } = require("./redact");
 
 function getUserInfo(req) {
   const user = req.user;
@@ -145,7 +146,7 @@ function canAccessCampaign(userInfo, campaignOrgId, moduleName = 'Campaign_Repor
 
 function logAuthResult(action, userInfo, authResult, resourceId = '') {
   const { email, userId, orgId } = userInfo;
-  const logMsg = `[Authorization] ${action} - User: ${email} (ID: ${userId}, Org: ${orgId}) - Resource: ${resourceId} - Result: ${authResult.allowed ? 'ALLOWED' : 'DENIED'} - Reason: ${authResult.reason}`;
+  const logMsg = `[Authorization] ${redactLogData(action)} - User: ${redactLogData(email)} (ID: ${redactLogData(userId)}, Org: ${redactLogData(orgId)}) - Resource: ${redactLogData(resourceId)} - Result: ${authResult.allowed ? 'ALLOWED' : 'DENIED'} - Reason: ${redactLogData(authResult.reason)}`;
   
   if (authResult.allowed) {
     logger.info(logMsg);

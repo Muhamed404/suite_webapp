@@ -1,4 +1,5 @@
 const { logger } = require("../../../logger/logger");
+const { redactString } = require("../../../utility/redact");
 const enums = require("../../../contants/enum");
 const getApiClient = require("../../../utility/api-client");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
@@ -50,8 +51,8 @@ exports.renderBulkImportJobs = async (req, res) => {
       locale: req.getLocale(),
     });
   } catch (error) {
-    logger.error(`Error - Render Bulk Import Jobs: ${error.message}`);
-    logger.error(error.stack);
+    logger.error(`Error - Render Bulk Import Jobs: ${redactString(error.message || String(error))}`);
+    logger.error(redactString(error.stack || ""));
     req.flash("message", req.__("user.bulkImportJobsLoadError"));
     req.flash("alertType", "error");
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.Home.INDEX);

@@ -49,7 +49,7 @@ function initSMTPFormValidator(config) {
           commonPort: true
         },
         smtp_account: {
-          required: true,
+          required: function() { return $('#is_authenticated').is(':checked'); },
           minlength: 3,
           maxlength: 1000
         },
@@ -59,7 +59,7 @@ function initSMTPFormValidator(config) {
           maxlength: 250
         },
         smtp_password: {
-          required: true,
+          required: function() { return $('#is_authenticated').is(':checked'); },
           minlength: 6,
           maxlength: 1000
         },
@@ -135,10 +135,15 @@ function initSMTPFormValidator(config) {
     function checkFormValidity() {
       var host = $('#host').val().trim();
       var port = $('#port').val().trim();
-      var smtp_account = $('#smtp_account').val().trim();
       var sender_email = $('#sender_email').val().trim();
-      var smtp_password = $('#smtp_password').val().trim();
+      var isAuthenticated = $('#is_authenticated').is(':checked');
 
+      if (!isAuthenticated) {
+        return host && port && sender_email;
+      }
+
+      var smtp_account = $('#smtp_account').val().trim();
+      var smtp_password = $('#smtp_password').val().trim();
       return host && port && smtp_account && sender_email && smtp_password;
     }
 

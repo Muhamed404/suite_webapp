@@ -2,6 +2,7 @@ const { logger } = require('../../../logger/logger');
 const getApiClient = require('../../../utility/api-client');
 const backend_api_urls = require('../../../config/backend_api_urls');
 const { extractAttachmentInfo, readFiles } = require('../../../utility/helperFunctions');
+const { redactLogData } = require("../../utility/redact");
 
 /**
  * API endpoint to fetch template details in JSON format
@@ -9,7 +10,7 @@ const { extractAttachmentInfo, readFiles } = require('../../../utility/helperFun
  */
 exports.viewTemplateApi = async (req, res) => {
   const templateId = String(req.params?.templateId || '').trim();
-  logger.info('API - View Template: request', { templateId, url: req.originalUrl, ip: req.ip });
+  logger.info('API - View Template: request', redactLogData({ templateId, url: req.originalUrl, ip: req.ip }));
 
   if (!templateId) {
     logger.warn('API - View Template: missing templateId', { params: req.params });
@@ -41,7 +42,7 @@ exports.viewTemplateApi = async (req, res) => {
       ?? response?.data
       ?? {};
 
-    logger.info('API - View Template: fetched template', { templateId, keys: Object.keys(tpl || {}) });
+    logger.info('API - View Template: fetched template', redactLogData({ templateId, keys: Object.keys(tpl || {}) }));
 
     if (!tpl || Object.keys(tpl).length === 0) {
       logger.warn('API - View Template: backend returned empty template', { backendUrl, status: response?.status });
@@ -64,10 +65,10 @@ exports.viewTemplateApi = async (req, res) => {
     const landingPageUrl = String(tpl.landing_page_url || '').trim();
     const isExternalLandingPageUrl = /^https?:\/\//i.test(landingPageUrl);
     const filesData = await readFiles(tpl.phishing_page_url, isExternalLandingPageUrl ? null : tpl.landing_page_url);
-    logger.info('API - View Template: readFiles result keys', { 
+    logger.info('API - View Template: readFiles result keys', redactLogData({ 
       hasPhishing: !!filesData.phishing_page?.content,
       hasLanding: !!filesData.landing_page?.content 
-    });
+    }));
 
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
@@ -87,12 +88,12 @@ exports.viewTemplateApi = async (req, res) => {
     }
 
     // Log what content fields are available
-    logger.info('API - View Template: content availability', {
+    logger.info('API - View Template: content availability', redactLogData({
       phishing_content: !!tpl.phishing_content,
       phishing_page_content: !!tpl.phishing_page_content,
       landing_page_content: !!tpl.landing_page_content,
       file_attachment_path: !!tpl.file_attachment_path
-    });
+    }));
 
     // Return template data as JSON
     return res.json({
@@ -102,11 +103,11 @@ exports.viewTemplateApi = async (req, res) => {
     });
 
   } catch (err) {
-    logger.error(`API - View Template: error fetching template`, { 
+    logger.error(`API - View Template: error fetching template`, redactLogData({ 
       error: err.message,
       stack: err.stack,
       response: err?.response?.data 
-    });
+    }));
     
     if (err?.response) {
       return res.status(err.response.status || 500).json({

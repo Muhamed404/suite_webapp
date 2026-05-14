@@ -3,6 +3,7 @@ const { logger } = require("../../../logger/logger");
 const enums = require("../../../contants/enum");
 const getApiClient = require('../../../utility/api-client');
 const { hasAccess } = require("../../../utility/helperFunctions");
+const { redactLogData } = require("../../../utility/redact");
 
 
 exports.listOrganizations = async (req, res) => {
@@ -13,7 +14,7 @@ exports.listOrganizations = async (req, res) => {
     const apiClient = getApiClient(req); // get the customized Axios instance
     const response = await apiClient.get(url);
     const data = response.data.message;
-    logger.debug('[List Organization]: Pringint List Organization: ' + JSON.stringify(data))
+    logger.debug('[List Organization]: Pringint List Organization: ' + JSON.stringify(redactLogData(data)))
     const hasPermission = hasAccess(req, enums.ModuleNames.Organization, [enums.Access_Types.RWD_ALL]);
 
     if (data.length > 0) {
@@ -31,7 +32,7 @@ exports.listOrganizations = async (req, res) => {
 
     //res.status(response.status).json(response.data);
   } catch (error) {
-    console.error("Error listing organizations:", error);
+    logger.error("Error listing organizations:", redactLogData(error));
     //res.status(error.response.status).json(error.response.data);
     res.redirect("/phm/");
   }
