@@ -1689,7 +1689,17 @@
 		"searchPlaceholder": "Search here...",
 		"subtitle": "Track all user actions and system events.",
 		"rowsPerPage": "Rows per page",
-		"noLogs": "No audit logs found"
+		"noLogs": "No audit logs found",
+		"paginationText": "Showing {from}–{to} of {total}",
+		"actions": {
+			"CREATE": "Create",
+			"UPDATE": "Update",
+			"DELETE": "Delete",
+			"UPLOAD": "Upload",
+			"LOGIN": "Login",
+			"LOGOUT": "Logout",
+			"VIEW": "View"
+		}
 	},
 	"CS-List": "Cybersecurity Categories",
 	"btn-CS-LibPosters-Upload-Document": "Upload Document",

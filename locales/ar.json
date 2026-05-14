@@ -1677,7 +1677,17 @@
 		"tabCompleted": "مكتمل",
 		"subtitle": "تتبع جميع إجراءات المستخدمين والأحداث.",
 		"rowsPerPage": "صفوف في الصفحة",
-		"noLogs": "لا توجد سجلات تدقيق"
+		"noLogs": "لا توجد سجلات تدقيق",
+		"paginationText": "عرض {from}–{to} من {total}",
+		"actions": {
+			"CREATE": "إنشاء",
+			"UPDATE": "تحديث",
+			"DELETE": "حذف",
+			"UPLOAD": "رفع",
+			"LOGIN": "تسجيل دخول",
+			"LOGOUT": "تسجيل خروج",
+			"VIEW": "عرض"
+		}
 	},
 	"CS-List": "فئات الأمن السيبراني",
 	"btn-CS-LibPosters-Upload-Document": "رفع مستند",

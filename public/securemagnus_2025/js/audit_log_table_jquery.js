@@ -54,7 +54,8 @@ function actionPill(action) {
     VIEW:   'bg-amber-100 text-amber-700',
   };
   const cls = map[a] || 'bg-gray-100 text-gray-600';
-  return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${cls}">${action}</span>`;
+  const label = window.i18n?.Audit?.actions?.[a] || action;
+  return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${cls}">${label}</span>`;
 }
 
 function modulePill(module) {
@@ -119,7 +120,7 @@ function renderTabs() {
   statusTabs.innerHTML = tabs.map(tab => {
     const count    = tab === 'All' ? totalRecords : data.filter(d => d.action === tab).length;
     const isActive = currentTab === tab;
-    const label    = tab === 'All' ? allLabel : tab;
+    const label    = tab === 'All' ? allLabel : (window.i18n?.Audit?.actions?.[tab.toUpperCase()] || tab);
 
     if (isActive) {
       return `<button onclick="setTab('${tab}')"
@@ -232,9 +233,12 @@ function renderPagination(total) {
     const from = total === 0 ? 0 : ((currentPage - 1) * rowsPerPage) + 1;
     const to = Math.min(currentPage * rowsPerPage, total);
 
+    const paginationFormat = window.i18n?.Audit?.paginationText || 'Showing {from}–{to} of {total}';
+    const paginationStr = paginationFormat.replace('{from}', from).replace('{to}', to).replace('{total}', total);
+
     if (totalPages <= 1) {
       pagination.innerHTML = total > 0
-        ? `<span class="text-xs text-gray-500">Showing ${from}–${to} of ${total}</span>`
+        ? `<span class="text-xs text-gray-500">${paginationStr}</span>`
         : '';
       return;
     }
@@ -252,7 +256,7 @@ function renderPagination(total) {
     }
 
     pagination.innerHTML = `
-      <span class="text-xs text-gray-500 mr-2">Showing ${from}–${to} of ${total}</span>
+      <span class="text-xs text-gray-500 mr-2">${paginationStr}</span>
       ${currentPage > 1
         ? `<button type="button" onclick="setPage(${currentPage - 1})"
              class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-xs">‹</button>`
@@ -273,14 +277,19 @@ function renderPagination(total) {
   const totalPages     = Math.max(Math.ceil(totalCount / pageSize), 1);
 
   if (totalPages <= 1) {
+    const paginationFormat = window.i18n?.Audit?.paginationText || 'Showing {from}–{to} of {total}';
+    const paginationStr = paginationFormat.replace('{from}', totalCount).replace('{to}', totalCount).replace('{total}', totalCount);
     pagination.innerHTML = totalCount > 0
-      ? `<span class="text-xs text-gray-500">Showing ${totalCount} of ${totalCount}</span>`
+      ? `<span class="text-xs text-gray-500">${paginationStr}</span>`
       : '';
     return;
   }
 
   const from = ((currentPageNum - 1) * pageSize) + 1;
   const to   = Math.min(currentPageNum * pageSize, totalCount);
+
+  const paginationFormat = window.i18n?.Audit?.paginationText || 'Showing {from}–{to} of {total}';
+  const paginationStr = paginationFormat.replace('{from}', from).replace('{to}', to).replace('{total}', totalCount);
 
   let pages = '';
   for (let i = 1; i <= totalPages; i++) {
@@ -295,7 +304,7 @@ function renderPagination(total) {
   }
 
   pagination.innerHTML = `
-    <span class="text-xs text-gray-500 mr-2">Showing ${from}–${to} of ${totalCount}</span>
+    <span class="text-xs text-gray-500 mr-2">${paginationStr}</span>
     ${currentPageNum > 1
       ? `<a href="?page=${currentPageNum - 1}&pageSize=${pageSize}"
            class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-xs">‹</a>`
