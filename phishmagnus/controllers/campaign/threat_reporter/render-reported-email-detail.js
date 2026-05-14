@@ -3,12 +3,13 @@ const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 exports.renderReportedEmailDetail = async (req, res) => {
     try {
         const { reportId } = req.params;
 
-        logger.info(`[Reported Email Detail]: Incoming request for reportId=${reportId}`);
+        logger.info(`[Reported Email Detail]: Incoming request for reportId=${redactLogData(reportId)}`);
 
         if (!req.session || !req.user) {
             logger.warn(`[Reported Email Detail]: No active session - redirecting to login`);

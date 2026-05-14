@@ -8,12 +8,13 @@ const frontend_app_urls = require('../../../../config/frontend_api_urls');
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const ApplicationConstants = require('../../../../contants/application-constants')
 const moment = require('moment');
+const { redactLogData } = require("../../../utility/redact");
 /**
  * Controller to render the NFC campaign details view with statistics and user details.
  */
 exports.viewNFCCampaignDetails = async (req, res) => {
-  logger.info(`NFC Campaign Detail: incoming params ${JSON.stringify(req.params, null, 2)}`);
-  logger.info(`NFC Campaign Detail: incoming query ${JSON.stringify(req.query, null, 2)}`);
+  logger.info(`NFC Campaign Detail: incoming params ${JSON.stringify(redactLogData(req.params), null, 2)}`);
+  logger.info(`NFC Campaign Detail: incoming query ${JSON.stringify(redactLogData(req.query), null, 2)}`);
   try {
     // return res.render(render_ejs_urls.PhishMagnus.Campaign.NFC.VIEW_CAMPAIGN);
 
@@ -36,11 +37,11 @@ exports.viewNFCCampaignDetails = async (req, res) => {
     ]);
 
     logger.info('NFC Campaign Detail: FETCHED ALL DATA');
-    logger.info(`NFC Campaign Report: ${JSON.stringify(apiResponseCampaignReport?.data, null, 2)}`);
+    logger.info(`NFC Campaign Report: ${JSON.stringify(redactLogData(apiResponseCampaignReport?.data), null, 2)}`);
 
 
     const campaignDetails = apiResponseCampaignReport?.data?.message.campaign || {};
-    logger.info(`NFC Campaign Detail: campaignDetails: ${JSON.stringify(campaignDetails, null, 2)}`);
+    logger.info(`NFC Campaign Detail: campaignDetails: ${JSON.stringify(redactLogData(campaignDetails), null, 2)}`);
     // Format the campaign start datetime for display (avoid raw ISO string)
     try {
       if (campaignDetails && campaignDetails.start_datetime) {
@@ -73,7 +74,7 @@ exports.viewNFCCampaignDetails = async (req, res) => {
       nfcDevices.forEach(device => logger.info(`NFC Device download_url: ${device.download_url}`));
     }
 
-    logger.info('NFC Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));
+    logger.info('NFC Campaign Detail: campaignStats: ' + JSON.stringify(redactLogData(campaignStats), null, 2));
 
     if (req.query.ajax) {
       return res.json({ nfcDevices });

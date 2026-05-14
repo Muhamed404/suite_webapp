@@ -1,5 +1,6 @@
 const { validationResult } = require('express-validator');
 const { logger } = require('../../logger/logger');
+const { redactLogData } = require('../../utility/redact');
 
 module.exports = (req, res, next) => {
   const errors = validationResult(req);
@@ -10,12 +11,12 @@ module.exports = (req, res, next) => {
   // log the validation error with request context
   try {
     // add prominent ERROR marker (emoji) for easy spotting in logs
-    logger.error(`❌ [Validation] Failed on ${req.originalUrl} - ${req.method} - IP:${req.ip} - errors: ${JSON.stringify(mapped)}`);
-    logger.debug(`[Validation] Request body: ${JSON.stringify(req.body)}`);
+    logger.error(`❌ [Validation] Failed on ${redactLogData(req.originalUrl)} - ${redactLogData(req.method)} - IP:${redactLogData(req.ip)} - errors: ${JSON.stringify(redactLogData(mapped))}`);
+    logger.debug(`[Validation] Request body: ${JSON.stringify(redactLogData(req.body))}`);
   } catch (logErr) {
     // fallback to console if logger fails
-    logger.error('❌ Validation logging error: ' + logErr);
-    logger.error('❌ Validation errors: ' + JSON.stringify(mapped));
+    logger.error('❌ Validation logging error: ' + redactLogData(logErr));
+    logger.error('❌ Validation errors: ' + JSON.stringify(redactLogData(mapped)));
   }
 
   // error icon URL to show prominently in rendered page or return with JSON

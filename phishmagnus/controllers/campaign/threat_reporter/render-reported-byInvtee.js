@@ -3,12 +3,13 @@ const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 exports.renderReportByInvitee = async (req, res) => {
     try {
         const { invId } = req.params;
 
-        logger.info(`[Reported By Invitee]: Incoming request for invId=${invId}`);
+        logger.info(`[Reported By Invitee]: Incoming request for invId=${redactLogData(invId)}`);
 
         if (!req.session || !req.user) {
             logger.warn(`[Reported By Invitee]: No active session - redirecting to login`);

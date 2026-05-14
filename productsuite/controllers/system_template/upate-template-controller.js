@@ -4,6 +4,7 @@ const enums = require("../../../contants/enum");
 const he = require('he');
 const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 exports.updateTemplate = async (req, res) => {
   logger.info('Controller - Update Template: Incoming Request');
@@ -15,7 +16,7 @@ exports.updateTemplate = async (req, res) => {
   // Build immutable payload from request body
   const payload = { ...req.body };
 
-  logger.info(`Controller - Update Template: Raw posted data: ${JSON.stringify(req.body, null, 2)}`);
+  logger.info(`Controller - Update Template: Raw posted data: ${JSON.stringify(redactLogData(req.body), null, 2)}`);
 
   try {
     const templateId = Number(req.params.templateId || 0);
@@ -102,10 +103,10 @@ exports.updateTemplate = async (req, res) => {
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PRODUCT_SUITE.Template.UPDATE(templateId);
     logger.info(`Controller - Update Template: Posting template to URL: ${url}`);
-    logger.debug(`Controller - Update Template: Final payload: ${JSON.stringify(payload)}`);
+    logger.debug(`Controller - Update Template: Final payload: ${JSON.stringify(redactLogData(payload))}`);
 
     const response = await apiClient.post(url, payload);
-    logger.info(`Controller - Update Template: Backend response: ${JSON.stringify(response.data)}`);
+    logger.info(`Controller - Update Template: Backend response: ${JSON.stringify(redactLogData(response.data))}`);
     if (response.data.success) {
       req.flash('message', req.__('system_template.save_success'));
       req.flash('alertType', 'success');

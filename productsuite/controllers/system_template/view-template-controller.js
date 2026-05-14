@@ -5,6 +5,7 @@ const { extractAttachmentInfo, FileFetcher, readFiles } = require('../../../util
 const render_ejs_urls = require('../../../config/render_ejs_urls');
 const frontend_api_urls = require('../../../config/frontend_api_urls');
 const enums = require("../../../contants/enum");
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 exports.viewTemplate = async (req, res) => {
   const templateId = String(req.params?.templateId || '').trim();
@@ -38,13 +39,13 @@ exports.viewTemplate = async (req, res) => {
       ?? response?.data
       ?? {};
 
-    logger.info('[View Template] fetched template' + JSON.stringify(tpl, null, 2));
+    logger.info('[View Template] fetched template' + JSON.stringify(redactLogData(tpl), null, 2));
     // debug: structured log + plain console output to inspect payload
     logger.info('[View Template] resolved tpl object' + { templateId, tplSummary: { keys: Object.keys(tpl || {}) } });
     try {
-      logger.info('[View Template] tpl (full)' + { tpl });
+      logger.info('[View Template] tpl (full)' + { tpl: redactLogData(tpl) });
     } catch (e) {
-      logger.info('[View Template] tpl (raw)' + { tpl });
+      logger.info('[View Template] tpl (raw)' + { tpl: redactLogData(tpl) });
     }
 
     if (!tpl || Object.keys(tpl).length === 0) {
@@ -64,7 +65,7 @@ exports.viewTemplate = async (req, res) => {
       const info = extractAttachmentInfo(filePathRaw);
       tpl.attachmentExt = info.attachmentExt; // e.g. ".pdf"
       tpl.file_extension = String(tpl.file_extension || info.file_extension || '').toLowerCase();
-      logger.info('[View Template] attachment resolved' + JSON.stringify({ filePathRaw, filename: info.filename, attachmentExt: tpl.attachmentExt, file_extension: tpl.file_extension }));
+      logger.info('[View Template] attachment resolved' + JSON.stringify(redactLogData({ filePathRaw, filename: info.filename, attachmentExt: tpl.attachmentExt, file_extension: tpl.file_extension })));
     }
 
     const landingPageUrl = String(tpl.landing_page_url || '').trim();
@@ -72,7 +73,7 @@ exports.viewTemplate = async (req, res) => {
     const filesData = await readFiles(tpl.phishing_page_url, isExternalLandingPageUrl ? null : tpl.landing_page_url).catch(err => {
       return { phishing_page: null, landing_page: null };
     });
-    logger.info('[View Template] readFiles result' + JSON.stringify(filesData, null, 2));
+    logger.info('[View Template] readFiles result' + JSON.stringify(redactLogData(filesData), null, 2));
 
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
@@ -104,7 +105,7 @@ exports.viewTemplate = async (req, res) => {
       tpl.sms_content = tpl?.phishing_content || '';
     }
 
-    logger.info('[View Template] rendering view' + JSON.stringify(tpl, null, 2));
+    logger.info('[View Template] rendering view' + JSON.stringify(redactLogData(tpl), null, 2));
     let postMethodUrl = frontend_api_urls.PRODUCT_SUITE.System_Template.EDIT(templateId);
     if (req.user.organization_id) {
       postMethodUrl = frontend_api_urls.PRODUCT_SUITE.System_Template.CLONE(templateId, req.user.organization_id);

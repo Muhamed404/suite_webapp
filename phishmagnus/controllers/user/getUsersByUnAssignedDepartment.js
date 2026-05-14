@@ -3,6 +3,7 @@ const backend_api_urls = require("../../../config/backend_api_urls");
 const { logger } = require("../../../logger/logger");
 
 const getApiClient = require("../../../utility/api-client");
+const { redactLogData } = require("../../../utility/redact");
 
 async function getUsersByUnAssignedDepartment(req, res) {
   try {
@@ -19,7 +20,7 @@ async function getUsersByUnAssignedDepartment(req, res) {
     const response = await apiClient.get(url)
 
     const users = response.data?.users || [];
-    logger.info('Printing unassigned department users: ' + JSON.stringify(users, null, 2));
+    logger.info('Printing unassigned department users: ' + JSON.stringify(redactLogData(users), null, 2));
     return res.status(200).json({ success: true, unassignedUsers: users });
 
   } catch (error) {

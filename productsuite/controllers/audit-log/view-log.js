@@ -1,9 +1,10 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require("../../../utility/api-client");
+const { redactLogData } = require("../../../utility/redact");
 
 exports.viewLogs = async (req, res) => {
-  logger.info(`Controller - View Logs: Incoming request with Params: ${JSON.stringify(req.params)}`);
+  logger.info(`Controller - View Logs: Incoming request with Params: ${JSON.stringify(redactLogData(req.params))}`);
   try {
     if (req.method !== "GET") {
       req.flash('alertType', 'error');
@@ -48,9 +49,9 @@ exports.viewLogs = async (req, res) => {
 
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PRODUCT_SUITE.Audit_Log.VIEW_LOGS(queryParams);
-    logger.info(`Controller - Audit Log: Backend API Caller: ${url}`);
+    logger.info(`Controller - Audit Log: Backend API Caller: ${redactLogData(url)}`);
     const response = await apiClient.get(url, { headers: { 'Accept': 'application/json' } });
-    logger.info(`audit report ${JSON.stringify(response.data, null, 2)}`)
+    logger.info(`audit report ${JSON.stringify(redactLogData(response.data), null, 2)}`)
     if (!response?.data || !response.data.success) {
       req.flash('alertType', 'error');
       req.flash('message', response?.data?.message || 'Failed to fetch audit logs');
@@ -85,8 +86,8 @@ exports.viewLogs = async (req, res) => {
     });
 
   } catch (error) {
-    logger.error("[View Audit Report]: " + error.message);
-    logger.error("[View Audit Report]: " + error.stack);
+    logger.error("[View Audit Report]: " + redactLogData(error.message));
+    logger.error("[View Audit Report]: " + redactLogData(error.stack));
     req.flash('alertType', 'error');
     req.flash('message', 'Failed to fetch audit logs');
     return res.redirect("/home");

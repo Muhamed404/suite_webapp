@@ -1,5 +1,6 @@
 const config = require("../../../../config/env.config");
 const { logger } = require("../../../../logger/logger");
+const { redactLogData } = require("../../../utility/redact");
 const enums = require("../../../../contants/enum");
 const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
@@ -10,7 +11,7 @@ const frontend_api_urls = require("../../../../config/frontend_api_urls");
  * Controller to render the email campaign details view with statistics and user details.
  */
 exports.emailUserReport = async (req, res) => {
-  logger.info(`User Email Report: Incoming request ${JSON.stringify(req.params)}`);
+  logger.info(`User Email Report: Incoming request ${JSON.stringify(redactLogData(req.params))}`);
   try {
     let campaignId = parseInt(req.params?.campId, 10);
     let inviteeId = parseInt(req.params?.inviteeId, 10);
@@ -31,7 +32,7 @@ exports.emailUserReport = async (req, res) => {
     const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.EMAIL.USER_REPORT(inviteeId, campaignId);
     logger.info('User Email Report: url' + url);
     const response = await apiClient.get(url);
-    logger.info('User Email Report: response ' + JSON.stringify(response.data, null, 2));
+    logger.info('User Email Report: response ' + JSON.stringify(redactLogData(response.data), null, 2));
     
     const campaignDetails = response?.data?.message.campaign || {};
     const sentUnSentStats = response?.data?.message.sentUnSentStats || {};
@@ -48,8 +49,8 @@ exports.emailUserReport = async (req, res) => {
       userInteractionTimeline // Add the timeline data
     };
 
-    logger.info('User Email Report: campaignStats: ' + JSON.stringify(campaignStats, null, 2));
-    logger.info('User Email Report: userInteractionTimeline: ' + JSON.stringify(userInteractionTimeline, null, 2));
+    logger.info('User Email Report: campaignStats: ' + JSON.stringify(redactLogData(campaignStats), null, 2));
+    logger.info('User Email Report: userInteractionTimeline: ' + JSON.stringify(redactLogData(userInteractionTimeline), null, 2));
     
     return res.render(render_ejs_urls.PhishMagnus.Campaign.Email.USER_REPORT, {
       campaignStats,

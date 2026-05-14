@@ -1,10 +1,11 @@
 const { logger } = require('../../../../logger/logger');
 const getApiClient = require('../../../../utility/api-client');
+const { redactLogData } = require("../../../../utility/redact");
 
 exports.createDomain = async (req, res) => {
     const orgId = req.body.organization_id;
     try {
-        logger.info(`[DomainManagement] Creating domain for orgId=${orgId}, domain=${req.body.domain_name}`);
+        logger.info(`[DomainManagement] Creating domain for orgId=${redactLogData(orgId)}, domain=${redactLogData(req.body.domain_name)}`);
 
         const apiClient = getApiClient(req);
         await apiClient.post(`/dms/${orgId}/organization`, {
@@ -16,7 +17,7 @@ exports.createDomain = async (req, res) => {
         req.flash('alertType', 'success');
         return res.redirect(`/dms/${orgId}/organization`);
     } catch (error) {
-        logger.error(`[DomainManagement] createDomain error: ${error.message}`);
+        logger.error(`[DomainManagement] createDomain error: ${redactLogData(error.message)}`);
         req.flash('message', req.__('org_domain.create_error'));
         req.flash('alertType', 'error');
         return res.redirect(`/dms/domain/${orgId}`);

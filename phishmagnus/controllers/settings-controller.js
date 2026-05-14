@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 
 const { logger } = require("../../logger/logger");
+const { redactLogData } = require("../utility/redact");
 const getApiClient = require('../../utility/api-client')
 
 
@@ -41,7 +42,7 @@ exports.deleteById = async (req, res) => {
       // });
     })
     .catch((error) => {
-      console.error("exception creating package:", error.response.data);
+      console.error("exception creating package:", redactLogData(error.response?.data));
       const err = error.response.data;
       res.redirect(
         `/package/list?message=${err.message}&alertType=${err.alertType}`

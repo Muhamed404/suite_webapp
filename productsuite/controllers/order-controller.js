@@ -3,6 +3,7 @@
 const { logger } = require("../../logger/logger");
 const enums = require("../../contants/enum");
 const { getUserInfo, canAccessOrganization, logAuthResult } = require("../../utility/authorization-helper");
+const { redactLogData } = require("../../utility/redact");
 
 const getApiClient = require('../../utility/api-client')
 
@@ -38,7 +39,7 @@ async function displayInvoice(req, res) {
       const response = await apiClient.get(url);
       // console.log(response)
       let invoiceData = response.data.message;
-      logger.info(`received invoice data is \n ${JSON.stringify(invoiceData)}`);
+      logger.info(`received invoice data is \n ${JSON.stringify(redactLogData(invoiceData))}`);
       res.render("pages/order/invoice", { invoiceData, enums: enums, enableSuiteManagementLeftMenu: true, });
     } catch (error) {
       logger.error(`exception in displayInvoice \n`, error);
@@ -53,7 +54,7 @@ async function updateInvoice(req, res) {
   try {
     //let organizationId = req.user.organization_id;
     logger.info('Request has received in update invoice')
-    logger.info(JSON.stringify(req.body))
+    logger.info(JSON.stringify(redactLogData(req.body)))
     let orderId = req.body.order;
     let subscriptionId = req.body.subscription;
     orgId = req.body.org;

@@ -4,6 +4,7 @@ const frontend_api_urls = require("../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client');
+const { redactLogData } = require("../../utility/redact");
 
 exports.createDepartment = async (req, res, next) => {
   logger.info('Incoming Request for create department');
@@ -17,7 +18,7 @@ exports.createDepartment = async (req, res, next) => {
       const response = await apiClient.get(url);
       const departments = response.data?.message || [];
       logger.info(`[Department GET] Retrieved ${departments.length} departments for organization ${organization}`);
-      logger.info(`[Department GET] Departments Data: ${JSON.stringify(departments, null, 2)}`);
+      logger.info(`[Department GET] Departments Data: ${JSON.stringify(redactLogData(departments), null, 2)}`);
       logger.info(`[Department GET] Rendering create department form`);
       return res.render(render_ejs_urls.PhishMagnus.Department.RENDER_CREATE_FORM, {
         enableSuiteManagementLeftMenu: true,
@@ -42,7 +43,7 @@ exports.createDepartment = async (req, res, next) => {
       organization: organization
     };
 
-    logger.info(`[Department POST] Payload: ${JSON.stringify(department, null, 2)}`);
+    logger.info(`[Department POST] Payload: ${JSON.stringify(redactLogData(department), null, 2)}`);
     const url = backend_api_urls.PHISHMAGNUS.DEPARTMENT.CREATE;
 
     try {

@@ -1,5 +1,6 @@
 const { logger } = require("../../../logger/logger");
 const getApiClient = require("../../../utility/api-client");
+const { redactLogData } = require("../../../utility/redact");
 
 
 const retrieveMFAConfiguration = async (req) => {
@@ -12,7 +13,7 @@ const retrieveMFAConfiguration = async (req) => {
         const response = await apiClient.get(url); // await the promise
 
         // Optional: Log response structure for clarity
-        logger.info(`[MFA Configuration Retrieval]: Raw response: ${JSON.stringify(response.data)}`);
+        logger.info(`[MFA Configuration Retrieval]: Raw response: ${JSON.stringify(redactLogData(response.data))}`);
 
         // Access based on your APIResponse structure
         const mfaSMTP = response?.data?.object;
@@ -21,7 +22,7 @@ const retrieveMFAConfiguration = async (req) => {
         return mfaSMTP;
 
     } catch (error) {
-        logger.error(`[MFA Configuration Retrieval]: Issue in retrieving mfa smtp: ${error.message}`);
+        logger.error(`[MFA Configuration Retrieval]: Issue in retrieving mfa smtp: ${redactLogData(error.message)}`);
         throw error;
     }
 };
@@ -42,7 +43,7 @@ const create = async (req, smtpName, smtpData, enable_mfa, is_encrypted) => {
         await apiClient.post(url, payload);
 
     } catch (error) {
-        logger.error(`[Save MFA Configuration]: Issue in saving mfa smtp: ${error.message}`);
+        logger.error(`[Save MFA Configuration]: Issue in saving mfa smtp: ${redactLogData(error.message)}`);
         throw error;
     }
 };

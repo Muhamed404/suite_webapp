@@ -1,13 +1,14 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const { logger } = require("../../../logger/logger");
+const { redactString } = require("../../../utility/redact");
 const getApiClient = require('../../../utility/api-client');
 
 const logTxn = 'Controller - [Service Registry - Delete]';
 
 exports.deleteService = async (req, res) => {
     const { registry_id, service_id } = req.params;
-    logger.info(`${logTxn} - Received request to delete service registry with id: ${service_id}`);
+    logger.info(`${logTxn} - Received request to delete service registry with id: ${redactString(String(service_id))}`);
     try {
         if (!registry_id || !service_id) {
             logger.warn(`${logTxn} - Missing registry_id or service_id in request parameters`);
@@ -23,12 +24,12 @@ exports.deleteService = async (req, res) => {
             req.flash('message', req.__('generic_label.service_deleted_successfully'));
             req.flash('alertType', 'success');
         } else {
-            logger.warn(`${logTxn} - Service registry deletion failed: ${response.data.message}`);
+            logger.warn(`${logTxn} - Service registry deletion failed: ${redactString(response.data.message || "")}`);
             req.flash('message', response.data.message || req.__('generic_label.service_registry_deletion_failed'));
             req.flash('alertType', 'error');
         }
     } catch (error) {
-        logger.error(`${logTxn} - Error deleting service registry: ${error.message}`);
+        logger.error(`${logTxn} - Error deleting service registry: ${redactString(error.message || String(error))}`);
         req.flash('message', error.response?.data?.message || req.__('generic_label.unable_to_delete_service_registry'));
         req.flash('alertType', 'error');
     }

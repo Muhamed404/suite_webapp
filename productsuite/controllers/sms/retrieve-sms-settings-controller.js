@@ -2,6 +2,7 @@
 const { logger } = require("../../../logger/logger");
 const apiClient = require("../../../utility/api-client");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 exports.retrieveSMSSettings = async (req, res) => {
     logger.info(`Controller - Retrieveing SMS Settings: Incoming request to retrieve SMS with ID ${req.params.organizationId}`);
     const organizationId = !req.user.organizationId ? req.params.organizationId : req.user.organizationId;
@@ -17,8 +18,7 @@ exports.retrieveSMSSettings = async (req, res) => {
         const response = await apiClientInstance.get(`/sms/settings/${organizationId}`);
         logger.info(`Retrieve SMS Controller: Successfully retrieved SMS with ID ${organizationId}`);
         const smsData = response.data.object || null;
-        console.log(JSON.stringify(smsData, null, 2));
-        logger.info(`Retrieve SMS Controller: SMS Data: ${JSON.stringify(smsData, null, 2)}`);
+        logger.info(`Retrieve SMS Controller: SMS Data: ${JSON.stringify(redactLogData(smsData), null, 2)}`);
         return res.render("pages/sms/create-sms", { sms: smsData, organization: req.params.organizationId, enableSuiteManagementLeftMenu: true });
 
 

@@ -4,6 +4,7 @@ const frontend_api_urls = require("../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 
 const { logger } = require("../../../logger/logger");
+const { redactEmail, redactLogData } = require("../../utility/redact");
 const getApiClient = require('../../../utility/api-client')
 
 
@@ -67,13 +68,14 @@ exports.createSMTP = async (req, res) => {
     };
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PHISHMAGNUS.PHISHING_SMTP.CREATE(selected_org);
-    logger.info(`[Rendering Phishing SMTP] POST:- Calling API URL:- ${url} with body ${smtpObj.smtp_account}`);
+    const redactedSmtpAccount = redactEmail(smtpObj.smtp_account);
+    logger.info(`[Rendering Phishing SMTP] POST:- Calling API URL:- ${url} with body ${redactedSmtpAccount}`);
 
     apiClient
       .post(url, smtpObj)
       .then((response) => {
         const data = response.data;
-        logger.info(`[Rendering Phishing SMTP] POST:- Response ${JSON.stringify(data)}`);
+        logger.info(`[Rendering Phishing SMTP] POST:- Response ${JSON.stringify(redactLogData(data))}`);
 
         if (data.success) {
           logger.info(`[Rendering Phishing SMTP] POST:- SMTP Account created successfully for organization ${selected_org}`);

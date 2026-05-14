@@ -1,6 +1,7 @@
 // validationMiddleware.js
 
 const { query, check, validationResult, body, param } = require("express-validator");
+const { redactLogData } = require("../utility/redact");
 
 const validateUserData = [
   check("username").notEmpty().withMessage("Username is required"),
@@ -233,7 +234,7 @@ const handleValidationResult = (req, res, next) => {
     //return res.status(400).json({ errors: errors.array() });
     logger.error(
       `Validation failed \n ${JSON.stringify(
-        errors.array().map((err) => err.msg)
+        redactLogData(errors.array().map((err) => err.msg))
       )}`
     );
     req.flash("alertType", "error");

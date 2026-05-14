@@ -3,6 +3,7 @@ const frontend_api_urls = require("../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client')
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 const logTxn = 'Controller - [Service Registry - Create]';
 
@@ -17,7 +18,7 @@ exports.renderForm = (req, res) => {
 
 exports.submitForm = async (req, res) => {
     logger.info(`${logTxn} - Received request to create service registry`);
-    logger.info(`${logTxn} - Request Body: ${JSON.stringify(req.body, null, 2)}`);
+    logger.info(`${logTxn} - Request Body: ${JSON.stringify(redactLogData(req.body), null, 2)}`);
     const { service_id, service_name, service_type, public_key } = req.body;
 
     try {

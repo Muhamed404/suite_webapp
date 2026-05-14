@@ -1,5 +1,6 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const { logger } = require("../../../logger/logger");
+const { redactLogData, redactString } = require("../../../utility/redact");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const getApiClient = require("../../../utility/api-client");
 const enums = require('../../../contants/enum')
@@ -39,14 +40,14 @@ exports.retrieveEnrolledPHMUsers = async (req, res) => {
 
     const users = response.data?.users || [];
     if (users.length === 0) {
-      logger.info('Controller - Enrolled User List: No enrolled users found for organization ' + organization);
+      logger.info('Controller - Enrolled User List: No enrolled users found for organization ' + redactLogData(organization));
       return res.status(200).json({ success: true, enrolledUsers: [] });
     }
-    logger.info('Printing enrolled users for organization ' + organization + ': ' + JSON.stringify(users, null, 2));
+    logger.info('Printing enrolled users for organization ' + redactLogData(organization) + ': ' + JSON.stringify(redactLogData(users), null, 2));
     return res.status(200).json({ success: true, enrolledUsers: users });
 
   } catch (error) {
-    logger.error("Error - Controller - Enrolled User List: " + error.stack);
+    logger.error("Error - Controller - Enrolled User List: " + redactString(error.stack || ""));
     req.flash("message", "Error in fetching enrolled users");
     req.flash('alertType', 'error');
     res.status(500).json({ success: false, message: "Error fetching users" });

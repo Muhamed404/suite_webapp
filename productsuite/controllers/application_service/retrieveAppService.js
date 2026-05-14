@@ -2,6 +2,7 @@ const backend_api_urls = require('../../../config/backend_api_urls');
 const render_ejs_urls = require('../../../config/render_ejs_urls');
 const logger = require('../../../logger/logger').logger;
 const getApiClient = require('../../../utility/api-client');
+const { redactLogData } = require('../../../utility/redact');
 
 // Render form
 exports.retrieveAppServices = async (req, res) => {
@@ -15,7 +16,7 @@ exports.retrieveAppServices = async (req, res) => {
     const data = response.data || {};
     const appServices = data.object ?? data.result ?? []; // support multiple shapes
 
-    logger.info(`[APP_SERVICE][LIST] Retrieved summary:${JSON.stringify(appServices, null, 2)}`);
+    logger.info(`[APP_SERVICE][LIST] Retrieved summary:${JSON.stringify(redactLogData(appServices), null, 2)}`);
 
 
     return res.render(render_ejs_urls.ProductSuiteManagement.App_Service.LIST, {
@@ -24,7 +25,7 @@ exports.retrieveAppServices = async (req, res) => {
     });
 
   } catch (error) {
-    logger.error(`[APP_SERVICE][LIST] Error: ${error.message}`);
+    logger.error(`[APP_SERVICE][LIST] Error: ${redactLogData(error.message)}`);
     const userMessage = error.response?.data?.message || error.response?.data?.error || "Error fetching packages";
     return res.status(404).render('pages/404', {
       message: error.message || 'Resource not found',

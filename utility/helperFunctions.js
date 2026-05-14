@@ -2,6 +2,7 @@
 
 const path = require('path');
 const { logger } = require('../logger/logger');
+const { redactEmail } = require('./redact');
 const fs = require('fs').promises;
 const enums = require('../contants/enum');
 const fetch = require('node-fetch');
@@ -66,7 +67,7 @@ function hasAccess(req, module_name, allowedAccessTypes) {
       perm.module.toLowerCase() === module_name.toLowerCase() &&
       allowedAccessTypes.some(type => type.toLowerCase() === perm.name.toLowerCase())
   );
-  logger.info(`[HAS CREATE/UPDATE ACCESS] User:${req.user.email} Access: ${hasAccess ? 'has Granted ✅' : 'has not Denied ❌'}`);
+  logger.info(`[HAS CREATE/UPDATE ACCESS] User:${redactEmail(req.user.email)} Access: ${hasAccess ? 'has Granted ✅' : 'has not Denied ❌'}`);
   if (!hasAccess) {
     logger.warn(`[HAS CREATE/UPDATE ACCESS] Access denied: Insufficient permission'}`);
     return false

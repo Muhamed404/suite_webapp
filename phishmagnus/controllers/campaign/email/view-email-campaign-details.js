@@ -1,5 +1,6 @@
 const config = require("../../../../config/env.config");
 const { logger } = require("../../../../logger/logger");
+const { redactLogData } = require("../../../utility/redact");
 const enums = require("../../../../contants/enum");
 const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
@@ -22,7 +23,7 @@ exports.viewCampaignDetails = async (req, res) => {
       return res.redirect("/phm/index");
     }
 
-    logger.info(`Email Campaign Detail: incoming params ${JSON.stringify(req.params, null, 2)}`);
+    logger.info(`Email Campaign Detail: incoming params ${JSON.stringify(redactLogData(req.params), null, 2)}`);
 
     // Function to fetch campaign statistics
     // Fetch statistics and user details in parallel for performance
@@ -32,7 +33,7 @@ exports.viewCampaignDetails = async (req, res) => {
     ]);
 
     logger.info('Email Campaign Detail: FETCH CAMPAIGN STATISTICS AND PHISHING USER DETAILS API CALL COMPLETED');
-    logger.debug(`Email Campaign Detail: respStatistics ${JSON.stringify(campaignReportDetails?.data, null, 2)}`);
+    logger.debug(`Email Campaign Detail: respStatistics ${JSON.stringify(redactLogData(campaignReportDetails?.data), null, 2)}`);
     const campaignDetails = campaignReportDetails?.data?.message.campaign || {};
     // Format the campaign start datetime for display (avoid raw ISO string)
     try {
@@ -88,9 +89,9 @@ exports.viewCampaignDetails = async (req, res) => {
     } catch (err) {
       logger.warn('Failed to format usersDetail schedule datetimes', err);
     }
-    logger.debug('respPhishingUserDetails: user Details ' + JSON.stringify(usersDetail, null, 2));
+    logger.debug('respPhishingUserDetails: user Details ' + JSON.stringify(redactLogData(usersDetail), null, 2));
 
-    logger.debug('Email Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));
+    logger.debug('Email Campaign Detail: campaignStats: ' + JSON.stringify(redactLogData(campaignStats), null, 2));
 
     if (req.query?.format === 'json' || req.headers?.accept?.includes('application/json')) {
       return res.json({

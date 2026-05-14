@@ -7,6 +7,7 @@ const getApiClient = require('../../../utility/api-client')
 const backend_api_urls = require('../../../config/backend_api_urls');
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
+const { redactLogData } = require("../../utility/redact");
 exports.fetchDepartment = async (req, res) => {
   logger.info(`Controller - Retrieving departments for organization ${req.user.organization_id}`);
 
@@ -23,10 +24,10 @@ exports.fetchDepartment = async (req, res) => {
     return Promise.all([apiClient.get(url), apiClient.get(subscriptionUrl)])
       .then(([response, subscriptionResponse]) => {
         const departments = response.data?.message || [];
-        logger.info('Department list ' + JSON.stringify(departments, null, 2))
+        logger.info('Department list ' + JSON.stringify(redactLogData(departments), null, 2))
         let subscription = subscriptionResponse.data?.message || [];
         logger.info(`[Department GET] Retrieved ${departments.length} departments for organization ${orgId}`);
-        logger.info(`[Department GET] Departments Data: ${JSON.stringify(departments, null, 2)}`);
+        logger.info(`[Department GET] Departments Data: ${JSON.stringify(redactLogData(departments), null, 2)}`);
         logger.info(`[Department GET] Rendering view department form`);
         const actionType = "department";
         let disableEmailDataTableIndex = false;

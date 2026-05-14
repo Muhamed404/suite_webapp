@@ -3,12 +3,13 @@ const getApiClient = require('../../../utility/api-client');
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const backend_api_urls = require("../../../config/backend_api_urls");
+const { redactLogData } = require("../../../phishmagnus/utility/redact");
 
 
 const logTxn = 'Controller - [Service Registry - Update]';
 
 exports.renderUpdateForm = async (req, res) => {
-  logger.info(`Controller - [Service Registry - Update]: Incoming request to render update form for service with ID ${JSON.stringify(req.params, null, 2)}`);
+  logger.info(`Controller - [Service Registry - Update]: Incoming request to render update form for service with ID ${JSON.stringify(redactLogData(req.params), null, 2)}`);
   try {
     const serviceId = req.params?.service_id || null;
     const registryId = req.params?.registry_id || null;
@@ -22,7 +23,7 @@ exports.renderUpdateForm = async (req, res) => {
 
     const apiClient = getApiClient(req);
     const serviceResponse = await apiClient.get(backend_api_urls.PRODUCT_SUITE.SERVICE_REGISTRY.RENDER_UPDATE_FORM(serviceId, registryId));
-    logger.info(`Controller - [Service Registry - Update]: Response from API: ${JSON.stringify(serviceResponse.data, null, 2)}`);
+    logger.info(`Controller - [Service Registry - Update]: Response from API: ${JSON.stringify(redactLogData(serviceResponse.data), null, 2)}`);
 
     // Handle service not found or error from API 
     if (!serviceResponse.data.success) {
@@ -48,7 +49,7 @@ exports.renderUpdateForm = async (req, res) => {
 };
 
 exports.submitUpdateForm = async (req, res) => {
-  logger.info(`${logTxn}: Incoming request to update service with ID ${JSON.stringify(req.params, null, 2)}`);
+  logger.info(`${logTxn}: Incoming request to update service with ID ${JSON.stringify(redactLogData(req.params), null, 2)}`);
   try {
     const serviceId = req.params?.service_id.trim() || null;
 
@@ -63,7 +64,7 @@ exports.submitUpdateForm = async (req, res) => {
     const { serviceId: service_id, serviceType: service_type, public_key, serviceName: service_name, status } = payload;
 
     if (!service_id || !service_type || !public_key || !service_name || typeof status === 'undefined') {
-      logger.warn(`${logTxn}: Incomplete payload received: ${JSON.stringify(payload)}`);
+      logger.warn(`${logTxn}: Incomplete payload received: ${JSON.stringify(redactLogData(payload))}`);
       req.flash("message", req.__("generic_label.incomplete_data_submitted"));
       req.flash("alertType", "error");
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.EDIT_SERVICE(serviceId));
@@ -71,7 +72,7 @@ exports.submitUpdateForm = async (req, res) => {
 
     const apiClient = getApiClient(req);
     const serviceResponse = await apiClient.post(backend_api_urls.PRODUCT_SUITE.SERVICE_REGISTRY.UPDATE_SERVICE(serviceId), payload);
-    logger.info(`${logTxn}: Response from API: ${JSON.stringify(serviceResponse.data, null, 2)}`);
+    logger.info(`${logTxn}: Response from API: ${JSON.stringify(redactLogData(serviceResponse.data), null, 2)}`);
 
     // Handle user not found or error from API
     if (!serviceResponse.data.success) {

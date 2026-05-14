@@ -1,5 +1,6 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const { logger } = require("../../../logger/logger");
+const { redactLogData, redactString } = require("../../../utility/redact");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const getApiClient = require("../../../utility/api-client");
 const enums = require('../../../contants/enum')
@@ -37,19 +38,19 @@ exports.retrieveUnEnrolledPHMUsers = async (req, res) => {
       url += (url.includes('?') ? '&' : '?') + `productId=${encodeURIComponent(productId)}`;
     }
     const apiClient = getApiClient(req);
-    logger.info(`Controller - UnEnrolled User List: Fetching UnEnrolled users from URL: ${url}`);
+    logger.info(`Controller - UnEnrolled User List: Fetching UnEnrolled users from URL: ${redactString(url)}`);
     const response = await apiClient.get(url)
 
     const users = response.data?.users || [];
     if (users.length === 0) {
-      logger.info('Controller - UnEnrolled User List: No UnEnrolled users found for organization ' + organization);
+      logger.info('Controller - UnEnrolled User List: No UnEnrolled users found for organization ' + redactLogData(organization));
       return res.status(200).json({ success: true, unenrolledUsers: [] });
     }
-    logger.info('Printing UnEnrolled users for organization ' + organization + ': ' + JSON.stringify(users, null, 2));
+    logger.info('Printing UnEnrolled users for organization ' + redactLogData(organization) + ': ' + JSON.stringify(redactLogData(users), null, 2));
     return res.status(200).json({ success: true, unenrolledUsers: users });
 
   } catch (error) {
-    logger.error("Error - Controller - UnEnrolled User List: " + error.stack);
+    logger.error("Error - Controller - UnEnrolled User List: " + redactString(error.stack || ""));
     req.flash("message", "Error in fetching UnEnrolled users");
     req.flash('alertType', 'error');
     res.status(500).json({ success: false, message: "Error fetching users" });
