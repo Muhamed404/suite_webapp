@@ -531,7 +531,9 @@
 			"labelAdminFirstName": "الاسم الأول",
 			"labelAdminLastName": "اسم العائلة",
 			"labelAdminPassword": "كلمة المرور",
-			"mandatory": "(*) إلزامي"
+			"mandatory": "(*) إلزامي",
+			"successMessage": "تم تحديث المؤسسة بنجاح",
+			"errorMessage": "خطأ في تحديث المؤسسة"
 		}
 	},
 	"package": {

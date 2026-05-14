@@ -524,7 +524,9 @@
 			"labelAdminFirstName": "First Name",
 			"labelAdminLastName": "Last Name",
 			"labelAdminPassword": "Password",
-			"mandatory": "(*) Mandatory"
+			"mandatory": "(*) Mandatory",
+			"successMessage": "Organization has updated",
+			"errorMessage": "Error updating organization"
 		}
 	},
 	"package": {
