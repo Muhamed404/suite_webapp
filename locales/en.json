@@ -2154,5 +2154,44 @@
 		"loginPlaceholder": "Enter 6-digit code",
 		"loginBtn": "Verify & Continue",
 		"loginBack": "Back to Login"
+	},
+	"notification_mail": {
+		"breadcrumb": "Notification Mail Log",
+		"title": "Notification Mail Log",
+		"subtitle": "Outbound email dispatch history and delivery status.",
+		"filters": {
+			"all_statuses": "All Statuses",
+			"type_placeholder": "Notification type...",
+			"apply": "Apply",
+			"clear": "Clear"
+		},
+		"columns": {
+			"recipient": "Recipient",
+			"type": "Type",
+			"priority": "Priority",
+			"status": "Status",
+			"retries": "Retries",
+			"queued_at": "Queued At",
+			"sent_at": "Sent At",
+			"error": "Error"
+		},
+		"messages": {
+			"no_mails_found": "No notification mails found."
+		},
+		"status": {
+			"pending": "PENDING",
+			"processing": "PROCESSING",
+			"sent": "SENT",
+			"rejected": "REJECTED",
+			"failed": "FAILED"
+		},
+		"priority": {
+			"high": "HIGH",
+			"low": "LOW",
+			"normal": "NORMAL"
+		},
+		"pagination": {
+			"records": "records"
+		}
 	}
 }

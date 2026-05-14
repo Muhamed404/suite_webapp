@@ -2459,5 +2459,44 @@
 		"loginBtn": "تحقق والمتابعة",
 		"loginBack": "العودة إلى تسجيل الدخول"
 	},
-	"user_not_found": "user_not_found"
+	"user_not_found": "user_not_found",
+	"notification_mail": {
+		"breadcrumb": "سجل بريد الإشعارات",
+		"title": "سجل بريد الإشعارات",
+		"subtitle": "تاريخ إرسال البريد الإلكتروني الصادر وحالة التسليم.",
+		"filters": {
+			"all_statuses": "جميع الحالات",
+			"type_placeholder": "نوع الإشعار...",
+			"apply": "تطبيق",
+			"clear": "مسح"
+		},
+		"columns": {
+			"recipient": "المستلم",
+			"type": "النوع",
+			"priority": "الأولوية",
+			"status": "الحالة",
+			"retries": "المحاولات",
+			"queued_at": "تم وضعه في الانتظار في",
+			"sent_at": "تم الإرسال في",
+			"error": "الخطأ"
+		},
+		"messages": {
+			"no_mails_found": "لم يتم العثور على رسائل إشعار."
+		},
+		"status": {
+			"pending": "قيد الانتظار",
+			"processing": "جارٍ المعالجة",
+			"sent": "تم الإرسال",
+			"rejected": "مرفوض",
+			"failed": "فشل"
+		},
+		"priority": {
+			"high": "عالية",
+			"low": "منخفضة",
+			"normal": "عادية"
+		},
+		"pagination": {
+			"records": "سجلات"
+		}
+	}
 }
