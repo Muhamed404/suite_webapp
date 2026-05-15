@@ -1,3 +1,24 @@
+function getLocalizedNoResultsLabel(rawLabel) {
+  const fallback = document.documentElement.lang === 'ar'
+    ? 'لا توجد نتائج تطابق استعلام البحث الخاص بك'
+    : 'No results match your search query';
+
+  if (typeof rawLabel !== 'string') {
+    return fallback;
+  }
+
+  const normalized = rawLabel.trim();
+  if (!normalized) {
+    return fallback;
+  }
+
+  if (normalized === 'generic_label.no_results_match_search' || normalized.includes('no_results_match_search')) {
+    return fallback;
+  }
+
+  return normalized;
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   if (!document.getElementById('filter-table') || typeof simpleDatatables === 'undefined' || typeof simpleDatatables.DataTable === 'undefined') {
     console.warn('simple-datatables not found or table missing');
@@ -9,7 +30,9 @@ document.addEventListener('DOMContentLoaded', function () {
   const perPageLabel = table.dataset.perPage || (window.translations && window.translations.entriesPerPage) || 'entries per page';
   const infoLabel = table.dataset.info || (window.translations && window.translations.datatableInfo) || 'Showing {start} to {end} of {rows} entries';
   const noRowsLabel = table.dataset.noRows || (window.translations && window.translations.no_entries_found) || 'No entries found';
-  const noResultsLabel = table.dataset.noResults || (window.translations && (window.translations.no_results_match_search || window.translations.noResults)) || 'No results match your search query';
+  const noResultsLabel = getLocalizedNoResultsLabel(
+    table.dataset.noResults || (window.translations && (window.translations.no_results_match_search || window.translations.noResults))
+  );
   const previousLabel = (window.translations && window.translations.back) || 'Previous';
   const nextLabel = (window.translations && window.translations.next) || 'Next';
 
@@ -3678,7 +3701,7 @@ document.addEventListener('DOMContentLoaded', function () {
                   perPage: "entries per page",
                   pageTitle: "Page {page}",
                   noRows: "No entries found",
-                  noResults: (window.translations && (window.translations.no_results_match_search || window.translations.noResults)) || (window.i18n ? window.i18n.__('generic_label.no_results_match_search') : "No results match your search query"),
+                  noResults: getLocalizedNoResultsLabel((window.translations && (window.translations.no_results_match_search || window.translations.noResults)) || (window.i18n ? window.i18n.__('generic_label.no_results_match_search') : '')),
                   info: "Showing {start} to {end} of {rows} entries",
                 },
                 template: (t, e) =>
