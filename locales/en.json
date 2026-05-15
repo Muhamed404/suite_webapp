@@ -524,7 +524,9 @@
 			"labelAdminFirstName": "First Name",
 			"labelAdminLastName": "Last Name",
 			"labelAdminPassword": "Password",
-			"mandatory": "(*) Mandatory"
+			"mandatory": "(*) Mandatory",
+			"successMessage": "Organization has updated",
+			"errorMessage": "Error updating organization"
 		}
 	},
 	"package": {
@@ -890,6 +892,9 @@
 		"suiteUsersClearSearch": "Clear",
 		"suiteUsersPrev": "Previous",
 		"suiteUsersNext": "Next",
+		"suiteUsersTotal": "{total} users total",
+		"suiteUsersPerPage": "per page",
+		"suiteUsersShowing": "Showing {start}–{end} of {total}",
 		"stepChooseProduct": "Choose Product",
 		"stepChooseFile": "Choose File",
 		"labelChooseTheProduct": "Choose the Product",
@@ -1686,7 +1691,17 @@
 		"searchPlaceholder": "Search here...",
 		"subtitle": "Track all user actions and system events.",
 		"rowsPerPage": "Rows per page",
-		"noLogs": "No audit logs found"
+		"noLogs": "No audit logs found",
+		"paginationText": "Showing {from}–{to} of {total}",
+		"actions": {
+			"CREATE": "Create",
+			"UPDATE": "Update",
+			"DELETE": "Delete",
+			"UPLOAD": "Upload",
+			"LOGIN": "Login",
+			"LOGOUT": "Logout",
+			"VIEW": "View"
+		}
 	},
 	"CS-List": "Cybersecurity Categories",
 	"btn-CS-LibPosters-Upload-Document": "Upload Document",
@@ -2141,5 +2156,44 @@
 		"loginPlaceholder": "Enter 6-digit code",
 		"loginBtn": "Verify & Continue",
 		"loginBack": "Back to Login"
+	},
+	"notification_mail": {
+		"breadcrumb": "Notification Mail Log",
+		"title": "Notification Mail Log",
+		"subtitle": "Outbound email dispatch history and delivery status.",
+		"filters": {
+			"all_statuses": "All Statuses",
+			"type_placeholder": "Notification type...",
+			"apply": "Apply",
+			"clear": "Clear"
+		},
+		"columns": {
+			"recipient": "Recipient",
+			"type": "Type",
+			"priority": "Priority",
+			"status": "Status",
+			"retries": "Retries",
+			"queued_at": "Queued At",
+			"sent_at": "Sent At",
+			"error": "Error"
+		},
+		"messages": {
+			"no_mails_found": "No notification mails found."
+		},
+		"status": {
+			"pending": "PENDING",
+			"processing": "PROCESSING",
+			"sent": "SENT",
+			"rejected": "REJECTED",
+			"failed": "FAILED"
+		},
+		"priority": {
+			"high": "HIGH",
+			"low": "LOW",
+			"normal": "NORMAL"
+		},
+		"pagination": {
+			"records": "records"
+		}
 	}
 }

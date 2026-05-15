@@ -80,12 +80,12 @@ exports.editOrganization = async (req, res) => {
 
       }
       logger.info('EDIT ORGANIZATION: ORGANIZATION HAS BEEN UPDATE');
-      req.flash('message', 'Organization has updated');
+      req.flash('message', req.__('organization.edit.successMessage'));
       req.flash('alertType', 'success');
       res.redirect(`/organization/profile/${organizationId}`);
     } catch (error) {
       logger.error("Error creating organization:" + redactLogData(error.stack));
-      req.flash('message', 'Error updating organization');
+      req.flash('message', req.__('organization.edit.errorMessage'));
       req.flash('alertType', 'error');
       res.redirect(`/organization/profile/${organizationId}`);
     }

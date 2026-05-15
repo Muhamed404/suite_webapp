@@ -2,6 +2,7 @@
   const sp = typeof suitePagination !== 'undefined' && suitePagination
     ? suitePagination
     : { page: 1, pageSize: 25, total: 0, totalPages: 0, search: '', basePath: '/user/suite-users' };
+  const isRtl = typeof locale === 'string' && locale.toLowerCase().startsWith('ar');
 %>
 
 <div class="flex flex-col p-6 pt-4 gap-5">
@@ -20,7 +21,7 @@
       <div>
         <h1 class="text-2xl font-semibold text-gray-900"><%= __("user.labelTitleUserManagement") %></h1>
         <% if (sp.total > 0) { %>
-          <p class="text-sm text-gray-400 mt-0.5"><%= sp.total %> users total</p>
+          <p class="text-sm text-gray-400 mt-0.5"><%= __("user.suiteUsersTotal").replace("{total}", sp.total) %></p>
         <% } %>
       </div>
 
@@ -128,9 +129,9 @@
 
         <!-- Page size -->
         <select id="suiteUserPageSize" name="pageSize"
-          class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+          class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none bg-white min-w-[140px]">
           <% [10, 25, 50, 100].forEach(function(ps) { %>
-            <option value="<%= ps %>" <%= Number(sp.pageSize) === ps ? 'selected' : '' %>><%= ps %> / page</option>
+            <option value="<%= ps %>" <%= Number(sp.pageSize) === ps ? 'selected' : '' %>><%= ps %> <%= __("user.suiteUsersPerPage") %></option>
           <% }); %>
         </select>
 
@@ -369,8 +370,15 @@
 
         <p class="text-sm text-gray-400">
           <% if (sp.total > 0) { %>
-            Showing <span class="font-medium text-gray-700"><%= ((sp.page - 1) * sp.pageSize) + 1 %>–<%= Math.min(sp.page * sp.pageSize, sp.total) %></span>
-            of <span class="font-medium text-gray-700"><%= sp.total %></span>
+            <%
+              var startIndex = ((sp.page - 1) * sp.pageSize) + 1;
+              var endIndex = Math.min(sp.page * sp.pageSize, sp.total);
+              var showingText = __("user.suiteUsersShowing")
+                .replace("{start}", startIndex)
+                .replace("{end}", endIndex)
+                .replace("{total}", sp.total);
+            %>
+            <span class="font-medium text-gray-700"><%= showingText %></span>
           <% } %>
         </p>
 
@@ -379,7 +387,7 @@
             <% if (sp.page > 1) { %>
               <a href="<%= sp.basePath %>?page=<%= sp.page - 1 %>&amp;pageSize=<%= sp.pageSize %>&amp;search=<%= encodeURIComponent(sp.search || '') %>"
                 class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="<%= isRtl ? 'M9 5l7 7-7 7' : 'M15 19l-7-7 7-7' %>"/></svg>
                 <%= __("user.suiteUsersPrev") %>
               </a>
             <% } %>
@@ -401,7 +409,7 @@
               <a href="<%= sp.basePath %>?page=<%= sp.page + 1 %>&amp;pageSize=<%= sp.pageSize %>&amp;search=<%= encodeURIComponent(sp.search || '') %>"
                 class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition">
                 <%= __("user.suiteUsersNext") %>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="<%= isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7' %>"/></svg>
               </a>
             <% } %>
           </nav>
