@@ -773,7 +773,8 @@
 			"labelTotalUsers": "Total Users",
 			"labelDiscount": "Discount",
 			"labelTotalCost": "Total Cost",
-			"optionSelectAdminUser": "Select Admin User"
+			"optionSelectAdminUser": "Select Admin User",
+			"successCreated": "Subscription created successfully"
 		}
 	},
 	"smtp": {

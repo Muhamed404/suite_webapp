@@ -780,7 +780,8 @@
 			"labelTotalUsers": "إجمالي المستخدمين",
 			"labelDiscount": "الخصم",
 			"labelTotalCost": "إجمالي التكلفة",
-			"optionSelectAdminUser": "اختر المستخدم الإداري"
+			"optionSelectAdminUser": "اختر المستخدم الإداري",
+			"successCreated": "تم إنشاء الاشتراك بنجاح"
 		}
 	},
 	"smtp": {
@@ -1591,20 +1592,20 @@
 		"Paid": "مدفوع"
 	},
 	"Header": {
-		"updateInvoice": "Header.updateInvoice"
+		"updateInvoice": "تحديث الفاتورة"
 	},
 	"Payment": {
-		"mode": "Payment.mode",
-		"status": "Payment.status"
+		"mode": "طريقة الدفع",
+		"status": "حالة الدفع"
 	},
 	"selPayment": {
-		"mode": "selPayment.mode",
-		"status": "selPayment.status"
+		"mode": "اختر طريقة الدفع",
+		"status": "اختر حالة الدفع"
 	},
 	"Order": {
 		"Modal": {
-			"Save": "Order.Modal.Save",
-			"Close": "Order.Modal.Close"
+			"Save": "حفظ",
+			"Close": "إغلاق"
 		}
 	},
 	"btn-Create": "إنشاء",
