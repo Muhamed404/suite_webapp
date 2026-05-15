@@ -193,7 +193,10 @@
 		"password_maxlength": "Password cannot exceed 255 characters"
 	},
 	"success_messages": {
-		"smtp_configured_successfully": "SMTP Configured Successfully"
+		"smtp_configured_successfully": "SMTP Configured Successfully",
+		"smtp_configured_fully": "SMTP configured fully",
+		"file_uploading_in_process": "File uploading is in process.",
+		"group_created_successfully": "Group created successfully"
 	},
 	"topnavbar": {
 		"welcome": "Welcome",

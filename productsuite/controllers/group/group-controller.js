@@ -49,7 +49,7 @@ exports.create = async (req, res) => {
       const response = await apiClient.post(url, groups);
       const { message: message, alertType: alertType } = response.data;
       req.flash('alertType', alertType);
-      req.flash('message', message);
+      req.flash('message', 'Group created successfully');
       logger.info(`[Group create]: Response from backend: ${JSON.stringify(redactLogData(response.data), null, 2)}`);
 
       res.redirect(

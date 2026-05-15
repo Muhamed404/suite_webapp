@@ -158,7 +158,7 @@ exports.uploadBulkUsers = async (req, res, next) => {
             req.flash("alertType", "success");
             return res.redirect(`${jobsPath}?jobId=${encodeURIComponent(String(jobId))}`);
           }
-          req.flash("message", 'File uploading is in Process.');
+          req.flash("message", 'File uploading is in process.');
           req.flash("alertType", "success");
           return res.redirect(frontend_api_urls.PRODUCT_SUITE.User_Management.SUITE_USERS);
         } catch (apiErr) {

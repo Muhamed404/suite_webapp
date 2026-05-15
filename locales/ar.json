@@ -201,7 +201,10 @@
 		"password_maxlength": "لا يمكن أن تتجاوز كلمة المرور 255 حرف"
 	},
 	"success_messages": {
-		"smtp_configured_successfully": "تم تكوين SMTP بنجاح"
+		"smtp_configured_successfully": "تم تكوين SMTP بنجاح",
+		"smtp_configured_fully": "تم تكوين SMTP بالكامل",
+		"file_uploading_in_process": "جاري رفع الملف.",
+		"group_created_successfully": "تم إنشاء المجموعة بنجاح"
 	},
 	"topnavbar": {
 		"welcome": "مرحباً",
