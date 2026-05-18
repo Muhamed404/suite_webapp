@@ -5,6 +5,7 @@ const he = require('he');
 const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const { redactLogData } = require("../../../phishmagnus/utility/redact");
+const { injectPhishingFormWebAction, normalizePhishingFormActions, interactionScript } = require("../../../utility/helperFunctions");
 
 exports.updateTemplate = async (req, res) => {
   logger.info('Controller - Update Template: Incoming Request');
@@ -88,13 +89,11 @@ exports.updateTemplate = async (req, res) => {
     ) {
       logger.info('Controller - Update Template: Adding interaction script to phishing_page_content');
 
-      // Remove any existing interactionScript before re-injecting
       const scriptRegex = /<script>[\s\S]*?<\/script>/gi;
       let content = payload.phishing_page_content.replace(scriptRegex, '');
-
-      // Inject phishing_url_submit into every <form> action automatically
-      content = injectFormAction(content);
-      logger.info('Controller - Update Template: Injected phishing_url_submit into form action(s)');
+      content = normalizePhishingFormActions(content);
+      content = injectPhishingFormWebAction(content);
+      logger.info('Controller - Update Template: Normalized/injected phishing_url_submit into form action(s)');
 
       payload.phishing_page_content = content + interactionScript();
     }
@@ -126,67 +125,3 @@ exports.updateTemplate = async (req, res) => {
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.System_Template.LIST);
   }
 };
-function injectFormAction(content) {
-  // Replace or add action="<%-phishing_url_submit%>" on every <form> tag
-  return content.replace(/<form(\b[^>]*)>/gi, (match, attrs) => {
-    const cleanedAttrs = (attrs || '').replace(/\s*action\s*=\s*(["'])[^"']*\1/gi, '');
-    return `<form${cleanedAttrs} action="<%-phishing_url_submit%>">`;
-  });
-}
-
-function interactionScript() {
-  const script = `
-  <script>
-    (function() {
-
-      const TRACK_URL = "<%- phishing_url %>";
-  let interactionSent = false; // <-- ensures firing only once
-
-  function sendInteraction(data) {
-    if (interactionSent) return; // stop duplicates
-    interactionSent = true;
-
-    fetch(TRACK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        timestamp: new Date().toISOString(),
-        pageUrl: window.location.href,
-        ...data
-      })
-    }).catch(err => console.error("Tracking Error:", err));
-
-    console.log("[Sent Once Only]", data);
-  }
-
-  // Detect first typing on ANY input, textarea, or content-editable
-  function handleTyping() {
-    sendInteraction({
-      eventType: "typing_start"
-    });
-
-    // Remove listeners after first trigger
-    document.removeEventListener("keydown", handleTyping);
-    document.removeEventListener("input", handleTyping);
-  }
-
-  // Detect first copy attempt
-  function handleCopy() {
-    sendInteraction({
-      eventType: "copy_attempt"
-    });
-
-    document.removeEventListener("copy", handleCopy);
-  }
-
-  // Add listeners
-  document.addEventListener("keydown", handleTyping);
-  document.addEventListener("input", handleTyping);
-  document.addEventListener("copy", handleCopy);
-})();
-  </script>
-  `;
-
-  logger.info("[Create System Template] interactionScript created");
-  return script;
-}

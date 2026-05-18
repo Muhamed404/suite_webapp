@@ -102,7 +102,7 @@ exports.createSMTP = async (req, res) => {
         
         if (data.alertType) {
           logger.info(`[Create Organization SMTP] POST: Organization ${orgId} SMTP Account created`)
-          req.flash('message', data.message);
+          req.flash('message', 'SMTP configured fully');
           req.flash('alertType', data.alertType);
           if (orgId === 0) {
             res.redirect(`/settings/smtp/${orgId}`);

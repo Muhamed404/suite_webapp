@@ -299,31 +299,49 @@ function cleanEmail(email) {
 }
 
 
+const PHISHING_FORM_SUBMIT_ACTION = '<%-phishing_url_submit%>';
+
+
+function normalizePhishingFormActions(content) {
+  if (!content) return content;
+  return content.replace(
+    /action\s*=\s*"<%-phishing_url_submit%[^"]*"/gi,
+    `action="${PHISHING_FORM_SUBMIT_ACTION}"`
+  );
+}
+
 function injectPhishingFormWebAction(content) {
   if (!content) return content;
+
+  content = normalizePhishingFormActions(content);
 
   const hasForm = /<form[\s>]/i.test(content);
 
   if (!hasForm) {
-    return `<form action="<%-phishing_url_submit%>" method="post">\n${content}\n</form>`;
+    return `<form action="${PHISHING_FORM_SUBMIT_ACTION}" method="post">\n${content}\n</form>`;
   }
 
-  return content.replace(/<form(\b(?:[^>"']|"[^"]*"|'[^']*')*?)>/gi, (_match, attrs) => {
-    let a = attrs || '';
+  return content.replace(/<form(\b[^>]*)>/gi, (match, attrs) => {
+    const a = attrs || '';
 
-    if (/\baction\s*=/i.test(a)) {
-      a = a.replace(/\baction\s*=\s*(["'])[^"']*\1/gi, `action="<%-phishing_url_submit%>"`);
-    } else {
-      a += ` action="<%-phishing_url_submit%>"`;
+    if (/phishing_url_submit/i.test(a)) {
+      return match;
     }
 
-    if (/\bmethod\s*=/i.test(a)) {
-      a = a.replace(/\bmethod\s*=\s*(["'])[^"']*\1/gi, `method="post"`);
+    let cleaned = a
+      .replace(/\s*action\s*=\s*"[^"]*"/gi, '')
+      .replace(/\s*action\s*=\s*'[^']*'/gi, '');
+
+    cleaned += ` action="${PHISHING_FORM_SUBMIT_ACTION}"`;
+
+    if (/\bmethod\s*=/i.test(cleaned)) {
+      cleaned = cleaned.replace(/\bmethod\s*=\s*"[^"]*"/gi, 'method="post"');
+      cleaned = cleaned.replace(/\bmethod\s*=\s*'[^']*'/gi, "method='post'");
     } else {
-      a += ` method="post"`;
+      cleaned += ' method="post"';
     }
 
-    return `<form${a}>`;
+    return `<form${cleaned}>`;
   });
 }
 
@@ -384,6 +402,7 @@ function interactionScript() {
 
 module.exports = {
   injectPhishingFormWebAction,
+  normalizePhishingFormActions,
   formatDate,
   extractAttachmentInfo,
   readFiles,

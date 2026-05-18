@@ -193,7 +193,10 @@
 		"password_maxlength": "Password cannot exceed 255 characters"
 	},
 	"success_messages": {
-		"smtp_configured_successfully": "SMTP Configured Successfully"
+		"smtp_configured_successfully": "SMTP Configured Successfully",
+		"smtp_configured_fully": "SMTP configured fully",
+		"file_uploading_in_process": "File uploading is in process.",
+		"group_created_successfully": "Group created successfully"
 	},
 	"topnavbar": {
 		"welcome": "Welcome",
@@ -1019,7 +1022,7 @@
 			"labelLandingPage_Title": "Landing Page Settings",
 			"labelLandingPage_radioOption1": "Import Custom Landing Page",
 			"labelLandingPage_radioOption2": "I like to redirect the user to a custom landing page",
-			"labelLandingPage_redirectToCustomWebPage": "I would like to redirect the user to a custom web/STC page",
+			"labelLandingPage_redirectToCustomWebPage": "I would like to set a custom landing page URL for redirection.",
 			"labelLandingPage_redirectUrl": "Redirect URL",
 			"labelLanguage": "Language",
 			"labelImportHtmlUrl": "Import Landing Page From An External URL",
