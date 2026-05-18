@@ -1022,7 +1022,7 @@
 			"labelLandingPage_Title": "Landing Page Settings",
 			"labelLandingPage_radioOption1": "Import Custom Landing Page",
 			"labelLandingPage_radioOption2": "I like to redirect the user to a custom landing page",
-			"labelLandingPage_redirectToCustomWebPage": "I would like to redirect the user to a custom web/STC page",
+			"labelLandingPage_redirectToCustomWebPage": "I would like to set a custom landing page URL for redirection.",
 			"labelLandingPage_redirectUrl": "Redirect URL",
 			"labelLanguage": "Language",
 			"labelImportHtmlUrl": "Import Landing Page From An External URL",

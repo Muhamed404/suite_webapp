@@ -652,46 +652,53 @@ const externalUrlInput = document.getElementById('landing_page_external_url');
 const hiddenLandingPageOption = document.getElementById('landing_page_option');
 const initialLandingPageMode = window.initialLandingPageMode || 'html';
 
+function normalizeLandingRadioValue(mode) {
+  return mode === 'url' ? 'url' : 'custom';
+}
+
 function updateLandingModeUI(mode) {
-  const isUrlMode = mode === 'url';
+  const normalizedMode = normalizeLandingRadioValue(mode);
+  const isUrlMode = normalizedMode === 'url';
+  const placeholderButtons = document.getElementById('placeholder-buttons');
   if (editorContainer) {
     editorContainer.style.display = isUrlMode ? 'none' : 'block';
   }
   if (externalUrlContainer) {
     externalUrlContainer.classList.toggle('hidden', !isUrlMode);
   }
+  if (externalUrlInput) {
+    externalUrlInput.readOnly = false;
+    externalUrlInput.removeAttribute('readonly');
+  }
   if (hiddenLandingPageOption) {
     hiddenLandingPageOption.value = isUrlMode ? 'url' : 'html';
+  }
+  if (placeholderButtons) {
+    const isLandingStep = currentStep === (phishing_landing_page_screen - 1);
+    placeholderButtons.style.display = !isUrlMode && isLandingStep ? '' : 'none';
   }
 }
 
 document.querySelectorAll('input[name="landing_option"]').forEach(radio => {
   radio.addEventListener('change', function () {
+    const isUrlMode = this.value === 'url';
     updateLandingModeUI(this.value);
+    if (isUrlMode) {
+      if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances['landing_page_content']) {
+        CKEDITOR.instances['landing_page_content'].setData('');
+      }
+    } else if (externalUrlInput) {
+      externalUrlInput.value = '';
+    }
   });
 });
 
 (function initLandingMode() {
   const selectedLandingOption = document.querySelector('input[name="landing_option"]:checked');
-  const selectedMode = selectedLandingOption ? selectedLandingOption.value : initialLandingPageMode;
+  const selectedMode = selectedLandingOption
+    ? selectedLandingOption.value
+    : normalizeLandingRadioValue(initialLandingPageMode);
   updateLandingModeUI(selectedMode);
-
-  const radios = Array.from(document.querySelectorAll('input[name="landing_option"]') || []);
-  radios.forEach(r => {
-    if (r.value !== initialLandingPageMode) {
-      r.disabled = true;
-      const lab = r.closest('label');
-      if (lab) {
-        lab.classList.add('opacity-50', 'pointer-events-none');
-      }
-    } else {
-      r.checked = true;
-    }
-  });
-
-  if (initialLandingPageMode !== 'url' && externalUrlInput) {
-    externalUrlInput.value = '';
-  }
 })();
 
 // Ensure editors array also initialized safely (for any that remain)
