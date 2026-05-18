@@ -476,7 +476,7 @@ let currentStep = 0;
       }
 
       if (landingMode === 'url') {
-        const isValidHttpUrl = /^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(externalUrl);
+        const isValidHttpUrl = /^(https?:\/\/|www\.)[^\s/$.?#].[^\s]*$/i.test(externalUrl);
         if (!isValidHttpUrl) {
           if (externalUrlInput) externalUrlInput.classList.add('border-red-500');
           alert('Please enter a valid URL.');
@@ -579,6 +579,11 @@ let currentStep = 0;
     }
     if (!isUrlLandingMode && externalUrlInput) {
       externalUrlInput.value = '';
+    }
+
+    const urlInput = document.getElementById('landing_page_external_url');
+    if (urlInput && urlInput.value.toLowerCase().startsWith('www.')) {
+      urlInput.value = 'https://' + urlInput.value;
     }
 
     const formEl = document.getElementById('templateCreationForm');

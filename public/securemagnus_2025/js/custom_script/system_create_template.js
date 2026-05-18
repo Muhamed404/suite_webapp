@@ -570,6 +570,15 @@ let currentStep = 0;
         textarea.value = textarea.value.split(window.WEB_TEMPLATE_BUCKET).join('<%=web_bucket%>');
       }
     });
+
+    const urlInputs = ['landing_page_external_url'];
+    urlInputs.forEach(id => {
+      const input = document.getElementsByName(id)[0] || document.getElementById(id);
+      if (input && input.value.toLowerCase().startsWith('www.')) {
+        input.value = 'https://' + input.value;
+      }
+    });
+
     document.getElementById('templateCreationForm').submit();
 
   }
