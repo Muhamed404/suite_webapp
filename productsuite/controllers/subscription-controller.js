@@ -90,7 +90,7 @@ async function createSubscription(req, res, next) {
     const apiClient = getApiClient(req);
     const response = await apiClient.post(`/subscription/${orgId}`, payload);
     const data = response.data;
-    req.flash("message", 'Subscription created successfully');
+    req.flash("message", req.__('subscription.create.successCreated'));
     req.flash("alertType", "success");
     logger.info(`[Create Subscription]: Subscription created successfully for organization id: ${orgId}`);
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.Subscription.PROFILE(orgId));

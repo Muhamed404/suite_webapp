@@ -1,5 +1,9 @@
 
 $(document).ready(function () {
+  const subscriptionLabels = window.subscriptionLabels || {};
+  const localizedSelectPackage = subscriptionLabels.selectPackage || 'Select Package';
+  const localizedNextLabel = window.i18n?.labels?.next || 'Next';
+  const localizedLoadingLabel = window.document.documentElement.lang === 'ar' ? 'جارٍ التحميل...' : 'Loading...';
 
   // Custom validator: at least one service must be selected
   $.validator.addMethod('requireOneService', function(value, element) {
@@ -251,7 +255,7 @@ $(document).ready(function () {
     const appId = $(this).val();
     $('#selectedPackage').empty();
     $("#selectedPackage").append(
-      `<option value="0" selected> Select Package  </option>`
+      `<option value="0" selected>${localizedSelectPackage}</option>`
     );
 
     if (appId) {
@@ -302,9 +306,10 @@ $(document).ready(function () {
       $('#totaluserlicense').removeData('package-info');
       $('#durationDays').removeData('package-info');
       $('#nextBtn').prop('disabled', false); // Re-enable next button
+      $('#nextBtn').text(localizedNextLabel);
     } else {
       $('#nextBtn').prop('disabled', true);
-      $('#nextBtn').text('Loading...');
+      $('#nextBtn').text(localizedLoadingLabel);
       
       // Fetch package details to get range and duration
       $.ajax({
@@ -349,13 +354,13 @@ $(document).ready(function () {
           
           // Re-enable next button
           $('#nextBtn').prop('disabled', false);
-          $('#nextBtn').text('Next');
+           $('#nextBtn').text(localizedNextLabel);
         },
         error: function(xhr, status, error) {
           console.error('Error fetching package details:', error);
           // Re-enable next button on error
           $('#nextBtn').prop('disabled', false);
-          $('#nextBtn').text('Next');
+           $('#nextBtn').text(localizedNextLabel);
         }
       });
     }

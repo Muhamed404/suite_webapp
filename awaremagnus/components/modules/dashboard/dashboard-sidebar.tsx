@@ -128,6 +128,7 @@ export const DashboardSidebar = ({
       label: t("menu.systemBranding"),
       children: [
         { href: "/dashboard/system-branding/certificate", icon: "", label: t("menu.certificate") },
+        { href: "/dashboard/system-branding/logo", icon: "", label: t("menu.logoAndImages") ?? "Logo & Images" },
       ],
     },
     {

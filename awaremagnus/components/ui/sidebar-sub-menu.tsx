@@ -11,6 +11,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@heroui/popover";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { useOrgLogo } from "@/hooks/useOrgBranding";
 
 const HOVER_OPEN_DELAY_MS = 120;
 const HOVER_CLOSE_DELAY_MS = 180;
@@ -58,6 +59,12 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
   const { dir } = useI18n();
   const t = useTranslations("common");
   const isRtl = dir === "rtl";
+
+  // Fetch org logo for white-label branding
+  const { data: orgBrandingData } = useOrgLogo();
+  const orgLogoUrl = orgBrandingData?.logo_url
+    ? getContentAssetUrl(orgBrandingData.logo_url)
+    : null;
 
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {};
@@ -121,11 +128,49 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
         isCollapsed ? "w-9 min-w-9" : "w-52 overflow-hidden"
       )}
     >
-      {/* HTML: images/img/aware-icon.svg, images/img/aware-name.svg - same padding as primary */}
+      {/* Logo area – use org custom logo if available, otherwise default Aware Magnus branding */}
       <div className={cn("flex gap-2 items-center py-4 px-2", isCollapsed ? "justify-center" : "")}>
-        {isCollapsed ? (
-          <Tooltip closeDelay={0} content="Aware Magnus" delay={300} placement={tooltipPlacement}>
-            <span className="flex justify-center">
+        {orgLogoUrl ? (
+          /* White-label: org custom logo */
+          isCollapsed ? (
+            <Tooltip closeDelay={0} content="Organization" delay={300} placement={tooltipPlacement}>
+              <span className="flex justify-center">
+                <Image
+                  alt="Organization Logo"
+                  className="size-5 shrink-0 object-contain"
+                  height={20}
+                  src={orgLogoUrl}
+                  width={20}
+                  unoptimized
+                />
+              </span>
+            </Tooltip>
+          ) : (
+            <Image
+              alt="Organization Logo"
+              className="h-5 w-auto max-w-[140px] shrink-0 object-contain"
+              height={20}
+              src={orgLogoUrl}
+              width={140}
+              unoptimized
+            />
+          )
+        ) : (
+          /* Default: Aware Magnus branding */
+          <>
+            {isCollapsed ? (
+              <Tooltip closeDelay={0} content="Aware Magnus" delay={300} placement={tooltipPlacement}>
+                <span className="flex justify-center">
+                  <Image
+                    alt=""
+                    className="size-4 shrink-0"
+                    height={16}
+                    src={getContentAssetUrl("/images/img/aware-icon.svg")}
+                    width={16}
+                  />
+                </span>
+              </Tooltip>
+            ) : (
               <Image
                 alt=""
                 className="size-4 shrink-0"
@@ -133,25 +178,17 @@ export const SubMenu = ({ items, isCollapsed = false, onLogout }: SubMenuProps) 
                 src={getContentAssetUrl("/images/img/aware-icon.svg")}
                 width={16}
               />
-            </span>
-          </Tooltip>
-        ) : (
-          <Image
-            alt=""
-            className="size-4 shrink-0"
-            height={16}
-            src={getContentAssetUrl("/images/img/aware-icon.svg")}
-            width={16}
-          />
-        )}
-        {!isCollapsed && (
-          <Image
-            alt="Aware Magnus"
-            className="h-3 w-auto text-[var(--mainblue)]"
-            height={12}
-            src={getContentAssetUrl("/images/img/aware-name.svg")}
-            width={80}
-          />
+            )}
+            {!isCollapsed && (
+              <Image
+                alt="Aware Magnus"
+                className="h-3 w-auto text-[var(--mainblue)]"
+                height={12}
+                src={getContentAssetUrl("/images/img/aware-name.svg")}
+                width={80}
+              />
+            )}
+          </>
         )}
       </div>
       <nav

@@ -362,5 +362,28 @@
     "moduleChartDesc": "Module completion graph will appear after completing your first module",
     "download": "Download",
     "loading": "Failed to load report card. Please try again."
+  },
+  "branding": {
+    "title": "Organization Logo",
+    "description": "Upload your organization logo to replace the default Secure Magnus branding across the platform.",
+    "currentLogo": "Current Logo",
+    "customLogo": "Custom organization logo",
+    "defaultLogo": "Default Secure Magnus branding",
+    "previewLabel": "Preview (not saved yet)",
+    "uploadNewLogo": "Upload New Logo",
+    "dragDrop": "Drag & drop your logo here",
+    "orClick": "or click to browse",
+    "fileRequirements": "JPEG, PNG, GIF, WebP, or SVG • Max 2MB",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "removeLogo": "Remove Logo",
+    "uploading": "Uploading...",
+    "removing": "Removing...",
+    "uploadSuccess": "Logo uploaded successfully!",
+    "removeSuccess": "Logo removed. Default branding will be used.",
+    "invalidFileType": "Only image files (JPEG, PNG, GIF, WebP, SVG) are allowed.",
+    "fileTooLarge": "File size must be less than 2MB.",
+    "infoTitle": "White-Label Branding",
+    "infoDescription": "Your organization logo will replace the default Secure Magnus logo across the platform for all users within your organization. It will be displayed in the sidebar navigation. Removing the logo will revert to the default branding."
   }
 }
