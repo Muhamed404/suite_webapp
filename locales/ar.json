@@ -201,7 +201,10 @@
 		"password_maxlength": "لا يمكن أن تتجاوز كلمة المرور 255 حرف"
 	},
 	"success_messages": {
-		"smtp_configured_successfully": "تم تكوين SMTP بنجاح"
+		"smtp_configured_successfully": "تم تكوين SMTP بنجاح",
+		"smtp_configured_fully": "تم تكوين SMTP بالكامل",
+		"file_uploading_in_process": "جاري رفع الملف.",
+		"group_created_successfully": "تم إنشاء المجموعة بنجاح"
 	},
 	"topnavbar": {
 		"welcome": "مرحباً",
@@ -1016,7 +1019,7 @@
 			"labelLandingPage_Title": "إعدادات صفحة الهبوط",
 			"labelLandingPage_radioOption1": "أرغب في إعادة توجيه المستخدم إلى رابط",
 			"labelLandingPage_radioOption2": "أرغب في إعادة توجيه المستخدم إلى صفحة هبوط مخصصة",
-			"labelLandingPage_redirectToCustomWebPage": "أرغب في إعادة توجيه المستخدم إلى صفحة ويب/STC مخصصة",
+			"labelLandingPage_redirectToCustomWebPage": "أرغب في تعيين عنوان URL مخصص لصفحة الهبوط لإعادة التوجيه.",
 			"labelLandingPage_redirectUrl": "رابط إعادة التوجيه",
 			"labelLanguage": "اللغة",
 			"labelPhishingWebContentEditor": "محتوى قالب صفحة التصيد الاحتيالي",

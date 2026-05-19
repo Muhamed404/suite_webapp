@@ -105,7 +105,7 @@ router.post(
           logger.info('[File Upload]: File forwarded to backend successfully');
           // cleanup temp file
           try { fs.unlinkSync(file.path); } catch (e) { logger.debug('[File Upload]: cleanup error', e); }
-          return res.redirect(`${redirectUrl}?message=${encodeURIComponent('File uploading is in Process.')}&alertType=info`);
+          return res.redirect(`${redirectUrl}?message=${encodeURIComponent('File uploading is in process.')}&alertType=info`);
         } catch (apiErr) {
           logger.error('[File Upload]: Error posting to backend', apiErr && apiErr.message);
           logger.debug(apiErr);

@@ -286,7 +286,8 @@ let currentStep = 0;
 
     // Show/hide placeholder buttons based on current step
     const placeholderButtons = document.getElementById('placeholder-buttons');
-    const allowedScreens = [phishing_content_screen - 1, phishing_webpage_screen - 1, phishing_landing_page_screen - 1, sms_phishing_screen - 1]; // include landing page step if needed
+    const landingPlaceholderButtons = document.getElementById('placeholder_buttons_landing_page_content');
+    const allowedScreens = [phishing_content_screen - 1, phishing_webpage_screen - 1, phishing_landing_page_screen - 1, sms_phishing_screen - 1];
 
     // Check if user selected custom landing page
     let showPlaceholders = allowedScreens.includes(index);
@@ -299,6 +300,9 @@ let currentStep = 0;
 
     if (placeholderButtons) {
       placeholderButtons.style.display = showPlaceholders ? '' : 'none';
+    }
+    if (landingPlaceholderButtons) {
+      landingPlaceholderButtons.style.display = showPlaceholders && index === phishing_landing_page_screen - 1 ? 'flex' : 'none';
     }
     updatePhishingPlaceholderVisibility();
   }
@@ -566,6 +570,15 @@ let currentStep = 0;
         textarea.value = textarea.value.split(window.WEB_TEMPLATE_BUCKET).join('<%=web_bucket%>');
       }
     });
+
+    const urlInputs = ['landing_page_external_url'];
+    urlInputs.forEach(id => {
+      const input = document.getElementsByName(id)[0] || document.getElementById(id);
+      if (input && input.value.toLowerCase().startsWith('www.')) {
+        input.value = 'https://' + input.value;
+      }
+    });
+
     document.getElementById('templateCreationForm').submit();
 
   }

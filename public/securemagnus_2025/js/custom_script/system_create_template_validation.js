@@ -1,4 +1,14 @@
 $(document).ready(function () {
+
+  $.validator.addMethod("flexibleUrl", function(value, element) {
+    if (this.optional(element)) {
+      return true;
+    }
+
+    const urlRegex = /^(https?:\/\/|www\.)[^\s/$.?#].[^\s]*$/i;
+    return urlRegex.test(value);
+  }, window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL.");
+
   function getPhishTypeContainer() {
     return $('input[name="phishType"]').first().closest('.mb-6');
   }
@@ -121,7 +131,7 @@ $(document).ready(function () {
         required: function() {
           return $('input[name="landing_option"]:checked').val() === 'url';
         },
-        url: true
+        flexibleUrl: true
       }
     },
     messages: {
@@ -181,7 +191,7 @@ $(document).ready(function () {
       },
       landing_page_external_url: {
         required: window.i18n?.validation_messages?.urlRequired || "URL is required.",
-        url: window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL."
+        flexibleUrl: window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL."
       }
     },
     errorClass: "text-red-500 text-sm mt-1",
