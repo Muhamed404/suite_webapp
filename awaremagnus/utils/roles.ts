@@ -54,6 +54,10 @@ export const isOrgAdmin = (roleId?: number) =>
 /** Org User = learner (role 5); limited to own org, learner view */
 export const isOrgUser = (roleId?: number) => roleId === ROLE_IDS.ORG_USER;
 
+/** Platform admins and org admins can access Assets & Materials */
+export const canAccessAwarenessAssets = (roleId?: number) =>
+  isPlatformAdmin(roleId) || isOrgAdmin(roleId);
+
 export const getRoleName = (roleId: number) => ROLES[roleId as RoleId]?.name ?? "Unknown Role";
 
 /**

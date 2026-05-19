@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect } from "react";
 import clsx from "clsx";
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
@@ -19,7 +20,7 @@ import { useContent } from "@/hooks/useQuiz";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
-import { isOrgAdmin } from "@/utils/roles";
+import { canAccessAwarenessAssets } from "@/utils/roles";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import {
   isBrochureDocumentContentType,
@@ -42,18 +43,28 @@ function isImageAsset(url: string) {
 
 export default function AwarenessAssetDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const { dir } = useI18n();
   const tDashboard = useTranslations("dashboard");
   const tAwarenessAssets = useTranslations("awarenessAssets");
   const isRtl = dir === "rtl";
   const user = useAuthStore((s) => s.user);
-  const isOrgAdminUser = isOrgAdmin(user?.role_id);
+  const canAccessAssets = canAccessAwarenessAssets(user?.role_id);
 
   const contentId = Number(params?.contentId ?? 0);
-  const { data: contentRes, isLoading } = useContent(contentId, Number.isFinite(contentId) && contentId > 0);
+  const { data: contentRes, isLoading } = useContent(
+    contentId,
+    Number.isFinite(contentId) && contentId > 0 && canAccessAssets
+  );
   const content = contentRes?.success ? contentRes.data : null;
 
-  if (user && !isOrgAdminUser) return null;
+  useEffect(() => {
+    if (user && !canAccessAssets) {
+      router.replace("/dashboard");
+    }
+  }, [user, canAccessAssets, router]);
+
+  if (user && !canAccessAssets) return null;
 
   const sourceUrl = resolveAssetUrl(content?.source_url ?? content?.source_path);
   const logoUrl = content?.logo_url ?? content?.logo_path;

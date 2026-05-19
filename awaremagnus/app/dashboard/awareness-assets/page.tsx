@@ -13,7 +13,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
-import { isOrgAdmin } from "@/utils/roles";
+import { canAccessAwarenessAssets } from "@/utils/roles";
 import { getContentTypeIconFor } from "@/utils/contentTypeIcons";
 import { quizService } from "@/services/quizService";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
@@ -129,7 +129,7 @@ export default function AwarenessAssetsPage() {
   const pageSize = 9;
 
   const user = useAuthStore((s) => s.user);
-  const isOrgAdminUser = isOrgAdmin(user?.role_id);
+  const canAccessAssets = canAccessAwarenessAssets(user?.role_id);
 
   const {
     data: assetsResponse,
@@ -147,7 +147,7 @@ export default function AwarenessAssetsPage() {
         page: searchText.trim() ? 1 : currentPage,
         limit: searchText.trim() ? 500 : 9,
       }),
-    enabled: isOrgAdminUser,
+    enabled: canAccessAssets,
     staleTime: 60 * 1000,
   });
 
@@ -225,12 +225,12 @@ export default function AwarenessAssetsPage() {
 
 
   useEffect(() => {
-    if (user && !isOrgAdminUser) {
+    if (user && !canAccessAssets) {
       router.replace("/dashboard");
     }
-  }, [user, isOrgAdminUser, router]);
+  }, [user, canAccessAssets, router]);
 
-  if (user && !isOrgAdminUser) {
+  if (user && !canAccessAssets) {
     return null;
   }
 
