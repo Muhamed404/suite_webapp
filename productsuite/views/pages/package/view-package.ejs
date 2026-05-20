@@ -199,22 +199,6 @@
 </style>
 
 <script>
-const packageTable = document.getElementById('filter-table');
-
-if (!packageTable || typeof simpleDatatables === 'undefined' || typeof simpleDatatables.DataTable === 'undefined') {
-  console.warn('simple-datatables not found or table missing');
-} else {
-  const dataTable = new simpleDatatables.DataTable('#filter-table', {
-    searchable: true,
-    fixedHeight: true,
-    labels: {
-      noResults: packageTable.dataset.noResults || '<%= __("generic_label.no_results_match_search") %>'
-    }
-  });
-}
-</script>
-
-<script>
 function toggleDropdown(button) {
   // Close all dropdown menus
   document.querySelectorAll('.dropdown-menu').forEach(menu => {
@@ -225,4 +209,81 @@ function toggleDropdown(button) {
   // Toggle the current dropdown
   button.nextElementSibling.classList.toggle('hidden');
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const table = document.getElementById('filter-table');
+  if (!table || !table.tBodies.length) {
+    return;
+  }
+
+  let strictQuery = '';
+
+  function normalize(value) {
+    return String(value || '')
+      .toLowerCase()
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function applyStrictFilter() {
+    const query = normalize(strictQuery);
+    const rows = Array.from(table.tBodies[0].rows);
+
+    rows.forEach((row) => {
+      const packageCell = row.cells[1];
+      if (!packageCell) {
+        return;
+      }
+
+      if (!query) {
+        row.style.display = '';
+        return;
+      }
+
+      const cellValue = normalize(packageCell.textContent);
+      row.style.display = cellValue.startsWith(query) ? '' : 'none';
+    });
+  }
+
+  function bindStrictSearch() {
+    const searchInput = document.querySelector('.datatable-search input');
+    if (!searchInput) {
+      return;
+    }
+
+    strictQuery = searchInput.value || '';
+
+    searchInput.addEventListener('input', function (event) {
+      strictQuery = event.target.value || '';
+      setTimeout(applyStrictFilter, 0);
+    });
+
+    const wrapper = table.closest('.datatable-wrapper');
+    if (wrapper) {
+      wrapper.addEventListener('click', function (event) {
+        const target = event.target;
+        if (target && target.closest && target.closest('[data-page]')) {
+          setTimeout(applyStrictFilter, 0);
+        }
+      });
+    }
+
+    const perPageSelect = document.querySelector('select.datatable-selector');
+    if (perPageSelect) {
+      perPageSelect.addEventListener('change', function () {
+        setTimeout(applyStrictFilter, 0);
+      });
+    }
+
+    const filterSelect = document.getElementById('filter');
+    if (filterSelect) {
+      filterSelect.addEventListener('change', function () {
+        setTimeout(applyStrictFilter, 0);
+      });
+    }
+  }
+
+  setTimeout(bindStrictSearch, 0);
+  setTimeout(applyStrictFilter, 0);
+});
 </script>
