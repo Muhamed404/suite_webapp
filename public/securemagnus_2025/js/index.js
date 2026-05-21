@@ -91,6 +91,7 @@ function showCustomToast(alertType, alertMessage = null) {
       'Package deleted successfully': 'تم حذف الباقة بنجاح',
       'User deleted successfully': 'تم حذف المستخدم بنجاح',
       'User created successfully': 'تم إنشاء المستخدم بنجاح',
+      'App service deleted successfully': 'تم حذف خدمة التطبيق بنجاح',
       'Campaign launch has been initiated': 'تم بدء إطلاق الحملة',
       'Campaign Launch has been initiated': 'تم بدء إطلاق الحملة',
       'Campaign has been initiated': 'تم بدء الحملة',

@@ -6,6 +6,26 @@ const getApiClient = require('../../../utility/api-client');
 
 const logTxn = 'Controller - [Service Registry - Delete]';
 
+function normalizeFlashMessage(message, fallback) {
+    if (typeof message === 'string') {
+        return message;
+    }
+
+    if (message && typeof message === 'object') {
+        if (typeof message.message === 'string') {
+            return message.message;
+        }
+
+        try {
+            return JSON.stringify(message);
+        } catch (error) {
+            logger.warn(`${logTxn} - Failed to stringify flash message: ${error.message || String(error)}`);
+        }
+    }
+
+    return fallback;
+}
+
 exports.deleteService = async (req, res) => {
     const { registry_id, service_id } = req.params;
     logger.info(`${logTxn} - Received request to delete service registry with id: ${redactString(String(service_id))}`);
@@ -25,12 +45,12 @@ exports.deleteService = async (req, res) => {
             req.flash('alertType', 'success');
         } else {
             logger.warn(`${logTxn} - Service registry deletion failed: ${redactString(response.data.message || "")}`);
-            req.flash('message', response.data.message || req.__('generic_label.service_registry_deletion_failed'));
+            req.flash('message', normalizeFlashMessage(response.data.message, req.__('generic_label.service_registry_deletion_failed')));
             req.flash('alertType', 'error');
         }
     } catch (error) {
         logger.error(`${logTxn} - Error deleting service registry: ${redactString(error.message || String(error))}`);
-        req.flash('message', error.response?.data?.message || req.__('generic_label.unable_to_delete_service_registry'));
+        req.flash('message', normalizeFlashMessage(error.response?.data?.message, req.__('generic_label.unable_to_delete_service_registry')));
         req.flash('alertType', 'error');
     }
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.Service_Registry.LIST);

@@ -38,6 +38,7 @@
 		"error_creating_nfc_campaign": "خطأ في إنشاء حملة NFC",
 		"success": "نجاح",
 		"service_deleted_successfully": "تم حذف الخدمة بنجاح!",
+		"app_service_deleted_successfully": "تم حذف خدمة التطبيق بنجاح!",
 		"service_registered_successfully": "تم تسجيل الخدمة بنجاح!",
 		"invalid_request_parameters": "معلمات الطلب غير صحيحة",
 		"service_registry_deletion_failed": "فشل في حذف سجل الخدمة",
@@ -366,10 +367,11 @@
 			"subscriptionHistory": "سجل الاشتراكات",
 			"products": "المنتجات",
 			"logout": "تسجيل الخروج",
-			"smtpNotifications": "menu.suite.smtpNotifications",
+			"smtpNotifications": "إشعارات SMTP",
 			"bulkImportJobs": "وظائف الاستيراد المجمع",
 			"notificationMailLog": "سجل بريد الإشعارات",
-			"notificationTemplates": "menu.suite.notificationTemplates"
+			"notificationTemplates": "قوالب الإشعارات",
+			"mfaMailLog": "سجل رسائل MFA"
 		}
 	},
 	"org_domain": {
