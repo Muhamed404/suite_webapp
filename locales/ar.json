@@ -125,6 +125,9 @@
 		"sr_no": "الرقم التسلسلي",
 		"no_data_found": "لا توجد بيانات"
 	},
+	"messages": {
+		"confirmSubmit": "هل أنت متأكد أنك تريد إرسال هذه الحملة؟ لا يمكن التراجع عن هذا الإجراء."
+	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
 		"campaign_name_required": "اسم الحملة مطلوب (حد أدنى حرفين).",

@@ -117,6 +117,9 @@
 		"rows_per_page": "generic_label.rows_per_page",
 		"no_data_found": "No data found"
 	},
+	"messages": {
+		"confirmSubmit": "Are you sure you want to submit this campaign? This action cannot be undone."
+	},
 	"validation_messages": {
 		"field_required": "This field is required.",
 		"campaign_name_required": "Campaign name is required (minimum 2 characters).",
