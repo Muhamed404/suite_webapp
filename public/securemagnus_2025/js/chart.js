@@ -182,10 +182,14 @@ document.addEventListener("DOMContentLoaded", function () {
     };
   }
 
-  const productMgmtCampaignChart = new ApexCharts(
-    document.querySelector("#campaignChart"),
-    chartOptions
-  );
+  const campaignChartElement = document.querySelector("#campaignChart");
+  
+  if (campaignChartElement) {
+    const productMgmtCampaignChart = new ApexCharts(
+      campaignChartElement,
+      chartOptions
+    );
 
-  productMgmtCampaignChart.render();
+    productMgmtCampaignChart.render();
+  }
 });

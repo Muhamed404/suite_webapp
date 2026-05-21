@@ -191,21 +191,24 @@
   }
 
   // Serialize visible provider fields into params JSON before submit
-  document.getElementById("smsSettingsForm").addEventListener("submit", function () {
-    var provider = document.getElementById("provider").value;
-    var inputs = providerInputs[provider] || [];
-    var params = {};
+  const smsForm = document.getElementById("smsSettingsForm");
+  if (smsForm) {
+    smsForm.addEventListener("submit", function () {
+      var provider = document.getElementById("provider").value;
+      var inputs = providerInputs[provider] || [];
+      var params = {};
 
-    inputs.forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el && !el.disabled) {
-        // Strip the provider prefix from the name to get the param key
-        params[el.name] = el.value;
-      }
+      inputs.forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el && !el.disabled) {
+          // Strip the provider prefix from the name to get the param key
+          params[el.name] = el.value;
+        }
+      });
+
+      document.getElementById("paramsJson").value = JSON.stringify(params);
     });
-
-    document.getElementById("paramsJson").value = JSON.stringify(params);
-  });
+  }
 
   // On page load: if editing existing data, select provider and populate fields
 (function () {

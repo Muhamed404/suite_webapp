@@ -163,53 +163,59 @@ function _attachBucketSourceRewrite(editor) {
   });
 }
 
-CKEDITOR.replace('phishing_content', {
-  height: 400,
-  width: '100%',
-  resize_enabled: true,
-  on: {
-    instanceReady: function (evt) { _attachBucketSourceRewrite(evt.editor); }
-  }
-});
+if (document.getElementById('phishing_content') && !CKEDITOR.instances.phishing_content) {
+  CKEDITOR.replace('phishing_content', {
+    height: 400,
+    width: '100%',
+    resize_enabled: true,
+    on: {
+      instanceReady: function (evt) { _attachBucketSourceRewrite(evt.editor); }
+    }
+  });
 
-CKEDITOR.instances.phishing_content.on('mode', function () {
-  if (this.mode === 'source') {
-    this.resize(this.container.$.offsetWidth, 700);
-  }
-});
-
-
-
-CKEDITOR.replace('phishing_page_content', {
-  height: 400,
-  width: '100%',
-  resize_enabled: true,
-  on: {
-    instanceReady: function (evt) { _attachBucketSourceRewrite(evt.editor); }
-  }
-});
-
-CKEDITOR.instances.phishing_page_content.on('mode', function () {
-  if (this.mode === 'source') {
-    this.resize(this.container.$.offsetWidth, 700);
-  }
-});
+  CKEDITOR.instances.phishing_content.on('mode', function () {
+    if (this.mode === 'source') {
+      this.resize(this.container.$.offsetWidth, 700);
+    }
+  });
+}
 
 
-CKEDITOR.replace('landing_page_content', {
-  height: 400,
-  width: '100%',
-  resize_enabled: true,
-  on: {
-    instanceReady: function (evt) { _attachBucketSourceRewrite(evt.editor); }
-  }
-});
 
-CKEDITOR.instances.landing_page_content.on('mode', function () {
-  if (this.mode === 'source') {
-    this.resize(this.container.$.offsetWidth, 700);
-  }
-});
+if (document.getElementById('phishing_page_content') && !CKEDITOR.instances.phishing_page_content) {
+  CKEDITOR.replace('phishing_page_content', {
+    height: 400,
+    width: '100%',
+    resize_enabled: true,
+    on: {
+      instanceReady: function (evt) { _attachBucketSourceRewrite(evt.editor); }
+    }
+  });
+
+  CKEDITOR.instances.phishing_page_content.on('mode', function () {
+    if (this.mode === 'source') {
+      this.resize(this.container.$.offsetWidth, 700);
+    }
+  });
+}
+
+
+if (document.getElementById('landing_page_content') && !CKEDITOR.instances.landing_page_content) {
+  CKEDITOR.replace('landing_page_content', {
+    height: 400,
+    width: '100%',
+    resize_enabled: true,
+    on: {
+      instanceReady: function (evt) { _attachBucketSourceRewrite(evt.editor); }
+    }
+  });
+
+  CKEDITOR.instances.landing_page_content.on('mode', function () {
+    if (this.mode === 'source') {
+      this.resize(this.container.$.offsetWidth, 700);
+    }
+  });
+}
 
 let currentStep = 0;
 (() => {
@@ -631,12 +637,15 @@ radios.forEach(radio => {
 
 
 
-editors.forEach(id => {
-  CKEDITOR.replace(id, {
-    // Use full toolbar
-    toolbar: 'Full'
-  });
-});
+// Initialize sms_phishing_content only if it exists (it's not a standard textarea in the template)
+if (document.getElementById('sms_phishing_content') && !CKEDITOR.instances.sms_phishing_content) {
+  const smsEl = document.getElementById('sms_phishing_content');
+  if (smsEl.tagName.toLowerCase() === 'textarea') {
+    CKEDITOR.replace('sms_phishing_content', {
+      toolbar: 'Full'
+    });
+  }
+}
 
 
 let editorInstance;
