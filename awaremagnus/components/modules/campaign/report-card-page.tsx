@@ -25,20 +25,27 @@ function formatStudyTime(minutes: number): string {
   return `${h}h ${m}m`;
 }
 
-function formatToday(): string {
-  return new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+function formatToday(locale: string): string {
+  return new Date().toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
-function getRiskBadge(level: string | null): { text: string; bg: string } {
-  if (!level) return { text: "Unknown", bg: "#6b7280" };
+function getRiskBadge(
+  level: string | null,
+  t: (key: string) => string
+): { text: string; bg: string } {
+  if (!level) return { text: t("reportCard.riskUnknown"), bg: "#6b7280" };
   const l = level.toLowerCase();
 
-  if (l.includes("not evaluated")) return { text: "Not Evaluated", bg: "#6b7280" };
-  if (l.includes("very high")) return { text: "Very High", bg: "#b91c1c" };
-  if (l.includes("high")) return { text: "High", bg: "#dc2626" };
-  if (l.includes("medium")) return { text: "Medium", bg: "#f59e0b" };
-  if (l.includes("very low")) return { text: "Very Low", bg: "#15803d" };
-  if (l.includes("low")) return { text: "Low", bg: "#16a34a" };
+  if (l.includes("not evaluated")) return { text: t("reportCard.riskNotEvaluated"), bg: "#6b7280" };
+  if (l.includes("very high")) return { text: t("reportCard.riskVeryHigh"), bg: "#b91c1c" };
+  if (l.includes("high")) return { text: t("reportCard.riskHigh"), bg: "#dc2626" };
+  if (l.includes("medium")) return { text: t("reportCard.riskMedium"), bg: "#f59e0b" };
+  if (l.includes("very low")) return { text: t("reportCard.riskVeryLow"), bg: "#15803d" };
+  if (l.includes("low")) return { text: t("reportCard.riskLow"), bg: "#16a34a" };
 
   return { text: level, bg: "#6b7280" };
 }
@@ -65,6 +72,8 @@ interface AreaChartProps {
   data: number[];
   labels: string[];
   dates?: Date[];
+  xAxisLabel: string;
+  yAxisLabel: string;
 }
 
 function buildCountTicks(maxValue: number): number[] {
@@ -117,14 +126,14 @@ function parseModuleCompletionDate(dateStr: string | null | undefined): Date | n
   return Number.isNaN(fallback.getTime()) ? null : fallback;
 }
 
-function formatChartDateLabel(date: Date): string {
-  const day = date.getDate();
-  const month = date.toLocaleDateString("en-GB", { month: "short" });
-
-  return `${day} ${month}`;
+function formatChartDateLabel(date: Date, locale: string): string {
+  return date.toLocaleDateString(locale === "ar" ? "ar-SA" : "en-GB", {
+    day: "numeric",
+    month: "short",
+  });
 }
 
-function AreaChart({ data, labels, dates }: AreaChartProps) {
+function AreaChart({ data, labels, dates, xAxisLabel, yAxisLabel }: AreaChartProps) {
   const color = "#38bdf8";
   const W = 300,
     H = 140,
@@ -234,7 +243,7 @@ function AreaChart({ data, labels, dates }: AreaChartProps) {
         </text>
       ))}
       <text fill="#6b7280" fontSize="8" textAnchor="middle" x={pL + iW / 2} y={H + 3}>
-        Module Completion Dates
+        {xAxisLabel}
       </text>
       <text
         fill="#6b7280"
@@ -242,7 +251,7 @@ function AreaChart({ data, labels, dates }: AreaChartProps) {
         textAnchor="middle"
         transform={`translate(8 ${pT + iH / 2}) rotate(-90)`}
       >
-        Module Counts
+        {yAxisLabel}
       </text>
     </svg>
   );
@@ -250,7 +259,7 @@ function AreaChart({ data, labels, dates }: AreaChartProps) {
 
 /* ─── Timeline Item ─── */
 function TimelineItem({ module: m, isLast, t }: { module: ReportCardModuleResult; isLast: boolean; t: any }) {
-  const title = m.module_name || "Module";
+  const title = m.module_name || t("reportCard.moduleFallback");
   const badge =
     m.quiz_percentage !== undefined
       ? m.quiz_percentage >= 90
@@ -435,7 +444,7 @@ function buildPrintHTML(args: {
     totalComplianceScore,
     riskSegmentsFilled,
   } = args;
-  const today = formatToday();
+  const today = formatToday(locale);
   const studyStr = formatStudyTime(studyTime);
 
   /* Timeline HTML */
@@ -448,7 +457,7 @@ function buildPrintHTML(args: {
       }))
     )
     .map(({ module: m, campaign: campName }, i) => {
-      const title = m.module_name || "Module";
+      const title = m.module_name || t("reportCard.moduleFallback");
       const badge =
         m.quiz_percentage !== undefined
           ? m.quiz_percentage >= 90
@@ -583,8 +592,8 @@ function buildPrintHTML(args: {
         return `<text x="${x.toFixed(1)}" y="${H - 4}" text-anchor="middle" font-size="7" fill="#94a3b8">${l}</text>`;
       })
       .join("")}
-    <text x="${(pL + iW / 2).toFixed(1)}" y="${H + 3}" text-anchor="middle" font-size="8" fill="#6b7280">Module Completion Dates</text>
-    <text x="8" y="${(pT + iH / 2).toFixed(1)}" text-anchor="middle" font-size="8" fill="#6b7280" transform="rotate(-90 8 ${(pT + iH / 2).toFixed(1)})">Module Counts</text>
+    <text x="${(pL + iW / 2).toFixed(1)}" y="${H + 3}" text-anchor="middle" font-size="8" fill="#6b7280">${t("reportCard.chartModuleCompletionDatesAxis")}</text>
+    <text x="8" y="${(pT + iH / 2).toFixed(1)}" text-anchor="middle" font-size="8" fill="#6b7280" transform="rotate(-90 8 ${(pT + iH / 2).toFixed(1)})">${t("reportCard.chartModuleCountsAxis")}</text>
   </svg>`;
 
   return `<!DOCTYPE html>
@@ -721,16 +730,18 @@ function buildPrintHTML(args: {
           <div style="margin-bottom:24px;">
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
               <span style="font-size:11px;color:#166534;background:#d1fae5;padding:2px 10px;border-radius:9999px;border:1px solid #a7f3d0;">${campaign.campaign_name}</span>
-              <span style="font-size:10px;color:#9ca3af;">${campaign.completed_modules.length} Module</span>
+              <span style="font-size:10px;color:#9ca3af;">${campaign.completed_modules.length === 1 ? t("certificationReport.oneModule") : t("certificationReport.manyModules", { count: campaign.completed_modules.length }).replace("{count}", String(campaign.completed_modules.length))}</span>
             </div>
             <div style="position:relative;padding-left:32px;">
               ${campaign.completed_modules.map((m, idx) => {
-    const t = m.module_name || "Module";
-    const b = m.quiz_percentage !== undefined ? m.quiz_percentage >= 90 ? null : m.quiz_percentage >= 70 ? "Good Score" : null : null;
+    const moduleTitle = m.module_name || t("reportCard.moduleFallback");
+    const b = m.quiz_percentage !== undefined ? m.quiz_percentage >= 90 ? null : m.quiz_percentage >= 70 ? t("reportCard.goodScore") : null : null;
     const r = m.achievements_unlocked_in_module >= 3 ? "Rare" : m.achievements_unlocked_in_module >= 1 ? "Common" : null;
     const rBg = r === "Rare" ? "#ffedd5" : "#e0f2fe";
     const rFg = r === "Rare" ? "#ea580c" : "#0284c7";
-    const d = m.quiz_percentage !== undefined ? `Scored ${m.quiz_percentage.toFixed(0)}% on the module quiz assessment` : "Completed and achieved full module progress";
+    const rLabel = r ? t(r === "Rare" ? "reportCard.rare" : "reportCard.common") : "";
+    const rawScoredStr = t("reportCard.scoredOnQuiz");
+    const d = m.quiz_percentage !== undefined ? rawScoredStr.replace("{score}", m.quiz_percentage.toFixed(0)) : t("reportCard.completedFullProgress");
     return `
               <div style="position:relative;margin-bottom:16px;">
                 ${idx < campaign.completed_modules.length - 1 ? `<span style="position:absolute;left:-19px;top:24px;height:100%;width:1.5px;background:#34d399;display:block;"></span>` : ""}
@@ -738,8 +749,8 @@ function buildPrintHTML(args: {
                 <div style="border:1px solid #e5e7eb;border-radius:12px;padding:12px;">
                   <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap;gap:4px;">
                     <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                      <span style="font-weight:500;font-size:12px;">${t}</span>
-                      ${r ? `<span style="padding:2px 8px;font-size:10px;border-radius:9999px;background:${rBg};color:${rFg};">${r}</span>` : ""}
+                      <span style="font-weight:500;font-size:12px;">${moduleTitle}</span>
+                      ${r ? `<span style="padding:2px 8px;font-size:10px;border-radius:9999px;background:${rBg};color:${rFg};">${rLabel}</span>` : ""}
                     </div>
                     ${m.module_completion_date ? `<span style="font-size:10px;color:#9ca3af;">📅 ${m.module_completion_date}</span>` : ""}
                   </div>
@@ -747,26 +758,26 @@ function buildPrintHTML(args: {
                   <div style="display:flex;align-items:center;gap:12px;font-size:10px;color:#6b7280;margin-bottom:4px;flex-wrap:wrap;">
                     <span style="color:#f97316;">⭐ +${m.achieved_xp_tokens} XP</span>
                     <span style="color:#a855f7;">🏆 ${m.achieved_compliance_score} pts</span>
-                    ${m.quiz_percentage !== undefined ? `<span>📘 ${m.quiz_percentage.toFixed(0)}% Quiz Score</span>` : ""}
+                    ${m.quiz_percentage !== undefined ? `<span>📘 ${m.quiz_percentage.toFixed(0)}% ${t("reportCard.quizScore")}</span>` : ""}
                     <span style="display:inline-flex;align-items:center;gap:4px;">
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#10b981" stroke-width="2">
                         <circle cx="12" cy="12" r="9" fill="#d1fae5" stroke="none"/>
                         <path d="M8 12l2.5 2.5L16 9" stroke-linecap="round" stroke-linejoin="round"/>
                       </svg>
-                      <span>Certificate Issue: ${m.certificate_issued || "Not applicable"}</span>
+                      <span>${t("reportCard.certificateIssue")}: ${m.certificate_issued || t("reportCard.notApplicable")}</span>
                     </span>
                     <span style="display:inline-flex;align-items:center;gap:4px;">
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#d946ef" stroke-width="2">
                         <circle cx="12" cy="12" r="9" fill="#f5d0fe" stroke="none"/>
                         <path d="M12 8l1.6 3.2 3.5.5-2.5 2.4.6 3.4L12 16l-3.2 1.5.6-3.4-2.5-2.4 3.5-.5L12 8z" stroke-linejoin="round"/>
                       </svg>
-                      <span>Achievement Unlocked: ${m.achievements_unlocked_in_module ?? 0}</span>
+                      <span>${t("reportCard.achievementUnlocked")}: ${m.achievements_unlocked_in_module ?? 0}</span>
                     </span>
-                    ${m.duration_minutes ? `<span>⏱ ${m.duration_minutes} minutes</span>` : ""}
+                    ${m.duration_minutes ? `<span>⏱ ${m.duration_minutes} ${t("reportCard.minutes")}</span>` : ""}
                   </div>
                   <p style="font-size:11px;color:#6b7280;">${d}</p>
                   <div style="margin-top:6px;">
-                    <span style="padding:2px 10px;font-size:10px;border-radius:9999px;background:#d1fae5;color:#059669;">Completed</span>
+                    <span style="padding:2px 10px;font-size:10px;border-radius:9999px;background:#d1fae5;color:#059669;">${t("reportCard.completed")}</span>
                   </div>
                 </div>
               </div>`;
@@ -871,7 +882,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
   const xpTokens = (meta?.xp_total_tokens as number | undefined) ?? 0;
   const studyTime = (meta?.total_study_time as number | undefined) ?? 0;
   const riskLevel = (meta?.user_risk_level as string | null | undefined) ?? null;
-  const riskBadge = getRiskBadge(riskLevel);
+  const riskBadge = getRiskBadge(riskLevel, t);
   const riskSegmentsFilled = getRiskSegmentCount(riskLevel);
 
   const totalComplianceScore = useMemo(
@@ -909,12 +920,15 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
       // Only show the date label for the last module of each day to avoid overlap
       const nextM = allDatedModules[idx + 1];
       const isLastForDay = !nextM || nextM.date.getTime() !== m.date.getTime();
-      labels.push(isLastForDay ? formatChartDateLabel(m.date) : "");
+      labels.push(isLastForDay ? formatChartDateLabel(m.date, locale) : "");
       dates.push(new Date(m.date));
     });
 
     return { data, labels, dates };
-  }, [allModules]);
+  }, [allModules, locale]);
+
+  const chartXAxisLabel = t("reportCard.chartModuleCompletionDatesAxis");
+  const chartYAxisLabel = t("reportCard.chartModuleCountsAxis");
 
   const chartData = completionChart.data;
   const chartLabels = completionChart.labels;
@@ -1095,7 +1109,7 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                             strokeLinejoin="round"
                           />
                         </svg>
-                        <span>{t("reportCard.generatedOn", { date: formatToday() }).replace("{date}", formatToday())}</span>
+                        <span>{t("reportCard.generatedOn", { date: formatToday(locale) })}</span>
                       </div>
                     </div>
                   </div>
@@ -1344,7 +1358,13 @@ export function ReportCardPage({ userId }: { userId?: number } = {}) {
                 </div>
                 {chartData.length > 0 ? (
                   <div className="flex-1 min-h-[120px]">
-                    <AreaChart data={chartData} labels={chartLabels} dates={chartDates} />
+                    <AreaChart
+                      data={chartData}
+                      dates={chartDates}
+                      labels={chartLabels}
+                      xAxisLabel={chartXAxisLabel}
+                      yAxisLabel={chartYAxisLabel}
+                    />
                   </div>
                 ) : (
                   <div className="flex-1 flex items-center justify-center py-4">

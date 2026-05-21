@@ -27,7 +27,26 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const { module } = use(params);
   const moduleName = module.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()); // Convert slug to title
   const t = useTranslations("module");
+  const tQuiz = useTranslations("quiz");
   const { dir, locale } = useI18n();
+
+  const getQuizTypeLabel = (quizTypeId?: number, quizTypeName?: string) => {
+    const name = (quizTypeName ?? "").toLowerCase();
+
+    if (quizTypeId === 2 || name.includes("multiple")) {
+      return tQuiz("quizTypes.multiple");
+    }
+    if (
+      quizTypeId === 3 ||
+      name.includes("true") ||
+      name.includes("false") ||
+      name.includes("صح")
+    ) {
+      return tQuiz("quizTypes.trueFalse");
+    }
+
+    return tQuiz("quizTypes.single");
+  };
   const isRtl = dir === "rtl";
   const { user } = useAuthStore();
   const router = useRouter();
@@ -122,10 +141,10 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
       question: q.question,
       options: (q.answers ?? []).map((a) => a.answer_text),
       correct: (q.answers ?? []).findIndex((a) => a.is_correct),
-      quizTypeName: q.quizType?.name ?? "Single Choice",
+      quizTypeName: getQuizTypeLabel(q.quiz_type_id, q.quizType?.name),
       quizTypeId: q.quiz_type_id,
     }));
-  }, [shuffledQuizzes]);
+  }, [shuffledQuizzes, locale]);
 
   const threshold: number | null = (campaignRes as any)?.quiz_retry_threshold ?? null;
 
@@ -140,7 +159,8 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const [selectedAnswers, setSelectedAnswers] = useState<{ [key: number]: number[] }>({});
   const [savedAnswers, setSavedAnswers] = useState<{ [key: number]: number[] }>({});
   const [showCompletion, setShowCompletion] = useState(false);
-  const [answerStatusMsg, setAnswerStatusMsg] = useState("");
+  const [answerStatusKey, setAnswerStatusKey] = useState<string | null>(null);
+  const [answerStatusIsError, setAnswerStatusIsError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [quizResults, setQuizResults] = useState<any[]>([]);
   const [moduleProgress, setModuleProgress] = useState<number | null>(null);
@@ -151,7 +171,8 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     setSelectedAnswers({});
     setSavedAnswers({});
     setShowCompletion(false);
-    setAnswerStatusMsg("");
+    setAnswerStatusKey(null);
+    setAnswerStatusIsError(false);
     setIsSubmitting(false);
     setQuizResults([]);
     setModuleProgress(null);
@@ -161,7 +182,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const quiz = quizData[currentQuestion];
 
   // Determine if the current question is single-choice (radio) or multi-choice (checkbox)
-  const isSingleChoice = quiz ? !quiz.quizTypeName.toLowerCase().includes("multiple") : true;
+  const isSingleChoice = quiz ? quiz.quizTypeId !== 2 : true;
 
   const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
 
@@ -191,31 +212,31 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
         ...prev,
         [currentQuestion]: [...selectedAnswers[currentQuestion]],
       }));
-      setAnswerStatusMsg(
-        '<span class="text-green-600 font-semibold">Answer saved successfully!</span>'
-      );
+      setAnswerStatusKey("answerSavedSuccess");
+      setAnswerStatusIsError(false);
     }
   };
 
   const goToPreviousQuestion = () => {
     if (currentQuestion > 0) {
       setCurrentQuestion(currentQuestion - 1);
-      setAnswerStatusMsg("");
+      setAnswerStatusKey(null);
+      setAnswerStatusIsError(false);
     }
   };
 
   const goToNextQuestion = () => {
     if (!savedAnswers[currentQuestion] || savedAnswers[currentQuestion].length === 0) {
-      setAnswerStatusMsg(
-        '<span class="text-red-600 font-semibold">Please save your answer first!</span>'
-      );
+      setAnswerStatusKey("saveAnswerFirst");
+      setAnswerStatusIsError(true);
 
       return;
     }
 
     if (currentQuestion < quizData.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setAnswerStatusMsg("");
+      setAnswerStatusKey(null);
+      setAnswerStatusIsError(false);
 
       return;
     }
@@ -224,18 +245,16 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     const allAnswered = quizData.every((_, index) => savedAnswers[index]?.length > 0);
 
     if (!allAnswered) {
-      setAnswerStatusMsg(
-        '<span class="text-red-600 font-semibold">Please answer all questions before submitting!</span>'
-      );
+      setAnswerStatusKey("answerAllBeforeSubmit");
+      setAnswerStatusIsError(true);
 
       return;
     }
 
     // Check if no attempts left
     if (noAttemptsLeft) {
-      setAnswerStatusMsg(
-        '<span class="text-red-600 font-semibold">You have no attempts left!</span>'
-      );
+      setAnswerStatusKey("noAttemptsLeft");
+      setAnswerStatusIsError(true);
 
       return;
     }
@@ -249,7 +268,8 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
     setSelectedAnswers({});
     setSavedAnswers({});
     setShowCompletion(false);
-    setAnswerStatusMsg("");
+    setAnswerStatusKey(null);
+    setAnswerStatusIsError(false);
     setIsSubmitting(false);
     if (campaignScopedQuizzes) {
       void queryClient.invalidateQueries({
@@ -272,12 +292,13 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
   const getQuizQuestion = (quizId: number): string => {
     const quiz = originalQuizzes.find((q) => q.id === quizId);
 
-    return quiz?.question || `Quiz ${quizId}`;
+    return quiz?.question || t("quizAttempt.quizFallback", { id: quizId });
   };
 
   const submitQuiz = async () => {
     if (!contentRes?.data?.mod_id) {
-      setAnswerStatusMsg('<span class="text-red-600 font-semibold">Module ID not found!</span>');
+      setAnswerStatusKey("moduleIdNotFound");
+      setAnswerStatusIsError(true);
 
       return;
     }
@@ -326,9 +347,8 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
       setShowCompletion(true);
     } catch (error) {
       console.error("Failed to submit quiz:", error);
-      setAnswerStatusMsg(
-        '<span class="text-red-600 font-semibold">Failed to submit quiz. Please try again.</span>'
-      );
+      setAnswerStatusKey("submitFailed");
+      setAnswerStatusIsError(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -479,7 +499,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                       className={breadcrumbLinkClassName}
                       href={`/dashboard/campaign-assignments/${campaignId}`}
                     >
-                      {campaignRes?.data?.name || "Campaign"}
+                      {campaignRes?.data?.name || t("quizAttempt.campaignFallback")}
                     </Link>
                     <span className="text-gray-400">›</span>
                     <Link
@@ -495,7 +515,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                           className={breadcrumbLinkClassName}
                           href={`/dashboard/campaign-assignments/${campaignId}/modules/${module}/content/${contentId}`}
                         >
-                          {contentRes?.data?.title || "Content"}
+                          {contentRes?.data?.title || t("quizAttempt.contentFallback")}
                         </Link>
                       </>
                     ) : null}
@@ -530,18 +550,20 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
               <div className="col-span-9">
                 {quizzesLoading ? (
                   <div className="bg-white rounded-2xl p-6 flex items-center justify-center min-h-[300px]">
-                    <p className="text-sm text-gray-500">Loading quizzes...</p>
+                    <p className="text-sm text-gray-500">{t("quizAttempt.loading")}</p>
                   </div>
                 ) : quizData.length === 0 ? (
                   <div className="bg-white rounded-2xl p-6 flex items-center justify-center min-h-[300px]">
-                    <p className="text-sm text-gray-500">No quizzes available for this content.</p>
+                    <p className="text-sm text-gray-500">{t("quizAttempt.noQuizzes")}</p>
                   </div>
                 ) : !showCompletion ? (
                   <div className="bg-white rounded-2xl p-3 w-full" id="quizContainer">
                     <div className="mb-2 flex items-center gap-3 flex-wrap">
                       <p className="text-[10px] text-blue-500" id="lessonInfo">
-                        Lesson {formatNumber(quiz.lesson, locale)} Of{" "}
-                        {formatNumber(quizData.length, locale)}
+                        {t("quizAttempt.lessonOf", {
+                          current: formatNumber(quiz.lesson, locale),
+                          total: formatNumber(quizData.length, locale),
+                        })}
                       </p>
                       <p className="text-sm text-gray-300 font-light">|</p>
                       <p className="text-[10px] text-green-500">{quiz.quizTypeName}</p>
@@ -573,7 +595,9 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                       })()}
                     </div>
 
-                    <h1 className="text-lg font-semibold text-gray-900 mb-3">{moduleName} Quiz</h1>
+                    <h1 className="text-lg font-semibold text-gray-900 mb-3">
+                      {t("quizAttempt.title", { moduleName: triviaTitle })}
+                    </h1>
 
                     {/* Progress Bar */}
                     <div className="mb-3">
@@ -594,7 +618,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                     {/* Question */}
                     <div className="mb-4">
                       <p className="text-base text-gray-900">
-                        <span className="font-semibold">Question :</span>{" "}
+                        <span className="font-semibold">{t("quizAttempt.questionLabel")}</span>{" "}
                         <span className="text-gray-600" id="questionText">
                           {quiz.question}
                         </span>
@@ -657,17 +681,27 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                     {/* Save Answer Button */}
                     <div className="flex items-center justify-between mb-12">
                       <p
-                        dangerouslySetInnerHTML={{ __html: answerStatusMsg }}
-                        className="text-xs text-gray-500 h-4"
+                        className={clsx(
+                          "text-xs font-semibold h-4",
+                          answerStatusKey
+                            ? answerStatusIsError
+                              ? "text-red-600"
+                              : "text-green-600"
+                            : "text-gray-500"
+                        )}
                         id="answerStatusMsg"
-                      />
+                      >
+                        {answerStatusKey ? t(`quizAttempt.${answerStatusKey}`) : ""}
+                      </p>
                       <button
                         className={`w-48 hover:opacity-90 text-white font-semibold px-12 py-2 text-xs rounded-full transition ${isSaved ? "bg-green-500 hover:bg-green-600" : hasAnswer ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"}`}
                         disabled={!hasAnswer}
                         id="saveAnswerBtn"
                         onClick={saveAnswer}
                       >
-                        {isSaved ? "✓ Answer Saved" : "Save Answer"}
+                        {isSaved
+                          ? `✓ ${t("quizAttempt.answerSaved")}`
+                          : t("quizAttempt.saveAnswer")}
                       </button>
                     </div>
 
@@ -675,7 +709,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                     {noAttemptsLeft && (
                       <div className="mb-4 text-center">
                         <p className="text-red-600 font-semibold text-sm">
-                          You have no attempts left!
+                          {t("quizAttempt.noAttemptsLeft")}
                         </p>
                       </div>
                     )}
@@ -689,7 +723,7 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                         style={{ opacity: currentQuestion === 0 ? 0.5 : 1 }}
                         onClick={goToPreviousQuestion}
                       >
-                        Previous
+                        {t("quizAttempt.previous")}
                       </button>
                       <button
                         className={`flex items-center gap-1.5 px-12 py-2 rounded-full text-xs font-medium transition-all ${noAttemptsLeft ? "bg-gray-300 border border-gray-300 text-gray-500 cursor-not-allowed" : "bg-transparent border border-blue-500 text-blue-800 hover:bg-blue-600 hover:text-white"}`}
@@ -700,16 +734,16 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                         {isSubmitting ? (
                           <>
                             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                            Submitting...
+                            {t("quizAttempt.submitting")}
                           </>
                         ) : currentQuestion === quizData.length - 1 ? (
                           noAttemptsLeft ? (
-                            "No Attempts Left"
+                            t("quizAttempt.noAttemptsLeftBtn")
                           ) : (
-                            "Submit Quiz"
+                            t("quizAttempt.submitQuiz")
                           )
                         ) : (
-                          "Next Quiz"
+                          t("quizAttempt.nextQuiz")
                         )}
                       </button>
                     </div>
@@ -762,15 +796,19 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                       className="transition-all duration-500 ease-out opacity-100 translate-y-0 text-center"
                       id="completionText"
                     >
-                      {resultSummary?.final_result === "Passed" ? (
+                      {resultSummary?.final_result?.toLowerCase() === "passed" ? (
                         <>
-                          <h2 className="text-2xl font-bold text-gray-900 mb-1">Congratulations!</h2>
-                          <p className="text-xs text-gray-600 mb-4">You have passed the quiz test successfully</p>
+                          <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                            {t("quizAttempt.congratulations")}
+                          </h2>
+                          <p className="text-xs text-gray-600 mb-4">{t("quizAttempt.passedMessage")}</p>
                         </>
                       ) : (
                         <>
-                          <h2 className="text-2xl font-bold text-red-600 mb-1">Quiz Failed</h2>
-                          <p className="text-xs text-gray-600 mb-4">You did not meet the passing threshold. Please review and try again.</p>
+                          <h2 className="text-2xl font-bold text-red-600 mb-1">
+                            {t("quizAttempt.quizFailed")}
+                          </h2>
+                          <p className="text-xs text-gray-600 mb-4">{t("quizAttempt.failedMessage")}</p>
                         </>
                       )}
                     </div>
@@ -781,11 +819,15 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                         {/* Accuracy Percentage Display */}
                         {resultSummary && (
                           <div className={`mb-4 rounded-lg p-4 border ${resultSummary.result_percentage >= resultSummary.passing_threshold_percentage ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' : 'bg-gradient-to-r from-red-50 to-pink-50 border-red-200'}`}>
-                            <p className="text-xs font-semibold text-gray-700 mb-1">Your Accuracy Percentage</p>
+                            <p className="text-xs font-semibold text-gray-700 mb-1">
+                              {t("quizAttempt.accuracyPercentage")}
+                            </p>
                             <div className="flex items-center justify-between">
                               <span className={`text-3xl font-bold ${resultSummary.result_percentage >= resultSummary.passing_threshold_percentage ? 'text-green-600' : 'text-red-600'}`}>{resultSummary.result_percentage.toFixed(2)}%</span>
                               <span className={`text-xs font-semibold ${resultSummary.result_percentage >= resultSummary.passing_threshold_percentage ? 'text-green-600' : 'text-red-600'}`}>
-                                Threshold: {resultSummary.passing_threshold_percentage}%
+                                {t("quizAttempt.threshold", {
+                                  percent: resultSummary.passing_threshold_percentage,
+                                })}
                               </span>
                             </div>
                             <div className={`w-full h-2 rounded-full overflow-hidden mt-2 ${resultSummary.result_percentage >= resultSummary.passing_threshold_percentage ? 'bg-green-100' : 'bg-red-100'}`}>
@@ -796,8 +838,13 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                                 }}
                               />
                             </div>
-                            {resultSummary.retries_left > 0 && resultSummary.final_result === "Failed" && (
-                              <p className="text-xs text-gray-600 mt-2 font-semibold">Retries left: <span className="text-orange-600">{resultSummary.retries_left}</span></p>
+                            {resultSummary.retries_left > 0 &&
+                              resultSummary.final_result?.toLowerCase() === "failed" && (
+                              <p className="text-xs text-gray-600 mt-2 font-semibold">
+                                {t("quizAttempt.retriesLeft", {
+                                  count: formatNumber(resultSummary.retries_left, locale),
+                                })}
+                              </p>
                             )}
                           </div>
                         )}
@@ -805,7 +852,9 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
 
                         {/* Performance Summary Header */}
                         <div className="flex items-center justify-between mb-3">
-                          <h3 className="text-sm font-semibold text-gray-900">Quiz Performance Summary</h3>
+                          <h3 className="text-sm font-semibold text-gray-900">
+                            {t("quizAttempt.performanceSummary")}
+                          </h3>
                         </div>
 
                         <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50">
@@ -857,25 +906,28 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                                         {result.score}%
                                       </div>
                                       <span className="text-[10px] text-gray-500 px-2 py-0.5 bg-gray-100 rounded">
-                                        Threshold: {result.passing_threshold}%
+                                        {t("quizAttempt.threshold", { percent: result.passing_threshold })}
                                       </span>
                                     </div>
                                   </div>
                                   <div className="mt-1 flex items-center justify-between text-xs text-gray-600">
                                     <div className="font-medium">
-                                      {result.correct_answers}/{result.total_questions} correct
+                                      {t("quizAttempt.correctCount", {
+                                        correct: formatNumber(result.correct_answers, locale),
+                                        total: formatNumber(result.total_questions, locale),
+                                      })}
                                     </div>
                                     <div className="flex gap-3">
                                       <span>
-                                        Attempt:{" "}
+                                        {t("quizAttempt.attempt")}{" "}
                                         <span className="font-semibold text-gray-800">
-                                          {result.attempt_number}
+                                          {formatNumber(result.attempt_number, locale)}
                                         </span>
                                       </span>
                                       <span>
-                                        Remaining:{" "}
+                                        {t("quizAttempt.remaining")}{" "}
                                         <span className="font-semibold text-gray-800">
-                                          {result.attempts_remaining}
+                                          {formatNumber(result.attempts_remaining, locale)}
                                         </span>
                                       </span>
                                     </div>
@@ -905,14 +957,14 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
                         id="viewReportBtn"
                         onClick={() => router.push("/dashboard/my-report-card")}
                       >
-                        View Report
+                        {t("quizAttempt.viewReport")}
                       </button>
                       <button
                         className="border border-gray-300 text-gray-700 font-semibold py-1.5 px-4 text-xs rounded-full hover:bg-gray-50 transition"
                         id="goBackBtn"
                         onClick={handleCompletionGoBack}
                       >
-                        Go Back
+                        {t("quizAttempt.goBack")}
                       </button>
                     </div>
                   </div>
@@ -923,23 +975,25 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
               <div className="col-span-3">
                 {/* Quiz Status Card */}
                 <div className="bg-white rounded-2xl p-4 mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Quiz Status</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">{t("quizAttempt.quizStatus")}</h3>
                   <div className="text-center py-4 bg-gray-50 rounded-lg">
                     <p className="text-3xl font-semibold text-gray-900">
                       <span id="statusCount">{padNumber(currentQuestion + 1, 2, locale)}</span>/
                       <span id="totalCount">{padNumber(quizData.length, 2, locale)}</span>
                     </p>
                     <p className="text-sm text-gray-600 mt-2">
-                      <span id="completedCount">{formatNumber(currentQuestion + 1, locale)}</span>{" "}
-                      out of{" "}
-                      <span id="totalQuizCount">{formatNumber(quizData.length, locale)}</span>{" "}
-                      quizzes are done
+                      {t("quizAttempt.quizzesDone", {
+                        completed: formatNumber(currentQuestion + 1, locale),
+                        total: formatNumber(quizData.length, locale),
+                      })}
                     </p>
                     {threshold !== null && threshold > 0 && (
                       <p
                         className={`text-sm mt-2 ${noAttemptsLeft ? "text-red-600 font-semibold" : "text-gray-600"}`}
                       >
-                        Attempts left: {formatNumber(attemptsLeft ?? 0, locale)}
+                        {t("quizAttempt.attemptsLeft", {
+                          count: formatNumber(attemptsLeft ?? 0, locale),
+                        })}
                       </p>
                     )}
                   </div>
@@ -958,7 +1012,9 @@ export default function QuizzesPage({ params }: { params: Promise<{ module: stri
 
                         if (!img.src.includes("data:image")) {
                           img.src =
-                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"%3E%3Crect fill="%23e5e7eb" width="400" height="300"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" font-family="sans-serif" font-size="18" fill="%239ca3af"%3EImage Not Available%3C/text%3E%3C/svg%3E';
+                            `data:image/svg+xml,${encodeURIComponent(
+                              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect fill="#e5e7eb" width="400" height="300"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-family="sans-serif" font-size="18" fill="#9ca3af">${t("quizAttempt.imageNotAvailable")}</text></svg>`
+                            )}`;
                         }
                       }}
                     />
