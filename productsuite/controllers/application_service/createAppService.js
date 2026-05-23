@@ -109,6 +109,30 @@ exports.createAppService = async (req, res) => {
 };
 
 // Delete app service
+function normalizeMessage(message, fallback) {
+  if (typeof message === 'string') {
+    return message;
+  }
+
+  if (message && typeof message === 'object') {
+    if (typeof message.message === 'string') {
+      return message.message;
+    }
+
+    if (typeof message.msg === 'string') {
+      return message.msg;
+    }
+
+    try {
+      return JSON.stringify(message);
+    } catch (error) {
+      logger.warn(`[APP SERVICE][DELETE] Failed to stringify message object: ${error.message || String(error)}`);
+    }
+  }
+
+  return fallback;
+}
+
 exports.deleteAppService = async (req, res) => {
   logger.info(`[APP SERVICE][DELETE] Delete app service - START`);
   
@@ -128,7 +152,7 @@ exports.deleteAppService = async (req, res) => {
     const response = await apiClient.delete(apiUrl);
     logger.info(`[APP SERVICE][DELETE] Delete response: ${JSON.stringify(redactLogData(response.data))}`);
 
-    const message = response.data?.message || response.data?.msg || 'Service deleted successfully';
+    const message = normalizeMessage(response.data?.message || response.data?.msg, req.__('generic_label.app_service_deleted_successfully'));
     const alertType = response.data?.alertType || 'success';
 
     logger.info(`[APP SERVICE][DELETE] Redirecting to list with message: ${message}`);
@@ -137,7 +161,7 @@ exports.deleteAppService = async (req, res) => {
     logger.error(`[APP SERVICE][DELETE] Error deleting app service: ${error.message}`);
     logger.error(`[APP SERVICE][DELETE] Error stack: ${error.stack}`);
     
-    const message = error.response?.data?.message || error.response?.data?.msg || error.message || 'Error deleting service';
+    const message = normalizeMessage(error.response?.data?.message || error.response?.data?.msg || error.message, 'Error deleting service');
     const alertType = error.response?.data?.alertType || 'error';
 
     logger.error(`[APP SERVICE][DELETE] Redirecting to list with error: ${message}`);

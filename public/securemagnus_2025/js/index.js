@@ -91,6 +91,7 @@ function showCustomToast(alertType, alertMessage = null) {
       'Package deleted successfully': 'تم حذف الباقة بنجاح',
       'User deleted successfully': 'تم حذف المستخدم بنجاح',
       'User created successfully': 'تم إنشاء المستخدم بنجاح',
+      'App service deleted successfully': 'تم حذف خدمة التطبيق بنجاح',
       'Campaign launch has been initiated': 'تم بدء إطلاق الحملة',
       'Campaign Launch has been initiated': 'تم بدء إطلاق الحملة',
       'Campaign has been initiated': 'تم بدء الحملة',
@@ -146,7 +147,7 @@ function showCustomToast(alertType, alertMessage = null) {
  * @param {Function} onConfirm - Called when the user clicks Confirm.
  * @param {Function} [onCancel] - Optional callback when the user cancels.
  */
-function showCustomConfirm(message, onConfirm, onCancel) {
+function showCustomConfirm(message, onConfirm, onCancel, confirmText = 'Confirm', cancelText = 'Cancel') {
   const backdrop = document.createElement('div');
   backdrop.className =
     'fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in';
@@ -165,11 +166,11 @@ function showCustomConfirm(message, onConfirm, onCancel) {
       <div class="flex justify-end gap-3">
         <button id="_confirmModalCancel" type="button"
           class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition">
-          Cancel
+          ${cancelText}
         </button>
         <button id="_confirmModalConfirm" type="button"
           class="px-6 py-2.5 rounded-lg bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition">
-          Confirm
+          ${confirmText}
         </button>
       </div>
     </div>

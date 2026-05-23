@@ -1451,12 +1451,14 @@ class EmailCampaignStepper {
 
     const message = window.i18n?.messages?.confirmSubmit ||
       'Are you sure you want to submit this campaign? This action cannot be undone.';
+    const confirmText = window.i18n?.labels?.confirm || 'Confirm';
+    const cancelText = window.i18n?.labels?.cancel || 'Cancel';
 
     showCustomConfirm(message, () => {
       this.isSubmitting = true;
       this.updateButtons();
       this.form.submit();
-    });
+    }, null, confirmText, cancelText);
   }
 }
 
