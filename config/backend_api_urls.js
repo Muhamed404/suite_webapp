@@ -58,8 +58,12 @@ module.exports = {
             ENROLLED_PHM_USERS: `/user/retrieved-enrolled-users`,
             UNENROLLED_PHM_USERS: `/user/retrieved-unenrolled-users`,
             SAVE_ENROLLMENT: (hasRequestedToUnenroll) => `/user/update-license-status/${hasRequestedToUnenroll}`,
+            BULK_INVITE_SEND: `/notification/user/invite/bulk/send`,
             DELETE: (userId) => `/user/delete/${userId}`,
             LIST_SUITE_USERS: (organization) => `/user/suite-users/${organization}`,
+            BULK_IMPORT_LIST: (organizationId) => `/user/bulk-import/list/${organizationId}`,
+            BULK_IMPORT_STATUS: (organizationId, jobId) =>
+              `/user/bulk-import/${organizationId}/${jobId}`,
             RETRIEVE_USER_BY_ID: (userId) => `/user/show/${userId}`,
             SAVE_EDIT_USER: (userId) => `/user/update/${userId}`,
             LICENSED_USERS_BY_PRODUCT: (productId) => `/user/licensed-users/${productId}`,
@@ -106,6 +110,12 @@ module.exports = {
             UPDATE: (id) => `/notification_template/${id}/edit`,
             DELETE: (id, name) => `/notification_template/${id}/delete/${name}/name`,
         },
+        Notification_Mail: {
+            LIST_BY_ORGANIZATION: (organizationId) => `/notification_mail/${organizationId}/organization`,
+        },
+        MFA_Mail: {
+            LIST: '/mfa-mail',
+        },
 
     },
     PHISHMAGNUS: {
@@ -114,6 +124,7 @@ module.exports = {
         GROUPS: {
             FIND_GROUP_BY_ORGANIZATION: (orgId) => `/group/findByOrganization/${orgId}`,
             CREATE: '/group/create',
+            DELETE: (groupId) => `/group/delete/${groupId}`,
             ASSIGNED_USERS_BY_GROUP: (groupId) => `/group/assignedUsersByGroup/${groupId}`,
             UNASSIGNED_USERS_BY_GROUP: (groupId) => `/group/getUnassignedUser/${groupId}`,
             EnrolUserToGroup: (groupId, hasRequestedToUnenroll) => `/group/enrolUserToGroup/${groupId}/${hasRequestedToUnenroll}`,
@@ -171,6 +182,7 @@ module.exports = {
         DEPARTMENT: {
             Find_Department_By_Organization: (orgId) => `/department/list/${orgId}`,
             CREATE: '/department/',
+            DELETE: (departmentId) => `/department/delete/${departmentId}`,
             ASSIGNED_USERS_BY_DEPARTMENT: (orgId, deptId) => `/department/assigned-users/${orgId}?department=${deptId}`,
             UNASSIGNED_USERS_BY_ORGANIZATION: (orgId) => `/department/unassigned-users/${orgId}`,
             EnrolUserToDepartment: (departmentId, hasRequestedToUnenroll) => `/department/enrolUserToDepartment/${departmentId}/${hasRequestedToUnenroll}`,

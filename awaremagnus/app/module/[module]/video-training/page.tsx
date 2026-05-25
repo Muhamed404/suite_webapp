@@ -10,6 +10,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useModules, useContentReportByContentId } from "@/hooks/useQuiz";
+import { useCampaign } from "@/hooks/useCampaigns";
 import { quizService } from "@/services/quizService";
 import { isOrgUser } from "@/utils/roles";
 import { getContentAssetUrl } from "@/services/awmStorage";
@@ -35,8 +36,10 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   }>({});
   const [sendingProgress, setSendingProgress] = useState<Set<number>>(new Set());
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
+  const videoContainerRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const lastSentPercentRef = useRef<{ [key: number]: number }>({});
   const videoIntervals = useRef<{ [key: number]: ReturnType<typeof setInterval> | null }>({});
+  const hasSoughtRef = useRef<Set<number>>(new Set());
   const moduleIdRef = useRef<number | null>(null);
   const campaignIdRef = useRef<number>(
     (() => {
@@ -142,10 +145,13 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   useEffect(() => {
     savedProgressMap.forEach((savedPct, contentId) => {
       if (savedPct <= 0 || savedPct >= 100) return;
+      if (hasSoughtRef.current.has(contentId)) return;
+
       const video = videoRefs.current[contentId];
 
       if (video && video.readyState >= 1 && isFinite(video.duration)) {
         video.currentTime = (savedPct / 100) * video.duration;
+        hasSoughtRef.current.add(contentId);
       }
     });
   }, [savedProgressMap]);
@@ -164,6 +170,8 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     }));
 
     // Seek to saved position (only when partially watched, not completed)
+    if (hasSoughtRef.current.has(contentId)) return;
+
     const savedPct = savedProgressMap.get(contentId);
 
     if (savedPct != null && savedPct > 0 && savedPct < 100) {
@@ -171,6 +179,7 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
 
       if (isFinite(seekTime)) {
         video.currentTime = seekTime;
+        hasSoughtRef.current.add(contentId);
       }
     }
   };
@@ -290,6 +299,28 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
     }
   };
 
+  const openVideoFullscreen = async (contentId: number) => {
+    const container = videoContainerRefs.current[contentId];
+    if (!container) return;
+
+    const fsElement = container as HTMLDivElement & {
+      webkitRequestFullscreen?: () => Promise<void> | void;
+      msRequestFullscreen?: () => Promise<void> | void;
+    };
+
+    try {
+      if (fsElement.requestFullscreen) {
+        await fsElement.requestFullscreen();
+      } else if (fsElement.webkitRequestFullscreen) {
+        fsElement.webkitRequestFullscreen();
+      } else if (fsElement.msRequestFullscreen) {
+        fsElement.msRequestFullscreen();
+      }
+    } catch (error) {
+      console.error("Failed to enter fullscreen mode:", error);
+    }
+  };
+
   const campaignId = useMemo(() => {
     const campaignIdFromUrl = searchParams?.get("campaign_id");
 
@@ -299,6 +330,9 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
 
     return 1; // Default campaign ID
   }, [searchParams]);
+
+  const { data: campaignRes } = useCampaign(campaignId, !!campaignId);
+  const isVideoSkippingEnabled = campaignRes ? !!(campaignRes.enable_video_skipping ?? campaignRes.data?.enable_video_skipping) : false;
 
   useEffect(() => {
     campaignIdRef.current = campaignId;
@@ -349,11 +383,8 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <link
-          href="https://cdn.jsdelivr.net/npm/flag-icons@6.7.0/css/flag-icons.min.css"
-          rel="stylesheet"
-        />
-        <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js" />
+        <link href="/vendor/flag-icons/css/flag-icons.min.css" rel="stylesheet" />
+        <script src="/vendor/lucide.min.js" />
         <div className="flex-1 flex flex-col h-screen bg-[#F1F5F8] lg:m-2 lg:ml-0 overflow-hidden lg:rounded-r-3xl">
           <main className="flex-1 overflow-y-auto">
             <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5 p-3 pb-0">
@@ -409,7 +440,13 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                     key={content.id || index}
                     className="bg-white rounded-xl overflow-hidden mb-4"
                   >
-                    <div className="relative bg-black" style={{ height: "60vh" }}>
+                    <div
+                      ref={(el) => {
+                        videoContainerRefs.current[content.id] = el;
+                      }}
+                      className="relative bg-black"
+                      style={{ height: "60vh" }}
+                    >
                       <video
                         ref={(el) => {
                           videoRefs.current[content.id] = el;
@@ -458,17 +495,19 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                         >
                           {t("videoTraining.back10s")}
                         </button>
-                        <button
-                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
-                          onClick={() => {
-                            const v = videoRefs.current[content.id];
+                        {isVideoSkippingEnabled && (
+                          <button
+                            className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                            onClick={() => {
+                              const v = videoRefs.current[content.id];
 
-                            if (v && isFinite(v.duration))
-                              v.currentTime = Math.min(v.duration, v.currentTime + 10);
-                          }}
-                        >
-                          {t("videoTraining.forward10s")}
-                        </button>
+                              if (v && isFinite(v.duration))
+                                v.currentTime = Math.min(v.duration, v.currentTime + 10);
+                            }}
+                          >
+                            {t("videoTraining.forward10s")}
+                          </button>
+                        )}
                         <button
                           className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
                           onClick={() => {
@@ -481,6 +520,12 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                           }}
                         >
                           {t("videoTraining.restart")}
+                        </button>
+                        <button
+                          className="border border-gray-400 bg-white text-gray-800 px-2.5 py-0.5 text-sm hover:bg-gray-50 transition"
+                          onClick={() => openVideoFullscreen(content.id)}
+                        >
+                          {t("videoTraining.openFullScreen")}
                         </button>
                         <span className="ml-1 text-sm text-gray-700">
                           {formatTime(videoProgress[content.id]?.currentTime ?? 0)} /{" "}
@@ -542,36 +587,6 @@ export default function VideoTrainingPage({ params }: { params: Promise<{ module
                       </p>
                     </div>
 
-                    {(() => {
-                      const fullUrl = !content.source_url
-                        ? undefined
-                        : getContentAssetUrl(content.source_url) || undefined;
-
-                      return fullUrl ? (
-                        <div className="p-4 flex items-center gap-3 flex-wrap">
-                          <a
-                            className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
-                            href={fullUrl}
-                            rel="noopener noreferrer"
-                            target="_blank"
-                          >
-                            <svg
-                              fill="none"
-                              height="14"
-                              stroke="currentColor"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              viewBox="0 0 24 24"
-                              width="14"
-                            >
-                              <polygon points="5 3 19 12 5 21 5 3" />
-                            </svg>
-                            {t("videoTraining.openFullScreen")}
-                          </a>
-                        </div>
-                      ) : null;
-                    })()}
                   </div>
                 ))
               ) : (

@@ -28,6 +28,7 @@ Thumbs.db
 # Build files
 dist/
 build/
+obfuscated/
 .next/
 awaremagnus/.next/
 awaremagnus/tsconfig.tsbuildinfo

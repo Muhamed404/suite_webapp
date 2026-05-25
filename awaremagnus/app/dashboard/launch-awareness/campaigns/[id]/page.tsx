@@ -23,6 +23,14 @@ import {
   useAvatarStatisticsByCampaign,
 } from "@/hooks/useDashboard";
 import { getLanguageId } from "@/utils/languageMapping";
+import achievementTranslationsAr from "@/messages/ar/gamification_achievements-ar.json";
+import scoreLevelTranslationsAr from "@/messages/ar/gamification_score_levels-ar.json";
+
+type ArabicAchievementTranslation = {
+  name: string;
+  description: string;
+  category: string;
+};
 
 export default function CampaignDetailsPage() {
   const params = useParams();
@@ -30,6 +38,14 @@ export default function CampaignDetailsPage() {
   const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
   const t = useTranslations("dashboard");
+  const isArabic = locale === "ar";
+  const unlockedLabel = t("campaignReport.unlocked");
+  const lockedLabel = t("campaignReport.locked");
+  const levelLabel = t("campaignReport.level");
+  const arabicAchievementMap = achievementTranslationsAr.achievements as Record<
+    string,
+    ArabicAchievementTranslation
+  >;
 
 
   const campaignId = params?.id ? Number(params.id) : 0;
@@ -55,54 +71,55 @@ export default function CampaignDetailsPage() {
   const achievementPercent =
     achievementTotal > 0 ? Math.round((achievementUnlocked / achievementTotal) * 100) : 0;
 
-  // Set of achievement numbers (1-16) present in the backend response. We
-  // parse the leading number from `image_small_url` (e.g. "1-quick-learner.png").
-  const unlockedAchievementNumbers = useMemo(() => {
+  const achievementStatsList = useMemo(() => {
+    return Array.isArray(achievementData?.object?.achievement_statistics)
+      ? achievementData.object.achievement_statistics
+      : [];
+  }, [achievementData]);
+
+  // Use backend ids directly so achieved badges (e.g. 18, 47) always appear.
+  const unlockedAchievementIds = useMemo(() => {
     const set = new Set<number>();
-    const items = achievementData?.object?.achievement_statistics ?? [];
 
-    for (const a of items) {
-      const img = a?.image_small_url ?? "";
-      const m = img.trim().match(/^(\d{1,2})/);
+    for (const achievement of achievementStatsList) {
+      const id = Number(achievement?.achievement_id);
 
-      if (!m) continue;
-      const n = Number(m[1]);
-
-      if (n >= 1 && n <= 16) set.add(n);
+      if (!Number.isFinite(id) || id <= 0) continue;
+      if (Number(achievement?.employee_count ?? 0) > 0) set.add(id);
     }
 
     return set;
-  }, [achievementData]);
+  }, [achievementStatsList]);
 
-  // Map: achievement number → full stats object (for tooltip data)
-  const achievementByNumber = useMemo(() => {
+  const achievementById = useMemo(() => {
     const map = new Map<number, any>();
-    const items = achievementData?.object?.achievement_statistics ?? [];
 
-    for (const a of items) {
-      const img = a?.image_small_url ?? "";
-      const m = img.trim().match(/^(\d{1,2})/);
+    for (const achievement of achievementStatsList) {
+      const id = Number(achievement?.achievement_id);
 
-      if (!m) continue;
-      const n = Number(m[1]);
-
-      if (n >= 1 && n <= 16) map.set(n, a);
+      if (!Number.isFinite(id) || id <= 0) continue;
+      map.set(id, achievement);
     }
 
     return map;
-  }, [achievementData]);
+  }, [achievementStatsList]);
 
-  // Display order: unlocked achievements first, then locked — capped at 16
+  // Keep 16 slots, but guarantee all unlocked ids are visible first.
   const achievementDisplayOrder = useMemo(() => {
-    const all = Array.from({ length: 16 }, (_, i) => i + 1);
+    const unlockedIds = Array.from(unlockedAchievementIds).sort((a, b) => a - b);
+    const defaultIds = Array.from({ length: Math.max(16, Number(achievementTotal) || 0) }, (_, i) => i + 1);
+    const order: number[] = [];
 
-    return all.sort((a, b) => {
-      const aUnlocked = unlockedAchievementNumbers.has(a) ? 0 : 1;
-      const bUnlocked = unlockedAchievementNumbers.has(b) ? 0 : 1;
+    for (const id of unlockedIds) {
+      if (!order.includes(id)) order.push(id);
+    }
 
-      return aUnlocked - bUnlocked;
-    });
-  }, [unlockedAchievementNumbers]);
+    for (const id of defaultIds) {
+      if (!order.includes(id)) order.push(id);
+    }
+
+    return order.slice(0, 16);
+  }, [unlockedAchievementIds, achievementTotal]);
 
   const avatarImageByLevel: Record<number, string> = {
     1: "Vulnerablenewbe_Level1_Robot.png",
@@ -121,21 +138,126 @@ export default function CampaignDetailsPage() {
     14: "UltimateCyberSentinel_Level14_Robot.png",
   };
 
+  const avatarNameByLevel: Record<number, string> = {
+    1: "Vulnerable Newbie",
+    2: "Alert Apprentice",
+    3: "Cautious Learner",
+    4: "Informed Defender",
+    5: "Vigilant Guardian",
+    6: "Skilled Sentinel",
+    7: "Resilient Protector",
+    8: "Advanced Watchman",
+    9: "Expert Enforcer",
+    10: "Master Strategist",
+    11: "Elite Vanguard",
+    12: "Legendary Shieldbearer",
+    13: "Supreme Cyber Knight",
+    14: "Ultimate Cyber Sentinel",
+  };
+  const avatarNameByLevelAr: Record<number, string> = {
+    1: scoreLevelTranslationsAr.items["10"],
+    2: scoreLevelTranslationsAr.items["11"],
+    3: scoreLevelTranslationsAr.items["12"],
+    4: scoreLevelTranslationsAr.items["13"],
+    5: scoreLevelTranslationsAr.items["14"],
+    6: scoreLevelTranslationsAr.items["15"],
+    7: scoreLevelTranslationsAr.items["16"],
+    8: scoreLevelTranslationsAr.items["17"],
+    9: scoreLevelTranslationsAr.items["18"],
+    10: scoreLevelTranslationsAr.items["19"],
+    11: scoreLevelTranslationsAr.items["20"],
+    12: scoreLevelTranslationsAr.items["21"],
+    13: scoreLevelTranslationsAr.items["22"],
+    14: scoreLevelTranslationsAr.items["23"],
+  };
+
+  const inferAvatarNameFromImage = (imageName?: string) => {
+    if (!imageName) return "";
+
+    const fileName = imageName.split("/").pop() ?? imageName;
+    const withoutExtension = fileName.replace(/\.[^/.]+$/, "");
+    const withoutSuffix = withoutExtension.replace(/_Level\d+_Robot$/i, "").replace(/_Robot$/i, "");
+
+    return withoutSuffix
+      .replace(/_/g, " ")
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .trim();
+  };
+
   const resolveAvatarImage = (avatar?: any) => {
     if (!avatar) return "1.png";
     return avatarImageByLevel[avatar.level_number] ?? avatar.image_small_url ?? "1.png";
   };
 
+  const resolveAvatarName = (avatar?: any) => {
+    if (!avatar) return isArabic ? avatarNameByLevelAr[1] : "Vulnerable Newbie";
+
+    const levelName = String(avatar.level_name ?? "").trim();
+    const genericLevelLabel = t("campaignReport.levelNumber", { n: avatar.level_number });
+
+    const apiArabicLevelName =
+      avatar?.level_name_ar ?? avatar?.level_name_arabic ?? avatar?.name_ar ?? avatar?.name_arabic;
+
+    if (isArabic) {
+      if (apiArabicLevelName) return apiArabicLevelName;
+      return avatarNameByLevelAr[avatar.level_number] ?? genericLevelLabel;
+    }
+
+    if (levelName && !/^Level\s+\d+$/i.test(levelName)) return levelName;
+
+    const inferredName = inferAvatarNameFromImage(avatar.image_small_url);
+
+    if (inferredName) return inferredName;
+
+    return avatarNameByLevel[avatar.level_number] ?? genericLevelLabel;
+  };
+
+  const formatUsersOnText = (count?: number) => {
+    const safeCount = Number(count ?? 0);
+    if (safeCount === 1) return t("campaignReport.usersOnOne");
+
+    return t("campaignReport.usersOnMany", { count: safeCount });
+  };
+
+  const resolveAchievementName = (meta: any, achievementId: number) => {
+    if (isArabic) {
+      const mappedArabic = arabicAchievementMap[String(achievementId)]?.name;
+      if (mappedArabic) return mappedArabic;
+
+      const localizedName =
+        meta?.achievement_name_ar ??
+        meta?.achievement_name_arabic ??
+        meta?.name_ar ??
+        meta?.name_arabic;
+      if (localizedName) return localizedName;
+    }
+
+    if (meta?.achievement_name) return meta.achievement_name;
+    return t("campaignReport.achievementFallback", { id: achievementId });
+  };
+
+  const resolveAchievementDescription = (meta: any, achievementId: number) => {
+    if (isArabic) {
+      const mappedArabic = arabicAchievementMap[String(achievementId)]?.description;
+      if (mappedArabic) return mappedArabic;
+
+      const localizedDescription =
+        meta?.achievement_description_ar ??
+        meta?.achievement_description_arabic ??
+        meta?.description_ar ??
+        meta?.description_arabic;
+      if (localizedDescription) return localizedDescription;
+    }
+
+    return meta?.achievement_description ?? "";
+  };
+
   // Find the unlocked avatar with the highest level to show in the main slot
   const avatarStats = useMemo(() => {
     const items = (avatarData?.object?.avatar_statistics ?? []) as any[];
-    return [...items].sort((a, b) => {
-      const aUnlocked = (a.employee_count ?? 0) > 0 ? 0 : 1;
-      const bUnlocked = (b.employee_count ?? 0) > 0 ? 0 : 1;
-
-      if (aUnlocked !== bUnlocked) return aUnlocked - bUnlocked;
-      return b.level_number - a.level_number;
-    });
+    return [...items]
+      .filter((avatar) => (avatar.level_number ?? 0) > 0)
+      .sort((a, b) => a.level_number - b.level_number);
   }, [avatarData]);
 
   const mainAvatar = useMemo(() => {
@@ -150,7 +272,15 @@ export default function CampaignDetailsPage() {
       };
     }
 
-    return avatarStats[0];
+    const unlockedAvatars = avatarStats.filter((avatar) => (avatar.employee_count ?? 0) > 0);
+
+    if (unlockedAvatars.length > 0) {
+      return unlockedAvatars.reduce((highest, current) =>
+        current.level_number > highest.level_number ? current : highest,
+      );
+    }
+
+    return avatarStats[avatarStats.length - 1];
   }, [avatarStats]);
 
   // Check if main avatar is unlocked (has employee_count > 0)
@@ -165,17 +295,17 @@ export default function CampaignDetailsPage() {
         payload: { campaign: { status_id: 2 } }, // ACTIVE status
       });
       // Optionally refresh the campaign data or show success message
-      alert("Campaign launched successfully!");
+      alert(t("campaignReport.launchSuccess"));
     } catch (error) {
       console.error("Failed to launch campaign:", error);
-      alert("Failed to launch campaign. Please try again.");
+      alert(t("campaignReport.launchFailure"));
     }
   };
 
   const formatDate = (date?: string) => {
     if (!date) return "-";
 
-    return new Date(date).toLocaleDateString("en-US", {
+    return new Date(date).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -241,7 +371,7 @@ export default function CampaignDetailsPage() {
     for (const row of completedModuleRows) {
       const moduleId = Number(row?.module_id || 0);
       if (!moduleId) continue;
-      const moduleName = row?.module_name || `Module ${moduleId}`;
+      const moduleName = row?.module_name || t("campaignReport.moduleNumber", { id: moduleId });
       if (!map.has(moduleId)) map.set(moduleId, moduleName);
     }
 
@@ -254,7 +384,7 @@ export default function CampaignDetailsPage() {
       const nameCompare = a.moduleName.localeCompare(b.moduleName);
       return nameCompare !== 0 ? nameCompare : a.moduleId - b.moduleId;
     });
-  }, [completedModuleRows]);
+  }, [completedModuleRows, t]);
 
   const parseYmdDate = (value?: string | null): Date | null => {
     if (!value) return null;
@@ -288,50 +418,196 @@ export default function CampaignDetailsPage() {
   const spanDays = dateSpanMs > 0 ? Math.ceil(dateSpanMs / oneDayMs) : 0;
   const xAxisTickAmount = hasSingleDate ? 3 : spanDays > 0 ? Math.min(7, spanDays + 1) : undefined;
 
-  // Transform completion data for ApexCharts
+  // Transform completion data for ApexCharts as cumulative completed modules over time.
+  // This ensures the chart always starts from 0 and avoids single floating points.
   const completionGraphPoints: Array<{
     x: number;
     y: number;
-    moduleId: number;
-    moduleName: string;
-    userName: string;
+    completionCount?: number;
+    moduleNames?: string[];
+    userNames?: string[];
     formattedDate: string;
-  }> = completedModuleRows
-    .map((row: any) => {
-      const moduleId = Number(row?.module_id || 0);
+    isBaseline?: boolean;
+  }> = useMemo(() => {
+    const dayBuckets = new Map<number, { count: number; moduleNames: Set<string>; userNames: Set<string> }>();
+    const dayStart = (d: Date) => {
+      const x = new Date(d);
+      x.setHours(0, 0, 0, 0);
+      return x;
+    };
+
+    for (const row of completedModuleRows) {
       const completionDate = parseYmdDate(row?.module_completion_date);
-      if (!moduleId || !completionDate) return null;
+      if (!completionDate) continue;
 
-      const moduleName = row?.module_name || modules.find((m) => m.moduleId === moduleId)?.moduleName || `Module ${moduleId}`;
-      const fullName = `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
-      const formattedDate = completionDate.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-      });
-
-      return {
-        x: completionDate.getTime(),
-        y: modules.findIndex((m) => m.moduleId === moduleId) + 1,
-        moduleId,
-        moduleName,
-        userName: fullName || `User ${row?.user_id || "-"}`,
-        formattedDate,
+      const bucketTime = dayStart(completionDate).getTime();
+      const bucket = dayBuckets.get(bucketTime) ?? {
+        count: 0,
+        moduleNames: new Set<string>(),
+        userNames: new Set<string>(),
       };
-    })
-    .filter((item: any): item is {
+
+      bucket.count += 1;
+      bucket.moduleNames.add(
+        row?.module_name || t("campaignReport.moduleNumber", { id: row?.module_id || "-" })
+      );
+      const fullName = `${row?.first_name ?? ""} ${row?.last_name ?? ""}`.trim();
+      bucket.userNames.add(
+        fullName || t("campaignReport.userNumber", { id: row?.user_id || "-" })
+      );
+      dayBuckets.set(bucketTime, bucket);
+    }
+
+    const sortedDays = Array.from(dayBuckets.entries()).sort((a, b) => a[0] - b[0]);
+    if (sortedDays.length === 0) return [];
+
+    const baselineX = sortedDays[0][0] - oneDayMs;
+    const points: Array<{
       x: number;
       y: number;
-      moduleId: number;
-      moduleName: string;
-      userName: string;
+      completionCount?: number;
+      moduleNames?: string[];
+      userNames?: string[];
       formattedDate: string;
-    } => item !== null)
-    .sort((a: { x: number; y: number }, b: { x: number; y: number }) => a.x - b.x); // Sort by date for line chart
+      isBaseline?: boolean;
+    }> = [
+      {
+        x: baselineX,
+        y: 0,
+        formattedDate: new Date(baselineX).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+        isBaseline: true,
+      },
+    ];
+
+    let cumulative = 0;
+    for (const [time, bucket] of sortedDays) {
+      cumulative += bucket.count;
+      points.push({
+        x: time,
+        y: cumulative,
+        completionCount: bucket.count,
+        moduleNames: Array.from(bucket.moduleNames),
+        userNames: Array.from(bucket.userNames),
+        formattedDate: new Date(time).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+      });
+    }
+
+    return points;
+  }, [completedModuleRows, locale, t]);
+
   // Chart data (only x and y for ApexCharts)
   const completionGraphData = completionGraphPoints.map(
     (point: { x: number; y: number }) => ({ x: point.x, y: point.y })
   );
+
+  const moduleCompletionChartOptions = useMemo(() => {
+    const pts = completionGraphPoints;
+    const lastY = pts.length > 0 ? (pts[pts.length - 1]?.y ?? 1) : 1;
+
+    return {
+      chart: {
+        type: "line" as const,
+        sparkline: { enabled: false },
+        toolbar: { show: false },
+        zoom: { enabled: false },
+        parentHeightOffset: 0,
+      },
+      colors: ["#3B82F6"],
+      stroke: { curve: "smooth" as const, width: 2 },
+      markers: {
+        size: 5,
+        colors: ["#3B82F6"],
+        strokeColors: "#fff",
+        strokeWidth: 2,
+        hover: { sizeOffset: 2 },
+      },
+      xaxis: {
+        type: "datetime" as const,
+        min: xAxisMin,
+        max: xAxisMax,
+        title: {
+          text: t("campaignReport.chartDateAxis"),
+          style: { fontSize: "12px", fontWeight: 600, color: "#475569" },
+        },
+        labels: {
+          format: "dd MMM",
+          datetimeUTC: false,
+          showDuplicates: false,
+          style: { fontSize: "11px", fontWeight: 500, colors: "#64748B" },
+        },
+        axisBorder: { show: true, color: "#94A3B8", height: 1 },
+        axisTicks: { show: false },
+        crosshairs: {
+          show: true,
+          position: "back",
+          stroke: { color: "#3B82F6", width: 0.5, dashArray: 3 },
+        },
+      },
+      yaxis: {
+        min: 0,
+        max: Math.max(1, lastY),
+        tickAmount: Math.min(6, Math.max(2, lastY)),
+        decimalsInFloat: 0,
+        title: {
+          text: t("campaignReport.chartCompletedModulesAxis"),
+          style: { fontSize: "12px", fontWeight: 600, color: "#475569" },
+          offsetX: +5,
+        },
+        labels: {
+          formatter: (value: number) => {
+            const rounded = Math.round(value);
+            return Number.isInteger(rounded) && rounded >= 0 ? String(rounded) : "";
+          },
+          style: { fontSize: "11px", fontWeight: 500, colors: "#64748B" },
+          offsetX: -10,
+        },
+        axisBorder: { show: true, color: "#94A3B8", width: 1 },
+        axisTicks: { show: false },
+      } as any,
+      grid: {
+        borderColor: "#E2E8F0",
+        strokeDashArray: 2,
+        xaxis: { lines: { show: true } },
+        yaxis: { lines: { show: true } },
+        padding: { left: 20, right: 20 },
+      },
+      tooltip: {
+        theme: "dark",
+        custom: function ({ dataPointIndex }: any) {
+          const point = pts[dataPointIndex];
+          if (!point) return "";
+          if (point.isBaseline) {
+            const label = t("campaignReport.tooltipStartingPoint");
+            return `
+                <div style="background: linear-gradient(to bottom right, #1e40af, #1e3a8a); color: white; border-radius: 8px; padding: 10px 14px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(147, 197, 253, 0.3);">
+                  <div style="font-size: 12px; font-weight: 600; color: #dbeafe;">${label}</div>
+                  <div style="color: #93c5fd; font-size: 11px; margin-top: 4px;">${point.formattedDate}</div>
+                </div>
+              `;
+          }
+          const completionTitle = t("campaignReport.tooltipCompletionCount", {
+            count: point.completionCount || 0,
+          });
+          const cumulativeLine = t("campaignReport.tooltipCumulative", { y: point.y });
+          return `
+                <div style="background: linear-gradient(to bottom right, #1e40af, #1e3a8a); color: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(147, 197, 253, 0.3);">
+                  <div style="font-size: 13px; font-weight: bold; color: #dbeafe;">${completionTitle}</div>
+                  <div style="color: #bfdbfe; margin-top: 6px; font-weight: 500; font-size: 12px;">${cumulativeLine}</div>
+                  <div style="color: #93c5fd; font-size: 11px; margin-top: 4px;">${point.formattedDate}</div>
+                </div>
+              `;
+        },
+      },
+    };
+  }, [t, completionGraphPoints, xAxisMin, xAxisMax]);
 
 
 
@@ -372,7 +648,8 @@ export default function CampaignDetailsPage() {
                 <ArrowLeft className="w-4 h-4" />
               </Button>
               <div className="text-xs text-gray-500">
-                Awareness Campaign &gt; {campaignDashboard?.name || `Campaign ${campaignId}`}
+                {t("campaignReport.breadcrumbPrefix")} &gt;{" "}
+                {campaignDashboard?.name || `${t("campaignReport.campaignDefault")} ${campaignId}`}
               </div>
             </div>
 
@@ -385,7 +662,7 @@ export default function CampaignDetailsPage() {
                 startContent={<Play className="w-4 h-4" />}
                 onClick={handleLaunchCampaign}
               >
-                Launch Campaign
+                {t("campaignReport.launchCampaign")}
               </Button>
             )}
 
@@ -400,7 +677,7 @@ export default function CampaignDetailsPage() {
                 )
               }
             >
-              Leaderboard
+              {t("campaignReport.leaderboard")}
             </Button>
           </div>
 
@@ -408,26 +685,29 @@ export default function CampaignDetailsPage() {
             <div className="bg-white p-5 rounded-xl grid grid-cols-1 md:grid-cols-2 gap-6 col-span-8 row-span-5">
               <div className="space-y-3 text-gray-700">
                 <h2 className="text-lg font-semibold mb-4">
-                  {campaignDashboard?.name || "Campaign"}
+                  {campaignDashboard?.name || t("campaignReport.campaignDefault")}
                 </h2>
 
                 <div className="grid grid-cols-3 text-xs">
-                  <span className="font-medium">Name</span>
+                  <span className="font-medium">{t("campaignReport.name")}</span>
                   <span className="col-span-2">{campaignDashboard?.name || "-"}</span>
                 </div>
 
                 <div className="grid grid-cols-3 text-xs">
-                  <span className="font-medium">Description</span>
+                  <span className="font-medium">{t("campaignReport.description")}</span>
                   <span className="col-span-2">{campaignDashboard?.description || "-"}</span>
                 </div>
 
                 <div className="grid grid-cols-3 text-xs">
-                  <span className="font-medium">Department</span>
+                  <span className="font-medium">{t("campaignReport.department")}</span>
                   <span className="col-span-2">
                     {campaignDashboard?.departments?.list && campaignDashboard.departments.list.length > 0 ? (
                       campaignDashboard.departments.list
-                        .map((d: any) => d.name || d.department_name || `Dept ${d.id}`)
-                        .join(', ')
+                        .map(
+                          (d: any) =>
+                            d.name || d.department_name || t("campaignReport.deptPrefix", { id: d.id })
+                        )
+                        .join(", ")
                     ) : (
                       campaignDashboard?.departments?.total ?? 0
                     )}
@@ -435,7 +715,7 @@ export default function CampaignDetailsPage() {
                 </div>
 
                 <div className="grid grid-cols-3 text-xs">
-                  <span className="font-medium">Group</span>
+                  <span className="font-medium">{t("campaignReport.group")}</span>
                   <div className="col-span-2 flex items-center gap-1">
                     {campaignDashboard?.groups?.list && campaignDashboard.groups.list.length > 0 ? (
                       campaignDashboard.groups.list.map((g: any, idx: number) => (
@@ -443,29 +723,31 @@ export default function CampaignDetailsPage() {
                           key={idx}
                           className="px-2 py-[2px] border border-red-300 rounded-full text-red-400 text-[10px]"
                         >
-                          {g.name || g.group_name || `Group ${g.id}`}
+                          {g.name || g.group_name || t("campaignReport.groupPrefix", { id: g.id })}
                         </span>
                       ))
                     ) : (
                       <span className="px-2 py-[2px] border border-red-300 rounded-full text-red-400 text-[10px]">
-                        {campaignDashboard?.groups?.total ?? 0} Group(s)
+                        {t("campaignReport.groupsCount", {
+                          count: campaignDashboard?.groups?.total ?? 0,
+                        })}
                       </span>
                     )}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 text-xs">
-                  <span className="font-medium">Users</span>
+                  <span className="font-medium">{t("campaignReport.users")}</span>
                   <span className="col-span-2">{campaignDashboard?.total_users_enrolled || 0}</span>
                 </div>
 
                 <div className="grid grid-cols-3 text-xs">
-                  <span className="font-medium">Start Date</span>
+                  <span className="font-medium">{t("campaignReport.startDate")}</span>
                   <span className="col-span-2">{formatDate(campaignDashboard?.start_date)}</span>
                 </div>
 
                 <div className="grid grid-cols-3 text-xs">
-                  <span className="font-medium">End Date</span>
+                  <span className="font-medium">{t("campaignReport.endDate")}</span>
                   <span className="col-span-2">{formatDate(campaignDashboard?.end_date)}</span>
                 </div>
               </div>
@@ -475,37 +757,51 @@ export default function CampaignDetailsPage() {
                   <span className="w-4 h-4">
                     <img alt="" className="w-full h-full" src="/awm/images/img/calendar.svg" />
                   </span>
-                  <h3 className="font-semibold text-gray-800 text-sm">Topics Schedule</h3>
+                  <h3 className="font-semibold text-gray-800 text-sm">{t("campaignReport.topicsSchedule")}</h3>
                 </div>
 
                 <div className="space-y-2 text-gray-700 text-xs">
                   {campaignDashboard?.upcoming_topics && campaignDashboard.upcoming_topics.length > 0 ? (
                     campaignDashboard.upcoming_topics.map((topic: any, idx: number) => (
                       <p key={idx}>
-                        {topic.module_name || `Module ${topic.module_id}`} {formatDate(topic.start_date)}
+                        {topic.module_name ||
+                          t("campaignReport.moduleNumber", { id: topic.module_id })}{" "}
+                        {formatDate(topic.start_date)}
                       </p>
                     ))
                   ) : (
-                    <p className="text-gray-400">No schedule available</p>
+                    <p className="text-gray-400">{t("campaignReport.noSchedule")}</p>
                   )}
                 </div>
 
                 {/* Enabled Features */}
                 <div className="pt-3 border-t border-gray-200">
-                  <h4 className="text-gray-700 font-medium text-xs mb-2">Enabled Features</h4>
+                  <h4 className="text-gray-700 font-medium text-xs mb-2">{t("campaignReport.enabledFeatures")}</h4>
                   <div className="grid grid-cols-2 gap-1 text-xs text-gray-600">
                     {campaignDashboard?.settings?.enable_gamification && (
-                      <span>✓ Gamification</span>
+                      <span>✓ {t("campaignReport.featureGamification")}</span>
                     )}
-                    {campaignDashboard?.settings?.enable_quiz && <span>✓ Quiz</span>}
-                    {campaignDashboard?.settings?.enable_certificate && <span>✓ Certificate</span>}
-                    {campaignDashboard?.settings?.enable_motion_videos && <span>✓ Videos</span>}
+                    {campaignDashboard?.settings?.enable_quiz && (
+                      <span>✓ {t("campaignReport.featureQuiz")}</span>
+                    )}
+                    {campaignDashboard?.settings?.enable_certificate && (
+                      <span>✓ {t("campaignReport.featureCertificate")}</span>
+                    )}
+                    {campaignDashboard?.settings?.enable_motion_videos && (
+                      <span>✓ {t("campaignReport.featureVideos")}</span>
+                    )}
                     {campaignDashboard?.settings?.enable_interactive_ispring && (
-                      <span>✓ Interactive</span>
+                      <span>✓ {t("campaignReport.featureInteractive")}</span>
                     )}
-                    {campaignDashboard?.settings?.enable_documents && <span>✓ Documents</span>}
-                    {campaignDashboard?.settings?.enable_games && <span>✓ Games</span>}
-                    {campaignDashboard?.settings?.enable_misc_items && <span>✓ Miscellaneous</span>}
+                    {campaignDashboard?.settings?.enable_documents && (
+                      <span>✓ {t("campaignReport.featureDocuments")}</span>
+                    )}
+                    {campaignDashboard?.settings?.enable_games && (
+                      <span>✓ {t("campaignReport.featureGames")}</span>
+                    )}
+                    {campaignDashboard?.settings?.enable_misc_items && (
+                      <span>✓ {t("campaignReport.featureMisc")}</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -515,7 +811,7 @@ export default function CampaignDetailsPage() {
             <div className="col-span-4 row-span-2 col-start-9">
               <div className="bg-white rounded-xl p-4 h-full">
                 <div className="flex justify-between items-start">
-                  <p className="text-gray-600 text-xs">Remaining days</p>
+                  <p className="text-gray-600 text-xs">{t("campaignReport.remainingDays")}</p>
                   <div className="w-6 h-6">
                     <img alt="" className="w-full h-full" src="/awm/images/profile.svg" />
                   </div>
@@ -547,14 +843,16 @@ export default function CampaignDetailsPage() {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-2xl font-bold text-sky-500">{remainingDays}</span>
-                      <span className="text-[10px] font-medium text-gray-600">Days</span>
+                      <span className="text-[10px] font-medium text-gray-600">{t("campaignReport.days")}</span>
                     </div>
                   </div>
 
                   <div className="text-xs text-gray-600 leading-5">
-                    <p className="font-medium text-gray-800">Timeline</p>
-                    <p>{remainingDaysPercent}% remaining</p>
-                    <p>Total {totalCampaignDays || 0} days</p>
+                    <p className="font-medium text-gray-800">{t("campaignReport.timeline")}</p>
+                    <p>
+                      {t("campaignReport.remainingPercent", { percent: remainingDaysPercent })}
+                    </p>
+                    <p>{t("campaignReport.totalDays", { count: totalCampaignDays || 0 })}</p>
                   </div>
                 </div>
               </div>
@@ -566,13 +864,20 @@ export default function CampaignDetailsPage() {
                 <div className="mb-4">
                   <div className="flex justify-between items-center mb-3">
                     <div>
-                      <h3 className="text-gray-800 text-sm font-bold">Module Completion Timeline</h3>
-                      <p className="text-gray-500 text-xs mt-0.5">{completionGraphPoints.length} completions • {modules.length} modules</p>
+                      <h3 className="text-gray-800 text-sm font-bold">
+                        {t("campaignReport.moduleCompletionTimeline")}
+                      </h3>
+                      <p className="text-gray-500 text-xs mt-0.5">
+                        {t("campaignReport.completionsModulesSummary", {
+                          completions: completedModuleRows.length,
+                          modules: modules.length,
+                        })}
+                      </p>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1.5 text-xs text-gray-600">
                         <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg shadow-blue-400/40" />
-                        <span>Completion</span>
+                        <span>{t("campaignReport.completion")}</span>
                       </div>
                     </div>
                   </div>
@@ -580,141 +885,10 @@ export default function CampaignDetailsPage() {
                   {completionGraphPoints.length > 0 ? (
                     <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-slate-50 rounded-lg p-4 border border-blue-100/50 shadow-sm w-full">
                       <Chart
-                        options={{
-                          chart: {
-                            type: "line",
-                            sparkline: { enabled: false },
-                            toolbar: {
-                              show: false,
-                            },
-                            zoom: {
-                              enabled: false,
-                            },
-                            parentHeightOffset: 0,
-                          },
-                          colors: ["#3B82F6"],
-                          stroke: {
-                            curve: "smooth",
-                            width: 2,
-                          },
-                          markers: {
-                            size: 5,
-                            colors: ["#3B82F6"],
-                            strokeColors: "#fff",
-                            strokeWidth: 2,
-                            hover: { sizeOffset: 2 },
-                          },
-                          xaxis: {
-                            type: "datetime",
-                            min: xAxisMin,
-                            max: xAxisMax,
-                            title: {
-                              text: "Date",
-                              style: {
-                                fontSize: "12px",
-                                fontWeight: 600,
-                                color: "#475569",
-                              },
-                            },
-                            labels: {
-                              format: "dd MMM",
-                              datetimeUTC: false,
-                              showDuplicates: false,
-                              style: {
-                                fontSize: "11px",
-                                fontWeight: 500,
-                                colors: "#64748B",
-                              },
-                            },
-                            axisBorder: {
-                              show: true,
-                              color: "#94A3B8",
-                              height: 1,
-                            },
-                            axisTicks: {
-                              show: false,
-                            },
-                            crosshairs: {
-                              show: true,
-                              position: "back",
-                              stroke: {
-                                color: "#3B82F6",
-                                width: 0.5,
-                                dashArray: 3,
-                              },
-                            },
-                          },
-                          yaxis: {
-                            min: 0,
-                            max: Math.max(1, modules.length) + 1,
-                            tickAmount: Math.max(1, modules.length) + 1,
-                            decimalsInFloat: 0,
-                            title: {
-                              text: "Modules",
-                              style: {
-                                fontSize: "12px",
-                                fontWeight: 600,
-                                color: "#475569",
-                              },
-                              offsetX: +5,
-                            },
-                            labels: {
-                              formatter: (value: number) => {
-                                const rounded = Math.round(value);
-                                return Number.isInteger(rounded) && rounded >= 0 ? String(rounded) : "";
-                              },
-                              style: {
-                                fontSize: "11px",
-                                fontWeight: 500,
-                                colors: "#64748B",
-                              },
-                              offsetX: -10,
-                            },
-                            axisBorder: {
-                              show: true,
-                              color: "#94A3B8",
-                              width: 1,
-                            },
-                            axisTicks: {
-                              show: false,
-                            },
-                          } as any,
-                          grid: {
-                            borderColor: "#E2E8F0",
-                            strokeDashArray: 2,
-                            xaxis: {
-                              lines: {
-                                show: true,
-                              },
-                            },
-                            yaxis: {
-                              lines: {
-                                show: true,
-                              },
-                            },
-                            padding: {
-                              left: 20,
-                              right: 20,
-                            },
-                          },
-                          tooltip: {
-                            theme: "dark",
-                            custom: function ({ dataPointIndex }: any) {
-                              const point = completionGraphPoints[dataPointIndex];
-                              if (!point) return "";
-                              return `
-                                <div style="background: linear-gradient(to bottom right, #1e40af, #1e3a8a); color: white; border-radius: 8px; padding: 12px 16px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border: 1px solid rgba(147, 197, 253, 0.3);">
-                                  <div style="font-size: 13px; font-weight: bold; color: #dbeafe;">${point.moduleName}</div>
-                                  <div style="color: #bfdbfe; margin-top: 6px; font-weight: 500; font-size: 12px;">${point.userName}</div>
-                                  <div style="color: #93c5fd; font-size: 11px; margin-top: 4px;">${point.formattedDate}</div>
-                                </div>
-                              `;
-                            },
-                          },
-                        }}
+                        options={moduleCompletionChartOptions}
                         series={[
                           {
-                            name: "Module Completions",
+                            name: t("campaignReport.chartSeriesModuleCompletions"),
                             data: completionGraphData,
                           },
                         ]}
@@ -726,7 +900,7 @@ export default function CampaignDetailsPage() {
                         <svg className="w-3 h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
                           <path d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" />
                         </svg>
-                        <span>Hover over any point to view completion details</span>
+                        <span>{t("campaignReport.chartHoverHint")}</span>
                       </div>
                     </div>
                   ) : (
@@ -734,13 +908,15 @@ export default function CampaignDetailsPage() {
                       <svg className="w-12 h-12 text-gray-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} />
                       </svg>
-                      <p className="text-gray-400 text-sm font-medium">No module completion data available</p>
-                      <p className="text-gray-300 text-xs mt-1">Completions will appear here as users finish modules</p>
+                      <p className="text-gray-400 text-sm font-medium">
+                        {t("campaignReport.noModuleCompletionData")}
+                      </p>
+                      <p className="text-gray-300 text-xs mt-1">{t("campaignReport.noModuleCompletionHint")}</p>
                     </div>
                   )}
 
                   <div className="flex justify-between items-center mb-1 mt-3">
-                    <span className="text-gray-600 text-xs">Campaign Progress</span>
+                    <span className="text-gray-600 text-xs">{t("campaignReport.campaignProgress")}</span>
                     <span className="text-gray-700 font-medium text-xs">
                       {campaignDashboard?.metrics?.campaign_progress_percent ?? progress}%
                     </span>
@@ -761,9 +937,9 @@ export default function CampaignDetailsPage() {
             {/* Top 3 Struggling Topics */}
             <div className="col-span-4 row-span-4 col-start-9 row-start-3 bg-white rounded-lg p-3 flex flex-col">
               <div className="flex justify-between items-center mb-1">
-                <h3 className="text-[10px] font-semibold text-gray-800">Top 3 Struggling Topics</h3>
+                <h3 className="text-[10px] font-semibold text-gray-800">{t("cards.top3StrugglingTopics")}</h3>
                 <a className="text-blue-600 text-[10px] font-medium" href="#">
-                  View All
+                  {t("cards.viewAll")}
                 </a>
               </div>
 
@@ -774,7 +950,10 @@ export default function CampaignDetailsPage() {
                     .slice(0, 3)
                     .map((topic: any, idx: number) => {
                       const topicDisplayName =
-                        topic.module_name || topic.topic_name || topic.name || "Unknown Topic";
+                        topic.module_name ||
+                        topic.topic_name ||
+                        topic.name ||
+                        t("campaignReport.unknownTopic");
                       const iconMap: Record<
                         string,
                         { icon: string; color: string; textColor: string }
@@ -832,20 +1011,22 @@ export default function CampaignDetailsPage() {
                     })
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-400 text-xs">
-                    No struggling topics data available
+                    {t("campaignReport.noStrugglingTopicsData")}
                   </div>
                 )}
               </div>
 
               <p className="text-[8px] text-red-600 mt-2 flex items-center gap-1">
                 <img alt="" className="w-2.5 h-2.5" src="/awm/images/icons/alert.svg" />
-                Your employees need attention on these topics
+                {t("cards.employeesNeedAttention")}
               </p>
             </div>
 
             {/* Employee Risk Rates */}
             <div className="col-span-4 row-span-4 col-start-1 row-start-8 bg-white rounded-xl p-4 flex flex-col items-center justify-center">
-              <h3 className="text-xs font-semibold text-gray-800 mb-2">Employee Risk Rates</h3>
+              <h3 className="text-xs font-semibold text-gray-800 mb-2">
+                {t("campaignReport.employeeRiskRates")}
+              </h3>
               <div className="w-72 h-72 flex items-center justify-center">
                 <SemiCircleChart
                   sent={campaignDashboard?.metrics?.total_low_risk_employees ?? 0}
@@ -854,14 +1035,20 @@ export default function CampaignDetailsPage() {
                   color1="#3ACE89"
                   color2="#FBBF24"
                   color3="#FB5050"
-                  labels={["Low Risk", "Medium Risk", "High Risk"]}
+                  labels={[
+                    t("cards.lowRisk"),
+                    t("cards.mediumRisk"),
+                    t("cards.highRisk"),
+                  ]}
                 />
               </div>
             </div>
 
             {/* Employee Certification */}
             <div className="col-span-4 row-span-4 col-start-5 row-start-8 bg-white rounded-xl p-4 flex flex-col items-center justify-center">
-              <h3 className="text-xs font-semibold text-gray-800 mb-2">Employee Certification</h3>
+              <h3 className="text-xs font-semibold text-gray-800 mb-2">
+                {t("cards.employeeCertification")}
+              </h3>
               <CertificationChart
                 color="#3ACE89"
                 color2="#FB5050"
@@ -879,11 +1066,15 @@ export default function CampaignDetailsPage() {
               <div className="flex justify-center gap-4 text-xs text-gray-600 mt-3">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 bg-green-400 rounded-full" />
-                  Certified: {campaignDashboard?.metrics?.total_certified_employees || 0}
+                  {t("cards.certified", {
+                    count: campaignDashboard?.metrics?.total_certified_employees || 0,
+                  })}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 bg-red-400 rounded-full" />
-                  Not Certified: {campaignDashboard?.metrics?.total_uncertified_employees || 0}
+                  {t("cards.notCertified", {
+                    count: campaignDashboard?.metrics?.total_uncertified_employees || 0,
+                  })}
                 </span>
               </div>
             </div>
@@ -895,7 +1086,7 @@ export default function CampaignDetailsPage() {
                 {/* Weekly Progress */}
                 <div className="bg-gray-50 p-2 rounded-xl flex flex-col items-center justify-center">
                   <span className="text-gray-700 text-[10px] font-medium mb-2">
-                    Weekly Progress
+                    {t("cards.weeklyProgress")}
                   </span>
                   <div className="relative w-16 h-16 flex items-center justify-center">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
@@ -919,7 +1110,7 @@ export default function CampaignDetailsPage() {
 
                 {/* Quiz Accuracy */}
                 <div className="bg-gray-50 p-2 rounded-xl flex flex-col items-center justify-center">
-                  <span className="text-gray-700 text-[10px] font-medium mb-2">Quiz Accuracy</span>
+                  <span className="text-gray-700 text-[10px] font-medium mb-2">{t("cards.quizAccuracy")}</span>
                   <div className="relative w-16 h-16 flex items-center justify-center">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 64 64">
                       <circle cx="32" cy="32" fill="none" r="28" stroke="#E5E7EB" strokeWidth="3" />
@@ -948,7 +1139,7 @@ export default function CampaignDetailsPage() {
                     <img alt="" className="w-full h-full" src="/awm/images/fire-red.svg" />
                   </div>
                   <span className="text-gray-700 font-medium text-[10px]">
-                    Active Learner This Month
+                    {t("campaignReport.activeLearnerThisMonth")}
                   </span>
                 </div>
                 <span className="text-gray-800 text-lg font-semibold">
@@ -962,7 +1153,7 @@ export default function CampaignDetailsPage() {
                     <img alt="" className="w-full h-full" src="/awm/images/fire-teal.svg" />
                   </div>
                   <span className="text-gray-700 font-medium text-[10px]">
-                    Training Completion Rate
+                    {t("cards.trainingCompletionRate")}
                   </span>
                 </div>
                 <span className="text-gray-800 text-lg font-semibold">
@@ -975,7 +1166,7 @@ export default function CampaignDetailsPage() {
           {/* Second Section - Gamified Distribution Statistics */}
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-medium">Gamified Distribution Statistics</h3>
+              <h3 className="text-lg font-medium">{t("gamification.title")}</h3>
             </div>
 
             {/* Gamification Grid */}
@@ -987,7 +1178,7 @@ export default function CampaignDetailsPage() {
                     <img alt="" className="w-5 h-5" src="/awm/images/gard_cap.svg" />
                   </span>
                   <div>
-                    Course Completed
+                    {t("gamification.courseCompleted")}
                     <div className="text-xl text-gray-900">
                       {campaignDashboard?.metrics?.total_completed_employees_modules || 0}/
                       {campaignDashboard?.metrics?.total_employees_modules_enrolled || 0}
@@ -1021,7 +1212,7 @@ export default function CampaignDetailsPage() {
                     <img alt="" className="w-5 h-5" src="/awm/images/clock_icon.svg" />
                   </span>
                   <div>
-                    Study Time
+                    {t("gamification.studyTime")}
                     <div className="text-xl text-gray-900">
                       {campaignDashboard?.metrics?.total_study_time ?? 0}h
                     </div>
@@ -1037,29 +1228,25 @@ export default function CampaignDetailsPage() {
                       <span className="text-lg">
                         <img alt="" className="w-5 h-5" src="/awm/images/img/Icon_Trophy.svg" />
                       </span>
-                      Achievement Gallery
+                      {t("gamification.achievementGallery")}
                     </h2>
-                    <p className="text-gray-500 text-xs mt-1">
-                      Organization locked and unlocked badges
-                    </p>
+                    <p className="text-gray-500 text-xs mt-1">{t("gamification.achievementSubtitle")}</p>
                   </div>
-                  <a className="text-blue-600 text-xs font-medium" href="#">
-                    View All
-                  </a>
                 </div>
                 <div className="grid grid-cols-8 gap-3 gap-y-4 mt-8">
-                  {achievementDisplayOrder.map((num) => {
-                    const isUnlocked = unlockedAchievementNumbers.has(num);
-                    const meta = achievementByNumber.get(num);
+                  {achievementDisplayOrder.map((achievementId) => {
+                    const isUnlocked = unlockedAchievementIds.has(achievementId);
+                    const meta = achievementById.get(achievementId);
+                    const imageFileName = meta?.image_small_url ?? `${achievementId}.png`;
 
                     const tooltipContent = (
                       <div className="flex flex-col gap-1 max-w-[200px] p-1">
                         <p className="font-semibold text-sm text-gray-900">
-                          {meta?.achievement_name ?? `Achievement #${num}`}
+                          {resolveAchievementName(meta, achievementId)}
                         </p>
-                        {meta?.achievement_description && (
+                        {resolveAchievementDescription(meta, achievementId) && (
                           <p className="text-xs text-gray-600 leading-tight">
-                            {meta.achievement_description}
+                            {resolveAchievementDescription(meta, achievementId)}
                           </p>
                         )}
                         <div className="flex items-center justify-between mt-1 gap-2">
@@ -1068,7 +1255,7 @@ export default function CampaignDetailsPage() {
                               isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
                             }`}
                           >
-                            {isUnlocked ? "Unlocked" : "Locked"}
+                            {isUnlocked ? unlockedLabel : lockedLabel}
                           </span>
                           {isUnlocked && meta?.employee_count != null && (
                             <span className="text-xs text-gray-500">
@@ -1080,7 +1267,7 @@ export default function CampaignDetailsPage() {
                     );
 
                     return (
-                      <Tooltip key={num} content={tooltipContent} placement="top">
+                      <Tooltip key={achievementId} content={tooltipContent} placement="top">
                         <div
                           aria-disabled={!isUnlocked}
                           className={`w-12 h-12 rounded-full flex items-center justify-center relative cursor-default ${
@@ -1088,9 +1275,9 @@ export default function CampaignDetailsPage() {
                           }`}
                         >
                           <img
-                            alt={meta?.achievement_name ?? `Achievement ${num}`}
+                            alt={meta?.achievement_name ?? `Achievement ${achievementId}`}
                             className="w-full h-full"
-                            src={`/awm/images/achivement/${num}.png`}
+                            src={`/awm/images/achivement/${imageFileName}`}
                           />
                         </div>
                       </Tooltip>
@@ -1098,10 +1285,13 @@ export default function CampaignDetailsPage() {
                   })}
                 </div>
                 <div className="mt-4 p-3 bg-white rounded-lg">
-                  <div className="text-xs text-gray-600 mb-1">Achievement Progress</div>
+                  <div className="text-xs text-gray-600 mb-1">{t("campaignReport.achievementProgress")}</div>
                   <div className="flex justify-between text-[10px] text-gray-500">
                     <span>
-                      {achievementUnlocked} / {achievementTotal} Achievements Unlocked
+                      {t("campaignReport.achievementsUnlockedProgress", {
+                        unlocked: achievementUnlocked,
+                        total: achievementTotal,
+                      })}
                     </span>
                     <span>{achievementPercent}%</span>
                   </div>
@@ -1118,9 +1308,6 @@ export default function CampaignDetailsPage() {
               <div className="col-span-6 row-span-2 row-start-2 bg-white rounded-xl p-4">
                 <div className="flex justify-between items-center">
                   <h2 className="text-base font-semibold">{t("gamification.employeeAvatarLevel")}</h2>
-                  <a className="text-blue-600 text-xs font-medium" href="#">
-                    View All
-                  </a>
                 </div>
 
                 <div className="mt-4 flex gap-6 items-start">
@@ -1130,25 +1317,17 @@ export default function CampaignDetailsPage() {
                       content={
                         <div className="flex flex-col gap-1 max-w-[200px] p-1">
                           <p className="font-semibold text-sm text-gray-900">
-                            Level {mainAvatar?.level_number ?? 1}
+                            {resolveAvatarName(mainAvatar)}
                           </p>
-                          <p className="text-xs text-gray-600 leading-tight">
-                            {mainAvatar?.level_name ?? "Vulnerable Newbie"}
-                          </p>
-                          <div className="flex items-center justify-between mt-1 gap-2">
-                            <span
-                              className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
-                                isMainAvatarUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                              }`}
-                            >
-                              {isMainAvatarUnlocked ? "Unlocked" : "Locked"}
-                            </span>
-                            {mainAvatar?.employee_count != null && (
-                              <span className="text-xs text-gray-500">
-                                {mainAvatar.employee_count}x
-                              </span>
-                            )}
-                          </div>
+                          <p className="text-xs text-gray-500">{formatUsersOnText(mainAvatar?.employee_count)}</p>
+                              <p className="text-xs text-gray-500">{levelLabel} {mainAvatar?.level_number ?? 1}</p>
+                          <span
+                            className={`w-fit text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                              isMainAvatarUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                            }`}
+                          >
+                                {isMainAvatarUnlocked ? unlockedLabel : lockedLabel}
+                          </span>
                         </div>
                       }
                       placement="top"
@@ -1165,7 +1344,7 @@ export default function CampaignDetailsPage() {
                       </div>
                     </Tooltip>
                     <p className="text-[12px] leading-tight text-gray-700 mt-4 w-full max-w-[120px] whitespace-normal break-keep text-center">
-                      {mainAvatar?.level_name ?? "Vulnerable Newbie"}
+                      {resolveAvatarName(mainAvatar)}
                     </p>
                   </div>
 
@@ -1176,7 +1355,6 @@ export default function CampaignDetailsPage() {
                   <div className="grid grid-cols-4 gap-6 flex-1">
                     {avatarStats
                       .filter((avatar) => avatar.level_number !== mainAvatar?.level_number)
-                      .slice(0, 8)
                       .map((avatar, idx) => {
                         const isUnlocked = (avatar.employee_count ?? 0) > 0;
                         const avatarImage = resolveAvatarImage(avatar);
@@ -1187,25 +1365,17 @@ export default function CampaignDetailsPage() {
                           content={
                             <div className="flex flex-col gap-1 max-w-[200px] p-1">
                               <p className="font-semibold text-sm text-gray-900">
-                                Level {avatar.level_number}
+                                {resolveAvatarName(avatar)}
                               </p>
-                              <p className="text-xs text-gray-600 leading-tight">
-                                {avatar.level_name}
-                              </p>
-                              <div className="flex items-center justify-between mt-1 gap-2">
-                                <span
-                                  className={`text-xs font-medium px-1.5 py-0.5 rounded-full ${
-                                    isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
-                                  }`}
-                                >
-                                  {isUnlocked ? "Unlocked" : "Locked"}
-                                </span>
-                                {avatar.employee_count != null && (
-                                  <span className="text-xs text-gray-500">
-                                    {avatar.employee_count}x
-                                  </span>
-                                )}
-                              </div>
+                              <p className="text-xs text-gray-500">{formatUsersOnText(avatar.employee_count)}</p>
+                              <p className="text-xs text-gray-500">{levelLabel} {avatar.level_number}</p>
+                              <span
+                                className={`w-fit text-xs font-medium px-1.5 py-0.5 rounded-full ${
+                                  isUnlocked ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"
+                                }`}
+                              >
+                                {isUnlocked ? unlockedLabel : lockedLabel}
+                              </span>
                             </div>
                           }
                           placement="top"
@@ -1227,7 +1397,7 @@ export default function CampaignDetailsPage() {
                                 isUnlocked ? "text-gray-700" : "text-gray-400"
                               }`}
                             >
-                              {avatar.level_name}
+                              {resolveAvatarName(avatar)}
                             </p>
                           </div>
                         </Tooltip>
@@ -1244,7 +1414,9 @@ export default function CampaignDetailsPage() {
             {/* High Risk Card */}
             <div className="bg-white rounded-2xl p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-red-600">Top 10 High-Risk Employees</h3>
+                <h3 className="text-sm font-semibold text-red-600">
+                  {t("campaignReport.top10HighRiskEmployees")}
+                </h3>
                 <Button
                   className="text-xs text-blue-600"
                   size="sm"
@@ -1255,7 +1427,7 @@ export default function CampaignDetailsPage() {
                     )
                   }
                 >
-                  View All
+                  {t("cards.viewAll")}
                 </Button>
               </div>
 
@@ -1264,15 +1436,15 @@ export default function CampaignDetailsPage() {
                   <table className="w-full text-xs">
                     <thead className="border-b border-gray-200">
                       <tr>
-                        <th className="text-left py-2 px-2 font-semibold text-gray-600">Name</th>
+                        <th className="text-left py-2 px-2 font-semibold text-gray-600">{t("campaignReport.name")}</th>
                         <th className="text-left py-2 px-2 font-semibold text-gray-600">
-                          Risk Level
+                          {t("campaignReport.tableRiskLevel")}
                         </th>
                         <th className="text-left py-2 px-2 font-semibold text-gray-600">
-                          Compliance
+                          {t("campaignReport.tableCompliance")}
                         </th>
                         <th className="text-left py-2 px-2 font-semibold text-gray-600">
-                          XP Tokens
+                          {t("campaignReport.tableXpTokens")}
                         </th>
                       </tr>
                     </thead>
@@ -1298,7 +1470,7 @@ export default function CampaignDetailsPage() {
                 </div>
               ) : (
                 <div className="text-center text-gray-400 text-xs py-8">
-                  No employee analytics data available
+                  {t("campaignReport.noEmployeeAnalytics")}
                 </div>
               )}
             </div>
@@ -1306,7 +1478,9 @@ export default function CampaignDetailsPage() {
             {/* Low Risk Card */}
             <div className="bg-white rounded-2xl p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-green-600">Top 10 Low Risk Employees</h3>
+                <h3 className="text-sm font-semibold text-green-600">
+                  {t("campaignReport.top10LowRiskEmployees")}
+                </h3>
                 <Button
                   className="text-xs text-blue-600"
                   size="sm"
@@ -1317,7 +1491,7 @@ export default function CampaignDetailsPage() {
                     )
                   }
                 >
-                  View All
+                  {t("cards.viewAll")}
                 </Button>
               </div>
 
@@ -1326,15 +1500,15 @@ export default function CampaignDetailsPage() {
                   <table className="w-full text-xs">
                     <thead className="border-b border-gray-200">
                       <tr>
-                        <th className="text-left py-2 px-2 font-semibold text-gray-600">Name</th>
+                        <th className="text-left py-2 px-2 font-semibold text-gray-600">{t("campaignReport.name")}</th>
                         <th className="text-left py-2 px-2 font-semibold text-gray-600">
-                          Risk Level
+                          {t("campaignReport.tableRiskLevel")}
                         </th>
                         <th className="text-left py-2 px-2 font-semibold text-gray-600">
-                          Compliance
+                          {t("campaignReport.tableCompliance")}
                         </th>
                         <th className="text-left py-2 px-2 font-semibold text-gray-600">
-                          XP Tokens
+                          {t("campaignReport.tableXpTokens")}
                         </th>
                       </tr>
                     </thead>
@@ -1360,7 +1534,7 @@ export default function CampaignDetailsPage() {
                 </div>
               ) : (
                 <div className="text-center text-gray-400 text-xs py-8">
-                  No employee analytics data available
+                  {t("campaignReport.noEmployeeAnalytics")}
                 </div>
               )}
             </div>

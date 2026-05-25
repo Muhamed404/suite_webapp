@@ -4,6 +4,8 @@ const enums = require("../../../contants/enum");
 const he = require('he');
 const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
+const { injectPhishingFormWebAction, interactionScript } = require("../../../utility/helperFunctions");
+const { redactLogData } = require("../../utility/redact");
 
 exports.renderCreateTemplate = async (req, res) => {
   logger.info('Controller - Create Template: Incoming GET request in renderCreateTemplate');
@@ -35,7 +37,7 @@ exports.renderCreateTemplate = async (req, res) => {
       fileTypes,
       campaignTypes: filteredData,
       phishTypeMap: enums.phishingType,
-
+      webTemplateBucket: process.env.WEB_TEMPLATE_BUCKET,
     });
     logger.info('Controller - Create Template: Rendered create_template page successfully');
   } catch (error) {
@@ -58,9 +60,9 @@ exports.createTemplate = async (req, res) => {
   // Build immutable payload from request body
   const payload = { ...req.body };
 
-  logger.info(`Create System Template: Initial payload from request body: ${JSON.stringify(payload, null, 2)}`);
+  logger.info(`Create System Template: Initial payload from request body: ${JSON.stringify(redactLogData(payload), null, 2)}`);
 
-  logger.info(`[Create System Template] Raw posted data: ${JSON.stringify(req.body, null, 2)}`);
+  logger.info(`[Create System Template] Raw posted data: ${JSON.stringify(redactLogData(req.body), null, 2)}`);
 
   try {
     try {
@@ -130,6 +132,12 @@ exports.createTemplate = async (req, res) => {
       }
     });
 
+    // Normalize relative image paths in phishing_content to <%=web_bucket%> placeholder
+    payload.phishing_content = normalizeImageBucketRefs(payload.phishing_content);
+
+    // Replace placeholder/empty anchor hrefs with <%=phishing_url%>
+    // payload.phishing_content = normalizeAnchorPhishingUrl(payload.phishing_content);
+
     // Optionally inject interaction script for DataEntryBasedPhishing when creating a new template
     if (
       payload.phishing_page_content &&
@@ -137,8 +145,6 @@ exports.createTemplate = async (req, res) => {
       payload.category == enums.phishingCategories.DataEntryBasedPhishing
     ) {
       logger.info('[Create System Template] Adding interaction script to phishing_page_content');
-      const scriptStart = '<script>';
-      const scriptEnd = '</script>';
       const newScript = interactionScript();
 
       // Remove any existing interactionScript
@@ -147,14 +153,19 @@ exports.createTemplate = async (req, res) => {
       if (scriptRegex.test(content)) {
         content = content.replace(scriptRegex, '');
       }
+
+      // Inject phishing_url_submit into every <form> action automatically
+      content = injectPhishingFormWebAction(content);
+      logger.info('[Create System Template] Injected phishing_url_submit into form action(s)');
+
       payload.phishing_page_content = content + newScript;
     }
     if (payload.phishType === enums.phishingType.SMS) {
       payload.phishing_content = payload.sms_content;
       delete payload.sms_content;
       logger.info('[Create System Template] Mapped sms_content to phishing_content for SMS phishType');
-    }else if(payload.phishType === enums.phishingType.Email){
-      
+    } else if (payload.phishType === enums.phishingType.Email) {
+
       const rawSmtpId = req.body.phishing_smtp;
       payload.phishing_smtp_id = rawSmtpId !== '' && rawSmtpId != null ? parseInt(rawSmtpId, 10) : null;
       logger.info(`[Create System Template] Set phishing_smtp_id to ${payload.phishing_smtp_id} for Email phishType`);
@@ -165,11 +176,11 @@ exports.createTemplate = async (req, res) => {
     const apiClient = getApiClient(req);
     const url = backend_api_urls.PRODUCT_SUITE.Template.PHM_CREATE;
     logger.info(`[Create System Template] Posting template to URL: ${url}`);
-    logger.info(`[Create System Template] Final payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`[Create System Template] Final payload: ${JSON.stringify(redactLogData(payload), null, 2)}`);
 
 
     const response = await apiClient.post(url, payload);
-    logger.info(`[Create System Template] Backend response: ${JSON.stringify(response.data)}`);
+    logger.info(`[Create System Template] Backend response: ${JSON.stringify(redactLogData(response.data))}`);
 
     // Handle backend response envelope
     req.flash('message', req.__('system_template.create.successMessage'));
@@ -179,11 +190,11 @@ exports.createTemplate = async (req, res) => {
   } catch (error) {
     logger.error('[Create System Template] Error:', error);
     logger.error(error.stack);
-    
+
     if (error.response && error.response.status === 403) {
       const errorMessage = error.response.data?.message || 'Access Denied';
       logger.warn(`[Create System Template] Access denied: ${errorMessage}`);
-      
+
       if (errorMessage.toLowerCase().includes('subscription')) {
         if (req.session) {
           req.flash('message', 'You do not have an active subscription to create templates.');
@@ -192,7 +203,7 @@ exports.createTemplate = async (req, res) => {
         return res.redirect(`${frontend_api_urls.PHISHMAGNUS.Home.INDEX}`);
       }
     }
-    
+
     if (req.session) {
       req.flash('message', req.__('system_template.create.errorMessage'));
       req.flash('alertType', 'error');
@@ -203,57 +214,25 @@ exports.createTemplate = async (req, res) => {
 };
 
 
-function interactionScript() {
-  const script = `
-  <script>
-    (function() {
+// function normalizeAnchorPhishingUrl(content) {
+//   if (!content) return content;
 
-      const TRACK_URL = "<%- phishing_url %>";
-  let interactionSent = false; // <-- ensures firing only once
+//   if (!/<a[\s>]/i.test(content)) return content;
 
-  function sendInteraction(data) {
-    if (interactionSent) return; // stop duplicates
-    interactionSent = true;
+//   // Replace href="{{website_url}}" or href="#" with href="<%=phishing_url%>"
+//   return content
+//     .replace(/(<a\b[^>]*\bhref=["'])\{\{website_url\}\}(["'])/gi, '$1<%=phishing_url%>$2')
+//     .replace(/(<a\b[^>]*\bhref=["'])#(["'])/gi, '$1<%=phishing_url%>$2');
+// }
 
-    fetch(TRACK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        timestamp: new Date().toISOString(),
-        pageUrl: window.location.href,
-        ...data
-      })
-    }).catch(err => console.error("Tracking Error:", err));
-  }
+function normalizeImageBucketRefs(content) {
+  if (!content) return content;
 
-  // Detect first typing on ANY input, textarea, or content-editable
-  function handleTyping() {
-    sendInteraction({
-      eventType: "typing_start"
-    });
+  const bucket = process.env.WEB_TEMPLATE_BUCKET || '';
+  if (!bucket) return content;
 
-    // Remove listeners after first trigger
-    document.removeEventListener("keydown", handleTyping);
-    document.removeEventListener("input", handleTyping);
-  }
+  if (content.indexOf(bucket) === -1) return content;
 
-  // Detect first copy attempt
-  function handleCopy() {
-    sendInteraction({
-      eventType: "copy_attempt"
-    });
-
-    document.removeEventListener("copy", handleCopy);
-  }
-
-  // Add listeners
-  document.addEventListener("keydown", handleTyping);
-  document.addEventListener("input", handleTyping);
-  document.addEventListener("copy", handleCopy);
-})();
-  </script>
-  `;
-
-  logger.info("[Create System Template] interactionScript created");
-  return script;
+  return content.split(bucket).join('<%=web_bucket%>');
 }
+

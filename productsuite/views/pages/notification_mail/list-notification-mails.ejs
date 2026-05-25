@@ -1,0 +1,190 @@
+<%
+  const isRtl = typeof locale === 'string' && locale.toLowerCase().startsWith('ar');
+%>
+<div class="flex flex-col px-6 pt-6 pb-3">
+  <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+    <div>
+      <nav class="flex items-center text-xs text-gray-400 gap-1.5 mb-1.5" aria-label="Breadcrumb">
+        <a href="/home" class="hover:text-gray-600 transition"><%= __("breadcrumbs.home") %></a>
+        <span>›</span>
+        <span class="text-gray-600 font-medium"><%= __("notification_mail.breadcrumb") %></span>
+      </nav>
+      <h3 class="text-xl font-semibold text-gray-900 leading-tight"><%= __("notification_mail.title") %></h3>
+      <p class="text-xs text-gray-400 mt-0.5"><%= __("notification_mail.subtitle") %></p>
+    </div>
+
+    <!-- Inline filters -->
+    <form method="GET" action="/notification-mail" class="flex flex-wrap items-center gap-2">
+      <select name="status"
+        class="px-3 py-1.5 rounded-lg text-xs border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--teal)] w-32">
+        <option value=""><%= __("notification_mail.filters.all_statuses") %></option>
+        <% ['PENDING','PROCESSING','SENT','REJECTED','FAILED'].forEach(function(s) { %>
+          <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= __("notification_mail.status." + s.toLowerCase()) %></option>
+        <% }); %>
+      </select>
+
+      <input type="text" name="notification_type" value="<%= filters.notificationType %>"
+        placeholder="<%= __("notification_mail.filters.type_placeholder") %>"
+        class="px-3 py-1.5 rounded-lg text-xs border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--teal)] w-44">
+
+      <input type="hidden" name="pageSize" value="<%= pagination.pageSize %>">
+
+      <button type="submit"
+        class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--teal)] text-white hover:opacity-90 transition">
+        <%= __("notification_mail.filters.apply") %>
+      </button>
+      <a href="/notification-mail"
+        class="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+        <%= __("notification_mail.filters.clear") %>
+      </a>
+    </form>
+  </div>
+</div>
+
+<div class="px-6 pb-6">
+
+  <!-- Table card -->
+  <div class="overflow-x-auto bg-white border border-gray-200 rounded-xl shadow-sm hide-scrollbar">
+    <table class="min-w-full text-xs text-left">
+      <thead>
+        <tr class="border-b border-gray-200 bg-gray-50">
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap w-8">#</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("notification_mail.columns.recipient") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("notification_mail.columns.type") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("notification_mail.columns.priority") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("notification_mail.columns.status") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap text-center"><%= __("notification_mail.columns.retries") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("notification_mail.columns.queued_at") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("notification_mail.columns.sent_at") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("notification_mail.columns.error") %></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <% if (!mails || mails.length === 0) { %>
+          <tr>
+            <td colspan="9" class="px-4 py-10 text-center text-gray-400 text-xs"><%= __("notification_mail.messages.no_mails_found") %></td>
+          </tr>
+        <% } else { %>
+          <% mails.forEach(function(mail, index) { %>
+            <tr class="hover:bg-gray-50/70 transition-colors">
+
+              <td class="px-4 py-2.5 text-gray-400 tabular-nums">
+                <%= ((pagination.currentPage - 1) * pagination.pageSize) + index + 1 %>
+              </td>
+
+              <td class="px-4 py-2.5 whitespace-nowrap">
+                <div class="font-medium text-gray-800 text-xs"><%= mail.to_email %></div>
+                <% if (mail.to_name) { %>
+                  <div class="text-gray-400 text-[11px] leading-tight mt-0.5"><%= mail.to_name %></div>
+                <% } %>
+              </td>
+
+              <td class="px-4 py-2.5 whitespace-nowrap">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wide bg-blue-50 text-blue-600 border border-blue-100">
+                  <%= mail.notification_type %>
+                </span>
+              </td>
+
+              <td class="px-4 py-2.5 whitespace-nowrap">
+                <% if (mail.priority === 'HIGH') { %>
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-red-500">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span><%= __("notification_mail.priority.high") %>
+                  </span>
+                <% } else if (mail.priority === 'LOW') { %>
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-gray-400">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-300 inline-block"></span><%= __("notification_mail.priority.low") %>
+                  </span>
+                <% } else { %>
+                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-yellow-600">
+                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-400 inline-block"></span><%= __("notification_mail.priority.normal") %>
+                  </span>
+                <% } %>
+              </td>
+
+              <td class="px-4 py-2.5 whitespace-nowrap">
+                <% if (mail.status === 'SENT') { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-emerald-50 text-emerald-600 border border-emerald-100 uppercase"><%= __("notification_mail.status.sent") %></span>
+                <% } else if (mail.status === 'PENDING') { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-amber-50 text-amber-600 border border-amber-100 uppercase"><%= __("notification_mail.status.pending") %></span>
+                <% } else if (mail.status === 'PROCESSING') { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-blue-50 text-blue-600 border border-blue-100 uppercase"><%= __("notification_mail.status.processing") %></span>
+                <% } else if (mail.status === 'REJECTED') { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-red-50 text-red-600 border border-red-100 uppercase"><%= __("notification_mail.status.rejected") %></span>
+                <% } else if (mail.status === 'FAILED') { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-rose-50 text-rose-700 border border-rose-100 uppercase"><%= __("notification_mail.status.failed") %></span>
+                <% } else { %>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide bg-gray-100 text-gray-500 border border-gray-200 uppercase"><%= mail.status %></span>
+                <% } %>
+              </td>
+
+              <td class="px-4 py-2.5 text-center text-gray-600 tabular-nums">
+                <span class="<%= mail.retry_count > 0 ? 'text-orange-500 font-semibold' : 'text-gray-400' %>">
+                  <%= mail.retry_count %>
+                </span>
+                <span class="text-gray-300">/3</span>
+              </td>
+
+              <td class="px-4 py-2.5 text-gray-400 whitespace-nowrap tabular-nums">
+                <%= mail.created_at ? new Date(mail.created_at).toLocaleString() : '—' %>
+              </td>
+
+              <td class="px-4 py-2.5 text-gray-400 whitespace-nowrap tabular-nums">
+                <%= mail.sent_at ? new Date(mail.sent_at).toLocaleString() : '—' %>
+              </td>
+
+              <td class="px-4 py-2.5 max-w-[180px]">
+                <% if (mail.error_message) { %>
+                  <span class="block truncate text-red-400 cursor-pointer error-tooltip-trigger"
+                    data-msg="<%= mail.error_message %>">
+                    <%= mail.error_message %>
+                  </span>
+                <% } else { %>
+                  <span class="text-gray-300">—</span>
+                <% } %>
+              </td>
+
+            </tr>
+          <% }); %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <% if (pagination.totalPages > 1) { %>
+    <div class="flex items-center justify-between px-1 pt-3">
+      <span class="text-xs text-gray-400">
+        <%= __("generic_label.page") %> <span class="font-medium text-gray-600"><%= pagination.currentPage %></span> <%= __("generic_label.of") %> <%= pagination.totalPages %>
+        &nbsp;·&nbsp; <span class="font-medium text-gray-600"><%= pagination.totalCount %></span> <%= __("notification_mail.pagination.records") %>
+      </span>
+      <div class="flex gap-1.5">
+        <% if (pagination.hasPreviousPage) { %>
+          <a href="?page=<%= pagination.previousPage %>&pageSize=<%= pagination.pageSize %>&status=<%= filters.status %>&notification_type=<%= filters.notificationType %>"
+            class="px-3 py-1.5 text-xs rounded-lg font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
+            <%= isRtl ? '→' : '←' %> <%= __("generic_label.previous") %>
+          </a>
+        <% } %>
+        <% if (pagination.hasNextPage) { %>
+          <a href="?page=<%= pagination.nextPage %>&pageSize=<%= pagination.pageSize %>&status=<%= filters.status %>&notification_type=<%= filters.notificationType %>"
+            class="px-3 py-1.5 text-xs rounded-lg font-medium bg-[var(--teal)] text-white hover:opacity-90 transition">
+            <%= __("generic_label.next") %> <%= isRtl ? '←' : '→' %>
+          </a>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+</div>
+
+<!-- Error message floating tooltip -->
+<div id="error-tooltip"
+  style="display:none;position:fixed;z-index:9999;max-width:320px;pointer-events:none;"
+  class="bg-gray-900 text-white text-xs rounded-lg px-3 py-2.5 shadow-2xl leading-relaxed break-words border border-gray-700">
+  <div class="flex items-start gap-2">
+    <svg class="w-3 h-3 mt-0.5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+    </svg>
+    <span id="error-tooltip-text"></span>
+  </div>
+</div>
+<script src="/securemagnus_2025/js/custom_script/notification-mail-error-tooltip.js"></script>

@@ -9,6 +9,7 @@
 		"view": "View",
 		"Finish": "Finish",
 		"create": "Create",
+		"update": "Update",
 		"download": "Download",
 		"active": "Active",
 		"inactive": "Inactive",
@@ -39,6 +40,7 @@
 		"error_creating_nfc_campaign": "Error creating NFC campaign",
 		"success": "Success",
 		"service_deleted_successfully": "Service deleted successfully!",
+		"app_service_deleted_successfully": "App service deleted successfully!",
 		"service_registered_successfully": "Service registered successfully!",
 		"invalid_request_parameters": "Invalid request parameters",
 		"service_registry_deletion_failed": "Service registry deletion failed",
@@ -85,6 +87,11 @@
 		"type_your_message_here": "Type your message here...",
 		"templateName": "Template Name",
 		"login": "Login",
+		"invalid_credentials": "Invalid credentials.",
+		"user_not_found": "User not found or inactive.",
+		"no_access_permissions": "User has no access permissions.",
+		"no_portal_access": "User has no portal access.",
+		"unexpected_error": "An unexpected error occurred. Please try again.",
 		"welcomeToSecureMagnus": "Welcome to SecureMagnus",
 		"welcomeToPhishMagnus": "Welcome to PhishMagnus",
 		"welcomeToAwareMagnus": "Welcome to AwareMagnus",
@@ -106,7 +113,13 @@
 		"emailOpened": "Track email opened",
 		"fileDownloaded": "Download",
 		"qrScanned": "Scanned",
-		"select": "Select"
+		"select": "Select",
+		"sr_no": "Sr. No",
+		"rows_per_page": "generic_label.rows_per_page",
+		"no_data_found": "No data found"
+	},
+	"messages": {
+		"confirmSubmit": "Are you sure you want to submit this campaign? This action cannot be undone."
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -184,7 +197,10 @@
 		"password_maxlength": "Password cannot exceed 255 characters"
 	},
 	"success_messages": {
-		"smtp_configured_successfully": "SMTP Configured Successfully"
+		"smtp_configured_successfully": "SMTP Configured Successfully",
+		"smtp_configured_fully": "SMTP configured fully",
+		"file_uploading_in_process": "File uploading is in process.",
+		"group_created_successfully": "Group created successfully"
 	},
 	"topnavbar": {
 		"welcome": "Welcome",
@@ -194,6 +210,10 @@
 		"dashboard": "Dashboard",
 		"campaigns": "Campaigns",
 		"reports": "Reports",
+		"subscriptionHistory": "Subscription History",
+		"groups": "Groups",
+		"department": "Department",
+		"bulkImportUsers": "Bulk Import Users",
 		"organizations": "Organizations",
 		"packages": "Packages",
 		"users": "Users",
@@ -201,7 +221,11 @@
 		"systemTemplate": "System Template",
 		"phishingSmtp": "Phishing SMTP",
 		"createPackage": "Create Package",
-		"simulatorEmails": "Simulator Emails"
+		"simulatorEmails": "Simulator Emails",
+		"smtpNotifications": "SMTP Notifications",
+		"notificationTemplates": "Notification Templates",
+		"createNotificationTemplate": "Create Notification Template",
+		"noModulesFound": "No modules found"
 	},
 	"breadcrumbs": {
 		"home": "Home",
@@ -336,7 +360,10 @@
 			"products": "Products",
 			"logout": "Logout",
 			"smtpNotifications": "SMTP Notifications",
-			"notificationTemplates": "Notification Templates"
+			"notificationTemplates": "Notification Templates",
+			"notificationMailLog": "Notification Mail Log",
+			"bulkImportJobs": "Bulk import jobs",
+			"mfaMailLog": "MFA Notification Mail Log"
 		}
 	},
 	"org_domain": {
@@ -372,7 +399,20 @@
 		"delete_modal_title": "Delete Domain",
 		"delete_modal_subtitle": "This action cannot be undone.",
 		"confirm_delete": "Are you sure you want to delete the domain:",
-		"modal_edit_title": "Edit Domain"
+		"modal_edit_title": "Edit Domain",
+		"create_success": "Domain added successfully.",
+		"create_error": "Failed to add domain.",
+		"update_success": "Domain updated successfully.",
+		"update_error": "Failed to update domain.",
+		"delete_success": "Domain deleted successfully.",
+		"delete_error": "Failed to delete domain.",
+		"enable_success": "Domain enabled successfully.",
+		"disable_success": "Domain disabled successfully.",
+		"status_update_error": "Failed to update domain status.",
+		"restrict_enable_success": "Domain restriction enabled.",
+		"restrict_disable_success": "Domain restriction disabled.",
+		"restrict_update_error": "Failed to update domain restriction.",
+		"not_authorized": "Not Authorized."
 	},
 	"organization": {
 		"homescreen": {
@@ -408,7 +448,10 @@
 			"validationOrgNameRequired": "Organization name is required.",
 			"validationOrgAddressRequired": "Address is required.",
 			"validationOrgPostalCodeRequired": "Postal code is required and must be digits.",
-			"validationOrgContactRequired": "Contact number is required and must be digits.",
+			"validationOrgContactRequired": "Contact number is required.",
+			"validationOrgContactDigits": "Contact number must contain digits only.",
+			"validationOrgContactMinLength": "Contact number must be at least 7 digits.",
+			"validationOrgContactMaxLength": "Contact number must not exceed 15 digits.",
 			"validationOrgCountryRequired": "Country is required.",
 			"validationOrgStateRequired": "State is required.",
 			"validationOrgCityRequired": "City is required.",
@@ -488,7 +531,9 @@
 			"labelAdminFirstName": "First Name",
 			"labelAdminLastName": "Last Name",
 			"labelAdminPassword": "Password",
-			"mandatory": "(*) Mandatory"
+			"mandatory": "(*) Mandatory",
+			"successMessage": "Organization has updated",
+			"errorMessage": "Error updating organization"
 		}
 	},
 	"package": {
@@ -732,7 +777,8 @@
 			"labelTotalUsers": "Total Users",
 			"labelDiscount": "Discount",
 			"labelTotalCost": "Total Cost",
-			"optionSelectAdminUser": "Select Admin User"
+			"optionSelectAdminUser": "Select Admin User",
+			"successCreated": "Subscription created successfully"
 		}
 	},
 	"smtp": {
@@ -745,6 +791,7 @@
 		"btnTestConfiguration": "Test Configuration",
 		"btnSaveSettings": "Save Settings",
 		"labelSenderEmail": "Sender Email",
+		"labelSenderDisplayName": "Sender Display Name",
 		"labelDetails": "Details",
 		"enableStartTLS": "Enable STARTTLS",
 		"enableStartTLSDesc": "Use STARTTLS to upgrade a plain connection to secure.",
@@ -758,7 +805,9 @@
 		"selectOrganization": "Select Organization",
 		"default": "Default",
 		"enabled": "Enabled",
-		"disabled": "Disabled"
+		"disabled": "Disabled",
+		"isAuthenticated": "Is Authenticated",
+		"isAuthenticatedDesc": "Mark this SMTP configuration as authenticated and verified."
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "Secmagnus User Management",
@@ -807,6 +856,53 @@
 		"validationEmailRequired": "Please enter a valid email address with full domain (e.g., user@example.com).",
 		"validationPasswordRequired": "Password must be at least 8 characters and include uppercase, lowercase, number, and special character.",
 		"labelBulkUploadUsers": "Bulk Upload Users",
+		"labelBulkImportJobs": "Bulk import jobs",
+		"bulkImportJobsSubtitle": "Recent CSV import jobs for this organization. Rows refresh automatically while a job is pending or processing.",
+		"bulkImportViewJobHistory": "View bulk import job history",
+		"bulkImportQueuedShort": "Your file was queued for import. Track progress below.",
+		"bulkImportSelectOrganization": "Choose an organization first, then open bulk import jobs from that organization’s user list.",
+		"bulkImportInvalidOrganization": "Your account is not linked to a valid organization for this page.",
+		"bulkImportJobsLoadError": "Could not load bulk import jobs. Try again later.",
+		"bulkImportRefresh": "Refresh",
+		"bulkImportColId": "Job",
+		"bulkImportColCreatedBy": "Created by (user id)",
+		"bulkImportColSkippedJson": "Skipped (JSON)",
+		"bulkImportColResultJson": "Result (JSON)",
+		"bulkImportColFile": "File",
+		"bulkImportColProduct": "Product",
+		"bulkImportColStatus": "Status",
+		"bulkImportColInserted": "Inserted",
+		"bulkImportColStarted": "Started",
+		"bulkImportColCompleted": "Completed",
+		"bulkImportColError": "Error",
+		"bulkImportNoJobs": "No bulk import jobs yet.",
+		"bulkImportTotalListed": "Jobs shown",
+		"bulkImportAutoRefreshNote": "While any job is pending or processing, this page reloads every 10 seconds.",
+		"btnBulkImportJobs": "Import jobs",
+		"inviteUserSelectionLabel": "User selection",
+		"inviteUserSelectionIndividual": "Individual users",
+		"inviteUserSelectionAll": "Select all users",
+		"inviteModeLabel": "Invite mode",
+		"inviteModePlaceholder": "Select invite action",
+		"inviteModeInviteOnly": "Send invitation only",
+		"inviteModeInviteWithCredentials": "Send credential with invite",
+		"inviteModeEligibilityHint": "When sending credentials, users with only active PhishMagnus license are skipped.",
+		"inviteSubmitButton": "Submit",
+		"inviteSelectAllVisibleTitle": "Select all visible users",
+		"inviteSelectUserAriaPrefix": "Select user",
+		"inviteModeRequiredError": "Please select an invite mode.",
+		"inviteUsersRequiredError": "Please select at least one user.",
+		"inviteSubmitSuccess": "Invite request submitted successfully.",
+		"inviteSubmitFailed": "Failed to submit invite request.",
+		"suiteUsersSearchLabel": "Search",
+		"suiteUsersPageSizeLabel": "Page Size",
+		"suiteUsersSearchSubmit": "Submit",
+		"suiteUsersClearSearch": "Clear",
+		"suiteUsersPrev": "Previous",
+		"suiteUsersNext": "Next",
+		"suiteUsersTotal": "{total} users total",
+		"suiteUsersPerPage": "per page",
+		"suiteUsersShowing": "Showing {start}–{end} of {total}",
 		"stepChooseProduct": "Choose Product",
 		"stepChooseFile": "Choose File",
 		"labelChooseTheProduct": "Choose the Product",
@@ -930,6 +1026,8 @@
 			"labelLandingPage_Title": "Landing Page Settings",
 			"labelLandingPage_radioOption1": "Import Custom Landing Page",
 			"labelLandingPage_radioOption2": "I like to redirect the user to a custom landing page",
+			"labelLandingPage_redirectToCustomWebPage": "I would like to set a custom landing page URL for redirection.",
+			"labelLandingPage_redirectUrl": "Redirect URL",
 			"labelLanguage": "Language",
 			"labelImportHtmlUrl": "Import Landing Page From An External URL",
 			"successMessage": "Created successfully",
@@ -1023,9 +1121,11 @@
 		"email_create_campaign": {
 			"title": "Create Email Campaign",
 			"email_content": "Email Content",
-			"landing_page": "Landing Page",
-			"redirect_page": "Redirect Page",
+			"landing_page": "Redirect Page",
+			"redirect_page": "Phishing Page",
 			"attachment": "Attachment",
+			"external_landing_page_url": "External landing page URL:",
+			"open_preview": "Open Preview",
 			"template_tracking_description": "system_template.create.labelTrackingDescription",
 			"tracking_items": {
 				"email_opened": "campaign.email_campaign_detail.labelEmailOpen",
@@ -1122,7 +1222,15 @@
 		"enterDepartmentName": "Enter Department Name",
 		"enterDescription": "Enter Description",
 		"departmentNameRequired": "Department name is required.",
-		"descriptionRequired": "Description is required (min 5 characters)."
+		"descriptionRequired": "Description is required (min 5 characters).",
+		"delete_confirm_title": "Delete Department",
+		"delete_confirm_message": "Are you sure you want to delete this department?",
+		"btn_cancel": "Cancel",
+		"btn_delete": "Delete",
+		"action_delete": "Delete Department",
+		"group_deleted_successfully": "Department deleted successfully",
+		"department_deleted_successfully": "Department deleted successfully",
+		"delete_error": "Failed to delete department. Please try again."
 	},
 	"group": {
 		"labelGroupManagement": "Group Management",
@@ -1143,7 +1251,15 @@
 		"done": "Done",
 		"viewDetails": "View Details",
 		"noEnrolledUsers": "No enrolled users",
-		"noUnenrolledUsers": "No unenrolled users"
+		"noUnenrolledUsers": "No unenrolled users",
+		"delete_confirm_title": "Delete Group",
+		"delete_confirm_message": "Are you sure you want to delete this group?",
+		"btn_cancel": "Cancel",
+		"btn_delete": "Delete",
+		"action_delete": "Delete Group",
+		"group_deleted_successfully": "Group deleted successfully",
+		"delete_error": "Failed to delete group. Please try again.",
+		"labelActions": "Actions"
 	},
 	"sms": {
 		"settings": {
@@ -1162,6 +1278,9 @@
 			"api_key_minlength": "Please enter at least 8 characters.",
 			"create_success": "SMS Configuration created successfully.",
 			"create_failed": "SMS creation failed.",
+			"edit_description": "Update your SMS provider configuration.",
+			"update_success": "SMS configuration updated successfully.",
+			"update_failed": "Failed to update SMS configuration.",
 			"create_description": "Description"
 		},
 		"create_campaign": {
@@ -1364,7 +1483,8 @@
 			"opened": "Opened",
 			"no_interaction": "No Interaction",
 			"no_invitees": "No invitee responses yet",
-			"invalid_id": "Invalid campaign ID"
+			"invalid_id": "Invalid campaign ID",
+			"invitee_email": "Invitee Email"
 		}
 	},
 	"qr_campaign": {
@@ -1411,8 +1531,10 @@
 		"viewReport": "View Report",
 		"searchHere": "Search here...",
 		"sortBy": "Sort by",
+		"showingResults": "Showing {start} to {end} of {total} results",
 		"prevPage": "Previous",
 		"nextPage": "Next",
+		"noRecords": "No records found",
 		"interactionReportByEachQRCode": "Interaction Report By Each QR Code",
 		"downloadQRCode": "Download QR Code",
 		"tagScan": "Tag Scan",
@@ -1454,7 +1576,7 @@
 		"interactForm": "Interact Form",
 		"formSubmitted": "Form Submitted",
 		"attachmentOpened": "Attachment Opened",
-		"interactionReport": "Interaction report",
+		"interactionReport": "Interaction Report",
 		"tagNumber": "Tag Number",
 		"nfcCode": "NFC Code",
 		"copyUrl": "Copy URL",
@@ -1577,7 +1699,17 @@
 		"searchPlaceholder": "Search here...",
 		"subtitle": "Track all user actions and system events.",
 		"rowsPerPage": "Rows per page",
-		"noLogs": "No audit logs found"
+		"noLogs": "No audit logs found",
+		"paginationText": "Showing {from}–{to} of {total}",
+		"actions": {
+			"CREATE": "Create",
+			"UPDATE": "Update",
+			"DELETE": "Delete",
+			"UPLOAD": "Upload",
+			"LOGIN": "Login",
+			"LOGOUT": "Logout",
+			"VIEW": "View"
+		}
 	},
 	"CS-List": "Cybersecurity Categories",
 	"btn-CS-LibPosters-Upload-Document": "Upload Document",
@@ -1710,7 +1842,12 @@
 		"sms_content": "template.sms_content",
 		"sms_message": "template.sms_message",
 		"sms_placeholder": "template.sms_placeholder",
-		"tracking_header": "This template will allow you to track the following items:"
+		"tracking_header": "This template will allow you to track the following items:",
+		"tracking_email_message_opened": "Track email/message opened",
+		"tracking_link_clicked": "Track phishing simulation link clicked",
+		"tracking_file_downloaded": "Track phishing simulation file downloaded (from email/message or landing page)",
+		"tracking_form_submitted": "Track data submitted through the phishing simulation form",
+		"tracking_form_interaction": "Track user interaction with the phishing simulation form"
 	},
 	"common": {
 		"search_here": "common.search_here",
@@ -2027,5 +2164,44 @@
 		"loginPlaceholder": "Enter 6-digit code",
 		"loginBtn": "Verify & Continue",
 		"loginBack": "Back to Login"
+	},
+	"notification_mail": {
+		"breadcrumb": "Notification Mail Log",
+		"title": "Notification Mail Log",
+		"subtitle": "Outbound email dispatch history and delivery status.",
+		"filters": {
+			"all_statuses": "All Statuses",
+			"type_placeholder": "Notification type...",
+			"apply": "Apply",
+			"clear": "Clear"
+		},
+		"columns": {
+			"recipient": "Recipient",
+			"type": "Type",
+			"priority": "Priority",
+			"status": "Status",
+			"retries": "Retries",
+			"queued_at": "Queued At",
+			"sent_at": "Sent At",
+			"error": "Error"
+		},
+		"messages": {
+			"no_mails_found": "No notification mails found."
+		},
+		"status": {
+			"pending": "PENDING",
+			"processing": "PROCESSING",
+			"sent": "SENT",
+			"rejected": "REJECTED",
+			"failed": "FAILED"
+		},
+		"priority": {
+			"high": "HIGH",
+			"low": "LOW",
+			"normal": "NORMAL"
+		},
+		"pagination": {
+			"records": "records"
+		}
 	}
 }

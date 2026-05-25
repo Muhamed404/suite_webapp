@@ -41,11 +41,13 @@ exports.createSMTP = async (req, res) => {
             isActive: smtp.is_active ? true : false,
             enableTestBtn: smtp.id ? true : false,
             sender_email: smtp.sender_email,
+            sender_display_name: smtp.sender_display_name || '',
             use_tls: smtp.use_tls,
             use_ssl: smtp.use_ssl,
             for_phishing_smtp: smtp.for_phishing_smtp,
             encrypt_password: smtp.is_encrypted ? true : false,
-            enable_mfa: smtp.enable_mfa ? true : false
+            enable_mfa: smtp.enable_mfa ? true : false,
+            is_authenticated: smtp.is_authenticated ? true : false
           });
         } else {
           logger.info(`[Create Organization SMTP] No Existing SMTP for Org ${orgId}`);
@@ -72,7 +74,7 @@ exports.createSMTP = async (req, res) => {
       });
   } else {
     logger.info(`[Create Organization SMTP] POST: Incoming Request`);
-    const { host, port, smtp_account, smtp_password, sender_email, use_tls, use_ssl, encrypt_password = true, enable_mfa } = req.body;
+    const { host, port, smtp_account, smtp_password, sender_email, sender_display_name, use_tls, use_ssl, encrypt_password = true, enable_mfa, is_authenticated } = req.body;
     logger.debug(`[Create Organization SMTP] POST: Incoming hostname ${JSON.stringify(req.body.host, null, 2)}`);
     let orgId = Number(req.params.orgId);
     const smtpObj = {
@@ -81,11 +83,13 @@ exports.createSMTP = async (req, res) => {
       smtp_account,
       smtp_password,
       sender_email,
+      sender_display_name: sender_display_name || null,
       use_tls: use_tls === 'true',
       use_ssl: use_ssl === 'true',
       organization_id: orgId,
       is_encrypted: encrypt_password === 'true',
       enable_mfa: enable_mfa === 'true',
+      is_authenticated: is_authenticated === 'true',
       is_active: true
     };
     const apiClient = getApiClient(req);
@@ -98,7 +102,7 @@ exports.createSMTP = async (req, res) => {
         
         if (data.alertType) {
           logger.info(`[Create Organization SMTP] POST: Organization ${orgId} SMTP Account created`)
-          req.flash('message', data.message);
+          req.flash('message', 'SMTP configured fully');
           req.flash('alertType', data.alertType);
           if (orgId === 0) {
             res.redirect(`/settings/smtp/${orgId}`);

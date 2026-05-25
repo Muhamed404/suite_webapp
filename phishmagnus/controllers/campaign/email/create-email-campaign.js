@@ -7,6 +7,7 @@ const getApiClient = require('../../../../utility/api-client')
 const DepartmentService = require('../../../services/department/department-service')
 const GroupService = require('../../../services/group/group-service')
 const TemplateService = require('../../../services/template/template-service');
+const { redactLogData } = require("../../../utility/redact");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const backend_api_urls = require("../../../../config/backend_api_urls");
@@ -79,7 +80,7 @@ exports.createEmailCampaign = async (req, res) => {
 
 
     } else if (req.method === "POST") {
-      logger.info(`Email Campaign Create IncomingBody Request: \n ${JSON.stringify(req.body, null, 2)}`);
+      logger.info(`Email Campaign Create IncomingBody Request: \n ${JSON.stringify(redactLogData(req.body), null, 2)}`);
       // return res.redirect('/phm/Campaign/email');
       let payload = req.body;
 
@@ -108,7 +109,7 @@ exports.createEmailCampaign = async (req, res) => {
         return res.redirect(`/phm/campaign/email`);
       }
 
-      logger.info("Payload data " + JSON.stringify(payload));
+      logger.info("Payload data " + JSON.stringify(redactLogData(payload)));
       const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.EMAIL.CREATE;
       logger.info("Posting Campaign URL " + url);
       const apiClient = getApiClient(req);

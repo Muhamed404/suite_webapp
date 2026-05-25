@@ -6,6 +6,7 @@ import type { LibraryType } from "../library-page";
 import Link from "next/link";
 import Image from "next/image";
 import clsx from "clsx";
+import { useRef } from "react";
 
 import { VideoPlayerWithFallback } from "./video-player-with-fallback";
 
@@ -138,6 +139,29 @@ export function VideoContentDetailScreen({
     : null;
 
   const completeImageUrl = logoUrl;
+  const videoContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const openVideoFullscreen = async () => {
+    const container = videoContainerRef.current;
+    if (!container) return;
+
+    const fsElement = container as HTMLDivElement & {
+      webkitRequestFullscreen?: () => Promise<void> | void;
+      msRequestFullscreen?: () => Promise<void> | void;
+    };
+
+    try {
+      if (fsElement.requestFullscreen) {
+        await fsElement.requestFullscreen();
+      } else if (fsElement.webkitRequestFullscreen) {
+        fsElement.webkitRequestFullscreen();
+      } else if (fsElement.msRequestFullscreen) {
+        fsElement.msRequestFullscreen();
+      }
+    } catch (error) {
+      console.error("Failed to enter fullscreen mode:", error);
+    }
+  };
 
   if (content) {
     console.log("COMPLETE IMAGE URL:", completeImageUrl);
@@ -247,7 +271,11 @@ export function VideoContentDetailScreen({
                   {/* Video Player Container - pixel perfect */}
                   <div className="bg-white rounded-xl overflow-hidden">
                     {/* Video Player */}
-                    <div className="relative bg-black" style={{ height: "60vh" }}>
+                    <div
+                      ref={videoContainerRef}
+                      className="relative bg-black"
+                      style={{ height: "60vh" }}
+                    >
                       {isLoading ? (
                         <div className="w-full h-full flex items-center justify-center bg-gray-900">
                           <div className="animate-pulse w-full h-full bg-gray-800" />
@@ -392,6 +420,13 @@ export function VideoContentDetailScreen({
                               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
                             </svg>
                             Next
+                          </button>
+                          <button
+                            className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-full text-xs font-medium transition"
+                            type="button"
+                            onClick={openVideoFullscreen}
+                          >
+                            {t("videoTraining.openFullScreen")}
                           </button>
                         </div>
                         <div

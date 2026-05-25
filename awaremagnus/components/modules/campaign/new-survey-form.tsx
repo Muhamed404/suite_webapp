@@ -3,7 +3,7 @@
 import type { SupportedLanguageId } from "@/utils/supportedLanguages";
 import type { Department, Group } from "@/services/suiteSuiteService";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@heroui/button";
@@ -27,6 +27,8 @@ import {
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
+import { formatLocaleInteger } from "@/i18n/localeFormat";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { useCreateSurvey, useSurveyQuestions } from "@/hooks/useSurvey";
 import { useCategories } from "@/hooks/useSuiteAwm";
@@ -34,21 +36,40 @@ import { suiteSuiteService } from "@/services/suiteSuiteService";
 import { surveyService } from "@/services/surveyService";
 import { SUPPORTED_LANGUAGES, LANGUAGE_FLAGS } from "@/utils/supportedLanguages";
 
-const STEPS = [
-  { id: 1, label: "Survey Details", icon: FileText },
-  { id: 2, label: "Target Audience", icon: Users },
-  { id: 3, label: "Add Questions by Category", icon: HelpCircle },
-];
-
-const QUIZ_TYPES = [
-  { id: 1, name: "True/False", description: "Simple true or false questions" },
-  { id: 2, name: "Single Choice", description: "One correct answer from multiple options" },
-  { id: 3, name: "Multiple Answers", description: "Multiple correct answers allowed" },
-];
-
 export function NewSurveyForm() {
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
+  const t = useTranslations("surveyManagement");
   const isRtl = dir === "rtl";
+
+  const steps = useMemo(
+    () => [
+      { id: 1, label: t("surveyCreate.step1"), icon: FileText },
+      { id: 2, label: t("surveyCreate.step2"), icon: Users },
+      { id: 3, label: t("surveyCreate.step3"), icon: HelpCircle },
+    ],
+    [t]
+  );
+
+  const quizTypes = useMemo(
+    () => [
+      {
+        id: 1,
+        name: t("surveyCreate.quizType1Name"),
+        description: t("surveyCreate.quizType1Desc"),
+      },
+      {
+        id: 2,
+        name: t("surveyCreate.quizType2Name"),
+        description: t("surveyCreate.quizType2Desc"),
+      },
+      {
+        id: 3,
+        name: t("surveyCreate.quizType3Name"),
+        description: t("surveyCreate.quizType3Desc"),
+      },
+    ],
+    [t]
+  );
   const router = useRouter();
   const { user } = useAuthStore();
   const createSurvey = useCreateSurvey();
@@ -127,11 +148,16 @@ export function NewSurveyForm() {
   // Check if max questions limit is exceeded
   useEffect(() => {
     if (currentStep === 3 && maxQuestions && filteredPreviewQuestions.length > Number(maxQuestions)) {
-      setLimitError(`Number of questions (${filteredPreviewQuestions.length}) exceeds the maximum limit (${maxQuestions}).`);
+      setLimitError(
+        t("surveyCreate.limitExceeded", {
+          current: formatLocaleInteger(locale, filteredPreviewQuestions.length),
+          max: formatLocaleInteger(locale, Number(maxQuestions)),
+        })
+      );
     } else {
       setLimitError(null);
     }
-  }, [currentStep, maxQuestions, filteredPreviewQuestions.length]);
+  }, [currentStep, maxQuestions, filteredPreviewQuestions.length, locale, t]);
 
   // Validation
   const validateStep = useCallback(
@@ -140,7 +166,7 @@ export function NewSurveyForm() {
       switch (step) {
         case 1:
           if (!name.trim()) {
-            setFormError("Survey name is required");
+            setFormError(t("surveyCreate.errors.nameRequired"));
 
             return false;
           }
@@ -148,7 +174,7 @@ export function NewSurveyForm() {
           return true;
         case 2:
           if (selectedDeptIds.length === 0 && selectedGroupIds.length === 0) {
-            setFormError("Select at least one department or group");
+            setFormError(t("surveyCreate.errors.audienceRequired"));
 
             return false;
           }
@@ -156,7 +182,7 @@ export function NewSurveyForm() {
           return true;
         case 3:
           if (selectedCategoryIds.length === 0) {
-            setFormError("Select at least one category");
+            setFormError(t("surveyCreate.errors.categoriesRequired"));
 
             return false;
           }
@@ -166,7 +192,7 @@ export function NewSurveyForm() {
           return true;
       }
     },
-    [name, selectedDeptIds, selectedGroupIds, selectedCategoryIds]
+    [name, selectedDeptIds, selectedGroupIds, selectedCategoryIds, t]
   );
 
   const handleNext = () => {
@@ -208,9 +234,7 @@ export function NewSurveyForm() {
       }
 
       if (!hasQuestions) {
-        setFormError(
-          "No questions found for the selected categories and quiz type combination. Survey cannot be created."
-        );
+        setFormError(t("surveyCreate.errors.noQuestionsCombo"));
         setIsValidatingQuestions(false);
 
         return;
@@ -230,10 +254,10 @@ export function NewSurveyForm() {
         groups: selectedGroupIds.map(Number),
       });
 
-      setFormSuccess("Survey created successfully! Redirecting...");
+      setFormSuccess(t("surveyCreate.success"));
       setTimeout(() => router.push("/dashboard"), 2000);
     } catch (err: any) {
-      setFormError(err?.message ?? "Failed to create survey");
+      setFormError(err?.message ?? t("surveyCreate.errors.createFailed"));
       setIsValidatingQuestions(false);
     }
   };
@@ -255,14 +279,14 @@ export function NewSurveyForm() {
               size="sm"
               variant="flat"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <ArrowLeft className={clsx("w-4 h-4", isRtl && "rotate-180")} />
             </Button>
-            <h2 className="text-xl font-bold text-gray-900">New Survey</h2>
+            <h2 className="text-xl font-bold text-gray-900">{t("surveyCreate.pageTitle")}</h2>
           </div>
 
           {/* ── Stepper ─────────────────────────────────── */}
           <div className="flex items-center justify-center mb-8">
-            {STEPS.map((step, index) => {
+            {steps.map((step, index) => {
               const Icon = step.icon;
               const isCompleted = currentStep > step.id;
               const isActive = currentStep === step.id;
@@ -294,7 +318,7 @@ export function NewSurveyForm() {
                       {step.label}
                     </span>
                   </div>
-                  {index < STEPS.length - 1 && (
+                  {index < steps.length - 1 && (
                     <div
                       className={clsx(
                         "w-20 h-0.5 mx-2 mt-[-16px] rounded-full transition-all duration-300",
@@ -324,15 +348,15 @@ export function NewSurveyForm() {
             {/* STEP 1: Survey Details */}
             {currentStep === 1 && (
               <div className="space-y-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Survey Details</h3>
-                <p className="text-xs text-gray-500 mb-4">
-                  Enter the basic information for your survey
-                </p>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  {t("surveyCreate.step1Heading")}
+                </h3>
+                <p className="text-xs text-gray-500 mb-4">{t("surveyCreate.step1Intro")}</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium text-gray-700 mb-1 block">
-                      Survey Name <span className="text-red-500">*</span>
+                      {t("surveyCreate.surveyName")} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       classNames={{
@@ -340,15 +364,17 @@ export function NewSurveyForm() {
                           "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300 focus-within:!border-blue-500",
                         input: "text-sm",
                       }}
-                      placeholder="e.g. Security Awareness Assessment"
+                      placeholder={t("surveyCreate.namePlaceholder")}
                       value={name}
                       onValueChange={setName}
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-gray-700 mb-1 block">Language</label>
+                    <label className="text-xs font-medium text-gray-700 mb-1 block">
+                      {t("surveyCreate.language")}
+                    </label>
                     <Select
-                      aria-label="Language"
+                      aria-label={t("surveyCreate.language")}
                       classNames={{
                         trigger:
                           "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300",
@@ -375,7 +401,7 @@ export function NewSurveyForm() {
 
                 <div>
                   <label className="text-xs font-medium text-gray-700 mb-1 block">
-                    Description
+                    {t("surveyCreate.description")}
                   </label>
                   <Textarea
                     classNames={{
@@ -384,7 +410,7 @@ export function NewSurveyForm() {
                       input: "text-sm",
                     }}
                     minRows={3}
-                    placeholder="Describe this survey..."
+                    placeholder={t("surveyCreate.descriptionPlaceholder")}
                     value={description}
                     onValueChange={setDescription}
                   />
@@ -393,10 +419,10 @@ export function NewSurveyForm() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
-                      <CalendarDays className="w-3.5 h-3.5" /> Start Date
+                      <CalendarDays className="w-3.5 h-3.5" /> {t("surveyCreate.startDate")}
                     </label>
                     <DatePicker
-                      aria-label="Start Date"
+                      aria-label={t("surveyCreate.startDate")}
                       className="w-full"
                       classNames={{
                         selectorButton: "h-8 min-w-8",
@@ -409,10 +435,10 @@ export function NewSurveyForm() {
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">
-                      <CalendarDays className="w-3.5 h-3.5" /> Deadline
+                      <CalendarDays className="w-3.5 h-3.5" /> {t("surveyCreate.deadline")}
                     </label>
                     <DatePicker
-                      aria-label="Deadline"
+                      aria-label={t("surveyCreate.deadline")}
                       className="w-full"
                       classNames={{
                         selectorButton: "h-8 min-w-8",
@@ -425,7 +451,7 @@ export function NewSurveyForm() {
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-700 mb-1 block">
-                      Max Questions
+                      {t("surveyCreate.maxQuestions")}
                     </label>
                     <Input
                       classNames={{
@@ -433,7 +459,7 @@ export function NewSurveyForm() {
                           "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300 focus-within:!border-blue-500",
                         input: "text-sm",
                       }}
-                      placeholder="e.g. 20"
+                      placeholder={t("surveyCreate.maxQuestionsPlaceholder")}
                       type="number"
                       value={maxQuestions}
                       onValueChange={setMaxQuestions}
@@ -446,16 +472,16 @@ export function NewSurveyForm() {
             {/* STEP 2: Target Audience */}
             {currentStep === 2 && (
               <div className="space-y-5">
-                <h3 className="text-lg font-semibold text-gray-800 mb-2">Target Audience</h3>
-                <p className="text-xs text-gray-500 mb-4">
-                  Select departments and/or groups to target for this survey
-                </p>
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                  {t("surveyCreate.step2Heading")}
+                </h3>
+                <p className="text-xs text-gray-500 mb-4">{t("surveyCreate.step2Intro")}</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Departments */}
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-blue-500" /> Departments
+                      <Users className="w-4 h-4 text-blue-500" /> {t("surveyCreate.departments")}
                     </h4>
                     <div className="border border-gray-200 rounded-xl p-4 max-h-64 overflow-y-auto space-y-2">
                       {loadingDepts ? (
@@ -464,7 +490,7 @@ export function NewSurveyForm() {
                         </div>
                       ) : departments.length === 0 ? (
                         <p className="text-xs text-gray-400 text-center py-4">
-                          No departments found
+                          {t("surveyCreate.noDepartments")}
                         </p>
                       ) : (
                         <CheckboxGroup value={selectedDeptIds} onChange={setSelectedDeptIds as any}>
@@ -480,8 +506,10 @@ export function NewSurveyForm() {
                               <div className="flex items-center justify-between w-full">
                                 <span>{dept.name}</span>
                                 {dept.user_count !== undefined && (
-                                  <span className="text-[10px] text-gray-400 ml-2">
-                                    {dept.user_count} users
+                                  <span className="text-[10px] text-gray-400 ms-2">
+                                    {t("surveyCreate.usersCount", {
+                                      count: formatLocaleInteger(locale, dept.user_count),
+                                    })}
                                   </span>
                                 )}
                               </div>
@@ -495,7 +523,7 @@ export function NewSurveyForm() {
                   {/* Groups */}
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-teal-500" /> Groups
+                      <Users className="w-4 h-4 text-teal-500" /> {t("surveyCreate.groups")}
                     </h4>
                     <div className="border border-gray-200 rounded-xl p-4 max-h-64 overflow-y-auto space-y-2">
                       {loadingGroups ? (
@@ -503,7 +531,9 @@ export function NewSurveyForm() {
                           <Spinner size="sm" />
                         </div>
                       ) : groups.length === 0 ? (
-                        <p className="text-xs text-gray-400 text-center py-4">No groups found</p>
+                        <p className="text-xs text-gray-400 text-center py-4">
+                          {t("surveyCreate.noGroups")}
+                        </p>
                       ) : (
                         <CheckboxGroup
                           value={selectedGroupIds}
@@ -521,8 +551,10 @@ export function NewSurveyForm() {
                               <div className="flex items-center justify-between w-full">
                                 <span>{group.name}</span>
                                 {group.user_count !== undefined && (
-                                  <span className="text-[10px] text-gray-400 ml-2">
-                                    {group.user_count} users
+                                  <span className="text-[10px] text-gray-400 ms-2">
+                                    {t("surveyCreate.usersCount", {
+                                      count: formatLocaleInteger(locale, group.user_count),
+                                    })}
                                   </span>
                                 )}
                               </div>
@@ -536,7 +568,10 @@ export function NewSurveyForm() {
 
                 <div className="flex gap-3 mt-2">
                   <span className="text-xs text-gray-500">
-                    Selected: {selectedDeptIds.length} departments, {selectedGroupIds.length} groups
+                    {t("surveyCreate.selectedSummary", {
+                      deptCount: formatLocaleInteger(locale, selectedDeptIds.length),
+                      groupCount: formatLocaleInteger(locale, selectedGroupIds.length),
+                    })}
                   </span>
                 </div>
               </div>
@@ -546,17 +581,17 @@ export function NewSurveyForm() {
             {currentStep === 3 && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">Quiz Type</h3>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Select the question type for this survey
-                  </p>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    {t("surveyCreate.quizTypeHeading")}
+                  </h3>
+                  <p className="text-xs text-gray-500 mb-4">{t("surveyCreate.quizTypeIntro")}</p>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {QUIZ_TYPES.map((qt) => (
+                    {quizTypes.map((qt) => (
                       <button
                         key={qt.id}
                         className={clsx(
-                          "p-5 rounded-2xl border-2 text-left transition-all duration-200 hover:shadow-md",
+                          "p-5 rounded-2xl border-2 text-start transition-all duration-200 hover:shadow-md",
                           quesTypeId === qt.id
                             ? "border-blue-500 bg-blue-50 shadow-md shadow-blue-100"
                             : "border-gray-200 bg-white hover:border-gray-300"
@@ -577,7 +612,7 @@ export function NewSurveyForm() {
                           </div>
                           <span className="font-medium text-sm text-gray-800">{qt.name}</span>
                         </div>
-                        <p className="text-xs text-gray-500 ml-8">{qt.description}</p>
+                        <p className="text-xs text-gray-500 ms-8">{qt.description}</p>
                       </button>
                     ))}
                   </div>
@@ -585,12 +620,9 @@ export function NewSurveyForm() {
 
                 <div className="border-t border-gray-100 pt-6">
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                    Add Questions by Category
+                    {t("surveyCreate.categoriesHeading")}
                   </h3>
-                  <p className="text-xs text-gray-500 mb-4">
-                    Select categories to include questions from. Questions will be randomly selected
-                    from these categories.
-                  </p>
+                  <p className="text-xs text-gray-500 mb-4">{t("surveyCreate.categoriesIntro")}</p>
 
                   {categoriesLoading ? (
                     <div className="flex justify-center py-8">
@@ -630,12 +662,11 @@ export function NewSurveyForm() {
                 {selectedCategoryIds.length > 0 && (
                   <div className="border-t border-gray-100 pt-6">
                     <h3 className={clsx("text-sm font-semibold text-gray-800 mb-2", !!limitError && "text-red-600")}>
-                      Available Questions ({filteredPreviewQuestions.length})
+                      {t("surveyCreate.availableQuestions", {
+                        count: formatLocaleInteger(locale, filteredPreviewQuestions.length),
+                      })}
                     </h3>
-                    <p className="text-xs text-gray-500 mb-4">
-                      These questions belong to the selected categories and match the chosen quiz
-                      type.
-                    </p>
+                    <p className="text-xs text-gray-500 mb-4">{t("surveyCreate.previewIntro")}</p>
 
                     {previewQuestionsLoading ? (
                       <div className="flex justify-center py-4">
@@ -643,7 +674,7 @@ export function NewSurveyForm() {
                       </div>
                     ) : filteredPreviewQuestions.length === 0 ? (
                       <p className="text-xs text-gray-400 text-center py-4">
-                        No questions found for the selected categories.
+                        {t("surveyCreate.noQuestionsPreview")}
                       </p>
                     ) : (
                       <div className="border border-gray-200 rounded-xl p-4 max-h-64 overflow-y-auto space-y-3">
@@ -653,7 +684,7 @@ export function NewSurveyForm() {
                             className="p-3 bg-gray-50 rounded-lg border border-gray-100"
                           >
                             <p className="text-sm font-medium text-gray-800 mb-1">
-                              {idx + 1}. {q.question}
+                              {formatLocaleInteger(locale, idx + 1)}. {q.question}
                             </p>
                             {q.category && (
                               <span className="inline-block px-2 py-1 bg-gray-200 text-gray-600 text-[10px] rounded-md mt-1">
@@ -676,21 +707,25 @@ export function NewSurveyForm() {
               className="border-gray-200 text-gray-600 px-6"
               isDisabled={currentStep === 1 || isSubmitting}
               radius="full"
-              startContent={<ArrowLeft className="w-4 h-4" />}
+              startContent={
+                <ArrowLeft className={clsx("w-4 h-4", isRtl && "rotate-180")} />
+              }
               variant="bordered"
               onPress={handleBack}
             >
-              Back
+              {t("surveyCreate.back")}
             </Button>
 
             {currentStep < 3 ? (
               <Button
                 className="bg-blue-500 hover:bg-blue-600 text-white px-8"
-                endContent={<ArrowRight className="w-4 h-4" />}
+                endContent={
+                  <ArrowRight className={clsx("w-4 h-4", isRtl && "rotate-180")} />
+                }
                 radius="full"
                 onPress={handleNext}
               >
-                Next
+                {t("surveyCreate.next")}
               </Button>
             ) : (
               <Button
@@ -701,10 +736,10 @@ export function NewSurveyForm() {
                 onPress={handleSubmit}
               >
                 {isValidatingQuestions
-                  ? "Validating..."
+                  ? t("surveyCreate.validating")
                   : isSubmitting
-                    ? "Creating Survey..."
-                    : "Finish & Launch"}
+                    ? t("surveyCreate.creating")
+                    : t("surveyCreate.finishLaunch")}
               </Button>
             )}
           </div>

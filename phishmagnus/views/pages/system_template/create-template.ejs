@@ -18,7 +18,6 @@
         </h3>
     </div>
 </div>
-
 <div class="flex flex-col p-6 pt-0">
     <!-- first section  -->
     <div class="flex flex-col p-8 gap-4 mt-3 rounded-3xl bg-white border border-gray-100 shadow-sm">
@@ -424,20 +423,30 @@
                 <!-- Radio Buttons -->
 
                 <div class="space-y-4 mb-6">
-                    <!-- <label class="flex items-center custom-radio cursor-pointer">
-                        <input type="radio" name="landing_option" value="link" id="landing_option_link">
-                        <span class="radio-circle"></span>
-                        <span class="text-gray-700">
-                            <%= __("system_template.create.labelLandingPage_radioOption1") %>
-                        </span>
-                    </label> -->
                     <label class="flex items-center custom-radio cursor-pointer">
-                        <input type="radio" name="landing_option" value="custom" id="landing_option_custom">
+                        <input type="radio" name="landing_option" value="custom" id="landing_option_custom" checked>
                         <span class="radio-circle"></span>
                         <span class="text-gray-700">
                             <%= __("system_template.create.labelLandingPage_radioOption2") %>
                         </span>
                     </label>
+                    <label class="flex items-center custom-radio cursor-pointer">
+                        <input type="radio" name="landing_option" value="url" id="landing_option_url">
+                        <span class="radio-circle"></span>
+                        <span class="text-gray-700">
+                            <%= __("system_template.create.labelLandingPage_redirectToCustomWebPage") %>
+                        </span>
+                    </label>
+                </div>
+                <input type="hidden" name="landing_page_option" id="landing_page_option" value="html">
+
+                <div id="landing-external-url-container" class="mb-6 hidden">
+                    <label for="landing_page_external_url" class="block text-gray-700 font-medium mb-2">
+                        <%= __("system_template.create.labelLandingPage_redirectUrl") %>
+                    </label>
+                    <input type="text" id="landing_page_external_url" name="landing_page_external_url"
+                        placeholder="https://www.youtube.com/"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400">
                 </div>
                 <!-- Import field for link option -->
                 <!-- <div id="import-html-url-container" class="mb-6" style="display:none;">
@@ -656,32 +665,44 @@
     };
 </script>
 
+<script>window.WEB_TEMPLATE_BUCKET = "<%- typeof webTemplateBucket !== 'undefined' ? webTemplateBucket : '' %>";</script>
 <script src="/securemagnus_2025/js/custom_script/system_create_template.js"></script>
 <script>
     // Show import field when 'link' is selected, hide otherwise
-    document.addEventListener('DOMContentLoaded', function () {
-        const linkRadio = document.getElementById('landing_option_link');
+document.addEventListener('DOMContentLoaded', function () {
         const customRadio = document.getElementById('landing_option_custom');
-        const importContainer = document.getElementById('import-html-url-container');
-        const fetchBtn = document.getElementById('fetch-html-template');
-        // const urlInput = document.getElementById('import-html-url');
-        // const errorDiv = document.getElementById('import-html-url-error');
-        const landingPageContent = document.getElementById('landing_page_content');
+        const urlRadio = document.getElementById('landing_option_url');
+        const editorContainer = document.getElementById('editor-container');
+        const placeholderButtons = document.getElementById('placeholder_buttons_landing_page_content');
+        const externalUrlContainer = document.getElementById('landing-external-url-container');
+        const externalUrlInput = document.getElementById('landing_page_external_url');
+        const hiddenLandingPageOption = document.getElementById('landing_page_option');
 
-        function toggleImportField() {
-            if (linkRadio && linkRadio.checked) {
-                importContainer.style.display = '';
-            } else {
-                importContainer.style.display = 'none';
-                errorDiv.style.display = 'none';
+        function toggleLandingMode() {
+            const isUrlMode = !!(urlRadio && urlRadio.checked);
+
+            if (hiddenLandingPageOption) {
+                hiddenLandingPageOption.value = isUrlMode ? 'url' : 'html';
+            }
+            if (editorContainer) {
+                editorContainer.style.display = isUrlMode ? 'none' : 'block';
+            }
+            if (placeholderButtons) {
+                placeholderButtons.style.display = isUrlMode ? 'none' : 'flex';
+            }
+            if (externalUrlContainer) {
+                externalUrlContainer.classList.toggle('hidden', !isUrlMode);
+            }
+            if (!isUrlMode && externalUrlInput) {
+                externalUrlInput.value = '';
+            }
+            if (isUrlMode && window.CKEDITOR && CKEDITOR.instances['landing_page_content']) {
+                CKEDITOR.instances['landing_page_content'].setData('');
             }
         }
-        if (linkRadio && customRadio) {
-            linkRadio.addEventListener('change', toggleImportField);
-            customRadio.addEventListener('change', toggleImportField);
-            // On page load
-            toggleImportField();
-        }
+        if (customRadio) customRadio.addEventListener('change', toggleLandingMode);
+        if (urlRadio) urlRadio.addEventListener('change', toggleLandingMode);
+        toggleLandingMode();
 
         // Fetch HTML from URL using backend proxy and insert into landing_page_content
         // if (fetchBtn && urlInput && landingPageContent) {

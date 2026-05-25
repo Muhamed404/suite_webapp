@@ -32,6 +32,11 @@ interface WizardStep5Props {
 export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
   const t = useTranslations("campaigns");
   const prevFieldsKey = useRef<string>("");
+  const parseWeightValue = (value: string): number => {
+    const parsedValue = Number.parseInt(value, 10);
+    if (Number.isNaN(parsedValue)) return 0;
+    return Math.min(100, Math.max(0, parsedValue));
+  };
 
   // Auto-distribute weights equally only for the 3 main content types.
   useEffect(() => {
@@ -86,23 +91,30 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
   const formulaParts = useMemo(() => {
     const parts: string[] = [];
 
-    if (formData.visualShortVideos) parts.push(`Videos (${formData.motionVideoWeight}%)`);
-    if (formData.visualInteractive)
-      parts.push(`Interactive (${formData.interactiveContentWeight}%)`);
-    if (formData.enableQuiz) parts.push(`Quiz (${formData.quizProgressWeight}%)`);
-    if (formData.visualOthers && formData.enableDocuments)
-      parts.push(`Documents (${formData.documentWeight}%)`);
-    if (formData.visualOthers && formData.enableGames)
-      parts.push(`Games (${formData.gameWeight}%)`);
+    if (formData.visualShortVideos) {
+      parts.push(t("form.formulaPartVideo", { weight: formData.motionVideoWeight }));
+    }
+    if (formData.visualInteractive) {
+      parts.push(t("form.formulaPartInteractive", { weight: formData.interactiveContentWeight }));
+    }
+    if (formData.enableQuiz) {
+      parts.push(t("form.formulaPartQuiz", { weight: formData.quizProgressWeight }));
+    }
+    if (formData.visualOthers && formData.enableDocuments) {
+      parts.push(t("form.formulaPartDocuments", { weight: formData.documentWeight }));
+    }
+    if (formData.visualOthers && formData.enableGames) {
+      parts.push(t("form.formulaPartGames", { weight: formData.gameWeight }));
+    }
     if (formData.visualOthers && formData.enableMiscItems) {
-      parts.push(`Brochures (${formData.brochureWeight}%)`);
-      parts.push(`Posters (${formData.posterWeight}%)`);
-      parts.push(`Screensavers (${formData.screensaverWeight}%)`);
-      parts.push(`VR Games (${formData.vrGameWeight}%)`);
+      parts.push(t("form.formulaPartBrochures", { weight: formData.brochureWeight }));
+      parts.push(t("form.formulaPartPosters", { weight: formData.posterWeight }));
+      parts.push(t("form.formulaPartScreensavers", { weight: formData.screensaverWeight }));
+      parts.push(t("form.formulaPartVrGames", { weight: formData.vrGameWeight }));
     }
 
     return parts;
-  }, [formData]);
+  }, [formData, t]);
 
   return (
     <div>
@@ -123,7 +135,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
         {/* Other Content Type Toggles (if "Others" visual selected) */}
         {formData.visualOthers && (
           <div className="border-b border-gray-200 pb-4">
-            <h6 className="text-xs font-semibold text-[#051226] mb-3">Additional Content Types</h6>
+            <h6 className="text-xs font-semibold text-[#051226] mb-3">{t("form.additionalContentTypes")}</h6>
             <div className="grid grid-cols-3 gap-3">
               <label className="flex items-center gap-1.5 cursor-pointer group p-2 transition-all">
                 <div
@@ -206,8 +218,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
         {/* Weight Configuration */}
         <div>
           <h6 className="text-sm font-semibold text-[#051226] mb-2">
-            How would you like users to complete their module?{" "}
-            <span className="text-red-500">*</span>
+            {t("form.contentWeights")} <span className="text-red-500">*</span>
           </h6>
           <div className="grid grid-cols-2 gap-2">
             {formData.visualShortVideos && (
@@ -221,7 +232,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                   min={0}
                   type="number"
                   value={formData.motionVideoWeight}
-                  onChange={(e) => onChange("motionVideoWeight", parseInt(e.target.value) || 0)}
+                  onChange={(e) => onChange("motionVideoWeight", parseWeightValue(e.target.value))}
                 />
               </div>
             )}
@@ -236,9 +247,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                   min={0}
                   type="number"
                   value={formData.interactiveContentWeight}
-                  onChange={(e) =>
-                    onChange("interactiveContentWeight", parseInt(e.target.value) || 0)
-                  }
+                  onChange={(e) => onChange("interactiveContentWeight", parseWeightValue(e.target.value))}
                 />
               </div>
             )}
@@ -253,7 +262,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                   min={0}
                   type="number"
                   value={formData.quizProgressWeight}
-                  onChange={(e) => onChange("quizProgressWeight", parseInt(e.target.value) || 0)}
+                  onChange={(e) => onChange("quizProgressWeight", parseWeightValue(e.target.value))}
                 />
               </div>
             )}
@@ -268,7 +277,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                   min={0}
                   type="number"
                   value={formData.documentWeight}
-                  onChange={(e) => onChange("documentWeight", parseInt(e.target.value) || 0)}
+                  onChange={(e) => onChange("documentWeight", parseWeightValue(e.target.value))}
                 />
               </div>
             )}
@@ -283,7 +292,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                   min={0}
                   type="number"
                   value={formData.gameWeight}
-                  onChange={(e) => onChange("gameWeight", parseInt(e.target.value) || 0)}
+                  onChange={(e) => onChange("gameWeight", parseWeightValue(e.target.value))}
                 />
               </div>
             )}
@@ -299,7 +308,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                     min={0}
                     type="number"
                     value={formData.brochureWeight}
-                    onChange={(e) => onChange("brochureWeight", parseInt(e.target.value) || 0)}
+                    onChange={(e) => onChange("brochureWeight", parseWeightValue(e.target.value))}
                   />
                 </div>
                 <div className="input-group">
@@ -312,7 +321,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                     min={0}
                     type="number"
                     value={formData.posterWeight}
-                    onChange={(e) => onChange("posterWeight", parseInt(e.target.value) || 0)}
+                    onChange={(e) => onChange("posterWeight", parseWeightValue(e.target.value))}
                   />
                 </div>
                 <div className="input-group">
@@ -325,7 +334,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                     min={0}
                     type="number"
                     value={formData.screensaverWeight}
-                    onChange={(e) => onChange("screensaverWeight", parseInt(e.target.value) || 0)}
+                    onChange={(e) => onChange("screensaverWeight", parseWeightValue(e.target.value))}
                   />
                 </div>
                 <div className="input-group">
@@ -338,7 +347,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
                     min={0}
                     type="number"
                     value={formData.vrGameWeight}
-                    onChange={(e) => onChange("vrGameWeight", parseInt(e.target.value) || 0)}
+                    onChange={(e) => onChange("vrGameWeight", parseWeightValue(e.target.value))}
                   />
                 </div>
               </>
@@ -348,7 +357,7 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
           {/* Weight Total */}
           <div className="mt-3">
             <strong className="text-sm">
-              Total:{" "}
+              {t("form.totalWeightLabel")}{" "}
               <span
                 className={clsx(
                   "text-lg font-bold",
@@ -360,19 +369,19 @@ export function WizardStep5({ formData, onChange, errors }: WizardStep5Props) {
               /100
             </strong>
             {totalWeight !== 100 && (
-              <div className="text-[10px] text-red-500 mt-0.5">
-                Total weights must equal exactly 100.
-              </div>
+              <div className="text-[10px] text-red-500 mt-0.5">{t("form.weightMustEqual100Exact")}</div>
             )}
           </div>
 
           {/* Progress Formula */}
           <div className="mt-3 p-3 bg-gray-50 rounded-md border border-gray-100">
-            <h6 className="mb-1.5 text-xs font-semibold text-[#051226]">Progress Formula:</h6>
+            <h6 className="mb-1.5 text-xs font-semibold text-[#051226]">
+              {t("form.progressFormulaHeading")}
+            </h6>
             <div className="text-[10px] text-gray-600 leading-relaxed">
               {formulaParts.length === 0
-                ? "Enable content types and assign weights to see progress calculation examples."
-                : `Progress = ${formulaParts.join(" + ")}`}
+                ? t("form.progressFormulaEmpty")
+                : t("form.progressFormulaLine", { parts: formulaParts.join(" + ") })}
             </div>
           </div>
         </div>

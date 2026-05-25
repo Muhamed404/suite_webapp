@@ -10,8 +10,8 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import {
   SUPPORTED_LANGUAGES,
-  LANGUAGE_FLAGS,
   getLanguageCountryCode,
+  getLocalizedLanguageName,
   type SupportedLanguageId,
 } from "@/utils/supportedLanguages";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
@@ -33,7 +33,7 @@ export function ModuleLanguageSelector({
   className,
 }: ModuleLanguageSelectorProps) {
   const t = useTranslations("module");
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
   const isRtl = dir === "rtl";
 
   const handleLanguageToggle = (langId: SupportedLanguageId) => {
@@ -45,7 +45,10 @@ export function ModuleLanguageSelector({
   };
 
   return (
-    <div className={clsx("rounded-xl p-4 bg-white border border-[var(--strokeGray)]", className)}>
+    <div
+      className={clsx("rounded-xl p-4 bg-white border border-[var(--strokeGray)]", className)}
+      dir={isRtl ? "rtl" : "ltr"}
+    >
       {/* Title row - matches HTML: lang icon + Select Language */}
       <div className={clsx("flex items-center gap-2 mb-3", isRtl && "flex-row-reverse")}>
         <Image
@@ -60,30 +63,27 @@ export function ModuleLanguageSelector({
 
       {/* Language Grid - matches HTML: grid-cols-2 gap-y-1 gap-x-4 */}
       <div
-        className={clsx(
-          "grid grid-cols-2 gap-y-1 gap-x-4 text-xs text-gray-700 font-medium mb-4",
-          isRtl && "text-right"
-        )}
+        className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs text-gray-700 font-medium mb-4 text-start"
       >
-        {SUPPORTED_LANGUAGES.map(({ id, name }) => {
-          const flag = LANGUAGE_FLAGS[id];
+        {SUPPORTED_LANGUAGES.map(({ id }) => {
           const isSelected = selectedLanguageIds.includes(id);
+          const labelText = getLocalizedLanguageName(id, locale);
 
           return (
             <label
               key={id}
               className={clsx(
-                "flex items-center gap-1 cursor-pointer select-none",
-                isRtl && "flex-row-reverse"
+                "flex items-center gap-2 min-w-0 cursor-pointer select-none w-full",
+                isRtl ? "flex-row-reverse justify-end" : "flex-row justify-start"
               )}
               data-lang-id={id}
             >
               <Checkbox
                 classNames={{
-                  base: "m-0 max-w-fit",
+                  base: "m-0 max-w-fit shrink-0",
                   wrapper: "!hidden",
                   icon: "!hidden",
-                  label: "ml-0",
+                  label: "ms-0 me-0 p-0 gap-2 flex items-center min-w-0",
                 }}
                 isSelected={isSelected}
                 onValueChange={() => handleLanguageToggle(id)}
@@ -110,9 +110,10 @@ export function ModuleLanguageSelector({
                   )}
                 </span>
               </Checkbox>
-              <span aria-hidden className="text-base leading-none">
+              <span aria-hidden className="text-base leading-none shrink-0">
                 <ReactCountryFlag
                   svg
+                  cdnUrl="/awm/vendor/flag-icons/flags/4x3/"
                   countryCode={getLanguageCountryCode(id)}
                   style={{
                     fontSize: "1em",
@@ -120,21 +121,24 @@ export function ModuleLanguageSelector({
                   }}
                 />
               </span>
-              <span className="lang-label">{name}</span>
+              <span className="lang-label truncate">{labelText}</span>
             </label>
           );
         })}
       </div>
 
       {/* Add Translation Button - Bottom Center, matches HTML */}
-      <div className="flex justify-center pt-3 border-t border-gray-200">
+      <div className={clsx("flex justify-center pt-3 border-t border-gray-200")}>
         <Button
-          className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-all"
+          className={clsx(
+            "flex items-center gap-2 px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-full hover:bg-blue-600 transition-all",
+            isRtl && "flex-row-reverse"
+          )}
           size="sm"
           type="button"
           onPress={onAddTranslation}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               d="M12 6v6m0 0v6m0-6h6m-6 0H6"
               strokeLinecap="round"

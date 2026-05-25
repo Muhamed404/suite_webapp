@@ -211,6 +211,13 @@ function updateStep(newStep) {
   }, 300);
 }
 
+function syncStepperButtonText() {
+  if (!nextBtn) return;
+  const nextLabel = window.i18n?.labels?.next || (document.documentElement.lang === 'ar' ? 'التالي' : 'Next');
+  const finishLabel = window.i18n?.labels?.finish || (document.documentElement.lang === 'ar' ? 'إنهاء' : 'Finish');
+  nextBtn.textContent = currentStep === steps.length - 1 ? finishLabel : nextLabel;
+}
+
 nextBtn.addEventListener("click", (e) => {
   e.preventDefault(); // Prevent default form submission
   
@@ -252,6 +259,10 @@ nextBtn.addEventListener("click", (e) => {
       mainForm.submit();
     }
   }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  syncStepperButtonText();
 });
 
 backBtn.addEventListener("click", () => {

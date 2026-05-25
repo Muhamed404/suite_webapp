@@ -5,6 +5,7 @@ const { hasAccess } = require("../../../utility/helperFunctions");
 const backend_api_urls = require("../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 const PHISH_TYPE_OPTIONS = [
   { key: 'email', label: 'Email', id: 2 },
@@ -40,7 +41,7 @@ exports.retrieveAllTemplates = async (req, res) => {
     let url = backend_api_urls.PRODUCT_SUITE.Template.PHM_LIST
 
     // const attFileTpypes = `/commons/getAttachmentFileTypes`;
-    logger.info(`My Template: API URL  ${url}`);
+    logger.info(`My Template: API URL  ${redactLogData(url)}`);
     // logger.info(`My Template: API URL  ${attFileTpypes}`);
     const apiClient = getApiClient(req);
 
@@ -62,19 +63,21 @@ exports.retrieveAllTemplates = async (req, res) => {
     }
     const organizationId = queryParams.organizationId;
     let templateTitleKey = 'system_template.homescreen.labelTitleOrganizationTemplateManagement'
+    const isOrgSubAdmin = req.user?.role?.id === enums.userType.OrgSubAdmin;
+    const canManageTemplates = hasAccess(req, enums.ModuleNames.My_Template, [enums.Access_Types.RWD_O]);
     let disableOption = {
-      disableCreateTemplate: false,
+      disableCreateTemplate: true,
       disableCloneOption: false,
-      disableEdit: false,
-      disableDelete: false,
+      disableEdit: true,
+      disableDelete: true,
       disableView: false
     }
 
     if (organizationId) {
-      disableOption.disableCreateTemplate = false;
+      disableOption.disableCreateTemplate = isOrgSubAdmin || !canManageTemplates;
       disableOption.disableCloneOption = true;
       disableOption.disableEdit = false;
-      disableOption.disableDelete = false;
+      disableOption.disableDelete = isOrgSubAdmin || !canManageTemplates;
       disableOption.disableView = false;
     }
 
@@ -91,7 +94,7 @@ exports.retrieveAllTemplates = async (req, res) => {
     });
   } catch (error) {
     logger.error(`My Template: Issue in retrieving fetching system templates`);
-    logger.error(error.stack)
+    logger.error(redactLogData(error.stack))
     
     if (error.response && error.response.status === 403) {
       const errorMessage = error.response.data?.message || 'Access Denied';

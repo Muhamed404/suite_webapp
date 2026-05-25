@@ -2,6 +2,9 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 const expressLayouts = require('express-ejs-layouts');
+const { validateEnv } = require('./config/env-validator');
+validateEnv();
+
 const i18n = require('./middleware/i18n-middleware');
 const { logger } = require('./logger/logger');
 const routes = require('./routes/routes');
@@ -26,6 +29,7 @@ const generateMenuMiddleware = require('./middleware/menu/session-menu-middlewar
 global.logger = logger;
 
 const app = express();
+const bodyLimit = '25mb';
 
 // Health check endpoint (before other routes)
 app.get("/health", (req, res) => {
@@ -59,8 +63,8 @@ app.get('/favicon.ico', (req, res) => {
 /**
  * Body parser
  */
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true, limit: bodyLimit }));
+app.use(bodyParser.json({ limit: bodyLimit }));
 
 /**
  * Cookie parser and session middleware
@@ -72,13 +76,17 @@ app.use(storeSessionMiddleware);
  * Flash messages
  */
 app.use(flash());
-// Safe flash: when session is missing (e.g. some API/fetch requests), no-op instead of throwing
+// Safe flash: if session is missing at any point in the request lifecycle, no-op instead of throwing
 app.use((req, res, next) => {
   const originalFlash = req.flash;
-  if (originalFlash && req.session === undefined) {
+  if (typeof originalFlash === 'function') {
     req.flash = function (key, value) {
-      if (arguments.length === 1) return [];
-      // setter: no-op
+      if (req.session === undefined) {
+        if (arguments.length === 1) return [];
+        // setter: no-op
+        return;
+      }
+      return originalFlash.apply(this, arguments);
     };
   }
   next();

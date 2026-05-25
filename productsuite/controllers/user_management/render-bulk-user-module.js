@@ -10,6 +10,7 @@ const multerMiddleware = require("../../../middleware/multer-middleware");
 const FormData = require("form-data");
 const fs = require("fs");
 const mime = require('mime-types');
+const { redactEmail, redactLogData } = require("../../../utility/redact");
 
 
 
@@ -47,12 +48,12 @@ exports.renderBulkUserModule = async (req, res, next) => {
         let subscriptionUrl = `/subscription/findAllByOrg/${organizationCode}`;
         respSubscription = await apiClient.get(subscriptionUrl);
         subscription = respSubscription.data.message;
-        logger.info(`[Render Bulk User Module] Printing Subscription: ` + JSON.stringify(subscription))
+        logger.info(`[Render Bulk User Module] Printing Subscription: ` + JSON.stringify(redactLogData(subscription)))
       }
 
 
       if (!hasAccess(req, enums.ModuleNames.User_Management, [enums.Access_Types.RWD_ALL, enums.Access_Types.RW_O, enums.Access_Types.RWD_O])) {
-        logger.info(`[Render Bulk User Module] Enabling Create Button for user: ` + userSession.email)
+        logger.info(`[Render Bulk User Module] Enabling Create Button for user: ` + redactEmail(userSession.email))
 
         hasCreatePermission = Boolean(true)
       }
@@ -90,7 +91,7 @@ exports.renderBulkUserModule = async (req, res, next) => {
 
 
 exports.uploadBulkUsers = async (req, res, next) => {
-  logger.info(`Controller - Upload Bulk Users: ${JSON.stringify(req.body, null, 2)}`);
+  logger.info(`Controller - Upload Bulk Users: ${JSON.stringify(redactLogData(req.body), null, 2)}`);
   try {
     multerMiddleware("csvFile", null)(req, res, async (err) => {
       logger.info('Controller - Upload Bulk Users: After multer parser');
@@ -102,7 +103,7 @@ exports.uploadBulkUsers = async (req, res, next) => {
       }
 
       try {
-        logger.info('Controller - Upload Bulk Users: ' + JSON.stringify(req.body || {}));
+        logger.info('Controller - Upload Bulk Users: ' + JSON.stringify(redactLogData(req.body || {})));
         const file = req.file;
         if (!file) {
           logger.warn('Controller - Upload Bulk Users: No file in request');
@@ -138,14 +139,26 @@ exports.uploadBulkUsers = async (req, res, next) => {
 
         logger.info(`[File Upload]: Sending file to backend url=${url}`);
         try {
-          await apiClient.post(url, formData, {
+          const response = await apiClient.post(url, formData, {
             headers: { ...formData.getHeaders() },
             maxContentLength: Infinity,
             maxBodyLength: Infinity
           });
           logger.info('[File Upload]: File forwarded to backend successfully');
           try { fs.unlinkSync(file.path); } catch (e) { logger.error('[File Upload]: cleanup error'+ e); }
-          req.flash("message", 'File uploading is in Process.');
+          const data = response.data || {};
+          const jobId = data.object && data.object.job_id;
+          const orgFromJob = data.object && data.object.organization_id;
+          if (data.alertType === 'success' && jobId != null) {
+            const orgForJobs = orgFromJob != null && !Number.isNaN(Number(orgFromJob)) && Number(orgFromJob) > 0
+              ? Number(orgFromJob)
+              : organization;
+            const jobsPath = frontend_api_urls.PRODUCT_SUITE.User_Management.BULK_IMPORT_JOBS(orgForJobs);
+            req.flash("message", req.__("user.bulkImportQueuedShort"));
+            req.flash("alertType", "success");
+            return res.redirect(`${jobsPath}?jobId=${encodeURIComponent(String(jobId))}`);
+          }
+          req.flash("message", 'File uploading is in process.');
           req.flash("alertType", "success");
           return res.redirect(frontend_api_urls.PRODUCT_SUITE.User_Management.SUITE_USERS);
         } catch (apiErr) {

@@ -75,7 +75,11 @@ function showCustomToast(alertType, alertMessage = null) {
 
   const lang = document.documentElement.lang;
   let title = alertType === 'error' ? 'Error' : 'Success!';
-  let message = alertMessage;
+  let message = typeof alertMessage === 'string' ? alertMessage.trim() : '';
+
+  if (!message) {
+    message = alertType === 'error' ? 'An unexpected error occurred.' : 'Operation completed successfully.';
+  }
 
   if (lang === 'ar') {
     if (alertType === 'error') {
@@ -87,6 +91,7 @@ function showCustomToast(alertType, alertMessage = null) {
       'Package deleted successfully': 'تم حذف الباقة بنجاح',
       'User deleted successfully': 'تم حذف المستخدم بنجاح',
       'User created successfully': 'تم إنشاء المستخدم بنجاح',
+      'App service deleted successfully': 'تم حذف خدمة التطبيق بنجاح',
       'Campaign launch has been initiated': 'تم بدء إطلاق الحملة',
       'Campaign Launch has been initiated': 'تم بدء إطلاق الحملة',
       'Campaign has been initiated': 'تم بدء الحملة',
@@ -100,7 +105,8 @@ function showCustomToast(alertType, alertMessage = null) {
       '! Success': '! نجاح',
       'Success !': 'نجاح !',
       'Delete Successfully': 'تم الحذف بنجاح',
-      'Successfully': 'بنجاح'
+      'Successfully': 'بنجاح',
+      'Order Payment has updated': 'تم تحديث دفع الطلب'
     };
     for (const [en, ar] of Object.entries(translations)) {
       message = message.replaceAll(en, ar);
@@ -141,7 +147,7 @@ function showCustomToast(alertType, alertMessage = null) {
  * @param {Function} onConfirm - Called when the user clicks Confirm.
  * @param {Function} [onCancel] - Optional callback when the user cancels.
  */
-function showCustomConfirm(message, onConfirm, onCancel) {
+function showCustomConfirm(message, onConfirm, onCancel, confirmText = 'Confirm', cancelText = 'Cancel') {
   const backdrop = document.createElement('div');
   backdrop.className =
     'fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in';
@@ -160,11 +166,11 @@ function showCustomConfirm(message, onConfirm, onCancel) {
       <div class="flex justify-end gap-3">
         <button id="_confirmModalCancel" type="button"
           class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition">
-          Cancel
+          ${cancelText}
         </button>
         <button id="_confirmModalConfirm" type="button"
           class="px-6 py-2.5 rounded-lg bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition">
-          Confirm
+          ${confirmText}
         </button>
       </div>
     </div>
@@ -398,6 +404,19 @@ btns.forEach(button => {
 
 
 // Full JS — paste this in place of your old scripts
+
+// Check for toast message on page load
+document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const message = urlParams.get('message');
+  const alertType = urlParams.get('alertType');
+  if (message && alertType && typeof showCustomToast === 'function') {
+    showCustomToast(alertType, message);
+    // Remove the params from URL without reloading
+    const newUrl = window.location.pathname + window.location.hash;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+});
 document.addEventListener('DOMContentLoaded', () => {
   // ===== Modal close/open logic =====
   const outerOverlay = document.getElementById('rightModalOverlay'); // outer wrapper

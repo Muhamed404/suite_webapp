@@ -24,6 +24,7 @@ const DMSRoutes = require("./organization/domain-management-routes");
 const userRoutes = require("./user/user-routes");
 const SMSRoutes = require("./organization/sms-routes");
 const notificationTemplateRoutes = require("./notification_template/notification-template-routes");
+const notificationMailRoutes     = require("./notification_mail/notification-mail-routes");
 const authenticateMiddleware = require('../../middleware/jwt_authenticator/jwt-authenticate-middleware');
 const departmentRoute = require('./department/department-route')
 const {validate, handleValidationResult} = require('../../middleware/routes-validation')
@@ -33,6 +34,7 @@ protectedRouter.use('/dms', DMSRoutes)
 protectedRouter.use('/template', SystemTemplate)
 protectedRouter.use('/sms', SMSRoutes)
 protectedRouter.use('/notification-template', notificationTemplateRoutes)
+protectedRouter.use('/notification-mail', notificationMailRoutes)
 protectedRouter.use("/audit", organizationAuditLog);
 protectedRouter.use('/department', departmentRoute)
 protectedRouter.use("/service-registry", ServiceRegistryRoutes);

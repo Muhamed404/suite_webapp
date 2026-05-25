@@ -1,9 +1,10 @@
 const { logger } = require("../../../logger/logger");
 const { getFilteredRolesByOrganizationLevel } = require("../../../commons/commons");
-const { hasAccess } = require("../../../utility/helperFunctions");
+const { hasAccess, cleanEmail } = require("../../../utility/helperFunctions");
 const ICONSTANTS = require("../../../contants/ICONSTANTS");
 const enums = require('../../../contants/enum')
 const getApiClient = require('../../../utility/api-client');
+const { redactEmail } = require("../../../utility/redact");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 
@@ -42,7 +43,7 @@ exports.create = async (req, res, next) => {
      
 
       if (!hasAccess(req, enums.ModuleNames.User_Management, [enums.Access_Types.RWD_ALL, enums.Access_Types.RW_O, enums.Access_Types.RWD_O])) {
-        logger.info(`[Create User Controller] Enabling Create Button for user: ` + userSession.email)
+        logger.info(`[Create User Controller] Enabling Create Button for user: ` + redactEmail(userSession.email))
 
         hasCreatePermission = Boolean(true)
       }
@@ -74,10 +75,10 @@ exports.create = async (req, res, next) => {
 
 
 exports.submitCreationForm = async (req, res, next) => {
-  logger.info(`[UserCreationSubmit] Incoming request for user:${JSON.stringify(req.body.email, null, 2)}`);
+  logger.info(`[UserCreationSubmit] Incoming request for user:${JSON.stringify(redactEmail(req.body.email), null, 2)}`);
   try {
     if (req.method === "POST") {
-      const email = req.body?.email || null;
+      const email = cleanEmail(req.body?.email || '')  || null;
       const first_name = req.body?.first_name || null;
       const last_name = req.body?.last_name || null;
       const password = req.body?.password || null;
@@ -102,7 +103,7 @@ exports.submitCreationForm = async (req, res, next) => {
         role_id: role,
         selectedProductKey
       };
-      logger.info('[UserCreationSubmit] Create User: Posting user payload ' + JSON.stringify(user.email, null, 2));
+      logger.info('[UserCreationSubmit] Create User: Posting user payload ' + JSON.stringify(redactEmail(user.email), null, 2));
       let userOrganizationId = req.user.organization_id;
       if (userOrganizationId !== undefined && userOrganizationId !== null && !isNaN(userOrganizationId)
         && userOrganizationId !== 0) {

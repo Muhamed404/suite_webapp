@@ -4,6 +4,7 @@ const render_ejs_urls = require("../../../config/render_ejs_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client');
 const enums = require('../../../contants/enum');
+const { redactLogData } = require("../../utility/redact");
 
 
 exports.listOfPhishingSMTPController = (req, res) => {
@@ -20,10 +21,10 @@ exports.listOfPhishingSMTPController = (req, res) => {
     .get(url)
     .then((response) => {
       const data = response.data;
-      logger.info(`Listing Of Phishing SMTP Controller: Response ${JSON.stringify(data, null, 2)}`);
+      logger.info(`Listing Of Phishing SMTP Controller: Response ${JSON.stringify(redactLogData(data), null, 2)}`);
       const smtpList = data?.smtps ?? [];
       logger.info(`Listing Of Phishing SMTP Controller: Total SMTPs fetched ${smtpList.length}`);
-      logger.debug(`Listing Of Phishing SMTP Controller: Rendering the list of phishing SMTPs \n ${JSON.stringify(smtpList, null, 2)}`);
+      logger.debug(`Listing Of Phishing SMTP Controller: Rendering the list of phishing SMTPs \n ${JSON.stringify(redactLogData(smtpList), null, 2)}`);
 
       const userPermissions = req.permissions || [];
       const canManageDefault = userPermissions.some(

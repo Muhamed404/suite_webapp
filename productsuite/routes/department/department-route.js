@@ -6,11 +6,14 @@ const checkPermission = require("../../../utility/check-permission");
 const enums = require('../../../contants/enum')
 const { getUsersByDepartment } = require('../../../phishmagnus/controllers/user/getUsersByDepartment')
 const { getUsersByUnAssignedDepartment } = require('../../../phishmagnus/controllers/user/getUsersByUnAssignedDepartment')
+const { deleteDepartment } = require('../../../phishmagnus/controllers/department/delete-department-controller')
+const { logger } = require("../../../logger/logger");
+const { redactLogData } = require("../../../utility/redact");
 
 
 // Logging middleware for all department routes
 router.use((req, res, next) => {
-    logger.info(`[Department Route] ${req.method} ${req.originalUrl}`);
+    logger.info(`[Department Route] ${redactLogData(req.method)} ${redactLogData(req.originalUrl)}`);
     next();
 });
 
@@ -40,5 +43,8 @@ router.post("/disable/:orgId",
     checkPermission(enums.ModuleNames.Department, [enums.Access_Types.RWD_O, enums.Access_Types.RW_ALL]), validate("disableDepartment"), handleValidationResult, controller.disableDepartment);
 router.post("/save-department-users/:departmentId",
     checkPermission(enums.ModuleNames.Department, [enums.Access_Types.RWD_O, enums.Access_Types.RW_ALL]), controller.addUsersIntoDepartments);
+
+router.delete("/delete/:departmentId", checkPermission(enums.ModuleNames.Department, [enums.Access_Types.RWD_O]),
+    deleteDepartment);
 
 module.exports = router;

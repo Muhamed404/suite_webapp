@@ -7,6 +7,14 @@ import { useAchievementStatistics } from "@/hooks/useDashboard";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { useTranslations } from "@/i18n/useTranslations";
 import Image from "next/image";
+import { useI18n } from "@/i18n/I18nProvider";
+import achievementTranslationsAr from "@/messages/ar/gamification_achievements-ar.json";
+
+type ArabicAchievementTranslation = {
+  name: string;
+  description: string;
+  category: string;
+};
 
 interface Achievement {
   achievement_id: number;
@@ -21,8 +29,77 @@ function MyAchievementsContent() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const { data: achievementData } = useAchievementStatistics();
   const t = useTranslations("dashboard");
+  const { locale } = useI18n();
+  const isArabic = locale === "ar";
+  const achievementFallbackLabel = isArabic ? "إنجاز" : "Achievement";
+  const arabicAchievementMap = achievementTranslationsAr.achievements as Record<
+    string,
+    ArabicAchievementTranslation
+  >;
+
+  const resolveAchievementName = (item: Achievement) => {
+    if (isArabic) {
+      const mappedArabic = arabicAchievementMap[String(item.achievement_id)]?.name;
+      if (mappedArabic) return mappedArabic;
+
+      const localizedName =
+        (item as any)?.achievement_name_ar ??
+        (item as any)?.achievement_name_arabic ??
+        (item as any)?.name_ar ??
+        (item as any)?.name_arabic;
+      if (localizedName) return localizedName;
+    }
+
+    if (item.achievement_name) return item.achievement_name;
+    return `${achievementFallbackLabel} #${item.achievement_id}`;
+  };
+
+  const resolveAchievementDescription = (item: Achievement) => {
+    if (isArabic) {
+      const mappedArabic = arabicAchievementMap[String(item.achievement_id)]?.description;
+      if (mappedArabic) return mappedArabic;
+
+      const localizedDescription =
+        (item as any)?.achievement_description_ar ??
+        (item as any)?.achievement_description_arabic ??
+        (item as any)?.description_ar ??
+        (item as any)?.description_arabic;
+      if (localizedDescription) return localizedDescription;
+    }
+
+    return item.achievement_description ?? "";
+  };
+
+  const resolveAchievementCategory = (item: Achievement) => {
+    if (isArabic) {
+      const mappedArabic = arabicAchievementMap[String(item.achievement_id)]?.category;
+      if (mappedArabic) return mappedArabic;
+    }
+    return item.achievement_category;
+  };
 
   const achievements = achievementData?.object?.achievement_statistics || [];
+
+  const categoryConfig: Record<string, { bg: string; text: string }> = {
+    Performance: { bg: "bg-orange-100", text: "text-orange-700" },
+    Milestone: { bg: "bg-blue-100", text: "text-blue-700" },
+    Behavior: { bg: "bg-red-100", text: "text-red-700" },
+    Streak: { bg: "bg-purple-100", text: "text-purple-700" },
+    Completion: { bg: "bg-teal-100", text: "text-teal-700" },
+    Learning: { bg: "bg-indigo-100", text: "text-indigo-700" },
+    Security: { bg: "bg-gray-100", text: "text-gray-700" },
+    Awareness: { bg: "bg-yellow-100", text: "text-yellow-700" },
+    Training: { bg: "bg-cyan-100", text: "text-cyan-700" },
+    Compliance: { bg: "bg-green-100", text: "text-green-700" },
+    Risk: { bg: "bg-pink-100", text: "text-pink-700" },
+    Engagement: { bg: "bg-lime-100", text: "text-lime-700" },
+    Consistency: { bg: "bg-rose-100", text: "text-rose-700" },
+    Exploration: { bg: "bg-emerald-100", text: "text-emerald-700" },
+    Leadership: { bg: "bg-violet-100", text: "text-violet-700" },
+    Mastery: { bg: "bg-amber-100", text: "text-amber-700" },
+    Resilience: { bg: "bg-sky-100", text: "text-sky-700" },
+    Resourcefulness: { bg: "bg-fuchsia-100", text: "text-fuchsia-700" },
+  };
 
   return (
     <main className="flex-1 overflow-y-auto">
@@ -78,8 +155,12 @@ function MyAchievementsContent() {
             <div key={index} className="bg-white rounded-2xl p-4 relative">
               {/* Header */}
               <div className="flex justify-between items-start mb-3">
-                <span className="px-2 py-0.5 text-[11px] rounded-full bg-orange-100 text-orange-500">
-                  {item.achievement_category}
+                <span
+                  className={`px-2 py-0.5 text-[11px] rounded-full ${
+                    categoryConfig[item.achievement_category]?.bg ?? "bg-gray-100"
+                  } ${categoryConfig[item.achievement_category]?.text ?? "text-gray-500"}`}
+                >
+                  {resolveAchievementCategory(item)}
                 </span>
                 <span className="text-[11px] text-gray-400">{item.employee_count}x</span>
               </div>
@@ -89,7 +170,7 @@ function MyAchievementsContent() {
                 <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center">
                   <Image
                     unoptimized
-                    alt={item.achievement_name}
+                    alt={resolveAchievementName(item)}
                     className="w-14 h-14"
                     height={56}
                     src={getContentAssetUrl(`/images/achivement/${item.image_small_url}`)}
@@ -99,8 +180,8 @@ function MyAchievementsContent() {
               </div>
 
               {/* Content */}
-              <h3 className="text-sm font-semibold text-center">{item.achievement_name}</h3>
-              <p className="text-xs text-gray-500 text-center mb-3">{item.achievement_description}</p>
+              <h3 className="text-sm font-semibold text-center">{resolveAchievementName(item)}</h3>
+              <p className="text-xs text-gray-500 text-center mb-3">{resolveAchievementDescription(item)}</p>
             </div>
           ))}
         </div>

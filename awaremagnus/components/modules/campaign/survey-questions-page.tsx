@@ -28,6 +28,8 @@ import {
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useTranslations } from "@/i18n/useTranslations";
+import { formatLocaleInteger } from "@/i18n/localeFormat";
 import { useSurveyQuestions, useDeleteSurveyQuestion, useImportSurveyQuestions } from "@/hooks/useSurvey";
 import { useCategories } from "@/hooks/useSuiteAwm";
 import { useAuthStore } from "@/hooks/useAuthStore";
@@ -37,22 +39,16 @@ const ROWS_PER_PAGE = 10;
 type SortField = "question" | "category" | "questType";
 type SortDirection = "asc" | "desc" | null;
 
-function getQuizTypeName(id?: number) {
-  switch (id) {
-    case 1:
-      return "True/False";
-    case 2:
-      return "Single Choice";
-    case 3:
-      return "Multiple Answers";
-    default:
-      return "—";
-  }
-}
-
 export function SurveyQuestionsPage() {
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
+  const t = useTranslations("surveyManagement");
   const isRtl = dir === "rtl";
+
+  const quizTypeLabel = (id?: number) => {
+    if (id !== 1 && id !== 2 && id !== 3) return "—";
+
+    return t(`surveyQuestions.quizTypes.${id}`);
+  };
 
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [typeFilter, setTypeFilter] = useState<string>("all");
@@ -103,7 +99,7 @@ export function SurveyQuestionsPage() {
     try {
       await importQuestions.mutateAsync(formData);
       setCsvStatus("success");
-      setCsvMessage("Questions imported successfully!");
+      setCsvMessage(t("surveyQuestions.importModal.importSuccess"));
       setTimeout(() => {
         setShowCsvModal(false);
         setCsvFile(null);
@@ -212,7 +208,7 @@ export function SurveyQuestionsPage() {
   const paginatedQuestions = filteredQuestions.slice(startIndex, endIndex);
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this question?")) {
+    if (window.confirm(t("surveyQuestions.deleteConfirm"))) {
       try {
         await deleteQuestion.mutateAsync(id);
       } catch {
@@ -264,9 +260,9 @@ export function SurveyQuestionsPage() {
                 size="sm"
                 variant="flat"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className={clsx("w-4 h-4", isRtl && "rotate-180")} />
               </Button>
-              <h2 className="text-lg font-semibold">Quiz and Questions</h2>
+              <h2 className="text-lg font-semibold">{t("buttons.quizAndQuestions")}</h2>
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -277,7 +273,7 @@ export function SurveyQuestionsPage() {
                 variant="bordered"
                 onPress={() => setShowCsvModal(true)}
               >
-                Import CSV
+                {t("surveyQuestions.importCsv")}
               </Button>
               <Button
                 as={Link}
@@ -287,7 +283,7 @@ export function SurveyQuestionsPage() {
                 size="md"
                 startContent={<Plus className="w-4 h-4" />}
               >
-                New Quiz/Question
+                {t("surveyQuestions.newQuizQuestion")}
               </Button>
             </div>
           </div>
@@ -295,7 +291,7 @@ export function SurveyQuestionsPage() {
           {/* Table */}
           <div className="flex flex-col">
             <div className="flex flex-wrap items-center justify-between gap-3 bg-white px-4 py-3.5 rounded-t-xl border border-gray-100">
-              <h3 className="text-gray-900 font-medium">Questions List</h3>
+              <h3 className="text-gray-900 font-medium">{t("surveyQuestions.questionsList")}</h3>
               <div className="flex flex-row gap-3">
                 <Input
                   classNames={{
@@ -304,7 +300,7 @@ export function SurveyQuestionsPage() {
                       "h-9 bg-white border border-gray-200 rounded-full hover:border-gray-300 focus-within:!border-blue-500",
                     input: "text-xs",
                   }}
-                  placeholder="Search questions..."
+                  placeholder={t("surveyQuestions.searchPlaceholder")}
                   startContent={<Search className="text-gray-400 w-4 h-4" />}
                   type="text"
                   value={searchQuery}
@@ -314,14 +310,14 @@ export function SurveyQuestionsPage() {
                   }}
                 />
                 <Select
-                  aria-label="Category filter"
+                  aria-label={t("surveyQuestions.filterCategory")}
                   classNames={{
                     base: "w-36",
                     trigger: "h-9 bg-white border border-gray-200 rounded-full",
                     value: "text-xs",
                   }}
                   items={[
-                    { id: "all", name: "All Categories" },
+                    { id: "all", name: t("surveyQuestions.allCategories") },
                     ...(categories as any[]).map((cat: any) => ({
                       id: String(cat.id),
                       name: cat.name,
@@ -344,7 +340,7 @@ export function SurveyQuestionsPage() {
                   )}
                 </Select>
                 <Select
-                  aria-label="Type filter"
+                  aria-label={t("surveyQuestions.filterType")}
                   classNames={{
                     base: "w-36",
                     trigger: "h-9 bg-white border border-gray-200 rounded-full",
@@ -360,10 +356,10 @@ export function SurveyQuestionsPage() {
                     }
                   }}
                 >
-                  <SelectItem key="all">All Types</SelectItem>
-                  <SelectItem key="1">True/False</SelectItem>
-                  <SelectItem key="2">Single Choice</SelectItem>
-                  <SelectItem key="3">Multiple Answers</SelectItem>
+                  <SelectItem key="all">{t("surveyQuestions.allTypes")}</SelectItem>
+                  <SelectItem key="1">{t("surveyQuestions.quizTypes.1")}</SelectItem>
+                  <SelectItem key="2">{t("surveyQuestions.quizTypes.2")}</SelectItem>
+                  <SelectItem key="3">{t("surveyQuestions.quizTypes.3")}</SelectItem>
                 </Select>
               </div>
             </div>
@@ -379,8 +375,10 @@ export function SurveyQuestionsPage() {
                     <div className="bg-gray-100 p-4 rounded-full inline-block mb-4">
                       <SearchX className="w-10 h-10 text-gray-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">No Questions Found</h3>
-                    <p className="text-sm text-gray-500">Create your first quiz question</p>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                      {t("surveyQuestions.emptyTitle")}
+                    </h3>
+                    <p className="text-sm text-gray-500">{t("surveyQuestions.emptyDescription")}</p>
                   </div>
                 </div>
               ) : (
@@ -389,19 +387,27 @@ export function SurveyQuestionsPage() {
                     <table className="w-full text-xs whitespace-nowrap">
                       <thead className="bg-gray-50 text-gray-600 border-b sticky top-0 z-10">
                         <tr>
-                          <th className="px-4 py-3 text-left font-semibold w-12">#</th>
-                          <th className="px-4 py-3 text-left font-semibold">
-                            <SortableHeader field="category" label="Category" />
+                          <th className="px-4 py-3 text-start font-semibold w-12">
+                            {t("surveyQuestions.table.number")}
                           </th>
-                          <th className="px-4 py-3 text-left font-semibold">
-                            <SortableHeader field="question" label="Question" />
+                          <th className="px-4 py-3 text-start font-semibold">
+                            <SortableHeader field="category" label={t("surveyQuestions.table.category")} />
                           </th>
-                          <th className="px-4 py-3 text-left font-semibold">Answers</th>
-                          <th className="px-4 py-3 text-left font-semibold">Correct</th>
-                          <th className="px-4 py-3 text-left font-semibold">
-                            <SortableHeader field="questType" label="Quiz Type" />
+                          <th className="px-4 py-3 text-start font-semibold">
+                            <SortableHeader field="question" label={t("surveyQuestions.table.question")} />
                           </th>
-                          <th className="px-4 py-3 text-left font-semibold">Action</th>
+                          <th className="px-4 py-3 text-start font-semibold">
+                            {t("surveyQuestions.table.answers")}
+                          </th>
+                          <th className="px-4 py-3 text-start font-semibold">
+                            {t("surveyQuestions.table.correct")}
+                          </th>
+                          <th className="px-4 py-3 text-start font-semibold">
+                            <SortableHeader field="questType" label={t("surveyQuestions.table.quizType")} />
+                          </th>
+                          <th className="px-4 py-3 text-start font-semibold">
+                            {t("surveyQuestions.table.action")}
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
@@ -410,7 +416,9 @@ export function SurveyQuestionsPage() {
 
                           return (
                             <tr key={q.id} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-4 py-3 text-gray-400">{startIndex + idx + 1}</td>
+                              <td className="px-4 py-3 text-gray-400">
+                                {formatLocaleInteger(locale, startIndex + idx + 1)}
+                              </td>
                               <td className="px-4 py-3">
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-medium">
                                   {q.category?.name ?? "—"}
@@ -444,19 +452,21 @@ export function SurveyQuestionsPage() {
                               </td>
                               <td className="px-4 py-3">
                                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 font-medium">
-                                  {q.questType?.name ?? getQuizTypeName(q.ques_type_id)}
+                                  {q.questType?.name ?? quizTypeLabel(q.ques_type_id)}
                                 </span>
                               </td>
                               <td className="px-4 py-3">
                                 <div className="flex items-center gap-1">
-                                  <Button
-                                    isIconOnly
-                                    className="text-gray-400 hover:text-blue-500"
-                                    size="sm"
-                                    variant="light"
-                                  >
-                                    <Edit3 className="w-3.5 h-3.5" />
-                                  </Button>
+                                    <Button
+                                      isIconOnly
+                                      as={Link}
+                                      className="text-gray-400 hover:text-blue-500"
+                                      href={`/dashboard/survey/questions/edit/${q.id}`}
+                                      size="sm"
+                                      variant="light"
+                                    >
+                                      <Edit3 className="w-3.5 h-3.5" />
+                                    </Button>
                                   <Button
                                     isIconOnly
                                     className="text-gray-400 hover:text-red-500"
@@ -479,7 +489,11 @@ export function SurveyQuestionsPage() {
                   {totalPages > 1 && (
                     <div className="flex flex-col md:flex-row justify-between items-center px-4 py-3 border-t bg-gray-50 gap-3">
                       <span className="text-[10px] text-gray-400 font-medium">
-                        Showing {startIndex + 1}–{endIndex} of {totalItems}
+                        {t("surveyQuestions.pagination", {
+                          start: formatLocaleInteger(locale, startIndex + 1),
+                          end: formatLocaleInteger(locale, endIndex),
+                          total: formatLocaleInteger(locale, totalItems),
+                        })}
                       </span>
                       <Pagination
                         showControls
@@ -506,7 +520,7 @@ export function SurveyQuestionsPage() {
               <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 m-4 relative">
                 {/* Close Button */}
                 <button
-                  className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
+                  className="absolute top-4 end-4 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition"
                   type="button"
                   onClick={resetCsvModal}
                 >
@@ -515,9 +529,11 @@ export function SurveyQuestionsPage() {
 
                 {/* Modal Header */}
                 <div className="mb-5">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1">Import Survey Questions</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    {t("surveyQuestions.importModal.title")}
+                  </h3>
                   <p className="text-xs text-gray-500 mb-3">
-                    Upload a CSV file to bulk import survey questions. Select the question type and optionally a category.
+                    {t("surveyQuestions.importModal.description")}
                   </p>
 
                   <button
@@ -526,17 +542,18 @@ export function SurveyQuestionsPage() {
                     onClick={handleDownloadTemplate}
                   >
                     <Download className="w-3.5 h-3.5" />
-                    Download Template
+                    {t("surveyQuestions.importModal.downloadTemplate")}
                   </button>
                 </div>
 
                 {/* Question Type Selection */}
                 <div className="mb-4">
                   <label className="text-xs font-medium text-gray-700 mb-1 block">
-                    Question Type <span className="text-red-500">*</span>
+                    {t("surveyQuestions.importModal.questionType")}{" "}
+                    <span className="text-red-500">*</span>
                   </label>
                   <Select
-                    aria-label="Question type for import"
+                    aria-label={t("surveyQuestions.importModal.questionType")}
                     classNames={{
                       base: "w-full",
                       trigger: "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300",
@@ -548,25 +565,25 @@ export function SurveyQuestionsPage() {
                       if (v) setCsvQuesTypeId(v);
                     }}
                   >
-                    <SelectItem key="1">True/False</SelectItem>
-                    <SelectItem key="2">Single Choice</SelectItem>
-                    <SelectItem key="3">Multiple Answers</SelectItem>
+                    <SelectItem key="1">{t("surveyQuestions.quizTypes.1")}</SelectItem>
+                    <SelectItem key="2">{t("surveyQuestions.quizTypes.2")}</SelectItem>
+                    <SelectItem key="3">{t("surveyQuestions.quizTypes.3")}</SelectItem>
                   </Select>
                 </div>
 
                 {/* Category Selection */}
                 <div className="mb-4">
                   <label className="text-xs font-medium text-gray-700 mb-1 block">
-                    Category (optional)
+                    {t("surveyQuestions.importModal.categoryOptional")}
                   </label>
                   <Select
-                    aria-label="Category for import"
+                    aria-label={t("surveyQuestions.importModal.categoryOptional")}
                     classNames={{
                       base: "w-full",
                       trigger: "h-10 bg-white border border-gray-200 rounded-xl hover:border-gray-300",
                       value: "text-sm",
                     }}
-                    placeholder="Select a category"
+                    placeholder={t("surveyQuestions.importModal.categoryPlaceholder")}
                     selectedKeys={csvCategoryId ? [csvCategoryId] : []}
                     onSelectionChange={(keys) => {
                       const v = Array.from(keys as Set<string>)[0] ?? "";
@@ -603,9 +620,11 @@ export function SurveyQuestionsPage() {
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-700 mb-0.5">
-                            {csvFile ? csvFile.name : "Click to upload"}
+                            {csvFile ? csvFile.name : t("surveyQuestions.importModal.clickToUpload")}
                           </p>
-                          <p className="text-xs text-gray-500">CSV or Excel files only</p>
+                          <p className="text-xs text-gray-500">
+                            {t("surveyQuestions.importModal.csvExcelOnly")}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -627,7 +646,7 @@ export function SurveyQuestionsPage() {
                     type="button"
                     onClick={resetCsvModal}
                   >
-                    Cancel
+                    {t("surveyQuestions.importModal.cancel")}
                   </button>
                   <button
                     className="px-4 py-2 rounded-full bg-[#3FBDFF] text-white text-xs font-medium hover:bg-[#29AAE8] transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -635,7 +654,9 @@ export function SurveyQuestionsPage() {
                     type="button"
                     onClick={handleUploadCsv}
                   >
-                    {csvStatus === "uploading" ? "Uploading..." : "Import Questions"}
+                    {csvStatus === "uploading"
+                      ? t("surveyQuestions.importModal.uploading")
+                      : t("surveyQuestions.importModal.import")}
                   </button>
                 </div>
               </div>

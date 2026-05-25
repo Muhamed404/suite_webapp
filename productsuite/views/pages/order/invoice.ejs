@@ -113,15 +113,16 @@
                 <p class="text-xl font-bold mt-2"><%= __("Invoice.totalPayable") %>: SAR <%=invoiceData.Subscription[0].SubscriptionOrder.payment_amount %></p>
             </div>
 
-            <!-- Download Button -->
-            <div class="mt-6 flex justify-end gap-4">
-                <button id="download-pdf"
-                    class="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-lg border border-green-300 hover:bg-green-200">
-                    <%= __("Invoice.downloadAsPdf") %>
-                </button>
-                <button class="btn btn-primary" onclick="goBack()"><%= __("Invoice.back") %></button>
+        </div>
 
-            </div>
+        <!-- Download Button -->
+        <div class="mt-6 flex justify-end gap-4 no-print">
+            <button id="download-pdf"
+                class="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-lg border border-green-300 hover:bg-green-200">
+                <%= __("Invoice.downloadAsPdf") %>
+            </button>
+            <button class="btn btn-primary" onclick="goBack()"><%= __("Invoice.back") %></button>
+
         </div>
 
 
@@ -134,8 +135,16 @@
 </div>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+        @media print {
+                .no-print {
+                        display: none !important;
+                }
+        }
+</style>
+
+<script src="/securemagnus_2025/js/jspdf.umd.min.js"></script>
+    <script src="/securemagnus_2025/js/html2canvas.min.js"></script>
 
   <script>
 

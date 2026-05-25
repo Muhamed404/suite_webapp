@@ -1,5 +1,6 @@
 const config = require("../../../../config/env.config");
 const { logger } = require("../../../../logger/logger");
+const { redactLogData } = require("../../../utility/redact");
 const enums = require("../../../../contants/enum");
 const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
@@ -44,15 +45,34 @@ exports.renderCampaignReport = async (req, res) => {
 
             // Extract data from your backend response format
             const backendData = response?.data || {};
-            logger.info(`${logContext} Backend response: ${JSON.stringify(backendData, null, 2)}`);
+            logger.info(`${logContext} Backend response: ${JSON.stringify(redactLogData(backendData), null, 2)}`);
             
             // Updated extraction based on your response structure
-            const campaignsData = backendData.data || {};
-            const rawCampaigns = campaignsData.campaigns || [];
+            let rawCampaigns = [];
+            let totalCount = 0;
+            let totalPages = 1;
+            let currentPage = page;
+
+            if (backendData.data && backendData.data.campaigns) {
+                const campaignsData = backendData.data;
+                rawCampaigns = campaignsData.campaigns || [];
+                totalCount = campaignsData.totalCampaigns || rawCampaigns.length;
+                totalPages = campaignsData.totalPages || Math.ceil(totalCount / pageSize);
+                currentPage = campaignsData.page || page;
+            } else if (backendData.campaigns) {
+                rawCampaigns = backendData.campaigns;
+                totalCount = rawCampaigns.length;
+            } else if (backendData.campaignObject) {
+                rawCampaigns = [{ campaign: backendData.campaignObject }];
+                totalCount = 1;
+            } else if (Array.isArray(backendData)) {
+                rawCampaigns = backendData.map(item => ({ campaign: item }));
+                totalCount = rawCampaigns.length;
+            }
             
             // Transform the nested campaign data structure
             const campaigns = rawCampaigns.map(item => {
-                const campaign = item.campaign || {};
+                const campaign = item.campaign || item || {}; // Fallback to item itself if not nested
                 const sentCount = Number(item.sentCount || 0);
                 const totalInvitees = Number(item.totalInvitees || 0);
                 return {
@@ -78,15 +98,10 @@ exports.renderCampaignReport = async (req, res) => {
             });
             
             logger.info(`${logContext} Retrieved ${campaigns.length} campaigns from backend`);
-            logger.info(`${logContext} Transformed campaigns: ${JSON.stringify(campaigns, null, 2)}`);
+            logger.info(`${logContext} Transformed campaigns: ${JSON.stringify(redactLogData(campaigns), null, 2)}`);
             
-            // Use pagination info from backend response
-            const totalCount = campaignsData.totalCampaigns || campaigns.length;
-            const totalPages = campaignsData.totalPages || Math.ceil(totalCount / pageSize);
-            const currentPage = campaignsData.page || page;
-
             logger.info(`${logContext} Successfully fetched ${campaigns.length} campaigns (total: ${totalCount})`);
-            logger.info(`${logContext} Backend message: ${backendData.message}`);
+            logger.info(`${logContext} Backend message: ${backendData.message || 'N/A'}`);
 
             // Prepare data for the template
             const templateData = {

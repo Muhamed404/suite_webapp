@@ -18,10 +18,30 @@ export const QUIZ_KEYS = {
   contents: (modId?: number, langId?: number) => ["quiz", "contents", { modId, langId }] as const,
   content: (id: number) => ["quiz", "content", id] as const,
   quizTypes: ["quiz", "quizTypes"] as const,
-  quizzes: (params?: { contentId?: number }) => ["quiz", "quizzes", params] as const,
+  quizzes: (params?: {
+    contentId?: number;
+    campaignId?: number;
+    rnd?: boolean;
+    limit?: number;
+    offset?: number;
+  }) => ["quiz", "quizzes", params] as const,
   quiz: (id: number) => ["quiz", "quiz", id] as const,
   quizAnswers: (quizId: number) => ["quiz", "quiz", quizId, "answers"] as const,
 };
+
+/** Stable React Query key + service options for GET /quiz/content/:contentId */
+export function quizzesContentQueryParams(
+  contentId: number,
+  opts?: { campaignId?: number; rnd?: boolean }
+): { contentId: number; campaignId?: number; rnd?: boolean } {
+  const campaignId = opts?.campaignId;
+  const hasCampaign = !!(campaignId && campaignId > 0);
+  if (!hasCampaign) {
+    return { contentId };
+  }
+  const rnd = opts?.rnd !== false;
+  return { contentId, campaignId, rnd };
+}
 
 export function useModules(
   params?: {
@@ -117,20 +137,29 @@ export function useQuizzes(params?: { contentId?: number; limit?: number; offset
   });
 }
 
-export function useQuizzesByContent(contentId: number, enabled = true) {
+export function useQuizzesByContent(
+  contentId: number,
+  enabled = true,
+  options?: { campaignId?: number; rnd?: boolean }
+) {
+  const keyParams = quizzesContentQueryParams(contentId, options);
   return useQuery({
-    queryKey: QUIZ_KEYS.quizzes({ contentId }),
-    queryFn: () => quizService.getQuizzesByContent(contentId),
+    queryKey: QUIZ_KEYS.quizzes(keyParams),
+    queryFn: () =>
+      quizService.getQuizzesByContent(contentId, {
+        campaignId: keyParams.campaignId,
+        rnd: keyParams.rnd === true ? true : undefined,
+      }),
     enabled: enabled && !!contentId,
   });
 }
 
 /** Fetches all quizzes for a module by first getting contents then quizzes per content */
-export function useQuizzesByModule(moduleId: number, enabled = true) {
+export function useQuizzesByModule(moduleId: number, langId?: number, enabled = true) {
   return useQuery({
-    queryKey: [...QUIZ_KEYS.contents(moduleId), "quizzes"],
+    queryKey: [...QUIZ_KEYS.contents(moduleId), "quizzes", { langId }],
     queryFn: async () => {
-      const contentsRes = await quizService.getContentsByModule(moduleId);
+      const contentsRes = await quizService.getContentsByModule(moduleId, langId != null ? { lang_id: langId } : undefined);
       const contents =
         contentsRes?.success && Array.isArray(contentsRes.data) ? contentsRes.data : [];
       const contentIds = contents.map((c: { id: number }) => c.id);
@@ -139,11 +168,15 @@ export function useQuizzesByModule(moduleId: number, enabled = true) {
       );
       const all = results.flatMap((r) => (r?.success && Array.isArray(r?.data) ? r.data : []));
 
-      // Create a map of content_id to content name for category display
-      const contentMap: Record<number, string> = {};
+      // Create a map of content_id to content info (name, language) for table display
+      const contentMap: Record<number, { name: string; language?: string; lang_id?: number }> = {};
 
-      contents.forEach((c: { id: number; title?: string; name?: string }) => {
-        contentMap[c.id] = c.title || (c as { name?: string }).name || `Content ${c.id}`;
+      contents.forEach((c: any) => {
+        contentMap[c.id] = {
+          name: c.title || c.name || `Content ${c.id}`,
+          language: c.language?.name || c.language_name || (c.lang_id === 2 ? "Arabic" : "English"),
+          lang_id: c.lang_id ?? c.language?.id,
+        };
       });
 
       return { success: true, data: all, contentMap };

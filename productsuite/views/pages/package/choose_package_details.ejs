@@ -8,6 +8,7 @@
             <div>
                 <label class="block text-gray-700 font-medium mb-3"><%= __("package.create.labelPackageName") %> </label>
                 <input placeholder="<%= __("package.create.placeholderPackageName") %>" type="text" value="" id="name" name="name" required
+                    oninput="this.value = this.value.replace(/[~`!@#$%\u005e\u0026\u002a\(\)_\u002b\u003d\{\}\u005b\u005d\u007c\u005c:\u003b\u0022\u0027\u003c\u003e,\u003f\/]/g, '')"
                     class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent" />
             </div>
             <div>

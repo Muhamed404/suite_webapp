@@ -2,6 +2,7 @@ const TemplateService = require('../../template/template-service');
 const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const { logger } = require("../../../../logger/logger");
+const { redactLogData } = require("../../../utility/redact");
 
 exports.fetchTemplates = async (orgId, phishingType, req) => {
   try {
@@ -22,7 +23,7 @@ exports.fetchTemplates = async (orgId, phishingType, req) => {
 exports.createCampaign = async (req) => {
   let payload = req.body;
   logger.info("NFC CAMPAIGN MODULE::: CREATE NFC CAMPAIGN SERVICE");
-  logger.info("Payload received: " + JSON.stringify(payload));
+  logger.info("Payload received: " + JSON.stringify(redactLogData(payload)));
   // Basic validation
   if (payload.templateId === null || payload.templateId === undefined || payload.templateId === "") {
     logger.info('Invalid Template has passed in nfc campaign ' + payload.templateId)

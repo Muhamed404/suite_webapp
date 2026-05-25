@@ -1,6 +1,7 @@
 const config = require("../../../config/env.config");
 
 const { logger } = require("../../../logger/logger");
+const { redactLogData } = require("../../utility/redact");
 const enums = require("../../../contants/enum");
 const getApiClient = require('../../../utility/api-client');
 const render_ejs_urls = require("../../../config/render_ejs_urls");
@@ -31,7 +32,7 @@ exports.nfcViewCampaignDetails = async (req, res) => {
         nfcUrls = nfcURLsResponse.data.message;
 
       }
-      logger.info('INCOMING STATISTICS ' + JSON.stringify(statistics))
+      logger.info('INCOMING STATISTICS ' + JSON.stringify(redactLogData(statistics)))
       let is_opened = 0;
       let is_downloaded = 0;
       let is_submitted = 0;

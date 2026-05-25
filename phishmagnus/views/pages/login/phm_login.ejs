@@ -8,11 +8,7 @@
   <meta name="googlebot" content="notranslate">
   <title>Secure Magnus</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fondamento:ital@0;1&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
-    rel="stylesheet">
+  <link rel="stylesheet" href="/securemagnus_2025/css/fonts.css">
 
   <!-- <script src="js/tailwind_3.js"></script> -->
   <script src="/securemagnus_2025/js/tailwind_3.js"></script>
@@ -98,7 +94,7 @@
 
 
       <!-- Login Form -->
-<form id="loginForm" action="/login" method="POST">
+<form id="loginForm" action="/login<%= locale ? ('?lang=' + locale) : '' %>" method="POST">
         <input type="hidden" name="userTimezone" id="userTimezone">
       <div class="flex items-center justify-center">
         <div class="flex flex-col max-w-2xl items-stretch ">
@@ -133,23 +129,6 @@
               </label>
 
             </fieldset>
-            <div class="flex justify-between mt-3">
-              <div class="flex items-center gap-3 ">
-                <input type="checkbox" class="accent-[var(--teal)] text-white w-5 h-5 rounded"
-                  aria-label="Custom checkbox" />
-
-                <label for="agreement" class="text-sm ">
-                  <%= __('generic_label.rememberMe') %>
-                </label>
-              </div>
-
-              <div class="">
-                <a class="label-text text-[var(--teal)] text-base-content/80 text-xs" href="">
-                  <%= __('generic_label.forgotPassword') %>
-                </a>
-              </div>
-
-            </div>
 
 
               <button type="submit"
@@ -158,12 +137,6 @@
                 <%= __('generic_label.login') %>
               </button>
 
-            <p class="text-base-content/80 mt-4 text-center text-sm md:mt-6">
-              <%= __('generic_label.dontHaveAccount') %>
-              <a class="text-[var(--teal)] ms-1 hover:underline" href="./onboarding1-eng.html">
-                <%= __('generic_label.signup') %>
-              </a>
-            </p>
           </div>
         </div>
       </div>

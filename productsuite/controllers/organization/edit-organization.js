@@ -3,6 +3,7 @@ const config = require("../../../config/env.config");
 const ICONSTANT = require("../../../contants/ICONSTANTS");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require('../../../utility/api-client')
+const { redactLogData } = require("../../../utility/redact");
 exports.editOrganization = async (req, res) => {
   logger.info(`EDIT ORGANIZATION: INCOMING REQUEST`);
   if (req.method === "GET") {
@@ -43,8 +44,8 @@ exports.editOrganization = async (req, res) => {
         organizationDetails,
       });
     } catch (error) {
-      logger.error("EDIT ORGANIZATION: " + error.message);
-      logger.error(error.stack);
+      logger.error("EDIT ORGANIZATION: " + redactLogData(error.message));
+      logger.error(redactLogData(error.stack));
 
       return res.status(500).render("pages/404", {
         message: "Internal Server Error while editing organization",
@@ -67,7 +68,7 @@ exports.editOrganization = async (req, res) => {
     if (req.body.password) {
       payload.password = req.body.password;
     }
-    logger.info(`EDIT ORGANIZATION: FINAL PAYLOAD:${JSON.stringify(payload)}`);
+    logger.info(`EDIT ORGANIZATION: FINAL PAYLOAD:${JSON.stringify(redactLogData(payload))}`);
 
     try {
 
@@ -79,12 +80,12 @@ exports.editOrganization = async (req, res) => {
 
       }
       logger.info('EDIT ORGANIZATION: ORGANIZATION HAS BEEN UPDATE');
-      req.flash('message', 'Organization has updated');
+      req.flash('message', req.__('organization.edit.successMessage'));
       req.flash('alertType', 'success');
       res.redirect(`/organization/profile/${organizationId}`);
     } catch (error) {
-      logger.error("Error creating organization:" + error.stack);
-      req.flash('message', 'Error updating organization');
+      logger.error("Error creating organization:" + redactLogData(error.stack));
+      req.flash('message', req.__('organization.edit.errorMessage'));
       req.flash('alertType', 'error');
       res.redirect(`/organization/profile/${organizationId}`);
     }

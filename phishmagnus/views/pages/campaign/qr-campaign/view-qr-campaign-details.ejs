@@ -287,27 +287,54 @@
                     <%= __( "qr_campaign.interactionReportByEachQRCode" ) %>
                 </h2>
                 <div class="relative hidden lg:block">
-                    <input type="text" placeholder="<%= __('qr_campaign.searchHere') %>"
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+                        </svg>
+                    </div>
+                    <input id="qrSearchInput" type="text" placeholder="<%= __('qr_campaign.searchHere') %>" value="<%= typeof search !== 'undefined' ? search : '' %>"
                         class="pl-9 pr-4 py-2 rounded-full bg-gray-50 text-sm border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400 w-56">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-                    </svg>
                 </div>
             </div>
             <!-- Table -->
             <div class="overflow-x-auto">
                 <table class="min-w-full text-sm text-left">
-                    <thead class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                    <thead class="bg-gray-50 text-gray-900 text-xs uppercase tracking-wider">
                         <tr>
                             <th class="px-6 py-3 font-medium whitespace-nowrap">#</th>
-                            <th class="px-6 py-3 font-medium whitespace-nowrap"><%= __( "qr_campaign.tagCode" ) %></th>
-                            <th class="px-6 py-3 font-medium whitespace-nowrap"><%= __( "qr_campaign.scanned" ) %></th>
-                            <th class="px-6 py-3 font-medium whitespace-nowrap"><%= __( "qr_campaign.downloadQRCode" ) %></th>
-                            <th class="px-6 py-3 font-medium whitespace-nowrap"><%= __( "qr_campaign.viewReport" ) %></th>
-                            <th class="px-6 py-3 font-medium whitespace-nowrap"><%= __('qr_campaign.testUrl') %></th>
+                            <th class="px-6 py-3 font-medium whitespace-nowrap">
+                                <div class="flex items-center gap-2">
+                                    <img src="/securemagnus_2025/images/qr-sent.svg" class="w-5 h-5" alt="">
+                                    <%= __( "qr_campaign.tagCode" ) %>
+                                </div>
+                            </th>
+                            <th class="px-6 py-3 font-medium whitespace-nowrap">
+                                <div class="flex items-center gap-2">
+                                    <img src="/securemagnus_2025/images/nfc-opened.svg" class="w-5 h-5" alt="">
+                                    <%= __( "qr_campaign.scanned" ) %>
+                                </div>
+                            </th>
+                            <th class="px-6 py-3 font-medium whitespace-nowrap">
+                                <div class="flex items-center gap-2">
+                                    <img src="/securemagnus_2025/images/qr-download-icon.svg" class="w-5 h-5" alt="">
+                                    <%= __( "qr_campaign.downloadQRCode" ) %>
+                                </div>
+                            </th>
+                            <th class="px-6 py-3 font-medium whitespace-nowrap">
+                                <div class="flex items-center gap-2">
+                                    <img src="/securemagnus_2025/images/eye.svg" class="w-5 h-5" alt="">
+                                    <%= __( "qr_campaign.viewReport" ) %>
+                                </div>
+                            </th>
+                            <th class="px-6 py-3 font-medium whitespace-nowrap">
+                                <div class="flex items-center gap-2">
+                                    <img src="/securemagnus_2025/images/link.svg" class="w-5 h-5" alt="">
+                                    <%= __('qr_campaign.testUrl') %>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody id="qrInteractionTableBody" class="divide-y divide-gray-100">
                         <% if (typeof qrImageUrls !== 'undefined' && qrImageUrls !== null && qrImageUrls.length > 0) {
                             qrImageUrls.forEach((images, index) => { %>
                             <tr class="bg-white hover:bg-gray-50 transition-colors duration-150">
@@ -373,6 +400,7 @@
                     </tbody>
                 </table>
             </div>
+            <div id="qrInteractionPagination" class="px-5 pb-5"></div>
         </div>
     </div>
 </div>
@@ -433,6 +461,8 @@
         uniqueDownloadedCount: <%= typeof downloadSegmentStats !== 'undefined' && downloadSegmentStats?.uniqueDownloadCount || 0 %>,
     };
 
+    window.qrImageUrls = <%- JSON.stringify(qrImageUrls || []) %>;
+
 
 
 
@@ -444,5 +474,246 @@
             .then(() => showCustomToast('success', 'URL copied!'))
             .catch(() => showCustomToast('error', 'Failed to copy URL'));
     });
+</script>
+<script>
+    const qrInteractionPagination = document.getElementById('qrInteractionPagination');
+    const qrShowingResultsLabel = '<%= __("qr_campaign.showingResults") %>';
+    const qrInteractionPageState = {
+        page: 1,
+        pageSize: 10,
+        totalPages: 1,
+        totalCount: 0,
+        items: []
+    };
+
+    function updateQrPagination(items, page) {
+        qrInteractionPageState.items = Array.isArray(items) ? items : [];
+        qrInteractionPageState.totalCount = qrInteractionPageState.items.length;
+        qrInteractionPageState.totalPages = qrInteractionPageState.totalCount === 0
+            ? 0
+            : Math.max(1, Math.ceil(qrInteractionPageState.totalCount / qrInteractionPageState.pageSize));
+        qrInteractionPageState.page = Math.min(Math.max(1, page || 1), qrInteractionPageState.totalPages || 1);
+    }
+
+    function renderQrPagination() {
+        if (!qrInteractionPagination) {
+            return;
+        }
+
+        const currentPageNum = qrInteractionPageState.page;
+        const totalPages = qrInteractionPageState.totalPages;
+        const pageSize = qrInteractionPageState.pageSize;
+        const totalCount = qrInteractionPageState.totalCount;
+
+        if (totalPages < 1) {
+            qrInteractionPagination.innerHTML = '';
+            return;
+        }
+
+        const startResult = totalCount === 0 ? 0 : ((currentPageNum - 1) * pageSize) + 1;
+        const endResult = totalCount === 0 ? 0 : Math.min(currentPageNum * pageSize, totalCount);
+
+        let paginationHTML = `
+            <div class="flex items-center justify-between w-full">
+                <div class="${document.dir === "rtl" ? "ml-4 mr-2" : "mr-4"}">
+                    <p class="text-sm text-gray-700">
+                        ${qrShowingResultsLabel
+                            .replace('{start}', startResult)
+                            .replace('{end}', endResult)
+                            .replace('{total}', totalCount)}
+                    </p>
+                </div>
+                <div class="flex space-x-2">
+        `;
+
+        if (currentPageNum > 1) {
+            paginationHTML += `
+                <button type="button" data-page="${currentPageNum - 1}"
+                    class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">
+                    ‹
+                </button>
+            `;
+        }
+
+        let startPage = Math.max(1, currentPageNum - 1);
+        let endPage = Math.min(totalPages, currentPageNum + 1);
+
+        if (endPage - startPage < 2) {
+            if (startPage === 1) {
+                endPage = Math.min(totalPages, 3);
+            } else if (endPage === totalPages) {
+                startPage = Math.max(1, totalPages - 2);
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i += 1) {
+            const isActive = i === currentPageNum;
+            paginationHTML += `
+                <button type="button" data-page="${i}"
+                    class="px-3 py-1 rounded-full ${isActive ? "bg-teal-50 text-[var(--teal)] border border-[var(--teal)]" : "border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300"}">
+                    ${i}
+                </button>
+            `;
+        }
+
+        if (currentPageNum < totalPages) {
+            paginationHTML += `
+                <button type="button" data-page="${currentPageNum + 1}"
+                    class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">
+                    ›
+                </button>
+            `;
+        }
+
+        paginationHTML += `
+                </div>
+            </div>
+        `;
+
+        qrInteractionPagination.innerHTML = paginationHTML;
+
+        qrInteractionPagination.querySelectorAll('button[data-page]').forEach(button => {
+            button.addEventListener('click', () => {
+                const nextPage = Number(button.dataset.page || 1);
+                renderQrPage(qrInteractionPageState.items, nextPage);
+            });
+        });
+    }
+
+    function renderQrPage(items, page) {
+        updateQrPagination(items, page);
+        const startIndex = (qrInteractionPageState.page - 1) * qrInteractionPageState.pageSize;
+        const pageItems = qrInteractionPageState.items.slice(
+            startIndex,
+            startIndex + qrInteractionPageState.pageSize
+        );
+        renderQRInteractionTable(pageItems);
+        renderQrPagination();
+    }
+
+    function applyQrFilter(rawSearch) {
+        const search = (rawSearch || '').trim().toLowerCase();
+        if (!search) {
+            return window.qrImageUrls || [];
+        }
+        return (window.qrImageUrls || []).filter(item => {
+            const code = String(item?.qr_code || '').toLowerCase();
+            return code.includes(search);
+        });
+    }
+
+    function debounce(fn, wait) {
+        let timeoutId;
+        return (...args) => {
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
+            timeoutId = setTimeout(() => {
+                fn(...args);
+            }, wait);
+        };
+    }
+
+    const applyQrSearch = debounce(() => {
+        const searchValue = $('#qrSearchInput').val();
+        const filtered = applyQrFilter(searchValue);
+        renderQrPage(filtered, 1);
+        const newUrl = new URL(window.location.href);
+        if (searchValue) {
+            newUrl.searchParams.set('search', searchValue);
+        } else {
+            newUrl.searchParams.delete('search');
+        }
+        window.history.pushState({}, '', newUrl);
+    }, 300);
+
+    $('#qrSearchInput').on('input', applyQrSearch);
+
+    $('#qrSearchInput').on('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            applyQrSearch();
+        }
+    });
+
+    $(function () {
+        const initialSearch = $('#qrSearchInput').val();
+        const filtered = applyQrFilter(initialSearch);
+        renderQrPage(filtered, 1);
+    });
+
+    function renderQRInteractionTable(qrImageUrls) {
+        const $tbody = $('#qrInteractionTableBody');
+        $tbody.empty();
+
+        if (qrImageUrls && qrImageUrls.length > 0) {
+            qrImageUrls.forEach((images, index) => {
+                const row = `
+                    <tr class="bg-white hover:bg-gray-50 transition-colors duration-150">
+                        <td class="px-6 py-4 text-gray-400 font-medium whitespace-nowrap">${index + 1}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700">
+                                ${images.qr_code}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            ${images.is_scanned ? `
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-teal-500 inline-block"></span>
+                                    <%= __('qr_campaign.scannedYes') %>
+                                </span>
+                            ` : `
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block"></span>
+                                    <%= __('qr_campaign.scannedNo') %>
+                                </span>
+                            `}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <button type="button"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-teal-600 border border-teal-200 bg-teal-50 hover:bg-teal-600 hover:text-white transition-colors duration-150"
+                                title="Download" data-url="${images.download_url}" data-toggle="tooltip">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                </svg>
+                                <%= __( "qr_campaign.downloadQRCode" ) %>
+                            </button>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="/phm/campaign/qr/tag/report/<%= campaignDetails.id %>/${images.qr_code}"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-blue-600 border border-blue-200 bg-blue-50 hover:bg-blue-600 hover:text-white transition-colors duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                <%= __( "qr_campaign.viewReport" ) %>
+                            </a>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <a href="<%=tvbs_backend_url%>/rq?iqr=${images.qr_code}" target="_blank"
+                                class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-teal-600 transition-colors duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                                <%= __('qr_campaign.clickToTest') %>
+                            </a>
+                        </td>
+                    </tr>
+                `;
+                $tbody.append(row);
+            });
+        } else {
+            $tbody.append(`
+                <tr>
+                    <td colspan="6" class="px-6 py-10 text-center text-gray-400 text-sm">
+                        <svg class="w-8 h-8 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-6 0h6"/>
+                        </svg>
+                        <%= __('qr_campaign.noRecords') %>
+                    </td>
+                </tr>
+            `);
+        }
+    }
 </script>
 <script src="/securemagnus_2025/js/qr_camp_view.js"></script>

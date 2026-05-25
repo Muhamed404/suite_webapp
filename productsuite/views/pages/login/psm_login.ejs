@@ -9,11 +9,7 @@
   <title>Secure Magnus</title>
 
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Fondamento:ital@0;1&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap"
-    rel="stylesheet">
+  <link rel="stylesheet" href="/securemagnus_2025/css/fonts.css">
 
 
   <script src="/securemagnus_2025/js/tailwind_3.js"></script>
@@ -128,7 +124,7 @@
 
 
       <!-- Login Form -->
-      <form id="loginForm" action="/login" method="POST">
+      <form id="loginForm" action="/login<%= locals.locale ? ('?lang=' + locals.locale) : '' %>" method="POST">
         <input type="hidden" name="userTimezone" id="userTimezone">
 
         <div class="flex items-center justify-center">

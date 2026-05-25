@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+import WebpackObfuscator from 'webpack-obfuscator';
+
 const nextConfig = {
   basePath: "/awm",
   assetPrefix: "/awm",
@@ -10,6 +12,19 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: "500mb",
     },
+  },
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      config.plugins.push(
+        new WebpackObfuscator({
+          rotateStringArray: true,
+          stringArray: true,
+          stringArrayThreshold: 0.5,
+          compact: true,
+        }, [])
+      );
+    }
+    return config;
   },
 };
 

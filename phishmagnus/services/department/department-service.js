@@ -1,6 +1,7 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require("../../../utility/api-client");
+const { redactLogData } = require("../../../utility/redact");
 
 
 
@@ -15,9 +16,9 @@ async function getDepartmentsByOrganization(req) {
     } catch (error) {
         logger.error(
             `Issue in fetching department list by organization: `,
-            error.message
+            redactLogData(error.message)
         );
-        logger.error(error.stack);
+        logger.error(redactLogData(error.stack));
         return null;
     }
 }

@@ -6,11 +6,13 @@ const { retrieveUser } = require('../../controllers/user_management/show-user')
 const { editUser } = require('../../controllers/user_management/edit-user')
 const enums = require('../../../contants/enum')
 const { renderSuiteUsers } = require('../../controllers/user_management/render-suite-users')
+const { renderBulkImportJobs } = require('../../controllers/user_management/render-bulk-import-jobs')
 
 const checkPermission = require("../../../utility/check-permission");
 const { renderLicensedUserByProduct } = require("../../controllers/user_management/render-licensed-users-by-product-controller");
 const { renderSecureMagnusUsers } = require("../../controllers/user_management/render-secure-magnus-users-controller");
 const { createSecureMagnusUser, submitSecureMagnusUser } = require("../../controllers/user_management/create-securemagnus-user");
+const { sendBulkUserInvite } = require("../../controllers/user_management/send-bulk-user-invite");
 
 
 
@@ -25,6 +27,25 @@ router.get("/create/bulk", async (req, res) => { userManagement.renderBulkUserMo
 
 router.post("/create/bulk", checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O]),
   async (req, res) => { userManagement.uploadBulkUsers(req, res); });
+
+router.get(
+  "/bulk-import/jobs",
+  checkPermission(enums.ModuleNames.User_Management, [
+    enums.Access_Types.RWD_O,
+    enums.Access_Types.RWD_ALL,
+    enums.Access_Types.R_ALL,
+  ]),
+  renderBulkImportJobs
+);
+router.get(
+  "/bulk-import/jobs/:organizationId",
+  checkPermission(enums.ModuleNames.User_Management, [
+    enums.Access_Types.RWD_O,
+    enums.Access_Types.RWD_ALL,
+    enums.Access_Types.R_ALL,
+  ]),
+  renderBulkImportJobs
+);
 
 // create single phm user
 router.get("/create", checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O]),
@@ -63,6 +84,12 @@ router.get("/retrieved-unenrolled-phm-users",
 router.post("/update-license-status/:hasRequestedToUnenroll?",
   checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O]),
   userManagement.saveUserAllocationLicense);
+
+router.post(
+  "/invite/bulk/send",
+  checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O, enums.Access_Types.RWD_ALL]),
+  sendBulkUserInvite
+);
 
 router.get(
   "/delete/:userId",

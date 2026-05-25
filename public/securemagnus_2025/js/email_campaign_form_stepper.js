@@ -96,6 +96,12 @@ class EmailCampaignStepper {
       if (hiddenTemplateId.length) {
         hiddenTemplateId.valid();
       }
+
+      const errorEl = document.getElementById('templateSelectError');
+      if (this.value && errorEl) {
+        errorEl.remove();
+        $(this).removeClass('border-red-500');
+      }
     });
   }
 
@@ -506,23 +512,51 @@ class EmailCampaignStepper {
   async validateForm() {
     if (!this.form) return true;
 
-    // Step 1: Validate campaign name
+    // Step 1: Validate campaign name and template selection
     if (this.currentStep === 0) {
       const nameInput = document.getElementById('name');
+      const templateSelect = document.getElementById('templateSelect');
+      const hiddenTemplateId = document.querySelector('input[name="templateId"]');
       const validator = $(this.form).validate();
+      let isValid = true;
 
-      if (nameInput && !nameInput.value.trim()) {
+      const trimmedName = nameInput?.value?.trim() || '';
+
+      if (nameInput && trimmedName.length < 2) {
         validator.showErrors({
           "name": window.i18n?.validation_messages?.campaign_name_required || "Campaign name is required (minimum 2 characters)."
         });
         $(nameInput).addClass('border-red-500');
         nameInput.focus();
         nameInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return false;
+        isValid = false;
       } else {
-        validator.resetForm();
         $(nameInput).removeClass('border-red-500');
       }
+
+      const selectedTemplateId = templateSelect?.value?.trim() || hiddenTemplateId?.value?.trim() || '';
+      if (!selectedTemplateId && templateSelect) {
+        this.showFieldError(
+          templateSelect,
+          window.i18n?.validation_messages?.template_required || "Please select a template.",
+          'templateSelectError'
+        );
+
+        if (isValid) {
+          templateSelect.focus();
+          templateSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        isValid = false;
+      } else if (templateSelect) {
+        this.clearFieldError(templateSelect, 'templateSelectError');
+      }
+
+      if (!isValid) {
+        return false;
+      }
+
+      validator.resetForm();
     }
 
     // Step 2: Validate department or group selection
@@ -609,6 +643,31 @@ class EmailCampaignStepper {
 
     // console.log('All validations passed for step:', this.currentStep);
     return true;
+  }
+
+  showFieldError(field, message, errorId) {
+    if (!field) return;
+
+    this.clearFieldError(field, errorId);
+
+    const error = document.createElement('span');
+    error.id = errorId;
+    error.className = 'text-red-500 text-sm mt-1 block';
+    error.textContent = message;
+
+    field.classList.add('border-red-500');
+    field.insertAdjacentElement('afterend', error);
+  }
+
+  clearFieldError(field, errorId) {
+    if (field) {
+      field.classList.remove('border-red-500');
+    }
+
+    const existingError = document.getElementById(errorId);
+    if (existingError) {
+      existingError.remove();
+    }
   }
 
   async validateMemberCount(departmentIds, groupIds) {
@@ -857,8 +916,14 @@ class EmailCampaignStepper {
                             this.currentTemplateData.attachment_url || 
                             this.currentTemplateData.file || 
                             this.currentTemplateData.file_url || 
-                            this.currentTemplateData.file_attachment) &&
-                          !!(this.currentTemplateData.inv && this.currentTemplateData.cid);
+                            this.currentTemplateData.file_attachment);
+
+    const phishOption = String(this.currentTemplateData?.phish_option || '').toLowerCase();
+    const isFormBasedByOption = ['data_entry', 'data-entry', 'dataentry'].includes(phishOption);
+    const formRegex = /<form[\s>]/i;
+    const hasFormTagInPages = formRegex.test(String(this.currentTemplateData?.phishing_page_content || '')) ||
+      formRegex.test(String(this.currentTemplateData?.landing_page_content || ''));
+    const hasFormSubmissionTracking = isFormBasedByOption || hasFormTagInPages;
 
    
     const path = window.location.pathname || '';
@@ -892,15 +957,15 @@ class EmailCampaignStepper {
       },
       {
         text: window.i18n?.generic_label?.formSubmitted || 'Track data submitted through the phishing simulation form',
-        available: hasLandingPage,
-        icon: hasLandingPage ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
-        color: hasLandingPage ? 'green' : 'blue'
+        available: hasFormSubmissionTracking,
+        icon: hasFormSubmissionTracking ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
+        color: hasFormSubmissionTracking ? 'green' : 'blue'
       },
       {
         text: window.i18n?.generic_label?.formInteraction || 'Track user interaction with the phishing simulation form',
-        available: hasLandingPage,
-        icon: hasLandingPage ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
-        color: hasLandingPage ? 'green' : 'blue'
+        available: hasFormSubmissionTracking,
+        icon: hasFormSubmissionTracking ? '<i class="fas fa-check text-green-500"></i>' : '<i class="fas fa-times text-red-500"></i>',
+        color: hasFormSubmissionTracking ? 'green' : 'blue'
       }
     ];
 
@@ -1034,7 +1099,8 @@ class EmailCampaignStepper {
         case 'landing':
           hasContent = !!(this.currentTemplateData.landing_page_content || 
                          this.currentTemplateData.landing_page || 
-                         this.currentTemplateData.landing_page_html);
+                         this.currentTemplateData.landing_page_html ||
+                         this.getLandingPageExternalUrl());
           // console.log(`Landing page content available: ${hasContent}`);
           break;
         case 'redirect':
@@ -1050,8 +1116,7 @@ class EmailCampaignStepper {
                          this.currentTemplateData.attachment_url || 
                          this.currentTemplateData.file || 
                          this.currentTemplateData.file_url || 
-                         this.currentTemplateData.file_attachment) &&
-                       !!(this.currentTemplateData.inv && this.currentTemplateData.cid);
+                         this.currentTemplateData.file_attachment);
           // console.log(`Attachment available: ${hasContent}`);
           break;
       }
@@ -1131,6 +1196,7 @@ class EmailCampaignStepper {
         if (content && !content.includes('No email content')) {
           if (previewIframe) {
             previewIframe.classList.remove('hidden');
+            previewIframe.removeAttribute('src');
             previewIframe.srcdoc = content;
             console.log('Email content loaded into iframe');
           }
@@ -1142,15 +1208,36 @@ class EmailCampaignStepper {
 
       case 'landing':
         title = 'Landing Page';
-        content = this.getLandingPageContent();
-        console.log('Landing page content length:', content?.length || 0);
-        if (content && !content.includes('No landing page')) {
+        const landingExternalUrl = this.getLandingPageExternalUrl();
+        if (landingExternalUrl) {
+          if (previewNoContent) {
+            previewNoContent.classList.remove('hidden');
+            previewNoContent.innerHTML = `
+              <div class="space-y-3">
+                <p class="text-gray-700">${window.i18n?.campaign?.email_create_campaign?.external_landing_page_url || 'External landing page URL:'}</p>
+                <p class="text-sm break-all text-teal-700">${landingExternalUrl}</p>
+                <button type="button" id="open-landing-preview-btn" class="px-4 py-2 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition">
+                  ${window.i18n?.campaign?.email_create_campaign?.open_preview || 'Open Preview'}
+                </button>
+              </div>
+            `;
+            const openBtn = document.getElementById('open-landing-preview-btn');
+            if (openBtn) {
+              openBtn.onclick = () => window.open(landingExternalUrl, '_blank', 'noopener,noreferrer');
+            }
+          }
+        } else {
+          content = this.getLandingPageContent();
+          console.log('Landing page content length:', content?.length || 0);
+        }
+        if (!landingExternalUrl && content && !content.includes('No landing page')) {
           if (previewIframe) {
             previewIframe.classList.remove('hidden');
+            previewIframe.removeAttribute('src');
             previewIframe.srcdoc = content;
             console.log('Landing page loaded into iframe');
           }
-        } else {
+        } else if (!landingExternalUrl) {
           if (previewNoContent) previewNoContent.classList.remove('hidden');
           console.log('No landing page content available');
         }
@@ -1163,6 +1250,7 @@ class EmailCampaignStepper {
         if (content && !content.includes('No redirection page')) {
           if (previewIframe) {
             previewIframe.classList.remove('hidden');
+            previewIframe.removeAttribute('src');
             previewIframe.srcdoc = content;
             console.log('Redirect page loaded into iframe');
           }
@@ -1235,6 +1323,14 @@ class EmailCampaignStepper {
     
     console.log('getLandingPageContent - landing_page_content:', this.currentTemplateData?.landing_page_content?.substring(0, 100));
     return content || '<p class="text-gray-500 p-4">No landing page available.</p>';
+  }
+
+  getLandingPageExternalUrl() {
+    const url = this.currentTemplateData?.landing_page_external_url || this.currentTemplateData?.landing_page_url;
+    if (typeof url === 'string' && /^https?:\/\//i.test(url.trim())) {
+      return url.trim();
+    }
+    return '';
   }
 
   getRedirectPageContent() {
@@ -1355,12 +1451,14 @@ class EmailCampaignStepper {
 
     const message = window.i18n?.messages?.confirmSubmit ||
       'Are you sure you want to submit this campaign? This action cannot be undone.';
+    const confirmText = window.i18n?.labels?.confirm || 'Confirm';
+    const cancelText = window.i18n?.labels?.cancel || 'Cancel';
 
     showCustomConfirm(message, () => {
       this.isSubmitting = true;
       this.updateButtons();
       this.form.submit();
-    });
+    }, null, confirmText, cancelText);
   }
 }
 

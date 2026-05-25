@@ -102,3 +102,29 @@ Supported languages and directions (LTR/RTL) are managed in the `i18n` module. T
 ## 📄 License
 
 This project is licensed under the MIT License.
+
+## Obfuscated Build And Deployment
+
+- Production builds use Webpack (via `next build`). The project is configured to apply Webpack obfuscation only to client bundles in `next.config.js` (so server/API code and middleware are not obfuscated).
+
+- To generate an obfuscated production build (client bundles are obfuscated by the Webpack plugin):
+
+```bash
+# from the awaremagnus project root
+npm install
+npm run build
+```
+
+- Package and copy the built files into the centralized obfuscated bundle (example, adjust paths for your environment):
+
+Create a directory inside the central obfuscated bundle (for example: Secure-Magnus-obfuscated/suite_webapp/awaremagnus) and place or copy the built artifacts into it (.next, public, package.json, README.md, next.config.js, etc.).
+
+- On the target (inside the obfuscated bundle) install production deps and start:
+
+```bash
+cd Secure-Magnus-obfuscated/suite_webapp/awaremagnus
+npm install
+npm start
+```
+
+Note: The central `start-all-obfuscated.ps1` will attempt to start this path automatically once the folder is present. Ensure `node` and `npm` are available on the host.

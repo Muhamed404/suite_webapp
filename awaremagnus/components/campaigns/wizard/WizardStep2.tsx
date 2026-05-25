@@ -92,13 +92,14 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
         setUsers(userMap);
       } catch (err) {
         console.error("Failed to fetch departments/groups/users:", err);
-        setError("Failed to load departments, groups, and users");
+        setError(t("form.loadTargetsError"));
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.organization_id, user?.org_id]);
 
   const toggleDepartment = (id: number) => {
@@ -132,11 +133,14 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
   };
 
   const getDepartmentName = (id: number) => {
-    return departments.find((d) => d.id === id)?.name || `Department ${id}`;
+    return (
+      departments.find((d) => Number(d.id) === Number(id))?.name ||
+      t("form.deptFallback", { id })
+    );
   };
 
   const getGroupName = (id: number) => {
-    return groups.find((g) => g.id === id)?.name || `Group ${id}`;
+    return groups.find((g) => Number(g.id) === Number(id))?.name || t("form.groupFallback", { id });
   };
 
   const activeDepartments = departments.filter(
@@ -169,7 +173,7 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
 
       {loading ? (
         <div className="text-center py-8 text-gray-400 text-xs">
-          Loading departments and groups...
+          {t("form.loadingDepartmentsGroups")}
         </div>
       ) : (
         <>
@@ -182,7 +186,7 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
 
               <div ref={deptDropdownRef} className="relative">
                 <button
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-start"
                   onClick={() => setDeptDropdownOpen(!deptDropdownOpen)}
                 >
                   <div className="flex flex-wrap gap-2 flex-1">
@@ -230,7 +234,7 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                       <input
                         autoFocus
                         className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                        placeholder="Search departments..."
+                        placeholder={t("form.searchDepartmentsPlaceholder")}
                         type="text"
                         value={deptSearch}
                         onChange={(e) => setDeptSearch(e.target.value)}
@@ -271,7 +275,7 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
 
               <div ref={groupDropdownRef} className="relative">
                 <button
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-left"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg flex items-center justify-between hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 bg-white min-h-[40px] text-start"
                   onClick={() => setGroupDropdownOpen(!groupDropdownOpen)}
                 >
                   <div className="flex flex-wrap gap-2 flex-1">
@@ -319,7 +323,7 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
                       <input
                         autoFocus
                         className="w-full px-2 py-1 border border-gray-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-400"
-                        placeholder="Search groups..."
+                        placeholder={t("form.searchGroupsPlaceholder")}
                         type="text"
                         value={groupSearch}
                         onChange={(e) => setGroupSearch(e.target.value)}
@@ -376,11 +380,11 @@ export function WizardStep2({ formData, onChange, errors, onOpenUserModal }: Wiz
               strokeLinejoin="round"
             />
           </svg>
-          <span>Add Users</span>
+          <span>{t("form.addUsersButton")}</span>
         </button>
         {formData.manualUsers.length > 0 && (
           <div className="mt-3" id="manualUsersList">
-            <h4 className="text-xs font-medium text-gray-700 mb-1">Manually Added:</h4>
+            <h4 className="text-xs font-medium text-gray-700 mb-1">{t("form.manuallyAddedHeading")}</h4>
             <ul className="space-y-1">
               {formData.manualUsers.map((user) => (
                 <li

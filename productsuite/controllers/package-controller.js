@@ -4,6 +4,7 @@ const getApiClient = require('../../utility/api-client');
 const render_ejs_urls = require("../../config/render_ejs_urls");
 const backend_api_urls = require("../../config/backend_api_urls");
 const logger = require("../../logger/logger").logger;
+const { redactLogData } = require("../../utility/redact");
 
 
 
@@ -18,7 +19,7 @@ exports.retrieveAll = async (req, res) => {
     logger.info(`[PACKAGE RETRIEVE ALL] Packages fetched: count=${data.Package?.length || 0}`);
     // Print package details
     if (data.Package && data.Package.length > 0) {
-      logger.info(`[PACKAGE RETRIEVE ALL] Package details:\n${JSON.stringify(data.Package, null, 2)}`);
+      logger.info(`[PACKAGE RETRIEVE ALL] Package details:\n${JSON.stringify(redactLogData(data.Package), null, 2)}`);
     }
     if (data.Package) {
       res.render("pages/package/view-package", {
@@ -47,7 +48,7 @@ exports.deleteById = async (req, res) => {
   logger.info(`[PACKAGE DELETE] User: ${req.user?.id || 'unknown'} | Start`);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    logger.warn(`[PACKAGE DELETE] Validation failed: ${JSON.stringify(errors.array())}`);
+    logger.warn(`[PACKAGE DELETE] Validation failed: ${JSON.stringify(redactLogData(errors.array()))}`);
     return res.render("pages/package/view-package", {
       enableSuiteManagementLeftMenu: true,
       message: "Provided Param is invalid",
@@ -83,7 +84,7 @@ exports.updatePackage = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      logger.warn(`[PACKAGE UPDATE][POST] Validation failed: ${JSON.stringify(errors.array())}`);
+      logger.warn(`[PACKAGE UPDATE][POST] Validation failed: ${JSON.stringify(redactLogData(errors.array()))}`);
       return res.render("pages/package/view-package", {
         enableSuiteManagementLeftMenu: true,
         message: "Validation failed",

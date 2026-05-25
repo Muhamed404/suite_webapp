@@ -6,10 +6,11 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { AWM_BASE_PATH } from "@/services/awmStorage";
 
 pdfjs.GlobalWorkerOptions.workerSrc =
   typeof window !== "undefined"
-    ? `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
+    ? `${AWM_BASE_PATH}/vendor/pdfjs/pdf.worker.min.mjs`
     : "";
 
 /** Demo fallback PDF in public folder when content URL fails or is missing. */
@@ -63,7 +64,6 @@ export function PdfViewer({
         ? {
             httpHeaders: {
               Authorization: `Bearer ${authToken}`,
-              "ngrok-skip-browser-warning": "true",
             },
           }
         : undefined,
@@ -136,18 +136,58 @@ export function PdfViewer({
     return () => el.removeEventListener("fullscreenchange", onFsChange);
   }, []);
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     const url = fileToShow || fallbackSrc;
+    if (!url) return;
 
-    if (url) window.open(url, "_blank", "noopener");
+    if (authToken && !useFallback) {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        if (!response.ok) throw new Error("Network response was not ok");
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, "_blank", "noopener");
+      } catch (err) {
+        console.error("Print fetch failed:", err);
+        window.open(url, "_blank", "noopener");
+      }
+    } else {
+      window.open(url, "_blank", "noopener");
+    }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     const url = fileToShow || fallbackSrc;
+    if (!url) return;
 
-    if (url) {
+    if (authToken && !useFallback) {
+      try {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        if (!response.ok) throw new Error("Network response was not ok");
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = "document.pdf";
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      } catch (err) {
+        console.error("Download fetch failed:", err);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "document.pdf";
+        a.click();
+      }
+    } else {
       const a = document.createElement("a");
-
       a.href = url;
       a.download = "document.pdf";
       a.click();

@@ -4,6 +4,7 @@ const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 exports.renderQRCampaignReport = async (req, res) => {
     const logContext = `[QR Campaign Report]:`;
@@ -34,7 +35,7 @@ exports.renderQRCampaignReport = async (req, res) => {
                 campaignFilters: JSON.stringify(campaignFilters)
             });
 
-            logger.info(`${logContext} Fetching campaigns with filters: ${JSON.stringify(campaignFilters)}`);
+            logger.info(`${logContext} Fetching campaigns with filters: ${JSON.stringify(redactLogData(campaignFilters))}`);
 
             const apiClient = getApiClient(req);
             const response = await apiClient.get(backend_api_urls.PHISHMAGNUS.CAMPAIGN.QR.RENDER_REPORT(queryParams), {
@@ -43,7 +44,7 @@ exports.renderQRCampaignReport = async (req, res) => {
 
             // Extract data from your backend response format
             const backendData = response?.data || {};
-            logger.info(`${logContext} Backend response: ${JSON.stringify(backendData, null, 2)}`);
+            logger.info(`${logContext} Backend response: ${JSON.stringify(redactLogData(backendData), null, 2)}`);
 
             // Updated extraction based on your response structure
             const campaignsData = backendData.data || {};
@@ -73,7 +74,7 @@ exports.renderQRCampaignReport = async (req, res) => {
             });
 
             logger.info(`${logContext} Retrieved ${campaigns.length} campaigns from backend`);
-            logger.info(`${logContext} Transformed campaigns: ${JSON.stringify(campaigns, null, 2)}`);
+            logger.info(`${logContext} Transformed campaigns: ${JSON.stringify(redactLogData(campaigns), null, 2)}`);
 
             // Use pagination info from backend response
             const totalCount = campaignsData.totalCampaigns || campaigns.length;

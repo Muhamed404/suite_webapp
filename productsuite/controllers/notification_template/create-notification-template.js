@@ -4,6 +4,7 @@ const render_ejs_urls = require("../../../config/render_ejs_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require("../../../utility/api-client");
 const { NotificationTypes } = require("../../../contants/application-constants");
+const { redactLogData } = require("../../../utility/redact");
 
  
 
@@ -17,8 +18,8 @@ exports.renderForm = (req, res) => {
 
 exports.submitForm = async (req, res) => {
   logger.info(`Controller - [Notification Template - Create] - Received create request`);
-  logger.info(`Controller - [Notification Template - Create] - Body: ${JSON.stringify(req.body.name_en, null, 2)}`);
-  logger.info(`Controller - [Notification Template - Create] - Body: ${JSON.stringify(req.body.name_ar, null, 2)}`);
+  logger.info(`Controller - [Notification Template - Create] - Body: ${JSON.stringify(redactLogData(req.body.name_en), null, 2)}`);
+  logger.info(`Controller - [Notification Template - Create] - Body: ${JSON.stringify(redactLogData(req.body.name_ar), null, 2)}`);
 
 
   try {
@@ -53,7 +54,7 @@ exports.submitForm = async (req, res) => {
     }
 
     logger.info(`Controller - [Notification Template - Create] - Submitting ${requests.map(r => r.lang).join(" + ")} template(s) in parallel`);
-    requests.forEach(({ lang, payload }) => logger.info(`Controller - [Notification Template - Create] - Payload [${lang}]: ${JSON.stringify(payload, null, 2)}`));
+    requests.forEach(({ lang, payload }) => logger.info(`Controller - [Notification Template - Create] - Payload [${lang}]: ${JSON.stringify(redactLogData(payload), null, 2)}`));
     const results = await Promise.all(requests.map(({ payload }) => apiClient.post(url, payload)));
 
     const errors = results
@@ -71,8 +72,8 @@ exports.submitForm = async (req, res) => {
     req.flash("message", req.__("settings.notificationTemplate.create.success"));
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.Notification_Template.LIST);
   } catch (error) {
-    logger.error(`Controller - [Notification Template - Create] - ${error.message}`);
-    logger.error(`Controller - [Notification Template - Create] - ${error.stack}`);
+    logger.error(`Controller - [Notification Template - Create] - ${redactLogData(error.message)}`);
+    logger.error(`Controller - [Notification Template - Create] - ${redactLogData(error.stack)}`);
     req.flash("alertType", "error");
     req.flash("message", error.response?.data?.message || req.__("settings.notificationTemplate.create.error"));
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.Notification_Template.CREATE);

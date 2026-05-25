@@ -75,18 +75,14 @@ export const DashboardSidebar = ({
           icon: getContentAssetUrl("/images/awaremagnus_sidebar/Training_Library_Solid.svg"),
           label: t("menu.myLibrary"),
         },
+        {
+          href: "/dashboard/awareness-assets",
+          icon: getContentAssetUrl("/images/awaremagnus_sidebar/AwarenessAssets_Solid.svg"),
+          label: t("menu.assetsAndMaterials") ?? "Assets & Materials",
+        },
       ],
     },
-    ...(isOrgAdminUser
-      ? [
-          {
-            href: "/dashboard/awareness-assets",
-            icon: getContentAssetUrl("/images/awaremagnus_sidebar/AwarenessAssets_Solid.svg"),
-            activeIcon: getContentAssetUrl("/images/awaremagnus_sidebar/AwarenessAssets_Solid.svg"),
-            label: t("menu.awarenessAssets"),
-          },
-        ]
-      : []),
+
     {
       href: "/dashboard/launch-awareness",
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Awareness_Solid.svg"),
@@ -103,6 +99,11 @@ export const DashboardSidebar = ({
           label: t("menu.campaigns"),
         },
       ],
+    },
+    {
+      href: "/dashboard/launch-awareness/invitations",
+      icon: getContentAssetUrl("/images/mail.svg"),
+      label: t("menu.invitationLog"),
     },
     {
       href: "/dashboard/survey",
@@ -127,6 +128,7 @@ export const DashboardSidebar = ({
       label: t("menu.systemBranding"),
       children: [
         { href: "/dashboard/system-branding/certificate", icon: "", label: t("menu.certificate") },
+        { href: "/dashboard/system-branding/logo", icon: "", label: t("menu.logoAndImages") ?? "Logo & Images" },
       ],
     },
     {
@@ -134,8 +136,7 @@ export const DashboardSidebar = ({
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Report.svg"),
       label: t("menu.myAwareness"),
       children: [
-        { href: "/dashboard/certificates", icon: "", label: t("menu.certificates") },
-       
+        { href: "/dashboard/certification-report", icon: "", label: t("menu.certificationReport") },
       ],
     },
   ];

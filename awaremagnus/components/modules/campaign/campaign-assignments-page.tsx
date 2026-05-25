@@ -84,6 +84,23 @@ function getCampaignStatus(campaign: CampaignAssignment): "active" | "pending" |
   return "pending";
 } 
 
+function getTimelinePriorityTimestamp(campaign: CampaignAssignment): number {
+  const now = Date.now();
+  const startTs = campaign.start_date ? new Date(campaign.start_date).getTime() : Number.POSITIVE_INFINITY;
+  const endTs = campaign.end_date ? new Date(campaign.end_date).getTime() : Number.POSITIVE_INFINITY;
+  const hasValidStart = Number.isFinite(startTs);
+  const hasValidEnd = Number.isFinite(endTs);
+
+  // If not started yet, prioritize by nearest upcoming start date.
+  if (hasValidStart && startTs >= now) return startTs;
+  // If in progress, prioritize by nearest remaining end date.
+  if (hasValidEnd && endTs >= now) return endTs;
+  // Completed/expired items go to the end ordered by end date.
+  if (hasValidEnd) return endTs;
+  if (hasValidStart) return startTs;
+  return Number.POSITIVE_INFINITY;
+}
+
 // add "inprogress" type for org users only
 function getStatusBadge(status: "active" | "pending" | "completed" | "inprogress", t: any) {
   const badges: Record<
@@ -151,17 +168,18 @@ function getActionButton(
     <Link href={`/module/${moduleSlug}?campaign_id=${campaign.campaign_id}`}>
       <button
         className={`${baseClasses} bg-[#3FBDFF] text-white hover:bg-opacity-90`}
-        onClick={() => {
-          // simply hit report endpoint; ignore response for now
-          campaignService
-            .getModuleReport(campaign.id)
-            .then((res) => {
-              console.log("[campaign-assignments] getModuleReport", res);
-            })
-            .catch((err) => {
-              console.error("[campaign-assignments] getModuleReport error", err);
-            });
-        }}
+        // Commented out useless API call - response was being ignored
+        // onClick={() => {
+        //   // simply hit report endpoint; ignore response for now
+        //   campaignService
+        //     .getModuleReport(campaign.id)
+        //     .then((res) => {
+        //       console.log("[campaign-assignments] getModuleReport", res);
+        //     })
+        //     .catch((err) => {
+        //       console.error("[campaign-assignments] getModuleReport error", err);
+        //     });
+        // }}
       >
         <span>{t("assignmentPage.actions.view")}</span>
       </button>
@@ -216,7 +234,9 @@ export function CampaignAssignmentsPage() {
   const displayCampaigns = campaigns;
   const { user } = useAuthStore();
   const isOrgUserView = isOrgUser(user?.role_id); // only learners should see progress-based labels
-  const [sortColumn, setSortColumn] = useState<"name" | "start" | "end" | "status">("name");
+  const [sortColumn, setSortColumn] = useState<"timeline" | "name" | "start" | "end" | "status">(
+    "timeline"
+  );
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -274,6 +294,10 @@ export function CampaignAssignmentsPage() {
       let aVal: any, bVal: any;
 
       switch (sortColumn) {
+        case "timeline":
+          aVal = getTimelinePriorityTimestamp(a);
+          bVal = getTimelinePriorityTimestamp(b);
+          break;
         case "name":
           aVal = campaignName(a, t).toLowerCase();
           bVal = campaignName(b, t).toLowerCase();
@@ -317,6 +341,7 @@ export function CampaignAssignmentsPage() {
       setSortColumn(column);
       setSortDirection("asc");
     }
+    setCurrentPage(1);
   };
 
   const updateTabIndicator = (activeTab: string) => {

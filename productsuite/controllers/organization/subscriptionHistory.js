@@ -6,6 +6,7 @@ const enums = require("../../../contants/enum");
 const moment = require("moment");
 const currentDate = moment().format("YYYY-MM-DD");
 const getApiClient = require('../../../utility/api-client')
+const { redactLogData } = require("../../../utility/redact");
 
 
 exports.subscriptionHistory = async (req, res) => {
@@ -24,12 +25,12 @@ exports.subscriptionHistory = async (req, res) => {
 
     const paymentTypes = resTypes.data.paymentMethod;
     const paymentStatus = resStatus.data.paymentStatus;
-    logger.info(`subscriptionHistory: ${JSON.stringify(subscriptionHistory.data, null, 2)}`);
+    logger.info(`subscriptionHistory: ${JSON.stringify(redactLogData(subscriptionHistory.data), null, 2)}`);
     const { message, object } = subscriptionHistory.data;
-    logger.info(`Payment types: ${JSON.stringify(paymentTypes)}`);
-    logger.info(`Payment status: ${JSON.stringify(paymentStatus)}`);
-    logger.info(`Payment status: ${JSON.stringify(paymentStatus)}`);
-    logger.info(`[Subscription History]: Stats: ${JSON.stringify(object, null, 2)}`);
+    logger.info(`Payment types: ${JSON.stringify(redactLogData(paymentTypes))}`);
+    logger.info(`Payment status: ${JSON.stringify(redactLogData(paymentStatus))}`);
+    logger.info(`Payment status: ${JSON.stringify(redactLogData(paymentStatus))}`);
+    logger.info(`[Subscription History]: Stats: ${JSON.stringify(redactLogData(object), null, 2)}`);
     const orderStatusNames = {
       [enums.orderStatus.Active]: req.__("Active"),
       [enums.orderStatus.SubscriptionCancelled]: req.__("SubscriptionCancelled"),
@@ -75,7 +76,7 @@ exports.subscriptionHistory = async (req, res) => {
       isSecureMagnusAdmin: req.user?.organization_id === null
     });
   } catch (error) {
-    logger.error("Error listing subscription History:", error);
+    logger.error("Error listing subscription History:", redactLogData(error));
     res.redirect("/phm/");
   }
 }

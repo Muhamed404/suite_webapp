@@ -6,6 +6,7 @@ const path = require('path');
 const archiver = require('archiver');
 const os = require('os');
 const getApiClient = require('../../../../utility/api-client')
+const { redactLogData } = require("../../../utility/redact");
 
 
 exports.createAndDownloadUSBCampaignZipFile = async (req, res) => {
@@ -25,7 +26,7 @@ exports.createAndDownloadUSBCampaignZipFile = async (req, res) => {
         const response = await apiClient.get(url);
         const data = response.data.message;
 
-        logger.info('USB PHISHING DOWNLOADING METHOD ::: RESPONSE ' + JSON.stringify(data, null, 2));
+        logger.info('USB PHISHING DOWNLOADING METHOD ::: RESPONSE ' + JSON.stringify(redactLogData(data), null, 2));
 
         // Extract values
         const folderPath = data.usbPhishingCampaignFolderPath;

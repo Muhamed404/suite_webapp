@@ -4,7 +4,6 @@ import type { ModuleLocale } from "../module/module-language-selector";
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Button } from "@heroui/button";
 import { Select, SelectItem } from "@heroui/select";
 import clsx from "clsx";
@@ -25,7 +24,6 @@ import { useModules, useContentsByModule } from "@/hooks/useQuiz";
 import { useCreateContent } from "@/hooks/useQuiz";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { getLanguageId } from "@/utils/languageMapping";
-import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 
 /** Minimal upload icon for dropzones */
 function UploadIcon({ className }: { className?: string }) {
@@ -516,30 +514,11 @@ export function CreateContentForm({
         )}
       </nav>
 
-      {/* Header — h3 text-xl font-semibold, subtitle text-gray-500 text-xs, Add New btn #3FBDFF */}
-      <div className={clsx("flex flex-col gap-0.5 p-3 py-0", isRtl && "flex-row-reverse")}>
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col leading-tight">
-            <h3 className="text-xl font-semibold text-gray-900">{t("title")}</h3>
-            <p className="text-gray-500 text-xs">{t("subtitle")}</p>
-          </div>
-          <div className="text-xs">
-            <Button
-              as={Link}
-              className="flex items-center justify-center gap-2 px-8 max-sm:px-1.5 py-2 rounded-full bg-[#3FBDFF] text-white border border-transparent transition-all duration-300 hover:bg-[var(--mainblue)] hover:border-[var(--mainblue)]"
-              href={backHref}
-              radius="full"
-              size="md"
-            >
-              <Image
-                alt=""
-                height={12}
-                src={getContentAssetUrl("/images/img/add.svg")}
-                width={12}
-              />
-              <span className="md:flex hidden text-xs">{t("addNew")}</span>
-            </Button>
-          </div>
+      {/* Header — h3 text-xl font-semibold, subtitle text-gray-500 text-xs */}
+      <div className="p-3 py-0">
+        <div className="flex flex-col leading-tight min-w-0">
+          <h3 className="text-xl font-semibold text-gray-900 truncate">{t("title")}</h3>
+          <p className="text-gray-500 text-xs truncate">{t("subtitle")}</p>
         </div>
       </div>
 

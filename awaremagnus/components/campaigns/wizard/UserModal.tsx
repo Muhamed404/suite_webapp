@@ -16,6 +16,7 @@ import {
 
 import { suiteSuiteService, type User } from "@/services/suiteSuiteService";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface UserModalProps {
   isOpen: boolean;
@@ -43,6 +44,7 @@ function getAvatarColor(index: number) {
 }
 
 export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModalProps) {
+  const t = useTranslations("campaigns");
   const { user } = useAuthStore();
   const [selectedIds, setSelectedIds] = useState<number[]>(selectedUserIds);
   const [availableHighlighted, setAvailableHighlighted] = useState<number[]>([]);
@@ -151,8 +153,8 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
                 <Users className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-white">Add Users Manually</h3>
-                <p className="text-[10px] text-white/70">Select users to add to the campaign</p>
+                <h3 className="text-sm font-semibold text-white">{t("userModal.title")}</h3>
+                <p className="text-[10px] text-white/70">{t("userModal.subtitle")}</p>
               </div>
             </div>
             <button
@@ -168,10 +170,10 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
         {/* Search Bar */}
         <div className="p-4 border-b border-gray-100">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
-              className="w-full pl-10 pr-4 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Search users..."
+              className="w-full ps-10 pe-4 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={t("userModal.searchPlaceholder")}
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -187,7 +189,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
                   <Users className="w-3 h-3 text-gray-400" />
-                  Available Users
+                  {t("userModal.availableUsers")}
                 </h4>
                 <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
                   {availableUsers.length}
@@ -196,11 +198,11 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
               <div className="w-full h-52 rounded-lg bg-gray-50 overflow-y-auto p-2 space-y-1 border border-gray-200">
                 {loading ? (
                   <div className="flex items-center justify-center h-full text-gray-400 text-xs">
-                    Loading users...
+                    {t("userModal.loadingUsers")}
                   </div>
                 ) : availableUsers.length === 0 ? (
                   <div className="flex items-center justify-center h-full text-gray-400 text-xs">
-                    No users available
+                    {t("userModal.noUsersAvailable")}
                   </div>
                 ) : (
                   availableUsers.map((u, idx) => (
@@ -232,7 +234,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
               <button
                 className="p-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
                 disabled={availableHighlighted.length === 0}
-                title="Add Selected"
+                title={t("userModal.titleAddSelected")}
                 type="button"
                 onClick={handleAdd}
               >
@@ -241,7 +243,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
               <button
                 className="p-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed"
                 disabled={availableUsers.length === 0}
-                title="Add All"
+                title={t("userModal.titleAddAll")}
                 type="button"
                 onClick={handleAddAll}
               >
@@ -250,7 +252,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
               <button
                 className="p-2.5 bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 disabled={selectedHighlighted.length === 0}
-                title="Remove Selected"
+                title={t("userModal.titleRemoveSelected")}
                 type="button"
                 onClick={handleRemove}
               >
@@ -259,7 +261,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
               <button
                 className="p-2.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                 disabled={selectedUsers.length === 0}
-                title="Remove All"
+                title={t("userModal.titleRemoveAll")}
                 type="button"
                 onClick={handleRemoveAll}
               >
@@ -272,7 +274,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
                   <UserCheck className="w-3 h-3 text-blue-500" />
-                  Added Users
+                  {t("userModal.addedUsers")}
                 </h4>
                 <span className="text-[10px] text-white bg-blue-500 px-2 py-0.5 rounded-full">
                   {selectedUsers.length}
@@ -282,7 +284,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
                 {selectedUsers.length === 0 ? (
                   <div className="flex flex-col items-center justify-center h-full text-gray-400">
                     <UserPlus className="w-8 h-8 mb-2 opacity-50" />
-                    <p className="text-[10px]">Select users and click arrow</p>
+                    <p className="text-[10px]">{t("userModal.hintSelectAndArrow")}</p>
                   </div>
                 ) : (
                   selectedUsers.map((u, idx) => (
@@ -324,7 +326,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
         {/* Footer */}
         <div className="flex items-center justify-between p-4 bg-gray-50 border-t border-gray-100">
           <p className="text-[10px] text-gray-500">
-            <span className="font-semibold">{selectedUsers.length}</span> user(s) will be added
+            {t("userModal.usersWillBeAdded", { count: selectedUsers.length })}
           </p>
           <div className="flex gap-2">
             <button
@@ -332,7 +334,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
               type="button"
               onClick={onClose}
             >
-              Cancel
+              {t("wizard.cancel")}
             </button>
             <button
               className="flex items-center gap-1.5 px-4 py-2 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all shadow-sm"
@@ -340,7 +342,7 @@ export function UserModal({ isOpen, onClose, onSave, selectedUserIds }: UserModa
               onClick={handleSave}
             >
               <Check className="w-3 h-3" />
-              Confirm Selection
+              {t("userModal.confirmSelection")}
             </button>
           </div>
         </div>

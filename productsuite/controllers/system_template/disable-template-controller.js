@@ -1,6 +1,7 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const { logger } = require("../../../logger/logger");
+const { redactString } = require("../../../utility/redact");
 const getApiClient = require('../../../utility/api-client')
 
 exports.disableTemplate = async (req, res) => {
@@ -26,7 +27,7 @@ exports.disableTemplate = async (req, res) => {
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.System_Template.LIST);
     }
     const url = backend_api_urls.PRODUCT_SUITE.Template.DELETE(templateId, { queryParams });
-    logger.info('Controller - Disable Template: API URL::: ' + url)
+    logger.info('Controller - Disable Template: API URL::: ' + redactString(url))
     const response = await apiClient.delete(url);
 
     if (!response.data.success) {
@@ -40,8 +41,8 @@ exports.disableTemplate = async (req, res) => {
     return res.redirect(redirectUrl)
 
   } catch (error) {
-    logger.error("Controller - Disable Template: Exception in delete template" + error);
-    logger.error(error.stack)
+    logger.error("Controller - Disable Template: Exception in delete template" + redactString(error.message || String(error)));
+    logger.error(redactString(error.stack || ""))
     req.flash('message', 'Unable to delete template');
     req.flash('alertType', 'error');
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.System_Template.LIST);

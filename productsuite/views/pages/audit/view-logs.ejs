@@ -56,13 +56,15 @@
 
     <!-- Pagination footer -->
     <div class="flex items-center justify-between px-6 py-3 border-t border-gray-100 flex-wrap gap-3">
-      <div class="flex items-center gap-2">
-        <span class="text-xs text-gray-500"><%= __("Audit.rowsPerPage") || "Rows per page" %>:</span>
-        <select id="rowsPerPage" class="text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-100 bg-white">
-          <option value="5">5</option>
-          <option value="10" selected>10</option>
-          <option value="20">20</option>
-        </select>
+      <div class="inline-flex items-center gap-2">
+        <label for="rowsPerPage" class="text-sm text-gray-700 font-medium select-none"><%= __("Audit.rowsPerPage") || "Rows per page" %>:</label>
+        <div>
+          <select id="rowsPerPage" class="h-9 min-w-[64px] text-sm text-gray-800 border border-gray-300 rounded-lg pl-3 pr-3 leading-tight focus:outline-none focus:ring-2 focus:ring-teal-100 bg-white shadow-sm">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+          </select>
+        </div>
       </div>
       <div id="pagination" class="flex items-center gap-2"></div>
     </div>
@@ -82,7 +84,17 @@
       tabActive:      "<%- __('Audit.tabActive') %>",
       tabInprogress:  "<%- __('Audit.tabInprogress') %>",
       tabCompleted:   "<%- __('Audit.tabCompleted') %>",
-      noLogs:         "<%- __('Audit.noLogs') %>"
+      noLogs:         "<%- __('Audit.noLogs') %>",
+      paginationText: "<%- __('Audit.paginationText') %>",
+      actions: {
+        CREATE: "<%- __('Audit.actions.CREATE') %>",
+        UPDATE: "<%- __('Audit.actions.UPDATE') %>",
+        DELETE: "<%- __('Audit.actions.DELETE') %>",
+        UPLOAD: "<%- __('Audit.actions.UPLOAD') %>",
+        LOGIN:  "<%- __('Audit.actions.LOGIN') %>",
+        LOGOUT: "<%- __('Audit.actions.LOGOUT') %>",
+        VIEW:   "<%- __('Audit.actions.VIEW') %>"
+      }
     }
   };
 </script>

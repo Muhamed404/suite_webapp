@@ -3,9 +3,12 @@
   "searchPlaceholder": "ابحث حسب العنوان أو اللغة أو الوصف",
   "filters": {
     "all": "الكل",
+    "interactiveContent": "المحتوى التفاعلي",
+    "motionVideos": "فيديوهات الحركة",
+    "brochures": "الكتيبات",
     "posters": "الملصقات",
     "screenSavers": "حافظات الشاشة",
-    "documents": "المستندات"
+    "allLanguages": "كل اللغات"
   },
   "actions": {
     "view": "عرض"

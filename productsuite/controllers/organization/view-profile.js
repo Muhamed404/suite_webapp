@@ -1,6 +1,7 @@
 const config = require("../../../config/env.config");
 const { logger } = require("../../../logger/logger");
 const { hasAccess } = require("../../../utility/helperFunctions");
+const { redactLogData } = require("../../../utility/redact");
 const enums = require("../../../contants/enum");
 const { currentDate } = require('../../../phishmagnus/utility/common-functions')
 const getApiClient = require('../../../utility/api-client')
@@ -50,7 +51,7 @@ exports.viewProfile = async (req, res) => {
         const paymentTypes = resTypes.data?.paymentMethod;
         const paymentStatus = resStatus.data?.paymentStatus;
         const profile = profileResponse.data?.message;
-        logger.info(`[PROFILE VIEW METHOD]: Profile Data: ${JSON.stringify(profile,null,2)}`);
+        logger.info(`[PROFILE VIEW METHOD]: Profile Data: ${JSON.stringify(redactLogData(profile), null, 2)}`);
         logger.info(`Payment types: ${JSON.stringify(paymentTypes)}`);
         logger.info(`Payment status: ${JSON.stringify(paymentStatus)}`);
         // Extract payment_status_id

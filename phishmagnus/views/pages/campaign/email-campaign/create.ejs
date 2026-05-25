@@ -87,7 +87,9 @@
     labels: {
       next: "<%= __('generic_label.next') %>",
       finish: "<%= __('generic_label.Finish') %>",
-      selectTemplate: "<%= __('generic_label.select_template') %>"
+      selectTemplate: "<%= __('generic_label.select_template') %>",
+      confirm: "<%= __('generic_label.confirm') %>",
+      cancel: "<%= __('generic_label.cancel') %>"
     },
     generic_label: {
       emailOpened: "<%= __('generic_label.emailOpened') %>",
@@ -122,6 +124,12 @@
       some_empty_selections: "<%= __('validation_messages.some_empty_selections') %>",
       validation_failed: "<%= __('validation_messages.validation_failed') %>"
     },
+    campaign: {
+      email_create_campaign: {
+        external_landing_page_url: "<%= __('campaign.email_create_campaign.external_landing_page_url') %>",
+        open_preview: "<%= __('campaign.email_create_campaign.open_preview') %>"
+      }
+    },
     sms: {
       validation_messages: {
         campaign_name_required: "<%= __('sms.validation_messages.campaign_name_required') %>",
@@ -135,6 +143,9 @@
         some_empty_selections: "<%= __('sms.validation_messages.some_empty_selections') %>",
         validation_failed: "<%= __('sms.validation_messages.validation_failed') %>"
       }
+    },
+    messages: {
+      confirmSubmit: "<%= __('messages.confirmSubmit') %>"
     }
   };
 </script>

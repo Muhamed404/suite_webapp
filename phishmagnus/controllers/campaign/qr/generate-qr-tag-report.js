@@ -4,12 +4,13 @@ const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 /**
  * Controller to render the email campaign details view with statistics and user details.
  */
 exports.generateQRTagReport = async (req, res) => {
-  logger.info(`[QR Tag Report]: Incoming request ${JSON.stringify(req.params)}`);
+  logger.info(`[QR Tag Report]: Incoming request ${JSON.stringify(redactLogData(req.params))}`);
   // return res.render(render_ejs_urls.PhishMagnus.Campaign.QR.RENDER_TAG_REPORT);
   try {
     const qrImageCode = req.params?.qrImageCode;
@@ -30,17 +31,17 @@ exports.generateQRTagReport = async (req, res) => {
     const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.QR.TAG_REPORT(campaignId, qrImageCode);
     logger.info('Initiation QR Tag Report: Request' + url);
     const response = await apiClient.get(url);
-    logger.info('[QR Tag Report]: Response: ' + JSON.stringify(response.data, null, 2));
+    logger.info('[QR Tag Report]: Response: ' + JSON.stringify(redactLogData(response.data), null, 2));
 
     const campaignDetails = response?.data?.message.campaignDetails || {};
-    logger.info(`[QR Tag Report]: Campaign Details: ${JSON.stringify(campaignDetails, null, 2)}`);
+    logger.info(`[QR Tag Report]: Campaign Details: ${JSON.stringify(redactLogData(campaignDetails), null, 2)}`);
     const interactionStats = response?.data?.message.interactionStats || {};
-    logger.info(`[QR Tag Report]: Interaction Stats: ${JSON.stringify(interactionStats, null, 2)}`);
+    logger.info(`[QR Tag Report]: Interaction Stats: ${JSON.stringify(redactLogData(interactionStats), null, 2)}`);
     const qrReportProfile = response?.data?.message.qrReportProfile || {};
-    logger.info(`[QR Tag Report]: QR Report Profile: ${JSON.stringify(qrReportProfile, null, 2)}`);
+    logger.info(`[QR Tag Report]: QR Report Profile: ${JSON.stringify(redactLogData(qrReportProfile), null, 2)}`);
 
     const qrTagReportDetails = response.data?.message.qrTagReportDetails || [];
-    logger.info(`[QR Tag Report]: QR Tag Report Details: ${JSON.stringify(qrTagReportDetails, null, 2)}`);
+    logger.info(`[QR Tag Report]: QR Tag Report Details: ${JSON.stringify(redactLogData(qrTagReportDetails), null, 2)}`);
    
     return res.render(render_ejs_urls.PhishMagnus.Campaign.QR.RENDER_TAG_REPORT, {
       interactionStats,

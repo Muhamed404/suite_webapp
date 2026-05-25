@@ -6,6 +6,7 @@ const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const {getStatusBadgeColor} = require('../../../../utility/helperFunctions');
+const { redactLogData } = require("../../../../utility/redact");
 /**
  * Transform raw campaign data from backend
  * @param {Array} rawCampaigns - Raw campaigns array from backend
@@ -74,7 +75,7 @@ exports.renderSMSCampaignReport = async (req, res) => {
         // FIXED: Call the function with queryParams as argument
         const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.SMS.RENDER_REPORT(queryParams);
 
-        logger.info(`[SMS Campaign Report] Fetching from URL: ${url}`);
+        logger.info(`[SMS Campaign Report] Fetching from URL: ${redactLogData(url)}`);
 
         const response = await apiClient.get(url, {
             headers: { 'Accept': 'application/json' }
@@ -109,8 +110,8 @@ exports.renderSMSCampaignReport = async (req, res) => {
         return res.render(render_ejs_urls.PhishMagnus.Campaign.SMS.CAMPAIGN_REPORT, templateData);
 
     } catch (error) {
-        logger.error(`[SMS Campaign Report] Error: ${error.message}`);
-        logger.debug(`[SMS Campaign Report] Stack: ${error.stack}`);
+        logger.error(`[SMS Campaign Report] Error: ${redactLogData(error.message)}`);
+        logger.debug(`[SMS Campaign Report] Stack: ${redactLogData(error.stack)}`);
 
         let errorMessage = 'Error retrieving SMS campaign reports. Please try again.';
 
@@ -118,7 +119,7 @@ exports.renderSMSCampaignReport = async (req, res) => {
             const statusCode = error.response.status;
             const backendMessage = error.response.data?.message || 'Unknown error';
 
-            logger.error(`[SMS Campaign Report] Backend API error: ${statusCode} - ${backendMessage}`);
+            logger.error(`[SMS Campaign Report] Backend API error: ${statusCode} - ${redactLogData(backendMessage)}`);
 
             if (statusCode === 404) {
                 errorMessage = 'No SMS campaigns found for your organization.';
@@ -167,7 +168,7 @@ exports.getCampaignDetails = async (req, res) => {
         return res.render(render_ejs_urls.PhishMagnus.Campaign.SMS.CAMPAIGN_DETAILS, templateData);
 
     } catch (error) {
-        logger.error(`[SMS Campaign Details] Error: ${error.message}`);
+        logger.error(`[SMS Campaign Details] Error: ${redactLogData(error.message)}`);
         req.flash('message', 'Error retrieving campaign details');
         req.flash('alertType', 'error');
         return res.redirect(frontend_api_urls.PHISHMAGNUS.Campaign.SMS.LIST);

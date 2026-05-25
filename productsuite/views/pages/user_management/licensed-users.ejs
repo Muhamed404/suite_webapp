@@ -1,162 +1,322 @@
-<div class="flex flex-col p-5 gap">
-  <div class="flex flex-col gap-2 mb-4 border-b border-gray-100 pb-4">
-    <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
-      <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
-      <span class="text-gray-400">›</span>
-      <span class="font-semibold text-gray-900"><%= __("breadcrumbs.licensedUsers") %></span>
-    </nav>
-    <h3 class="text-3xl font-medium text-gray-900">
-      <%= __("breadcrumbs.licensedUsers") %>
-    </h3>
-  </div>
+<!-- Page Header -->
+<div class="flex flex-col px-6 pt-6 pb-4 gap-1 border-b border-gray-100">
+  <nav class="flex items-center text-sm text-gray-500 gap-2" aria-label="Breadcrumb">
+    <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+    <span class="text-gray-400">›</span>
+    <span class="font-semibold text-gray-900"><%= __("breadcrumbs.licensedUsers") %></span>
+  </nav>
+  <h1 class="text-2xl font-semibold text-gray-900 mt-1"><%= __("breadcrumbs.licensedUsers") %></h1>
 </div>
 
-<div class="flex flex-col p-2 pt-0">
-  <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
-    <!-- Search & Filter -->
-    <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
-      <table id="filter-table" class="min-w-full border-none text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} <%= __('generic_label.to') %> {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
-        <thead class="bg-gray-50 text-gray-600 text-xs">
+<!-- Main Content -->
+<div class="p-6">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-100">
+      <!-- Search -->
+      <div class="relative">
+        <span class="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+          </svg>
+        </span>
+        <input id="search-input" type="text"
+          placeholder="<%= __('generic_label.search_here') %>"
+          class="pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-60 transition"/>
+      </div>
+      <!-- Page size -->
+      <div class="flex items-center gap-2 text-sm text-gray-500">
+        <span>Show</span>
+        <select id="page-size-select"
+          class="border border-gray-200 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+          <option value="10"  <%= pageSize == 10  ? 'selected' : '' %>>10</option>
+          <option value="25"  <%= pageSize == 25  ? 'selected' : '' %>>25</option>
+          <option value="50"  <%= pageSize == 50  ? 'selected' : '' %>>50</option>
+          <option value="100" <%= pageSize == 100 ? 'selected' : '' %>>100</option>
+        </select>
+        <span>entries</span>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-sm text-left text-gray-700">
+        <thead class="bg-gray-50 border-b border-gray-100">
           <tr>
-            <th class="px-4 py-5 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                class="size-3.5 ml-3 inline">
-              #
-            </th>
-            <th class="px-4 py-5 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                class="size-3.5 ml-3 inline">
+            <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider w-12">#</th>
+            <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
               <%= __("user_management.licensed_users.first_name") || "First Name" %>
             </th>
-            <th class="px-4 py-5 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                class="size-3.5 ml-3 inline">
+            <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
               <%= __("user_management.licensed_users.last_name") || "Last Name" %>
             </th>
-            <th class="px-4 py-5 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                class="size-3.5 ml-3 inline">
+            <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
               <%= __("user_management.licensed_users.email") || "Email" %>
             </th>
-            <th class="px-4 py-5 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                class="size-3.5 ml-3 inline">
+            <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
               <%= __("user_management.licensed_users.role") || "Role" %>
             </th>
-            <th class="px-4 py-5 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                class="size-3.5 ml-3 inline">
-              <%= __("user_management.licensed_users.license_status") || "License Status" %>
+            <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <%= __("user_management.licensed_users.license_status") || "Status" %>
             </th>
-            <th class="px-4 py-5 text-sm font-normal">
-              <img src="/securemagnus_2025/images/package_management/sort.svg" alt="License Cost"
-                class="size-3.5 ml-3 inline">
-              <%= __("user_management.licensed_users.allocated") || "Allocated" %>
+            <th class="px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <%= __("user_management.licensed_users.allocated") || "Allocated Date" %>
             </th>
           </tr>
         </thead>
-        <tbody id="users-table-body">
-          <% users.forEach((item, idx)=> { %>
-            <tr class="bg-white border-b hover:bg-gray-50">
-              <td class="px-6 py-6 whitespace-nowrap"><%= idx + 1 %></td>
-              <td class="px-6 py-6 whitespace-nowrap"><%= item.UserProfile.first_name %></td>
-              <td class="px-6 py-6 whitespace-nowrap"><%= item.UserProfile.last_name %></td>
-              <td class="px-6 py-6 whitespace-nowrap"><%= item.UserProfile.email %></td>
-              <td class="px-6 py-6 whitespace-nowrap"><%= item.UserProfile.User.UserRole.role_name %></td>
-              <td class="px-6 py-6 whitespace-nowrap">
-                <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold
-                  <%= item.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
-                  <%= item.status === 'Active' ? __("user_management.licensed_users.active") : __("user_management.licensed_users.inactive") %>
+        <tbody id="users-table-body" class="divide-y divide-gray-100">
+          <% const startIndex = (page - 1) * pageSize; %>
+          <% users.forEach((item, idx) => { %>
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-4 text-gray-400 text-xs font-mono"><%= startIndex + idx + 1 %></td>
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-xs uppercase flex-shrink-0 select-none">
+                    <%= (item.UserProfile.first_name || '').charAt(0) %><%= (item.UserProfile.last_name || '').charAt(0) %>
+                  </div>
+                  <span class="font-medium text-gray-900"><%= item.UserProfile.first_name %></span>
+                </div>
+              </td>
+              <td class="px-5 py-4 text-gray-600"><%= item.UserProfile.last_name %></td>
+              <td class="px-5 py-4 text-gray-600"><%= item.UserProfile.email %></td>
+              <td class="px-5 py-4">
+                <span class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-md font-medium">
+                  <%= item.UserProfile.User.UserRole.role_name %>
                 </span>
               </td>
-              <td class="px-6 py-6 whitespace-nowrap"><%= item.licenses_allocation_date_formatted %></td>
+              <td class="px-5 py-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
+                  <%= item.status === 'Active' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600' %>">
+                  <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 <%= item.status === 'Active' ? 'bg-green-500' : 'bg-red-400' %>"></span>
+                  <%= item.status === 'Active'
+                    ? __("user_management.licensed_users.active")
+                    : __("user_management.licensed_users.inactive") %>
+                </span>
+              </td>
+              <td class="px-5 py-4 text-gray-500 text-sm"><%= item.licenses_allocation_date_formatted || '—' %></td>
             </tr>
           <% }) %>
+          <% if (users.length === 0) { %>
+            <tr>
+              <td colspan="7" class="px-5 py-16 text-center">
+                <div class="flex flex-col items-center gap-3 text-gray-400">
+                  <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  <span class="text-sm"><%= __('generic_label.no_entries_found') %></span>
+                </div>
+              </td>
+            </tr>
+          <% } %>
         </tbody>
       </table>
     </div>
 
-    <!-- Pagination Controls -->
-    <div class="p-5 border-t bg-gray-50 flex justify-center">
-      <div class="flex justify-center items-center space-x-1">
-        <% const totalPages = Math.ceil(total / pageSize); %>
-        <% for(let p=1; p <= totalPages; p++) { %>
-          <button
-            class="px-3 py-1 rounded-lg border font-semibold
-              <%= p === page ? 'bg-blue-600 text-white border-blue-600 shadow' : 'bg-white text-blue-600 border-gray-300 hover:bg-blue-50' %>
-              transition"
-            onclick="fetchLicensedUsers(<%= p %>)">
-            <%= p %>
-          </button>
-        <% } %>
-      </div>
+    <!-- Footer: info + pagination -->
+    <div class="flex flex-wrap items-center justify-between gap-4 px-5 py-4 border-t border-gray-100 bg-gray-50">
+      <p id="pagination-info" class="text-sm text-gray-500">
+        <%
+          const totalPages = Math.ceil(total / pageSize);
+          const startEntry = total === 0 ? 0 : (page - 1) * pageSize + 1;
+          const endEntry   = Math.min(page * pageSize, total);
+        %>
+        Showing
+        <span class="font-semibold text-gray-700"><%= startEntry %></span>
+        to
+        <span class="font-semibold text-gray-700"><%= endEntry %></span>
+        of
+        <span class="font-semibold text-gray-700"><%= total %></span>
+        entries
+      </p>
+      <div id="pagination-controls" class="flex items-center gap-1"></div>
     </div>
+
   </div>
 </div>
 
 
-
+<div id="page-data"
+  data-page="<%= page %>"
+  data-page-size="<%= pageSize %>"
+  data-total="<%= total %>"
+  data-product-id="<%= productId %>"
+  data-active="<%= __('user_management.licensed_users.active')   || 'Active' %>"
+  data-inactive="<%= __('user_management.licensed_users.inactive') || 'Inactive' %>"
+  style="display:none"></div>
 
 <script>
-  // Localized strings
-  const localizedStrings = {
-    active: '<%= __("user_management.licensed_users.active") || "Active" %>',
-    inactive: '<%= __("user_management.licensed_users.inactive") || "Inactive" %>'
+  const _ds = document.getElementById('page-data').dataset;
+  const _pageState = {
+    page:      parseInt(_ds.page, 10),
+    pageSize:  parseInt(_ds.pageSize, 10),
+    total:     parseInt(_ds.total, 10),
+    productId: _ds.productId,
+    active:    _ds.active,
+    inactive:  _ds.inactive
   };
-  // pageSize and productId should be set in your EJS context or globally
-  const pageSize = <%= typeof pageSize !== 'undefined' ? pageSize : 10 %>;
-  // const productId = <%= typeof productId !== 'undefined' ? productId : '' %>;
-  const productId = <%- JSON.stringify(productId) %>;
-function fetchLicensedUsers(page) {
-  const url = `/user/licensed-users/${productId}?page=${page}&pageSize=${pageSize}&requestType=ajax`;
-  fetch(url)
-    .then(res => res.json())
-    .then(json => {
-      const tbody = document.getElementById('users-table-body');
-      tbody.innerHTML = '';
-      const users = Array.isArray(json.users) ? json.users : [];
-      users.forEach((item, idx) => {
-        const statusClass = item.status === 'Active'
-          ? 'bg-green-100 text-green-700'
-          : 'bg-red-100 text-red-700';
-        const statusText = item.status === 'Active' ? localizedStrings.active : localizedStrings.inactive;
-        const tr = document.createElement('tr');
-        tr.className = 'bg-white border-b hover:bg-gray-50';
-        tr.innerHTML = `
-          <td class="px-6 py-6 whitespace-nowrap">${idx + 1}</td>
-          <td class="px-6 py-6 whitespace-nowrap">${item.UserProfile.first_name}</td>
-          <td class="px-6 py-6 whitespace-nowrap">${item.UserProfile.last_name}</td>
-          <td class="px-6 py-6 whitespace-nowrap">${item.UserProfile.email}</td>
-          <td class="px-6 py-6 whitespace-nowrap">${item.UserProfile.User.UserRole.role_name}</td>
-          <td class="px-6 py-6 whitespace-nowrap">
-            <span class="inline-block px-2 py-1 rounded-full text-xs font-semibold ${statusClass}">
-              ${statusText}
-            </span>
-          </td>
-          <td class="px-6 py-6 whitespace-nowrap">${item.licenses_allocation_date_formatted || ''}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-      // Re-render pagination controls with the current page
-      renderPagination(json.page, json.pageSize, json.total);
-    });
-}
 
-  function renderPagination(currentPage, pageSize, total) {
-  const totalPages = Math.ceil(total / pageSize);
-  const paginationDiv = document.querySelector('.p-5.border-t.bg-gray-50 .flex.justify-center.items-center.space-x-1');
-  if (!paginationDiv) return;
-  paginationDiv.innerHTML = '';
-  for (let p = 1; p <= totalPages; p++) {
-    const btn = document.createElement('button');
-    btn.className = `px-3 py-1 rounded-lg border font-semibold transition ${
-      p === currentPage
-        ? 'bg-blue-600 text-white border-blue-600 shadow'
-        : 'bg-white text-blue-600 border-gray-300 hover:bg-blue-50'
-    }`;
-    btn.textContent = p;
-    btn.onclick = () => fetchLicensedUsers(p);
-    paginationDiv.appendChild(btn);
+  // ── Pagination helpers ────────────────────────────────────────────────────
+
+  function getPageRange(current, total) {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+    if (current <= 4)          return [1, 2, 3, 4, 5, total];
+    if (current >= total - 3)  return [1, total - 4, total - 3, total - 2, total - 1, total];
+    return [1, current - 1, current, current + 1, total];
   }
-}
+
+  function renderPagination(currentPage, pageSizeVal, total) {
+    const totalPages = Math.ceil(total / pageSizeVal);
+    const controls   = document.getElementById('pagination-controls');
+    const info       = document.getElementById('pagination-info');
+
+    const start = total === 0 ? 0 : (currentPage - 1) * pageSizeVal + 1;
+    const end   = Math.min(currentPage * pageSizeVal, total);
+    info.innerHTML =
+      `Showing <span class="font-semibold text-gray-700">${start}</span> ` +
+      `to <span class="font-semibold text-gray-700">${end}</span> ` +
+      `of <span class="font-semibold text-gray-700">${total}</span> entries`;
+
+    controls.innerHTML = '';
+
+    const mkBtn = (label, targetPage, active = false, disabled = false) => {
+      const btn = document.createElement('button');
+      btn.innerHTML  = label;
+      btn.disabled   = disabled;
+      btn.className  = [
+        'min-w-[2rem] h-8 px-2.5 rounded-lg text-sm font-medium transition select-none',
+        active   ? 'bg-blue-600 text-white shadow-sm cursor-default' :
+        disabled ? 'text-gray-300 cursor-not-allowed' :
+                   'text-gray-600 hover:bg-gray-200'
+      ].join(' ');
+      if (!disabled && !active) btn.addEventListener('click', () => fetchLicensedUsers(targetPage));
+      return btn;
+    };
+
+    const mkEllipsis = () => {
+      const s = document.createElement('span');
+      s.textContent = '…';
+      s.className   = 'min-w-[2rem] h-8 flex items-center justify-center text-gray-400 text-sm select-none';
+      return s;
+    };
+
+    // ‹ Previous
+    controls.appendChild(mkBtn('‹', currentPage - 1, false, currentPage <= 1));
+
+    // Page number window
+    const pages = getPageRange(currentPage, totalPages);
+    let prev = null;
+    pages.forEach(p => {
+      if (prev !== null && p - prev > 1) controls.appendChild(mkEllipsis());
+      controls.appendChild(mkBtn(p, p, p === currentPage));
+      prev = p;
+    });
+
+    // Next ›
+    controls.appendChild(mkBtn('›', currentPage + 1, false, currentPage >= totalPages || totalPages === 0));
+  }
+
+  // ── AJAX fetch ────────────────────────────────────────────────────────────
+
+  function fetchLicensedUsers(page) {
+    const { pageSize, productId, active, inactive } = _pageState;
+    const url = `/user/licensed-users/${productId}?page=${page}&pageSize=${pageSize}&requestType=ajax`;
+
+    fetch(url)
+      .then(r => r.json())
+      .then(json => {
+        _pageState.page  = json.page;
+        _pageState.total = json.total;
+
+        const tbody = document.getElementById('users-table-body');
+        tbody.innerHTML = '';
+
+        const users      = Array.isArray(json.users) ? json.users : [];
+        const startIndex = (json.page - 1) * json.pageSize;
+
+        if (users.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="px-5 py-16 text-center">
+                <div class="flex flex-col items-center gap-3 text-gray-400">
+                  <svg class="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  <span class="text-sm">No entries found</span>
+                </div>
+              </td>
+            </tr>`;
+        } else {
+          users.forEach((item, idx) => {
+            const isActive    = item.status === 'Active';
+            const statusClass = isActive ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600';
+            const dotClass    = isActive ? 'bg-green-500' : 'bg-red-400';
+            const statusText  = isActive ? active : inactive;
+            const fn = item.UserProfile.first_name || '';
+            const ln = item.UserProfile.last_name  || '';
+            const initials = (fn.charAt(0) + ln.charAt(0)).toUpperCase();
+
+            const tr = document.createElement('tr');
+            tr.className = 'hover:bg-gray-50 transition-colors';
+            tr.innerHTML = `
+              <td class="px-5 py-4 text-gray-400 text-xs font-mono">${startIndex + idx + 1}</td>
+              <td class="px-5 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold text-xs uppercase flex-shrink-0 select-none">
+                    ${initials}
+                  </div>
+                  <span class="font-medium text-gray-900">${fn}</span>
+                </div>
+              </td>
+              <td class="px-5 py-4 text-gray-600">${ln}</td>
+              <td class="px-5 py-4 text-gray-600">${item.UserProfile.email || ''}</td>
+              <td class="px-5 py-4">
+                <span class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-md font-medium">
+                  ${item.UserProfile.User.UserRole.role_name || ''}
+                </span>
+              </td>
+              <td class="px-5 py-4">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${statusClass}">
+                  <span class="w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotClass}"></span>
+                  ${statusText}
+                </span>
+              </td>
+              <td class="px-5 py-4 text-gray-500 text-sm">${item.licenses_allocation_date_formatted || '—'}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+
+        // Apply any active search filter to the new rows
+        applySearch();
+        renderPagination(json.page, json.pageSize, json.total);
+      })
+      .catch(err => console.error('fetchLicensedUsers error:', err));
+  }
+
+  // ── Client-side search filter (visible rows on current page) ─────────────
+
+  function applySearch() {
+    const term  = document.getElementById('search-input').value.trim().toLowerCase();
+    const rows  = document.querySelectorAll('#users-table-body tr');
+    rows.forEach(row => {
+      row.style.display = (!term || row.textContent.toLowerCase().includes(term)) ? '' : 'none';
+    });
+  }
+
+  // ── Page-size change ──────────────────────────────────────────────────────
+
+  document.getElementById('page-size-select').addEventListener('change', function () {
+    _pageState.pageSize = parseInt(this.value, 10);
+    fetchLicensedUsers(1);
+  });
+
+  document.getElementById('search-input').addEventListener('input', applySearch);
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+
+  renderPagination(_pageState.page, _pageState.pageSize, _pageState.total);
 </script>

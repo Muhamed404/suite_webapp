@@ -115,6 +115,46 @@ const customRules = [
   },
 ];
 
+function _attachBucketSourceRewrite(editor) {
+  editor.on('beforeSetMode', function (evt) {
+    if (evt.data !== 'wysiwyg') return;
+    if (editor.mode !== 'source') return;
+    var editable = editor.editable();
+    if (!editable || typeof editable.getValue !== 'function') return;
+    var src = editable.getValue();
+    if (!src) return;
+
+    var bucket = window.WEB_TEMPLATE_BUCKET || '';
+    if (bucket && src.indexOf('<%=web_bucket%>') !== -1) {
+      var cleanBucket = bucket.replace(/\/+$/, '');
+      editable.setValue(
+        src.split('<%=web_bucket%>/').join(cleanBucket + '/')
+           .split('<%=web_bucket%>').join(cleanBucket + '/')
+      );
+    }
+  });
+
+  editor.on('setData', function (evt) {
+    var bucket = window.WEB_TEMPLATE_BUCKET || '';
+    if (bucket && evt.data.dataValue && evt.data.dataValue.indexOf('<%=web_bucket%>') !== -1) {
+      var cleanBucket = bucket.replace(/\/+$/, '');
+      evt.data.dataValue = evt.data.dataValue
+        .split('<%=web_bucket%>/').join(cleanBucket + '/')
+        .split('<%=web_bucket%>').join(cleanBucket + '/');
+    }
+  });
+
+  editor.on('paste', function (evt) {
+    var bucket = window.WEB_TEMPLATE_BUCKET || '';
+    if (bucket && evt.data.dataValue && evt.data.dataValue.indexOf('<%=web_bucket%>') !== -1) {
+      var cleanBucket = bucket.replace(/\/+$/, '');
+      evt.data.dataValue = evt.data.dataValue
+        .split('<%=web_bucket%>/').join(cleanBucket + '/')
+        .split('<%=web_bucket%>').join(cleanBucket + '/');
+    }
+  });
+}
+
 // Safe CKEditor init: only if element exists
 (function safeInitCKEditors() {
   if (typeof CKEDITOR === 'undefined') return;
@@ -124,6 +164,9 @@ const customRules = [
       if (!el) return;
       if (!CKEDITOR.instances[id]) {
         const instance = CKEDITOR.replace(id, { height: 400, width: '100%', resize_enabled: true });
+        
+        _attachBucketSourceRewrite(instance);
+
         // ensure the editor receives the server-provided textarea content
         instance.on && instance.on('instanceReady', function () {
           try {
@@ -235,8 +278,15 @@ let currentStep = 0;
 
     const placeholderButtons = document.getElementById('placeholder-buttons');
     const allowedScreens = [phishing_content_screen - 1, phishing_webpage_screen - 1, phishing_landing_page_screen - 1];
+    let showPlaceholders = allowedScreens.includes(index);
+    if (index === (phishing_landing_page_screen - 1)) {
+      const selectedLandingOption = document.querySelector('input[name="landing_option"]:checked');
+      if (!selectedLandingOption || selectedLandingOption.value !== 'custom') {
+        showPlaceholders = false;
+      }
+    }
     if (placeholderButtons) {
-      placeholderButtons.style.display = allowedScreens.includes(index) ? '' : 'none';
+      placeholderButtons.style.display = showPlaceholders ? '' : 'none';
     }
 
     if (allowedScreens.includes(index)) {
@@ -264,7 +314,7 @@ let currentStep = 0;
     if (!stepEl) return;
     const inputs = Array.from(stepEl.querySelectorAll('input, textarea, select'));
     const key = `step${idx + 1}`;
-    formData[key] = formData[key] || {};
+    formData[key] = {};
     inputs.forEach(inp => {
       const name = inp.name || `_anon_${idx}`;
       if (inp.type === 'radio') {
@@ -324,6 +374,16 @@ let currentStep = 0;
       // fallthrough
     }
     return s.split(',').map(x => x.trim()).filter(Boolean).map(String);
+  }
+
+  function getPersistedDifficultyLevels() {
+    const form = document.getElementById('templateCreationForm');
+    let raw = (form && form.dataset && form.dataset.difficulty) || '';
+    if (!raw) {
+      const hid = document.querySelector('input[name="hidDifficultyLevel"]');
+      raw = hid ? hid.value : '';
+    }
+    return parseSelectedLevels(raw);
   }
 
   function renderOptions(type) {
@@ -404,6 +464,35 @@ let currentStep = 0;
       if (inlineError) inlineError.remove();
     }
 
+    if (currentStep === (phishing_landing_page_screen - 1)) {
+      const selectedLandingOption = document.querySelector('input[name="landing_option"]:checked');
+      const landingMode = selectedLandingOption ? selectedLandingOption.value : '';
+      const externalUrlInput = document.getElementById('landing_page_external_url');
+      const externalUrl = externalUrlInput ? externalUrlInput.value.trim() : '';
+
+      if (!landingMode) {
+        alert('Please select a landing page option.');
+        return;
+      }
+
+      if (landingMode === 'url') {
+        const isValidHttpUrl = /^(https?:\/\/|www\.)[^\s/$.?#].[^\s]*$/i.test(externalUrl);
+        if (!isValidHttpUrl) {
+          if (externalUrlInput) externalUrlInput.classList.add('border-red-500');
+          alert('Please enter a valid URL.');
+          return;
+        }
+        if (externalUrlInput) externalUrlInput.classList.remove('border-red-500');
+      } else if (landingMode === 'custom') {
+        const landingEditor = (typeof CKEDITOR !== 'undefined') ? CKEDITOR.instances['landing_page_content'] : null;
+        const landingData = landingEditor ? (landingEditor.getData() || '').trim() : '';
+        if (!landingData) {
+          alert('Landing page content is required.');
+          return;
+        }
+      }
+    }
+
     saveDataForStep(currentStep);
     if (currentStep === 0) {
       const sel = formData.step1 && formData.step1.phishType;
@@ -412,7 +501,9 @@ let currentStep = 0;
         return;
       }
       selectedPhishType = sel;
-      activeFlow = getBaseFlowForType(selectedPhishType);
+      const selectedLevels = getPersistedDifficultyLevels();
+      const matched = computeMatchingRule(selectedPhishType, selectedLevels);
+      activeFlow = matched ? buildActiveFlow(matched, selectedPhishType) : getBaseFlowForType(selectedPhishType);
 
       if ((selectedPhishType === 'nfc' || selectedPhishType === 'qr') && emailContent) {
         emailContent.style.display = 'none';
@@ -425,7 +516,13 @@ let currentStep = 0;
     }
 
     if (currentStep === 1) {
-      const selectedOptions = (formData.step2 && formData.step2.options) ? formData.step2.options : [];
+      let selectedOptions = (formData.step2 && formData.step2.options) ? formData.step2.options : [];
+      if (!Array.isArray(selectedOptions)) {
+        selectedOptions = selectedOptions ? [selectedOptions] : [];
+      }
+      if (!selectedOptions.length) {
+        selectedOptions = getPersistedDifficultyLevels();
+      }
       if (selectedOptions.length === 0) {
         alert('Please select at least one option.');
         return;
@@ -454,6 +551,41 @@ let currentStep = 0;
       return;
     }
 
+    ['phishing_content', 'phishing_page_content', 'landing_page_content'].forEach(function (editorId) {
+      const editor = (typeof CKEDITOR !== 'undefined') ? CKEDITOR.instances[editorId] : null;
+      if (!editor) return;
+      editor.updateElement();
+      const textarea = document.getElementById(editorId);
+      const bucket = window.WEB_TEMPLATE_BUCKET;
+      if (!textarea || !bucket) return;
+      const cleanBucket = bucket.replace(/\/+$/, '');
+      if (textarea.value.includes(cleanBucket)) {
+        textarea.value = textarea.value
+          .split(cleanBucket + '/').join('<%=web_bucket%>')
+          .split(cleanBucket).join('<%=web_bucket%>');
+      }
+    });
+
+    const selectedLandingOption = document.querySelector('input[name="landing_option"]:checked');
+    const hiddenLandingPageOption = document.getElementById('landing_page_option');
+    const externalUrlInput = document.getElementById('landing_page_external_url');
+    const landingTextarea = document.getElementById('landing_page_content');
+    const isUrlLandingMode = !!(selectedLandingOption && selectedLandingOption.value === 'url');
+    if (hiddenLandingPageOption) {
+      hiddenLandingPageOption.value = isUrlLandingMode ? 'url' : 'html';
+    }
+    if (isUrlLandingMode && landingTextarea) {
+      landingTextarea.value = '';
+    }
+    if (!isUrlLandingMode && externalUrlInput) {
+      externalUrlInput.value = '';
+    }
+
+    const urlInput = document.getElementById('landing_page_external_url');
+    if (urlInput && urlInput.value.toLowerCase().startsWith('www.')) {
+      urlInput.value = 'https://' + urlInput.value;
+    }
+
     const formEl = document.getElementById('templateCreationForm');
     if (formEl) formEl.submit();
   }
@@ -470,7 +602,9 @@ let currentStep = 0;
     const preselectedPhishType = document.querySelector('input[name="phishType"]:checked');
     if (preselectedPhishType) {
       selectedPhishType = preselectedPhishType.value;
-      activeFlow = getBaseFlowForType(selectedPhishType);
+      const selectedLevels = getPersistedDifficultyLevels();
+      const matched = computeMatchingRule(selectedPhishType, selectedLevels);
+      activeFlow = matched ? buildActiveFlow(matched, selectedPhishType) : getBaseFlowForType(selectedPhishType);
     }
     renderProgressBar();
     showStep(0);
@@ -517,78 +651,59 @@ radios.forEach(radio => {
   });
 });
 
-// re-init editors block (ClassicEditor for landing custom)
-let editorInstance = null;
 const editorContainer = document.getElementById('editor-container');
-if (editorContainer) editorContainer.style.display = 'none';
+const externalUrlContainer = document.getElementById('landing-external-url-container');
+const externalUrlInput = document.getElementById('landing_page_external_url');
+const hiddenLandingPageOption = document.getElementById('landing_page_option');
+const initialLandingPageMode = window.initialLandingPageMode || 'html';
+
+function normalizeLandingRadioValue(mode) {
+  return mode === 'url' ? 'url' : 'custom';
+}
+
+function updateLandingModeUI(mode) {
+  const normalizedMode = normalizeLandingRadioValue(mode);
+  const isUrlMode = normalizedMode === 'url';
+  const placeholderButtons = document.getElementById('placeholder-buttons');
+  if (editorContainer) {
+    editorContainer.style.display = isUrlMode ? 'none' : 'block';
+  }
+  if (externalUrlContainer) {
+    externalUrlContainer.classList.toggle('hidden', !isUrlMode);
+  }
+  if (externalUrlInput) {
+    externalUrlInput.readOnly = false;
+    externalUrlInput.removeAttribute('readonly');
+  }
+  if (hiddenLandingPageOption) {
+    hiddenLandingPageOption.value = isUrlMode ? 'url' : 'html';
+  }
+  if (placeholderButtons) {
+    const isLandingStep = currentStep === (phishing_landing_page_screen - 1);
+    placeholderButtons.style.display = !isUrlMode && isLandingStep ? '' : 'none';
+  }
+}
 
 document.querySelectorAll('input[name="landing_option"]').forEach(radio => {
   radio.addEventListener('change', function () {
-    if (!editorContainer) return;
-    if (this.value === 'custom') {
-      editorContainer.style.display = 'block';
-      // alert('Show custom landing page editor');
-      if (!editorInstance && typeof ClassicEditor !== 'undefined') {
-        // alert('Initialize ClassicEditor for custom landing page content');
-        ClassicEditor.create(document.querySelector('#editor'), { placeholder: 'Enter custom page HTML here...' })
-          .then(editor => { editorInstance = editor; })
-          .catch(error => console.error('ClassicEditor init error', error));
+    const isUrlMode = this.value === 'url';
+    updateLandingModeUI(this.value);
+    if (isUrlMode) {
+      if (typeof CKEDITOR !== 'undefined' && CKEDITOR.instances['landing_page_content']) {
+        CKEDITOR.instances['landing_page_content'].setData('');
       }
-    } else {
-      editorContainer.style.display = 'none';
+    } else if (externalUrlInput) {
+      externalUrlInput.value = '';
     }
   });
 });
 
-// --- new: on-load check for pre-checked "custom" radio and init editor ---
-(function initLandingEditorIfPrechecked() {
-  try {
-    const preCheckedCustom = document.querySelector('input[name="landing_option"][value="custom"]:checked');
-    if (!preCheckedCustom || !editorContainer) return;
-    // show container
-    editorContainer.style.display = 'block';
-
-    // copy textarea content into editor element (ClassicEditor will pick this up)
-    const editorEl = document.querySelector('#editor');
-    const landingContentEl = document.getElementById('landing_page_content');
-    if (landingContentEl && editorEl && !editorEl.value) {
-      editorEl.value = landingContentEl.value || landingContentEl.textContent || '';
-    }
-
-    // disable other landing_option radios so user cannot change selection
-    const radios = Array.from(document.querySelectorAll('input[name="landing_option"]') || []);
-    radios.forEach(r => {
-      if (r !== preCheckedCustom) {
-        r.disabled = true;
-        // also visually indicate disabled state on label if present
-        const lab = r.closest('label') || (r.id ? document.querySelector(`label[for="${r.id}"]`) : null);
-        if (lab) {
-          lab.classList.add('opacity-50', 'pointer-events-none');
-        }
-      }
-    });
-
-    // initialize ClassicEditor if not already done
-    if (!editorInstance && typeof ClassicEditor !== 'undefined') {
-      ClassicEditor.create(editorEl || document.querySelector('#editor'), { placeholder: 'Enter custom page HTML here...' })
-        .then(editor => {
-          editorInstance = editor;
-          // set initial data if present
-          try {
-            const initial = (landingContentEl && (landingContentEl.value || landingContentEl.textContent)) || '';
-            if (initial) editorInstance.setData(initial);
-          } catch (e) { /* ignore */ }
-        })
-        .catch(err => console.error('ClassicEditor init error (prechecked):', err));
-    } else if (editorInstance) {
-      try {
-        const initial = (landingContentEl && (landingContentEl.value || landingContentEl.textContent)) || '';
-        if (initial) editorInstance.setData(initial);
-      } catch (e) { /* ignore */ }
-    }
-  } catch (e) {
-    console.warn('initLandingEditorIfPrechecked error', e);
-  }
+(function initLandingMode() {
+  const selectedLandingOption = document.querySelector('input[name="landing_option"]:checked');
+  const selectedMode = selectedLandingOption
+    ? selectedLandingOption.value
+    : normalizeLandingRadioValue(initialLandingPageMode);
+  updateLandingModeUI(selectedMode);
 })();
 
 // Ensure editors array also initialized safely (for any that remain)

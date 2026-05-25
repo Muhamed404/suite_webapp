@@ -1,12 +1,13 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const { logger } = require("../../../logger/logger");
+const { redactLogData, redactString } = require("../../../utility/redact");
 const getApiClient = require('../../../utility/api-client')
 const enums = require(`../../../contants/enum`);
 const render_ejs_urls = require("../../../config/render_ejs_urls");
 const helperFunctions = require("../../../utility/helperFunctions");
 
 exports.renderLicensedUserByProduct = async (req, res) => {
-  logger.info(`Controller - Licensed Users By Product: Incoming params ${JSON.stringify(req.params)} and query ${JSON.stringify(req.query)}`);
+  logger.info(`Controller - Licensed Users By Product: Incoming params ${JSON.stringify(redactLogData(req.params))} and query ${JSON.stringify(redactLogData(req.query))}`);
 
   let productId = req.params.productId || null;
   let productName = null;
@@ -45,7 +46,7 @@ exports.renderLicensedUserByProduct = async (req, res) => {
   // Append query parameters
   url += `?page=${encodeURIComponent(page)}&pageSize=${encodeURIComponent(pageSize)}`;
 
-  logger.info(`Controller - Licensed Users By Product: URL ${url}`);
+  logger.info(`Controller - Licensed Users By Product: URL ${redactString(url)}`);
   const response = await apiClient.get(url);
   // const users = response.data?.data || [];
   const users = (response.data?.data || []).map(user => ({
@@ -58,7 +59,7 @@ exports.renderLicensedUserByProduct = async (req, res) => {
   pageSize = response.data?.pageSize || pageSize;
   const total = response.data?.total || 0;
   logger.info(`Controller - Licensed Users By Product: Fetched ${users.length} users from backend.`);
-  logger.info(`Controller - Licensed Users By Product: ${JSON.stringify(users.slice(0, 2), null, 2)}`);
+  logger.info(`Controller - Licensed Users By Product: ${JSON.stringify(redactLogData(users.slice(0, 2)), null, 2)}`);
   if (req.query.requestType && req.query.requestType === 'ajax') {
     logger.info(`Controller - Licensed Users By Product: Sending JSON response for AJAX request.`);
     return res.json({

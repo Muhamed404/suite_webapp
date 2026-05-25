@@ -56,7 +56,7 @@
       </div>
 
       <!-- SMTP Account -->
-      <div>
+      <div id="smtp-account-field">
         <label class="block text-gray-700 font-medium mb-3">
           <%= __("smtp.labelServiceAccount") %>
         </label>
@@ -79,8 +79,18 @@
           class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
       </div>
 
-      <!-- Password -->
+      <!-- Sender Display Name -->
       <div>
+        <label class="block text-gray-700 font-medium mb-3">
+          <%= __("smtp.labelSenderDisplayName") %>
+        </label>
+        <input type="text" name="sender_display_name" id="sender_display_name" maxlength="250"
+          value="<%= typeof sender_display_name !== 'undefined' && sender_display_name ? sender_display_name : '' %>"
+          class="w-full px-4 py-2 border rounded-lg outline-none bg-gray-50 focus:ring-2 focus:ring-teal-400 text-gray-900 bg-gray-50" />
+      </div>
+
+      <!-- Password -->
+      <div id="smtp-password-field">
         <label class="block text-gray-700 font-medium mb-3">
           <%= __("smtp.labelPassword") %>
         </label>
@@ -146,6 +156,19 @@
           <label class="relative inline-flex items-center cursor-pointer">
             <input type="hidden" name="encrypt_password" id="encrypt_password_input" value="<%= typeof encrypt_password !== 'undefined' ? (encrypt_password ? 'true' : 'false') : 'true' %>" />
             <input type="checkbox" id="encrypt_password" <%= typeof encrypt_password === 'undefined' || encrypt_password ? 'checked' : '' %> class="sr-only peer" />
+            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-teal-500 peer-focus:ring-2 peer-focus:ring-teal-100 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
+          </label>
+        </div>
+
+        <!-- Is Authenticated -->
+        <div class="flex items-center gap-4">
+          <div>
+            <p class="text-sm font-medium text-gray-700"><%= __("smtp.isAuthenticated") %></p>
+            <p class="text-xs text-gray-400 mt-0.5"><%= __("smtp.isAuthenticatedDesc") %></p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="hidden" name="is_authenticated" id="is_authenticated_input" value="<%= typeof is_authenticated !== 'undefined' && is_authenticated === false ? 'false' : 'true' %>" />
+            <input type="checkbox" id="is_authenticated" <%= typeof is_authenticated === 'undefined' || is_authenticated ? 'checked' : '' %> class="sr-only peer" />
             <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-teal-500 peer-focus:ring-2 peer-focus:ring-teal-100 transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5"></div>
           </label>
         </div>
@@ -227,7 +250,7 @@
   });
 
   // TLS / SSL / Encrypt Password toggle labels + hidden input sync
-  ['use_tls', 'use_ssl', 'encrypt_password', 'enable_mfa'].forEach(function(id) {
+  ['use_tls', 'use_ssl', 'encrypt_password', 'enable_mfa', 'is_authenticated'].forEach(function(id) {
     var checkbox = document.getElementById(id);
     var hidden = document.getElementById(id + '_input');
     if (!checkbox || !hidden) return;
@@ -235,6 +258,43 @@
       hidden.value = this.checked ? 'true' : 'false';
     });
   });
+
+  var AUTH_PLACEHOLDER = 'Authentication set to true';
+
+  function applyIsAuthenticatedState(checked) {
+    var accountField = document.getElementById('smtp-account-field');
+    var passwordField = document.getElementById('smtp-password-field');
+    var accountInput = document.getElementById('smtp_account');
+    var passwordInput = document.getElementById('smtp_password');
+    if (!accountField || !passwordField || !accountInput || !passwordInput) return;
+
+    if (checked) {
+      // is_authenticated ON: show fields and validate normally
+      accountField.style.display = '';
+      passwordField.style.display = '';
+      if (accountInput.value === AUTH_PLACEHOLDER) accountInput.value = '';
+      if (passwordInput.value === AUTH_PLACEHOLDER) passwordInput.value = '';
+      accountInput.setAttribute('required', 'required');
+      passwordInput.setAttribute('required', 'required');
+    } else {
+      // is_authenticated OFF: hide fields and skip validation
+      accountField.style.display = 'none';
+      passwordField.style.display = 'none';
+      accountInput.value = AUTH_PLACEHOLDER;
+      passwordInput.value = AUTH_PLACEHOLDER;
+      accountInput.removeAttribute('required');
+      passwordInput.removeAttribute('required');
+    }
+  }
+
+  var isAuthCheckbox = document.getElementById('is_authenticated');
+  if (isAuthCheckbox) {
+    isAuthCheckbox.addEventListener('change', function() {
+      applyIsAuthenticatedState(this.checked);
+    });
+    // Apply initial state on page load
+    applyIsAuthenticatedState(isAuthCheckbox.checked);
+  }
 
   (function () {
     var toggleBtn = document.getElementById('toggleSmtpPassword');

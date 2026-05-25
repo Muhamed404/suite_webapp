@@ -15,6 +15,23 @@ function splitDateTime(datetimeStr) {
   };
 }
 
+// Helper function to determine campaign status on the frontend
+function determineStatus(campaign) {
+  const now = new Date();
+  const startDate = new Date(campaign.start_datetime);
+  const endDate = new Date(campaign.end_datetime);
+
+  if (!campaign.is_camp_uploaded) {
+    return 'draft';
+  } else if (now < startDate) {
+    return 'scheduled';
+  } else if (now >= startDate && now <= endDate) {
+    return 'active';
+  } else {
+    return 'completed';
+  }
+}
+
 // Transform server data for table display
 const data = originalCampaigns.map(campaign => {
   const start   = splitDateTime(campaign.start_datetime);
@@ -22,6 +39,7 @@ const data = originalCampaigns.map(campaign => {
   const created = splitDateTime(campaign.creation_date);
   const totalInvitees = Number(campaign.totalInvitees || 0);
   const sentCount = Number(campaign.sentCount || 0);
+  
   return {
     id: campaign.id,
     name: campaign.name,
@@ -31,7 +49,7 @@ const data = originalCampaigns.map(campaign => {
     end_date:   end.date,
     start_time: start.time,
     end_time:   end.time,
-    status: campaign.status,
+    status: determineStatus(campaign), // Calculate status in the browser
     totalInvitees,
     sentCount,
     unsentCount: Math.max(totalInvitees - sentCount, 0),
@@ -64,7 +82,7 @@ const rowsSelect  = document.getElementById("rowsPerPage");
 function renderTabs() {
   // Count how many items are in each status
   const counts = { All: data.length };
-  ["draft", "scheduled", "inprogress", "completed"].forEach(st => {
+  ["draft", "scheduled", "active", "completed"].forEach(st => {
     counts[st] = data.filter(d => d.status === st).length;
   });
 
@@ -73,7 +91,7 @@ function renderTabs() {
     All: window.translations.filterAll,
     draft: window.translations.filterDraft,
     scheduled: window.translations.filterScheduled,
-    inprogress: window.translations.InProgress,
+    active: window.translations.InProgress || 'Active',
     completed: window.translations.filterCompleted
   };
 
@@ -162,7 +180,7 @@ function renderTable() {
   // Render campaign rows into table body
   tableBody.innerHTML = pageData.map(campaign => {
     let statusClass = "";
-    if (campaign.status === "inprogress") statusClass = "px-4 py-1 text-sm text-blue-700 bg-blue-100 rounded-full";
+    if (campaign.status === "active") statusClass = "px-4 py-1 text-sm text-blue-700 bg-blue-100 rounded-full";
     if (campaign.status === "completed") statusClass = "px-4 py-1 text-sm text-green-700 bg-green-100 rounded-full";
 
     // Action icons (view details, edit)
@@ -229,14 +247,14 @@ function renderPagination(total) {
   const pageSize = serverPagination.pageSize || 10;
   const totalCount = serverPagination.totalCount || 0;
 
-  if (totalPages <= 1) {
+  if (totalPages < 1) {
     pagination.innerHTML = "";
     return;
   }
 
   let paginationHTML = `
     <div class="flex items-center justify-between w-full">
-      <div>
+      <div class="${document.dir === 'rtl' ? 'ml-4 mr-2' : 'mr-4'}">
         <p class="text-sm text-gray-700">
           ${window.translations.showingResults
             .replace('{start}', ((currentPageNum - 1) * pageSize) + 1)
@@ -247,13 +265,43 @@ function renderPagination(total) {
       <div class="flex space-x-2">
   `;
 
-  // Generate page buttons using your styling
-  for (let i = 1; i <= totalPages; i++) {
+  // Previous button
+  if (currentPageNum > 1) {
+    paginationHTML += `
+      <a href="?page=${currentPageNum - 1}&pageSize=${pageSize}"
+         class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">
+        ‹
+      </a>
+    `;
+  }
+
+  let startPage = Math.max(1, currentPageNum - 1);
+  let endPage = Math.min(totalPages, currentPageNum + 1);
+
+  if (endPage - startPage < 2) {
+    if (startPage === 1) {
+      endPage = Math.min(totalPages, 3);
+    } else if (endPage === totalPages) {
+      startPage = Math.max(1, totalPages - 2);
+    }
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
     const isActive = i === currentPageNum;
     paginationHTML += `
-      <a href="?page=${i}&pageSize=${pageSize}" 
+      <a href="?page=${i}&pageSize=${pageSize}"
          class="px-3 py-1 rounded-full ${isActive ? 'bg-teal-50 text-[var(--teal)] border border-[var(--teal)]' : 'border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300'}">
         ${i}
+      </a>
+    `;
+  }
+
+  // Next button
+  if (currentPageNum < totalPages) {
+    paginationHTML += `
+      <a href="?page=${currentPageNum + 1}&pageSize=${pageSize}"
+         class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">
+        ›
       </a>
     `;
   }
@@ -295,10 +343,12 @@ if (filterType) {
 
 // Rows per page selector
 if (rowsSelect) {
-  rowsSelect.addEventListener("change", e => { 
-    rowsPerPage = parseInt(e.target.value); 
-    currentPage = 1; 
-    renderTable(); 
+  rowsSelect.addEventListener("change", e => {
+    const newPageSize = e.target.value;
+    const url = new URL(window.location.href);
+    url.searchParams.set('pageSize', newPageSize);
+    url.searchParams.set('page', '1');
+    window.location.href = url.toString();
   });
 }
 

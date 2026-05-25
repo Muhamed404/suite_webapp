@@ -1,8 +1,9 @@
 
- 
+
 const { logger } = require("../../logger/logger");
 const enums = require("../../contants/enum");
 const { getUserInfo, canAccessOrganization, logAuthResult } = require("../../utility/authorization-helper");
+const { redactLogData } = require("../../utility/redact");
 
 const getApiClient = require('../../utility/api-client')
 
@@ -38,8 +39,8 @@ async function displayInvoice(req, res) {
       const response = await apiClient.get(url);
       // console.log(response)
       let invoiceData = response.data.message;
-      logger.info(`received invoice data is \n ${JSON.stringify(invoiceData)}`);
-      res.render("pages/order/invoice", { invoiceData, enums: enums,enableSuiteManagementLeftMenu: true, });
+      logger.info(`received invoice data is \n ${JSON.stringify(redactLogData(invoiceData))}`);
+      res.render("pages/order/invoice", { invoiceData, enums: enums, enableSuiteManagementLeftMenu: true, });
     } catch (error) {
       logger.error(`exception in displayInvoice \n`, error);
       const errMessage = "Error in Request, Contact to Administrator";
@@ -53,7 +54,7 @@ async function updateInvoice(req, res) {
   try {
     //let organizationId = req.user.organization_id;
     logger.info('Request has received in update invoice')
-    logger.info(JSON.stringify(req.body))
+    logger.info(JSON.stringify(redactLogData(req.body)))
     let orderId = req.body.order;
     let subscriptionId = req.body.subscription;
     orgId = req.body.org;
@@ -83,17 +84,17 @@ async function updateInvoice(req, res) {
     //   `/organization/?message=${message}&alertType=${alertType}`
     // );
     res.redirect(
-      `/organization/profile/${orgId}?message=${message}&alertType=${alertType}`
+      `/organization/profile/${orgId}?message=${message}&alertType=${alertType}&tab=subscription`
     );
   } catch (error) {
     logger.error(`Exception in updateInvoice \n` + error);
     const errMessage = "Error in Request, Contact Administrator";
-    res.redirect(`/organization/profile/${orgId}?message=${errMessage}&alertType=error`);
+    res.redirect(`/organization/profile/${orgId}?message=${errMessage}&alertType=error&tab=subscription`);
   }
 }
 
 module.exports = {
-  
+
   displayInvoice,
   updateInvoice,
 };

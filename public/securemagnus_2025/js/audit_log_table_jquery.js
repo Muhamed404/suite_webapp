@@ -18,7 +18,7 @@ const data = serverData.map(report => ({
 // ===============================
 let currentTab    = 'All';
 let currentPage   = 1;
-let rowsPerPage   = 10;
+let rowsPerPage   = Number(window['auditData']?.pagination?.pageSize) || 10;
 let currentSort   = { key: '', asc: true };
 
 // ===============================
@@ -54,7 +54,8 @@ function actionPill(action) {
     VIEW:   'bg-amber-100 text-amber-700',
   };
   const cls = map[a] || 'bg-gray-100 text-gray-600';
-  return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${cls}">${action}</span>`;
+  const label = window.i18n?.Audit?.actions?.[a] || action;
+  return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${cls}">${label}</span>`;
 }
 
 function modulePill(module) {
@@ -82,20 +83,44 @@ function truncate(str, len) {
     : str;
 }
 
+function renderDescription(str) {
+  if (!str || str === '—') return '<span class="text-gray-400">—</span>';
+  if (str.length <= 70) {
+    return `<span class="text-sm text-gray-600 break-words">${str}</span>`;
+  }
+
+  return `
+    <details class="group text-sm text-gray-600">
+      <summary class="cursor-pointer list-none break-words text-gray-600 group-open:hidden">
+        ${str.slice(0, 70)}…
+        <span class="text-teal-600 text-xs ml-1">View</span>
+      </summary>
+      <div class="hidden group-open:block mt-1 break-words text-gray-700">
+        <div>${str}</div>
+        <button type="button"
+          onclick="this.closest('details').open=false"
+          class="mt-1 text-teal-600 text-xs hover:underline">
+          Hide
+        </button>
+      </div>
+    </details>`;
+}
+
 // ===============================
 // Tabs — dynamic, based on unique action types
 // ===============================
 function renderTabs() {
   const allLabel = statusTabs?.dataset?.tabAll || 'All';
+  const totalRecords = Number(window['auditData']?.pagination?.totalCount) || data.length;
 
   // Collect unique action types from data
   const actionTypes = [...new Set(data.map(d => d.action).filter(Boolean))].sort();
   const tabs = ['All', ...actionTypes];
 
   statusTabs.innerHTML = tabs.map(tab => {
-    const count    = tab === 'All' ? data.length : data.filter(d => d.action === tab).length;
+    const count    = tab === 'All' ? totalRecords : data.filter(d => d.action === tab).length;
     const isActive = currentTab === tab;
-    const label    = tab === 'All' ? allLabel : tab;
+    const label    = tab === 'All' ? allLabel : (window.i18n?.Audit?.actions?.[tab.toUpperCase()] || tab);
 
     if (isActive) {
       return `<button onclick="setTab('${tab}')"
@@ -183,7 +208,7 @@ function renderTable() {
       <td class="px-6 py-3.5 whitespace-nowrap">${actionPill(report.action)}</td>
       <td class="px-6 py-3.5 whitespace-nowrap">${modulePill(report.module)}</td>
       <td class="px-6 py-3.5 max-w-[220px]">
-        <span class="text-sm text-gray-600">${truncate(report.description, 60)}</span>
+        ${renderDescription(report.description)}
       </td>
       <td class="px-6 py-3.5 whitespace-nowrap">
         <code class="text-xs font-mono text-gray-600 bg-gray-100 px-2 py-0.5 rounded">${report.ip_address}</code>
@@ -201,21 +226,70 @@ function renderTable() {
 // Pagination
 // ===============================
 function renderPagination(total) {
+  const hasLocalFilters = currentTab !== 'All' || !!(searchInput?.value || '').trim();
+
+  if (hasLocalFilters) {
+    const totalPages = Math.max(Math.ceil(total / rowsPerPage), 1);
+    const from = total === 0 ? 0 : ((currentPage - 1) * rowsPerPage) + 1;
+    const to = Math.min(currentPage * rowsPerPage, total);
+
+    const paginationFormat = window.i18n?.Audit?.paginationText || 'Showing {from}–{to} of {total}';
+    const paginationStr = paginationFormat.replace('{from}', from).replace('{to}', to).replace('{total}', total);
+
+    if (totalPages <= 1) {
+      pagination.innerHTML = total > 0
+        ? `<span class="text-xs text-gray-500">${paginationStr}</span>`
+        : '';
+      return;
+    }
+
+    let pages = '';
+    for (let i = 1; i <= totalPages; i++) {
+      const active = i === currentPage;
+      pages += `<button type="button" onclick="setPage(${i})"
+        class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-colors
+          ${active
+            ? 'bg-teal-600 text-white'
+            : 'text-gray-600 hover:bg-gray-100 border border-gray-200'}">
+        ${i}
+      </button>`;
+    }
+
+    pagination.innerHTML = `
+      <span class="text-xs text-gray-500 mr-2">${paginationStr}</span>
+      ${currentPage > 1
+        ? `<button type="button" onclick="setPage(${currentPage - 1})"
+             class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-xs">‹</button>`
+        : ''}
+      ${pages}
+      ${currentPage < totalPages
+        ? `<button type="button" onclick="setPage(${currentPage + 1})"
+             class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-xs">›</button>`
+        : ''}`;
+
+    return;
+  }
+
   const serverPagination = window['auditData']?.pagination || {};
   const currentPageNum = serverPagination.currentPage || 1;
-  const totalPages     = serverPagination.totalPages  || 1;
-  const pageSize       = serverPagination.pageSize    || 10;
+  const pageSize       = rowsPerPage || serverPagination.pageSize || 10;
   const totalCount     = serverPagination.totalCount  || total;
+  const totalPages     = Math.max(Math.ceil(totalCount / pageSize), 1);
 
   if (totalPages <= 1) {
+    const paginationFormat = window.i18n?.Audit?.paginationText || 'Showing {from}–{to} of {total}';
+    const paginationStr = paginationFormat.replace('{from}', totalCount).replace('{to}', totalCount).replace('{total}', totalCount);
     pagination.innerHTML = totalCount > 0
-      ? `<span class="text-xs text-gray-500">Showing ${totalCount} of ${totalCount}</span>`
+      ? `<span class="text-xs text-gray-500">${paginationStr}</span>`
       : '';
     return;
   }
 
   const from = ((currentPageNum - 1) * pageSize) + 1;
   const to   = Math.min(currentPageNum * pageSize, totalCount);
+
+  const paginationFormat = window.i18n?.Audit?.paginationText || 'Showing {from}–{to} of {total}';
+  const paginationStr = paginationFormat.replace('{from}', from).replace('{to}', to).replace('{total}', totalCount);
 
   let pages = '';
   for (let i = 1; i <= totalPages; i++) {
@@ -230,7 +304,7 @@ function renderPagination(total) {
   }
 
   pagination.innerHTML = `
-    <span class="text-xs text-gray-500 mr-2">Showing ${from}–${to} of ${totalCount}</span>
+    <span class="text-xs text-gray-500 mr-2">${paginationStr}</span>
     ${currentPageNum > 1
       ? `<a href="?page=${currentPageNum - 1}&pageSize=${pageSize}"
            class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-100 transition-colors text-xs">‹</a>`
@@ -263,8 +337,20 @@ if (searchInput) {
   searchInput.addEventListener('input', () => { currentPage = 1; renderTable(); });
 }
 if (rowsSelect) {
+  rowsSelect.value = String(rowsPerPage);
   rowsSelect.addEventListener('change', e => {
-    rowsPerPage = parseInt(e.target.value);
+    rowsPerPage = parseInt(e.target.value, 10);
+
+    // In unfiltered view, data is server-paginated. Reload with selected page size.
+    const hasLocalFilters = currentTab !== 'All' || !!(searchInput?.value || '').trim();
+    if (!hasLocalFilters) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('page', '1');
+      url.searchParams.set('pageSize', String(rowsPerPage));
+      window.location.href = url.toString();
+      return;
+    }
+
     currentPage = 1;
     renderTable();
   });

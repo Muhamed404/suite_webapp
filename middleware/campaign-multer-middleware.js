@@ -7,6 +7,7 @@ const path = require('path');
 const fs = require('fs');
 const sharp = require('sharp');
 const ApplicationConstants = require('../contants/application-constants');
+const { redactLogData } = require("../phishmagnus/utility/redact");
 
 
 const phishingCampaignDirectoryPath = ApplicationConstants.QR_CODE_STORAGE_DIR
@@ -22,7 +23,7 @@ const storage = multer.diskStorage({
     const unixTimestamp = Date.now();  // This will give the current Unix timestamp
     const extension = path.extname(file.originalname); // Get file extension
     const fileName = `${unixTimestamp}-${file.originalname}`;
-    logger.info('CAMPAIGN MULTER MIDDLEWARE ::: FILENAME IS ' + fileName)
+    logger.info('CAMPAIGN MULTER MIDDLEWARE ::: FILENAME IS ' + redactLogData(fileName))
     cb(null, fileName); // Save the file with the Unix timestamp in the filename
   }
 });
@@ -94,20 +95,20 @@ const conditionalFileUpload = (req, res, next) => {
   // It's a multipart request, use multer
   upload(req, res, (err) => {
     if (err) {
-      logger.error(`[Multer] Upload error: ${err.message}`);
-      logger.error(err.stack);
+      logger.error(`[Multer] Upload error: ${redactLogData(err.message)}`);
+      logger.error(redactLogData(err.stack));
       return next(err);
     }
     
     // Log what multer parsed
     logger.info(`[Multer] File received: ${!!req.file}`);
     if (req.file) {
-      logger.info(`[Multer] File details: ${JSON.stringify({
+      logger.info(`[Multer] File details: ${redactLogData(JSON.stringify({
         fieldname: req.file.fieldname,
         originalname: req.file.originalname,
         filename: req.file.filename,
         size: req.file.size
-      })}`);
+      }))}`);
     }
     logger.info(`[Multer] Body fields: ${Object.keys(req.body || {}).join(', ')}`);
     

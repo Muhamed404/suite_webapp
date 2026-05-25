@@ -15,6 +15,14 @@ interface SemiCircleChartProps {
   labels?: string[];
   showLegend?: boolean;
   hideZeroLegendEntries?: boolean;
+  showLowRiskCounter?: boolean;
+  lowRiskCounterLabel?: string;
+  /** Legend segment share (0–100); default uses `toFixed(2)`. */
+  formatLegendPercent?: (value: number) => string;
+  /** Tooltip share (0–100); default uses one decimal + % */
+  formatTooltipPercent?: (value: number) => string;
+  /** Count beside low-risk label; default raw number */
+  formatCount?: (value: number) => string;
 }
 
 export const SemiCircleChart = ({
@@ -27,6 +35,11 @@ export const SemiCircleChart = ({
   labels = ["Sent", "Opened", "Admin"],
   showLegend = true,
   hideZeroLegendEntries = false,
+  showLowRiskCounter = false,
+  lowRiskCounterLabel = "Low risk employees",
+  formatLegendPercent,
+  formatTooltipPercent,
+  formatCount,
 }: SemiCircleChartProps) => {
   const total = sent + opened + admin;
   const sentPercent = total === 0 ? 0 : (sent / total) * 100;
@@ -43,6 +56,9 @@ export const SemiCircleChart = ({
         pie: {
           donut: {
             size: "70%",
+            labels: {
+              show: !showLowRiskCounter,
+            },
           },
           startAngle: -90,
           endAngle: 90,
@@ -55,7 +71,8 @@ export const SemiCircleChart = ({
         position: "bottom" as const,
         formatter: function (seriesName: string, opts: any) {
           const value = opts.w.globals.series[opts.seriesIndex];
-          const label = `${labels[opts.seriesIndex]} (${value.toFixed(2)})`;
+          const pct = formatLegendPercent ? formatLegendPercent(value) : value.toFixed(2);
+          const label = `${labels[opts.seriesIndex]} (${pct})`;
 
           if (hideZeroLegendEntries && value === 0) {
             return "";
@@ -69,14 +86,35 @@ export const SemiCircleChart = ({
       },
       tooltip: {
         y: {
-          formatter: (val: number) => `${val.toFixed(1)}%`,
+          formatter: (val: number) =>
+            formatTooltipPercent ? formatTooltipPercent(val) : `${val.toFixed(1)}%`,
         },
       },
     }),
-    [sent, opened, admin, color1, color2, color3, labels]
+    [
+      sent,
+      opened,
+      admin,
+      color1,
+      color2,
+      color3,
+      labels,
+      showLowRiskCounter,
+      formatLegendPercent,
+      formatTooltipPercent,
+    ]
   );
 
   const series = [sentPercent, openedPercent, adminPercent];
 
-  return <Chart options={chartOptions} series={series} type="donut" />;
+  return (
+    <div className="w-full flex flex-col items-center">
+      {showLowRiskCounter && (
+        <p className="text-sm font-medium text-gray-700 mb-2">
+          {lowRiskCounterLabel}: {formatCount ? formatCount(sent) : sent}
+        </p>
+      )}
+      <Chart options={chartOptions} series={series} type="donut" />
+    </div>
+  );
 };

@@ -11,6 +11,7 @@ const mime = require('mime-types');
 const getApiClient = require('../../../utility/api-client')
 const backend_api_urls = require('../../../config/backend_api_urls');
 const frontend_api_urls = require('../../../config/frontend_api_urls');
+const { redactLogData } = require("../../utility/redact");
 
 router.post(
   "/upload",
@@ -34,7 +35,7 @@ router.post(
 
       // basic validation and logging
       try {
-        logger.info('[File Upload]: Incoming body: ' + JSON.stringify(req.body || {}));
+        logger.info('[File Upload]: Incoming body: ' + JSON.stringify(redactLogData(req.body || {})));
         const file = req.file;
         if (!file) {
           logger.warn('[File Upload]: No file in request');
@@ -104,7 +105,7 @@ router.post(
           logger.info('[File Upload]: File forwarded to backend successfully');
           // cleanup temp file
           try { fs.unlinkSync(file.path); } catch (e) { logger.debug('[File Upload]: cleanup error', e); }
-          return res.redirect(`${redirectUrl}?message=${encodeURIComponent('File uploading is in Process.')}&alertType=info`);
+          return res.redirect(`${redirectUrl}?message=${encodeURIComponent('File uploading is in process.')}&alertType=info`);
         } catch (apiErr) {
           logger.error('[File Upload]: Error posting to backend', apiErr && apiErr.message);
           logger.debug(apiErr);
@@ -158,7 +159,7 @@ router.post("/filePostersUpload", (req, res, next) => {
 
       const apiClient = getApiClient(req);
       const postUrl = backend_api_urls.PRODUCT_SUITE.CYBERSECURITY.FILE_POSTERS_UPLOAD;
-      logger.info(`[File Posters Upload]: Posting to ${postUrl} with payload: \n` + JSON.stringify(payload, null, 2));
+      logger.info(`[File Posters Upload]: Posting to ${postUrl} with payload: \n` + JSON.stringify(redactLogData(payload), null, 2));
       const redirectUrl = `/cybersecurity/categories/list`;
 
       try {

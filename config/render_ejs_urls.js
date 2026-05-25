@@ -96,6 +96,12 @@ module.exports = {
             CREATE: 'pages/notification_template/create-notification-template',
             EDIT: 'pages/notification_template/edit-notification-template',
         },
+        Notification_Mail: {
+            LIST: 'pages/notification_mail/list-notification-mails',
+        },
+        MFA_Mail: {
+            LIST: 'pages/mfa/list-mfa-mails',
+        },
         Package_Management: {
             CREATE: 'pages/package/create_package',
         },
@@ -107,6 +113,7 @@ module.exports = {
             LIST_SECUREMAGNUS_USERS: 'pages/user_management/list-securemagnus-users',
             LIST: 'pages/user_management/list-user',
             BULK_UPLOAD: 'pages/user_management/upload-user',
+            BULK_IMPORT_JOBS: 'pages/user_management/list-bulk-import-jobs',
             // CREATE: 'pages/user_management/addUser',
             CREATE_USER: 'pages/user_management/create-user', // This is new temporary file for new design
             CREATE_SECUREMAGNUS_USER: 'pages/user_management/create-securemagnus-user',

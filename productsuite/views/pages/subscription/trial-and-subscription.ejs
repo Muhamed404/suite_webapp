@@ -22,12 +22,15 @@
         </select>
       </div>
       <div>
-        <label class="block text-gray-700 font-medium mb-3"><%= __("subscription.create.labelTotalUserLicenses") %></label>
-        <input class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
-            oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
-            min="1" id="totaluserlicense" name="totaluserlicense" type="text"  />
-        
+        <label class="block text-gray-700 font-medium mb-3"><%= __("subscription.create.optionSelectPackage") %></label>
+        <select  name="selectedPackage" id="selectedPackage"
+          class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-white">
+          <option value="0" selected>
+              <%= __("subscription.create.optionSelectPackage") %>
+            </option>
+        </select>
       </div>
+
 
       <div>
         <label class="block text-gray-700 font-medium mb-3"> <%= __("subscription.create.labelLicenseStartDate") %></label>
@@ -50,13 +53,11 @@
     <!-- Right Side: Package/Start Date -->
     <div class="flex flex-col gap-6">
       <div>
-        <label class="block text-gray-700 font-medium mb-3"><%= __("subscription.create.optionSelectPackage") %></label>
-        <select  name="selectedPackage" id="selectedPackage"
-          class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-white">
-          <option value="0" selected>
-              <%= __("subscription.create.optionSelectPackage") %>
-            </option>
-        </select>
+        <label class="block text-gray-700 font-medium mb-3"><%= __("subscription.create.labelTotalUserLicenses") %></label>
+        <input class="w-full px-4 py-2 rounded-lg border focus:border-teal-400 focus:ring-2 focus:ring-teal-200 text-[var(--mainblue)] bg-transparent"
+            oninput="this.value = this.value.replace(/[^0-9]/g, ''); if(this.value.startsWith('-')) this.value = this.value.substr(1);"
+            min="1" id="totaluserlicense" name="totaluserlicense" type="text"  />
+        
       </div>
       <div>
         <label class="block text-gray-700 font-medium mb-3"><%= __("subscription.create.labelLicenseDuration") %></label>

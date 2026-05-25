@@ -1,4 +1,5 @@
 const { logger } = require("../../../logger/logger");
+const { redactLogData, redactString } = require("../../../utility/redact");
 const ICONSTANTS = require("../../../contants/ICONSTANTS");
 const enums = require('../../../contants/enum')
 const getApiClient = require('../../../utility/api-client');
@@ -147,7 +148,7 @@ const getSuccessRedirectUrl = (user) => {
  * Main controller for editing user
  */
 exports.editUser = async (req, res) => {
-  logger.info(`Controller - [Edit User]: Incoming request to edit user with ID ${JSON.stringify(req.params, null, 2)}`);
+  logger.info(`Controller - [Edit User]: Incoming request to edit user with ID ${JSON.stringify(redactLogData(req.params), null, 2)}`);
 
   try {
     const userId = req.params?.userId || null;
@@ -155,19 +156,19 @@ exports.editUser = async (req, res) => {
     // Validate user ID
     const userIdValidation = validateUserId(userId);
     if (!userIdValidation.isValid) {
-      logger.warn(`Controller - [Edit User]: Invalid user ID passed: ${userId}`);
+      logger.warn(`Controller - [Edit User]: Invalid user ID passed: ${redactLogData(userId)}`);
       req.flash("message", "Invalid User ID. Please contact administrator.");
       req.flash("alertType", "error");
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.User_Management.SUITE_USERS);
     }
 
     const payload = req.body || {};
-    logger.info(`Controller - [Edit User]: Payload received for user ID ${userId}: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`Controller - [Edit User]: Payload received for user ID ${redactLogData(userId)}: ${JSON.stringify(redactLogData(payload), null, 2)}`);
 
     // Validate required fields
     const requiredFieldsValidation = validateRequiredFields(payload);
     if (!requiredFieldsValidation.isValid) {
-      logger.warn(`Controller - [Edit User]: ${requiredFieldsValidation.message}`);
+      logger.warn(`Controller - [Edit User]: ${redactString(requiredFieldsValidation.message)}`);
       req.flash("message", requiredFieldsValidation.message);
       req.flash("alertType", "error");
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.User_Management.EDIT_USER(userId));
@@ -176,7 +177,7 @@ exports.editUser = async (req, res) => {
     // Validate password fields
     const passwordValidation = validatePasswordFields(payload.newPassword, payload.confirmPassword);
     if (!passwordValidation.isValid) {
-      logger.warn(`Controller - [Edit User]: Password validation failed - ${passwordValidation.message}`);
+      logger.warn(`Controller - [Edit User]: Password validation failed - ${redactString(passwordValidation.message)}`);
       req.flash("message", passwordValidation.message);
       req.flash("alertType", "error");
       return res.redirect(frontend_api_urls.PRODUCT_SUITE.User_Management.EDIT_USER(userId));
@@ -184,9 +185,9 @@ exports.editUser = async (req, res) => {
 
     // Log password update status
     if (passwordValidation.shouldUpdatePassword) {
-      logger.info(`Controller - [Edit User]: Password validation passed, updating password for user ID ${userId}`);
+      logger.info(`Controller - [Edit User]: Password validation passed, updating password for user ID ${redactLogData(userId)}`);
     } else {
-      logger.info(`Controller - [Edit User]: No password change requested for user ID ${userId}`);
+      logger.info(`Controller - [Edit User]: No password change requested for user ID ${redactLogData(userId)}`);
     }
 
     // Prepare final payload
@@ -198,7 +199,7 @@ exports.editUser = async (req, res) => {
       backend_api_urls.PRODUCT_SUITE.User_Management.SAVE_EDIT_USER(userId),
       finalPayload
     );
-    logger.info(`Controller - [Edit User]: API Response: ${JSON.stringify(userResponse.data, null, 2)}`);
+    logger.info(`Controller - [Edit User]: API Response: ${JSON.stringify(redactLogData(userResponse.data), null, 2)}`);
 
     // Handle API response
     if (!userResponse.data.success) {
@@ -215,8 +216,8 @@ exports.editUser = async (req, res) => {
     return res.redirect(redirectUrl);
 
   } catch (error) {
-    logger.error(`Error Controller - [Edit User]: ${error.message || error}`);
-    logger.error(`Error Controller - [Edit User]: ${error.stack}`);
+    logger.error(`Error Controller - [Edit User]: ${redactString(error.message || String(error))}`);
+    logger.error(`Error Controller - [Edit User]: ${redactString(error.stack || "")}`);
     req.flash("message", error?.response?.data?.message || 'Error in saving user.');
     req.flash("alertType", "error");
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.User_Management.SUITE_USERS);

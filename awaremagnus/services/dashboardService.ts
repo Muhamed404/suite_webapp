@@ -115,6 +115,16 @@ export const dashboardService = {
   },
 
   // --- User Dashboard ---
+  recomputeDashboardOrganizations: async (params?: { orgId?: number }) => {
+    const { data } = await awmClient.post<OrganizationDashboardsResponse>(
+      `${API_BASE}/dashboard/organizations/recompute`,
+      null,
+      { params }
+    );
+
+    return data;
+  },
+
   getUserDashboards: async (params?: {
     orgId?: number;
     userId?: number;

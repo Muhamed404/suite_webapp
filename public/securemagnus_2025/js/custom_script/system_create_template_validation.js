@@ -1,4 +1,23 @@
 $(document).ready(function () {
+
+  $.validator.addMethod("flexibleUrl", function(value, element) {
+    if (this.optional(element)) {
+      return true;
+    }
+
+    const urlRegex = /^(https?:\/\/|www\.)[^\s/$.?#].[^\s]*$/i;
+    return urlRegex.test(value);
+  }, window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL.");
+
+  function getPhishTypeContainer() {
+    return $('input[name="phishType"]').first().closest('.mb-6');
+  }
+
+  $('input[name="phishType"]').on('change', function() {
+    getPhishTypeContainer().find('.validation-error').remove();
+    $(this).valid();
+  });
+
   // Setup validation for the template creation form
   $("#templateCreationForm").validate({
     ignore: [], // Don't ignore hidden fields as they might be in inactive steps
@@ -107,6 +126,12 @@ $(document).ready(function () {
           return selectedOptions.includes('3') && phishOption === 'custom-url';
         },
         url: true
+      },
+      landing_page_external_url: {
+        required: function() {
+          return $('input[name="landing_option"]:checked').val() === 'url';
+        },
+        flexibleUrl: true
       }
     },
     messages: {
@@ -163,6 +188,10 @@ $(document).ready(function () {
       webpage_url: {
         required: window.i18n?.validation_messages?.urlRequired || "URL is required.",
         url: window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL."
+      },
+      landing_page_external_url: {
+        required: window.i18n?.validation_messages?.urlRequired || "URL is required.",
+        flexibleUrl: window.i18n?.validation_messages?.urlInvalid || "Please enter a valid URL."
       }
     },
     errorClass: "text-red-500 text-sm mt-1",
@@ -217,14 +246,14 @@ $(document).ready(function () {
       // Validate phishType
       if (!$('input[name="phishType"]:checked').val()) {
         // Add error message for phishType below the options
-        const phishTypeContainer = $('input[name="phishType"]').closest('div').parent();
+        const phishTypeContainer = getPhishTypeContainer();
         phishTypeContainer.find('.validation-error').remove();
         const errorMessage = window.i18n?.validation_messages?.phishing_type_required || 'Please select a phishing type.';
         phishTypeContainer.append(`<div class="validation-error text-red-500 text-sm mt-2">${errorMessage}</div>`);
         isValid = false;
       } else {
         // Remove error if present
-        $('input[name="phishType"]').closest('div').parent().find('.validation-error').remove();
+        getPhishTypeContainer().find('.validation-error').remove();
       }
     }
     
@@ -325,6 +354,11 @@ $(document).ready(function () {
       // If custom landing page is selected, validate content
       if (landingOption === 'custom') {
         if (!validateCKEditor('landing_page_content', 'Landing page content is required.')) {
+          isValid = false;
+        }
+      } else if (landingOption === 'url') {
+        const externalUrlInput = $('#landing_page_external_url');
+        if (externalUrlInput.length && !externalUrlInput.valid()) {
           isValid = false;
         }
       }

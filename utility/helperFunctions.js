@@ -2,6 +2,7 @@
 
 const path = require('path');
 const { logger } = require('../logger/logger');
+const { redactEmail } = require('./redact');
 const fs = require('fs').promises;
 const enums = require('../contants/enum');
 const fetch = require('node-fetch');
@@ -66,7 +67,7 @@ function hasAccess(req, module_name, allowedAccessTypes) {
       perm.module.toLowerCase() === module_name.toLowerCase() &&
       allowedAccessTypes.some(type => type.toLowerCase() === perm.name.toLowerCase())
   );
-  logger.info(`[HAS CREATE/UPDATE ACCESS] User:${req.user.email} Access: ${hasAccess ? 'has Granted ✅' : 'has not Denied ❌'}`);
+  logger.info(`[HAS CREATE/UPDATE ACCESS] User:${redactEmail(req.user.email)} Access: ${hasAccess ? 'has Granted ✅' : 'has not Denied ❌'}`);
   if (!hasAccess) {
     logger.warn(`[HAS CREATE/UPDATE ACCESS] Access denied: Insufficient permission'}`);
     return false
@@ -287,8 +288,121 @@ function getPasswordStrength(password) {
   };
 }
 
-// append FileFetcher to exports
+function cleanEmail(email) {
+  if (!email || typeof email !== 'string') return '';
+  return email
+    .normalize('NFKC')
+    .replace(/[\u200B-\u200D\uFEFF\u2060\u00AD]/g, '')
+    .replace(/[\u00A0\u202F\u2007]/g, '')
+    .trim()
+    .toLowerCase();
+}
+
+
+const PHISHING_FORM_SUBMIT_ACTION = '<%-phishing_url_submit%>';
+
+
+function normalizePhishingFormActions(content) {
+  if (!content) return content;
+  return content.replace(
+    /action\s*=\s*"<%-phishing_url_submit%[^"]*"/gi,
+    `action="${PHISHING_FORM_SUBMIT_ACTION}"`
+  );
+}
+
+function injectPhishingFormWebAction(content) {
+  if (!content) return content;
+
+  content = normalizePhishingFormActions(content);
+
+  const hasForm = /<form[\s>]/i.test(content);
+
+  if (!hasForm) {
+    return `<form action="${PHISHING_FORM_SUBMIT_ACTION}" method="post">\n${content}\n</form>`;
+  }
+
+  return content.replace(/<form(\b[^>]*)>/gi, (match, attrs) => {
+    const a = attrs || '';
+
+    if (/phishing_url_submit/i.test(a)) {
+      return match;
+    }
+
+    let cleaned = a
+      .replace(/\s*action\s*=\s*"[^"]*"/gi, '')
+      .replace(/\s*action\s*=\s*'[^']*'/gi, '');
+
+    cleaned += ` action="${PHISHING_FORM_SUBMIT_ACTION}"`;
+
+    if (/\bmethod\s*=/i.test(cleaned)) {
+      cleaned = cleaned.replace(/\bmethod\s*=\s*"[^"]*"/gi, 'method="post"');
+      cleaned = cleaned.replace(/\bmethod\s*=\s*'[^']*'/gi, "method='post'");
+    } else {
+      cleaned += ' method="post"';
+    }
+
+    return `<form${cleaned}>`;
+  });
+}
+
+function interactionScript() {
+  const script = `
+  <script>
+    (function() {
+
+      const TRACK_URL = "<%- phishing_url %>";
+  let interactionSent = false; // <-- ensures firing only once
+
+  function sendInteraction(data) {
+    if (interactionSent) return; // stop duplicates
+    interactionSent = true;
+
+    fetch(TRACK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(),
+        pageUrl: window.location.href,
+        ...data
+      })
+    }).catch(err => console.error("Tracking Error:", err));
+  }
+
+  // Detect first typing on ANY input, textarea, or content-editable
+  function handleTyping() {
+    sendInteraction({
+      eventType: "typing_start"
+    });
+
+    // Remove listeners after first trigger
+    document.removeEventListener("keydown", handleTyping);
+    document.removeEventListener("input", handleTyping);
+  }
+
+  // Detect first copy attempt
+  function handleCopy() {
+    sendInteraction({
+      eventType: "copy_attempt"
+    });
+
+    document.removeEventListener("copy", handleCopy);
+  }
+
+  // Add listeners
+  document.addEventListener("keydown", handleTyping);
+  document.addEventListener("input", handleTyping);
+  document.addEventListener("copy", handleCopy);
+})();
+  </script>
+  `;
+
+  logger.info("[Create System Template] interactionScript created");
+  return script;
+}
+
 module.exports = {
+  injectPhishingFormWebAction,
+  normalizePhishingFormActions,
   formatDate,
   extractAttachmentInfo,
   readFiles,
@@ -297,6 +411,8 @@ module.exports = {
   fetchHtmlFromUrl,
   validatePasswordComplexity,
   isStrongPassword,
-  getPasswordStrength
+  getPasswordStrength,
+  cleanEmail,
+  interactionScript
 };
 

@@ -6,12 +6,12 @@ import type { Module, ModuleContent } from "@/types/quiz";
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ReactCountryFlag from "react-country-flag";
 import { Button } from "@heroui/button";
 import { Select, SelectItem } from "@heroui/select";
 import clsx from "clsx";
 
 import { QuizTypeSelectorPills, QuizCardType } from "./quiz-type-selector-pills";
-import { QuizLanguageSelectorFlags } from "./quiz-language-selector-flags";
 import {
   QuizLanguageCard,
   generateId,
@@ -25,23 +25,58 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useModules, useContentsByModule, useCreateQuiz, useQuizTypes } from "@/hooks/useQuiz";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { getApiErrorMessage } from "@/utils/apiError";
+import {
+  SUPPORTED_LANGUAGES,
+  getLanguageCountryCode,
+  getLanguageName,
+} from "@/utils/supportedLanguages";
 
 function createEmptyAnswer(): QuizAnswer {
   return { id: generateId(), text: "", correct: false };
 }
 
-function createEmptyQuestion(): QuizQuestion {
+/** Localized "True" / "False" labels per quiz language (matches the language the quiz is authored in,
+ *  not the current UI locale). Falls back to English. */
+const TRUE_FALSE_LABELS: Record<number, { yes: string; no: string }> = {
+  1: { yes: "True", no: "False" }, // English
+  2: { yes: "صح", no: "خطأ" }, // Arabic
+  3: { yes: "سچ", no: "جھوٹ" }, // Urdu
+  4: { yes: "Vrai", no: "Faux" }, // French
+  5: { yes: "对", no: "错" }, // Mandarin Chinese
+  6: { yes: "Doğru", no: "Yanlış" }, // Turkish
+};
+
+function getTrueFalseLabels(langId?: number): { yes: string; no: string } {
+  if (langId != null && TRUE_FALSE_LABELS[langId]) return TRUE_FALSE_LABELS[langId]!;
+
+  return TRUE_FALSE_LABELS[1]!;
+}
+
+function createDefaultAnswers(type: QuizCardType, langId?: number): QuizAnswer[] {
+  if (type === "truefalse") {
+    const { yes, no } = getTrueFalseLabels(langId);
+
+    return [
+      { id: generateId(), text: yes, correct: true },
+      { id: generateId(), text: no, correct: false },
+    ];
+  }
+
+  return [createEmptyAnswer()];
+}
+
+function createDefaultQuestion(type: QuizCardType, langId?: number): QuizQuestion {
   return {
     id: generateQuestionId(),
     question: "",
-    answers: [createEmptyAnswer()],
+    answers: createDefaultAnswers(type, langId),
   };
 }
 
-function createLanguageFormByLangId(langId: number): QuizLanguageForm {
+function createLanguageFormByLangId(langId: number, type: QuizCardType): QuizLanguageForm {
   return {
     langId,
-    questions: [createEmptyQuestion()],
+    questions: [createDefaultQuestion(type, langId)],
   };
 }
 
@@ -74,11 +109,17 @@ export function CreateQuizForm({
   const { user } = useAuthStore();
 
   const [moduleId, setModuleId] = useState<string>(initialModuleId);
+  const [languageId, setLanguageId] = useState<string>("");
   const [contentId, setContentId] = useState<string>("");
 
   useEffect(() => {
     if (initialModuleId) setModuleId(initialModuleId);
   }, [initialModuleId]);
+
+  // Reset content when module or language changes (content list depends on both)
+  useEffect(() => {
+    setContentId("");
+  }, [moduleId, languageId]);
 
   // Quiz Type State
   const [selectedQuizType, setSelectedQuizType] = useState<QuizCardType>("single");
@@ -110,53 +151,66 @@ export function CreateQuizForm({
 
   // Helper to reverse map if needed, but we drive state by UI selection now.
 
-  const [selectedLanguageIds, setSelectedLanguageIds] = useState<number[]>([]);
-  const [generated, setGenerated] = useState(false);
-  const [languageForms, setLanguageForms] = useState<QuizLanguageForm[]>([]);
+  const [languageForm, setLanguageForm] = useState<QuizLanguageForm | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
 
   const { data: modulesRes } = useModules();
   const modules = modulesRes?.success ? (modulesRes.data ?? []) : [];
 
-  const { data: contentsRes } = useContentsByModule(moduleId ? Number(moduleId) : 0, !!moduleId);
+  const langIdNumber = languageId ? Number(languageId) : undefined;
+  const { data: contentsRes } = useContentsByModule(
+    moduleId ? Number(moduleId) : 0,
+    moduleId && langIdNumber != null ? { enabled: true, lang_id: langIdNumber } : !!moduleId
+  );
   const contents = contentsRes?.success ? (contentsRes.data ?? []) : [];
 
   const createQuiz = useCreateQuiz();
 
-  const handleGenerateForm = useCallback(() => {
+  // Whenever language changes, regenerate the form for that language using the current quiz type.
+  useEffect(() => {
+    if (langIdNumber != null) {
+      setLanguageForm(createLanguageFormByLangId(langIdNumber, selectedQuizType));
+    } else {
+      setLanguageForm(null);
+    }
     setFormError(null);
     setFormSuccess(null);
+    // Intentionally only on language change; quiz-type changes are handled below so that
+    // the user does not lose their typed question text every time language is re-selected.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [langIdNumber]);
 
-    if (selectedLanguageIds.length === 0) {
-      setFormError(t("selectLanguageError") || "Please select at least one language");
+  // When quiz type changes, reset only the answer rows (preserve question text the user typed).
+  // For "truefalse" this seeds the two locked True/False rows; for the others it goes back to
+  // a single empty answer row so the previously-entered (and now-irrelevant) options don't leak.
+  useEffect(() => {
+    setLanguageForm((prev) => {
+      if (!prev) return prev;
 
-      return;
-    }
+      return {
+        ...prev,
+        questions: prev.questions.map((q) => ({
+          ...q,
+          answers: createDefaultAnswers(selectedQuizType, prev.langId),
+        })),
+      };
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedQuizType]);
 
-    const forms = selectedLanguageIds.map(createLanguageFormByLangId);
-
-    setLanguageForms(forms);
-    setGenerated(true);
-  }, [selectedLanguageIds, t]);
+  const generated = !!languageForm;
 
   const updateForm = useCallback(
-    (index: number, updater: (prev: QuizLanguageForm) => QuizLanguageForm) => {
-      setLanguageForms((prev) => prev.map((f, i) => (i === index ? updater(f) : f)));
+    (updater: (prev: QuizLanguageForm) => QuizLanguageForm) => {
+      setLanguageForm((prev) => (prev ? updater(prev) : prev));
     },
     []
   );
 
-  const removeForm = useCallback((index: number) => {
-    setLanguageForms((prev) => prev.filter((_, i) => i !== index));
-    // Also uncheck the language? Optional, but keeps UI sync
-    // For now we keep the selection in pills separate or sync them?
-    // Design suggests they might be separate steps.
-  }, []);
-
   const addAnswer = useCallback(
-    (formIndex: number, questionIndex: number) => {
-      updateForm(formIndex, (f) => ({
+    (questionIndex: number) => {
+      updateForm((f) => ({
         ...f,
         questions: f.questions.map((q, i) =>
           i === questionIndex ? { ...q, answers: [...q.answers, createEmptyAnswer()] } : q
@@ -166,19 +220,16 @@ export function CreateQuizForm({
     [updateForm]
   );
 
-  const addQuestion = useCallback(
-    (formIndex: number) => {
-      updateForm(formIndex, (f) => ({
-        ...f,
-        questions: [...f.questions, createEmptyQuestion()],
-      }));
-    },
-    [updateForm]
-  );
+  const addQuestion = useCallback(() => {
+    updateForm((f) => ({
+      ...f,
+      questions: [...f.questions, createDefaultQuestion(selectedQuizType, f.langId)],
+    }));
+  }, [updateForm, selectedQuizType]);
 
   const removeQuestion = useCallback(
-    (formIndex: number, questionIndex: number) => {
-      updateForm(formIndex, (f) => ({
+    (questionIndex: number) => {
+      updateForm((f) => ({
         ...f,
         questions: f.questions.filter((_, i) => i !== questionIndex),
       }));
@@ -190,7 +241,7 @@ export function CreateQuizForm({
     e.preventDefault();
     setFormError(null);
     setFormSuccess(null);
-    if (!generated || languageForms.length === 0) return;
+    if (!languageForm) return;
     const modContentId = contentId ? Number(contentId) : 0;
 
     if (!modContentId) {
@@ -199,59 +250,101 @@ export function CreateQuizForm({
       return;
     }
 
-    let hasValid = false;
+    const isTrueFalse = selectedQuizType === "truefalse";
 
-    for (const form of languageForms) {
-      const validQuestions = form.questions.filter((q) => {
-        const answers = q.answers.filter((a) => a.text.trim() !== "");
+    // Validate every question the author has touched. A question is considered "started"
+    // when it has any question text or any non-empty answer text. Started questions must
+    // pass type-specific validation; truly empty questions are skipped silently.
+    const validQuestions: typeof languageForm.questions = [];
 
-        return answers.length > 0 && answers.some((a) => a.correct);
-      });
+    for (let i = 0; i < languageForm.questions.length; i++) {
+      const q = languageForm.questions[i]!;
+      const number = i + 1;
+      const questionText = q.question.trim();
+      const filledAnswers = q.answers.filter((a) => a.text.trim() !== "");
+      const hasAnyCorrect = q.answers.some((a) => a.correct);
 
-      if (validQuestions.length > 0) hasValid = true;
+      if (isTrueFalse) {
+        // True/False rows are pre-seeded and locked, so the only thing the author has
+        // to do is pick which side is correct.
+        if (!hasAnyCorrect) {
+          setFormError(t("validationQuestionMissingCorrect", { number }));
+
+          return;
+        }
+        validQuestions.push(q);
+        continue;
+      }
+
+      const isStarted = questionText !== "" || filledAnswers.length > 0;
+
+      if (!isStarted) continue;
+
+      if (questionText === "") {
+        setFormError(t("validationQuestionMissingText", { number }));
+
+        return;
+      }
+
+      if (filledAnswers.length === 0) {
+        setFormError(t("validationQuestionMissingAnswers", { number }));
+
+        return;
+      }
+
+      if (!filledAnswers.some((a) => a.correct)) {
+        setFormError(t("validationQuestionMissingCorrect", { number }));
+
+        return;
+      }
+
+      validQuestions.push(q);
     }
 
-    if (!hasValid) {
+    if (validQuestions.length === 0) {
       setFormError(t("validationQuestionAnswers"));
 
       return;
     }
 
     const selectedQuizTypeId = getTypeIdFromCardType(selectedQuizType);
+    const tfLabels = getTrueFalseLabels(languageForm.langId);
 
     try {
-      for (const form of languageForms) {
-        const validQuestions = form.questions.filter((q) => {
-          const answers = q.answers.filter((a) => a.text.trim() !== "");
+      for (const q of validQuestions) {
+        let answers: Array<{ answer: string; validity: boolean }>;
 
-          return answers.length > 0 && answers.some((a) => a.correct);
-        });
+        if (isTrueFalse) {
+          // Defensive: always emit both options so the learner sees True AND False, regardless
+          // of any prior buggy state. Determine which side the author marked as correct.
+          const yesRow = q.answers.find((a) => a.text.trim() === tfLabels.yes);
+          const isYesCorrect = yesRow ? yesRow.correct : !!q.answers[0]?.correct;
 
-        for (const q of validQuestions) {
-          const answers = q.answers
+          answers = [
+            { answer: tfLabels.yes, validity: isYesCorrect },
+            { answer: tfLabels.no, validity: !isYesCorrect },
+          ];
+        } else {
+          answers = q.answers
             .filter((a) => a.text.trim() !== "")
-            .map((a, i) => ({
+            .map((a) => ({
               answer: a.text.trim(),
               validity: a.correct,
-              // order: i + 1, // Not strictly in API docs but order matters
             }));
-
-          await createQuiz.mutateAsync({
-            quiz: {
-              con_id: modContentId,
-              qtype_id: selectedQuizTypeId,
-              question: q.question.trim() || "Untitled question",
-              difficulty: 1,
-              // time_limit: 60, // Not in API docs
-              // lang_id: form.langId, // Not in API docs, removing
-            },
-            answers,
-          });
         }
+
+        await createQuiz.mutateAsync({
+          quiz: {
+            con_id: modContentId,
+            qtype_id: selectedQuizTypeId,
+            question: q.question.trim() || "Untitled question",
+            difficulty: 1,
+          },
+          answers,
+        });
       }
       setFormSuccess(t("createSuccess"));
 
-      // Redirect after success
       setTimeout(() => {
         const path =
           user?.role_id && (user.role_id === 1 || user.role_id === 2)
@@ -271,8 +364,9 @@ export function CreateQuizForm({
   };
 
   const handleCancel = () => {
-    setGenerated(false);
-    setLanguageForms([]);
+    setLanguageForm(
+      langIdNumber != null ? createLanguageFormByLangId(langIdNumber, selectedQuizType) : null
+    );
     setFormError(null);
     setFormSuccess(null);
   };
@@ -304,8 +398,8 @@ export function CreateQuizForm({
       <p className="text-xs text-[var(--darkgray)] mb-5 mt-1">{t("subtitle")}</p>
 
       <div className="bg-white border border-[var(--strokeGray)] rounded-2xl p-6 mb-5 shadow-none">
-        {/* Module and Content Selectors */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        {/* Module + Language + Content Selectors (language is required first) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div>
             <p className="text-[10px] font-medium text-gray-900 mb-1">{t("selectModule")}</p>
             <Select
@@ -332,6 +426,68 @@ export function CreateQuizForm({
           </div>
 
           <div>
+            <p className="text-[10px] font-medium text-gray-900 mb-1">
+              {t("selectLanguage") ?? "Language"}
+            </p>
+            <Select
+              aria-label="Quiz language"
+              className="w-full"
+              classNames={{
+                trigger:
+                  "h-10 min-h-10 rounded-lg bg-white border border-gray-200 data-[hover=true]:bg-white data-[focus=true]:border-[#3FBDFF] transition-colors text-xs px-3 shadow-none",
+                value: "text-xs group-data-[has-value=true]:text-gray-900",
+              }}
+              isDisabled={!moduleId}
+              placeholder={t("selectLanguage") ?? "Select language"}
+              renderValue={(items) =>
+                items.map((item) => {
+                  const id = Number(item.key);
+
+                  return (
+                    <span key={id} className="inline-flex items-center gap-2">
+                      <span className="w-4 h-4 rounded-full overflow-hidden border border-gray-100 inline-flex items-center justify-center">
+                        <ReactCountryFlag
+                          svg
+                          className="w-full h-full object-cover"
+                          cdnUrl="/awm/vendor/flag-icons/flags/4x3/"
+                          countryCode={getLanguageCountryCode(id)}
+                          style={{ fontSize: "1.4em", lineHeight: "1.4em" }}
+                          title={getLanguageName(id)}
+                        />
+                      </span>
+                      <span>{getLanguageName(id)}</span>
+                    </span>
+                  );
+                })
+              }
+              selectedKeys={languageId ? [languageId] : []}
+              onSelectionChange={(keys) => {
+                const v = Array.from(keys)[0] as string;
+
+                setLanguageId(v || "");
+              }}
+            >
+              {SUPPORTED_LANGUAGES.map((lang) => (
+                <SelectItem key={lang.id} textValue={lang.name}>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full overflow-hidden border border-gray-100 inline-flex items-center justify-center">
+                      <ReactCountryFlag
+                        svg
+                        className="w-full h-full object-cover"
+                        cdnUrl="/awm/vendor/flag-icons/flags/4x3/"
+                        countryCode={getLanguageCountryCode(lang.id)}
+                        style={{ fontSize: "1.4em", lineHeight: "1.4em" }}
+                        title={lang.name}
+                      />
+                    </span>
+                    <span className="text-xs">{lang.name}</span>
+                  </span>
+                </SelectItem>
+              ))}
+            </Select>
+          </div>
+
+          <div>
             <p className="text-[10px] font-medium text-gray-900 mb-1">{t("selectContent")}</p>
             <Select
               className="w-full"
@@ -340,8 +496,12 @@ export function CreateQuizForm({
                   "h-10 min-h-10 rounded-lg bg-white border border-gray-200 data-[hover=true]:bg-white data-[focus=true]:border-[#3FBDFF] transition-colors text-xs px-3 shadow-none",
                 value: "text-xs group-data-[has-value=true]:text-gray-900",
               }}
-              isDisabled={!moduleId}
-              placeholder={t("contentPlaceholder")}
+              isDisabled={!moduleId || !languageId}
+              placeholder={
+                !languageId
+                  ? t("selectLanguage") ?? "Select a language first"
+                  : t("contentPlaceholder")
+              }
               selectedKeys={contentId ? [contentId] : []}
               onSelectionChange={(keys) => {
                 const v = Array.from(keys)[0] as string;
@@ -355,6 +515,11 @@ export function CreateQuizForm({
                 </SelectItem>
               ))}
             </Select>
+            {moduleId && languageId && contents.length === 0 && (
+              <p className="text-[10px] text-gray-500 mt-1">
+                No content available for this module in {getLanguageName(Number(languageId))}.
+              </p>
+            )}
           </div>
         </div>
 
@@ -363,24 +528,6 @@ export function CreateQuizForm({
           value={selectedQuizType}
           onChange={setSelectedQuizType}
         />
-
-        <QuizLanguageSelectorFlags
-          className="mt-2"
-          value={selectedLanguageIds}
-          onChange={setSelectedLanguageIds}
-        />
-
-        <div className="mt-6 flex justify-end pb-2 border-b border-gray-100">
-          <Button
-            className="rounded-full bg-[#3FBDFF] text-white font-medium hover:opacity-90 disabled:opacity-50 text-xs px-6"
-            isDisabled={!moduleId || !contentId || selectedLanguageIds.length === 0}
-            radius="full"
-            size="sm"
-            onPress={handleGenerateForm}
-          >
-            {t("generateForm")}
-          </Button>
-        </div>
       </div>
 
       <form id="quizForm" onSubmit={handleSubmit}>
@@ -396,37 +543,36 @@ export function CreateQuizForm({
         )}
 
         <div className="space-y-4" id="languageForms">
-          {generated &&
-            languageForms.map((form, formIndex) => (
-              <QuizLanguageCard
-                key={String(form.langId ?? form.lang ?? formIndex)}
-                allowAddQuestion={true}
-                contentId={contentId ? Number(contentId) : undefined}
-                form={form}
-                moduleId={moduleId ? Number(moduleId) : undefined}
-                quizType={selectedQuizType as any}
-                quizTypeId={getTypeIdFromCardType(selectedQuizType)}
-                onAddAnswer={(qIndex) => addAnswer(formIndex, qIndex)}
-                onAddQuestion={() => addQuestion(formIndex)}
-                onAnswersChange={(qIndex, answers) =>
-                  updateForm(formIndex, (f) => ({
-                    ...f,
-                    questions: f.questions.map((q, i) => (i === qIndex ? { ...q, answers } : q)),
-                  }))
-                }
-                onQuestionChange={(qIndex, question) =>
-                  updateForm(formIndex, (f) => ({
-                    ...f,
-                    questions: f.questions.map((q, i) => (i === qIndex ? { ...q, question } : q)),
-                  }))
-                }
-                onRemove={() => removeForm(formIndex)}
-                onRemoveQuestion={(qIndex) => removeQuestion(formIndex, qIndex)}
-              />
-            ))}
+          {generated && languageForm && (
+            <QuizLanguageCard
+              key={String(languageForm.langId ?? "lang-form")}
+              allowAddQuestion={true}
+              contentId={contentId ? Number(contentId) : undefined}
+              form={languageForm}
+              moduleId={moduleId ? Number(moduleId) : undefined}
+              quizType={selectedQuizType as any}
+              quizTypeId={getTypeIdFromCardType(selectedQuizType)}
+              onAddAnswer={(qIndex) => addAnswer(qIndex)}
+              onAddQuestion={() => addQuestion()}
+              onAnswersChange={(qIndex, answers) =>
+                updateForm((f) => ({
+                  ...f,
+                  questions: f.questions.map((q, i) => (i === qIndex ? { ...q, answers } : q)),
+                }))
+              }
+              onQuestionChange={(qIndex, question) =>
+                updateForm((f) => ({
+                  ...f,
+                  questions: f.questions.map((q, i) => (i === qIndex ? { ...q, question } : q)),
+                }))
+              }
+              onRemove={handleCancel}
+              onRemoveQuestion={(qIndex) => removeQuestion(qIndex)}
+            />
+          )}
         </div>
 
-        {generated && languageForms.length > 0 && (
+        {generated && languageForm && (
           <div className={clsx("flex justify-end gap-3 mt-6", isRtl && "flex-row-reverse")}>
             <Button
               className="rounded-full border border-gray-200 text-gray-600 font-medium hover:bg-gray-50 text-xs px-6"

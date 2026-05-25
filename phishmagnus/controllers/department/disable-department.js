@@ -3,6 +3,7 @@ const config = require("../../../config/env.config");
 const { logger } = require("../../../logger/logger");
 const ICONSTANTS = require('../../../contants/ICONSTANTS')
 const getApiClient = require('../../../utility/api-client')
+const { redactLogData } = require("../../utility/redact");
 
 exports.disableDepartment = async (req, res) => {
   logger.info('INCOMING RQUEST IN DISABLE DEPARTMENT')
@@ -15,7 +16,7 @@ exports.disableDepartment = async (req, res) => {
       name: deptName
     }
 
-    logger.info('INCOMING PAYLOAD ' + JSON.stringify(payload))
+    logger.info('INCOMING PAYLOAD ' + JSON.stringify(redactLogData(payload)))
     let orgId = req.params.orgId;
     const url = `/department/disable/${orgId}`;
     logger.info('INCOMING url ' + url)

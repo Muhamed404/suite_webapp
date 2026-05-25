@@ -3,6 +3,7 @@ const enums = require("../../contants/enum");
 const LicenseService = require("../../productsuite/services/license/licenseService");
 const moment = require('moment');
 const getApiClient = require('../../utility/api-client');
+const { redactLogData } = require("../../utility/redact");
 const FrontEndApiUrl = require('../../config/frontend_api_urls');
 const BACKEND_API_URL = require("../../config/backend_api_urls");
 const RENDER_PAGE_URLS = require('../../config/render_ejs_urls');
@@ -21,14 +22,14 @@ exports.dashboard = async (req, res, next) => {
   logger.info(`[PHM Home]: Calling API ` + statisticsUrl);
 
   respPhishMagnusLicenseDetails = await LicenseService.retrieveSuiteManagementLicenseInformation(req);
-  logger.info('[PHM Home]: Phishmganus License Details ' + JSON.stringify(respPhishMagnusLicenseDetails, null, 2))
+  logger.info('[PHM Home]: Phishmganus License Details ' + JSON.stringify(redactLogData(respPhishMagnusLicenseDetails), null, 2))
   const phishMagnusLicense = respPhishMagnusLicenseDetails?.PhishMagnus?.Subscription ?? null;
 
 
   apiClient.get(statisticsUrl)
     .then((statisticsResponse) => {
       // console.log(statisticsResponse.data.message);
-      logger.info('[PHM Home]: statisticsResponse ' + JSON.stringify(statisticsResponse.data?.message, null, 2))
+      logger.info('[PHM Home]: statisticsResponse ' + JSON.stringify(redactLogData(statisticsResponse.data?.message), null, 2))
       const statistics = statisticsResponse.data?.message; // Assuming response data has the stats you need
       const totalUserPhishingTypeCategoryInteractions = statistics?.totalUserPhishingTypeCategoryInteractions || {};
       const interactionsByPhishingTypes = statistics?.interactionsByPhishingTypes;
@@ -102,7 +103,7 @@ exports.dashboard = async (req, res, next) => {
 
 
 function extractUniqueEmailInteractions(interactionsCount) {
-  logger.info('[PHM Home]: extractUniqueEmailInteractions interactionsCount ' + JSON.stringify(interactionsCount, null, 2))
+  logger.info('[PHM Home]: extractUniqueEmailInteractions interactionsCount ' + JSON.stringify(redactLogData(interactionsCount), null, 2))
   return {
     openEmail: interactionsCount?.is_phish_msg_opened || 0,
     linkOpened: interactionsCount?.is_phish_msg_link_opened || 0,
@@ -115,7 +116,7 @@ function extractUniqueEmailInteractions(interactionsCount) {
 
 
 function extractUniqueSMSInteractions(interactionsCount) {
-  logger.info('[PHM Home]: extractUniqueSMSInteractions interactionsCount ' + JSON.stringify(interactionsCount, null, 2))
+  logger.info('[PHM Home]: extractUniqueSMSInteractions interactionsCount ' + JSON.stringify(redactLogData(interactionsCount), null, 2))
   return {
     deliveredSMS: interactionsCount?.is_sms_delivered || 0,
     linkClicked: interactionsCount?.is_link_clicked || 0,
@@ -129,7 +130,7 @@ function extractUniqueSMSInteractions(interactionsCount) {
 
 
 function extractUniqueQRInteractions(interactionsCount) {
-  logger.info('[PHM Home]: extractUniqueQRInteractions interactionsCount ' + JSON.stringify(interactionsCount, null, 2))
+  logger.info('[PHM Home]: extractUniqueQRInteractions interactionsCount ' + JSON.stringify(redactLogData(interactionsCount), null, 2))
   return {
     scan: interactionsCount?.is_opened || 0,
     fileDownloaded: interactionsCount?.is_downloaded || 0,
@@ -141,7 +142,7 @@ function extractUniqueQRInteractions(interactionsCount) {
 
 
 function extractUniqueNFCInteractions(interactionsCount) {
-  logger.info('[PHM Home]: extractUniqueNFCInteractions interactionsCount ' + JSON.stringify(interactionsCount, null, 2))
+  logger.info('[PHM Home]: extractUniqueNFCInteractions interactionsCount ' + JSON.stringify(redactLogData(interactionsCount), null, 2))
   return {
     scan: interactionsCount?.is_opened || 0,
     fileDownloaded: interactionsCount?.is_downloaded || 0,
@@ -152,7 +153,7 @@ function extractUniqueNFCInteractions(interactionsCount) {
 
 
 function extractUniqueWhatsappInteractions(interactionsCount) {
-  logger.info('[PHM Home]: extractUniqueWhatsappInteractions interactionsCount ' + JSON.stringify(interactionsCount, null, 2))
+  logger.info('[PHM Home]: extractUniqueWhatsappInteractions interactionsCount ' + JSON.stringify(redactLogData(interactionsCount), null, 2))
   return {
     open: interactionsCount?.is_whatsapp_opened || 0,
     clickLink: interactionsCount?.is_link_clicked || 0,

@@ -26,8 +26,8 @@ const data = originalCampaigns.map(campaign => ({
 // State variables
 // ===============================
 let currentTab = "All";          // Current tab filter (All, Active, Scheduled, Completed, Draft)
-let currentPage = 1;             // Current page for pagination
-let rowsPerPage = 10;            // Rows per page (user can change)
+let currentPage = serverData.pagination?.currentPage || 1;
+let rowsPerPage = serverData.pagination?.pageSize || 10;
 let currentSort = { key: "", asc: true }; // Current sorting state
 
 // ===============================
@@ -134,12 +134,10 @@ function getFilteredData() {
 function renderTable() {
   const filtered = getFilteredData();
 
-  // Pagination: calculate visible rows
-  const start = (currentPage - 1) * rowsPerPage;
-  const end = start + rowsPerPage;
-  let pageData = filtered.slice(start, end);
+  // Server-side pagination: data is already the current page
+  let pageData = filtered;
 
-  // Sort only the visible rows (not full dataset)
+  // Sort only the visible rows
   if (currentSort.key) {
     pageData = pageData.sort((a, b) => {
       let valA = a[currentSort.key].toString().toLowerCase();
@@ -212,8 +210,8 @@ function renderTable() {
     </tr>`;
   }).join("");
 
-  // Update pagination
-  renderPagination(filtered.length);
+  // Update pagination (server-side)
+  renderPagination();
 }
 
 // ===============================
@@ -230,21 +228,21 @@ function viewCampaign(campaignId) {
 // ===============================
 // Render pagination buttons - Simplified with new styling
 // ===============================
-function renderPagination(total) {
+function renderPagination() {
   const serverPagination = window.campaignsData.pagination || {};
   const currentPageNum = serverPagination.currentPage || 1;
   const totalPages = serverPagination.totalPages || 1;
   const pageSize = serverPagination.pageSize || 10;
   const totalCount = serverPagination.totalCount || 0;
 
-  if (totalPages <= 1) {
+  if (totalPages < 1) {
     pagination.innerHTML = "";
     return;
   }
 
   let paginationHTML = `
     <div class="flex items-center justify-between w-full">
-      <div>
+      <div class="${document.dir === 'rtl' ? 'ml-4 mr-2' : 'mr-4'}">
         <p class="text-sm text-gray-700">
           ${window.I18N ? window.I18N.showing : 'Showing'} ${((currentPageNum - 1) * pageSize) + 1}
           ${window.I18N ? window.I18N.to : 'to'} ${Math.min(currentPageNum * pageSize, totalCount)}
@@ -254,13 +252,44 @@ function renderPagination(total) {
       <div class="flex space-x-2">
   `;
 
-  // Generate page buttons using your styling
-  for (let i = 1; i <= totalPages; i++) {
+  // Previous button
+  if (currentPageNum > 1) {
+    paginationHTML += `
+      <a href="?page=${currentPageNum - 1}&pageSize=${pageSize}"
+         class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">
+        ‹
+      </a>
+    `;
+  }
+
+  // Windowed page range
+  let startPage = Math.max(1, currentPageNum - 1);
+  let endPage = Math.min(totalPages, currentPageNum + 1);
+
+  if (endPage - startPage < 2) {
+    if (startPage === 1) {
+      endPage = Math.min(totalPages, 3);
+    } else if (endPage === totalPages) {
+      startPage = Math.max(1, totalPages - 2);
+    }
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
     const isActive = i === currentPageNum;
     paginationHTML += `
-      <a href="?page=${i}&pageSize=${pageSize}" 
+      <a href="?page=${i}&pageSize=${pageSize}"
          class="px-3 py-1 rounded-full ${isActive ? 'bg-teal-50 text-[var(--teal)] border border-[var(--teal)]' : 'border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300'}">
         ${i}
+      </a>
+    `;
+  }
+
+  // Next button
+  if (currentPageNum < totalPages) {
+    paginationHTML += `
+      <a href="?page=${currentPageNum + 1}&pageSize=${pageSize}"
+         class="px-3 py-1 rounded-full border text-gray-600 hover:bg-teal-50 hover:text-[var(--teal)] hover:border hover:border-[var(--teal)] duration-300">
+        ›
       </a>
     `;
   }
@@ -292,7 +321,18 @@ function setPage(p) {
 // ===============================
 // Search input
 if (searchInput) {
-  searchInput.addEventListener("input", renderTable);
+  searchInput.addEventListener("input", () => {
+    renderTable();
+    // Update URL without reload
+    const url = new URL(window.location.href);
+    const query = searchInput.value;
+    if (query) {
+      url.searchParams.set('search', query);
+    } else {
+      url.searchParams.delete('search');
+    }
+    window.history.pushState({}, '', url);
+  });
 }
 
 // Dropdown filter
@@ -303,9 +343,11 @@ if (filterType) {
 // Rows per page selector
 if (rowsSelect) {
   rowsSelect.addEventListener("change", e => {
-    rowsPerPage = parseInt(e.target.value);
-    currentPage = 1;
-    renderTable();
+    const newPageSize = e.target.value;
+    const url = new URL(window.location.href);
+    url.searchParams.set('pageSize', newPageSize);
+    url.searchParams.set('page', '1');
+    window.location.href = url.toString();
   });
 }
 
@@ -327,6 +369,13 @@ document.querySelectorAll("th[data-sort]").forEach(th => {
 // Initialize table + tabs (only if data exists)
 // ===============================
 if (data.length > 0) {
+  // Map search param from URL on load
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchParam = urlParams.get('search');
+  if (searchParam && searchInput) {
+    searchInput.value = searchParam;
+  }
+
   renderTabs();
   renderTable();
 } else {

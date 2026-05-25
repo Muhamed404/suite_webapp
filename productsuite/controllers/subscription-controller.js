@@ -3,6 +3,7 @@
 const frontend_api_urls = require("../../config/frontend_api_urls");
 const { logger } = require("../../logger/logger");
 const getApiClient = require('../../utility/api-client')
+const { redactLogData } = require("../../utility/redact");
 
 
 async function createSubscription(req, res, next) {
@@ -10,7 +11,7 @@ async function createSubscription(req, res, next) {
   const orgId = req?.user.organization_id || req.params.orgId;
   if (req.method === "GET") {
 
-    logger.info(`[Create Subscription]: GET: Incoming Param ${JSON.stringify(req.params)}`);
+    logger.info(`[Create Subscription]: GET: Incoming Param ${JSON.stringify(redactLogData(req.params))}`);
     // const organizationUrl = `/organization/find/${orgId}`;
     const application_url = `/phm/commons/retrieve-applications`;
     const organizationDetailUrl = `/phm/commons/fetchOrganizationDetails/${orgId}`;
@@ -49,7 +50,7 @@ async function createSubscription(req, res, next) {
   }
   try {
     logger.info(`[Create Subscription]: POST: inside the post method of create subscription`);
-    logger.info(`[Create Subscription]: POST: Incomig Body ${JSON.stringify(req.body)}`);
+    logger.info(`[Create Subscription]: POST: Incomig Body ${JSON.stringify(redactLogData(req.body))}`);
     const payload = {
       selectedApplication: parseInt(req.body?.selectedApplication || 0),
       durationDays: parseInt(req.body?.durationDays || 0),
@@ -70,7 +71,7 @@ async function createSubscription(req, res, next) {
       ttlPayableAmt: parseFloat(req.body.ttlPayableAmt || 0),
       allocatedOrgAdminUser: parseInt(req.body?.allocatedOrgAdminUser || 0)
     };
-    logger.info(`[Create Subscription]: POST: Printing Payload ${JSON.stringify(payload)}`);
+    logger.info(`[Create Subscription]: POST: Printing Payload ${JSON.stringify(redactLogData(payload))}`);
 
     if (payload.selectedApplication === 0) {
       logger.warn(`[Create Subscription]: POST: User did not select the Application.`)
@@ -89,7 +90,7 @@ async function createSubscription(req, res, next) {
     const apiClient = getApiClient(req);
     const response = await apiClient.post(`/subscription/${orgId}`, payload);
     const data = response.data;
-    req.flash("message", 'Subscription created successfully');
+    req.flash("message", req.__('subscription.create.successCreated'));
     req.flash("alertType", "success");
     logger.info(`[Create Subscription]: Subscription created successfully for organization id: ${orgId}`);
     return res.redirect(frontend_api_urls.PRODUCT_SUITE.Subscription.PROFILE(orgId));

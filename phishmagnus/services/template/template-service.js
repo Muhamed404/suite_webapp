@@ -1,6 +1,7 @@
 const backend_api_urls = require("../../../config/backend_api_urls");
 const { logger } = require("../../../logger/logger");
 const getApiClient = require("../../../utility/api-client");
+const { redactLogData } = require("../../../utility/redact");
 
 
 async function  listTemplatesByOrgAndType(orgId, phishingCampaignType, req) {
@@ -38,7 +39,7 @@ async function getSystemTemplates(phishingCampaignType, req) {
                 } else {
                     logger.info(`Retrieved system templates (non-array) type=${typeof templates} for campaignType=${phishingCampaignType}`);
                 }
-                logger.info(`System templates sample (first item): ${JSON.stringify(Array.isArray(templates) ? templates[0] : templates)}`);
+                logger.info(`System templates sample (first item): ${JSON.stringify(redactLogData(Array.isArray(templates) ? templates[0] : templates))}`);
                 return templates;
             }
             logger.info('Response contained no templates property');
@@ -50,7 +51,7 @@ async function getSystemTemplates(phishingCampaignType, req) {
         logger.error(`Issue in fetching system templates: `, error.message);
         // If using axios-like client, include response details if available
         if (error.response) {
-            logger.error(`Upstream response status=${error.response.status} data=${JSON.stringify(error.response.data)}`);
+            logger.error(`Upstream response status=${error.response.status} data=${JSON.stringify(redactLogData(error.response.data))}`);
         }
         logger.error(error.stack);
         return null;

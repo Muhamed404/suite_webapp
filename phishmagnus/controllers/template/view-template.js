@@ -5,10 +5,11 @@ const { extractAttachmentInfo, FileFetcher, readFiles } = require('../../../util
 const frontend_api_urls = require('../../../config/frontend_api_urls');
 const render_ejs_urls = require('../../../config/render_ejs_urls');
 const enums = require('../../../contants/enum');
+const { redactLogData } = require('../../../utility/redact');
 
 exports.viewTemplate = async (req, res) => {
   const templateId = String(req.params?.templateId || '').trim();
-  logger.info('Controller - View Template: request', { templateId, url: req.originalUrl, ip: req.ip });
+  logger.info('Controller - View Template: request', redactLogData({ templateId, url: req.originalUrl, ip: req.ip }));
 
   if (!templateId) {
     logger.warn('Controller - View Template: missing templateId', { params: req.params });
@@ -41,13 +42,13 @@ exports.viewTemplate = async (req, res) => {
       ?? response?.data
       ?? {};
 
-    logger.info('Controller - View Template: fetched template' + JSON.stringify(tpl, null, 2));
+    logger.info('Controller - View Template: fetched template' + JSON.stringify(redactLogData(tpl), null, 2));
     // debug: structured log + plain console output to inspect payload
-    logger.info('Controller - View Template: resolved tpl object' + { templateId, tplSummary: { keys: Object.keys(tpl || {}) } });
+    logger.info('Controller - View Template: resolved tpl object' + JSON.stringify(redactLogData({ templateId, tplSummary: { keys: Object.keys(tpl || {}) } })));
     try {
-      logger.info('Controller - View Template: tpl (full)' + { tpl });
+      logger.info('Controller - View Template: tpl (full)' + JSON.stringify(redactLogData({ tpl })));
     } catch (e) {
-      logger.info('Controller - View Template: tpl (raw)' + { tpl });
+      logger.info('Controller - View Template: tpl (raw)' + JSON.stringify(redactLogData({ tpl })));
     }
 
     if (!tpl || Object.keys(tpl).length === 0) {
@@ -66,15 +67,30 @@ exports.viewTemplate = async (req, res) => {
       const info = extractAttachmentInfo(filePathRaw);
       tpl.attachmentExt = info.attachmentExt; // e.g. ".pdf"
       tpl.file_extension = String(tpl.file_extension || info.file_extension || '').toLowerCase();
-      logger.info('Controller - View Template: attachment resolved' + JSON.stringify({ filePathRaw, filename: info.filename, attachmentExt: tpl.attachmentExt, file_extension: tpl.file_extension }));
+      logger.info('Controller - View Template: attachment resolved' + JSON.stringify(redactLogData({ filePathRaw, filename: info.filename, attachmentExt: tpl.attachmentExt, file_extension: tpl.file_extension })));
     }
 
-    const filesData = await readFiles(tpl.phishing_page_url, tpl.landing_page_url);
-    logger.info('Controller - View Template: readFiles result' + JSON.stringify(filesData, null, 2));
+    const landingPageUrl = String(tpl.landing_page_url || '').trim();
+    const isExternalLandingPageUrl = /^https?:\/\//i.test(landingPageUrl);
+    const filesData = await readFiles(tpl.phishing_page_url, isExternalLandingPageUrl ? null : tpl.landing_page_url);
+    logger.info('Controller - View Template: readFiles result' + JSON.stringify(redactLogData(filesData), null, 2));
 
     tpl.phishing_page_content = filesData.phishing_page?.content || '';
     tpl.landing_page_content = filesData.landing_page?.content || '';
+    tpl.landing_page_option = isExternalLandingPageUrl ? 'url' : 'html';
+    tpl.landing_page_external_url = isExternalLandingPageUrl ? landingPageUrl : '';
     tpl.phishing_smtp = tpl.phishing_smtp_id; // ensure this property exists for the view, even if null
+
+    // Enforce exactly one slash after bucket root to avoid malformed .../o... paths.
+    const webBucketRoot = (process.env.WEB_TEMPLATE_BUCKET || '').replace(/\/+$/, '');
+    if (webBucketRoot) {
+      ['phishing_content', 'phishing_page_content', 'landing_page_content'].forEach((field) => {
+        if (!tpl[field] || !tpl[field].includes('<%=web_bucket%>')) return;
+        tpl[field] = tpl[field]
+          .split('<%=web_bucket%>/').join(`${webBucketRoot}/`)
+          .split('<%=web_bucket%>').join(`${webBucketRoot}/`);
+      });
+    }
     // if(!tpl.phish_option){
     //   if(tpl.phishcat_id === enums.phishingCategories.DataEntryBasedPhishing){
     //     tpl.phish_option = 'data_entry';
@@ -82,10 +98,15 @@ exports.viewTemplate = async (req, res) => {
     //     tpl.phish_option = 'simple';
     //   }
     // }
-    logger.info('Controller - View Template: rendering view' + JSON.stringify(tpl, null, 2));
+    logger.info('Controller - View Template: rendering view' + JSON.stringify(redactLogData(tpl), null, 2));
     const postMethodUrl = '/phm/template/update/' + tpl?.id;
 
-    return res.render(render_ejs_urls.PhishMagnus.System_Template.SHOW, { template: tpl, enableSuiteManagementLeftMenu: false, postMethodUrl });
+    return res.render(render_ejs_urls.PhishMagnus.System_Template.SHOW, { 
+      template: tpl, 
+      enableSuiteManagementLeftMenu: false, 
+      postMethodUrl,
+      webTemplateBucket: process.env.WEB_TEMPLATE_BUCKET
+    });
   } catch (err) {
     // Detailed logging for different axios failure modes
     logger.error(`Controller - View Template: error fetching template \n ${err.stack}`);

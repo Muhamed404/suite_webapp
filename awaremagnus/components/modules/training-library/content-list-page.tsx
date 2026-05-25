@@ -321,18 +321,6 @@ export function ContentListPage({ moduleId, contentTypeId, libraryType }: Conten
                           >
                             {t("library.viewDetails")}
                           </Button>
-                          <Button radius="full" size="sm" variant="light">
-                            {t("library.edit")}
-                          </Button>
-                          <Button
-                            className={isRtl ? "mr-1" : "ml-1"}
-                            color="danger"
-                            radius="full"
-                            size="sm"
-                            variant="light"
-                          >
-                            {t("library.delete")}
-                          </Button>
                         </TableCell>
                       </TableRow>
                     )}
@@ -487,9 +475,6 @@ function ContentCard({
             variant="flat"
           >
             {t("library.viewDetails")}
-          </Button>
-          <Button radius="full" size="sm" variant="light">
-            {t("library.edit")}
           </Button>
         </div>
       </CardBody>

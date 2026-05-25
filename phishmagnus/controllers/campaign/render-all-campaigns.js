@@ -4,6 +4,7 @@ const getApiClient = require("../../../utility/api-client");
 const backend_api_urls = require("../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../config/frontend_api_urls");
 const render_ejs_urls = require("../../../config/render_ejs_urls");
+const { redactLogData } = require("../../../utility/redact");
 
 const CAMPAIGN_TYPES = [
   { key: "email", label: "Email", fetcher: fetchEmailCampaigns },
@@ -37,8 +38,8 @@ exports.renderAllCampaigns = async (req, res) => {
       magnusAdmin: typeof res.locals.magnusAdmin !== "undefined" ? res.locals.magnusAdmin : (req.user?.organization_id === null)
     });
   } catch (error) {
-    logger.error(`${logCtx} Error rendering campaigns page: ${error.message}`);
-    logger.error(error.stack);
+    logger.error(`${logCtx} Error rendering campaigns page: ${redactLogData(error.message)}`);
+    logger.error(redactLogData(error.stack));
 
     req.flash("message", "Unable to load campaigns. Please try again.");
     req.flash("alertType", "error");
@@ -55,7 +56,7 @@ async function collectCampaigns(req) {
       try {
         return await type.fetcher(req, type);
       } catch (error) {
-        logger.error(`[All Campaigns] Failed to fetch ${type.key} campaigns: ${error.message}`);
+        logger.error(`[All Campaigns] Failed to fetch ${type.key} campaigns: ${redactLogData(error.message)}`);
         return [];
       }
     })
@@ -216,28 +217,10 @@ function normalizeCampaign(campaign = {}, extras = {}) {
     templateName: extras.templateName || "N/A",
     startDate,
     endDate,
-    status: determineStatus(campaign),
+    is_camp_uploaded: campaign.is_camp_uploaded,
     totalTargets: extras.totalTargets ?? null,
     typeKey: extras.typeKey,
     typeLabel: extras.typeLabel || extras.typeKey || "Campaign",
     detailPath: extras.detailPath || "#",
   };
 }
-
-function determineStatus(campaign = {}) {
-  const now = new Date();
-  const startDate = new Date(campaign.start_datetime || campaign.scheduled_date || campaign.start_date || now);
-  const endDate = new Date(campaign.end_datetime || campaign.scheduled_date || campaign.start_date || now);
-
-  if (!campaign.is_camp_uploaded && campaign.is_camp_uploaded !== undefined) {
-    return "draft";
-  }
-  if (now < startDate) {
-    return "scheduled";
-  }
-  if (now >= startDate && now <= endDate) {
-    return "active";
-  }
-  return "completed";
-}
-

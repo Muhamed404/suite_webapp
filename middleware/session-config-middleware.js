@@ -4,6 +4,7 @@ const { RedisStore } = require('connect-redis');
 const Redis = require('ioredis');
 const jwt = require('jsonwebtoken');
 const ApplicationConstants = require("../contants/application-constants");
+const { redactLogData, redactSessionId, redactString } = require("../utility/redact");
 
 // Initialize Redis client
 const redisClient = new Redis({
@@ -41,7 +42,7 @@ const storeUserSessionInRedis = session({
 });
 
 const sessionTimeoutValidation = (req, res, next) => {
-  logger.info(`[Session Config Middleware]: Validating session timeout for sessionID=${req.sessionID}`);
+  logger.info(`[Session Config Middleware]: Validating session timeout for sessionID=${redactSessionId(req.sessionID)}`);
 
   const currentTimestamp = Math.floor(Date.now() / 1000);
 
@@ -50,7 +51,7 @@ const sessionTimeoutValidation = (req, res, next) => {
   if (token !== null && token) {
     try {
       const decoded = jwt.decode(token);
-      logger.info('[Session Config Middleware]: Decoded JWT ' + JSON.stringify(decoded, null, 2));
+      logger.info('[Session Config Middleware]: Decoded JWT ' + JSON.stringify(redactLogData(decoded), null, 2));
 
       const { iss: service_id, sub: service_name, iat: issuedAt, exp: expiresAt } = decoded;
       if (expiresAt && currentTimestamp >= expiresAt) {
@@ -59,7 +60,7 @@ const sessionTimeoutValidation = (req, res, next) => {
       }
 
     } catch (err) {
-      logger.error("[Session Config Middleware]: Failed to decode JWT token:" + err.message);
+      logger.error("[Session Config Middleware]: Failed to decode JWT token:" + redactString(err.message));
       req.flash('message', 'Session expired. Please log in again.');
       req.flash('alertType', 'error');
       req.session.destroy(() => { });

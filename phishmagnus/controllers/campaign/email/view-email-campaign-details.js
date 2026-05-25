@@ -1,5 +1,6 @@
 const config = require("../../../../config/env.config");
 const { logger } = require("../../../../logger/logger");
+const { redactLogData } = require("../../../utility/redact");
 const enums = require("../../../../contants/enum");
 const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
@@ -22,7 +23,7 @@ exports.viewCampaignDetails = async (req, res) => {
       return res.redirect("/phm/index");
     }
 
-    logger.info(`Email Campaign Detail: incoming params ${JSON.stringify(req.params, null, 2)}`);
+    logger.info(`Email Campaign Detail: incoming params ${JSON.stringify(redactLogData(req.params), null, 2)}`);
 
     // Function to fetch campaign statistics
     // Fetch statistics and user details in parallel for performance
@@ -32,12 +33,15 @@ exports.viewCampaignDetails = async (req, res) => {
     ]);
 
     logger.info('Email Campaign Detail: FETCH CAMPAIGN STATISTICS AND PHISHING USER DETAILS API CALL COMPLETED');
-    logger.debug(`Email Campaign Detail: respStatistics ${JSON.stringify(campaignReportDetails?.data, null, 2)}`);
+    logger.debug(`Email Campaign Detail: respStatistics ${JSON.stringify(redactLogData(campaignReportDetails?.data), null, 2)}`);
     const campaignDetails = campaignReportDetails?.data?.message.campaign || {};
     // Format the campaign start datetime for display (avoid raw ISO string)
     try {
       if (campaignDetails && campaignDetails.start_datetime) {
-        campaignDetails.start_datetime = moment(campaignDetails.start_datetime).format('DD-MMM-YYYY hh:mm A');
+        const m = moment(campaignDetails.start_datetime, [moment.ISO_8601, 'DD-MMM-YYYY hh:mm A']);
+        if (m.isValid()) {
+          campaignDetails.start_datetime = m.format('DD-MMM-YYYY hh:mm A');
+        }
       }
     } catch (err) {
       logger.warn('Failed to format campaignDetails.start_datetime', err);
@@ -60,13 +64,22 @@ exports.viewCampaignDetails = async (req, res) => {
     }
 
     const usersDetail = respPhishingUserDetails?.data?.message || [];
+    const usersDetailPagination = respPhishingUserDetails?.data?.message?.pagination || respPhishingUserDetails?.data?.pagination || {};
+    const userDetailsQuery = {
+      page: req.query?.page || '',
+      pageSize: req.query?.pageSize || '',
+      search: req.query?.search || ''
+    };
     // Format invitee schedule datetimes for display
     try {
       if (usersDetail && Array.isArray(usersDetail.Phishing_Invities)) {
         usersDetail.Phishing_Invities.forEach((invite) => {
           try {
             if (invite && invite.CampaignSchedule && invite.CampaignSchedule.start_datetime) {
-              invite.CampaignSchedule.start_datetime = moment(invite.CampaignSchedule.start_datetime).format('DD-MMM-YYYY hh:mm A');
+              const m = moment(invite.CampaignSchedule.start_datetime, [moment.ISO_8601, 'DD-MMM-YYYY hh:mm A']);
+              if (m.isValid()) {
+                invite.CampaignSchedule.start_datetime = m.format('DD-MMM-YYYY hh:mm A');
+              }
             }
           } catch (e) {
             // ignore formatting errors per-invite
@@ -76,13 +89,23 @@ exports.viewCampaignDetails = async (req, res) => {
     } catch (err) {
       logger.warn('Failed to format usersDetail schedule datetimes', err);
     }
-    logger.debug('respPhishingUserDetails: user Details ' + JSON.stringify(usersDetail, null, 2));
+    logger.debug('respPhishingUserDetails: user Details ' + JSON.stringify(redactLogData(usersDetail), null, 2));
 
-    logger.debug('Email Campaign Detail: campaignStats: ' + JSON.stringify(campaignStats, null, 2));
+    logger.debug('Email Campaign Detail: campaignStats: ' + JSON.stringify(redactLogData(campaignStats), null, 2));
+
+    if (req.query?.format === 'json' || req.headers?.accept?.includes('application/json')) {
+      return res.json({
+        usersDetail,
+        pagination: usersDetailPagination
+      });
+    }
+
     return res.render(render_ejs_urls.PhishMagnus.Campaign.Email.VIEW_CAMPAIGN, {
       campaignStats,
       campaignDetails,
       usersDetail,
+      usersDetailPagination,
+      userDetailsQuery,
       translations: {
         campaign: {
           email_campaign_detail: {
@@ -161,7 +184,18 @@ async function getPhishingUserDetailsByCampaign(req, campId) {
   try {
     logger.info('GET PHISHING CAMPAIGN::: CALLING CAMPAIGN PHISHING USER DETAILS API');
     const apiClient = getApiClient(req);
-    const url = backend_api_urls.PHISHMAGNUS.CAMPAIGN.EMAIL.PHISHING_USER_DETAIL(campId);
+    const baseUrl = backend_api_urls.PHISHMAGNUS.CAMPAIGN.EMAIL.PHISHING_USER_DETAIL(campId);
+    const queryParams = new URLSearchParams();
+    if (req.query?.page) {
+      queryParams.set('page', req.query.page);
+    }
+    if (req.query?.pageSize) {
+      queryParams.set('pageSize', req.query.pageSize);
+    }
+    if (req.query?.search) {
+      queryParams.set('search', req.query.search);
+    }
+    const url = queryParams.toString() ? `${baseUrl}?${queryParams.toString()}` : baseUrl;
     logger.info('URL for phishing user details: ' + url);
     const response = await apiClient.get(url);
     if (!response) {

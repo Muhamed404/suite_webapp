@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { Input } from "@heroui/input";
 import { Button } from "@heroui/button";
 import clsx from "clsx";
 import { useMemo } from "react";
@@ -31,16 +30,6 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
     [user?.email, jwtPayload]
   );
 
-  const searchIcon = (
-    <Image
-      alt=""
-      className="size-4 text-gray-400"
-      height={16}
-      src={getContentAssetUrl("/images/img/search.svg")}
-      width={16}
-    />
-  );
-
   return (
     <header
       className={clsx(
@@ -57,47 +46,7 @@ export const DashboardHeader = ({ onMenuClick }: DashboardHeaderProps) => {
       <div
         className={clsx("hidden lg:flex items-center gap-3 shrink-0", isRtl && "flex-row-reverse")}
       >
-        <div className="w-56 xl:w-64">
-          <Input
-            classNames={{
-              input: clsx("py-2 text-sm", isRtl ? "pr-10 pl-9" : "pl-10 pr-9"),
-              inputWrapper:
-                "rounded-full bg-[var(--gray)] border border-[var(--strokeGray)] h-9 min-h-9",
-            }}
-            endContent={isRtl ? searchIcon : undefined}
-            placeholder={t("header.searchPlaceholder")}
-            startContent={isRtl ? undefined : searchIcon}
-            type="text"
-          />
-        </div>
-        <Button
-          isIconOnly
-          aria-label={t("header.mail")}
-          className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[var(--strokeGray)] bg-white hover:bg-[var(--gray)]"
-          variant="light"
-        >
-          <Image
-            alt=""
-            className="size-4"
-            height={16}
-            src={getContentAssetUrl("/images/img/mail.svg")}
-            width={16}
-          />
-        </Button>
-        <Button
-          isIconOnly
-          aria-label={t("header.notifications")}
-          className="w-9 h-9 min-w-9 min-h-9 rounded-full border border-[var(--strokeGray)] bg-white hover:bg-[var(--gray)]"
-          variant="light"
-        >
-          <Image
-            alt=""
-            className="size-4"
-            height={16}
-            src={getContentAssetUrl("/images/img/bell.svg")}
-            width={16}
-          />
-        </Button>
+        {/* Temporarily hidden per request: search, message, and notification controls */}
         <LanguageSwitcher />
         <div
           className={clsx(

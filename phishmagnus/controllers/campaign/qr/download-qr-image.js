@@ -10,6 +10,7 @@ const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const getApiClient = require("../../../../utility/api-client");
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const ApplicationConstants = require('../../../../contants/application-constants');
+const { redactLogData } = require("../../../utility/redact");
 
 let apiClient = null;
 
@@ -26,7 +27,7 @@ exports.downloadQRImage = async (req, res) => {
     const qrCode = req.params.qrCode;
 
     logger.info(`[PARAMS] orgId: ${orgId}, qrCode: ${qrCode}`);
-    logger.debug(`[SESSION] user: ${JSON.stringify(user)}`);
+    logger.debug(`[SESSION] user: ${JSON.stringify(redactLogData(user))}`);
 
     if (!qrCode) {
       logger.error("[VALIDATION] Missing qrCode in request parameters");
@@ -151,7 +152,7 @@ async function getQRImageFileName(apiClient, qrcode) {
     logger.info('[API] URL getQRImageFileName: ' + url);
 
     const response = await apiClient.get(url);
-    logger.info('[API] API response: ' + JSON.stringify(response?.data, null, 2));
+    logger.info('[API] API response: ' + JSON.stringify(redactLogData(response?.data), null, 2));
 
     if (!response || !response.data || !response.data.message) {
       logger.warn(`[API] GET QR IMAGE FILE NAME: RESPONSE IS NULL or invalid for qrcode=${qrcode}`);

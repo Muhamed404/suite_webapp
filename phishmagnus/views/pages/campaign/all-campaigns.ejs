@@ -64,27 +64,31 @@
 <% } %>
 
 <div class="flex flex-col p-6 pt-0">
-  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-6">
+  <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-6 min-w-0">
     <div id="statusTabs"
       class="flex items-center justify-start gap-4 p-1 text-sm font-medium bg-white rounded-full w-fit"></div>
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-      <div class="relative">
-        <input id="searchInput" type="text" placeholder="<%= __("all_campaigns.searchCampaigns") %>"
-          class="pl-10 pr-10 py-3 w-[240px] sm:w-[300px] rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-        <div class="absolute inset-y-0 left-0 flex items-center pl-3">
-          <img src="/securemagnus_2025/images/img/search.svg"
-            class="w-5 h-5 text-gray-400" alt="Search icon">
+    <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center min-w-0">
+      <div class="flex-1 min-w-0">
+        <div class="relative">
+          <input id="searchInput" type="text" placeholder="<%= __("all_campaigns.searchCampaigns") %>"
+            class="pl-10 pr-10 py-3 w-full rounded-full bg-white text-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
+          <div class="absolute inset-y-0 left-0 flex items-center pl-3">
+            <img src="/securemagnus_2025/images/img/search.svg"
+              class="w-5 h-5 text-gray-400" alt="Search icon">
+          </div>
         </div>
       </div>
 
-      <select id="filterType"
-        class="px-6 py-3 rounded-full border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-        <option value="all"><%= __("all_campaigns.allTypes") %></option>
-        <% typeOptions.forEach(type => { %>
-          <option value="<%= type.key %>"><%= type.label %></option>
-        <% }) %>
-      </select>
+      <div class="flex-shrink-0 mt-2 sm:mt-0 sm:ml-3">
+        <select id="filterType"
+          class="px-4 py-3 rounded-full border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--teal)] max-w-[220px] whitespace-nowrap">
+          <option value="all"><%= __("all_campaigns.allTypes") %></option>
+          <% typeOptions.forEach(type => { %>
+            <option value="<%= type.key %>"><%= type.label %></option>
+          <% }) %>
+        </select>
+      </div>
     </div>
   </div>
 
@@ -119,33 +123,23 @@
   </div>
 </div>
 
-<div id="campaignsData" 
-  data-campaigns='<%- JSON.stringify(campaigns || []) %>'
-  data-type-options='<%- JSON.stringify(typeOptions || []) %>'
-  style="display: none;"></div>
-
 <script>
   (function() {
-    const dataEl = document.getElementById('campaignsData');
-    if (dataEl) {
-      window.allCampaignsData = {
-        campaigns: JSON.parse(dataEl.getAttribute('data-campaigns') || '[]'),
-        typeOptions: JSON.parse(dataEl.getAttribute('data-type-options') || '[]'),
-        translations: {
-          noCampaignsFound: "<%= __("all_campaigns.noCampaignsFound") %>",
-          createFirstCampaign: "<%= __("all_campaigns.createFirstCampaign") %>",
-          filterAll: "<%= __("all_campaigns.filterAll") %>",
-          filterActive: "<%= __("all_campaigns.filterActive") %>",
-          filterScheduled: "<%= __("all_campaigns.filterScheduled") %>",
-          filterCompleted: "<%= __("all_campaigns.filterCompleted") %>",
-          filterDraft: "<%= __("all_campaigns.filterDraft") %>",
-          viewDetails: "<%= __("all_campaigns.viewDetails") %>",
-          showingResults: "<%= __("all_campaigns.showingResults") %>"
-        }
-      };
-    } else {
-      window.allCampaignsData = { campaigns: [], typeOptions: [], translations: {} };
-    }
+    window.allCampaignsData = {
+      campaigns: <%- JSON.stringify(campaigns || []).replace(/<\/script>/g, '<\\/script') %>,
+      typeOptions: <%- JSON.stringify(typeOptions || []).replace(/<\/script>/g, '<\\/script') %>,
+      translations: {
+        noCampaignsFound: "<%= __("all_campaigns.noCampaignsFound") %>",
+        createFirstCampaign: "<%= __("all_campaigns.createFirstCampaign") %>",
+        filterAll: "<%= __("all_campaigns.filterAll") %>",
+        filterActive: "<%= __("all_campaigns.filterActive") %>",
+        filterScheduled: "<%= __("all_campaigns.filterScheduled") %>",
+        filterCompleted: "<%= __("all_campaigns.filterCompleted") %>",
+        filterDraft: "<%= __("all_campaigns.filterDraft") %>",
+        viewDetails: "<%= __("all_campaigns.viewDetails") %>",
+        showingResults: "<%= __("all_campaigns.showingResults") %>"
+      }
+    };
   })();
 </script>
 <script src="/securemagnus_2025/js/all_campaigns_table.js"></script>

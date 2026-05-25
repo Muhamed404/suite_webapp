@@ -108,7 +108,7 @@
     <div class="flex flex-wrap items-center justify-between gap-3 px-5 pt-5">
        
 
-      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} to {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>">
+      <table id="filter-table" class="min-w-full border-none  text-sm text-left text-gray-700" data-placeholder="<%= __('generic_label.search_here') %>" data-per-page="<%= __('entries per page') %>" data-info="<%= __('generic_label.showing') %> {start} <%= __('generic_label.to') %> {end} <%= __('generic_label.of') %> {rows} <%= __('entries') %>" data-no-rows="<%= __('generic_label.no_entries_found') %>" data-no-results="<%= __('generic_label.no_results_match_search') !== 'generic_label.no_results_match_search' ? __('generic_label.no_results_match_search') : (locale === 'ar' ? 'لا توجد نتائج تطابق استعلام البحث الخاص بك' : 'No results match your search query') %>">
         <thead class="bg-gray-50 text-gray-600  text-xs">
           <tr>
             <th class="px-4 py-55 text-sm font-normal">

@@ -44,7 +44,7 @@ interface FormData {
   manualUsers: User[];
   modules: number[];
   visualShortVideos: boolean;
-  allowSkippingVideos: boolean;
+  enableVideoSkipping: boolean;
   visualInteractive: boolean;
   visualOthers: boolean;
   enableQuiz: boolean;
@@ -102,7 +102,7 @@ export default function CreateCampaignPage() {
     manualUsers: [],
     modules: [],
     visualShortVideos: false,
-    allowSkippingVideos: false,
+    enableVideoSkipping: false,
     visualInteractive: false,
     visualOthers: false,
     enableQuiz: false,
@@ -220,11 +220,11 @@ export default function CreateCampaignPage() {
 
     switch (step) {
       case 1:
-        if (!formData.campaignName.trim()) newErrors.campaignName = "Required";
-        if (!formData.startDate) newErrors.startDate = "Required";
-        if (!formData.endDate) newErrors.endDate = "Required";
+        if (!formData.campaignName.trim()) newErrors.campaignName = t("form.fieldRequired");
+        if (!formData.startDate) newErrors.startDate = t("form.fieldRequired");
+        if (!formData.endDate) newErrors.endDate = t("form.fieldRequired");
         if (formData.startDate && formData.endDate && formData.endDate < formData.startDate) {
-          newErrors.endDate = "End date must be after start date";
+          newErrors.endDate = t("form.endDateAfterStart");
         }
         break;
       case 2:
@@ -245,13 +245,13 @@ export default function CreateCampaignPage() {
       case 4:
         if (formData.enableQuiz) {
           if (!formData.totalQuizzesPerModule || formData.totalQuizzesPerModule <= 0) {
-            newErrors.totalQuizzesPerModule = "Required";
+            newErrors.totalQuizzesPerModule = t("form.fieldRequired");
           }
           if (!formData.quizPassingThreshold || formData.quizPassingThreshold <= 0) {
-            newErrors.quizPassingThreshold = "Required";
+            newErrors.quizPassingThreshold = t("form.fieldRequired");
           }
           if (!formData.quizRetryThreshold || formData.quizRetryThreshold <= 0) {
-            newErrors.quizRetryThreshold = "Required";
+            newErrors.quizRetryThreshold = t("form.fieldRequired");
           }
         }
         break;
@@ -309,7 +309,7 @@ export default function CreateCampaignPage() {
         enable_games: formData.enableGames,
         enable_misc_items: formData.enableMiscItems,
         enable_motion_videos: formData.visualShortVideos,
-        allow_skipping_videos: formData.allowSkippingVideos,
+        enable_video_skipping: formData.enableVideoSkipping ? 1 : 0,
         enable_interactive_ispring: formData.visualInteractive,
         enable_documents: formData.enableDocuments,
         motion_video_weight: formData.motionVideoWeight,
@@ -345,7 +345,7 @@ export default function CreateCampaignPage() {
 
   const generateSchedule = () => {
     if (!formData.startDate || !formData.endDate || formData.modules.length === 0) {
-      console.error("Please set dates and select modules first");
+      console.error(t("form.generateScheduleMissing"));
 
       return;
     }
@@ -385,7 +385,7 @@ export default function CreateCampaignPage() {
       <DashboardLayout>
         <div className={clsx("p-3", isRtl && "text-right")}>
           <nav
-            aria-label="Breadcrumb"
+            aria-label={t("wizard.breadcrumbAria")}
             className="flex flex-wrap items-center text-xs text-gray-500 mb-6 gap-1.5"
           >
             <Link className="hover:text-gray-700 transition" href="/dashboard/launch-awareness">
@@ -485,7 +485,7 @@ export default function CreateCampaignPage() {
                   type="button"
                   onClick={handlePrevious}
                 >
-                  Back
+                  {t("wizard.previous")}
                 </button>
                 <button
                   className="flex items-center gap-1.5 px-12 py-2 bg-blue-500 text-white rounded-full text-xs font-medium hover:bg-blue-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
@@ -499,7 +499,7 @@ export default function CreateCampaignPage() {
                       {t("wizard.finish")}
                     </>
                   ) : (
-                    "Next"
+                    t("wizard.next")
                   )}
                 </button>
               </div>

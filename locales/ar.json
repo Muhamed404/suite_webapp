@@ -38,6 +38,7 @@
 		"error_creating_nfc_campaign": "خطأ في إنشاء حملة NFC",
 		"success": "نجاح",
 		"service_deleted_successfully": "تم حذف الخدمة بنجاح!",
+		"app_service_deleted_successfully": "تم حذف خدمة التطبيق بنجاح!",
 		"service_registered_successfully": "تم تسجيل الخدمة بنجاح!",
 		"invalid_request_parameters": "معلمات الطلب غير صحيحة",
 		"service_registry_deletion_failed": "فشل في حذف سجل الخدمة",
@@ -96,6 +97,11 @@
 		"enterPassword": "أدخل كلمة المرور",
 		"enterNewPassword": "أدخل كلمة المرور الجديدة",
 		"login": "تسجيل الدخول",
+		"invalid_credentials": "بيانات الاعتماد غير صالحة.",
+		"user_not_found": "المستخدم غير موجود أو غير نشط.",
+		"no_access_permissions": "ليس لدى المستخدم أذونات وصول.",
+		"no_portal_access": "ليس لدى المستخدم حق الوصول إلى البوابة.",
+		"unexpected_error": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
 		"welcomeToPhishMagnus": "مرحباً بك في PhishMagnus",
 		"welcomeToAwareMagnus": "مرحباً بك في AwareMagnus",
 		"emailAddress": "عنوان البريد الإلكتروني",
@@ -116,7 +122,12 @@
 		"show": "عرض",
 		"select_template_to_preview": "اختر قالبًا للمعاينة",
 		"emailOpened": "تتبع فتح البريد الإلكتروني",
-		"fileDownloaded": "generic_label.fileDownloaded"
+		"fileDownloaded": "generic_label.fileDownloaded",
+		"sr_no": "الرقم التسلسلي",
+		"no_data_found": "لا توجد بيانات"
+	},
+	"messages": {
+		"confirmSubmit": "هل أنت متأكد أنك تريد إرسال هذه الحملة؟ لا يمكن التراجع عن هذا الإجراء."
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -194,7 +205,10 @@
 		"password_maxlength": "لا يمكن أن تتجاوز كلمة المرور 255 حرف"
 	},
 	"success_messages": {
-		"smtp_configured_successfully": "تم تكوين SMTP بنجاح"
+		"smtp_configured_successfully": "تم تكوين SMTP بنجاح",
+		"smtp_configured_fully": "تم تكوين SMTP بالكامل",
+		"file_uploading_in_process": "جاري رفع الملف.",
+		"group_created_successfully": "تم إنشاء المجموعة بنجاح"
 	},
 	"topnavbar": {
 		"welcome": "مرحباً",
@@ -204,6 +218,10 @@
 		"dashboard": "لوحة التحكم",
 		"campaigns": "الحملات",
 		"reports": "التقارير",
+		"subscriptionHistory": "سجل الاشتراك",
+		"groups": "المجموعات",
+		"department": "القسم",
+		"bulkImportUsers": "استيراد المستخدمين بالجملة",
 		"organizations": "المؤسسات",
 		"packages": "الحزم",
 		"users": "المستخدمون",
@@ -211,7 +229,11 @@
 		"systemTemplate": "قالب النظام",
 		"phishingSmtp": "SMTP التصيد",
 		"createPackage": "إنشاء حزمة",
-		"simulatorEmails": "رسائل المحاكي"
+		"simulatorEmails": "رسائل المحاكي",
+		"smtpNotifications": "إشعارات SMTP",
+		"notificationTemplates": "قوالب الإشعارات",
+		"createNotificationTemplate": "إنشاء قالب إشعار",
+		"noModulesFound": "لم يتم العثور على وحدات"
 	},
 	"breadcrumbs": {
 		"home": "الرئيسية",
@@ -345,7 +367,11 @@
 			"subscriptionHistory": "سجل الاشتراكات",
 			"products": "المنتجات",
 			"logout": "تسجيل الخروج",
-			"smtpNotifications": "menu.suite.smtpNotifications"
+			"smtpNotifications": "إشعارات SMTP",
+			"bulkImportJobs": "وظائف الاستيراد المجمع",
+			"notificationMailLog": "سجل بريد الإشعارات",
+			"notificationTemplates": "قوالب الإشعارات",
+			"mfaMailLog": "سجل رسائل MFA"
 		}
 	},
 	"org_domain": {
@@ -381,7 +407,20 @@
 		"delete_modal_title": "حذف النطاق",
 		"delete_modal_subtitle": "لا يمكن التراجع عن هذا الإجراء.",
 		"confirm_delete": "هل أنت متأكد أنك تريد حذف النطاق:",
-		"modal_edit_title": "تعديل النطاق"
+		"modal_edit_title": "تعديل النطاق",
+		"create_success": "تمت إضافة النطاق بنجاح.",
+		"create_error": "فشل في إضافة النطاق.",
+		"update_success": "تم تحديث النطاق بنجاح.",
+		"update_error": "فشل في تحديث النطاق.",
+		"delete_success": "تم حذف النطاق بنجاح.",
+		"delete_error": "فشل في حذف النطاق.",
+		"enable_success": "تم تفعيل النطاق بنجاح.",
+		"disable_success": "تم تعطيل النطاق بنجاح.",
+		"status_update_error": "فشل في تحديث حالة النطاق.",
+		"restrict_enable_success": "تم تفعيل تقييد النطاق.",
+		"restrict_disable_success": "تم تعطيل تقييد النطاق.",
+		"restrict_update_error": "فشل في تحديث تقييد النطاق.",
+		"not_authorized": "غير مصرح."
 	},
 	"organization": {
 		"homescreen": {
@@ -417,7 +456,10 @@
 			"validationOrgNameRequired": "اسم المؤسسة مطلوب.",
 			"validationOrgAddressRequired": "العنوان مطلوب.",
 			"validationOrgPostalCodeRequired": "الرمز البريدي مطلوب ويجب أن يكون أرقاماً.",
-			"validationOrgContactRequired": "رقم الاتصال مطلوب ويجب أن يكون أرقاماً.",
+			"validationOrgContactRequired": "رقم الاتصال مطلوب.",
+			"validationOrgContactDigits": "يجب أن يحتوي رقم الاتصال على أرقام فقط.",
+			"validationOrgContactMinLength": "يجب أن يكون رقم الاتصال 7 أرقام على الأقل.",
+			"validationOrgContactMaxLength": "يجب ألا يتجاوز رقم الاتصال 15 رقم.",
 			"validationOrgCountryRequired": "الدولة مطلوبة.",
 			"validationOrgStateRequired": "الولاية مطلوبة.",
 			"validationOrgCityRequired": "المدينة مطلوبة.",
@@ -497,7 +539,9 @@
 			"labelAdminFirstName": "الاسم الأول",
 			"labelAdminLastName": "اسم العائلة",
 			"labelAdminPassword": "كلمة المرور",
-			"mandatory": "(*) إلزامي"
+			"mandatory": "(*) إلزامي",
+			"successMessage": "تم تحديث المؤسسة بنجاح",
+			"errorMessage": "خطأ في تحديث المؤسسة"
 		}
 	},
 	"package": {
@@ -741,7 +785,8 @@
 			"labelTotalUsers": "إجمالي المستخدمين",
 			"labelDiscount": "الخصم",
 			"labelTotalCost": "إجمالي التكلفة",
-			"optionSelectAdminUser": "اختر المستخدم الإداري"
+			"optionSelectAdminUser": "اختر المستخدم الإداري",
+			"successCreated": "تم إنشاء الاشتراك بنجاح"
 		}
 	},
 	"smtp": {
@@ -754,6 +799,7 @@
 		"btnTestConfiguration": "اختبار الإعدادات",
 		"btnSaveSettings": "حفظ الإعدادات",
 		"labelSenderEmail": "البريد الإلكتروني المرسل",
+		"labelSenderDisplayName": "اسم عرض المرسل",
 		"labelDetails": "التفاصيل",
 		"enableStartTLS": "تفعيل STARTTLS",
 		"enableStartTLSDesc": "استخدام STARTTLS لترقية الاتصال العادي إلى اتصال آمن.",
@@ -766,7 +812,9 @@
 		"selectOrganization": "اختر المؤسسة",
 		"default": "افتراضي",
 		"enabled": "مفعل",
-		"disabled": "معطل"
+		"disabled": "معطل",
+		"isAuthenticated": "تم المصادقة",
+		"isAuthenticatedDesc": "وضع علامة على هذا الإعداد بأنه تم التحقق منه ومصادقته."
 	},
 	"user": {
 		"labelTitleSecmagnusUserManagement": "إدارة مستخدمي سيكماجنوس",
@@ -825,6 +873,53 @@
 		"validationEmailRequired": "يرجى إدخال عنوان بريد إلكتروني صالح مع النطاق الكامل (مثل user@example.com).",
 		"validationPasswordRequired": "يجب أن تكون كلمة المرور 8 أحرف على الأقل وتشمل حرفاً كبيراً وحرفاً صغيراً ورقماً وحرفاً خاصاً.",
 		"labelBulkUploadUsers": "تحميل مستخدمين مجمع",
+		"labelBulkImportJobs": "وظائف الاستيراد المجمع",
+		"bulkImportJobsSubtitle": "أحدث مهام استيراد CSV لهذه المؤسسة. تُحدَّث الصفحة تلقائياً أثناء انتظار المعالجة أو أثناءها.",
+		"bulkImportViewJobHistory": "عرض سجل وظائف الاستيراد المجمع",
+		"bulkImportQueuedShort": "تمت جدولة الملف للاستيراد. تابع التقدم أدناه.",
+		"bulkImportSelectOrganization": "اختر مؤسسة أولاً، ثم افتح وظائف الاستيراد المجمع من قائمة مستخدمي تلك المؤسسة.",
+		"bulkImportInvalidOrganization": "حسابك غير مرتبط بمؤسسة صالحة لهذه الصفحة.",
+		"bulkImportJobsLoadError": "تعذّر تحميل وظائف الاستيراد المجمع. حاول لاحقاً.",
+		"bulkImportRefresh": "تحديث",
+		"bulkImportColId": "المعرّف",
+		"bulkImportColCreatedBy": "أنشأه (معرّف المستخدم)",
+		"bulkImportColSkippedJson": "تم التخطي (JSON)",
+		"bulkImportColResultJson": "النتيجة (JSON)",
+		"bulkImportColFile": "الملف",
+		"bulkImportColProduct": "المنتج",
+		"bulkImportColStatus": "الحالة",
+		"bulkImportColInserted": "المُدرَجون",
+		"bulkImportColStarted": "بدء",
+		"bulkImportColCompleted": "اكتمال",
+		"bulkImportColError": "خطأ",
+		"bulkImportNoJobs": "لا توجد وظائف استيراد مجمع بعد.",
+		"bulkImportTotalListed": "الوظائف المعروضة",
+		"bulkImportAutoRefreshNote": "أثناء وجود وظيفة قيد الانتظار أو المعالجة، تُعاد تحميل هذه الصفحة كل 10 ثوانٍ.",
+		"btnBulkImportJobs": "وظائف الاستيراد",
+		"inviteUserSelectionLabel": "اختيار المستخدمين",
+		"inviteUserSelectionIndividual": "مستخدمون محددون",
+		"inviteUserSelectionAll": "تحديد جميع المستخدمين",
+		"inviteModeLabel": "نوع الدعوة",
+		"inviteModePlaceholder": "اختر إجراء الدعوة",
+		"inviteModeInviteOnly": "إرسال دعوة فقط",
+		"inviteModeInviteWithCredentials": "إرسال بيانات الدخول مع الدعوة",
+		"inviteModeEligibilityHint": "عند إرسال بيانات الدخول، يتم تخطي المستخدمين الذين لديهم ترخيص PhishMagnus نشط فقط.",
+		"inviteSubmitButton": "إرسال",
+		"inviteSelectAllVisibleTitle": "تحديد جميع المستخدمين الظاهرين",
+		"inviteSelectUserAriaPrefix": "تحديد المستخدم",
+		"inviteModeRequiredError": "يرجى اختيار نوع الدعوة.",
+		"inviteUsersRequiredError": "يرجى اختيار مستخدم واحد على الأقل.",
+		"inviteSubmitSuccess": "تم إرسال طلب الدعوة بنجاح.",
+		"inviteSubmitFailed": "فشل إرسال طلب الدعوة.",
+		"suiteUsersSearchLabel": "بحث المستخدمين",
+		"suiteUsersPageSizeLabel": "صفوف لكل صفحة",
+		"suiteUsersSearchSubmit": "بحث",
+		"suiteUsersClearSearch": "مسح",
+		"suiteUsersPrev": "السابق",
+		"suiteUsersNext": "التالي",
+		"suiteUsersTotal": "إجمالي المستخدمين {total}",
+		"suiteUsersPerPage": "لكل صفحة",
+		"suiteUsersShowing": "عرض {start}–{end} من {total}",
 		"stepChooseProduct": "اختر المنتج",
 		"stepChooseFile": "اختر الملف",
 		"labelChooseTheProduct": "اختر المنتج",
@@ -929,6 +1024,8 @@
 			"labelLandingPage_Title": "إعدادات صفحة الهبوط",
 			"labelLandingPage_radioOption1": "أرغب في إعادة توجيه المستخدم إلى رابط",
 			"labelLandingPage_radioOption2": "أرغب في إعادة توجيه المستخدم إلى صفحة هبوط مخصصة",
+			"labelLandingPage_redirectToCustomWebPage": "أرغب في تعيين عنوان URL مخصص لصفحة الهبوط لإعادة التوجيه.",
+			"labelLandingPage_redirectUrl": "رابط إعادة التوجيه",
 			"labelLanguage": "اللغة",
 			"labelPhishingWebContentEditor": "محتوى قالب صفحة التصيد الاحتيالي",
 			"successMessage": "تم الإنشاء بنجاح",
@@ -955,7 +1052,10 @@
 			"whatsappAttachUrlTitle": "إرفاق رابط",
 			"whatsappAttachUrlDescription": "تضمين رابط قابل للنقر في الرسالة القصيرة.",
 			"whatsappDownloadTemplateTitle": "تحميل القالب",
-			"whatsappDownloadTemplateDescription": "استخدام قالب رسائل قصيرة جاهز."
+			"whatsappDownloadTemplateDescription": "استخدام قالب رسائل قصيرة جاهز.",
+			"email_domain": "نطاق البريد الإلكتروني",
+			"select_email_domain": "اختر نطاق البريد الإلكتروني",
+			"failed_to_load_smtp_configurations": "فشل تحميل نطاقات البريد الإلكتروني."
 		},
 		"stepper8": "محتوى قالب الرسائل النصية"
 	},
@@ -1012,7 +1112,8 @@
 			"labelSubmitData": "إرسال البيانات",
 			"labelEmailOpenedNotReported": "تم فتح البريد ولكن لم يتم الإبلاغ",
 			"labelEmailOpenedAndReported": "تم فتح البريد وتم الإبلاغ",
-			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ"
+			"labelEmailNotOpenedAndReported": "لم يتم فتح البريد ولكن تم الإبلاغ",
+			"scheduleTime": "وقت الجدولة"
 		},
 		"email_create_campaign": {
 			"title": "إنشاء حملة بريد إلكتروني",
@@ -1020,6 +1121,8 @@
 			"landing_page": "صفحة الهبوط",
 			"redirect_page": "صفحة إعادة التوجيه",
 			"attachment": "المرفق",
+			"external_landing_page_url": "رابط صفحة هبوط خارجية:",
+			"open_preview": "فتح المعاينة",
 			"template_tracking_description": "system_template.create.labelTrackingDescription",
 			"tracking_items": {
 				"email_opened": "campaign.email_campaign_detail.labelEmailOpen",
@@ -1070,7 +1173,8 @@
 			"select_template": "اختر القالب",
 			"select_target_audience": "اختر الجمهور المستهدف",
 			"select_department": "اختر القسم",
-			"select_group": "اختر المجموعة"
+			"select_group": "اختر المجموعة",
+			"fb_account_required": "لإطلاق حملة رسائل قصيرة، يلزم وجود حساب مزود خدمة رسائل قصيرة مسجل."
 		},
 		"validation_messages": {
 			"campaign_name_required": "اسم الحملة مطلوب (حد أدنى حرفين).",
@@ -1256,6 +1360,8 @@
 			"sortBy": "رتب حسب",
 			"prevPage": "السابق",
 			"nextPage": "التالي",
+			"showingResults": "عرض {start} إلى {end} من {total} نتائج",
+			"noRecords": "لا توجد سجلات",
 			"interactionReportByEachQRCode": "تقرير التفاعل لكل رمز QR",
 			"downloadQRCode": "تنزيل رمز QR",
 			"tagScan": "تم مسح الوسم",
@@ -1491,20 +1597,20 @@
 		"Paid": "مدفوع"
 	},
 	"Header": {
-		"updateInvoice": "Header.updateInvoice"
+		"updateInvoice": "تحديث الفاتورة"
 	},
 	"Payment": {
-		"mode": "Payment.mode",
-		"status": "Payment.status"
+		"mode": "طريقة الدفع",
+		"status": "حالة الدفع"
 	},
 	"selPayment": {
-		"mode": "selPayment.mode",
-		"status": "selPayment.status"
+		"mode": "اختر طريقة الدفع",
+		"status": "اختر حالة الدفع"
 	},
 	"Order": {
 		"Modal": {
-			"Save": "Order.Modal.Save",
-			"Close": "Order.Modal.Close"
+			"Save": "حفظ",
+			"Close": "إغلاق"
 		}
 	},
 	"btn-Create": "إنشاء",
@@ -1582,7 +1688,17 @@
 		"tabCompleted": "مكتمل",
 		"subtitle": "تتبع جميع إجراءات المستخدمين والأحداث.",
 		"rowsPerPage": "صفوف في الصفحة",
-		"noLogs": "لا توجد سجلات تدقيق"
+		"noLogs": "لا توجد سجلات تدقيق",
+		"paginationText": "عرض {from}–{to} من {total}",
+		"actions": {
+			"CREATE": "إنشاء",
+			"UPDATE": "تحديث",
+			"DELETE": "حذف",
+			"UPLOAD": "رفع",
+			"LOGIN": "تسجيل دخول",
+			"LOGOUT": "تسجيل خروج",
+			"VIEW": "عرض"
+		}
 	},
 	"CS-List": "فئات الأمن السيبراني",
 	"btn-CS-LibPosters-Upload-Document": "رفع مستند",
@@ -1695,7 +1811,12 @@
 		"sms_content": "محتوى قالب الرسائل النصية",
 		"sms_message": "نص الرسالة القصيرة",
 		"sms_placeholder": "نص الرسالة",
-		"tracking_header": "هذا القالب سيسمح لك بتتبع العناصر التالية:"
+		"tracking_header": "هذا القالب سيسمح لك بتتبع العناصر التالية:",
+		"tracking_email_message_opened": "تتبع فتح البريد الإلكتروني/الرسالة",
+		"tracking_link_clicked": "تتبع النقر على رابط التصيد الاحتيالي",
+		"tracking_file_downloaded": "تتبع تحميل ملف التصيد الاحتيالي (من البريد الإلكتروني/الرسالة أو صفحة الهبوط)",
+		"tracking_form_submitted": "تتبع البيانات المرسلة من خلال نموذج التصيد الاحتيالي",
+		"tracking_form_interaction": "تتبع تفاعل المستخدم مع نموذج التصيد الاحتيالي"
 	},
 	"common": {
 		"search_here": "ابحث هنا",
@@ -1761,7 +1882,8 @@
 		"totalQRImages": "إجمالي صور QR",
 		"created": "تم الإنشاء",
 		"unsent": "غير مرسل",
-		"totalCampaigns": "إجمالي الحملات"
+		"totalCampaigns": "إجمالي الحملات",
+		"reported_emails": "رسائل البريد الإلكتروني المبلغ عنها"
 	},
 	"reports": {
 		"campaignReports": "تقارير الحملات",
@@ -1832,6 +1954,8 @@
 		"attachmentOpened": "تم فتح المرفق",
 		"interactionReportByEachQRCode": "تقرير التفاعل لكل رمز QR",
 		"sortBy": "ترتيب حسب",
+		"showingResults": "عرض {start} إلى {end} من {total} نتائج",
+		"noRecords": "لا توجد سجلات",
 		"tagSequence": "تسلسل العلامة #",
 		"tagCode": "رمز العلامة",
 		"downloadQRCode": "تحميل رمز QR",
@@ -1864,7 +1988,8 @@
 			"select_group": "اختر المجموعة",
 			"select_date_time": "اختر التاريخ والوقت",
 			"start_time": "وقت البدء *",
-			"end_time": "وقت الانتهاء"
+			"end_time": "وقت الانتهاء",
+			"fb_account_required": "لإطلاق حملة واتساب، يلزم وجود حساب أعمال فيسبوك (Meta) مسجل."
 		},
 		"campaign_report": {
 			"title": "تقارير حملات واتساب",
@@ -1941,6 +2066,7 @@
 			"file_download": "تحميل الملف",
 			"invitee_responses": "ردود المدعوين",
 			"invitee_name": "اسم المدعو",
+			"invitee_email": "بريد المدعو الإلكتروني",
 			"form_interacted": "تفاعل مع النموذج",
 			"opened": "مفتوح",
 			"no_interaction": "لا توجد تفاعلات",
@@ -2083,7 +2209,15 @@
 		"enterDepartmentName": "أدخل اسم القسم",
 		"enterDescription": "أدخل الوصف",
 		"departmentNameRequired": "اسم القسم مطلوب.",
-		"descriptionRequired": "الوصف مطلوب (حد أدنى 5 أحرف)."
+		"descriptionRequired": "الوصف مطلوب (حد أدنى 5 أحرف).",
+		"delete_confirm_title": "حذف القسم",
+		"delete_confirm_message": "هل أنت متأكد أنك تريد حذف هذا القسم؟",
+		"btn_cancel": "إلغاء",
+		"btn_delete": "حذف",
+		"action_delete": "حذف القسم",
+		"group_deleted_successfully": "تم حذف القسم بنجاح",
+		"delete_error": "فشل في حذف القسم. يرجى المحاولة مرة أخرى.",
+		"department_deleted_successfully": "تم حذف القسم بنجاح"
 	},
 	"group": {
 		"labelGroupManagement": "إدارة المجموعات",
@@ -2104,7 +2238,15 @@
 		"done": "تم",
 		"viewDetails": "عرض التفاصيل",
 		"noEnrolledUsers": "لا يوجد مستخدمون مسجلون",
-		"noUnenrolledUsers": "لا يوجد مستخدمون غير مسجلين"
+		"noUnenrolledUsers": "لا يوجد مستخدمون غير مسجلين",
+		"delete_confirm_title": "حذف المجموعة",
+		"delete_confirm_message": "هل أنت متأكد أنك تريد حذف هذه المجموعة؟",
+		"btn_cancel": "إلغاء",
+		"btn_delete": "حذف",
+		"action_delete": "حذف المجموعة",
+		"group_deleted_successfully": "تم حذف المجموعة بنجاح",
+		"delete_error": "فشل في حذف المجموعة. يرجى المحاولة مرة أخرى.",
+		"labelActions": "الإجراءات"
 	},
 	"Organization": {
 		"SubscriptionHistory": "سجل الاشتراكات",
@@ -2327,5 +2469,45 @@
 		"loginPlaceholder": "أدخل الرمز المكون من 6 أرقام",
 		"loginBtn": "تحقق والمتابعة",
 		"loginBack": "العودة إلى تسجيل الدخول"
+	},
+	"user_not_found": "user_not_found",
+	"notification_mail": {
+		"breadcrumb": "سجل بريد الإشعارات",
+		"title": "سجل بريد الإشعارات",
+		"subtitle": "تاريخ إرسال البريد الإلكتروني الصادر وحالة التسليم.",
+		"filters": {
+			"all_statuses": "جميع الحالات",
+			"type_placeholder": "نوع الإشعار...",
+			"apply": "تطبيق",
+			"clear": "مسح"
+		},
+		"columns": {
+			"recipient": "المستلم",
+			"type": "النوع",
+			"priority": "الأولوية",
+			"status": "الحالة",
+			"retries": "المحاولات",
+			"queued_at": "تم وضعه في الانتظار في",
+			"sent_at": "تم الإرسال في",
+			"error": "الخطأ"
+		},
+		"messages": {
+			"no_mails_found": "لم يتم العثور على رسائل إشعار."
+		},
+		"status": {
+			"pending": "قيد الانتظار",
+			"processing": "جارٍ المعالجة",
+			"sent": "تم الإرسال",
+			"rejected": "مرفوض",
+			"failed": "فشل"
+		},
+		"priority": {
+			"high": "عالية",
+			"low": "منخفضة",
+			"normal": "عادية"
+		},
+		"pagination": {
+			"records": "سجلات"
+		}
 	}
 }

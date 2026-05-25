@@ -2,6 +2,7 @@
 const { logger } = require("../../../logger/logger");
  
 const getApiClient = require('../../../utility/api-client')
+const { redactLogData } = require("../../../utility/redact");
 exports.organizationalStatistics = async (req, res) => {
   let user = req.user;
   let orgId = req.params.orgId === undefined ? user.organization_id : req.params.orgId;
@@ -45,7 +46,7 @@ exports.organizationalStatistics = async (req, res) => {
         });
       })
       .catch((error) => {
-        logger.error(`Issue in fetching statistics: ${error.message}`);
+        logger.error(`Issue in fetching statistics: ${redactLogData(error.message)}`);
         return res.redirect("/phm/");
       });
 

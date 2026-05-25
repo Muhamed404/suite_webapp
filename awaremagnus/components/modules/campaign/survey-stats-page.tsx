@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@heroui/button";
@@ -24,7 +24,15 @@ import {
 
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import type { Locale } from "@/i18n/config";
 import { useI18n } from "@/i18n/I18nProvider";
+import {
+  formatLocaleInteger,
+  formatLocaleMediumDate,
+  formatLocalePercentOf100,
+  formatLocaleShortDayMonth,
+  formatLocaleDecimal,
+} from "@/i18n/localeFormat";
 import { useTranslations } from "@/i18n/useTranslations";
 import { DonutChart } from "@/components/modules/dashboard/charts/donut-chart";
 import { AreaChart } from "@/components/modules/dashboard/charts/area-chart";
@@ -69,19 +77,6 @@ function StatCard({
   );
 }
 
-function formatDate(dateStr?: string | null) {
-  if (!dateStr) return "—";
-  try {
-    return new Date(dateStr).toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  } catch {
-    return dateStr;
-  }
-}
-
 function getRiskBadge(
   riskName: string | null | undefined,
   t: (key: string, values?: Record<string, unknown>) => string
@@ -115,8 +110,20 @@ export function SurveyStatsPage() {
   const tManagement = useTranslations("surveyManagement");
   const t = (key: string, values?: Record<string, unknown>) =>
     tManagement(`surveyStats.${key}`, values);
-  const { dir } = useI18n();
+  const { dir, locale } = useI18n();
+  const loc = (locale === "ar" ? "ar" : "en") as Locale;
   const isRtl = dir === "rtl";
+
+  const formatSurveyDate = (dateStr?: string | null) => {
+    if (!dateStr) return "—";
+    try {
+      const d = new Date(dateStr);
+
+      return Number.isFinite(d.getTime()) ? formatLocaleMediumDate(loc, d) : dateStr;
+    } catch {
+      return dateStr;
+    }
+  };
   const tableTextAlignClass = isRtl ? "text-right" : "text-left";
   const searchParams = useSearchParams();
   // useSearchParams can return null during initial render in some cases
@@ -153,20 +160,28 @@ export function SurveyStatsPage() {
 
   const deptDonutValues = deptRisk.map((d) => d.total_employees);
   const deptDonutLabels = deptRisk.map(
-    (d) => d.department_name ?? t("fallback.department", { id: d.department_id })
+    (d) =>
+      d.department_name ??
+      t("fallback.department", { id: formatLocaleInteger(loc, d.department_id) })
   );
   const groupDonutValues = groupRisk.map((g) => g.total_employees);
   const groupDonutLabels = groupRisk.map(
-    (g) => g.group_name ?? t("fallback.group", { id: g.group_id })
+    (g) => g.group_name ?? t("fallback.group", { id: formatLocaleInteger(loc, g.group_id) })
   );
 
-  const timelineLabels = timeline.map((t) => {
-    try {
-      return new Date(t.date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
-    } catch {
-      return t.date;
-    }
-  });
+  const timelineLabels = useMemo(
+    () =>
+      timeline.map((row) => {
+        try {
+          const d = new Date(row.date);
+
+          return Number.isFinite(d.getTime()) ? formatLocaleShortDayMonth(loc, d) : row.date;
+        } catch {
+          return row.date;
+        }
+      }),
+    [timeline, loc]
+  );
   const timelineData = timeline.map((t) => t.total_submitted);
 
   const overall = stats?.overall_risk_level;
@@ -246,12 +261,12 @@ export function SurveyStatsPage() {
                 <div className="flex flex-wrap items-center gap-3 mt-2">
                   <span className="text-sm text-gray-600 font-medium">{t("header.startDate")}</span>
                   <span className="text-sm text-gray-800 bg-gray-100 px-2.5 py-1 rounded font-medium">
-                    {formatDate(surveyStartDate)}
+                    {formatSurveyDate(surveyStartDate)}
                   </span>
                   <span className="text-sm text-gray-400">|</span>
                   <span className="text-sm text-gray-600 font-medium">{t("header.endDate")}</span>
                   <span className="text-sm text-gray-800 bg-gray-100 px-2.5 py-1 rounded font-medium">
-                    {formatDate(surveyEndDate)}
+                    {formatSurveyDate(surveyEndDate)}
                   </span>
                 </div>
               </div>
@@ -298,7 +313,7 @@ export function SurveyStatsPage() {
                   color="bg-green-100"
                   icon={<CheckCircle className="w-5 h-5 text-green-600" />}
                   label={t("stats.submittedSurveys")}
-                  value={stats?.survey_summary?.total_surveys_submitted ?? 0}
+                  value={formatLocaleInteger(loc, stats?.survey_summary?.total_surveys_submitted ?? 0)}
                 />
                 <StatCard
                   color="bg-yellow-100"
@@ -317,13 +332,13 @@ export function SurveyStatsPage() {
                   color="bg-blue-100"
                   icon={<Send className="w-5 h-5 text-blue-600" />}
                   label={t("stats.totalSurveysSent")}
-                  value={stats?.survey_summary?.total_surveys_sent ?? 0}
+                  value={formatLocaleInteger(loc, stats?.survey_summary?.total_surveys_sent ?? 0)}
                 />
                 <StatCard
                   color="bg-purple-100"
                   icon={<Users className="w-5 h-5 text-purple-600" />}
                   label={t("stats.totalReceived")}
-                  value={stats?.survey_summary?.total_surveys_submitted ?? 0}
+                  value={formatLocaleInteger(loc, stats?.survey_summary?.total_surveys_submitted ?? 0)}
                 />
               </div>
 
@@ -338,6 +353,7 @@ export function SurveyStatsPage() {
                         <DonutChart
                           centerLabel={deptDonutLabels[0] ?? ""}
                           colors={donutColors.slice(0, deptRisk.length)}
+                          formatTooltipValue={(v) => formatLocaleInteger(loc, v)}
                           height={192}
                           labels={deptDonutLabels}
                           values={deptDonutValues}
@@ -348,7 +364,10 @@ export function SurveyStatsPage() {
                           <LegendDot
                             key={d.department_id}
                             color={donutColors[i % donutColors.length]}
-                            label={d.department_name ?? t("fallback.department", { id: d.department_id })}
+                            label={
+                              d.department_name ??
+                              t("fallback.department", { id: formatLocaleInteger(loc, d.department_id) })
+                            }
                           />
                         ))}
                       </div>
@@ -367,6 +386,7 @@ export function SurveyStatsPage() {
                         <DonutChart
                           centerLabel={groupDonutLabels[0] ?? ""}
                           colors={donutColors.slice(0, groupRisk.length)}
+                          formatTooltipValue={(v) => formatLocaleInteger(loc, v)}
                           height={192}
                           labels={groupDonutLabels}
                           values={groupDonutValues}
@@ -377,7 +397,10 @@ export function SurveyStatsPage() {
                           <LegendDot
                             key={g.group_id}
                             color={donutColors[i % donutColors.length]}
-                            label={g.group_name ?? t("fallback.group", { id: g.group_id })}
+                            label={
+                              g.group_name ??
+                              t("fallback.group", { id: formatLocaleInteger(loc, g.group_id) })
+                            }
                           />
                         ))}
                       </div>
@@ -396,6 +419,9 @@ export function SurveyStatsPage() {
                       color1="#3ACE89"
                       color2="#BEC3C7"
                       color3="#FB5050"
+                      formatCount={(n) => formatLocaleInteger(loc, n)}
+                      formatLegendPercent={(v) => formatLocaleDecimal(loc, v, 2, 2)}
+                      formatTooltipPercent={(v) => formatLocalePercentOf100(loc, v, 1)}
                       opened={stats?.response_chart?.total_not_submitted ?? 0}
                       sent={stats?.response_chart?.total_correct_answers ?? 0}
                       labels={[t("charts.correct"), t("charts.notSubmitted"), t("charts.incorrect")]}
@@ -447,6 +473,9 @@ export function SurveyStatsPage() {
                         color1="#3ACE89"
                         color2="#BEC3C7"
                         color3="#FB5050"
+                        formatCount={(n) => formatLocaleInteger(loc, n)}
+                        formatLegendPercent={(v) => formatLocaleDecimal(loc, v, 2, 2)}
+                        formatTooltipPercent={(v) => formatLocalePercentOf100(loc, v, 1)}
                         opened={overall?.total_overall_non_submitted_employees ?? 0}
                         sent={overall?.total_overall_nonrisky_employees ?? 0}
                         labels={[t("charts.nonRisky"), t("charts.notSubmitted"), t("charts.risky")]}
@@ -551,13 +580,19 @@ export function SurveyStatsPage() {
                                   </div>
                                 </td>
                                 <td className={clsx("px-4 py-3 text-green-600 font-medium", tableTextAlignClass)}>
-                                  {user.correct_answers ?? "—"}
+                                  {user.correct_answers != null
+                                    ? formatLocaleInteger(loc, Number(user.correct_answers))
+                                    : "—"}
                                 </td>
                                 <td className={clsx("px-4 py-3 text-red-600 font-medium", tableTextAlignClass)}>
-                                  {user.incorrect_answers ?? "—"}
+                                  {user.incorrect_answers != null
+                                    ? formatLocaleInteger(loc, Number(user.incorrect_answers))
+                                    : "—"}
                                 </td>
                                 <td className={clsx("px-4 py-3 text-gray-500", tableTextAlignClass)}>
-                                  {user.skipped_answers ?? "—"}
+                                  {user.skipped_answers != null
+                                    ? formatLocaleInteger(loc, Number(user.skipped_answers))
+                                    : "—"}
                                 </td>
                                 <td className={clsx("px-4 py-3", tableTextAlignClass)}>{getRiskBadge(user.risk_level_name, t)}</td>
                                 <td className={clsx("px-4 py-3", tableTextAlignClass)}>
@@ -584,9 +619,9 @@ export function SurveyStatsPage() {
                         <div className="flex justify-between items-center px-4 py-3 border-t bg-gray-50">
                           <span className="text-[10px] text-gray-400">
                             {t("answersList.pagination.pageOf", {
-                              page: usersData.pagination.current_page,
-                              totalPages: usersData.pagination.total_pages,
-                              users: usersData.pagination.total_items,
+                              page: formatLocaleInteger(loc, usersData.pagination.current_page),
+                              totalPages: formatLocaleInteger(loc, usersData.pagination.total_pages),
+                              users: formatLocaleInteger(loc, usersData.pagination.total_items),
                             })}
                           </span>
                           <Pagination
