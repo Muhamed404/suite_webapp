@@ -2166,7 +2166,39 @@
 		"loginLabel": "Verification Code",
 		"loginPlaceholder": "Enter 6-digit code",
 		"loginBtn": "Verify & Continue",
-		"loginBack": "Back to Login"
+		"loginBack": "Back to Login",
+		"mail_log": {
+			"breadcrumb": "MFA Mail Log",
+			"title": "MFA Mail Log",
+			"subtitle": "Outbound MFA email dispatch history and delivery status.",
+			"filters": {
+				"all_statuses": "All Statuses",
+				"apply": "Apply",
+				"clear": "Clear"
+			},
+			"columns": {
+				"number": "#",
+				"recipient": "Recipient",
+				"subject": "Subject",
+				"status": "Status",
+				"queued_at": "Queued At"
+			},
+			"messages": {
+				"no_mails_found": "No MFA mails found."
+			},
+			"status": {
+				"pending": "PENDING",
+				"processing": "PROCESSING",
+				"sent": "SENT",
+				"rejected": "REJECTED",
+				"failed": "FAILED"
+			},
+			"pagination": {
+				"records": "records",
+				"prev": "← Prev",
+				"next": "Next →"
+			}
+		}
 	},
 	"notification_mail": {
 		"breadcrumb": "Notification Mail Log",

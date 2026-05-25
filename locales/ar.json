@@ -2471,7 +2471,39 @@
 		"loginLabel": "رمز التحقق",
 		"loginPlaceholder": "أدخل الرمز المكون من 6 أرقام",
 		"loginBtn": "تحقق والمتابعة",
-		"loginBack": "العودة إلى تسجيل الدخول"
+		"loginBack": "العودة إلى تسجيل الدخول",
+		"mail_log": {
+			"breadcrumb": "سجل بريد MFA",
+			"title": "سجل بريد MFA",
+			"subtitle": "تاريخ إرسال البريد الإلكتروني الصادر للمصادقة متعددة العوامل (MFA) وحالة التسليم.",
+			"filters": {
+				"all_statuses": "جميع الحالات",
+				"apply": "تطبيق",
+				"clear": "مسح"
+			},
+			"columns": {
+				"number": "#",
+				"recipient": "المستلم",
+				"subject": "الموضوع",
+				"status": "الحالة",
+				"queued_at": "تم وضعه في الانتظار في"
+			},
+			"messages": {
+				"no_mails_found": "لم يتم العثور على رسائل بريد MFA."
+			},
+			"status": {
+				"pending": "قيد الانتظار",
+				"processing": "جارٍ المعالجة",
+				"sent": "تم الإرسال",
+				"rejected": "مرفوض",
+				"failed": "فشل"
+			},
+			"pagination": {
+				"records": "سجلات",
+				"prev": "→ السابق",
+				"next": "التالي ←"
+			}
+		}
 	},
 	"user_not_found": "user_not_found",
 	"notification_mail": {

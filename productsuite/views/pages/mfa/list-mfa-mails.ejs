@@ -2,21 +2,21 @@
   <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
     <div>
       <nav class="flex items-center text-xs text-gray-400 gap-1.5 mb-1.5" aria-label="Breadcrumb">
-        <a href="/home" class="hover:text-gray-600 transition">Home</a>
+        <a href="/home" class="hover:text-gray-600 transition"><%= __("breadcrumbs.home") %></a>
         <span>›</span>
-        <span class="text-gray-600 font-medium">MFA Mail Log</span>
+        <span class="text-gray-600 font-medium"><%= __("mfa.mail_log.breadcrumb") %></span>
       </nav>
-      <h3 class="text-xl font-semibold text-gray-900 leading-tight">MFA Mail Log</h3>
-      <p class="text-xs text-gray-400 mt-0.5">Outbound MFA email dispatch history and delivery status.</p>
+      <h3 class="text-xl font-semibold text-gray-900 leading-tight"><%= __("mfa.mail_log.title") %></h3>
+      <p class="text-xs text-gray-400 mt-0.5"><%= __("mfa.mail_log.subtitle") %></p>
     </div>
 
     <!-- Inline filters -->
     <form method="GET" action="/mfa/mail-log" class="flex flex-wrap items-center gap-2">
       <select name="status"
         class="px-3 py-1.5 rounded-lg text-xs border border-gray-200 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-[var(--teal)]">
-        <option value="">All Statuses</option>
+        <option value=""><%= __("mfa.mail_log.filters.all_statuses") %></option>
         <% ['PENDING','PROCESSING','SENT','REJECTED','FAILED'].forEach(function(s) { %>
-          <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= s %></option>
+          <option value="<%= s %>" <%= filters.status === s ? 'selected' : '' %>><%= __("mfa.mail_log.status." + s.toLowerCase()) %></option>
         <% }); %>
       </select>
 
@@ -24,11 +24,11 @@
 
       <button type="submit"
         class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-[var(--teal)] text-white hover:opacity-90 transition">
-        Apply
+        <%= __("mfa.mail_log.filters.apply") %>
       </button>
       <a href="/mfa/mail-log"
         class="px-3 py-1.5 rounded-lg text-xs font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
-        Clear
+        <%= __("mfa.mail_log.filters.clear") %>
       </a>
     </form>
   </div>
@@ -41,17 +41,17 @@
     <table class="min-w-full text-xs text-left">
       <thead>
         <tr class="border-b border-gray-200 bg-gray-50">
-          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap w-8">#</th>
-          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Recipient</th>
-          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Subject</th>
-          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Status</th>
-          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Queued At</th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap w-8"><%= __("mfa.mail_log.columns.number") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("mfa.mail_log.columns.recipient") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("mfa.mail_log.columns.subject") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("mfa.mail_log.columns.status") %></th>
+          <th class="px-4 py-2.5 font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap"><%= __("mfa.mail_log.columns.queued_at") %></th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100">
         <% if (!mails || mails.length === 0) { %>
           <tr>
-            <td colspan="5" class="px-4 py-10 text-center text-gray-400 text-xs">No MFA mails found.</td>
+            <td colspan="5" class="px-4 py-10 text-center text-gray-400 text-xs"><%= __("mfa.mail_log.messages.no_mails_found") %></td>
           </tr>
         <% } else { %>
           <% mails.forEach(function(mail, index) { %>
@@ -71,17 +71,17 @@
 
               <td class="px-4 py-2.5 whitespace-nowrap">
                 <% if (mail.status === 'SENT') { %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-emerald-50 text-emerald-600 border border-emerald-100">SENT</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-emerald-50 text-emerald-600 border border-emerald-100"><%= __("mfa.mail_log.status.sent") %></span>
                 <% } else if (mail.status === 'PENDING') { %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-amber-50 text-amber-600 border border-amber-100">PENDING</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-amber-50 text-amber-600 border border-amber-100"><%= __("mfa.mail_log.status.pending") %></span>
                 <% } else if (mail.status === 'PROCESSING') { %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-blue-50 text-blue-600 border border-blue-100">PROCESSING</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-blue-50 text-blue-600 border border-blue-100"><%= __("mfa.mail_log.status.processing") %></span>
                 <% } else if (mail.status === 'REJECTED') { %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-red-50 text-red-600 border border-red-100">REJECTED</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-red-50 text-red-600 border border-red-100"><%= __("mfa.mail_log.status.rejected") %></span>
                 <% } else if (mail.status === 'FAILED') { %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-rose-50 text-rose-700 border border-rose-100">FAILED</span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-rose-50 text-rose-700 border border-rose-100"><%= __("mfa.mail_log.status.failed") %></span>
                 <% } else { %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-gray-100 text-gray-500 border border-gray-200"><%= mail.status || '—' %></span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide bg-gray-100 text-gray-500 border border-gray-200"><%= mail.status ? __("mfa.mail_log.status." + mail.status.toLowerCase()) : '—' %></span>
                 <% } %>
               </td>
 
@@ -100,20 +100,20 @@
   <% if (pagination.totalPages > 1) { %>
     <div class="flex items-center justify-between px-1 pt-3">
       <span class="text-xs text-gray-400">
-        Page <span class="font-medium text-gray-600"><%= pagination.currentPage %></span> of <%= pagination.totalPages %>
-        &nbsp;·&nbsp; <span class="font-medium text-gray-600"><%= pagination.totalCount %></span> records
+        <%= __("generic_label.page") %> <span class="font-medium text-gray-600"><%= pagination.currentPage %></span> <%= __("generic_label.of") %> <%= pagination.totalPages %>
+        &nbsp;·&nbsp; <span class="font-medium text-gray-600"><%= pagination.totalCount %></span> <%= __("mfa.mail_log.pagination.records") %>
       </span>
       <div class="flex gap-1.5">
         <% if (pagination.hasPreviousPage) { %>
           <a href="?page=<%= pagination.previousPage %>&pageSize=<%= pagination.pageSize %>&status=<%= filters.status %>"
             class="px-3 py-1.5 text-xs rounded-lg font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition">
-            ← Prev
+            <%= __("mfa.mail_log.pagination.prev") %>
           </a>
         <% } %>
         <% if (pagination.hasNextPage) { %>
           <a href="?page=<%= pagination.nextPage %>&pageSize=<%= pagination.pageSize %>&status=<%= filters.status %>"
             class="px-3 py-1.5 text-xs rounded-lg font-medium bg-[var(--teal)] text-white hover:opacity-90 transition">
-            Next →
+            <%= __("mfa.mail_log.pagination.next") %>
           </a>
         <% } %>
       </div>
