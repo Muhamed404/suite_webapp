@@ -103,6 +103,7 @@ module.exports = {
             CONFIG: (organizationId) => `/org/${organizationId}/ldap/config`,
             SYNC: (organizationId) => `/org/${organizationId}/ldap/sync`,
             STATUS: (organizationId) => `/org/${organizationId}/ldap/status`,
+        },
         Notification_Template: {
             LIST_BY_ORGANIZATION: (organizationId) => `/notification_template/${organizationId}/organization`,
             CREATE: `/notification_template/create`,
