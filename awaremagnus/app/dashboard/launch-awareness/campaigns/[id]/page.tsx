@@ -580,7 +580,7 @@ export default function CampaignDetailsPage() {
         padding: { left: 20, right: 20 },
       },
       tooltip: {
-        theme: "dark",
+        theme: "dark" as const,
         custom: function ({ dataPointIndex }: any) {
           const point = pts[dataPointIndex];
           if (!point) return "";
