@@ -125,7 +125,7 @@ export const AreaChart = ({
         },
       },
       tooltip: {
-        theme: "light",
+        theme: "light" as const,
         style: { fontSize: "12px" },
         y: {
           formatter: (val: number) => `${formatLocaleInteger(loc, Math.round(val))} ${yLabel}`,
