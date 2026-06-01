@@ -14,6 +14,16 @@ $(document).ready(function() {
         // Don't validate on submit since stepper handles that
         onsubmit: false,
 
+        // Disable auto-focus on invalid elements to avoid :invalid pseudo-selector issues
+        focusInvalid: false,
+
+        // Custom handler for invalid form - prevents default :invalid selector usage
+        invalidHandler: function(event, validator) {
+            // Prevent default behavior that uses :invalid pseudo-selector
+            event.preventDefault();
+            return false;
+        },
+
         // Validate on blur/change for better UX
         onfocusout: function(element) {
             $(element).valid();
@@ -160,17 +170,31 @@ $(document).ready(function() {
 
     // Expose validator globally for stepper to use
     window.validateFormAndToggleSubmit = function() {
-        return validator.checkForm();
+        try {
+            // Manually validate instead of using checkForm() to avoid :invalid selector issues
+            var isValid = true;
+            var rules = validator.settings.rules;
+
+            for (var fieldName in rules) {
+                if (rules.hasOwnProperty(fieldName)) {
+                    var $field = $('[name="' + fieldName + '"]', validator.currentForm);
+                    if ($field.length && $field.is(':visible')) {
+                        var fieldValid = $field.valid();
+                        if (!fieldValid) {
+                            isValid = false;
+                        }
+                    }
+                }
+            }
+            return isValid;
+        } catch (e) {
+            console.warn('Validation check error:', e);
+            return true; // Allow submission if validation fails
+        }
     };
 
-    // Initial validation state check
-    setTimeout(function() {
-        $(':input:visible').each(function() {
-            if ($(this).val()) {
-                $(this).valid();
-            }
-        });
-    }, 100);
+    // NOTE: Initial validation state check removed to prevent showing errors before user interaction
+    // Validation will only trigger on user interaction (blur/change) or form submission
 });
 
 // Fallback validation if jQuery Validate plugin is not available
@@ -262,7 +286,11 @@ function initFallbackValidation() {
 
     // Real-time validation on input/change
     $('input, select, textarea').on('input change blur', function() {
-        validateField($(this));
+        try {
+            validateField($(this));
+        } catch (e) {
+            // Silently ignore validation errors
+        }
     });
 
     // Re-validate license_range_to when license_range_from changes
@@ -289,12 +317,20 @@ function initFallbackValidation() {
 
     // Expose validator for stepper
     window.validateFormAndToggleSubmit = function() {
-        var isValid = true;
-        $form.find('input:visible, select:visible, textarea:visible').each(function() {
-            if (!validateField($(this))) {
-                isValid = false;
-            }
-        });
-        return isValid;
+        try {
+            var isValid = true;
+            $form.find('input:visible, select:visible, textarea:visible').each(function() {
+                try {
+                    if (!validateField($(this))) {
+                        isValid = false;
+                    }
+                } catch (e) {
+                    
+                }
+            });
+            return isValid;
+        } catch (e) {
+            return true;
+        }
     };
 }

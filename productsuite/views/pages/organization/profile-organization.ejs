@@ -144,14 +144,16 @@
     const dataTable = new simpleDatatables.DataTable('#filter-table');
 
     const filter = document.getElementById('filter');
-    filter.addEventListener('change', function () {
-      const value = this.value;
+    if (filter) {
+      filter.addEventListener('change', function () {
+        const value = this.value;
 
-      if (value === '') {
-        dataTable.search(''); // Clear filter
-      } else {
-        dataTable.search(value); // Search all columns
-      }
-    });
+        if (value === '') {
+          dataTable.search(''); // Clear filter
+        } else {
+          dataTable.search(value); // Search all columns
+        }
+      });
+    }
   });
 </script>
