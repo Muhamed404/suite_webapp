@@ -43,9 +43,13 @@ document.querySelectorAll('tbody tr').forEach(row => {
   }
 });
 
-document.querySelector('button').addEventListener('click', () => {
-  document.querySelector('input[type="date"]').focus();
-});
+const dateButton = document.querySelector('button');
+const dateInput = document.querySelector('input[type="date"]');
+if (dateButton && dateInput) {
+  dateButton.addEventListener('click', () => {
+    dateInput.focus();
+  });
+}
 
 
 
@@ -91,6 +95,7 @@ function showCustomToast(alertType, alertMessage = null) {
       'Package deleted successfully': 'تم حذف الباقة بنجاح',
       'User deleted successfully': 'تم حذف المستخدم بنجاح',
       'User created successfully': 'تم إنشاء المستخدم بنجاح',
+      'App service deleted successfully': 'تم حذف خدمة التطبيق بنجاح',
       'Campaign launch has been initiated': 'تم بدء إطلاق الحملة',
       'Campaign Launch has been initiated': 'تم بدء إطلاق الحملة',
       'Campaign has been initiated': 'تم بدء الحملة',
@@ -146,7 +151,7 @@ function showCustomToast(alertType, alertMessage = null) {
  * @param {Function} onConfirm - Called when the user clicks Confirm.
  * @param {Function} [onCancel] - Optional callback when the user cancels.
  */
-function showCustomConfirm(message, onConfirm, onCancel) {
+function showCustomConfirm(message, onConfirm, onCancel, confirmText = 'Confirm', cancelText = 'Cancel') {
   const backdrop = document.createElement('div');
   backdrop.className =
     'fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in';
@@ -165,11 +170,11 @@ function showCustomConfirm(message, onConfirm, onCancel) {
       <div class="flex justify-end gap-3">
         <button id="_confirmModalCancel" type="button"
           class="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition">
-          Cancel
+          ${cancelText}
         </button>
         <button id="_confirmModalConfirm" type="button"
           class="px-6 py-2.5 rounded-lg bg-teal-500 text-white text-sm font-semibold hover:bg-teal-600 transition">
-          Confirm
+          ${confirmText}
         </button>
       </div>
     </div>
@@ -182,15 +187,22 @@ function showCustomConfirm(message, onConfirm, onCancel) {
     setTimeout(() => backdrop.remove(), 200);
   }
 
-  backdrop.querySelector('#_confirmModalCancel').addEventListener('click', function () {
-    close();
-    if (typeof onCancel === 'function') onCancel();
-  });
+  const cancelBtn = backdrop.querySelector('#_confirmModalCancel');
+  const confirmBtn = backdrop.querySelector('#_confirmModalConfirm');
+  
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function () {
+      close();
+      if (typeof onCancel === 'function') onCancel();
+    });
+  }
 
-  backdrop.querySelector('#_confirmModalConfirm').addEventListener('click', function () {
-    close();
-    onConfirm();
-  });
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function () {
+      close();
+      onConfirm();
+    });
+  }
 
   // Click outside modal to cancel
   backdrop.addEventListener('click', function (e) {
@@ -346,16 +358,20 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.classList.add('text-gray-600', 'hover:text-black');
 
           const span = btn.querySelector('.number');
-          span.classList.remove('bg-gray-700', 'text-white');
-          span.classList.add('bg-green-500/15', 'text-green-500');
+          if (span) {
+            span.classList.remove('bg-gray-700', 'text-white');
+            span.classList.add('bg-green-500/15', 'text-green-500');
+          }
         });
 
         button.classList.add('bg-gray-900', 'text-white');
         button.classList.remove('text-gray-600', 'hover:text-black');
 
         const span = button.querySelector('.number');
-        span.classList.remove('bg-green-500/15', 'text-green-500');
-        span.classList.add('bg-gray-700', 'text-white');
+        if (span) {
+          span.classList.remove('bg-green-500/15', 'text-green-500');
+          span.classList.add('bg-gray-700', 'text-white');
+        }
       });
     });
 
@@ -598,16 +614,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeBtn = document.getElementById("closeModalBtn");
   const closeBottomBtn = document.getElementById("closeBottomBtn");
 
-  // Open Modal
-  openBtn.addEventListener("click", () => {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  });
+  // Only attach event listeners if elements exist
+  if (modal && openBtn && closeBtn && closeBottomBtn) {
+    // Open Modal
+    openBtn.addEventListener("click", () => {
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    });
 
-  // Close Modal (top button & bottom button)
-  [closeBtn, closeBottomBtn].forEach(btn =>
-    btn.addEventListener("click", () => {
-      modal.classList.remove("flex");
-      modal.classList.add("hidden");
-    })
-  );
+    // Close Modal (top button & bottom button)
+    [closeBtn, closeBottomBtn].forEach(btn =>
+      btn.addEventListener("click", () => {
+        modal.classList.remove("flex");
+        modal.classList.add("hidden");
+      })
+    );
+
+    // Close on clicking overlay
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    });
+  }

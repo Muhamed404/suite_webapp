@@ -72,18 +72,20 @@
 
     <!-- Toolbar -->
     <div class="px-5 py-3 border-b border-gray-100">
-      <form method="get" action="<%= sp.basePath %>" class="flex items-center gap-2 flex-wrap">
+      <form id="suiteUsersFilterForm" method="get" action="<%= sp.basePath %>" class="flex items-center gap-2 flex-wrap">
         <input type="hidden" name="page" value="1"/>
 
         <!-- Search -->
         <div class="relative">
-          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
-          </svg>
+          <span class="absolute inset-y-0 left-3 flex items-center h-full pointer-events-none text-gray-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/>
+            </svg>
+          </span>
           <input id="suiteUserSearch" type="search" name="search" value="<%= sp.search || '' %>"
             placeholder="<%= __('generic_label.search_here') %>"
             autocomplete="off"
-            class="w-48 pl-9 pr-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"/>
+            class="w-48 pl-10 pr-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"/>
         </div>
 
         <!-- Divider -->
@@ -91,7 +93,7 @@
 
         <!-- User selection -->
         <select id="userSelectionMode"
-          class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+          class="rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none bg-white min-w-[220px]">
           <option value="individual" selected><%= __("user.inviteUserSelectionIndividual") %></option>
           <option value="all"><%= __("user.inviteUserSelectionAll") %></option>
         </select>
@@ -135,15 +137,17 @@
           <% }); %>
         </select>
 
-        <% if (sp.search) { %>
-          <a href="<%= sp.basePath %>?page=1&amp;pageSize=<%= sp.pageSize %>"
-            class="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-500 hover:bg-gray-50 transition">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-            <%= __("user.suiteUsersClearSearch") %>
-          </a>
-        <% } %>
+        <div id="suiteUsersClearSearchSlot">
+          <% if (sp.search) { %>
+            <button id="suiteUsersClearSearch" type="button"
+              class="inline-flex items-center gap-1 px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-500 hover:bg-gray-50 transition">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              <%= __("user.suiteUsersClearSearch") %>
+            </button>
+          <% } %>
+        </div>
 
       </form>
     </div>
@@ -181,7 +185,7 @@
             </th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-50">
+        <tbody id="suiteUsersTableBody" class="divide-y divide-gray-50">
           <% if (Array.isArray(users)) { users.forEach(u => { %>
             <tr class="hover:bg-gray-50 transition-colors">
 
@@ -365,8 +369,7 @@
     </div>
 
     <!-- Footer: count + pagination -->
-    <% if (sp.totalPages >= 1) { %>
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-gray-100">
+    <div id="suiteUsersFooter" class="flex flex-col sm:flex-row items-center justify-between gap-3 px-5 py-4 border-t border-gray-100 <%= sp.totalPages >= 1 ? '' : 'hidden' %>">
 
         <p class="text-sm text-gray-400">
           <% if (sp.total > 0) { %>
@@ -378,12 +381,12 @@
                 .replace("{end}", endIndex)
                 .replace("{total}", sp.total);
             %>
-            <span class="font-medium text-gray-700"><%= showingText %></span>
+            <span id="suiteUsersShowingText" class="font-medium text-gray-700"><%= showingText %></span>
           <% } %>
         </p>
 
-        <% if (sp.totalPages > 1) { %>
-          <nav class="flex items-center gap-1" aria-label="Pagination">
+        <nav id="suiteUsersPagination" class="flex items-center gap-1 <%= sp.totalPages > 1 ? '' : 'hidden' %>" aria-label="Pagination">
+          <% if (sp.totalPages > 1) { %>
             <% if (sp.page > 1) { %>
               <a href="<%= sp.basePath %>?page=<%= sp.page - 1 %>&amp;pageSize=<%= sp.pageSize %>&amp;search=<%= encodeURIComponent(sp.search || '') %>"
                 class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-sm text-gray-600 hover:bg-gray-50 transition">
@@ -412,11 +415,10 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="<%= isRtl ? 'M15 19l-7-7 7-7' : 'M9 5l7 7-7 7' %>"/></svg>
               </a>
             <% } %>
-          </nav>
-        <% } %>
+          <% } %>
+        </nav>
 
-      </div>
-    <% } %>
+    </div>
 
   </div>
 </div>
@@ -466,11 +468,95 @@
   const selectAllVisibleUsers = document.getElementById('selectAllVisibleUsers');
   const suiteUserPageSize = document.getElementById('suiteUserPageSize');
   const suiteUserSearchInput = document.getElementById('suiteUserSearch');
+  const suiteUsersFilterForm = document.getElementById('suiteUsersFilterForm');
+  const suiteUsersTableBody = document.getElementById('suiteUsersTableBody');
+  let suiteUsersFooter = document.getElementById('suiteUsersFooter');
+  let suiteUsersPagination = document.getElementById('suiteUsersPagination');
+  const suiteUsersClearSearchSlot = document.getElementById('suiteUsersClearSearchSlot');
   const bulkInviteSubmitBtn = document.getElementById('bulkInviteSubmitBtn');
-  const searchForm = suiteUserSearchInput ? suiteUserSearchInput.closest('form') : null;
+  const defaultPageSize = <%= Number(sp.pageSize) || 25 %>;
+  let searchDebounceTimer = null;
+  let activeSuiteUsersRequest = 0;
 
   function getUserSelectionCheckboxes() {
     return Array.from(document.querySelectorAll('.user-select-checkbox'));
+  }
+
+  function buildSuiteUsersUrl(page) {
+    const formAction = suiteUsersFilterForm ? suiteUsersFilterForm.getAttribute('action') : '<%= sp.basePath %>';
+    const url = new URL(formAction, window.location.origin);
+    const params = new URLSearchParams();
+    params.set('page', String(page || 1));
+    params.set('pageSize', suiteUserPageSize ? suiteUserPageSize.value : String(defaultPageSize));
+    params.set('search', suiteUserSearchInput ? suiteUserSearchInput.value.trim() : '');
+    url.search = params.toString();
+    return url;
+  }
+
+  function syncSuiteUsersStateFromDocument(doc) {
+    const nextFooter = doc.getElementById('suiteUsersFooter');
+    if (suiteUsersFooter && nextFooter) {
+      suiteUsersFooter.className = nextFooter.className;
+      suiteUsersFooter.innerHTML = nextFooter.innerHTML;
+      suiteUsersPagination = document.getElementById('suiteUsersPagination');
+    }
+
+    if (suiteUsersClearSearchSlot) {
+      const nextClearSearchSlot = doc.getElementById('suiteUsersClearSearchSlot');
+      suiteUsersClearSearchSlot.innerHTML = nextClearSearchSlot ? nextClearSearchSlot.innerHTML : '';
+    }
+  }
+
+  async function loadSuiteUsers(page, options) {
+    const state = options || {};
+    const targetPage = Number(page || 1);
+    const requestId = ++activeSuiteUsersRequest;
+    const url = buildSuiteUsersUrl(targetPage);
+    url.searchParams.set('page', String(targetPage));
+
+    if (state.search !== undefined && suiteUserSearchInput) {
+      suiteUserSearchInput.value = state.search;
+      url.searchParams.set('search', state.search);
+    }
+
+    if (state.pageSize !== undefined && suiteUserPageSize) {
+      suiteUserPageSize.value = String(state.pageSize);
+      url.searchParams.set('pageSize', String(state.pageSize));
+    }
+
+    try {
+      const response = await fetch(url.toString(), {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch suite users');
+      }
+
+      const html = await response.text();
+      if (requestId !== activeSuiteUsersRequest) return;
+
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const nextTableBody = doc.getElementById('suiteUsersTableBody');
+      if (suiteUsersTableBody && nextTableBody) {
+        suiteUsersTableBody.innerHTML = nextTableBody.innerHTML;
+      }
+
+      syncSuiteUsersStateFromDocument(doc);
+
+      const nextUrl = `${url.pathname}?${url.searchParams.toString()}`;
+      window.history.replaceState({}, '', nextUrl);
+      syncHeaderSelectionState();
+    } catch (error) {
+      showCustomToast('error', '<%= __("user.suiteUsersClearSearch") %>');
+    }
+  }
+
+  function scheduleSuiteUsersSearch() {
+    window.clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = window.setTimeout(function () {
+      loadSuiteUsers(1);
+    }, 300);
   }
 
   function setAllUserCheckboxes(checked) {
@@ -510,11 +596,48 @@
     }
   });
 
-  if (suiteUserPageSize && searchForm) {
+  if (suiteUsersFilterForm) {
+    suiteUsersFilterForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      loadSuiteUsers(1);
+    });
+  }
+
+  if (suiteUserSearchInput) {
+    suiteUserSearchInput.addEventListener('input', function () {
+      scheduleSuiteUsersSearch();
+    });
+  }
+
+  if (suiteUsersClearSearchSlot) {
+    document.addEventListener('click', function (e) {
+      const clearButton = e.target.closest('#suiteUsersClearSearch');
+      if (!clearButton) return;
+      e.preventDefault();
+      if (suiteUserSearchInput) {
+        suiteUserSearchInput.value = '';
+      }
+      loadSuiteUsers(1, { search: '' });
+    });
+  }
+
+  if (suiteUserPageSize) {
     suiteUserPageSize.addEventListener('change', function () {
-      const pageInput = searchForm.querySelector('input[name="page"]');
-      if (pageInput) pageInput.value = '1';
-      searchForm.submit();
+      loadSuiteUsers(1, { pageSize: this.value });
+    });
+  }
+
+  if (suiteUsersPagination) {
+    document.addEventListener('click', function (e) {
+      const paginationLink = e.target.closest('#suiteUsersPagination a[href]');
+      if (!paginationLink) return;
+      e.preventDefault();
+      try {
+        const linkUrl = new URL(paginationLink.getAttribute('href'), window.location.origin);
+        const nextPage = parseInt(linkUrl.searchParams.get('page'), 10) || 1;
+        loadSuiteUsers(nextPage);
+      } catch (error) {
+      }
     });
   }
 

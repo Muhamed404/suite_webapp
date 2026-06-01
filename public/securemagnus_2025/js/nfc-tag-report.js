@@ -480,13 +480,16 @@ function createSemiDonut(selector, colors, total) {
     tooltip: { enabled: true }
   };
 
-  new ApexCharts(document.querySelector(selector), options).render();
+  var el = document.querySelector(selector);
+  if (el) {
+    new ApexCharts(el, options).render();
+  }
 }
 
-createSemiDonut("#linksChart", ['#ef4444', '#22c55e'], '50');
-createSemiDonut("#formChart", ['#fbbf24', '#22c55e'], '50');
-createSemiDonut("#submitChart", ['#a78bfa', '#22c55e'], '50');
-createSemiDonut("#attachChart", ['#3b82f6', '#22c55e'], '50');
+if (document.querySelector("#linksChart")) createSemiDonut("#linksChart", ['#ef4444', '#22c55e'], '50');
+if (document.querySelector("#formChart")) createSemiDonut("#formChart", ['#fbbf24', '#22c55e'], '50');
+if (document.querySelector("#submitChart")) createSemiDonut("#submitChart", ['#a78bfa', '#22c55e'], '50');
+if (document.querySelector("#attachChart")) createSemiDonut("#attachChart", ['#3b82f6', '#22c55e'], '50');
 
 
 

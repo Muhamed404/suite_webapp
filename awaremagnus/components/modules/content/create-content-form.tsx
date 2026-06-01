@@ -24,6 +24,7 @@ import { useModules, useContentsByModule } from "@/hooks/useQuiz";
 import { useCreateContent } from "@/hooks/useQuiz";
 import { getApiErrorMessage } from "@/utils/apiError";
 import { getLanguageId } from "@/utils/languageMapping";
+import { BROCHURE_POSTER_FILE_ACCEPT } from "@/utils/contentMediaType";
 
 /** Minimal upload icon for dropzones */
 function UploadIcon({ className }: { className?: string }) {
@@ -418,6 +419,22 @@ export function CreateContentForm({
         : false;
   const showUrlOnly = requiresFileOrUrlForDisplay && !allowsFileUpload;
   const showFileOrUrlChoice = requiresFileOrUrlForDisplay && allowsFileUpload;
+
+  const sourceFileAccept = (() => {
+    if (contentType === "Video") return "video/*";
+    if (contentType === "PDF") return "application/pdf";
+    if (contentType === "iSpring") return ".zip,.html";
+    if (contentType === "Brochure" || contentType === "Poster") return BROCHURE_POSTER_FILE_ACCEPT;
+
+    const name = selectedContentTypeName?.toLowerCase().trim() ?? "";
+
+    if (name.includes("motion video") || name === "video") return "video/*";
+    if (name.includes("brochure") || name.includes("poster")) return BROCHURE_POSTER_FILE_ACCEPT;
+    if (name.includes("document")) return "application/pdf,.pdf,.doc,.docx";
+    if (name.includes("ispring") || name.includes("interactive content")) return ".zip,.html";
+
+    return "*/*";
+  })();
 
   const quizFormHref =
     returnHref && moduleId
@@ -833,15 +850,7 @@ export function CreateContentForm({
                     <h4 className="font-medium text-gray-700 mb-2 text-sm">{t("sourceFile")}</h4>
                     <input
                       ref={sourceInputRef}
-                      accept={
-                        contentType === "Video"
-                          ? "video/*"
-                          : contentType === "PDF"
-                            ? "application/pdf"
-                            : contentType === "iSpring"
-                              ? ".zip,.html"
-                              : "*/*"
-                      }
+                      accept={sourceFileAccept}
                       className="sr-only"
                       type="file"
                       onChange={handleSourceFileChange}

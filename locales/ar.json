@@ -25,6 +25,9 @@
 		"select_template": "اختر القالب",
 		"description": "الوصف",
 		"preview": "معاينة",
+		"no_content_to_preview": "لا يوجد محتوى للمعاينة.",
+		"body_preview_english": "معاينة المحتوى — الإنجليزية",
+		"body_preview_arabic": "معاينة المحتوى — العربية",
 		"formInteraction": "تتبع تفاعل المستخدم مع نموذج التصيد الاحتيالي",
 		"formSubmitted": "تتبع البيانات المرسلة من خلال نموذج التصيد الاحتيالي",
 		"attachmentOpened": "تتبع تحميل ملف التصيد الاحتيالي (من البريد الإلكتروني أو صفحة الهبوط)",
@@ -38,6 +41,7 @@
 		"error_creating_nfc_campaign": "خطأ في إنشاء حملة NFC",
 		"success": "نجاح",
 		"service_deleted_successfully": "تم حذف الخدمة بنجاح!",
+		"app_service_deleted_successfully": "تم حذف خدمة التطبيق بنجاح!",
 		"service_registered_successfully": "تم تسجيل الخدمة بنجاح!",
 		"invalid_request_parameters": "معلمات الطلب غير صحيحة",
 		"service_registry_deletion_failed": "فشل في حذف سجل الخدمة",
@@ -124,6 +128,9 @@
 		"fileDownloaded": "generic_label.fileDownloaded",
 		"sr_no": "الرقم التسلسلي",
 		"no_data_found": "لا توجد بيانات"
+	},
+	"messages": {
+		"confirmSubmit": "هل أنت متأكد أنك تريد إرسال هذه الحملة؟ لا يمكن التراجع عن هذا الإجراء."
 	},
 	"validation_messages": {
 		"field_required": "validation_messages.field_required",
@@ -363,10 +370,11 @@
 			"subscriptionHistory": "سجل الاشتراكات",
 			"products": "المنتجات",
 			"logout": "تسجيل الخروج",
-			"smtpNotifications": "menu.suite.smtpNotifications",
+			"smtpNotifications": "إشعارات SMTP",
 			"bulkImportJobs": "وظائف الاستيراد المجمع",
 			"notificationMailLog": "سجل بريد الإشعارات",
-			"notificationTemplates": "menu.suite.notificationTemplates"
+			"notificationTemplates": "قوالب الإشعارات",
+			"mfaMailLog": "سجل رسائل MFA"
 		}
 	},
 	"org_domain": {
@@ -2463,7 +2471,39 @@
 		"loginLabel": "رمز التحقق",
 		"loginPlaceholder": "أدخل الرمز المكون من 6 أرقام",
 		"loginBtn": "تحقق والمتابعة",
-		"loginBack": "العودة إلى تسجيل الدخول"
+		"loginBack": "العودة إلى تسجيل الدخول",
+		"mail_log": {
+			"breadcrumb": "سجل بريد MFA",
+			"title": "سجل بريد MFA",
+			"subtitle": "تاريخ إرسال البريد الإلكتروني الصادر للمصادقة متعددة العوامل (MFA) وحالة التسليم.",
+			"filters": {
+				"all_statuses": "جميع الحالات",
+				"apply": "تطبيق",
+				"clear": "مسح"
+			},
+			"columns": {
+				"number": "#",
+				"recipient": "المستلم",
+				"subject": "الموضوع",
+				"status": "الحالة",
+				"queued_at": "تم وضعه في الانتظار في"
+			},
+			"messages": {
+				"no_mails_found": "لم يتم العثور على رسائل بريد MFA."
+			},
+			"status": {
+				"pending": "قيد الانتظار",
+				"processing": "جارٍ المعالجة",
+				"sent": "تم الإرسال",
+				"rejected": "مرفوض",
+				"failed": "فشل"
+			},
+			"pagination": {
+				"records": "سجلات",
+				"prev": "→ السابق",
+				"next": "التالي ←"
+			}
+		}
 	},
 	"user_not_found": "user_not_found",
 	"notification_mail": {

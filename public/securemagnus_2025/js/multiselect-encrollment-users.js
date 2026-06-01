@@ -63,13 +63,21 @@ function openModal() {
 
       // after moving, attempt to save using collected ids
       if (movedIds.length && window.removeSelectedUsers) {
-        window.removeSelectedUsers(movedIds)
-          .then(() => {
+        const result = window.removeSelectedUsers(movedIds);
+        if (result && typeof result.then === 'function') {
+          result.then(function() {
             console.log('Removing selected users after moveToUnenrolled');
-          })
-          .catch((e) => {
-            console.error('Error saving users after moveToUnenrolled', e);
           });
+          if (typeof result.fail === 'function') {
+            result.fail(function(e) {
+              console.error('Error saving users after moveToUnenrolled', e);
+            });
+          } else if (typeof result.catch === 'function') {
+            result.catch(function(e) {
+              console.error('Error saving users after moveToUnenrolled', e);
+            });
+          }
+        }
       }
     }
 
@@ -92,7 +100,8 @@ function openModal() {
       });
 
       if (movedIds.length && window.saveSelectedUsers) {
-        window.saveSelectedUsers(movedIds)
+        const saveResult = window.saveSelectedUsers(movedIds);
+        Promise.resolve(saveResult)
           .then(() => {
             console.log('Saved selected users after moveToEnrolled');
           })

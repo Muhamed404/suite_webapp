@@ -5,9 +5,9 @@ const serverTimelineData = window.userInteractionTimeline || [];
 const campaignStatsData = window.campaignStats || {};
 
 // Transform server data or use default if no data
-const events = serverTimelineData.length > 0 ? 
-  serverTimelineData.filter(event => event.time !== null) : // Filter out events without timestamps
- 
+const events = serverTimelineData.length > 0
+  ? serverTimelineData.filter((event) => event.time !== null) // Filter out events without timestamps
+  : [];
 
 console.log('Events for chart:', events);
 
@@ -92,11 +92,16 @@ if (events.length > 0) {
     }
   };
 
-  var chart = new ApexCharts(document.querySelector("#chart"), options);
-  chart.render();
+  var chartEl = document.querySelector("#chart");
+  if (chartEl) {
+    var chart = new ApexCharts(chartEl, options);
+    chart.render();
+  }
 } else {
   // Handle case when no timeline data is available
-  document.querySelector("#chart").innerHTML = `
+  var chartEl = document.querySelector("#chart");
+  if (chartEl) {
+    chartEl.innerHTML = `
     <div class="flex items-center justify-center h-96 text-gray-500">
       <div class="text-center">
         <h3 class="text-lg font-medium mb-2">No Timeline Data</h3>
@@ -104,6 +109,7 @@ if (events.length > 0) {
       </div>
     </div>
   `;
+  }
 }
 
 // ===============================
@@ -179,7 +185,10 @@ var successOptions = {
   }
 };
 
-new ApexCharts(document.querySelector("#successChart"), successOptions).render();
+var successChartEl = document.querySelector("#successChart");
+if (successChartEl) {
+  new ApexCharts(successChartEl, successOptions).render();
+}
 
 // Employees Phishing Segments with real data
 var segmentsOptions = {
@@ -228,7 +237,10 @@ var segmentsOptions = {
   }
 };
 
-new ApexCharts(document.querySelector("#userPhishingSegmentsChart"), segmentsOptions).render();
+var segmentsChartEl = document.querySelector("#userPhishingSegmentsChart");
+if (segmentsChartEl) {
+  new ApexCharts(segmentsChartEl, segmentsOptions).render();
+}
 
 // Reported To Admin chart with real data
 var reportOptions = {
@@ -251,7 +263,10 @@ var reportOptions = {
     }
   }
 };
-new ApexCharts(document.querySelector("#reportChart"), reportOptions).render();
+var reportChartEl = document.querySelector("#reportChart");
+if (reportChartEl) {
+  new ApexCharts(reportChartEl, reportOptions).render();
+}
 
 // Semi Donut Charts for bottom
 function createSemiDonut(selector, colors, total) {
@@ -285,13 +300,16 @@ function createSemiDonut(selector, colors, total) {
     tooltip: { enabled: true }
   };
 
-  new ApexCharts(document.querySelector(selector), options).render();
+  var semiDonutEl = document.querySelector(selector);
+  if (semiDonutEl) {
+    new ApexCharts(semiDonutEl, options).render();
+  }
 }
 
-createSemiDonut("#linksChart", ['#ef4444', '#22c55e'], '50');
-createSemiDonut("#formChart", ['#fbbf24', '#22c55e'], '50');
-createSemiDonut("#submitChart", ['#a78bfa', '#22c55e'], '50');
-createSemiDonut("#attachChart", ['#3b82f6', '#22c55e'], '50');
+if (document.querySelector("#linksChart")) createSemiDonut("#linksChart", ['#ef4444', '#22c55e'], '50');
+if (document.querySelector("#formChart")) createSemiDonut("#formChart", ['#fbbf24', '#22c55e'], '50');
+if (document.querySelector("#submitChart")) createSemiDonut("#submitChart", ['#a78bfa', '#22c55e'], '50');
+if (document.querySelector("#attachChart")) createSemiDonut("#attachChart", ['#3b82f6', '#22c55e'], '50');
 
 
 

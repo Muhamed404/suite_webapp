@@ -26,6 +26,9 @@
 		"select_template": "Select Template",
 		"description": "Description",
 		"preview": "Preview",
+		"no_content_to_preview": "No content to preview.",
+		"body_preview_english": "Body Preview — English",
+		"body_preview_arabic": "Body Preview — Arabic",
 		"formInteraction": "Interaction",
 		"formSubmitted": "Submitted",
 		"attachmentOpened": "Attachment Opened",
@@ -40,6 +43,7 @@
 		"error_creating_nfc_campaign": "Error creating NFC campaign",
 		"success": "Success",
 		"service_deleted_successfully": "Service deleted successfully!",
+		"app_service_deleted_successfully": "App service deleted successfully!",
 		"service_registered_successfully": "Service registered successfully!",
 		"invalid_request_parameters": "Invalid request parameters",
 		"service_registry_deletion_failed": "Service registry deletion failed",
@@ -116,6 +120,9 @@
 		"sr_no": "Sr. No",
 		"rows_per_page": "generic_label.rows_per_page",
 		"no_data_found": "No data found"
+	},
+	"messages": {
+		"confirmSubmit": "Are you sure you want to submit this campaign? This action cannot be undone."
 	},
 	"validation_messages": {
 		"field_required": "This field is required.",
@@ -2159,7 +2166,39 @@
 		"loginLabel": "Verification Code",
 		"loginPlaceholder": "Enter 6-digit code",
 		"loginBtn": "Verify & Continue",
-		"loginBack": "Back to Login"
+		"loginBack": "Back to Login",
+		"mail_log": {
+			"breadcrumb": "MFA Mail Log",
+			"title": "MFA Mail Log",
+			"subtitle": "Outbound MFA email dispatch history and delivery status.",
+			"filters": {
+				"all_statuses": "All Statuses",
+				"apply": "Apply",
+				"clear": "Clear"
+			},
+			"columns": {
+				"number": "#",
+				"recipient": "Recipient",
+				"subject": "Subject",
+				"status": "Status",
+				"queued_at": "Queued At"
+			},
+			"messages": {
+				"no_mails_found": "No MFA mails found."
+			},
+			"status": {
+				"pending": "PENDING",
+				"processing": "PROCESSING",
+				"sent": "SENT",
+				"rejected": "REJECTED",
+				"failed": "FAILED"
+			},
+			"pagination": {
+				"records": "records",
+				"prev": "← Prev",
+				"next": "Next →"
+			}
+		}
 	},
 	"notification_mail": {
 		"breadcrumb": "Notification Mail Log",

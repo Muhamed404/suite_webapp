@@ -203,11 +203,6 @@ function updateStep(newStep) {
     backBtn.classList.toggle("bg-teal-500", currentStep !== 0);
     backBtn.classList.toggle("text-white", currentStep !== 0);
     nextBtn.textContent = currentStep === steps.length - 1 ? (window.i18n?.labels?.finish || 'Finish') : (window.i18n?.labels?.next || 'Next');
-
-    // Trigger validation check when step changes
-    if (window.jQuery && typeof window.validateFormAndToggleSubmit === 'function') {
-      window.validateFormAndToggleSubmit();
-    }
   }, 300);
 }
 
@@ -233,7 +228,8 @@ nextBtn.addEventListener("click", (e) => {
     });
     if (!isValid) {
       // Focus first invalid field and do not advance
-      const $firstErr = $visibleFields.filter('.error, :invalid').first();
+      // Note: using .error class instead of :invalid pseudo-selector to avoid jQuery compatibility issues
+      const $firstErr = $visibleFields.filter('.error').first();
       if ($firstErr && $firstErr.length) $firstErr.focus();
       return;
     }
@@ -252,7 +248,8 @@ nextBtn.addEventListener("click", (e) => {
         mainForm.submit();
       } else {
         // Focus first invalid field
-        const $firstErr = $(mainForm).find(':input.error, :input:invalid').first();
+        // Note: using .error class instead of :invalid pseudo-selector to avoid jQuery compatibility issues
+        const $firstErr = $(mainForm).find(':input.error').first();
         if ($firstErr && $firstErr.length) $firstErr.focus();
       }
     } else {

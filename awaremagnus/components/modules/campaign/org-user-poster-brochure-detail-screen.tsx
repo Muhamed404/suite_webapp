@@ -6,9 +6,9 @@ import type { Module, ModuleContent } from "@/types/quiz";
 
 import Link from "next/link";
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import clsx from "clsx";
 
+import { PdfOrImageContentViewer } from "@/components/content-viewer/pdf-or-image-content-viewer";
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { AuthImage } from "@/components/ui/auth-image";
@@ -26,18 +26,12 @@ import { quizService } from "@/services/quizService";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { getContentMediaKind, resolveAwmContentUrl } from "@/utils/contentMediaType";
 import { CONTENT_TYPES } from "@/constants/content-types";
 import { VideoPlayerWithFallback } from "@/components/modules/training-library/content-detail-screens/video-player-with-fallback";
 
-const PdfViewer = dynamic(
-  () => import("@/components/document-viewer/pdf-viewer").then((m) => ({ default: m.PdfViewer })),
-  { ssr: false }
-);
-
 const BROCHURE_FALLBACK_PDF = getContentAssetUrl("/brochure.pdf");
 const POSTER_FALLBACK_IMG = getContentAssetUrl("/posters.png");
-const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg"]);
-const DOC_EXTENSIONS = new Set(["doc", "docx"]);
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
@@ -71,25 +65,6 @@ function formatDuration(minutes: number | undefined, t: (key: string) => string 
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-function resolveSourceUrl(raw: string | null | undefined): string | null {
-  if (!raw?.trim()) return null;
-  const s = raw.trim();
-
-  if (s.startsWith("http")) return s;
-  if (s.startsWith("/contents/")) return `/awm${s}`;
-
-  return `/awm/contents/${s.startsWith("/") ? s.slice(1) : s}`;
-}
-
-function extractFileExtension(url: string | null | undefined): string | null {
-  if (!url?.trim()) return null;
-  const cleanUrl = url.trim().split("?")[0].split("#")[0];
-  const lastDot = cleanUrl.lastIndexOf(".");
-
-  if (lastDot < 0 || lastDot === cleanUrl.length - 1) return null;
-
-  return cleanUrl.slice(lastDot + 1).toLowerCase();
-}
 
 // ─── component ───────────────────────────────────────────────────────────────
 
@@ -245,11 +220,9 @@ export function OrgUserPosterBrochureDetailScreen({
   // Source URL
   const rawSourceUrl =
     content?.source_url ?? (content as { source_path?: string } | null)?.source_path ?? null;
-  const resolvedUrl = resolveSourceUrl(rawSourceUrl);
-  const fileExtension = extractFileExtension(rawSourceUrl ?? resolvedUrl);
-  const isPdfFile = fileExtension == null || fileExtension === "pdf";
-  const isImageFile = fileExtension != null && IMAGE_EXTENSIONS.has(fileExtension);
-  const isDocFile = fileExtension != null && DOC_EXTENSIONS.has(fileExtension);
+  const resolvedUrl = resolveAwmContentUrl(rawSourceUrl);
+  const mediaKind = getContentMediaKind(rawSourceUrl);
+  const isDocFile = mediaKind === "doc";
   const officePreviewSourceUrl =
     isDocFile && resolvedUrl
       ? resolvedUrl.startsWith("http")
@@ -350,38 +323,48 @@ export function OrgUserPosterBrochureDetailScreen({
               {isLoading ? (
                 <div className="w-full bg-gray-100 animate-pulse" style={{ minHeight: 480 }} />
               ) : isPoster ? (
-                /* ── Poster image viewer ── */
-                <div className="w-full bg-gray-50 p-4" style={{ minHeight: 480 }}>
-                  <div className="relative w-full max-w-4xl mx-auto aspect-[4/3] bg-white rounded-xl overflow-hidden shadow-inner">
-                    {posterDisplayUrl ? (
-                      <AuthImage
-                        fill
-                        alt={content ? getContentTitle(content) : "Awareness Poster"}
-                        className="object-contain"
-                        fallbackContent={
-                          <Image
-                            fill
-                            alt="Poster"
-                            className="object-contain"
-                            sizes="(max-width: 896px) 100vw, 896px"
-                            src={POSTER_FALLBACK_IMG}
-                          />
-                        }
-                        loadingContent={<div className="w-full h-full animate-pulse bg-gray-200" />}
-                        sizes="(max-width: 896px) 100vw, 896px"
-                        src={posterDisplayUrl}
-                      />
-                    ) : (
-                      <Image
-                        fill
-                        alt="Poster"
-                        className="object-contain"
-                        sizes="(max-width: 896px) 100vw, 896px"
-                        src={POSTER_FALLBACK_IMG}
-                      />
-                    )}
+                rawSourceUrl ? (
+                  <PdfOrImageContentViewer
+                    alt={content ? getContentTitle(content) : "Awareness Poster"}
+                    authToken={token}
+                    imageFallbackSrc={POSTER_FALLBACK_IMG}
+                    imageViewportHeight={480}
+                    pdfFallbackSrc={POSTER_FALLBACK_IMG}
+                    rawSourceUrl={rawSourceUrl}
+                  />
+                ) : (
+                  <div className="w-full bg-gray-50 p-4" style={{ minHeight: 480 }}>
+                    <div className="relative w-full max-w-4xl mx-auto aspect-[4/3] bg-white rounded-xl overflow-hidden shadow-inner">
+                      {posterDisplayUrl ? (
+                        <AuthImage
+                          fill
+                          alt={content ? getContentTitle(content) : "Awareness Poster"}
+                          className="object-contain"
+                          fallbackContent={
+                            <Image
+                              fill
+                              alt="Poster"
+                              className="object-contain"
+                              sizes="(max-width: 896px) 100vw, 896px"
+                              src={POSTER_FALLBACK_IMG}
+                            />
+                          }
+                          loadingContent={<div className="w-full h-full animate-pulse bg-gray-200" />}
+                          sizes="(max-width: 896px) 100vw, 896px"
+                          src={posterDisplayUrl}
+                        />
+                      ) : (
+                        <Image
+                          fill
+                          alt="Poster"
+                          className="object-contain"
+                          sizes="(max-width: 896px) 100vw, 896px"
+                          src={POSTER_FALLBACK_IMG}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
+                )
               ) : isMiscVideo ? (
                 /* ── Misc video player ── */
                 <div className="w-full bg-black" style={{ minHeight: 480 }}>
@@ -392,37 +375,20 @@ export function OrgUserPosterBrochureDetailScreen({
                   />
                 </div>
               ) : isBrochure ? (
-                isPdfFile ? (
-                  /* ── PDF viewer ── */
-                  <div style={{ minHeight: 800 }}>
-                    <PdfViewer
-                      authToken={token}
-                      className="w-full"
-                      fallbackSrc={BROCHURE_FALLBACK_PDF}
-                      resolveUrl={rawSourceUrl ? !rawSourceUrl.startsWith("http") : true}
-                      src={rawSourceUrl ?? undefined}
-                    />
-                  </div>
-                ) : isImageFile && resolvedUrl ? (
-                  /* ── Image viewer ── */
-                  <div className="w-full bg-gray-50 p-4" style={{ minHeight: 480 }}>
-                    <div className="relative w-full max-w-5xl mx-auto h-[760px] bg-white rounded-xl overflow-hidden shadow-inner">
-                      <AuthImage
-                        fill
-                        alt={content ? getContentTitle(content) : "Brochure image"}
-                        className="object-contain"
-                        loadingContent={<div className="w-full h-full animate-pulse bg-gray-200" />}
-                        sizes="(max-width: 1280px) 100vw, 1280px"
-                        src={resolvedUrl}
-                      />
-                    </div>
-                  </div>
-                ) : isDocFile && officeViewerEmbedUrl ? (
-                  /* ── DOC/DOCX viewer ── */
+                isDocFile && officeViewerEmbedUrl ? (
                   <iframe
                     className="w-full h-[800px] border-0 bg-gray-50"
                     src={officeViewerEmbedUrl}
                     title={content ? getContentTitle(content) : "Document preview"}
+                  />
+                ) : rawSourceUrl ? (
+                  <PdfOrImageContentViewer
+                    alt={content ? getContentTitle(content) : "Brochure image"}
+                    authToken={token}
+                    imageViewportHeight={640}
+                    minHeight={800}
+                    pdfFallbackSrc={BROCHURE_FALLBACK_PDF}
+                    rawSourceUrl={rawSourceUrl}
                   />
                 ) : (
                   <div className="w-full h-64 flex items-center justify-center text-gray-500 text-sm bg-gray-50">

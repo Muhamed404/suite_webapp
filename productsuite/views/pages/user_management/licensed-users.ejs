@@ -309,12 +309,19 @@
 
   // ── Page-size change ──────────────────────────────────────────────────────
 
-  document.getElementById('page-size-select').addEventListener('change', function () {
-    _pageState.pageSize = parseInt(this.value, 10);
-    fetchLicensedUsers(1);
-  });
+  const pageSizeSelect = document.getElementById('page-size-select');
+  const searchInput = document.getElementById('search-input');
+  
+  if (pageSizeSelect) {
+    pageSizeSelect.addEventListener('change', function () {
+      _pageState.pageSize = parseInt(this.value, 10);
+      fetchLicensedUsers(1);
+    });
+  }
 
-  document.getElementById('search-input').addEventListener('input', applySearch);
+  if (searchInput) {
+    searchInput.addEventListener('input', applySearch);
+  }
 
   // ── Init ──────────────────────────────────────────────────────────────────
 

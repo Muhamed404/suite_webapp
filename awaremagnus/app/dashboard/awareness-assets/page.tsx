@@ -143,9 +143,9 @@ export default function AwarenessAssetsPage() {
       quizService.getContents({
         ...(activeFilter !== 0 && { contype_id: activeFilter }),
         ...(languageFilter !== "all" && { lang_id: Number(languageFilter) }),
-        // When searching, fetch a broader dataset so search is meaningful.
+        // When searching, fetch up to API max (100) for client-side filtering.
         page: searchText.trim() ? 1 : currentPage,
-        limit: searchText.trim() ? 500 : 9,
+        limit: searchText.trim() ? 100 : 9,
       }),
     enabled: canAccessAssets,
     staleTime: 60 * 1000,
