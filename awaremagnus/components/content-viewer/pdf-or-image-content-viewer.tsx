@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Image from "next/image";
+import clsx from "clsx";
 
 import { AuthImage } from "@/components/ui/auth-image";
 import { isImageContent, isPdfContent, resolveAwmContentUrl } from "@/utils/contentMediaType";
@@ -19,7 +20,10 @@ export interface PdfOrImageContentViewerProps {
   className?: string;
   pdfFallbackSrc: string;
   imageFallbackSrc?: string;
+  /** Minimum height for PDF viewer area. */
   minHeight?: number | string;
+  /** Fixed viewport height for image preview (capped at 70vh). */
+  imageViewportHeight?: number;
   imageClassName?: string;
 }
 
@@ -34,7 +38,8 @@ export function PdfOrImageContentViewer({
   pdfFallbackSrc,
   imageFallbackSrc,
   minHeight = 800,
-  imageClassName = "object-contain",
+  imageViewportHeight = 560,
+  imageClassName = "object-contain object-center",
 }: PdfOrImageContentViewerProps) {
   const displayUrl = resolveAwmContentUrl(rawSourceUrl);
 
@@ -51,7 +56,7 @@ export function PdfOrImageContentViewer({
 
   if (isPdfContent(rawSourceUrl)) {
     return (
-      <div className={className} style={{ minHeight }}>
+      <div className={clsx("w-full overflow-hidden", className)} style={{ minHeight }}>
         <PdfViewer
           authToken={authToken}
           className="w-full"
@@ -65,24 +70,39 @@ export function PdfOrImageContentViewer({
 
   if (isImageContent(rawSourceUrl) && displayUrl) {
     return (
-      <div className={className ?? "relative w-full bg-gray-50"} style={{ minHeight }}>
-        <AuthImage
-          fill
-          alt={alt}
-          className={imageClassName}
-          fallbackContent={
-            imageFallbackSrc ? (
-              <Image fill alt={alt} className={imageClassName} sizes="100vw" src={imageFallbackSrc} />
-            ) : undefined
-          }
-          loadingContent={
-            <div className="w-full h-full flex items-center justify-center bg-gray-100">
-              <div className="animate-pulse w-full h-full bg-gray-200" />
-            </div>
-          }
-          sizes="100vw"
-          src={displayUrl}
-        />
+      <div className={clsx("w-full bg-gray-50 p-4 sm:p-6 flex justify-center", className)}>
+        <div
+          className="relative w-full max-w-4xl mx-auto overflow-hidden rounded-xl bg-white border border-gray-100 shadow-sm"
+          style={{
+            height: imageViewportHeight,
+            maxHeight: "70vh",
+            minHeight: 240,
+          }}
+        >
+          <AuthImage
+            fill
+            alt={alt}
+            className={imageClassName}
+            fallbackContent={
+              imageFallbackSrc ? (
+                <Image
+                  fill
+                  alt={alt}
+                  className={imageClassName}
+                  sizes="(max-width: 896px) 100vw, 896px"
+                  src={imageFallbackSrc}
+                />
+              ) : undefined
+            }
+            loadingContent={
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                <div className="w-full h-full animate-pulse bg-gray-200" />
+              </div>
+            }
+            sizes="(max-width: 896px) 100vw, 896px"
+            src={displayUrl}
+          />
+        </div>
       </div>
     );
   }

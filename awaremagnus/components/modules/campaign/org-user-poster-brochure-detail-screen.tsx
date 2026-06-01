@@ -327,9 +327,8 @@ export function OrgUserPosterBrochureDetailScreen({
                   <PdfOrImageContentViewer
                     alt={content ? getContentTitle(content) : "Awareness Poster"}
                     authToken={token}
-                    className="w-full bg-gray-50 p-4"
                     imageFallbackSrc={POSTER_FALLBACK_IMG}
-                    minHeight={480}
+                    imageViewportHeight={480}
                     pdfFallbackSrc={POSTER_FALLBACK_IMG}
                     rawSourceUrl={rawSourceUrl}
                   />
@@ -386,7 +385,7 @@ export function OrgUserPosterBrochureDetailScreen({
                   <PdfOrImageContentViewer
                     alt={content ? getContentTitle(content) : "Brochure image"}
                     authToken={token}
-                    className="w-full bg-gray-50"
+                    imageViewportHeight={640}
                     minHeight={800}
                     pdfFallbackSrc={BROCHURE_FALLBACK_PDF}
                     rawSourceUrl={rawSourceUrl}

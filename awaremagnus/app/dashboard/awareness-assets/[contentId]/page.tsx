@@ -122,8 +122,8 @@ export default function AwarenessAssetDetailPage() {
               <div className="overflow-hidden rounded-lg border border-[var(--strokeGray)] bg-white">
                 <PdfOrImageContentViewer
                   alt={title}
-                  className="relative min-h-[70vh]"
                   imageFallbackSrc={pdfOrImageFallback}
+                  imageViewportHeight={560}
                   minHeight="70vh"
                   pdfFallbackSrc={pdfOrImageFallback}
                   rawSourceUrl={rawSourceUrl}
