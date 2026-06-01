@@ -65,6 +65,10 @@ export const authService = {
     const response = await suiteClient.post<LoginResponse>("/login", {
       ...payload,
       product: "awm",
+    }, {
+      headers: {
+        'X-Product-Key': 'awm'
+      }
     });
 
     const token = response.data.object?.userToken ?? null;
