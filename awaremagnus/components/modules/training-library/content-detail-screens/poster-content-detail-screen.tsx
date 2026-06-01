@@ -19,7 +19,7 @@ import { PdfOrImageContentViewer } from "@/components/content-viewer/pdf-or-imag
 import { AuthImage } from "@/components/ui/auth-image";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
-import { isPdfContent, resolveAwmContentUrl } from "@/utils/contentMediaType";
+import { resolveAwmContentUrl } from "@/utils/contentMediaType";
 
 function moduleName(m: Module): string {
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
@@ -133,7 +133,6 @@ export function PosterContentDetailScreen({
   const posterImageUrl = posterDisplayUrl ?? logoFallbackUrl;
 
   const completeImageUrl = logoFallbackUrl;
-  const hasPdfSource = isPdfContent(sourceUrl);
 
   if (content) {
     console.log("COMPLETE IMAGE URL:", completeImageUrl);
@@ -280,9 +279,9 @@ export function PosterContentDetailScreen({
                         <PdfOrImageContentViewer
                           alt={content ? contentTitle(content) : "Awareness Poster"}
                           authToken={token}
-                          className="w-full bg-white p-4"
                           imageFallbackSrc={POSTER_FALLBACK}
-                          minHeight={hasPdfSource ? 800 : 320}
+                          imageViewportHeight={480}
+                          minHeight={800}
                           pdfFallbackSrc={POSTER_FALLBACK}
                           rawSourceUrl={sourceUrl}
                         />

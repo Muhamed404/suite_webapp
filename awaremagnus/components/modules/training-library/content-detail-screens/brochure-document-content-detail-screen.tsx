@@ -310,7 +310,7 @@ export function BrochureDocumentContentDetailScreen({
                         <PdfOrImageContentViewer
                           alt={content ? contentTitle(content) : "Brochure image"}
                           authToken={token}
-                          className="relative w-full h-[800px] bg-gray-50"
+                          imageViewportHeight={640}
                           minHeight={800}
                           pdfFallbackSrc={BROCHURE_DOCUMENT_FALLBACK_PDF}
                           rawSourceUrl={docSourceUrl}
