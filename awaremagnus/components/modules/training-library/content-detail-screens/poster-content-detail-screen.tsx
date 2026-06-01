@@ -4,7 +4,6 @@ import type { Module, ModuleContent } from "@/types/quiz";
 import type { LibraryType } from "../library-page";
 
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import clsx from "clsx";
 
@@ -16,24 +15,11 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModule, useContent, useContentsByModule } from "@/hooks/useQuiz";
 import { CONTENT_TYPES } from "@/constants/content-types";
-import { useAuthStore } from "@/hooks/useAuthStore";
+import { PdfOrImageContentViewer } from "@/components/content-viewer/pdf-or-image-content-viewer";
 import { AuthImage } from "@/components/ui/auth-image";
+import { useAuthStore } from "@/hooks/useAuthStore";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
-
-const PdfViewer = dynamic(
-  () => import("@/components/document-viewer/pdf-viewer").then((m) => ({ default: m.PdfViewer })),
-  { ssr: false }
-);
-
-function extractFileExtension(url: string | null | undefined): string | null {
-  if (!url?.trim()) return null;
-  const cleanUrl = url.trim().split("?")[0].split("#")[0];
-  const lastDot = cleanUrl.lastIndexOf(".");
-
-  if (lastDot < 0 || lastDot === cleanUrl.length - 1) return null;
-
-  return cleanUrl.slice(lastDot + 1).toLowerCase();
-}
+import { isPdfContent, resolveAwmContentUrl } from "@/utils/contentMediaType";
 
 function moduleName(m: Module): string {
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
@@ -138,23 +124,16 @@ export function PosterContentDetailScreen({
     ? (content.source_url ?? (content as { source_path?: string }).source_path?.trim())
     : null;
 
-  // Use local same-origin proxy for posters
-  const posterImageUrl = sourceUrl
-    ? sourceUrl.startsWith("http")
-      ? sourceUrl
-      : sourceUrl.startsWith("/contents/")
-        ? `/awm${sourceUrl}`
-        : `/awm/contents/${sourceUrl.startsWith("/") ? sourceUrl.slice(1) : sourceUrl}`
-    : content
-      ? (content.logo_url ?? content.logo_path)
-        ? getContentAssetUrl(content.logo_url ?? content.logo_path)
-        : null
+  const posterDisplayUrl = resolveAwmContentUrl(sourceUrl);
+  const logoFallbackUrl =
+    content?.logo_url || (content as { logo_path?: string }).logo_path
+      ? getContentAssetUrl(content.logo_url ?? (content as { logo_path?: string }).logo_path!)
       : null;
+  const posterImageUrl = posterDisplayUrl ?? logoFallbackUrl;
 
   const logoUrl = content?.logo_url || (content as any)?.logo_path;
   const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
-  const fileExtension = extractFileExtension(sourceUrl ?? posterImageUrl);
-  const isPdfFile = fileExtension === "pdf";
+  const hasPdfSource = isPdfContent(sourceUrl);
 
   if (content) {
     console.log("COMPLETE IMAGE URL:", completeImageUrl);
@@ -297,17 +276,17 @@ export function PosterContentDetailScreen({
                     <div className="relative w-full min-h-[200px] bg-[var(--gray)]/30">
                       {isLoading ? (
                         <div className="w-full h-64 sm:h-80 flex items-center justify-center bg-gray-100 animate-pulse" />
-                      ) : posterImageUrl && isPdfFile ? (
-                        <div className="w-full" style={{ minHeight: "800px" }}>
-                          <PdfViewer
-                            authToken={token}
-                            className="w-full"
-                            fallbackSrc={POSTER_FALLBACK}
-                            resolveUrl={sourceUrl ? !sourceUrl.startsWith("http") : true}
-                            src={sourceUrl ?? undefined}
-                          />
-                        </div>
-                      ) : posterImageUrl ? (
+                      ) : sourceUrl ? (
+                        <PdfOrImageContentViewer
+                          alt={content ? contentTitle(content) : "Awareness Poster"}
+                          authToken={token}
+                          className="w-full bg-white p-4"
+                          imageFallbackSrc={POSTER_FALLBACK}
+                          minHeight={hasPdfSource ? 800 : 320}
+                          pdfFallbackSrc={POSTER_FALLBACK}
+                          rawSourceUrl={sourceUrl}
+                        />
+                      ) : logoFallbackUrl ? (
                         <div className="relative w-full bg-white p-4" style={{ minHeight: 320 }}>
                           <div className="relative w-full max-w-4xl mx-auto aspect-[4/3] bg-gray-50 rounded-lg overflow-hidden">
                             <AuthImage
@@ -329,7 +308,7 @@ export function PosterContentDetailScreen({
                                 </div>
                               }
                               sizes="(max-width: 896px) 100vw, 896px"
-                              src={posterImageUrl}
+                              src={logoFallbackUrl}
                             />
                           </div>
                         </div>
