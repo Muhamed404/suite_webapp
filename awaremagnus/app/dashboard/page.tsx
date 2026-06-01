@@ -2025,7 +2025,7 @@ export default function DashboardPage() {
                                 padding: { left: 20, right: 20 },
                               },
                               tooltip: {
-                                theme: "dark",
+                                theme: "dark" as const,
                                 custom: function ({ series, seriesIndex, dataPointIndex, w }: any) {
                                   const data = w.globals.initialSeries[seriesIndex].data[dataPointIndex];
                                   const items = data.items || [];

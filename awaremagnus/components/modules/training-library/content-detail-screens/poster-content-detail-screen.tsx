@@ -125,14 +125,14 @@ export function PosterContentDetailScreen({
     : null;
 
   const posterDisplayUrl = resolveAwmContentUrl(sourceUrl);
-  const logoFallbackUrl =
-    content?.logo_url || (content as { logo_path?: string }).logo_path
-      ? getContentAssetUrl(content.logo_url ?? (content as { logo_path?: string }).logo_path!)
-      : null;
+  const logoPath =
+    content?.logo_url?.trim() ||
+    (content as { logo_path?: string } | null)?.logo_path?.trim() ||
+    "";
+  const logoFallbackUrl = logoPath ? getContentAssetUrl(logoPath) : null;
   const posterImageUrl = posterDisplayUrl ?? logoFallbackUrl;
 
-  const logoUrl = content?.logo_url || (content as any)?.logo_path;
-  const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
+  const completeImageUrl = logoFallbackUrl;
   const hasPdfSource = isPdfContent(sourceUrl);
 
   if (content) {

@@ -14,6 +14,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModule, useContent, useContentsByModule } from "@/hooks/useQuiz";
+import { useAuthStore } from "@/hooks/useAuthStore";
 import { CONTENT_TYPES } from "@/constants/content-types";
 import { PdfOrImageContentViewer } from "@/components/content-viewer/pdf-or-image-content-viewer";
 import { AuthImage } from "@/components/ui/auth-image";
