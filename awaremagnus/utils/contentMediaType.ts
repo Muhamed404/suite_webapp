@@ -46,13 +46,42 @@ export function isImageContent(url: string | null | undefined): boolean {
   return getContentMediaKind(url) === "image";
 }
 
-/** Resolve AWM-relative content paths to same-origin proxy URLs. */
+/**
+ * Resolve AWM-relative content paths to same-origin proxy URLs.
+ *
+ * For external OCI/S3 URLs, if the path contains `/contents/`, the
+ * asset segment is extracted and routed through the backend proxy at
+ * `/awm/contents/…` — so the backend's OCI SDK credentials are used
+ * instead of sending the user JWT directly to object storage (which
+ * causes 401 because OCI rejects non-OCI auth tokens).
+ */
 export function resolveAwmContentUrl(raw: string | null | undefined): string | null {
   if (!raw?.trim()) return null;
   const s = raw.trim();
 
-  if (s.startsWith("http")) return s;
+  if (s.startsWith("http://") || s.startsWith("https://")) {
+    // Try to rewrite known asset types to the backend proxy so the
+    // user's Bearer token never hits object storage directly.
+    try {
+      const parsed = new URL(s);
+      const lowerPath = parsed.pathname.toLowerCase();
+      for (const marker of ["/contents/", "/module_translations/", "/certificates/"]) {
+        const idx = lowerPath.indexOf(marker);
+        if (idx >= 0) {
+          // e.g. /awm/contents/brochures/system_files/file.pdf
+          return `/awm${parsed.pathname.slice(idx)}${parsed.search}`;
+        }
+      }
+    } catch {
+      // URL parse failed — fall through and return as-is
+    }
+    return s;
+  }
+
+  if (s.startsWith("/awm")) return s;
   if (s.startsWith("/contents/")) return `/awm${s}`;
+  if (s.startsWith("/module_translations/")) return `/awm${s}`;
+  if (s.startsWith("/certificates/")) return `/awm${s}`;
 
   return `/awm/contents/${s.startsWith("/") ? s.slice(1) : s}`;
 }
