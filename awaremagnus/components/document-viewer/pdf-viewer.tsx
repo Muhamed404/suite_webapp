@@ -58,16 +58,23 @@ export function PdfViewer({
     return resolveUrl ? getContentAssetUrl(raw) : raw;
   }, [src, resolveUrl]);
 
+  // Only send the Bearer token to same-origin / proxy URLs.
+  // External object-storage URLs (OCI, S3, etc.) reject a user JWT with 401.
+  const isSameOriginUrl =
+    !pdfUrl ||
+    pdfUrl.startsWith("/") ||
+    (typeof window !== "undefined" && pdfUrl.startsWith(window.location.origin));
+
   const documentOptions = useMemo(
     () =>
-      authToken && !useFallback
+      authToken && !useFallback && isSameOriginUrl
         ? {
             httpHeaders: {
               Authorization: `Bearer ${authToken}`,
             },
           }
         : undefined,
-    [authToken, useFallback]
+    [authToken, useFallback, isSameOriginUrl]
   );
 
   const fileToShow = useFallback && fallbackSrc ? fallbackSrc : pdfUrl;

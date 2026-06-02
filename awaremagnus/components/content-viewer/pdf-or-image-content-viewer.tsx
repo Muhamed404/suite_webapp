@@ -55,14 +55,17 @@ export function PdfOrImageContentViewer({
   }
 
   if (isPdfContent(rawSourceUrl)) {
+    // Always pass the resolved proxy URL so the PDF never hits object
+    // storage directly with a user Bearer token (OCI returns 401 for non-OCI auth).
+    // resolveUrl=false because displayUrl is already fully resolved.
     return (
       <div className={clsx("w-full overflow-hidden", className)} style={{ minHeight }}>
         <PdfViewer
           authToken={authToken}
           className="w-full"
           fallbackSrc={pdfFallbackSrc}
-          resolveUrl={rawSourceUrl ? !rawSourceUrl.startsWith("http") : true}
-          src={rawSourceUrl ?? undefined}
+          resolveUrl={false}
+          src={displayUrl ?? undefined}
         />
       </div>
     );
