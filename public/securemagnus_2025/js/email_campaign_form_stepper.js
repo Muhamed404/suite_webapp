@@ -1187,6 +1187,7 @@ class EmailCampaignStepper {
 
     let content = '';
     let title = '';
+    const previewLabels = window.i18n?.campaign?.email_create_campaign || {};
 
     switch(tab) {
       case 'email':
@@ -1207,7 +1208,7 @@ class EmailCampaignStepper {
         break;
 
       case 'landing':
-        title = 'Landing Page';
+        title = previewLabels.preview_landing_page || 'Landing Page';
         const landingExternalUrl = this.getLandingPageExternalUrl();
         if (landingExternalUrl) {
           if (previewNoContent) {
