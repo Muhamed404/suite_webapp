@@ -1,0 +1,34 @@
+# =============================================================================
+# .dockerignore — awaremagnus (Next.js)
+# =============================================================================
+
+# Node modules — rebuilt inside the image via `npm ci`
+node_modules/
+
+# Previous build output — rebuilt fresh inside Docker with correct NEXT_PUBLIC_* vars
+.next/
+
+# TypeScript build info
+tsconfig.tsbuildinfo
+
+# Git metadata
+.git/
+.gitignore
+
+# Secret / environment files — NEXT_PUBLIC_* vars are injected as build-args,
+# not at runtime. The .env file must NOT be baked into the image.
+.env
+.env.*
+.env.local
+
+# Log files
+logs/
+*.log
+
+# Developer / documentation files
+README.md
+LICENSE
+
+# OS artefacts
+.DS_Store
+Thumbs.db
