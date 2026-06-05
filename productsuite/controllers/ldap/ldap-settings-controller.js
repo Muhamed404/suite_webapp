@@ -30,15 +30,6 @@ function normalizeTransportSecurity(value) {
   return "NONE";
 }
 
-function normalizeLdapIntegrationMode(value) {
-  const normalized = String(value || "SYNC_ONLY").trim().toUpperCase();
-  if (["SYNC_ONLY", "FULL_LDAP_AUTH"].includes(normalized)) {
-    return normalized;
-  }
-
-  return "SYNC_ONLY";
-}
-
 function extractErrorMessage(error, fallbackMessage) {
   const responseData = error?.response?.data || {};
   const errorCode = responseData.errorCode || null;
@@ -113,7 +104,9 @@ async function saveLdapConfig(req, res) {
       auto_sync_enabled: toBool(req.body.auto_sync_enabled, false),
       sync_interval_minutes: Number(req.body.sync_interval_minutes || 60),
       incremental_sync_enabled: toBool(req.body.incremental_sync_enabled, false),
-      ldap_integration_mode: normalizeLdapIntegrationMode(req.body.ldap_integration_mode),
+      enable_group_sync: toBool(req.body.enable_group_sync, true),
+      enable_department_sync: toBool(req.body.enable_department_sync, true),
+      enable_user_update: toBool(req.body.enable_user_update, true),
       user_filter: req.body.user_filter,
       group_filter: req.body.group_filter,
       department_filter: req.body.department_filter,
@@ -156,8 +149,27 @@ async function triggerManualSync(req, res) {
   }
 }
 
+async function testLdapConnection(req, res) {
+  let orgId = 0;
+
+  try {
+    orgId = resolveOrgId(req);
+    const apiClient = getApiClient(req);
+    const response = await apiClient.get(`/org/${orgId}/ldap/test-connection`);
+    const message = response.data?.message || "LDAP connection test successful.";
+
+    return res.status(200).json({ success: true, message });
+  } catch (error) {
+    const details = extractErrorMessage(error, "LDAP connection test failed.");
+    logger.error(`[LDAP Settings][TEST][${details.errorCode || "LDAP_UI_ERROR"}] ${details.message}`);
+    const statusCode = error?.response?.status || 400;
+    return res.status(statusCode).json({ success: false, message: details.displayMessage });
+  }
+}
+
 module.exports = {
   renderLdapPage,
   saveLdapConfig,
   triggerManualSync,
+  testLdapConnection,
 };

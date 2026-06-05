@@ -64,6 +64,7 @@ module.exports = {
             BULK_IMPORT_LIST: (organizationId) => `/user/bulk-import/list/${organizationId}`,
             BULK_IMPORT_STATUS: (organizationId, jobId) =>
               `/user/bulk-import/${organizationId}/${jobId}`,
+            LDAP_IMPORT: (organizationId) => `/user/ldap/import/${organizationId}`,
             RETRIEVE_USER_BY_ID: (userId) => `/user/show/${userId}`,
             SAVE_EDIT_USER: (userId) => `/user/update/${userId}`,
             LICENSED_USERS_BY_PRODUCT: (productId) => `/user/licensed-users/${productId}`,

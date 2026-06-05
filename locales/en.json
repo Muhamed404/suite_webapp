@@ -820,6 +820,12 @@
 		"btnAddUser": "Add User",
 		"btnBulkAssign": "Bulk Assign",
 		"btnImport": "Import",
+		"btnImportLdap": "Import from Active Directory",
+		"btnImportLdapOnly": "Only Import",
+		"btnImportLdapLogin": "Import and Login",
+		"ldapImportMissingOrg": "Organization id is missing for LDAP import.",
+		"ldapImportSuccess": "LDAP import completed.",
+		"ldapImportFailed": "LDAP import failed.",
 		"labelPhishMagnusLicenseStatus": "PhishMagnus License Status",
 		"labelAwarenessLicenseStatus": "Awareness License Status",
 		"statusLicensed": "Licensed",
@@ -937,7 +943,12 @@
 		"labelChooseProduct": "Choose Product",
 		"labelEnterUserDetails": "Enter User Details",
 		"labelSave": "Save",
-		"labelAvailableUsersLicense": "Available Users License"
+		"labelAvailableUsersLicense": "Available Users License",
+		"labelImportFromLdap": "Import from LDAP",
+		"stepSelectLdapMode": "Select LDAP Mode",
+		"labelSelectMode": "Select Import Mode",
+		"labelOnlyImport": "Only Import",
+		"labelImportAndLogin": "Import and Login"
 	},
 	"system_template": {
 		"stepper1": "Template Details",

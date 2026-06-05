@@ -5,6 +5,7 @@ const {
   renderLdapPage,
   saveLdapConfig,
   triggerManualSync,
+  testLdapConnection,
 } = require("../../controllers/ldap/ldap-settings-controller");
 
 const router = express.Router();
@@ -16,6 +17,7 @@ const permission = checkPermission(enums.ModuleNames.Organization_Settings, [
   enums.Access_Types.RW_O,
 ]);
 
+router.get("/test-connection/:orgId", permission, testLdapConnection);
 router.get("/:orgId?", permission, renderLdapPage);
 router.post("/:orgId", permission, saveLdapConfig);
 router.post("/:orgId/sync", permission, triggerManualSync);
