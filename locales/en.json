@@ -1126,6 +1126,8 @@
 			"email_content": "Email Content",
 			"landing_page": "Redirect Page",
 			"redirect_page": "Phishing Page",
+			"preview_landing_page": "Landing Page",
+			"preview_redirect_page": "Redirect Page",
 			"attachment": "Attachment",
 			"external_landing_page_url": "External landing page URL:",
 			"open_preview": "Open Preview",
