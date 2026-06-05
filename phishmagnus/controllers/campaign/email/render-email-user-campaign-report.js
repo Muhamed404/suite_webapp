@@ -36,14 +36,10 @@ exports.emailUserReport = async (req, res) => {
     logger.info('User Email Report: response ' + JSON.stringify(redactLogData(response.data), null, 2));
     
     const campaignDetails = response?.data?.message.campaign || {};
-    if (campaignDetails?.start_datetime) {
-      campaignDetails.start_datetime = formatDateTimeDDMmmYYYYHHmmAMPM(campaignDetails.start_datetime);
-    }
     const sentUnSentStats = response?.data?.message.sentUnSentStats || {};
     const campaignInteractionStats = response?.data?.message.interactionStatsByCampaign || {};
     const userProfile = response?.data?.message.userProfile || {};
-    
-    // Transform interaction stats into timeline format
+
     const userInteractionTimeline = transformInteractionStats(campaignInteractionStats, sentUnSentStats);
     
     const campaignStats = {

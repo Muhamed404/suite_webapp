@@ -43,9 +43,7 @@ exports.usbCampaignViewReport = async (req, res) => {
     logger.info(`Controller - USB Campaign View Report - Data fetched successfully`);
     logger.info(`Controller - USB Campaign View Report - ${JSON.stringify(redactLogData(campaigns), null, 2)}`);
 
-    if (campaigns?.start_datetime) {
-      campaigns.start_datetime = formatDateTimeDDMmmYYYYHHmmAMPM(campaigns.start_datetime);
-    }
+    // start_datetime formatted in user timezone by service_suite (generate-usb-campaign-report)
 
     const allUsbDevices = Array.isArray(campaigns.usb_devices) ? campaigns.usb_devices : [];
     const totalDevices = allUsbDevices.length;
