@@ -1,0 +1,42 @@
+# =============================================================================
+# .dockerignore — suite_webapp
+# =============================================================================
+
+# Node modules — rebuilt inside the image via `npm ci`
+node_modules/
+
+# awaremagnus sub-app — built and run as its own separate container
+awaremagnus/
+
+# Git metadata
+.git/
+.gitignore
+
+# Secret / environment files — injected at runtime via docker-compose env_file,
+# never baked into the image layer.
+.env
+.env.*
+.env.local
+template_env.txt
+
+# JWT key path — public.key is bind-mounted read-only at runtime;
+# must NOT land in image layers.
+# (service_suite/keys/ lives on the host, not inside suite_webapp/)
+
+# Log files — written to the mounted /app/logs volume at runtime
+logs/
+*.log
+
+# Developer / documentation files not needed at runtime
+docs/
+README.md
+Wsl_Redis_Installation.md
+QR-Generation-sample.js
+technical_readme.md
+
+# Build / obfuscation tooling
+obfuscator.js
+
+# OS artefacts
+.DS_Store
+Thumbs.db
