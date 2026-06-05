@@ -10,7 +10,17 @@ const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const axios = require("axios");
 const moment = require('moment');
+const { formatDateTimeDDMmmYYYYHHmmAMPM } = require('../../../../utility/date-time-utility');
 const { redactLogData } = require("../../../utility/redact");
+
+function formatUsbDeviceDates(devices) {
+  return (devices || []).map((device) => ({
+    ...device,
+    creation_date: device?.creation_date
+      ? formatDateTimeDDMmmYYYYHHmmAMPM(device.creation_date)
+      : device?.creation_date
+  }));
+}
 
 exports.usbCampaignViewReport = async (req, res) => {
   try {
@@ -33,9 +43,8 @@ exports.usbCampaignViewReport = async (req, res) => {
     logger.info(`Controller - USB Campaign View Report - Data fetched successfully`);
     logger.info(`Controller - USB Campaign View Report - ${JSON.stringify(redactLogData(campaigns), null, 2)}`);
 
-    // Format the start_datetime
-    if (campaigns && campaigns.start_datetime) {
-      campaigns.start_datetime = moment(campaigns.start_datetime).format('DD-MMM-YYYY hh:mm A');
+    if (campaigns?.start_datetime) {
+      campaigns.start_datetime = formatDateTimeDDMmmYYYYHHmmAMPM(campaigns.start_datetime);
     }
 
     const allUsbDevices = Array.isArray(campaigns.usb_devices) ? campaigns.usb_devices : [];
@@ -62,7 +71,7 @@ exports.usbCampaignViewReport = async (req, res) => {
     const currentPage = Math.min(requestedPage, totalPages);
     const startIdx = (currentPage - 1) * pageSize;
     const endIdx = Math.min(startIdx + pageSize, filteredDevicesCount);
-    const paginatedDevices = filteredUsbDevices.slice(startIdx, endIdx);
+    const paginatedDevices = formatUsbDeviceDates(filteredUsbDevices.slice(startIdx, endIdx));
 
     if (req.query.ajax === "1") {
       return res.json({

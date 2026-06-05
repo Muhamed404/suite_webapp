@@ -4,6 +4,7 @@ const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
+const { formatDateTimeDDMmmYYYYHHmmAMPM } = require('../../../../utility/date-time-utility');
 const { redactLogData } = require("../../../utility/redact");
 
 /**
@@ -34,6 +35,9 @@ exports.generateNFCDeviceReport = async (req, res) => {
     logger.info('[NFC Device Report Controller]: Response: ' + JSON.stringify(redactLogData(response.data), null, 2));
 
     const campaignDetails = response?.data?.message.campaignDetails || {};
+    if (campaignDetails?.start_datetime) {
+      campaignDetails.start_datetime = formatDateTimeDDMmmYYYYHHmmAMPM(campaignDetails.start_datetime);
+    }
     logger.info(`[NFC Device Report Controller]: Campaign Details: ${JSON.stringify(redactLogData(campaignDetails), null, 2)}`);
     const interactionStats = response?.data?.message.interactionStats || {};
     logger.info(`[NFC Device Report Controller]: Interaction Stats: ${JSON.stringify(redactLogData(interactionStats), null, 2)}`);
