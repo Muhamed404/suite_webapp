@@ -65,7 +65,10 @@ var barOptions = {
   }
 };
 
-new ApexCharts(document.querySelector("#barChart"), barOptions).render();
+var barChartEl = document.querySelector("#barChart");
+if (barChartEl) {
+  new ApexCharts(barChartEl, barOptions).render();
+}
 
 // Data
 const openLink = campMetricsData.openedLink || 0;
@@ -74,12 +77,18 @@ const attachmentDownloaded = campMetricsData.attachmentDownloaded || 0;
 const targetCompromised = campMetricsData.totalNFCDevices - campMetricsData.totalNotScans || 0;
 const totalNotScans = campMetricsData?.totalNotScans || 0
 
-// Update left labels dynamically
-document.getElementById('scanText').innerText = `${openLink} ${localizedLabels.people}`;
-document.getElementById('notScanText').innerText = `${totalNotScans} ${localizedLabels.people}`;
-document.getElementById('formInteractionText').innerText = `${formInteractions} ${localizedLabels.people}`;
-document.getElementById('targetCompromisedText').innerText = `${targetCompromised} ${localizedLabels.people}`;
-document.getElementById('attachmentDownloadedText').innerText = `${attachmentDownloaded} ${localizedLabels.people}`;
+function setText(id, value) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.innerText = value;
+  }
+}
+
+setText('scanText', `${openLink} ${localizedLabels.people}`);
+setText('notScanText', `${totalNotScans} ${localizedLabels.people}`);
+setText('formInteractionText', `${formInteractions} ${localizedLabels.people}`);
+setText('targetCompromisedText', `${targetCompromised} ${localizedLabels.people}`);
+setText('attachmentDownloadedText', `${attachmentDownloaded} ${localizedLabels.people}`);
 // ApexCharts Configuration
 var successOptions = {
   series: [openLink, formInteractions, attachmentDownloaded, targetCompromised,totalNotScans],
@@ -129,7 +138,10 @@ var successOptions = {
   }
 };
 
-new ApexCharts(document.querySelector("#successChart"), successOptions).render();
+var successChartEl = document.querySelector("#successChart");
+if (successChartEl) {
+  new ApexCharts(successChartEl, successOptions).render();
+}
 
 
 
@@ -180,7 +192,10 @@ var segmentsOptions = {
   }
 };
 
-new ApexCharts(document.querySelector("#segmentsChart"), segmentsOptions).render();
+var segmentsChartEl = document.querySelector("#segmentsChart");
+if (segmentsChartEl) {
+  new ApexCharts(segmentsChartEl, segmentsOptions).render();
+}
 
 
 // Reported To Admin
@@ -202,4 +217,7 @@ var reportOptions = {
   dataLabels: { enabled: false },
   tooltip: { enabled: true }
 };
-new ApexCharts(document.querySelector("#adminReportChart"), reportOptions).render();
+var adminReportChartEl = document.querySelector("#adminReportChart");
+if (adminReportChartEl) {
+  new ApexCharts(adminReportChartEl, reportOptions).render();
+}

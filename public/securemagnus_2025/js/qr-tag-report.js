@@ -94,7 +94,10 @@ if (qrTagReportDetails.length > 0) {
     }
   };
 
-  new ApexCharts(document.querySelector('#timelineChart'), timelineOptions).render();
+  const timelineChartEl = document.querySelector('#timelineChart');
+  if (timelineChartEl) {
+    new ApexCharts(timelineChartEl, timelineOptions).render();
+  }
 
   // ---- Per-IP interaction cards (top 4 by total scans) ----
   const cardsContainer = document.querySelector('#timelineCards');
@@ -311,9 +314,15 @@ const total = qrScanned + formInteracted + targetCompromised;
 
 // Update DOM elements with real data
 const timesText = window.i18n?.qr_report?.times || 'Times';
-document.getElementById('qrScanned').innerText = `${qrScanned} ${timesText}`;
-document.getElementById('formInteract').innerText = `${formInteracted} ${timesText}`;
-document.getElementById('targetCompromisedText').innerText = `${targetCompromised} ${timesText}`;
+function setText(id, value) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.innerText = value;
+  }
+}
+setText('qrScanned', `${qrScanned} ${timesText}`);
+setText('formInteract', `${formInteracted} ${timesText}`);
+setText('targetCompromisedText', `${targetCompromised} ${timesText}`);
 
 // Success Chart with real data
 var successOptions = {
@@ -367,7 +376,10 @@ var successOptions = {
   }
 };
 
-new ApexCharts(document.querySelector("#successChart"), successOptions).render();
+const successChartEl = document.querySelector("#successChart");
+if (successChartEl) {
+  new ApexCharts(successChartEl, successOptions).render();
+}
 
 // Employees Phishing Segments with real data
 var segmentsOptions = {
@@ -416,7 +428,10 @@ var segmentsOptions = {
   }
 };
 
-new ApexCharts(document.querySelector("#userPhishingSegmentsChart"), segmentsOptions).render();
+const segmentsChartEl = document.querySelector("#userPhishingSegmentsChart");
+if (segmentsChartEl) {
+  new ApexCharts(segmentsChartEl, segmentsOptions).render();
+}
 
 // Employee Response chart — NFC interaction breakdown
 const reportedToAdmin = interactionStats.reportedToAdmin || 0;
@@ -480,13 +495,24 @@ function createSemiDonut(selector, colors, total) {
     tooltip: { enabled: true }
   };
 
-  new ApexCharts(document.querySelector(selector), options).render();
+  const el = document.querySelector(selector);
+  if (el) {
+    new ApexCharts(el, options).render();
+  }
 }
 
-createSemiDonut("#linksChart", ['#ef4444', '#22c55e'], '50');
-createSemiDonut("#formChart", ['#fbbf24', '#22c55e'], '50');
-createSemiDonut("#submitChart", ['#a78bfa', '#22c55e'], '50');
-createSemiDonut("#attachChart", ['#3b82f6', '#22c55e'], '50');
+if (document.querySelector("#linksChart")) {
+  createSemiDonut("#linksChart", ['#ef4444', '#22c55e'], '50');
+}
+if (document.querySelector("#formChart")) {
+  createSemiDonut("#formChart", ['#fbbf24', '#22c55e'], '50');
+}
+if (document.querySelector("#submitChart")) {
+  createSemiDonut("#submitChart", ['#a78bfa', '#22c55e'], '50');
+}
+if (document.querySelector("#attachChart")) {
+  createSemiDonut("#attachChart", ['#3b82f6', '#22c55e'], '50');
+}
 
 
 

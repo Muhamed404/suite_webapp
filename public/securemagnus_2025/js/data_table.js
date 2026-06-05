@@ -74,21 +74,23 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   const filter = document.getElementById('filter');
-  filter.addEventListener('change', function () {
-    const value = this.value;
-    const normalizedValueMap = {
-      AWM: 'AwareMagnus',
-      Awaremagnus: 'AwareMagnus',
-      awaremagnus: 'AwareMagnus'
-    };
-    const normalizedValue = normalizedValueMap[value] || value;
+  if (filter) {
+    filter.addEventListener('change', function () {
+      const value = this.value;
+      const normalizedValueMap = {
+        AWM: 'AwareMagnus',
+        Awaremagnus: 'AwareMagnus',
+        awaremagnus: 'AwareMagnus'
+      };
+      const normalizedValue = normalizedValueMap[value] || value;
 
-    if (normalizedValue === '') {
-      dataTable.search(''); // Clear filter
-    } else {
-      dataTable.search(normalizedValue); // Search all columns
-    }
-  });
+      if (normalizedValue === '') {
+        dataTable.search(''); // Clear filter
+      } else {
+        dataTable.search(normalizedValue); // Search all columns
+      }
+    });
+  }
 });
 
 
@@ -3701,7 +3703,12 @@ document.addEventListener('DOMContentLoaded', function () {
                   perPage: "entries per page",
                   pageTitle: "Page {page}",
                   noRows: "No entries found",
-                  noResults: getLocalizedNoResultsLabel((window.translations && (window.translations.no_results_match_search || window.translations.noResults)) || (window.i18n ? window.i18n.__('generic_label.no_results_match_search') : '')),
+                  noResults: getLocalizedNoResultsLabel(
+                    (window.translations && (window.translations.no_results_match_search || window.translations.noResults)) ||
+                    (window.i18n && typeof window.i18n.__ === 'function'
+                      ? window.i18n.__('generic_label.no_results_match_search')
+                      : '')
+                  ),
                   info: "Showing {start} to {end} of {rows} entries",
                 },
                 template: (t, e) =>

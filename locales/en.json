@@ -26,6 +26,9 @@
 		"select_template": "Select Template",
 		"description": "Description",
 		"preview": "Preview",
+		"no_content_to_preview": "No content to preview.",
+		"body_preview_english": "Body Preview — English",
+		"body_preview_arabic": "Body Preview — Arabic",
 		"formInteraction": "Interaction",
 		"formSubmitted": "Submitted",
 		"attachmentOpened": "Attachment Opened",
@@ -1134,6 +1137,8 @@
 			"email_content": "Email Content",
 			"landing_page": "Redirect Page",
 			"redirect_page": "Phishing Page",
+			"preview_landing_page": "Landing Page",
+			"preview_redirect_page": "Redirect Page",
 			"attachment": "Attachment",
 			"external_landing_page_url": "External landing page URL:",
 			"open_preview": "Open Preview",
@@ -1604,6 +1609,7 @@
 		"notOpenedReported": "Not Opened & Reported",
 		"tagReport": "Tag Report",
 		"totalNotScans": "Total Not Scans",
+		"totalScans": "Total Scans",
 		"totalSubmitted": "Total Submitted",
 		"totalInteract": "Total Interact",
 		"nfcView": "NFC Scan",
@@ -2174,7 +2180,39 @@
 		"loginLabel": "Verification Code",
 		"loginPlaceholder": "Enter 6-digit code",
 		"loginBtn": "Verify & Continue",
-		"loginBack": "Back to Login"
+		"loginBack": "Back to Login",
+		"mail_log": {
+			"breadcrumb": "MFA Mail Log",
+			"title": "MFA Mail Log",
+			"subtitle": "Outbound MFA email dispatch history and delivery status.",
+			"filters": {
+				"all_statuses": "All Statuses",
+				"apply": "Apply",
+				"clear": "Clear"
+			},
+			"columns": {
+				"number": "#",
+				"recipient": "Recipient",
+				"subject": "Subject",
+				"status": "Status",
+				"queued_at": "Queued At"
+			},
+			"messages": {
+				"no_mails_found": "No MFA mails found."
+			},
+			"status": {
+				"pending": "PENDING",
+				"processing": "PROCESSING",
+				"sent": "SENT",
+				"rejected": "REJECTED",
+				"failed": "FAILED"
+			},
+			"pagination": {
+				"records": "records",
+				"prev": "← Prev",
+				"next": "Next →"
+			}
+		}
 	},
 	"notification_mail": {
 		"breadcrumb": "Notification Mail Log",

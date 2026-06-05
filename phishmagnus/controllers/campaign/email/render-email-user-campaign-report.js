@@ -6,6 +6,7 @@ const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
+const { formatDateTimeDDMmmYYYYHHmmAMPM } = require('../../../../utility/date-time-utility');
 
 /**
  * Controller to render the email campaign details view with statistics and user details.
@@ -35,6 +36,9 @@ exports.emailUserReport = async (req, res) => {
     logger.info('User Email Report: response ' + JSON.stringify(redactLogData(response.data), null, 2));
     
     const campaignDetails = response?.data?.message.campaign || {};
+    if (campaignDetails?.start_datetime) {
+      campaignDetails.start_datetime = formatDateTimeDDMmmYYYYHHmmAMPM(campaignDetails.start_datetime);
+    }
     const sentUnSentStats = response?.data?.message.sentUnSentStats || {};
     const campaignInteractionStats = response?.data?.message.interactionStatsByCampaign || {};
     const userProfile = response?.data?.message.userProfile || {};
@@ -74,65 +78,44 @@ exports.emailUserReport = async (req, res) => {
 // Add this function to your emailUserReport.js controller
 function transformInteractionStats(campaignInteractionStats, sentUnSentStats) {
   const interactions = [];
-  
-  // Email Sent - use creation date or a default sent time
+
+  const pushInteraction = (name, rawTime) => {
+    if (!rawTime) return;
+    interactions.push({
+      name,
+      time: rawTime,
+      displayTime: formatDateTimeDDMmmYYYYHHmmAMPM(rawTime)
+    });
+  };
+
   if (sentUnSentStats?.sentCount > 0) {
-    interactions.push({
-      name: "Email Sent",
-      time: sentUnSentStats.sentDate || new Date().toISOString() // Use actual sent date if available
-    });
+    pushInteraction('Email Sent', sentUnSentStats.sentDate || null);
   }
-  
-  // Email Open
-  if (campaignInteractionStats.is_phish_msg_opened > 0 && campaignInteractionStats.msg_opened_date) {
-    interactions.push({
-      name: "Email Open",
-      time: campaignInteractionStats.msg_opened_date
-    });
+
+  if (campaignInteractionStats.is_phish_msg_opened > 0) {
+    pushInteraction('Email Open', campaignInteractionStats.msg_opened_date);
   }
-  
-  // Clicked Link
-  if (campaignInteractionStats.is_phish_msg_link_opened > 0 && campaignInteractionStats.msg_link_opened_date) {
-    interactions.push({
-      name: "Clicked Link",
-      time: campaignInteractionStats.msg_link_opened_date
-    });
+
+  if (campaignInteractionStats.is_phish_msg_link_opened > 0) {
+    pushInteraction('Clicked Link', campaignInteractionStats.msg_link_opened_date);
   }
-  
-  // Interact Form (data entered in form)
-  if (campaignInteractionStats.is_phish_msg_data_entered_in_form > 0 && campaignInteractionStats.msg_data_entered_date) {
-    interactions.push({
-      name: "Interact Form",
-      time: campaignInteractionStats.msg_data_entered_date
-    });
+
+  if (campaignInteractionStats.is_phish_msg_data_entered_in_form > 0) {
+    pushInteraction('Interact Form', campaignInteractionStats.msg_data_entered_date);
   }
-  
-  // Form Submit
-  if (campaignInteractionStats.is_phish_msg_data_entered_submited_in_form > 0 && campaignInteractionStats.msg_data_submitted_date) {
-    interactions.push({
-      name: "Form Submit",
-      time: campaignInteractionStats.msg_data_submitted_date
-    });
+
+  if (campaignInteractionStats.is_phish_msg_data_entered_submited_in_form > 0) {
+    pushInteraction('Form Submit', campaignInteractionStats.msg_data_submitted_date);
   }
-  
-  // Attachment Open/Download
-  if (campaignInteractionStats.is_phish_msg_file_downloaded > 0 && campaignInteractionStats.msg_file_downloaded_date) {
-    interactions.push({
-      name: "Attachment Open",
-      time: campaignInteractionStats.msg_file_downloaded_date
-    });
+
+  if (campaignInteractionStats.is_phish_msg_file_downloaded > 0) {
+    pushInteraction('Attachment Open', campaignInteractionStats.msg_file_downloaded_date);
   }
-   
-  
-  // Reported to Admin
-  if (campaignInteractionStats.is_phish_msg_reported_to_admin > 0 && campaignInteractionStats.msg_reported_to_admin_date) {
-    interactions.push({
-      name: "Reported Admin",
-      time: campaignInteractionStats.msg_reported_to_admin_date
-    });
+
+  if (campaignInteractionStats.is_phish_msg_reported_to_admin > 0) {
+    pushInteraction('Reported Admin', campaignInteractionStats.msg_reported_to_admin_date);
   }
-  
-  // Sort by time (earliest first), null times go to end
+
   return interactions.sort((a, b) => {
     if (!a.time && !b.time) return 0;
     if (!a.time) return 1;

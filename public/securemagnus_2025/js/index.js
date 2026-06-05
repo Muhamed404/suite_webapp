@@ -43,9 +43,13 @@ document.querySelectorAll('tbody tr').forEach(row => {
   }
 });
 
-document.querySelector('button').addEventListener('click', () => {
-  document.querySelector('input[type="date"]').focus();
-});
+const dateButton = document.querySelector('button');
+const dateInput = document.querySelector('input[type="date"]');
+if (dateButton && dateInput) {
+  dateButton.addEventListener('click', () => {
+    dateInput.focus();
+  });
+}
 
 
 
@@ -183,15 +187,22 @@ function showCustomConfirm(message, onConfirm, onCancel, confirmText = 'Confirm'
     setTimeout(() => backdrop.remove(), 200);
   }
 
-  backdrop.querySelector('#_confirmModalCancel').addEventListener('click', function () {
-    close();
-    if (typeof onCancel === 'function') onCancel();
-  });
+  const cancelBtn = backdrop.querySelector('#_confirmModalCancel');
+  const confirmBtn = backdrop.querySelector('#_confirmModalConfirm');
+  
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function () {
+      close();
+      if (typeof onCancel === 'function') onCancel();
+    });
+  }
 
-  backdrop.querySelector('#_confirmModalConfirm').addEventListener('click', function () {
-    close();
-    onConfirm();
-  });
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function () {
+      close();
+      onConfirm();
+    });
+  }
 
   // Click outside modal to cancel
   backdrop.addEventListener('click', function (e) {
@@ -347,16 +358,20 @@ document.addEventListener('DOMContentLoaded', () => {
           btn.classList.add('text-gray-600', 'hover:text-black');
 
           const span = btn.querySelector('.number');
-          span.classList.remove('bg-gray-700', 'text-white');
-          span.classList.add('bg-green-500/15', 'text-green-500');
+          if (span) {
+            span.classList.remove('bg-gray-700', 'text-white');
+            span.classList.add('bg-green-500/15', 'text-green-500');
+          }
         });
 
         button.classList.add('bg-gray-900', 'text-white');
         button.classList.remove('text-gray-600', 'hover:text-black');
 
         const span = button.querySelector('.number');
-        span.classList.remove('bg-green-500/15', 'text-green-500');
-        span.classList.add('bg-gray-700', 'text-white');
+        if (span) {
+          span.classList.remove('bg-green-500/15', 'text-green-500');
+          span.classList.add('bg-gray-700', 'text-white');
+        }
       });
     });
 
@@ -599,16 +614,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeBtn = document.getElementById("closeModalBtn");
   const closeBottomBtn = document.getElementById("closeBottomBtn");
 
-  // Open Modal
-  openBtn.addEventListener("click", () => {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  });
+  // Only attach event listeners if elements exist
+  if (modal && openBtn && closeBtn && closeBottomBtn) {
+    // Open Modal
+    openBtn.addEventListener("click", () => {
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    });
 
-  // Close Modal (top button & bottom button)
-  [closeBtn, closeBottomBtn].forEach(btn =>
-    btn.addEventListener("click", () => {
-      modal.classList.remove("flex");
-      modal.classList.add("hidden");
-    })
-  );
+    // Close Modal (top button & bottom button)
+    [closeBtn, closeBottomBtn].forEach(btn =>
+      btn.addEventListener("click", () => {
+        modal.classList.remove("flex");
+        modal.classList.add("hidden");
+      })
+    );
+
+    // Close on clicking overlay
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    });
+  }

@@ -60,7 +60,14 @@ exports.postLogin = async (req, res) => {
     try {
         let userTimezone = req.body.userTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-        const { data } = await apiClient.post(loginUrl, { email, password, userTimezone });
+        const { data } = await apiClient.post(loginUrl, 
+            { email, password, userTimezone },
+            {
+                headers: {
+                    'X-Product-Key': 'phm'
+                }
+            }
+        );
         // logger.info(`[PSuite Login Controller]: POST: Received login response: ${JSON.stringify(data, null, 2)}`);
         const userToken = data?.object?.userToken || null;
         const mfaRequired = data?.object?.mfaRequired || false;

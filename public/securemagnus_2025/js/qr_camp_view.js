@@ -63,7 +63,10 @@ var barOptions = {
   }
 };
 
-new ApexCharts(document.querySelector("#barChart"), barOptions).render();
+var barChartEl = document.querySelector("#barChart");
+if (barChartEl) {
+  new ApexCharts(barChartEl, barOptions).render();
+}
 
 // Success chart
 const total = campMetricsData.totalQRImages || 1;
@@ -133,7 +136,10 @@ var successOptions = {
   }
 };
 
-new ApexCharts(document.querySelector("#successChart"), successOptions).render();
+var successChartEl = document.querySelector("#successChart");
+if (successChartEl) {
+  new ApexCharts(successChartEl, successOptions).render();
+}
 
 
 
@@ -182,5 +188,8 @@ var segmentsOptions = {
   }
 };
 
-new ApexCharts(document.querySelector("#segmentsChart"), segmentsOptions).render();
+var segmentsChartEl = document.querySelector("#segmentsChart");
+if (segmentsChartEl) {
+  new ApexCharts(segmentsChartEl, segmentsOptions).render();
+}
 

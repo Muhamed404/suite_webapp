@@ -1,25 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import clsx from "clsx";
 
+import { PdfOrImageContentViewer } from "@/components/content-viewer/pdf-or-image-content-viewer";
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { AuthImage } from "@/components/ui/auth-image";
-
-/** react-pdf/pdfjs uses DOMMatrix — must not load on the Node server bundle. */
-const PdfViewer = dynamic(
-  () => import("@/components/document-viewer/pdf-viewer").then((m) => ({ default: m.PdfViewer })),
-  { ssr: false }
-);
 import { VideoPlayerWithFallback } from "@/components/modules/training-library/content-detail-screens/video-player-with-fallback";
 import { useContent } from "@/hooks/useQuiz";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
+import { resolveAwmContentUrl } from "@/utils/contentMediaType";
 import { canAccessAwarenessAssets } from "@/utils/roles";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import {
@@ -29,17 +23,8 @@ import {
   isVideoContentType,
 } from "@/components/modules/training-library/content-detail-screens";
 
-function resolveAssetUrl(raw?: string | null) {
-  if (!raw?.trim()) return null;
-  if (raw.startsWith("http")) return raw;
-  if (raw.startsWith("/contents/")) return `/awm${raw}`;
-  return `/awm/contents/${raw.startsWith("/") ? raw.slice(1) : raw}`;
-}
-
-function isImageAsset(url: string) {
-  const clean = url.split("?")[0].toLowerCase();
-  return [".png", ".jpg", ".jpeg", ".webp", ".gif", ".svg"].some((ext) => clean.endsWith(ext));
-}
+const BROCHURE_PDF_FALLBACK = getContentAssetUrl("/brochure.pdf");
+const POSTER_IMAGE_FALLBACK = getContentAssetUrl("/posters.png");
 
 export default function AwarenessAssetDetailPage() {
   const params = useParams();
@@ -66,17 +51,18 @@ export default function AwarenessAssetDetailPage() {
 
   if (user && !canAccessAssets) return null;
 
-  const sourceUrl = resolveAssetUrl(content?.source_url ?? content?.source_path);
-  const logoUrl = content?.logo_url ?? content?.logo_path;
-  const previewUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
+  const rawSourceUrl = content?.source_url ?? content?.source_path ?? null;
+  const sourceUrl = resolveAwmContentUrl(rawSourceUrl);
   const contentTypeId = content?.content_type_id;
   const title = content?.title ?? content?.name ?? tAwarenessAssets("fallback.asset", { id: contentId });
 
   const isVideo = isVideoContentType(contentTypeId, content?.content_type);
-  const isDocument = isBrochureDocumentContentType(contentTypeId);
+  const isBrochureOrPoster =
+    isBrochureDocumentContentType(contentTypeId) || isPosterContentType(contentTypeId);
   const isInteractive = isInteractiveContentType(contentTypeId);
-  const isPoster = isPosterContentType(contentTypeId);
-  const shouldRenderImage = isPoster || (!!sourceUrl && isImageAsset(sourceUrl));
+  const pdfOrImageFallback = isPosterContentType(contentTypeId)
+    ? POSTER_IMAGE_FALLBACK
+    : BROCHURE_PDF_FALLBACK;
 
   return (
     <ProtectedRoute>
@@ -132,16 +118,15 @@ export default function AwarenessAssetDetailPage() {
                   <VideoPlayerWithFallback url={sourceUrl} />
                 </div>
               </div>
-            ) : isDocument ? (
-              <PdfViewer className="min-h-[70vh]" resolveUrl={false} src={sourceUrl} />
-            ) : shouldRenderImage ? (
-              <div className="relative overflow-hidden rounded-lg border border-[var(--strokeGray)] bg-white min-h-[70vh]">
-                <AuthImage
-                  fill
+            ) : isBrochureOrPoster ? (
+              <div className="overflow-hidden rounded-lg border border-[var(--strokeGray)] bg-white">
+                <PdfOrImageContentViewer
                   alt={title}
-                  className="object-contain"
-                  sizes="100vw"
-                  src={sourceUrl ?? previewUrl ?? ""}
+                  imageFallbackSrc={pdfOrImageFallback}
+                  imageViewportHeight={560}
+                  minHeight="70vh"
+                  pdfFallbackSrc={pdfOrImageFallback}
+                  rawSourceUrl={rawSourceUrl}
                 />
               </div>
             ) : (

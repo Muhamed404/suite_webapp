@@ -4,7 +4,6 @@ import type { Module, ModuleContent } from "@/types/quiz";
 import type { LibraryType } from "../library-page";
 
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import clsx from "clsx";
 
@@ -15,31 +14,16 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useModule, useContent, useContentsByModule } from "@/hooks/useQuiz";
-import { CONTENT_TYPES } from "@/constants/content-types";
 import { useAuthStore } from "@/hooks/useAuthStore";
+import { CONTENT_TYPES } from "@/constants/content-types";
+import { PdfOrImageContentViewer } from "@/components/content-viewer/pdf-or-image-content-viewer";
 import { AuthImage } from "@/components/ui/auth-image";
 import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { getContentTypeIconFor } from "@/utils/contentTypeIcons";
-
-const PdfViewer = dynamic(
-  () => import("@/components/document-viewer/pdf-viewer").then((m) => ({ default: m.PdfViewer })),
-  { ssr: false }
-);
+import { getContentMediaKind, resolveAwmContentUrl } from "@/utils/contentMediaType";
 
 /** Demo fallback when brochure/document URL fails or is missing (file in public folder). */
 const BROCHURE_DOCUMENT_FALLBACK_PDF = getContentAssetUrl("/brochure.pdf");
-const IMAGE_EXTENSIONS = new Set(["jpg", "jpeg", "png", "gif", "webp", "svg"]);
-const DOC_EXTENSIONS = new Set(["doc", "docx"]);
-
-function extractFileExtension(url: string | null | undefined): string | null {
-  if (!url?.trim()) return null;
-  const cleanUrl = url.trim().split("?")[0].split("#")[0];
-  const lastDot = cleanUrl.lastIndexOf(".");
-
-  if (lastDot < 0 || lastDot === cleanUrl.length - 1) return null;
-
-  return cleanUrl.slice(lastDot + 1).toLowerCase();
-}
 
 function moduleName(m: Module): string {
   return m.title ?? m.translations?.[0]?.name ?? m.code ?? `Module ${m.id}`;
@@ -144,21 +128,12 @@ export function BrochureDocumentContentDetailScreen({
     ? (content.source_url ?? (content as { source_path?: string }).source_path?.trim())
     : null;
 
-  // Use local same-origin proxy for documents
-  const fullDocUrl = docSourceUrl
-    ? docSourceUrl.startsWith("http")
-      ? docSourceUrl
-      : docSourceUrl.startsWith("/contents/")
-        ? `/awm${docSourceUrl}`
-        : `/awm/contents/${docSourceUrl.startsWith("/") ? docSourceUrl.slice(1) : docSourceUrl}`
-    : null;
+  const fullDocUrl = resolveAwmContentUrl(docSourceUrl);
 
   const logoUrl = content?.logo_url || (content as any)?.logo_path;
   const completeImageUrl = logoUrl ? getContentAssetUrl(logoUrl) : null;
-  const fileExtension = extractFileExtension(docSourceUrl ?? fullDocUrl);
-  const isPdfFile = fileExtension == null || fileExtension === "pdf";
-  const isImageFile = fileExtension != null && IMAGE_EXTENSIONS.has(fileExtension);
-  const isDocFile = fileExtension != null && DOC_EXTENSIONS.has(fileExtension);
+  const mediaKind = getContentMediaKind(docSourceUrl);
+  const isDocFile = mediaKind === "doc";
   const officePreviewSourceUrl =
     isDocFile && fullDocUrl
       ? fullDocUrl.startsWith("http")
@@ -325,29 +300,6 @@ export function BrochureDocumentContentDetailScreen({
                         <div className="w-full h-[500px] flex items-center justify-center bg-gray-100">
                           <div className="animate-pulse w-full h-full bg-gray-200" />
                         </div>
-                      ) : (content || docSourceUrl) && isPdfFile ? (
-                        <PdfViewer
-                          authToken={token}
-                          className="w-full"
-                          fallbackSrc={BROCHURE_DOCUMENT_FALLBACK_PDF}
-                          resolveUrl={docSourceUrl ? !docSourceUrl.startsWith("http") : true}
-                          src={docSourceUrl ?? undefined}
-                        />
-                      ) : (content || docSourceUrl) && isImageFile && fullDocUrl ? (
-                        <div className="relative w-full h-[800px] bg-gray-50">
-                          <AuthImage
-                            fill
-                            alt={content ? contentTitle(content) : "Brochure image"}
-                            className="object-contain"
-                            loadingContent={
-                              <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                                <div className="animate-pulse w-full h-full bg-gray-200" />
-                              </div>
-                            }
-                            sizes="100vw"
-                            src={fullDocUrl}
-                          />
-                        </div>
                       ) : (content || docSourceUrl) && isDocFile && officeViewerEmbedUrl ? (
                         <iframe
                           className="w-full h-[800px] border-0 bg-gray-50"
@@ -355,21 +307,14 @@ export function BrochureDocumentContentDetailScreen({
                           title={content ? contentTitle(content) : "Document preview"}
                         />
                       ) : content || docSourceUrl ? (
-                        <div className="w-full h-[500px] flex flex-col items-center justify-center gap-3 text-gray-600 text-sm bg-gray-50 px-4">
-                          <p>Preview is not available for this file type.</p>
-                          {fullDocUrl ? (
-                            <a
-                              download
-                              className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-xs font-medium transition"
-                              href={fullDocUrl}
-                              rel="noopener noreferrer"
-                              target="_blank"
-                            >
-                              {t(downloadLabelKey) ??
-                                (isBrochure ? "Download Brochure" : "Download Document")}
-                            </a>
-                          ) : null}
-                        </div>
+                        <PdfOrImageContentViewer
+                          alt={content ? contentTitle(content) : "Brochure image"}
+                          authToken={token}
+                          imageViewportHeight={640}
+                          minHeight={800}
+                          pdfFallbackSrc={BROCHURE_DOCUMENT_FALLBACK_PDF}
+                          rawSourceUrl={docSourceUrl}
+                        />
                       ) : (
                         <div className="w-full h-64 flex items-center justify-center text-gray-500 text-sm bg-gray-50">
                           Content not found

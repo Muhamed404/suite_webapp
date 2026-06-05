@@ -25,6 +25,9 @@
 		"select_template": "اختر القالب",
 		"description": "الوصف",
 		"preview": "معاينة",
+		"no_content_to_preview": "لا يوجد محتوى للمعاينة.",
+		"body_preview_english": "معاينة المحتوى — الإنجليزية",
+		"body_preview_arabic": "معاينة المحتوى — العربية",
 		"formInteraction": "تتبع تفاعل المستخدم مع نموذج التصيد الاحتيالي",
 		"formSubmitted": "تتبع البيانات المرسلة من خلال نموذج التصيد الاحتيالي",
 		"attachmentOpened": "تتبع تحميل ملف التصيد الاحتيالي (من البريد الإلكتروني أو صفحة الهبوط)",
@@ -1128,6 +1131,8 @@
 			"email_content": "محتوى البريد الإلكتروني",
 			"landing_page": "صفحة الهبوط",
 			"redirect_page": "صفحة إعادة التوجيه",
+			"preview_landing_page": "صفحة الهبوط",
+			"preview_redirect_page": "صفحة إعادة التوجيه",
 			"attachment": "المرفق",
 			"external_landing_page_url": "رابط صفحة هبوط خارجية:",
 			"open_preview": "فتح المعاينة",
@@ -2124,6 +2129,7 @@
 		"notOpenedReported": "غير مفتوح ومصرّح",
 		"tagReport": "تقرير العلامة",
 		"totalNotScans": "إجمالي غير الممسوح",
+		"totalScans": "إجمالي الممسوح",
 		"totalSubmitted": "إجمالي المقدم",
 		"totalInteract": "إجمالي التفاعل",
 		"qrView": "عرض QR",
@@ -2476,7 +2482,39 @@
 		"loginLabel": "رمز التحقق",
 		"loginPlaceholder": "أدخل الرمز المكون من 6 أرقام",
 		"loginBtn": "تحقق والمتابعة",
-		"loginBack": "العودة إلى تسجيل الدخول"
+		"loginBack": "العودة إلى تسجيل الدخول",
+		"mail_log": {
+			"breadcrumb": "سجل بريد MFA",
+			"title": "سجل بريد MFA",
+			"subtitle": "تاريخ إرسال البريد الإلكتروني الصادر للمصادقة متعددة العوامل (MFA) وحالة التسليم.",
+			"filters": {
+				"all_statuses": "جميع الحالات",
+				"apply": "تطبيق",
+				"clear": "مسح"
+			},
+			"columns": {
+				"number": "#",
+				"recipient": "المستلم",
+				"subject": "الموضوع",
+				"status": "الحالة",
+				"queued_at": "تم وضعه في الانتظار في"
+			},
+			"messages": {
+				"no_mails_found": "لم يتم العثور على رسائل بريد MFA."
+			},
+			"status": {
+				"pending": "قيد الانتظار",
+				"processing": "جارٍ المعالجة",
+				"sent": "تم الإرسال",
+				"rejected": "مرفوض",
+				"failed": "فشل"
+			},
+			"pagination": {
+				"records": "سجلات",
+				"prev": "→ السابق",
+				"next": "التالي ←"
+			}
+		}
 	},
 	"user_not_found": "user_not_found",
 	"notification_mail": {
