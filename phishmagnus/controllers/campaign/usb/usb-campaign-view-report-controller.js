@@ -9,18 +9,7 @@ const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const axios = require("axios");
-const moment = require('moment');
-const { formatDateTimeDDMmmYYYYHHmmAMPM } = require('../../../../utility/date-time-utility');
 const { redactLogData } = require("../../../utility/redact");
-
-function formatUsbDeviceDates(devices) {
-  return (devices || []).map((device) => ({
-    ...device,
-    creation_date: device?.creation_date
-      ? formatDateTimeDDMmmYYYYHHmmAMPM(device.creation_date)
-      : device?.creation_date
-  }));
-}
 
 exports.usbCampaignViewReport = async (req, res) => {
   try {
@@ -53,7 +42,7 @@ exports.usbCampaignViewReport = async (req, res) => {
           const usbCode = (device?.usb_code || "").toString().toLowerCase();
           const description = (device?.description || "").toString().toLowerCase();
           const creationDate = device?.creation_date
-            ? moment(device.creation_date).format("DD-MMM-YYYY hh:mm A").toLowerCase()
+            ? String(device.creation_date).toLowerCase()
             : "";
 
           return (
@@ -69,7 +58,7 @@ exports.usbCampaignViewReport = async (req, res) => {
     const currentPage = Math.min(requestedPage, totalPages);
     const startIdx = (currentPage - 1) * pageSize;
     const endIdx = Math.min(startIdx + pageSize, filteredDevicesCount);
-    const paginatedDevices = formatUsbDeviceDates(filteredUsbDevices.slice(startIdx, endIdx));
+    const paginatedDevices = filteredUsbDevices.slice(startIdx, endIdx);
 
     if (req.query.ajax === "1") {
       return res.json({
