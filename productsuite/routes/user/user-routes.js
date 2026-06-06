@@ -13,6 +13,8 @@ const { renderLicensedUserByProduct } = require("../../controllers/user_manageme
 const { renderSecureMagnusUsers } = require("../../controllers/user_management/render-secure-magnus-users-controller");
 const { createSecureMagnusUser, submitSecureMagnusUser } = require("../../controllers/user_management/create-securemagnus-user");
 const { sendBulkUserInvite } = require("../../controllers/user_management/send-bulk-user-invite");
+const { importLdapUsers } = require("../../controllers/user_management/ldap-import-users");
+const { renderLdapImportModule } = require("../../controllers/user_management/render-ldap-import-module");
 
 
 
@@ -24,6 +26,12 @@ router.get("/licensed-users/:productId",
 
 // adding with new design page. this is not functional yet
 router.get("/create/bulk", async (req, res) => { userManagement.renderBulkUserModule(req, res); });
+
+router.get(
+  "/ldap/import/:organizationId?",
+  checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O, enums.Access_Types.RWD_ALL]),
+  renderLdapImportModule
+);
 
 router.post("/create/bulk", checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O]),
   async (req, res) => { userManagement.uploadBulkUsers(req, res); });
@@ -89,6 +97,12 @@ router.post(
   "/invite/bulk/send",
   checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O, enums.Access_Types.RWD_ALL]),
   sendBulkUserInvite
+);
+
+router.post(
+  "/ldap/import/:organizationId?",
+  checkPermission(enums.ModuleNames.User_Management, [enums.Access_Types.RWD_O, enums.Access_Types.RWD_ALL]),
+  importLdapUsers
 );
 
 router.get(
