@@ -64,6 +64,7 @@ module.exports = {
             BULK_IMPORT_LIST: (organizationId) => `/user/bulk-import/list/${organizationId}`,
             BULK_IMPORT_STATUS: (organizationId, jobId) =>
               `/user/bulk-import/${organizationId}/${jobId}`,
+            LDAP_IMPORT: (organizationId) => `/user/ldap/import/${organizationId}`,
             RETRIEVE_USER_BY_ID: (userId) => `/user/show/${userId}`,
             SAVE_EDIT_USER: (userId) => `/user/update/${userId}`,
             LICENSED_USERS_BY_PRODUCT: (productId) => `/user/licensed-users/${productId}`,
@@ -98,6 +99,11 @@ module.exports = {
         SMS: {
             CREATE: (organizationId) => `/sms/settings/create/${organizationId}`,
             UPDATE: (organizationId) => `/sms/settings/${organizationId}`,
+        },
+        LDAP: {
+            CONFIG: (organizationId) => `/org/${organizationId}/ldap/config`,
+            SYNC: (organizationId) => `/org/${organizationId}/ldap/sync`,
+            STATUS: (organizationId) => `/org/${organizationId}/ldap/status`,
         },
         Notification_Template: {
             LIST_BY_ORGANIZATION: (organizationId) => `/notification_template/${organizationId}/organization`,

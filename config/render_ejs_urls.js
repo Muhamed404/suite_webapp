@@ -118,7 +118,8 @@ module.exports = {
             CREATE_USER: 'pages/user_management/create-user', // This is new temporary file for new design
             CREATE_SECUREMAGNUS_USER: 'pages/user_management/create-securemagnus-user',
             EDIT_USER: 'pages/user_management/edit-user',
-            LICENSED_USERS: 'pages/user_management/licensed-users'
+            LICENSED_USERS: 'pages/user_management/licensed-users',
+            LDAP_IMPORT: 'pages/user_management/ldap-import'
 
         },
         Organization:

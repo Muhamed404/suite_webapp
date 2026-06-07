@@ -9,7 +9,6 @@ const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const axios = require("axios");
-const moment = require('moment');
 const { redactLogData } = require("../../../utility/redact");
 
 exports.usbCampaignViewReport = async (req, res) => {
@@ -33,10 +32,7 @@ exports.usbCampaignViewReport = async (req, res) => {
     logger.info(`Controller - USB Campaign View Report - Data fetched successfully`);
     logger.info(`Controller - USB Campaign View Report - ${JSON.stringify(redactLogData(campaigns), null, 2)}`);
 
-    // Format the start_datetime
-    if (campaigns && campaigns.start_datetime) {
-      campaigns.start_datetime = moment(campaigns.start_datetime).format('DD-MMM-YYYY hh:mm A');
-    }
+    // start_datetime formatted in user timezone by service_suite (generate-usb-campaign-report)
 
     const allUsbDevices = Array.isArray(campaigns.usb_devices) ? campaigns.usb_devices : [];
     const totalDevices = allUsbDevices.length;
@@ -46,7 +42,7 @@ exports.usbCampaignViewReport = async (req, res) => {
           const usbCode = (device?.usb_code || "").toString().toLowerCase();
           const description = (device?.description || "").toString().toLowerCase();
           const creationDate = device?.creation_date
-            ? moment(device.creation_date).format("DD-MMM-YYYY hh:mm A").toLowerCase()
+            ? String(device.creation_date).toLowerCase()
             : "";
 
           return (

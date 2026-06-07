@@ -185,7 +185,7 @@
                                         <%= device.description %>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-gray-800">
-                                        <%= device.creation_date ? new Date(device.creation_date).toLocaleString() : 'N/A' %>
+                                        <%= device.creation_date || 'N/A' %>
                                     </td>
                                      
                                     <td class="px-6 py-4 whitespace-nowrap text-gray-800">
@@ -421,9 +421,7 @@ window.i18n = {
 
         function formatDate(value) {
             if (!value) return naText;
-            var d = new Date(value);
-            if (isNaN(d.getTime())) return naText;
-            return d.toLocaleString(locale);
+            return String(value);
         }
 
         function buildRow(device, idx, startIdx) {
