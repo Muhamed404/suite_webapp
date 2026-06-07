@@ -11,6 +11,7 @@ import { Search, Send } from "lucide-react";
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useInvitations, useSendBatchReminders, useSendBatchUserReminder } from "@/hooks/useInvitation";
+import { useTranslations } from "@/i18n/useTranslations";
 
 const ROWS_PER_PAGE = 10;
 
@@ -30,6 +31,7 @@ function formatDate(dateStr?: string | null) {
 }
 
 export function InvitationLogPage() {
+  const t = useTranslations("dashboard");
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
 
@@ -65,63 +67,78 @@ export function InvitationLogPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className="space-y-4 rounded-2xl border border-default-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-wrap items-center gap-3">
-            <Input
-              className="max-w-sm"
-              placeholder="Search email or name"
-              startContent={<Search className="h-4 w-4 text-default-400" />}
-              value={search}
-              onValueChange={setSearch}
-            />
-            <Button variant="flat" onPress={() => refetch()}>
-              Refresh
-            </Button>
-          </div>
+        <div className="flex flex-col gap-4 p-3">
+          <h1 className="text-lg font-bold text-[var(--mainblue)] md:text-xl">
+            {t("menu.invitationLog")}
+          </h1>
 
-          {isLoading ? (
-            <div className="flex justify-center py-16">
-              <Spinner />
+          <div className="space-y-6 rounded-xl border border-[var(--strokeGray)] bg-white p-6 shadow-sm">
+            <div className="flex flex-wrap items-center gap-3">
+              <Input
+                className="max-w-sm"
+                placeholder="Search email or name"
+                startContent={<Search className="h-4 w-4 text-default-400" />}
+                value={search}
+                onValueChange={setSearch}
+              />
+              <Button variant="flat" onPress={() => refetch()}>
+                Refresh
+              </Button>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
-                <thead>
-                  <tr className="border-b text-left text-default-500">
-                    <th className="py-2 pr-4">Created</th>
-                    <th className="py-2 pr-4">Email</th>
-                    <th className="py-2 pr-4">Department / Group</th>
-                    <th className="py-2 pr-4">Status</th>
-                    <th className="py-2 pr-4">Last sent</th>
-                    <th className="py-2">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.map((row: any) => (
-                    <tr key={row.id} className="border-b border-default-100">
-                      <td className="py-3 pr-4">{formatDate(row.createdAt)}</td>
-                      <td className="py-3 pr-4">{row.invitee?.email ?? "—"}</td>
-                      <td className="py-3 pr-4">
-                        {row.invitee?.department_name || row.invitee?.group_name || "—"}
-                      </td>
-                      <td className="py-3 pr-4">{row.status?.name ?? "—"}</td>
-                      <td className="py-3 pr-4">{formatDate(row.invitation_time)}</td>
-                      <td className="py-3">
-                        <Button size="sm" variant="flat" startContent={<Send className="h-3 w-3" />} onPress={() => handleResend(row)}>
-                          Resend
-                        </Button>
-                      </td>
+
+            {isLoading ? (
+              <div className="flex justify-center py-16">
+                <Spinner />
+              </div>
+            ) : (
+              <div className="overflow-x-auto -mx-2 px-2">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-default-200 text-left text-default-500">
+                      <th className="px-4 py-3 font-semibold">Created</th>
+                      <th className="px-4 py-3 font-semibold">Email</th>
+                      <th className="px-4 py-3 font-semibold">Department / Group</th>
+                      <th className="px-4 py-3 font-semibold">Status</th>
+                      <th className="px-4 py-3 font-semibold">Last sent</th>
+                      <th className="px-4 py-3 font-semibold">Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              {!filtered.length && <p className="py-8 text-center text-default-500">No invitations yet.</p>}
-            </div>
-          )}
+                  </thead>
+                  <tbody>
+                    {filtered.map((row: any) => (
+                      <tr key={row.id} className="border-b border-default-100">
+                        <td className="px-4 py-3 whitespace-nowrap">{formatDate(row.createdAt)}</td>
+                        <td className="px-4 py-3">{row.invitee?.email ?? "—"}</td>
+                        <td className="px-4 py-3">
+                          {row.invitee?.department_name || row.invitee?.group_name || "—"}
+                        </td>
+                        <td className="px-4 py-3">{row.status?.name ?? "—"}</td>
+                        <td className="px-4 py-3 whitespace-nowrap">{formatDate(row.invitation_time)}</td>
+                        <td className="px-4 py-3">
+                          <Button
+                            size="sm"
+                            variant="flat"
+                            startContent={<Send className="h-3 w-3" />}
+                            onPress={() => handleResend(row)}
+                          >
+                            Resend
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {!filtered.length && (
+                  <p className="py-10 text-center text-default-500">No invitations yet.</p>
+                )}
+              </div>
+            )}
 
-          {(data?.total_pages ?? 0) > 1 && (
-            <Pagination page={page} total={data?.total_pages ?? 1} onChange={setPage} />
-          )}
+            {(data?.total_pages ?? 0) > 1 && (
+              <div className="flex justify-center pt-2">
+                <Pagination page={page} total={data?.total_pages ?? 1} onChange={setPage} />
+              </div>
+            )}
+          </div>
         </div>
       </DashboardLayout>
     </ProtectedRoute>
