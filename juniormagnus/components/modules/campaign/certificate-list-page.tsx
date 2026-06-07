@@ -1,0 +1,983 @@
+"use client";
+
+import type { Certificate } from "@/types/campaign";
+
+import { useState, useEffect, useRef } from "react";
+import { Search } from "lucide-react";
+
+import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { useTranslations } from "@/i18n/useTranslations";
+import { useI18n } from "@/i18n/I18nProvider";
+import { useUserCertificates } from "@/hooks/useCampaign";
+import { campaignService } from "@/services/campaignService";
+import { certificateService } from "@/services/certificateService";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { decodeJwt, extractUserDisplayName } from "@/utils/jwt";
+import { getCertificateAssetUrl } from "@/utils/contentAssetUrl";
+import { generateCertificateHtml } from "@/utils/certificateHtmlGenerator";
+
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return "—";
+  try {
+    return new Date(dateStr).toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  } catch {
+    return "—";
+  }
+}
+
+function certificateName(c: Certificate): string {
+  return c.certificate_name ?? c.name ?? c.title ?? `Certificate ${c.id}`;
+}
+
+export function CertificateListPage() {
+  const t = useTranslations("campaigns");
+  const tMenu = useTranslations("dashboard");
+  const { dir } = useI18n();
+  const isRtl = dir === "rtl";
+  const { user } = useAuthStore();
+
+  const { data: certsRes, isLoading } = useUserCertificates();
+  const certificates = certsRes?.success ? (certsRes.data ?? []) : [];
+
+  // Transform certificates to match table format
+  const certificateData = certificates.map((cert) => ({
+    id: cert.id,
+    name: cert.module_name || t("unknownModule"),
+    content: cert.campaign_name || t("unknownCampaign"),
+    date: cert.certificate_issue_date || cert.created_at || "",
+    status: (cert.status as "active" | "pending" | "completed") || "completed",
+  }));
+
+  // State
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 8;
+  const [currentStatus, setCurrentStatus] = useState("all");
+  const [currentSearch, setCurrentSearch] = useState("");
+  const [currentDateFilter, setCurrentDateFilter] = useState("all");
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [showDateDropdown, setShowDateDropdown] = useState(false);
+
+  // Refs for tab indicator animation
+  const tabIndicatorRef = useRef<HTMLDivElement>(null);
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (showDateDropdown && !(event.target as Element).closest(".date-dropdown-container")) {
+        setShowDateDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showDateDropdown]);
+
+  const updateTabIndicator = (activeTab: string) => {
+    if (!tabIndicatorRef.current || !tabsContainerRef.current) return;
+    const tabs = tabsContainerRef.current.querySelectorAll(".tab-btn");
+    const activeIndex = Array.from(tabs).findIndex(
+      (tab) => tab.getAttribute("data-status") === activeTab
+    );
+
+    if (activeIndex === -1) return;
+    const activeTabEl = tabs[activeIndex] as HTMLElement;
+    const left = activeTabEl.offsetLeft + 4;
+    const width = activeTabEl.offsetWidth - 8;
+
+    tabIndicatorRef.current.style.left = `${left}px`;
+    tabIndicatorRef.current.style.width = `${width}px`;
+  };
+
+  useEffect(() => {
+    updateTabIndicator(currentStatus);
+  }, [currentStatus]);
+
+  // Helpers
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  };
+
+  const statusBadge = (status: string) => {
+    const badges = {
+      active: {
+        class: "bg-green-50 text-green-700 border border-green-200",
+        text: t("status.active"),
+      },
+      pending: {
+        class: "bg-amber-50 text-amber-700 border border-amber-200",
+        text: t("status.pending"),
+      },
+      completed: { class: "bg-gray-50 text-gray-700", text: t("status.completed") },
+    };
+    const badge = badges[status as keyof typeof badges] || badges.completed;
+
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full ${badge.class} text-[10px] font-semibold min-w-[96px] justify-center`}
+      >
+        {badge.text}
+      </span>
+    );
+  };
+
+  const actionButton = (cert: (typeof certificateData)[0]) => {
+    const handleDownload = async () => {
+      try {
+        // Try to find original certificate object (may include module_id from API)
+        const original = certificates.find((c) => c.id === cert.id) as any | undefined;
+        const moduleId = original?.module_id ?? undefined;
+
+        await campaignService.downloadCertificate(cert.id, moduleId);
+      } catch (error: any) {
+        const message =
+          error?.message ||
+          t("errors.downloadUnknown");
+
+       
+        if (message.includes("certificate download failed")) {
+          const original = certificates.find((c) => c.id === cert.id) as any | undefined;
+          const moduleId = original?.module_id ?? undefined;
+          if (moduleId) {
+            try {
+              // fetch the template so we can render our own PDF
+              const tplResponse = await certificateService.downloadTemplate?.(moduleId);
+              const template = tplResponse?.data;
+              const templateText = template?.template_text || "";
+              const bgColor = template?.bg_color || "#ffffff";
+              const assets = {
+                logo: template?.top_logo_url ? getCertificateAssetUrl(template.top_logo_url) : null,
+                bottomLogo: template?.bottom_logo_url ? getCertificateAssetUrl(template.bottom_logo_url) : null,
+                border: template?.border_image_url ? getCertificateAssetUrl(template.border_image_url) : null,
+                watermark: template?.bg_watermark_url ? getCertificateAssetUrl(template.bg_watermark_url) : null,
+                stamp: template?.stamp_logo_url ? getCertificateAssetUrl(template.stamp_logo_url) : null,
+                signature: template?.sign_image_url ? getCertificateAssetUrl(template.sign_image_url) : null,
+              };
+
+              // determine user display name from JWT token stored in auth
+              const token = useAuthStore.getState().token;
+              const fullName = extractUserDisplayName(decodeJwt(token));
+              const [firstName, ...rest] = fullName.split(" ");
+              const lastName = rest.join(" ");
+
+              // format the ISO timestamp into a human‑readable date for the
+              // placeholder; the server returns an ISO string, which would show up
+              // verbatim in the template otherwise.
+              const rawDate = original?.certificate_issue_date || original?.created_at || "";
+              const formattedDate = rawDate
+                ? new Date(rawDate).toLocaleDateString("en-GB", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })
+                : "";
+
+              const htmlContent = generateCertificateHtml({
+                templateText,
+                bgColor,
+                langId: template?.lang_id,
+                assets,
+                firstName,
+                lastName,
+                courseName: original?.module_name || "",
+                completionDate: formattedDate,
+                // also send issue date so it can be rendered above the bottom-right label
+                issueDate: formattedDate,
+              });
+
+              const preview = window.open("", "_blank");
+              if (preview) {
+                preview.document.open();
+                preview.document.write(htmlContent);
+                preview.document.close();
+                preview.onload = () => preview.print();
+              } else {
+                window.alert(t("errors.popupBlocked"));
+              }
+
+              // fallback handled – no error to log or display
+              return;
+            } catch (fallbackErr) {
+              console.error("Fallback certificate generation failed", fallbackErr);
+              // fall through to show original message below
+            }
+          }
+        }
+
+        // log and alert for anything not handled above
+        console.error("Failed to download certificate:", error);
+        window.alert(message);
+      }
+    };
+
+    return (
+      <button
+        className="flex items-center gap-2 border border-sky-500 text-sky-500 px-2 py-1.5 rounded-full text-[11px] text-xs hover:bg-sky-50"
+        onClick={handleDownload}
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <polyline points="7,10 12,15 17,10" />
+          <line x1="12" x2="12" y1="15" y2="3" />
+        </svg>
+        <span>{t("downloadCertificate")}</span>
+      </button>
+    );
+  };
+
+  const filterByDateRange = (data: typeof certificateData) => {
+    if (currentDateFilter === "all") return data;
+    const today = new Date();
+
+    today.setHours(0, 0, 0, 0);
+    const days = parseInt(currentDateFilter, 10);
+    const cutoff = new Date(today);
+
+    cutoff.setDate(today.getDate() - days);
+
+    return data.filter((item) => new Date(item.date) >= cutoff);
+  };
+
+  const filteredData = () => {
+    let filtered = [...certificateData];
+
+    if (currentStatus !== "all") {
+      filtered = filtered.filter((c) => c.status === currentStatus);
+    }
+    if (currentSearch) {
+      filtered = filtered.filter(
+        (c) =>
+          c.name.toLowerCase().includes(currentSearch.toLowerCase()) ||
+          c.content.toLowerCase().includes(currentSearch.toLowerCase())
+      );
+    }
+    filtered = filterByDateRange(filtered);
+
+    if (sortColumn) {
+      filtered.sort((a, b) => {
+        let valA: any;
+        let valB: any;
+
+        if (sortColumn === "name") {
+          valA = a.name.toLowerCase();
+          valB = b.name.toLowerCase();
+        } else if (sortColumn === "content") {
+          valA = a.content.toLowerCase();
+          valB = b.content.toLowerCase();
+        } else if (sortColumn === "date") {
+          valA = new Date(a.date);
+          valB = new Date(b.date);
+        } else if (sortColumn === "status") {
+          valA = a.status;
+          valB = b.status;
+        }
+        if (valA < valB) return sortDirection === "asc" ? -1 : 1;
+        if (valA > valB) return sortDirection === "asc" ? 1 : -1;
+
+        return 0;
+      });
+    }
+
+    return filtered;
+  };
+
+  const handleSort = (column: string) => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(column);
+      setSortDirection("asc");
+    }
+    setCurrentPage(1);
+  };
+
+  const handleTabClick = (status: string) => {
+    setCurrentStatus(status);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setCurrentSearch(value);
+    setCurrentPage(1);
+  };
+
+  // Header handlers
+  const handleSearch = (value: string) => {
+    setCurrentSearch(value);
+    setCurrentPage(1);
+  };
+
+  const handleMailClick = () => {
+    // TODO: Implement mail functionality
+    console.log("Mail clicked");
+  };
+
+  const handleNotificationClick = () => {
+    // TODO: Implement notification functionality
+    console.log("Notification clicked");
+  };
+
+  const handleProfileClick = () => {
+    // TODO: Implement profile functionality
+    console.log("Profile clicked");
+  };
+
+  const changePage = (page: number) => {
+    const totalPages = Math.ceil(filteredData().length / rowsPerPage) || 1;
+
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  // Calculate pagination
+  const data = filteredData();
+  const total = data.length;
+  const totalPages = Math.ceil(total / rowsPerPage) || 1;
+  const start = (currentPage - 1) * rowsPerPage;
+  const end = Math.min(start + rowsPerPage, total);
+  const pageData = data.slice(start, end);
+
+  // Tab counts
+  const allCount = certificateData.length;
+  const activeCount = certificateData.filter((c) => c.status === "active").length;
+  const pendingCount = certificateData.filter((c) => c.status === "pending").length;
+  const completedCount = certificateData.filter((c) => c.status === "completed").length;
+
+  return (
+    <ProtectedRoute>
+      <DashboardLayout>
+        <div className="p-3">
+          {/* Breadcrumb */}
+          <nav className="flex items-center text-xs text-gray-500 mb-6 gap-1.5">
+            <a className="hover:text-gray-700 transition" href="#">
+              {tMenu("menu.systemBranding")}
+            </a>
+            <span className="text-gray-400">›</span>
+            <span className="font-semibold text-gray-900">{tMenu("menu.certificate")}</span>
+          </nav>
+
+          {/* Header */}
+          <div className="flex items-center mb-4">
+            <h1 className="text-xl font-semibold">{t("certificatesTitle")}</h1>
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-col md:flex-row justify-between gap-3 mb-4">
+            <style>
+              {`
+                .tab-btn.active:hover {
+                  background-color: transparent !important;
+                }
+                .tab-btn:not(.active):hover {
+                  background-color: rgba(243, 244, 246, 1);
+                }
+                /* Base Button Styles */
+                .modern-dropdown-button {
+                  width: 100%;
+                  height: 47px; /* Overridden by small variant */
+                  background: white;
+                  border: 1px solid #e5e7eb;
+                  border-radius: 0.5rem; /* Overridden by rounded-full */
+                  padding: 0 2.5rem 0 0.75rem; /* Overridden by variants */
+                  font-size: 0.75rem;
+                  color: #374151;
+                  cursor: pointer;
+                  transition: all 0.2s ease;
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  user-select: none;
+                  outline: none;
+                  line-height: 1.5;
+                }
+
+                /* Small Size Variant */
+                .modern-dropdown-wrapper.small .modern-dropdown-button {
+                  height: 39px;
+                  padding: 0 2rem 0 0.625rem; /* Left padding overridden by inline style */
+                  font-size: 0.75rem;
+                }
+
+                /* Rounded-Full Variant */
+                .modern-dropdown-wrapper.rounded-full .modern-dropdown-button {
+                  border-radius: 9999px;
+                  padding: 0 2rem 0 0.875rem; /* Left padding overridden by inline style */
+                }
+
+                /* Hover State */
+                .modern-dropdown-button:hover {
+                  border-color: #d1d5db;
+                }
+
+                /* Active/Focused State */
+                .modern-dropdown-button.active {
+                  border-color: #3b82f6;
+                  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+                }
+
+                /* Arrow Icon */
+                .modern-dropdown-arrow {
+                  position: absolute;
+                  right: 0.75rem;
+                  top: 50%;
+                  transform: translateY(-50%);
+                  pointer-events: none;
+                  transition: transform 0.2s ease;
+                }
+
+                .modern-dropdown-arrow svg {
+                  width: 1rem;
+                  height: 1rem;
+                  color: #6b7280;
+                  transition: color 0.2s;
+                }
+
+                /* Dropdown Menu */
+                .modern-dropdown-menu {
+                  position: absolute;
+                  top: calc(100% + 0.25rem);
+                  left: 0;
+                  right: 0;
+                  background: white;
+                  border: 1px solid #e5e7eb;
+                  border-radius: 0.5rem; /* 1rem for rounded-full */
+                  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+                  max-height: 240px;
+                  overflow-y: auto;
+                  z-index: 50;
+                  opacity: 0;
+                  transform: translateY(-10px);
+                  pointer-events: none;
+                  transition: all 0.2s ease;
+                }
+
+                .modern-dropdown-menu.open {
+                  opacity: 1;
+                  transform: translateY(0);
+                  pointer-events: auto;
+                }
+              `}
+            </style>
+
+            {/* Tabs */}
+            <div ref={tabsContainerRef} className="flex gap-0 bg-white p-0.5 rounded-full relative">
+              <div
+                ref={tabIndicatorRef}
+                className="absolute bg-[#051226] rounded-full transition-all duration-300"
+                style={{ top: "3px", height: "calc(100% - 6px)" }}
+              />
+
+              <button
+                className={`tab-btn ${currentStatus === "all" ? "active" : ""} px-3 py-0.5 text-xs font-semibold ${currentStatus === "all" ? "text-white" : "bg-transparent text-gray-700"} rounded-full transition-colors duration-200 inline-flex items-center gap-2 relative z-10`}
+                data-status="all"
+                onClick={() => handleTabClick("all")}
+              >
+                <span className="tab-label">{t("filters.all")}</span>
+                <span
+                  className={`tab-count w-5 h-5 rounded-full ${currentStatus === "all" ? "bg-white/30 text-white" : "bg-green-100 text-green-400"} text-[10px] font-bold flex items-center justify-center transition-all duration-200`}
+                >
+                  {allCount}
+                </span>
+              </button>
+              <button
+                className={`tab-btn ${currentStatus === "active" ? "active" : ""} px-3 py-0.5 text-xs font-semibold ${currentStatus === "active" ? "text-white" : "bg-transparent text-gray-700"} rounded-full transition-colors duration-200 inline-flex items-center gap-2 relative z-10`}
+                data-status="active"
+                onClick={() => handleTabClick("active")}
+              >
+                <span className="tab-label">{t("status.active")}</span>
+                <span
+                  className={`tab-count w-5 h-5 rounded-full ${currentStatus === "active" ? "bg-white/30 text-white" : "bg-green-100 text-green-400"} text-[10px] font-bold flex items-center justify-center transition-all duration-200`}
+                >
+                  {activeCount}
+                </span>
+              </button>
+              <button
+                className={`tab-btn ${currentStatus === "pending" ? "active" : ""} px-3 py-0.5 text-xs font-semibold ${currentStatus === "pending" ? "text-white" : "bg-transparent text-gray-700"} rounded-full transition-colors duration-200 inline-flex items-center gap-2 relative z-10`}
+                data-status="pending"
+                onClick={() => handleTabClick("pending")}
+              >
+                <span className="tab-label">{t("status.pending")}</span>
+                <span
+                  className={`tab-count w-5 h-5 rounded-full ${currentStatus === "pending" ? "bg-white/30 text-white" : "bg-green-100 text-green-400"} text-[10px] font-bold flex items-center justify-center transition-all duration-200`}
+                >
+                  {pendingCount}
+                </span>
+              </button>
+              <button
+                className={`tab-btn ${currentStatus === "completed" ? "active" : ""} px-3 py-0.5 text-xs font-semibold ${currentStatus === "completed" ? "text-white" : "bg-transparent text-gray-700"} rounded-full transition-colors duration-200 inline-flex items-center gap-2 relative z-10`}
+                data-status="completed"
+                onClick={() => handleTabClick("completed")}
+              >
+                <span className="tab-label">{t("status.completed")}</span>
+                <span
+                  className={`tab-count w-5 h-5 rounded-full ${currentStatus === "completed" ? "bg-white/30 text-white" : "bg-green-100 text-green-400"} text-[10px] font-bold flex items-center justify-center transition-all duration-200`}
+                >
+                  {completedCount}
+                </span>
+              </button>
+            </div>
+
+            {/* Search & Date Filter */}
+            <div className="flex gap-2">
+              {/* Search with Icon */}
+              <div className="relative w-64">
+                <Search
+                  className="absolute text-gray-400 pointer-events-none z-10 w-4 h-4"
+                  style={{ left: "16px", top: "40%", transform: "translateY(-50%)" }}
+                />
+                <input
+                  className="datatable-input w-full pr-4 py-2 text-xs border bg-white border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all h-9 placeholder-gray-400"
+                  placeholder={t("searchCertificates")}
+                  style={{ paddingLeft: "40px" }}
+                  type="text"
+                  value={currentSearch}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                />
+              </div>
+
+              {/* Date Filter with Modern Dropdown */}
+              <div className="relative w-40 modern-dropdown-wrapper small rounded-full date-dropdown-container">
+                <button
+                  className="modern-dropdown-button"
+                  onClick={() => setShowDateDropdown(!showDateDropdown)}
+                >
+                  <span>
+                    {currentDateFilter === "all"
+                      ? t("filters.allTime")
+                      : currentDateFilter === "7"
+                        ? t("filters.last7Days")
+                        : currentDateFilter === "30"
+                          ? t("filters.last30Days")
+                          : currentDateFilter === "90"
+                            ? t("filters.last3Months")
+                            : currentDateFilter === "180"
+                              ? t("filters.last6Months")
+                              : t("filters.thisYear")}
+                  </span>
+                  <div className="modern-dropdown-arrow">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        d="M19 9l-7 7-7-7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                  </div>
+                </button>
+
+                {showDateDropdown && (
+                  <div className="modern-dropdown-menu open">
+                    <button
+                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => {
+                        setCurrentDateFilter("all");
+                        setCurrentPage(1);
+                        setShowDateDropdown(false);
+                      }}
+                    >
+                      {t("filters.allTime")}
+                    </button>
+                    <button
+                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => {
+                        setCurrentDateFilter("7");
+                        setCurrentPage(1);
+                        setShowDateDropdown(false);
+                      }}
+                    >
+                      {t("filters.last7Days")}
+                    </button>
+                    <button
+                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => {
+                        setCurrentDateFilter("30");
+                        setCurrentPage(1);
+                        setShowDateDropdown(false);
+                      }}
+                    >
+                      {t("filters.last30Days")}
+                    </button>
+                    <button
+                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => {
+                        setCurrentDateFilter("90");
+                        setCurrentPage(1);
+                        setShowDateDropdown(false);
+                      }}
+                    >
+                      {t("filters.last3Months")}
+                    </button>
+                    <button
+                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => {
+                        setCurrentDateFilter("180");
+                        setCurrentPage(1);
+                        setShowDateDropdown(false);
+                      }}
+                    >
+                      {t("filters.last6Months")}
+                    </button>
+                    <button
+                      className="w-full text-left px-4 py-2 text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => {
+                        setCurrentDateFilter("365");
+                        setCurrentPage(1);
+                        setShowDateDropdown(false);
+                      }}
+                    >
+                      {t("filters.thisYear")}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100">
+            <div
+              className="overflow-x-auto overflow-y-auto relative"
+              style={{ height: "55vh", minHeight: "400px" }}
+            >
+              <table className="w-full text-xs">
+                <thead className="bg-gray-50 text-gray-600 border-b sticky top-0 z-10">
+                  <tr>
+                    <th
+                      className="px-4 py-3.5 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors"
+                      data-sort="name"
+                      onClick={() => handleSort("name")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{t("certificateName")}</span>
+                        <span
+                          className={`sort-icon ${sortColumn === "name" ? "text-blue-600" : "text-gray-400"}`}
+                        >
+                          {sortColumn === "name" ? (
+                            sortDirection === "asc" ? (
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M5 15l7-7 7 7"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M19 9l-7 7-7-7"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            )
+                          ) : (
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                              />
+                            </svg>
+                          )}
+                        </span>
+                      </div>
+                    </th>
+                    <th
+                      className="px-4 py-3.5 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors"
+                      data-sort="content"
+                      onClick={() => handleSort("content")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{t("certificatesContentName")}</span>
+                        <span
+                          className={`sort-icon ${sortColumn === "content" ? "text-blue-600" : "text-gray-400"}`}
+                        >
+                          {sortColumn === "content" ? (
+                            sortDirection === "asc" ? (
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M5 15l7-7 7 7"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M19 9l-7 7-7-7"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            )
+                          ) : (
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                              />
+                            </svg>
+                          )}
+                        </span>
+                      </div>
+                    </th>
+                    <th
+                      className="px-4 py-3.5 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors"
+                      data-sort="date"
+                      onClick={() => handleSort("date")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{t("issuedDate")}</span>
+                        <span
+                          className={`sort-icon ${sortColumn === "date" ? "text-blue-600" : "text-gray-400"}`}
+                        >
+                          {sortColumn === "date" ? (
+                            sortDirection === "asc" ? (
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M5 15l7-7 7 7"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M19 9l-7 7-7-7"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            )
+                          ) : (
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                              />
+                            </svg>
+                          )}
+                        </span>
+                      </div>
+                    </th>
+                    <th
+                      className="px-4 py-3.5 text-left font-semibold cursor-pointer hover:bg-gray-100 transition-colors"
+                      data-sort="status"
+                      onClick={() => handleSort("status")}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{t("table.status")}</span>
+                        <span
+                          className={`sort-icon ${sortColumn === "status" ? "text-blue-600" : "text-gray-400"}`}
+                        >
+                          {sortColumn === "status" ? (
+                            sortDirection === "asc" ? (
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M5 15l7-7 7 7"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            ) : (
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M19 9l-7 7-7-7"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                />
+                              </svg>
+                            )
+                          ) : (
+                            <svg
+                              className="w-3.5 h-3.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                              />
+                            </svg>
+                          )}
+                        </span>
+                      </div>
+                    </th>
+                    <th className="px-4 py-3.5 text-left font-semibold">
+                      <div className="flex items-center gap-2">
+                        <span>{t("table.action")}</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100" id="tableBody">
+                  {pageData.map((cert) => (
+                    <tr key={cert.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3.5 font-medium text-gray-700">{cert.name}</td>
+                      <td className="px-4 py-3.5 text-gray-600">{cert.content}</td>
+                      <td className="px-4 py-3.5 text-gray-600">{formatDate(cert.date)}</td>
+                      <td className="px-4 py-3.5">{statusBadge(cert.status)}</td>
+                      <td className="px-4 py-3.5">{actionButton(cert)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div
+                className={`${total === 0 && !isLoading ? "" : "hidden"} absolute inset-0 flex items-center justify-center bg-white`}
+                id="emptyState"
+              >
+                <div className="text-center py-12">
+                  <div className="bg-gray-100 p-4 rounded-full inline-block mb-4">
+                    <svg
+                      className="w-10 h-10 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                    {t("emptyCertificatesTitle")}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {t("emptyState.description")}
+                  </p>
+                </div>
+              </div>
+
+              {isLoading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white">
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto mb-4" />
+                    <p className="text-sm text-gray-500">{t("loadingCertificates")}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col md:flex-row justify-between items-center px-4 py-3.5  bg-gray-50 gap-3">
+              <div
+                className="flex items-center gap-2 text-[10px] text-gray-400 font-medium"
+                id="paginationInfo"
+              >
+                <span>
+                  {t("certificatesPaginationShowing", {
+                    start: start + 1,
+                    end,
+                    total,
+                  })}
+                </span>
+              </div>
+              <div className="flex gap-1.5" id="paginationButtons">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    className={`min-w-[32px] h-8 px-2 border rounded-full text-xs transition-all ${
+                      page === currentPage
+                        ? "bg-blue-50 text-blue-600 border-blue-500 font-semibold"
+                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                    }`}
+                    onClick={() => changePage(page)}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </DashboardLayout>
+    </ProtectedRoute>
+  );
+}

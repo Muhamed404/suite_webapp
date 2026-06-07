@@ -1,0 +1,24 @@
+{
+  "meta": {
+    "title": "تسجيل الدخول - juniormagnus",
+    "description": "سجّل الدخول إلى حساب juniormagnus الخاص بك"
+  },
+  "page": {
+    "copyright": "© 2025 Securemagnus"
+  },
+  "form": {
+    "title": "مرحبًا بك في {appName}",
+    "emailPlaceholder": "البريد الإلكتروني",
+    "passwordPlaceholder": "كلمة المرور",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "loginButton": "تسجيل الدخول",
+    "noAccount": "ليس لديك حساب؟",
+    "signup": "إنشاء حساب",
+    "errors": {
+      "emailInvalid": "البريد الإلكتروني غير صالح، يرجى إدخال بريد إلكتروني صحيح.",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور التي أدخلتها غير صحيحة. يرجى المحاولة مرة أخرى.",
+      "networkError": "خطأ في الشبكة: تعذر الاتصال بالخادم. يرجى المحاولة مرة أخرى لاحقًا."
+    }
+  }
+}
