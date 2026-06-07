@@ -21,11 +21,16 @@ export interface InvitationInvitee {
   email: string;
   firstname: string;
   lastname: string;
+  department_name?: string | null;
+  group_name?: string | null;
+  spacename?: string | null;
+  pin_code?: string | null;
 }
 
 export interface InvitationLogItem {
   id: number;
   invitee_id: number;
+  batch_id?: number;
   campaign_id?: number | null;
   survey_id?: number | null;
   user_id: number;

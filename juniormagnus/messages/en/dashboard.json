@@ -422,5 +422,48 @@
     "fileTooLarge": "File size must be less than 2MB.",
     "infoTitle": "White-Label Branding",
     "infoDescription": "Your organization logo will replace the default Secure Magnus logo across the platform for all users within your organization. It will be displayed in the sidebar navigation. Removing the logo will revert to the default branding."
+  },
+  "invitationLog": {
+    "searchPlaceholder": "Search email or name",
+    "refresh": "Refresh",
+    "bulkResend": "Bulk resend",
+    "bulkResendCount": "Bulk resend ({count})",
+    "selectAll": "Select all on page",
+    "empty": "No invitations yet.",
+    "totalRecords": "{total} total records",
+    "toast": {
+      "noneSelected": "Select at least one invitation to resend.",
+      "bulkQueued": "{count} reminder(s) queued",
+      "reminderQueued": "Reminder queued",
+      "failed": "Failed to queue reminder"
+    },
+    "table": {
+      "created": "Created",
+      "email": "Email",
+      "departmentGroup": "Department / Group",
+      "status": "Status",
+      "lastSent": "Last sent",
+      "action": "Action",
+      "resend": "Resend",
+      "viewLogin": "View login"
+    },
+    "credentialsModal": {
+      "title": "Family login credentials",
+      "description": "Share these details with the parent so they can sign in to Junior Magnus.",
+      "email": "Email",
+      "loginSpace": "Login space",
+      "pinCode": "PIN code",
+      "copy": "Copy",
+      "copied": "Copied to clipboard",
+      "close": "Close",
+      "unavailable": "Not available yet"
+    },
+    "status": {
+      "completed": "Completed",
+      "failed": "Failed",
+      "pending": "Pending",
+      "retry": "Retry",
+      "unknown": "Unknown"
+    }
   }
 }

@@ -130,13 +130,11 @@ export const suiteSuiteService = {
   },
 
   /**
-   * GET /department/list/:orgId?
+   * GET /department/list/:orgId
    * Get all departments for an organization
    */
-  getDepartments: async (orgId?: number) => {
-    const url = orgId ? `/department/list/${orgId}` : `/department/list`;
-
-    return request<Department[]>(() => suiteClient.get(url));
+  getDepartments: async (orgId: number) => {
+    return request<Department[]>(() => suiteClient.get(`/department/list/${orgId}`));
   },
 
   /**

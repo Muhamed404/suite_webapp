@@ -20,8 +20,9 @@ export default function AddFamiliesPage() {
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
 
   const { data: departments } = useQuery({
-    queryKey: ["suite-departments"],
-    queryFn: () => suiteSuiteService.getDepartments(),
+    queryKey: ["suite-departments", orgId],
+    queryFn: () => suiteSuiteService.getDepartments(orgId),
+    enabled: orgId > 0,
   });
 
   const { data: groups } = useQuery({
