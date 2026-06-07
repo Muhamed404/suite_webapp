@@ -1,4 +1,4 @@
-import type { ApiResponse } from "@/types/quiz";
+import type { ApiResponse } from "@/types/api";
 
 import { jnrClient, API_BASE } from "./httpClient";
 import { normalizejnrResponse, type jnrResponseBody } from "./jnrResponse";
