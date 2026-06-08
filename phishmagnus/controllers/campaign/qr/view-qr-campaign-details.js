@@ -6,7 +6,6 @@ const backend_api_urls = require("../../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const frontend_app_urls = require('../../../../config/frontend_api_urls');
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
-const moment = require('moment');
 const { redactLogData } = require("../../../utility/redact");
 /**
  * Controller to render the QR campaign details view with statistics and user details.
@@ -39,14 +38,7 @@ exports.viewQRCampaignDetails = async (req, res) => {
 
 
     const campaignDetails = apiResponseCampaignReport?.data?.message.campaign || {};
-    // Format the campaign start datetime for display (avoid raw ISO string)
-    try {
-      if (campaignDetails && campaignDetails.start_datetime) {
-        campaignDetails.start_datetime = moment(campaignDetails.start_datetime).format('DD-MMM-YYYY hh:mm A');
-      }
-    } catch (err) {
-      logger.warn('Failed to format campaignDetails.start_datetime', err);
-    }
+    // start_datetime formatted in user timezone by service_suite (generate-qr-report-by-campaign)
     const templateDetails = apiResponseCampaignReport?.data?.message.campaign.Templates || {};
     const campaignStats = apiResponseCampaignReport?.data?.message.interactionStatsByCampaign || {};
     const openSegmentStats = apiResponseCampaignReport?.data?.message.openSegmentStats || {};

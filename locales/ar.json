@@ -842,6 +842,9 @@
 		"labelAvailableUsersLicense": "التراخيص المتاحة للمستخدمين",
 		"btnBulkAssign": "تعيين مجمع",
 		"btnImport": "استيراد",
+		"btnImportLdap": "استيراد من Active Directory",
+		"btnImportLdapOnly": "استيراد فقط",
+		"btnImportLdapLogin": "استيراد وتسجيل الدخول",
 		"labelPhishMagnusLicenseStatus": "حالة ترخيص PhishMagnus",
 		"labelAwarenessLicenseStatus": "حالة ترخيص Awareness",
 		"statusLicensed": "مرخص",
@@ -947,7 +950,12 @@
 		"placeholderSearchUnenrolled": "البحث في غير المسجلين",
 		"labelUnenrolled": "غير مسجل",
 		"btnMoveToEnrolled": "الانتقال إلى مسجل",
-		"btnDone": "تم"
+		"btnDone": "تم",
+		"labelImportFromLdap": "استيراد من LDAP",
+		"stepSelectLdapMode": "تحديد وضع LDAP",
+		"labelSelectMode": "تحديد وضع الاستيراد",
+		"labelOnlyImport": "استيراد فقط",
+		"labelImportAndLogin": "استيراد وتسجيل الدخول"
 	},
 	"system_template": {
 		"stepper1": "تفاصيل القالب",
@@ -2121,6 +2129,7 @@
 		"notOpenedReported": "غير مفتوح ومصرّح",
 		"tagReport": "تقرير العلامة",
 		"totalNotScans": "إجمالي غير الممسوح",
+		"totalScans": "إجمالي الممسوح",
 		"totalSubmitted": "إجمالي المقدم",
 		"totalInteract": "إجمالي التفاعل",
 		"qrView": "عرض QR",

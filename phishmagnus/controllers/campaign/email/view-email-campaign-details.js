@@ -5,8 +5,6 @@ const enums = require("../../../../contants/enum");
 const getApiClient = require('../../../../utility/api-client');
 const backend_api_urls = require("../../../../config/backend_api_urls");
 const render_ejs_urls = require("../../../../config/render_ejs_urls");
-const moment = require('moment');
-
 /**
  * Controller to render the email campaign details view with statistics and user details.
  */
@@ -35,17 +33,7 @@ exports.viewCampaignDetails = async (req, res) => {
     logger.info('Email Campaign Detail: FETCH CAMPAIGN STATISTICS AND PHISHING USER DETAILS API CALL COMPLETED');
     logger.debug(`Email Campaign Detail: respStatistics ${JSON.stringify(redactLogData(campaignReportDetails?.data), null, 2)}`);
     const campaignDetails = campaignReportDetails?.data?.message.campaign || {};
-    // Format the campaign start datetime for display (avoid raw ISO string)
-    try {
-      if (campaignDetails && campaignDetails.start_datetime) {
-        const m = moment(campaignDetails.start_datetime, [moment.ISO_8601, 'DD-MMM-YYYY hh:mm A']);
-        if (m.isValid()) {
-          campaignDetails.start_datetime = m.format('DD-MMM-YYYY hh:mm A');
-        }
-      }
-    } catch (err) {
-      logger.warn('Failed to format campaignDetails.start_datetime', err);
-    }
+    // start_datetime is formatted in user timezone by service_suite (view-campaign-statistics)
     // const campaignInvitees = campaignReportDetails?.data?.message.invitees || [];
     const sentUnSentStats = campaignReportDetails?.data?.message.sentUnSentStats || {};
     const campaignInteractionStats = campaignReportDetails?.data?.message.interactionStatsByCampaign || {};
@@ -70,25 +58,7 @@ exports.viewCampaignDetails = async (req, res) => {
       pageSize: req.query?.pageSize || '',
       search: req.query?.search || ''
     };
-    // Format invitee schedule datetimes for display
-    try {
-      if (usersDetail && Array.isArray(usersDetail.Phishing_Invities)) {
-        usersDetail.Phishing_Invities.forEach((invite) => {
-          try {
-            if (invite && invite.CampaignSchedule && invite.CampaignSchedule.start_datetime) {
-              const m = moment(invite.CampaignSchedule.start_datetime, [moment.ISO_8601, 'DD-MMM-YYYY hh:mm A']);
-              if (m.isValid()) {
-                invite.CampaignSchedule.start_datetime = m.format('DD-MMM-YYYY hh:mm A');
-              }
-            }
-          } catch (e) {
-            // ignore formatting errors per-invite
-          }
-        });
-      }
-    } catch (err) {
-      logger.warn('Failed to format usersDetail schedule datetimes', err);
-    }
+    // Schedule times formatted in user timezone by service_suite (view-campaign-user-details)
     logger.debug('respPhishingUserDetails: user Details ' + JSON.stringify(redactLogData(usersDetail), null, 2));
 
     logger.debug('Email Campaign Detail: campaignStats: ' + JSON.stringify(redactLogData(campaignStats), null, 2));
