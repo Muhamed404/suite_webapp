@@ -97,26 +97,29 @@
           </tr>
         </thead>
         <tbody>
-          <% if (typeof organization !=='undefined' ){ organization.forEach(org=> { %>
+          <% if (typeof organization !=='undefined' ){ organization.forEach(org=> {
+            const adminProfile = (org.UserProfile || []).find(function (profile) {
+              return profile.User && (
+                profile.User.role_id == enums.OrgSuperAdmin ||
+                profile.User.role_id == enums.MagSuperAdmin
+              );
+            });
+          %>
             <tr class="bg-white border-b hover:bg-gray-50">
               <td class="px-6 py-6 whitespace-nowrap">
                 <%= org.name %>
-
               </td>
-              <% org.UserProfile.forEach(profile=> {
-                if(profile.User.role_id == enums.OrgSuperAdmin || profile.User.role_id ==
-                enums.MagSuperAdmin){
-                %>
-
-                <td class="px-6 py-6 whitespace-nowrap  ">
-                  <%= profile.first_name %>
-                    <%= profile.last_name %>
-                </td>
-                <td class="px-6 py-6 whitespace-nowrap  ">
-                  <%= profile.email %>
-                </td>
-                <%}})%>
-                  <td class="px-6 py-6 whitespace-nowrap  ">
+              <td class="px-6 py-6 whitespace-nowrap">
+                <% if (adminProfile) { %>
+                  <%= adminProfile.first_name %> <%= adminProfile.last_name %>
+                <% } %>
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap">
+                <% if (adminProfile) { %>
+                  <%= adminProfile.email %>
+                <% } %>
+              </td>
+              <td class="px-6 py-6 whitespace-nowrap  ">
                     <%= org.Subscriptions.Active %>
                   </td>
                   <td class="px-6 py-6 whitespace-nowrap  ">
