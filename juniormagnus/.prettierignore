@@ -1,0 +1,30 @@
+# Dependencies
+node_modules
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Cache
+.turbo
+*.tsbuildinfo
+
+# Lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lock
+
+# Generated / vendored
+.next/
+public/
+
+# Logs and env
+*.log
+.env
+.env.*
+
+# Messages (often edited by non-devs or generated)
+# Uncomment if you want to skip: messages/
