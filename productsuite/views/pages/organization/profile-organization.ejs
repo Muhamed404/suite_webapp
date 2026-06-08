@@ -16,7 +16,7 @@
     class="bg-white p-1 rounded-full flex items-center justify-start gap-4 w-fit text-sm font-medium mt-4">
 
     <button
-      class="filter-btn bg-gray-900 text-white px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
+      class="filter-btn bg-gray-900 text-white hover:bg-gray-800 hover:text-white px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
       data-toggle="tab" data-target="#aboutme">
       <i data-lucide="info" class="icon size-5 transition-all duration-300"></i>
       <%= __("organization.profile.tabInfo.labelTabTitle") %>
@@ -37,14 +37,14 @@
     </button> -->
 
     <button
-      class="filter-btn text-gray-600 hover:text-black px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
+      class="filter-btn text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
       data-toggle="tab" data-target="#settingsTab">
       <i data-lucide="shield-check" class="icon size-5 transition-all duration-300"></i>
       <%= __("organization.profile.tabSettings.labelTabTitle") %>
     </button>
 
     <button
-      class="filter-btn text-gray-600 hover:text-black px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
+      class="filter-btn text-gray-600 hover:bg-gray-100 hover:text-gray-900 px-4 py-2 rounded-full flex items-center gap-1 transition-all duration-300"
       data-toggle="tab" data-target="#subscriptionTab">
       <i data-lucide="credit-card" class="icon size-5 transition-all duration-300"></i>
       <%= __("organization.profile.tabSubscription.labelTabTitle") %>
@@ -104,13 +104,15 @@
     // Function to activate a tab
     function activateTab(targetId) {
       // Remove active styles from all buttons
-      buttons.forEach(b => b.classList.remove('bg-gray-900', 'text-white'));
-      buttons.forEach(b => b.classList.add('text-gray-600'));
+      buttons.forEach(b => {
+        b.classList.remove('bg-gray-900', 'text-white', 'hover:bg-gray-800', 'hover:text-white');
+        b.classList.add('text-gray-600', 'hover:bg-gray-100', 'hover:text-gray-900');
+      });
       // Add active style to the target button
       const targetBtn = document.querySelector(`.filter-btn[data-target="#${targetId}"]`);
       if (targetBtn) {
-        targetBtn.classList.add('bg-gray-900', 'text-white');
-        targetBtn.classList.remove('text-gray-600');
+        targetBtn.classList.add('bg-gray-900', 'text-white', 'hover:bg-gray-800', 'hover:text-white');
+        targetBtn.classList.remove('text-gray-600', 'hover:bg-gray-100', 'hover:text-gray-900');
       }
 
       // Hide all tabs
