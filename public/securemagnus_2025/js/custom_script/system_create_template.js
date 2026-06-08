@@ -6,6 +6,44 @@ const url_phishing_screen = 5;
 const phishing_webpage_screen = 6;
 const phishing_landing_page_screen = 7;
 const sms_phishing_screen = 8;
+const landingPageStepIndex = phishing_landing_page_screen - 1;
+const phishingWebpageStepIndex = phishing_webpage_screen - 1;
+const urlPhishingStepIndex = url_phishing_screen - 1;
+
+function normalizePhishOption(value) {
+  return String(value || '').toLowerCase().replace(/-/g, '_');
+}
+
+function isDataEntryPhishOptionValue(value) {
+  const normalized = normalizePhishOption(value);
+  return normalized === 'data_entry' || normalized === 'custom_url';
+}
+
+function getSelectedPhishOptionValue() {
+  const radio = document.querySelector('input[name="phish_option"]:checked');
+  if (radio) return radio.value;
+  return (typeof window !== 'undefined' && window.initialPhishOption) ? window.initialPhishOption : '';
+}
+
+function shouldIncludeLandingPageStep() {
+  return isDataEntryPhishOptionValue(getSelectedPhishOptionValue());
+}
+
+function adjustFlowForPhishOption(flow) {
+  if (!Array.isArray(flow) || !flow.includes(urlPhishingStepIndex)) {
+    return flow;
+  }
+  const includeLanding = shouldIncludeLandingPageStep();
+  let adjusted = [...flow];
+  if (!includeLanding) {
+    return adjusted.filter(stepIndex => stepIndex !== landingPageStepIndex);
+  }
+  if (!adjusted.includes(landingPageStepIndex) && adjusted.includes(phishingWebpageStepIndex)) {
+    const webpagePos = adjusted.indexOf(phishingWebpageStepIndex);
+    adjusted.splice(webpagePos + 1, 0, landingPageStepIndex);
+  }
+  return adjusted;
+}
 const difficulty_level_open_email = '1';
 const difficulty_level_download_file = '2';
 const difficulty_level_url_click = '3';
@@ -451,14 +489,27 @@ let currentStep = 0;
   function buildActiveFlow(matchedRule, phishType) {
     // alert('build active flow alert');
     // alert('Building active flow based on matched rule: ' + JSON.stringify(matchedRule));
-    if (!matchedRule) return getBaseFlowForType(phishType);
+    if (!matchedRule) return adjustFlowForPhishOption(getBaseFlowForType(phishType));
     const goToZeroBased = matchedRule.goTo.map(n => n - 1);
     const uniq = [0, 1];
     goToZeroBased.forEach(x => { if (!uniq.includes(x)) uniq.push(x); });
-    if (!['sms', 'whatsapp'].includes(phishType)) {
-      return uniq.filter(stepIndex => stepIndex !== smsStepIndex);
+    const flow = !['sms', 'whatsapp'].includes(phishType)
+      ? uniq.filter(stepIndex => stepIndex !== smsStepIndex)
+      : uniq;
+    return adjustFlowForPhishOption(flow);
+  }
+
+  function onPhishOptionChange() {
+    activeFlow = adjustFlowForPhishOption(activeFlow);
+    if (!shouldIncludeLandingPageStep() && currentStep === landingPageStepIndex) {
+      history = history.filter(stepIndex => stepIndex !== landingPageStepIndex);
+      const webpagePos = activeFlow.indexOf(phishingWebpageStepIndex);
+      if (webpagePos >= 0) {
+        currentStep = phishingWebpageStepIndex;
+        history.push(currentStep);
+      }
     }
-    return uniq;
+    showStep(currentStep);
   }
 
   function renderOptions(type) {
@@ -500,6 +551,11 @@ let currentStep = 0;
     }
 
     saveDataForStep(currentStep);
+
+    if (currentStep === urlPhishingStepIndex) {
+      activeFlow = adjustFlowForPhishOption(activeFlow);
+    }
+
     const sel = formData.step1.phishType;
     if (currentStep === 0) {
       // alert('currentStep Processing selections for step 0...');
@@ -599,6 +655,9 @@ let currentStep = 0;
   }
 
   function init() {
+    document.querySelectorAll('input[name="phish_option"]').forEach(radio => {
+      radio.addEventListener('change', onPhishOptionChange);
+    });
     renderProgressBar();
     showStep(0);
     nextBtn.addEventListener('click', handleNext);
