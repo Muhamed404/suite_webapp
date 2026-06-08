@@ -73,7 +73,7 @@
           <%= __("subscription.create.optionSelectAdminUser") %>
         </option>
         <% superUsers.forEach(function(user) { %>
-          <option value="<%= user.id %>">
+          <option value="<%= user.user_id %>">
             <%= user.email %>
           </option>
           <% }); %>
