@@ -97,40 +97,47 @@
           </tr>
         </thead>
         <tbody>
-          <% if (typeof organization !=='undefined' ){ organization.forEach(org=> {
-            const adminProfile = org.UserProfile
-              ? org.UserProfile.find(function(p) {
-                  return p.User && (p.User.role_id == enums.OrgSuperAdmin || p.User.role_id == enums.MagSuperAdmin);
-                })
-              : undefined;
-          %>
+          <% if (typeof organization !=='undefined' ){ organization.forEach(org=> { %>
             <tr class="bg-white border-b hover:bg-gray-50">
               <td class="px-6 py-6 whitespace-nowrap">
                 <%= org.name %>
+
               </td>
-              <td class="px-6 py-6 whitespace-nowrap">
-                <%= adminProfile ? (adminProfile.first_name + ' ' + adminProfile.last_name) : '' %>
-              </td>
-              <td class="px-6 py-6 whitespace-nowrap">
-                <%= adminProfile ? adminProfile.email : '' %>
-              </td>
-              <td class="px-6 py-6 whitespace-nowrap">
-                <%= org.Subscriptions.Active %>
-              </td>
-              <td class="px-6 py-6 whitespace-nowrap">
-                <%= org.Subscriptions.PendingInvoice %>
-              </td>
-              <td class="px-6 py-6 whitespace-nowrap">
-                <%= org.Subscriptions.CancelledInvoice %>
-              </td>
-              <td class="px-6 py-6 whitespace-nowrap">
-                <%= org.Subscriptions.SubscriptionCancelled %>
-              </td>
-              <td class="px-6 py-6 whitespace-nowrap">
-                <a class="pill-btn blue" href="/organization/profile/<%= org.id%>"><%= __("organization.homescreen.btnViewDetails") %></a>
-              </td>
+              <% org.UserProfile.forEach(profile=> {
+                if(profile.User.role_id == enums.OrgSuperAdmin || profile.User.role_id ==
+                enums.MagSuperAdmin){
+                %>
+
+                <td class="px-6 py-6 whitespace-nowrap  ">
+                  <%= profile.first_name %>
+                    <%= profile.last_name %>
+                </td>
+                <td class="px-6 py-6 whitespace-nowrap  ">
+                  <%= profile.email %>
+                </td>
+                <%}})%>
+                  <td class="px-6 py-6 whitespace-nowrap  ">
+                    <%= org.Subscriptions.Active %>
+                  </td>
+                  <td class="px-6 py-6 whitespace-nowrap  ">
+                    <%= org.Subscriptions.PendingInvoice %>
+
+                  </td>
+                  <td class="px-6 py-6 whitespace-nowrap  ">
+                    <%= org.Subscriptions.CancelledInvoice %>
+
+                  </td>
+                  <td class="px-6 py-6 whitespace-nowrap  ">
+                    <%= org.Subscriptions.SubscriptionCancelled %>
+                  </td>
+                  <td class="px-6 py-6 whitespace-nowrap  ">
+                    <a class="pill-btn blue" href="/organization/profile/<%= org.id%>"><%= __("organization.homescreen.btnViewDetails") %></a>
+
+                  </td>
+
+
             </tr>
-          <% }); }%>
+            <% }); }%>
 
         </tbody>
       </table>
