@@ -36,6 +36,7 @@
 		"search_here": "ابحث هنا...",
 		"sort_by": "رتّب حسب",
 		"loading": "جارٍ التحميل...",
+		"refresh": "تحديث",
 		"error": "خطأ",
 		"form_validation_error": "خطأ في التحقق من النموذج",
 		"error_creating_nfc_campaign": "خطأ في إنشاء حملة NFC",
