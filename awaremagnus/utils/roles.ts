@@ -58,6 +58,9 @@ export const isOrgUser = (roleId?: number) => roleId === ROLE_IDS.ORG_USER;
 export const canAccessAwarenessAssets = (roleId?: number) =>
   isPlatformAdmin(roleId) || isOrgAdmin(roleId);
 
+/** Org admins can create and launch awareness campaigns; platform admins cannot */
+export const canManageCampaigns = (roleId?: number) => isOrgAdmin(roleId);
+
 export const getRoleName = (roleId: number) => ROLES[roleId as RoleId]?.name ?? "Unknown Role";
 
 /**

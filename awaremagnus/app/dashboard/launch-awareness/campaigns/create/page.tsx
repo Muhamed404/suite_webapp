@@ -32,6 +32,8 @@ import { WizardStep5 } from "@/components/campaigns/wizard/WizardStep5";
 import { WizardStep6 } from "@/components/campaigns/wizard/WizardStep6";
 import { WizardStep7 } from "@/components/campaigns/wizard/WizardStep7";
 import { UserModal } from "@/components/campaigns/wizard/UserModal";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { canManageCampaigns } from "@/utils/roles";
 
 interface FormData {
   campaignName: string;
@@ -85,6 +87,13 @@ export default function CreateCampaignPage() {
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    if (user && !canManageCampaigns(user.role_id)) {
+      router.replace("/dashboard/launch-awareness/campaigns");
+    }
+  }, [user, router]);
 
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 7;
