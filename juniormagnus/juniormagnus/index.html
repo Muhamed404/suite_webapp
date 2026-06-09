@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Junior Magnus - Videos & Comics for Kids</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+  <!-- Fun Decorative Top Banner -->
+  <div class="fun-banner">
+    <div class="banner-shapes">
+      <span class="shape circle yellow"></span>
+      <span class="shape star pink"></span>
+      <span class="shape triangle cyan"></span>
+      <span class="shape circle pink"></span>
+      <span class="shape star yellow"></span>
+    </div>
+  </div>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-bar">
+    <div class="logo-container">
+      <img src="images/logo-light.png" alt="Junior Magnus Logo" class="logo">
+      <img src="images/saudi-made.png" alt="Saudi Made Logo" class="saudi-made-header">
+      <span class="school-name"></span>
+    </div>
+
+    <nav class="top-nav">
+      <a href="#videos" class="nav-link" data-en="Videos" data-ar="فيديوهات">Videos</a>
+      <a href="#comics" class="nav-link" data-en="Comics" data-ar="قصص مصورة">Comics</a>
+      <a href="#" class="nav-link" data-en="Games" data-ar="ألعاب">Games</a>
+      <a href="#about" class="nav-link" data-en="About" data-ar="عن جونيور ماغنوس">About</a>
+    </nav>
+
+    <div class="header-actions">
+      <!-- Language Toggle -->
+      <button class="lang-toggle" id="langToggle" aria-label="Switch Language">
+        <span class="lang-icon">🌐</span>
+        <span class="lang-text" id="langText">العربية</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <!-- Animated Running Characters Background -->
+    <div class="hero-characters">
+      <!-- Character 1 - Running Kid -->
+      <div class="character character-1">
+        <img src="https://media.giphy.com/media/3oKIPnAiaMCws8nOsE/giphy.gif" alt="Running character" class="char-img">
+      </div>
+      <!-- Character 2 - Jumping Character -->
+      <div class="character character-2">
+        <img src="https://media.giphy.com/media/l0HlBO7eyXzSZkJri/giphy.gif" alt="Jumping character" class="char-img">
+      </div>
+      <!-- Character 3 - Happy Character -->
+      <div class="character character-3">
+        <img src="https://media.giphy.com/media/11sBLVxNs7v6WA/giphy.gif" alt="Happy character" class="char-img">
+      </div>
+      <!-- Character 4 - Dancing Character -->
+      <div class="character character-4">
+        <img src="https://media.giphy.com/media/l46Cy1rHbQ92uuLXa/giphy.gif" alt="Dancing character" class="char-img">
+      </div>
+      <!-- Character 5 - Running Character -->
+      <div class="character character-5">
+        <img src="https://media.giphy.com/media/fUYhyT9IjftxrxJXcE/giphy.gif" alt="Running character" class="char-img">
+      </div>
+    </div>
+
+    <!-- Floating Shapes -->
+    <div class="hero-decoration">
+      <div class="floating-shape shape-1"></div>
+      <div class="floating-shape shape-2"></div>
+      <div class="floating-shape shape-3"></div>
+      <div class="floating-shape shape-4"></div>
+      <div class="floating-shape shape-5"></div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="hero-content">
+      <h1 class="hero-title" data-en="Welcome to Junior Magnus!" data-ar="مرحباً بكم في جونيور ماغنوس!">Welcome to
+        Junior Magnus!</h1>
+      <p class="hero-subtitle" data-en="Fun videos and exciting comics for awesome kids!"
+        data-ar="فيديوهات ممتعة وقصص مصورة مثيرة للأطفال الرائعين!">Fun videos and exciting comics for awesome kids!</p>
+      <div class="hero-buttons">
+        <a href="#videos" class="btn btn-primary" data-en="Watch Videos" data-ar="شاهد الفيديوهات">Watch Videos</a>
+        <a href="#comics" class="btn btn-secondary" data-en="Read Comics" data-ar="اقرأ القصص">Read Comics</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="main-container">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3 class="sidebar-title" data-en="Video Categories" data-ar="تصنيفات الفيديو">Video Categories</h3>
+        <ul class="sidebar-links">
+          <li><a href="#" class="active" data-category="all" data-en="All Videos" data-ar="كل الفيديوهات">All Videos</a>
+          </li>
+          <li><a href="#" data-category="cyber-safety" data-en="Cyber Safety" data-ar="سلامة الإنترنت">Cyber Safety</a>
+          </li>
+          <li><a href="#" data-category="security" data-en="Security" data-ar="أمان">Security</a></li>
+          <li><a href="#" data-category="awareness" data-en="Awareness" data-ar="توعية">Awareness</a></li>
+          <li><a href="#" data-category="safety-tips" data-en="Safety Tips" data-ar="نصائح السلامة">Safety Tips</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-title" data-en="Comics" data-ar="القصص المصورة">Comics</h3>
+        <ul class="sidebar-links">
+          <li><a href="#comics" data-en="Adventure Comics" data-ar="قصص المغامرات">Adventure Comics</a></li>
+          <li><a href="#comics" data-en="Funny Comics" data-ar="قصص مضحكة">Funny Comics</a></li>
+          <li><a href="#comics" data-en="Learning Comics" data-ar="قصص تعليمية">Learning Comics</a></li>
+        </ul>
+      </div>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-title" data-en="Quick Links" data-ar="روابط سريعة">Quick Links</h3>
+        <ul class="sidebar-links">
+          <li><a href="#about" data-en="About Us" data-ar="عن جونيور ماغنوس">About Us</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content">
+      <!-- Video Gallery Section -->
+      <section id="videos" class="section">
+        <div class="section-header">
+          <h2 class="section-title" data-en="Cybersecurity Educational Cartoon"
+            data-ar="رسوم متحركة تعليمية عن الأمن السيبراني">Cybersecurity Educational Cartoon</h2>
+          <p class="section-desc" data-en="Watch cybersecurity awareness safe kids videos"
+            data-ar="شاهد فيديوهات توعوية عن الأمن السيبراني للأطفال بشكل آمن">Watch cybersecurity awareness safe kids
+            videos!</p>
+        </div>
+
+        <div class="video-grid">
+          <!-- Video Card 1: Fake Prize -->
+          <div class="video-card" data-category="cyber-safety">
+            <a href="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FFake%20prize%20link%20EN.mp4"
+              target="_blank" class="video-link"
+              data-en="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FFake%20prize%20link%20EN.mp4"
+              data-ar="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FFake%20Prize%20Link%20Arabic.mp4">
+              <div class="thumbnail">
+                <img
+                  src="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Ffake-prize.png"
+                  data-en="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Ffake-prize.png"
+                  data-ar="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Ffake-prize-ar.png"
+                  alt="Fake Prize">
+                <div class="play-button">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+                <span class="video-badge" data-en="Cyber Safety" data-ar="سلامة الإنترنت">Cyber Safety</span>
+              </div>
+              <div class="video-info">
+                <h3 data-en="Fake Prize" data-ar="جائزة وهمية">Fake Prize</h3>
+                <p data-en="Don't fall for fake prizes!" data-ar="لا تنخدع بالجوائز الوهمية!">Don't fall for fake
+                  prizes!</p>
+                <span class="duration">2:15</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Video Card 2: Password Gate -->
+          <div class="video-card" data-category="security">
+            <a href="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FPassword%20Gate%20Video%20EN.mp4"
+              target="_blank" class="video-link"
+              data-en="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FPassword%20Gate%20Video%20EN.mp4"
+              data-ar="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FPassword%20Gate%20Arabic%20video.mp4">
+              <div class="thumbnail">
+                <img
+                  src="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fpassword-gate.png"
+                  data-en="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fpassword-gate.png"
+                  data-ar="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fpassword-gate-ar.png"
+                  alt="Password Gate">
+                <div class="play-button">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+                <span class="video-badge" data-en="Security" data-ar="أمان">Security</span>
+              </div>
+              <div class="video-info">
+                <h3 data-en="Password Gate" data-ar="بوابة كلمة المرور">Password Gate</h3>
+                <p data-en="Protect your passwords!" data-ar="احمِ كلمات مرورك!">Protect your passwords!</p>
+                <span class="duration">1:45</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Video Card 3: The Hackers Store -->
+          <div class="video-card" data-category="awareness">
+            <a href="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FThe%20hackers%20store%20EN.mp4"
+              target="_blank" class="video-link"
+              data-en="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FThe%20hackers%20store%20EN.mp4"
+              data-ar="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fthe%20hackers%20store%20AR.mp4">
+              <div class="thumbnail">
+                <img
+                  src="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fhacker-store.png"
+                  data-en="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fhacker-store.png"
+                  data-ar="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fhacker-store-ar.png"
+                  alt="The Hackers Store">
+                <div class="play-button">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+                <span class="video-badge" data-en="Awareness" data-ar="توعية">Awareness</span>
+              </div>
+              <div class="video-info">
+                <h3 data-en="The Hackers Store" data-ar="متجر القراصنة">The Hackers Store</h3>
+                <p data-en="Stay away from dangerous sites." data-ar="ابقَ بعيداً عن المواقع الخطرة.">Stay away from
+                  dangerous sites.</p>
+                <span class="duration">3:05</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Video Card 4: Mysterious USB -->
+          <div class="video-card" data-category="safety-tips">
+            <a href="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fmysterious%20USB%20EN.mp4"
+              target="_blank" class="video-link"
+              data-en="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fmysterious%20USB%20EN.mp4"
+              data-ar="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fmysterious%20USB%20AR.mp4">
+              <div class="thumbnail">
+                <img
+                  src="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fmyesterious-usb.png"
+                  data-en="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fmyesterious-usb.png"
+                  data-ar="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fmyesterious-usb-ar.png"
+                  alt="Mysterious USB">
+                <div class="play-button">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+                <span class="video-badge" data-en="Safety Tips" data-ar="نصائح السلامة">Safety Tips</span>
+              </div>
+              <div class="video-info">
+                <h3 data-en="Mysterious USB" data-ar="يو أس بي غامض">Mysterious USB</h3>
+                <p data-en="Never plug in unknown USBs!" data-ar="لا تقم أبداً بتوصيل يو أس بي مجهول!">Never plug in
+                  unknown USBs!</p>
+                <span class="duration">2:40</span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Comics Section -->
+      <section id="comics" class="section comics-section">
+        <div class="section-header">
+          <h2 class="section-title" data-en="Comics & Stories" data-ar="القصص المصورة">Comics & Stories</h2>
+          <p class="section-desc" data-en="Read amazing comics and stories!" data-ar="اقرأ قصص مصورة وحكايات رائعة!">
+            Read amazing comics and stories!</p>
+        </div>
+
+        <div class="comics-grid">
+          <!-- Comic Card 1: Omar and Layla Adventures -->
+          <div class="comic-card">
+            <a href="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FOmar%20and%20Layla%20adventures%20English%20version.pdf"
+              target="_blank" class="comic-link"
+              data-en="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FOmar%20and%20Layla%20adventures%20English%20version.pdf"
+              data-ar="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2FOmar%20and%20Layla%20adventures%20Arabic%20Version.pdf">
+              <div class="comic-cover">
+                <img
+                  src="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fcomic-1-eng.png"
+                  data-en="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fcomic-1-eng.png"
+                  data-ar="https://objectstorage.me-riyadh-1.oraclecloud.com/n/axqfg50971fp/b/JuniorMagnus/o/contents%2Fcomic-1-ara.png"
+                  alt="Omar and Layla Adventures">
+                <div class="comic-overlay">
+                  <span class="read-btn" data-en="Read Now" data-ar="اقرأ الآن">Read Now</span>
+                </div>
+              </div>
+              <div class="comic-info">
+                <h3 data-en="Omar and Layla Adventures" data-ar="مغامرات عمر وليلى">Omar and Layla Adventures</h3>
+                <span class="comic-pages" data-en="Adventure Story" data-ar="قصة مغامرة">Adventure Story</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- 
+
+          <div class="comic-card">
+            <a href="comics/ocean-friends.pdf" target="_blank" class="comic-link">
+              <div class="comic-cover">
+                <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=300&h=400&fit=crop"
+                  alt="Ocean Friends Comic">
+                <div class="comic-overlay">
+                  <span class="read-btn" data-en="Read Now" data-ar="اقرأ الآن">Read Now</span>
+                </div>
+              </div>
+              <div class="comic-info">
+                <h3 data-en="Ocean Friends" data-ar="أصدقاء المحيط">Ocean Friends</h3>
+                <span class="comic-pages" data-en="20 Pages" data-ar="20 صفحة">20 Pages</span>
+              </div>
+            </a>
+          </div>
+
+         
+          <div class="comic-card">
+            <a href="comics/math-heroes.pdf" target="_blank" class="comic-link">
+              <div class="comic-cover">
+                <img src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=300&h=400&fit=crop"
+                  alt="Math Heroes Comic">
+                <div class="comic-overlay">
+                  <span class="read-btn" data-en="Read Now" data-ar="اقرأ الآن">Read Now</span>
+                </div>
+              </div>
+              <div class="comic-info">
+                <h3 data-en="Math Heroes" data-ar="أبطال الرياضيات">Math Heroes</h3>
+                <span class="comic-pages" data-en="18 Pages" data-ar="18 صفحة">18 Pages</span>
+              </div>
+            </a>
+          </div>
+
+         
+          <div class="comic-card">
+            <a href="comics/dinosaur-world.pdf" target="_blank" class="comic-link">
+              <div class="comic-cover">
+                <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=300&h=400&fit=crop"
+                  alt="Dinosaur World Comic">
+                <div class="comic-overlay">
+                  <span class="read-btn" data-en="Read Now" data-ar="اقرأ الآن">Read Now</span>
+                </div>
+              </div>
+              <div class="comic-info">
+                <h3 data-en="Dinosaur World" data-ar="عالم الديناصورات">Dinosaur World</h3>
+                <span class="comic-pages" data-en="22 Pages" data-ar="22 صفحة">22 Pages</span>
+              </div>
+            </a>
+          </div>
+          -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- About Section -->
+  <section id="about" class="section about-section">
+    <div class="section-header">
+      <div class="about-logo">
+        <img src="images/company-logo.png" alt="SecureMagnus Logo" width="400px">
+      </div>
+      <h2 class="section-title" data-en="About Our Company" data-ar="عن جونيور ماغنوس">About Our Company</h2>
+      <p class="section-desc"
+        data-en="JuniorMagnus helps kids understand online threats and make smart, safe choices through fun and engaging comics. Each story builds awareness, teaches practical skills, and encourages critical thinking so children can navigate the digital world confidently and responsibly"
+        data-ar="ﺎﺗﺴﺎﻋﺪ JuniorMagnus اﻷﻃﻔﺎل ﻋﲆ ﻓﻬﻢ اﻟﺘﻬﺪﻳﺪات ﻋﺒﺮ اﻹﻧﺘﺮﻧﺖ واﺗﺨﺎذ ﺧﻴﺎرات ذﻛﻴﺔ وآﻣﻨﺔ ﻣﻦ ﺧﻼل ﻗﺼﺺ ﻣﺼﻮّرة ﻣﻤﺘﻌﺔ وﺟﺬاﺑﺔ. ﻛﻞ ﻗﺼﺔ ﺗﻌﺰز اﻟﻮﻋﻲ، وﺗﻌﻠ ّﻢ ﻣﻬﺎرات ﻋﻤﻠﻴﺔ، وﺗﺸﺠﻊ ﻋﲆ اﻟﺘﻔﻜﻴﺮ اﻟﻨﻘﺪي، ﻟﻴﺘﻤﻜﻦ اﻷﻃﻔﺎل ﻣﻦ اﻟﺘﻨﻘﻞ ﻓﻲ اﻟﻌﺎﻟﻢ اﻟﺮﻗﻤﻲ ﺑﺜﻘﺔ وﻣﺴﺆوﻟﻴﺔ.">
+        JuniorMagnus helps kids understand online threats and make smart, safe choices through fun and engaging comics.
+        Each story builds awareness, teaches practical skills, and encourages critical thinking so children can navigate
+        the digital world confidently and responsibly
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <p class="footer-text"
+        data-en="© 2025 SecureMagnus. All rights reserved. All information shared is for educational purposes only."
+        data-ar="© 2025 ﺷﺮﻛﺔ SecureMagnus. ﺟﻤﻴﻊ اﻟﺤﻘﻮق ﻣﺤﻔﻮﻇﺔ. ﺟﻤﻴﻊ اﻟﻤﻌﻠﻮﻣﺎت اﻟﻤﺸﺘﺮﻛﺔ ﻷﻏﺮاض ﺗﻌﻠﻴﻤﻴﺔ ﻓﻘﻂ">© 2025
+        SecureMagnus. All rights reserved. All information shared is for educational purposes only.</p>
+      <p class="footer-text" data-en="Created by SecureMagnus, a trusted name in cybersecurity awareness"
+        data-ar="ﺗﻢ اﻹﻧﺸﺎء ﺑﻮاﺳﻄﺔ ﺷﺮﻛﺔ SecureMagnus، اﻻﺳﻢ اﻟﻤﻮﺛﻮق ﻓﻲ اﻟﺘﻮﻋﻴﺔ ﺑﺎﻷﻣﻦ اﻟﺴﻴﺒﺮاﻧﻲ.">Created by SecureMagnus,
+        a trusted name in cybersecurity awareness</p>
+      <div class="footer-links">
+        <a href="#" data-en="Contact" data-ar="تواصل معنا">www.securemagnus.com</a>
+        <a href="#" data-en="Help" data-ar="مساعدة">JuniorMagnus.securemagnus-suite.com</a>
+      </div>
+      <div class="footer-badges">
+        <img src="images/saudi-made.png" alt="Saudi Made Logo" class="saudi-made-footer">
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

@@ -7,7 +7,6 @@ const render_ejs_urls = require("../../../../config/render_ejs_urls");
 const frontend_app_urls = require('../../../../config/frontend_api_urls');
 const frontend_api_urls = require("../../../../config/frontend_api_urls");
 const ApplicationConstants = require('../../../../contants/application-constants')
-const { formatDateTimeDDMmmYYYYHHmmAMPM } = require('../../../../utility/date-time-utility');
 const { redactLogData } = require("../../../utility/redact");
 /**
  * Controller to render the NFC campaign details view with statistics and user details.
@@ -42,9 +41,7 @@ exports.viewNFCCampaignDetails = async (req, res) => {
 
     const campaignDetails = apiResponseCampaignReport?.data?.message.campaign || {};
     logger.info(`NFC Campaign Detail: campaignDetails: ${JSON.stringify(redactLogData(campaignDetails), null, 2)}`);
-    if (campaignDetails?.start_datetime) {
-      campaignDetails.start_datetime = formatDateTimeDDMmmYYYYHHmmAMPM(campaignDetails.start_datetime);
-    }
+    // start_datetime formatted in user timezone by service_suite (generate-nfc-report-by-campaign)
     const templateDetails = apiResponseCampaignReport?.data?.message.campaign.Templates || {};
     const campaignStats = apiResponseCampaignReport?.data?.message.interactionStatsByCampaign || {};
     const openSegmentStats = apiResponseCampaignReport?.data?.message.openSegmentStats || {};

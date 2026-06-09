@@ -1,0 +1,182 @@
+<div class="flex flex-col  p-6 pt-0">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+    <div class="flex-1">
+      <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
+        <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
+        <span class="text-gray-400">›</span>
+        <a href="/user/suite-users" class="hover:text-gray-700 transition"><%= __("user.labelSecureMagnusUsers") %></a>
+        <span class="text-gray-400">›</span>
+        <span class="font-semibold text-gray-900"><%= __("user.labelImportFromLdap") %></span>
+      </nav>
+      <h3 class="text-3xl font-medium">
+        <%= __("user.labelImportFromLdap") %>
+      </h3>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
+    <form action="/user/ldap/import/<%= typeof organization !== 'undefined' ? organization : '' %>" method="post" name="importLdapUser" id="importLdapUser" 
+    class="bg-white  w-full mt-3 p-8" novalidate>
+      <!-- Stepper Navigation -->
+      <div id="stepper" class="flex items-center justify-between mb-10">
+        <div class="flex items-center gap-2">
+          <div class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-teal-500 text-white font-bold text-xs">1</div>
+          <span class="font-medium step-label text-teal-700 text-sm"><%= __("user.stepChooseProduct") %></span>
+        </div>
+        <div class="flex-1 h-0.5 bg-teal-100 mx-2"></div>
+        <div class="flex items-center gap-2">
+          <div class="step-circle w-6 h-6 flex items-center justify-center rounded-full bg-white border-2 border-teal-300 text-teal-400 font-bold text-xs">2</div>
+          <span class="font-medium step-label text-gray-400 text-sm"><%= __("user.stepSelectLdapMode") || 'Select Mode' %></span>
+        </div>
+      </div>
+
+      <div id="steps">
+        <%- include('./select_product.ejs') %>
+        <%- include('./select_ldap_mode.ejs') %>
+      </div>
+    </form>
+
+    <div class="flex justify-end gap-4 mt-10 p-8">
+      <button id="backBtn" type="button"
+        class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition"><%= __("generic_label.back") %></button>
+      <button id="nextBtn" type="submit"
+        class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition"><%= __("generic_label.next") %></button>
+    </div>
+  </div>
+</div>
+
+<script src="/securemagnus_2025/js/form_stepper.js"></script>
+<script>
+window.i18n = window.i18n || {};
+window.i18n.labels = window.i18n.labels || {};
+window.i18n.labels.finish = '<%= __("generic_label.Finish") %>';
+window.i18n.labels.next = '<%= __("generic_label.next") %>';
+
+// Override default form submission triggered by form_stepper.js to run AJAX sync
+const form = document.getElementById('importLdapUser');
+const originalSubmit = form.submit;
+form.submit = function() {
+  const event = new Event('submit', { cancelable: true, bubbles: true });
+  form.dispatchEvent(event);
+  if (!event.defaultPrevented) {
+    originalSubmit.call(form);
+  }
+};
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  var isLastStep = !document.getElementById('step-2').classList.contains('hidden');
+  if (!isLastStep) return;
+
+  var mode = document.getElementById('import_mode').value;
+  var product = document.getElementById('application').value;
+  if (!mode) {
+    Swal.fire({
+      icon: 'warning',
+      text: 'Please select an import mode',
+      confirmButtonColor: '#3085d6',
+    });
+    return;
+  }
+
+  var nextBtn = document.getElementById('nextBtn');
+  var originalBtnText = nextBtn.innerHTML;
+  
+  try {
+    nextBtn.disabled = true;
+    nextBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+    
+    var response = await fetch(form.action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+      body: JSON.stringify({ import_mode: mode, application: product })
+    });
+
+    var data = await response.json();
+    if (!response.ok || !data.success) {
+      if (typeof showCustomToast === 'function') {
+        showCustomToast('error', data.message || 'LDAP import failed');
+      } else {
+        Swal.fire('Error', data.message || 'LDAP import failed', 'error');
+      }
+      return;
+    }
+
+    if (typeof showCustomToast === 'function') {
+      showCustomToast('success', data.message || 'LDAP import successful');
+    } else {
+      Swal.fire('Success', data.message || 'LDAP import successful', 'success');
+    }
+    setTimeout(function() {
+      window.location.href = '/user/suite-users';
+    }, 1200);
+
+  } catch (error) {
+    if (typeof showCustomToast === 'function') {
+      showCustomToast('error', 'An error occurred during LDAP import');
+    } else {
+      Swal.fire('Error', 'An error occurred during LDAP import', 'error');
+    }
+  } finally {
+    nextBtn.disabled = false;
+    nextBtn.innerHTML = originalBtnText;
+  }
+});
+
+// Available quota fetch and disable/enable next button accordingly
+$(document).ready(function () {
+    const $nextBtn = $('#nextBtn');
+    
+    // Disable next button initially if no application is selected
+    if (!$('#application').val()) {
+        $nextBtn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+    }
+
+    $('#application').on('change', function () {
+        const selectedProduct = $(this).val();
+        if (!selectedProduct || selectedProduct == 0) {
+            $nextBtn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+            $('#alertLicenseAvailability').val('');
+            return;
+        }
+
+        // Show loading indicator
+        $('#alertLicenseAvailability').val('Loading...');
+
+        $.ajax({
+            url: `/license/retrieve/information/${selectedProduct}`,
+            method: 'GET',
+            success: function (response) {
+                var licenseText = $('#alertLicenseAvailability').data('license-text') || 'Available Users License';
+                var available = response.filteredLicense?.availableLicenses || 0;
+                var phishLicenses = response.filteredLicense?.phishLicenses || 0;
+                var awareLicenses = response.filteredLicense?.awareLicenses || 0;
+                
+                if (selectedProduct == 4) { // All
+                    $('#alertLicenseAvailability').val('Phish: ' + (phishLicenses || 0) + ', Aware: ' + (awareLicenses || 0));
+                    var hasLicenseForProduct = (phishLicenses > 0) && (awareLicenses > 0);
+                    if (hasLicenseForProduct) {
+                        $nextBtn.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+                    } else {
+                        $nextBtn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+                    }
+                } else {
+                    $('#alertLicenseAvailability').val(licenseText + ': ' + available);
+                    var hasLicenseForProduct = available > 0;
+                    if (hasLicenseForProduct) {
+                        $nextBtn.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+                    } else {
+                        $nextBtn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+                    }
+                }
+            },
+            error: function () {
+                var licenseText = $('#alertLicenseAvailability').data('license-text') || 'Available Users License';
+                $('#alertLicenseAvailability').val(licenseText + ': ' + 0);
+                $nextBtn.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+            }
+        });
+    });
+});
+</script>

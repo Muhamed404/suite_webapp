@@ -1,0 +1,1678 @@
+@import "tailwindcss";
+
+@plugin '../hero.ts';
+
+@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@source '../node_modules/@heroui/date-picker/dist/**/*.{js,ts,jsx,tsx}';
+@source '../node_modules/@heroui/calendar/dist/**/*.{js,ts,jsx,tsx}';
+@source '../node_modules/@heroui/date-input/dist/**/*.{js,ts,jsx,tsx}';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: "Fredoka", "Nunito Sans", sans-serif;
+  --font-mono: "monospace", monospace;
+  --font-fondamento: "Fondamento", cursive;
+}
+
+:root {
+  /* Junior Magnus public website brand (juniormagnus/styles.css) */
+  --primary-color: #FF6B35;
+  --secondary-color: #00D4AA;
+  --accent-yellow: #FFD23F;
+  --accent-pink: #FF69B4;
+  --accent-cyan: #00CED1;
+  --dark-color: #2D3047;
+  --white: #ffffff;
+  --light-gray: #f8f9fa;
+
+  /* Legacy app variables — layout tokens match Aware Magnus; accent colors stay JNR brand */
+  --bg: #fafbfc;
+  --teal: #00ccc4;
+  --gray: #f1f5f8;
+  --darkgray: #656972;
+  --strokeGray: #dae1e5;
+  --mainblue: #051226;
+  --lightBlue: #5ce8c9;
+  --blue: var(--primary-color);
+  --email: var(--accent-cyan);
+  --emaillight: #e6faf8;
+
+  /* Module card thumbnail gradient */
+  --cardbg: linear-gradient(90deg, #FF6B35 0%, #FF6B35 35%, #00D4AA 100%);
+
+  /* Dashboard typography scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+}
+
+* {
+  font-family: "Fredoka", "Nunito Sans", sans-serif;
+}
+
+html[lang="ar"] * {
+  font-family: "Noto Kufi Arabic", "Fredoka", "Nunito Sans", sans-serif;
+}
+
+/* Website-style decorative top banner */
+.jnr-fun-banner {
+  height: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-color) 0%,
+    var(--accent-yellow) 25%,
+    var(--secondary-color) 50%,
+    var(--accent-cyan) 75%,
+    var(--accent-pink) 100%
+  );
+}
+
+/* Custom scrollbar for sidebar */
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  overflow-y: auto;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.custom-scroll:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Hide scrollbar but keep scroll (primary sidebar) */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Sidebar collapsed on desktop (icon-only) - match example app */
+#sidebar.collapsed {
+  width: 5rem;
+  /* Tailwind w-20 */
+}
+
+/* Hide text spans (keep toggle button visible so user can expand again) */
+#sidebar.collapsed a>span,
+#sidebar.collapsed button:not(.sidebar-toggle)>span {
+  display: none;
+}
+
+#sidebar.collapsed a,
+#sidebar.collapsed button:not(.sidebar-toggle) {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Center logo when collapsed */
+#sidebar.collapsed a.sidebar-logo {
+  left: 50%;
+  transform: translateX(-50%);
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#sidebar.collapsed a>div.absolute {
+  left: auto !important;
+  right: 0.25rem !important;
+  width: 0.25rem !important;
+  height: 3rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  border-radius: 9999px !important;
+}
+
+/* Add content form: preview areas (match HTML reference) */
+.dashed-preview {
+  border: 1px dashed #e5e7eb;
+  background: #fafbfc;
+  border-radius: 0.75rem;
+}
+
+.upload-pill {
+  border-radius: 9999px;
+  border: 1px solid #e6eef6;
+  background: #ffffff;
+}
+
+/* Content type card status pills (match HTML reference) */
+.pill-btn {
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  cursor: default;
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+.pill-btn.green {
+  color: #22c55e;
+  background-color: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.pill-btn.orange {
+  color: #f97316;
+  background-color: rgba(249, 115, 22, 0.08);
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+/* Additional styles from the HTML project */
+
+* {
+  font-family: "Nunito Sans", sans-serif;
+}
+
+:root {
+  --bg: #FAFBFC;
+  --gray: #F1F5F8;
+  --darkgray: #656972;
+  --strokeGray: #DAE1E5;
+  --mainblue: #051226;
+  --lightBlue: #66CAFE;
+  --blue: var(--primary-color, #FF6B35);
+  --subheading: #656972;
+  --cardbg: linear-gradient(90deg, #FF6B35 0%, #FF6B35 35%, #00D4AA 100%);
+  --email: #57ABE6;
+  --emaillight: #D9E5F3;
+
+
+  --sms:
+
+}
+
+.cke_notifications_area {
+  display: none !important;
+}
+
+
+
+.bg-white {
+  background-color: var(--bg);
+}
+
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  /* gap-2 */
+  min-width: 160px;
+  /* required */
+  padding: 0.5rem 1rem;
+  /* px-4 py-2 */
+  background-color: var(--blue);
+  color: #ffffff;
+  border-radius: 9999px;
+  /* rounded-full */
+  font-size: 0.75rem;
+  /* text-xs */
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  justify-content: center;
+  /* keeps content centered */
+}
+
+.btn:hover {
+  background-color: #e55a28;
+}
+
+.secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-width: 160px;
+  /* keep consistency with primary */
+  padding: 0.5rem 1.5rem;
+  /* px-6 py-2 */
+  background-color: #ffffff;
+  color: #4b5563;
+  /* text-gray-600 */
+  border-radius: 9999px;
+  /* rounded-full */
+  font-size: 0.75rem;
+  /* text-xs */
+  font-weight: 500;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: 1px solid #f3f4f6;
+  /* border-gray-300 */
+}
+
+.secondary-btn:hover {
+  border: 1px solid #d1d5db;
+  /* hover:bg-gray-100 */
+}
+
+/* Base table action button */
+.table-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  /* gap-1.5 */
+  min-width: 120px;
+  padding: 0.375rem 0.5rem;
+  /* px-2 py-1.5 */
+  border-radius: 9999px;
+  /* rounded-full */
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* Variants */
+.table-btn--primary {
+  background-color: var(--blue);
+}
+
+.table-btn--primary:hover {
+  opacity: 0.9;
+}
+
+.table-btn--warning {
+  background-color: #f59e0b;
+  /* amber-500 */
+}
+
+.table-btn--warning:hover {
+  background-color: #d97706;
+  /* amber-600 */
+}
+
+.table-btn--neutral {
+  background-color: #6b7280;
+  /* gray-500 */
+}
+
+.table-btn--neutral:hover {
+  background-color: #4b5563;
+  /* gray-600 */
+}
+
+/* Icon size consistency */
+.table-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+
+
+
+/* Ensure fixed width on Rate cell, even when hovered */
+.rate-cell {
+  width: 15rem;
+  /* matches Tailwind w-60 */
+  min-width: 15rem;
+  max-width: 15rem;
+}
+
+/* Optional: smooth transition for progress bar */
+.progress-bar {
+  transition: width 0.8s cubic-bezier(.4, 0, .2, 1);
+}
+
+
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.95rem;
+  background: #e6fcf8;
+  color: black;
+  border-radius: 6px;
+  margin-right: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.tag button {
+  background: none;
+  border: none;
+  color: black;
+  font-size: 1.1em;
+  cursor: pointer;
+  padding: 0;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  cursor: pointer;
+  display: block;
+  background: transparent;
+  color: #374151;
+  /* Darker gray for better visibility */
+  padding: 0;
+  margin: 0;
+  filter: invert(0);
+  /* Ensure icon is dark */
+  position: relative;
+  right: 0;
+}
+
+/* Add custom calendar icon if browser default is not visible */
+input[type="date"] {
+  position: relative;
+  -moz-appearance: textfield;
+  /* Firefox */
+}
+
+input[type="date"]::after {
+  content: "📅";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+
+
+.round-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 9999px;
+  border: 2px solid #17b1a8;
+  background: #fff;
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.round-checkbox:checked {
+  background: #17b1a8;
+  border-color: #17b1a8;
+}
+
+.round-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 0.33rem;
+  top: 0;
+  width: 0.4rem;
+  height: 0.8rem;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+  /* creates the tick */
+}
+
+
+
+/* Mountain Mist: round checkbox & radio styles */
+.mm-checkbox,
+.mm-radio {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 9999px;
+  border: 2px solid #17b1a8;
+  background: #fff;
+  transition: box-shadow .2s, border-color .2s;
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+}
+
+.mm-checkbox:checked {
+  background-color: #17b1a8;
+  border-color: #17b1a8;
+}
+
+.mm-checkbox:checked::after {
+  content: '';
+  position: absolute;
+  left: 0.30rem;
+  top: 0.17rem;
+  width: 0.4rem;
+  height: 0.65rem;
+  border-right: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(45deg);
+}
+
+.mm-radio {
+  border-radius: 9999px;
+}
+
+.mm-radio:checked {
+  background-color: #17b1a8;
+  border-color: #17b1a8;
+}
+
+.mm-radio:checked::after {
+  content: '';
+  position: absolute;
+  left: 0.32rem;
+  top: 0.32rem;
+  width: 0.36rem;
+  height: 0.36rem;
+  background: #fff;
+  border-radius: 9999px;
+}
+
+
+
+.fade-enter {
+  opacity: 0;
+  transform: translateX(20px);
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transform: translateX(0);
+  transition: all 0.4s ease;
+}
+
+.fade-exit {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.4s ease;
+}
+
+
+
+
+
+/* Hide default calendar/clock icons in datetime-local */
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  display: none;
+  -webkit-appearance: none;
+}
+
+input[type="datetime-local"]::-webkit-clear-button {
+  display: none;
+}
+
+/* Hide Google Translate elements */
+.goog-te-banner-frame.skiptranslate {
+  display: none !important;
+}
+
+body {
+  top: 0px !important;
+}
+
+.goog-logo-link {
+  display: none !important;
+}
+
+.goog-te-gadget {
+  color: transparent !important;
+}
+
+#goog-gt-tt, .goog-tooltip, .goog-tooltip:hover, .goog-text-highlight {
+  display: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+input[type="datetime-local"]::-webkit-inner-spin-button {
+  display: none;
+}
+
+
+
+.datatable-input {
+  padding: 0.75rem 2.5rem;
+  /* 12px */
+  padding-left: 1.5rem;
+  /* 56px */
+  border-radius: 9999px;
+  background-color: #ffffff;
+  font-size: 0.875rem;
+  /* 14px */
+  border-width: 1px;
+  border-color: #d1d5db;
+}
+
+.datatable-input:focus {
+  outline: 1px solid transparent;
+  outline-offset: 1px;
+  box-shadow: 0 0 0 calc(.5px + .5px) var(--teal);
+  /* This assumes a custom property named --teal */
+}
+
+
+#filter {
+
+
+  padding: 0.75rem 2.5rem;
+  /* 12px */
+  padding-left: 1.5rem;
+  /* 56px */
+
+  border-radius: 9999px;
+  background-color: #ffffff;
+  font-size: 0.875rem;
+  /* 14px */
+  border-width: 1px;
+  border-color: #d1d5db;
+}
+
+
+
+/* Pagination container */
+.datatable-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+/* Pagination list */
+.datatable-pagination-list {
+  display: flex;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Pagination items */
+.datatable-pagination-list-item {
+  display: inline-block;
+}
+
+/* Buttons */
+.datatable-pagination-list-item-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 1px solid #d0e4e4;
+  /* light teal border */
+  background-color: transparent;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Active page */
+.datatable-pagination-list-item.datatable-active .datatable-pagination-list-item-link {
+  background-color: #e6f7f7;
+  /* light teal background */
+  border-color: #36b6b6;
+  /* teal border */
+  color: #36b6b6;
+
+}
+
+/* Hover effect */
+.datatable-pagination-list-item-link:hover {
+  background-color: #f0fafa;
+  border-color: #36b6b6;
+  color: #36b6b6;
+}
+
+/* Disabled arrows */
+.datatable-pagination-list-item.datatable-disabled .datatable-pagination-list-item-link {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Optional: Arrows smaller */
+.datatable-pagination-list-item-link {
+  font-size: 16px;
+}
+
+
+
+/* buttons */
+
+.pill-btn {
+  font-size: 0.875rem;
+  /* 14px */
+  font-weight: 500;
+  border-radius: 9999px;
+  /* Pill shape */
+  padding: 0.25rem 0.75rem;
+  cursor: default;
+  border: 1px solid;
+  transition: all 0.3s ease;
+}
+
+/* Red */
+.pill-btn.red {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.pill-btn.red:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.6);
+  font-weight: 600;
+}
+
+/* Orange */
+.pill-btn.orange {
+  color: #f97316;
+  background-color: rgba(249, 115, 22, 0.08);
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+.pill-btn.orange:hover {
+  background-color: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.6);
+  font-weight: 600;
+}
+
+/* Yellow */
+.pill-btn.yellow {
+  color: #eab308;
+  background-color: rgba(234, 179, 8, 0.08);
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.pill-btn.yellow:hover {
+  background-color: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.6);
+  font-weight: 600;
+}
+
+/* Green */
+.pill-btn.green {
+  color: #22c55e;
+  background-color: rgba(34, 197, 94, 0.08);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+.pill-btn.green:hover {
+  background-color: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.6);
+  font-weight: 600;
+}
+
+/* Blue */
+.pill-btn.blue {
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.3);
+}
+
+.pill-btn.blue:hover {
+  background-color: rgba(37, 99, 235, 0.15);
+  border-color: rgba(37, 99, 235, 0.6);
+  font-weight: 600;
+}
+
+/* Indigo */
+.pill-btn.indigo {
+  color: #4f46e5;
+  background-color: rgba(79, 70, 229, 0.08);
+  border-color: rgba(79, 70, 229, 0.3);
+}
+
+.pill-btn.indigo:hover {
+  background-color: rgba(79, 70, 229, 0.15);
+  border-color: rgba(79, 70, 229, 0.6);
+  font-weight: 600;
+}
+
+/* Violet */
+.pill-btn.violet {
+  color: #a855f7;
+  background-color: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.pill-btn.violet:hover {
+  background-color: rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.6);
+  font-weight: 600;
+}
+
+
+
+/* <button class="pill-btn red">45%</button>
+<button class="pill-btn orange">45%</button>
+<button class="pill-btn yellow">45%</button>
+<button class="pill-btn green">45%</button>
+<button class="pill-btn blue">45%</button>
+<button class="pill-btn indigo">45%</button>
+<button class="pill-btn violet">45%</button> */
+
+
+
+/* Wrapper */
+.custom-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+
+/* Hidden Checkbox */
+.hidden-checkbox {
+  display: none;
+}
+
+/* Custom Circle */
+.custom-circle {
+
+  width: 24px;
+  height: 24px;
+  border: 2px solid #9ca3af;
+  /* gray-400 */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  top: 5px;
+  transition: all 0.3s ease;
+}
+
+/* Tick mark inside the circle */
+.custom-circle::after {
+  content: '';
+  position: absolute;
+  display: none;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 14px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -60%) rotate(45deg);
+  position: absolute;
+  top: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* When checkbox is checked */
+.hidden-checkbox:checked+.custom-circle {
+  background-color: #10b981;
+  /* green-500 */
+  border-color: #10b981;
+}
+
+.hidden-checkbox:checked+.custom-circle::after {
+  opacity: 1;
+}
+
+/* Text content */
+.text-content .title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  /* gray-900 */
+}
+
+.text-content .desc {
+  font-size: 0.875rem;
+  color: #6b7280;
+  /* gray-500 */
+}
+
+
+
+.ck.ck-editor__editable_inline {
+  min-height: 300px !important;
+  /* Bigger height */
+  border-radius: 8px;
+  /* Rounded like your design */
+  background: #f9fafb;
+  /* Match input background */
+}
+
+
+
+/* Hide the original radio */
+.custom-radio input[type="radio"] {
+  display: none;
+}
+
+/* Outer circle */
+.custom-radio .radio-circle {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #d1d5db;
+  /* gray-300 */
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: border 0.3s ease;
+  flex-shrink: 0;
+  /* Prevent shrinking */
+}
+
+/* When checked */
+.custom-radio input[type="radio"]:checked+.radio-circle {
+  border: 2px solid #00CCC4;
+  /* teal */
+}
+
+.custom-radio input[type="radio"]:checked+.radio-circle::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background-color: #00CCC4;
+  border-radius: 50%;
+}
+
+/* Fix label alignment */
+.custom-radio {
+  display: flex;
+  align-items: center;
+  /* Vertical center */
+  gap: 12px;
+  /* Space between circle and text */
+  cursor: pointer;
+}
+
+
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.upload-pill {
+  border-radius: 9999px;
+  border: 1px solid #E6EEF6;
+  background: #FFFFFF;
+}
+
+.dashed-preview {
+  border-style: dashed;
+  border-color: #E5E7EB;
+  background: #FAFBFC;
+}
+
+.icon-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #F3F7FA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+select:focus+svg {
+  transform: rotate(180deg) translateY(50%);
+}
+
+/* 
+.image-preview {
+  width: 48px;
+  height: 48px;
+  border: 1px dashed #d1d5db;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  position: relative;
+}
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+.remove-btn {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  border-radius: 50%;
+  color: #ef4444;
+  font-weight: bold;
+  width: 16px;
+  height: 16px;
+  line-height: 12px;
+  text-align: center;
+  cursor: pointer;
+  padding: 0;
+  font-size: 11px;
+  z-index: 10;
+}
+.remove-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+#editor {
+  height: 128px;
+  background: #f9fafb;
+}
+.preview-area {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  height: 160px;
+  overflow: auto;
+} */
+
+/* ================================================
+   MODERN MINIMALIST SCROLLBAR
+   ================================================ */
+
+/* Universal Scrollbar - Ultra Minimal */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 100px;
+  transition: background 0.3s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+
+/* Firefox Support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Mobile - Even thinner */
+@media (max-width: 768px) {
+  *::-webkit-scrollbar {
+    width: 3px;
+    height: 3px;
+  }
+}
+
+
+
+
+
+
+/* ==============================================
+   MODERN CHECKBOX COMPONENT
+============================================== */
+.modern-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.modern-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.modern-checkbox .checkmark {
+  position: relative;
+  height: 18px;
+  width: 18px;
+  background-color: #fff;
+  border: 2px solid #d1d5db;
+  border-radius: 0.375rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
+}
+
+.modern-checkbox:hover .checkmark {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modern-checkbox input:checked~.checkmark {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.modern-checkbox input:disabled~.checkmark {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modern-checkbox .checkmark::after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -60%) rotate(45deg);
+}
+
+.modern-checkbox input:checked~.checkmark::after {
+  display: block;
+}
+
+.modern-checkbox .label-text {
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.modern-checkbox:hover .label-text {
+  color: #1f2937;
+}
+
+/* Rounded variant */
+.modern-checkbox.rounded .checkmark {
+  border-radius: 9999px;
+}
+
+/* Small size variant */
+.modern-checkbox.small .checkmark {
+  height: 14px;
+  width: 14px;
+}
+
+.modern-checkbox.small .checkmark::after {
+  width: 3px;
+  height: 6px;
+}
+
+.modern-checkbox.small .label-text {
+  font-size: 0.75rem;
+}
+
+/* Large size variant */
+.modern-checkbox.large .checkmark {
+  height: 22px;
+  width: 22px;
+}
+
+.modern-checkbox.large .checkmark::after {
+  width: 5px;
+  height: 10px;
+}
+
+/* ==============================================
+   MODERN SELECT DROPDOWN COMPONENT
+============================================== */
+.modern-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.modern-select {
+  width: 100%;
+  background-color: white;
+  color: #374151;
+  font-size: 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 9999px;
+  padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+}
+
+.modern-select:hover {
+  border-color: #9ca3af;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.modern-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.modern-select:disabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.modern-select-wrapper::after {
+  content: '';
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #6b7280;
+  pointer-events: none;
+  transition: transform 0.2s;
+}
+
+.modern-select-wrapper:hover::after {
+  border-top-color: #374151;
+}
+
+.modern-select:focus~.modern-select-wrapper::after,
+.modern-select-wrapper.focused::after {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* Icon variant */
+.modern-select-wrapper.with-icon {
+  display: flex;
+  align-items: center;
+}
+
+.modern-select-wrapper.with-icon .select-icon {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+  pointer-events: none;
+  transition: all 0.2s;
+}
+
+.modern-select-wrapper.with-icon:hover .select-icon {
+  color: #374151;
+}
+
+.modern-select-wrapper.with-icon .modern-select {
+  padding-right: 2.5rem;
+}
+
+/* Small size */
+.modern-select.small {
+  font-size: 0.75rem;
+  padding: 0.75rem 2rem 0.75rem 0.625rem;
+}
+
+/* Large size */
+.modern-select.large {
+  font-size: 1rem;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+}
+
+/* Success state */
+.modern-select.success {
+  border-color: #10b981;
+}
+
+.modern-select.success:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Error state */
+.modern-select.error {
+  border-color: #ef4444;
+}
+
+.modern-select.error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+
+
+/* Styel Input field */
+/* Reusable Input Field Class */
+.input-field {
+  width: 100%;
+  padding: 0.59rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.75rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: #3b82f6;
+  ring: 2px;
+  ring-color: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+
+.input-field:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.input-field::placeholder {
+  color: #9ca3af;
+}
+
+/* Label Class */
+.input-label {
+  display: block;
+  color: #374151;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+  font-size: 0.75rem;
+}
+
+/* Input Group Container */
+.input-group {
+  margin-bottom: 1rem;
+}
+
+/* Error State */
+.input-field.error {
+  border-color: #ef4444;
+}
+
+.input-field.error:focus {
+  ring-color: rgba(239, 68, 68, 0.1);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Success State */
+.input-field.success {
+  border-color: #10b981;
+}
+
+.input-field.success:focus {
+  ring-color: rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+
+/* table */
+
+.tab-btn {
+  padding: 8px 16px;
+  font-size: 11px;
+  font-weight: 500;
+  background: #f3f4f6;
+  color: #6b7280;
+  border-radius: 999px;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.tab-btn:hover {
+  background: #e5e7eb;
+}
+
+.tab-btn.active {
+  background: #0f172a;
+  color: white;
+}
+
+.page-btn {
+  min-width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  font-size: 11px;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.page-btn.active {
+  background: #0ea5e9;
+  color: white;
+  border-color: #0ea5e9;
+}
+
+.page-btn:disabled {
+  cursor: not-allowed;
+}
+
+.action-btn {
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Wizard Progress Styling - Stepper Form */
+.wizard-progress {
+  position: relative;
+  padding: 0 0 20px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+/* Single background line connecting all steps */
+.wizard-progress::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e5e7eb;
+  z-index: 0;
+  width: calc(100% - 1.5rem);
+  margin: 0 0.75rem;
+}
+
+/* Progress line fill (animated as user progresses) */
+.wizard-progress::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 0.75rem;
+  height: 2px;
+  background: #3b82f6;
+  z-index: 1;
+  transition: width 0.5s ease-in-out;
+  width: 0;
+}
+
+/* Individual step styling - NO lines here */
+.wizard-progress-step {
+  position: relative;
+  z-index: 10;
+  flex: 1;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+/* Remove the ::before and ::after from individual steps */
+.wizard-progress-step::before,
+.wizard-progress-step::after {
+  display: none !important;
+}
+
+/* Step circle styles */
+.wizard-progress-step .circle {
+  position: relative;
+  z-index: 20;
+  transition: all 0.3s ease;
+}
+
+.wizard-progress-step.active .circle {
+  background: #3b82f6 !important;
+  color: white !important;
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.wizard-progress-step.done .circle {
+  background: #3b82f6 !important;
+  color: white !important;
+}
+
+/* Calculate progress line width dynamically */
+.wizard-progress-step:nth-child(1).done~.wizard-progress::after {
+  width: calc((100% - 1.5rem) * 1 / 6);
+}
+
+.wizard-progress-step:nth-child(2).done~.wizard-progress::after {
+  width: calc((100% - 1.5rem) * 2 / 6);
+}
+
+.wizard-progress-step:nth-child(3).done~.wizard-progress::after {
+  width: calc((100% - 1.5rem) * 3 / 6);
+}
+
+.wizard-progress-step:nth-child(4).done~.wizard-progress::after {
+  width: calc((100% - 1.5rem) * 4 / 6);
+}
+
+.wizard-progress-step:nth-child(5).done~.wizard-progress::after {
+  width: calc((100% - 1.5rem) * 5 / 6);
+}
+
+.wizard-progress-step:nth-child(6).done~.wizard-progress::after {
+  width: calc((100% - 1.5rem) * 6 / 6);
+}
+
+/* Wizard form validation and error states */
+.wizard-step {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.wizard-step.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Input field styling for wizard */
+.input-field {
+  width: 100%;
+  padding: 0.59rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.input-field:hover {
+  border-color: #d1d5db;
+}
+
+.input-field:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input-field:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.input-field::placeholder {
+  color: #9ca3af;
+}
+
+.input-label {
+  display: block;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+}
+
+/* Checkbox custom styling */
+.lang-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.real-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #d1d5db;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: white;
+  position: relative;
+}
+
+.real-checkbox:hover {
+  border-color: #3b82f6;
+}
+
+.real-checkbox:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+/* Disabled ::after since we use .visual-tick for the checkmark */
+.real-checkbox:checked::after {
+  display: none;
+}
+
+.visual-tick {
+  border-radius: 0.25rem !important;
+}
+
+.lang-item .real-checkbox:checked+.visual-tick {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.lang-item .real-checkbox:checked+.visual-tick i {
+  opacity: 1;
+}
+
+/* Field error styling */
+.field-error {
+  color: #ef4444;
+  font-size: 0.625rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.field-error.hidden {
+  display: none;
+}
+
+/* Progress formula section */
+#progressFormula {
+  background-color: #f9fafb;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  border-left: 3px solid #3b82f6;
+  font-size: 0.75rem;
+  color: #4b5563;
+  line-height: 1.6;
+  font-family: 'Courier New', monospace;
+}
+
+/* Weight input and display */
+.weight-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.weight-input:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+#weightTotal {
+  color: #41A5FE;
+  font-size: 1.1em;
+  font-weight: 600;
+}
+
+#weightTotal.error {
+  color: #dc3545;
+}
+
+#weightError {
+  color: #ef4444;
+  font-size: 0.625rem;
+}
+
+#weightError.hidden {
+  display: none;
+}

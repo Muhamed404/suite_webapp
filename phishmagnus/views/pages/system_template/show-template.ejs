@@ -480,6 +480,7 @@
     };
     window.disableSaveEdit = <%= typeof disableSaveEdit !== 'undefined' ? disableSaveEdit : false %>;
 window.initialLandingPageMode = "<%= isLandingUrlMode ? 'url' : 'custom' %>";
+window.initialPhishOption = "<%= String(template?.phish_option || 'simple') %>";
 </script>
 
 <script>window.WEB_TEMPLATE_BUCKET = "<%- typeof webTemplateBucket !== 'undefined' ? webTemplateBucket : '' %>";</script>

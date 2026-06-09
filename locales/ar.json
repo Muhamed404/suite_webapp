@@ -36,6 +36,7 @@
 		"search_here": "ابحث هنا...",
 		"sort_by": "رتّب حسب",
 		"loading": "جارٍ التحميل...",
+		"refresh": "تحديث",
 		"error": "خطأ",
 		"form_validation_error": "خطأ في التحقق من النموذج",
 		"error_creating_nfc_campaign": "خطأ في إنشاء حملة NFC",
@@ -842,6 +843,9 @@
 		"labelAvailableUsersLicense": "التراخيص المتاحة للمستخدمين",
 		"btnBulkAssign": "تعيين مجمع",
 		"btnImport": "استيراد",
+		"btnImportLdap": "استيراد من Active Directory",
+		"btnImportLdapOnly": "استيراد فقط",
+		"btnImportLdapLogin": "استيراد وتسجيل الدخول",
 		"labelPhishMagnusLicenseStatus": "حالة ترخيص PhishMagnus",
 		"labelAwarenessLicenseStatus": "حالة ترخيص Awareness",
 		"statusLicensed": "مرخص",
@@ -947,7 +951,12 @@
 		"placeholderSearchUnenrolled": "البحث في غير المسجلين",
 		"labelUnenrolled": "غير مسجل",
 		"btnMoveToEnrolled": "الانتقال إلى مسجل",
-		"btnDone": "تم"
+		"btnDone": "تم",
+		"labelImportFromLdap": "استيراد من LDAP",
+		"stepSelectLdapMode": "تحديد وضع LDAP",
+		"labelSelectMode": "تحديد وضع الاستيراد",
+		"labelOnlyImport": "استيراد فقط",
+		"labelImportAndLogin": "استيراد وتسجيل الدخول"
 	},
 	"system_template": {
 		"stepper1": "تفاصيل القالب",
