@@ -15,8 +15,20 @@
   </div>
 
   <div class="flex flex-col gap-4 mt-3 rounded-3xl bg-white">
+    <% if (!ldapConfigured) { %>
+      <div class="rounded-xl border border-amber-300 bg-amber-50 p-5 flex items-start gap-4">
+        <div class="text-amber-500 text-2xl mt-0.5">⚠️</div>
+        <div>
+          <p class="font-semibold text-amber-800 text-sm"><%= __("user.ldapNotConfiguredWarning") %></p>
+          <% if (orgId) { %>
+            <a href="/settings/ldap/<%= orgId %>" class="text-sm text-amber-700 underline hover:text-amber-900 mt-1 inline-block">Configure LDAP Settings →</a>
+          <% } %>
+        </div>
+      </div>
+    <% } %>
+
     <form action="/user/ldap/import/<%= typeof organization !== 'undefined' ? organization : '' %>" method="post" name="importLdapUser" id="importLdapUser" 
-    class="bg-white  w-full mt-3 p-8" novalidate>
+    class="bg-white  w-full mt-3 p-8 <%= !ldapConfigured ? 'opacity-50 pointer-events-none select-none' : '' %>" novalidate>
       <!-- Stepper Navigation -->
       <div id="stepper" class="flex items-center justify-between mb-10">
         <div class="flex items-center gap-2">
@@ -40,7 +52,10 @@
       <button id="backBtn" type="button"
         class="px-8 py-2 rounded-lg bg-gray-100 text-gray-600 font-medium border hover:border-gray-300 transition"><%= __("generic_label.back") %></button>
       <button id="nextBtn" type="submit"
-        class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition"><%= __("generic_label.next") %></button>
+        class="px-8 py-2 rounded-lg bg-[var(--teal)] text-white font-semibold hover:bg-teal-500 transition <%= !ldapConfigured ? 'opacity-50 cursor-not-allowed' : '' %>"
+        <%= !ldapConfigured ? 'disabled' : '' %>>
+        <%= __("generic_label.next") %>
+      </button>
     </div>
   </div>
 </div>
