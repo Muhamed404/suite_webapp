@@ -28,6 +28,8 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useSurveyListAndStats } from "@/hooks/useSurvey";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { canManageSurveys } from "@/utils/roles";
 
 const ROWS_PER_PAGE = 8;
 
@@ -89,6 +91,8 @@ export function SurveyManagementListPage() {
   const t = useTranslations("surveyManagement");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const user = useAuthStore((state) => state.user);
+  const showCreateSurvey = canManageSurveys(user?.role_id);
 
   const { data: surveyListData, isLoading, error } = useSurveyListAndStats();
 
@@ -225,16 +229,18 @@ export function SurveyManagementListPage() {
               >
                 {t("buttons.quizAndQuestions")}
               </Button>
-              <Button
-                as={Link}
-                className="flex items-center gap-2 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition"
-                href="/dashboard/survey/new"
-                radius="full"
-                size="md"
-                startContent={<Plus className="w-4 h-4" />}
-              >
-                {t("buttons.newSurvey")}
-              </Button>
+              {showCreateSurvey && (
+                <Button
+                  as={Link}
+                  className="flex items-center gap-2 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium transition"
+                  href="/dashboard/survey/new"
+                  radius="full"
+                  size="md"
+                  startContent={<Plus className="w-4 h-4" />}
+                >
+                  {t("buttons.newSurvey")}
+                </Button>
+              )}
             </div>
           </div>
 

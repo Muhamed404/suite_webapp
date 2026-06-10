@@ -61,6 +61,9 @@ export const canAccessAwarenessAssets = (roleId?: number) =>
 /** Org admins can create and launch awareness campaigns; platform admins cannot */
 export const canManageCampaigns = (roleId?: number) => isOrgAdmin(roleId);
 
+/** Org admins can create surveys; platform admins cannot */
+export const canManageSurveys = (roleId?: number) => isOrgAdmin(roleId);
+
 export const getRoleName = (roleId: number) => ROLES[roleId as RoleId]?.name ?? "Unknown Role";
 
 /**
