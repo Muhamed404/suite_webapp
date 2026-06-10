@@ -6,6 +6,10 @@
           <%= __("breadcrumbs.home") %>
         </a>
         <span class="text-gray-400">›</span>
+        <a href="<%= magnusAdmin ? '/organization/profile/' + organization + '?tab=settings' : '/organization/profile?tab=settings' %>" class="hover:text-gray-700 transition">
+          <%= __("breadcrumbs.organization") %>
+        </a>
+        <span class="text-gray-400">›</span>
         <span class="font-semibold text-gray-900">
           <%= __("breadcrumbs.department") %>
         </span>
