@@ -31,6 +31,7 @@
         <thead class="bg-gray-50 text-gray-600 uppercase text-xs tracking-wide">
           <tr>
             <th class="px-4 py-3"><%= __("user.bulkImportColId") %></th>
+            <th class="px-4 py-3"><%= __("user.bulkImportColType") %></th>
             <th class="px-4 py-3"><%= __("user.bulkImportColCreatedBy") %></th>
             <th class="px-4 py-3"><%= __("user.bulkImportColFile") %></th>
             <th class="px-4 py-3"><%= __("user.bulkImportColProduct") %></th>
@@ -45,18 +46,29 @@
         <tbody class="divide-y divide-gray-100">
           <% if (!jobs || jobs.length === 0) { %>
             <tr>
-              <td colspan="10" class="px-4 py-8 text-center text-gray-500"><%= __("user.bulkImportNoJobs") %></td>
+              <td colspan="11" class="px-4 py-8 text-center text-gray-500"><%= __("user.bulkImportNoJobs") %></td>
             </tr>
           <% } else { %>
             <% jobs.forEach(function (job) { %>
               <% const rowHighlight = typeof highlightJobId !== 'undefined' && highlightJobId !== null && Number(job.id) === Number(highlightJobId); %>
-              <% const creatorId = job.created_by_user_id; const creatorDisplay = (creatorId != null && creatorId !== 0 && creatorId !== '') ? creatorId : '—'; %>
+              <% const creatorDisplay = job.created_by_user_email || (job.created_by_user_id ? job.created_by_user_id : '—'); %>
               <% const skippedCell = (job.skipped_json != null && String(job.skipped_json).trim() !== '') ? String(job.skipped_json) : (job.skipped != null ? JSON.stringify(job.skipped, null, 2) : '—'); %>
               <tr class="<%= rowHighlight ? 'bg-amber-50' : 'hover:bg-gray-50' %>">
                 <td class="px-4 py-3 font-mono text-gray-800"><%= job.id %></td>
-                <td class="px-4 py-3 font-mono text-gray-700 whitespace-nowrap"><%= creatorDisplay %></td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                  <% if (job.import_type === 'ldap') { %>
+                    <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-indigo-100 text-indigo-800 border border-indigo-200 whitespace-nowrap">
+                      🔗 <%= __("user.bulkImportTypeLdap") %>
+                    </span>
+                  <% } else { %>
+                    <span class="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-teal-100 text-teal-800 border border-teal-200 whitespace-nowrap">
+                      📄 <%= __("user.bulkImportTypeCsv") %>
+                    </span>
+                  <% } %>
+                </td>
+                <td class="px-4 py-3 text-gray-700 whitespace-nowrap"><%= creatorDisplay %></td>
                 <td class="px-4 py-3 text-gray-800 max-w-xs truncate" title="<%= job.original_filename || '' %>"><%= job.original_filename || "—" %></td>
-                <td class="px-4 py-3 text-gray-600"><%= job.selected_product_key || "—" %></td>
+                <td class="px-4 py-3 text-gray-600"><%= job.selected_product_name || "—" %></td>
                 <td class="px-4 py-3">
                   <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
                     <%= job.status === 'completed' ? 'bg-green-100 text-green-800' : '' %>
