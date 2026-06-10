@@ -5,12 +5,6 @@
     <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0" aria-label="Breadcrumb">
       <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
       <span class="text-gray-400">›</span>
-      <% if (typeof isSecureMagnusAdmin !== 'undefined' && isSecureMagnusAdmin) { %>
-        <a href="/organization/list" class="hover:text-gray-700 transition"><%= __("breadcrumbs.organization") %></a>
-      <% } else { %>
-        <a href="/organization/profile/<%= typeof user !== 'undefined' && user.organization_id ? user.organization_id : '' %>" class="hover:text-gray-700 transition"><%= __("breadcrumbs.organization") %></a>
-      <% } %>
-      <span class="text-gray-400">›</span>
       <span class="font-semibold text-gray-900"><%= __("breadcrumbs.subscriptionHistory") %></span>
     </nav>
     <h3 class="text-3xl font-medium text-gray-900">

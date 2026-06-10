@@ -38,6 +38,7 @@
 		"search_here": "Search here...",
 		"sort_by": "Sort by",
 		"loading": "Loading...",
+		"refresh": "Refresh",
 		"error": "Error",
 		"form_validation_error": "Form validation Error",
 		"error_creating_nfc_campaign": "Error creating NFC campaign",

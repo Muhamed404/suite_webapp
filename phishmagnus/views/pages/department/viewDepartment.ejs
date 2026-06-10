@@ -6,21 +6,9 @@
           <%= __("breadcrumbs.home") %>
         </a>
         <span class="text-gray-400">›</span>
-        <% if (typeof isSecureMagnusAdmin !=='undefined' && isSecureMagnusAdmin) { %>
-          <a href="/organization/list" class="hover:text-gray-700 transition">
-            <%= __("breadcrumbs.organization") %>
-          </a>
-          <% } else { %>
-            <a href="/organization/profile/<%= typeof user !== 'undefined' && user.organization_id ? user.organization_id : (typeof organization !== 'undefined' ? organization : '') %>"
-              class="hover:text-gray-700 transition">
-              <%= typeof organizationName !=='undefined' && organizationName ? organizationName :
-                __("breadcrumbs.organization") %>
-            </a>
-            <% } %>
-              <span class="text-gray-400">›</span>
-              <span class="font-semibold text-gray-900">
-                <%= __("breadcrumbs.department") %>
-              </span>
+        <span class="font-semibold text-gray-900">
+          <%= __("breadcrumbs.department") %>
+        </span>
       </nav>
       <h3 class="text-3xl font-medium">
         <%= __("department.labelDepartmentManagement") %>

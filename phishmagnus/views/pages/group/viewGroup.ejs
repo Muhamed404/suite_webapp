@@ -5,10 +5,6 @@
       <nav class="flex items-center text-[1rem] text-gray-500 gap-2 p-0 pb-0 mb-2" aria-label="Breadcrumb">
         <a href="/home" class="hover:text-gray-700 transition"><%= __("breadcrumbs.home") %></a>
         <span class="text-gray-400">›</span>
-        <a id="groupOrgBreadcrumbLink" href="/organization/profile/<%= typeof subscriptionOrganization !== 'undefined' ? subscriptionOrganization : '' %>" class="hover:text-gray-700 transition">
-          <span id="groupOrgBreadcrumbName"><%= typeof organizationName !== 'undefined' && organizationName ? organizationName : __("breadcrumbs.organization") %></span>
-        </a>
-        <span class="text-gray-400">›</span>
         <span class="font-semibold text-gray-900"><%= __("breadcrumbs.group") %></span>
       </nav>
       <h3 class="text-3xl font-medium">
@@ -229,15 +225,6 @@
     const pathMatch = window.location.pathname.match(/\/group\/(?:list|create)\/(\d+)/);
     const orgIdFromPath = pathMatch ? pathMatch[1] : null;
     const orgId = orgIdFromPath || orgIdFromQuery;
-
-    const orgLink = document.getElementById('groupOrgBreadcrumbLink');
-    const orgNameEl = document.getElementById('groupOrgBreadcrumbName');
-    if (orgName && orgNameEl) {
-      orgNameEl.textContent = orgName;
-    }
-    if (orgId && orgLink) {
-      orgLink.href = `/organization/profile/${orgId}`;
-    }
 
     const createBtn = document.getElementById('createGroupBtn');
     if (createBtn) {
