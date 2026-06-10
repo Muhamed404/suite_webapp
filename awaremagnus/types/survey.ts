@@ -175,8 +175,9 @@ export interface SurveyUserListResponse {
     total_pages: number;
   };
   filters: {
-    departments: Array<{ id: number; name: string }>;
-    groups: Array<{ id: number; name: string }>;
+    departments: Array<{ id: number; name: string | null }>;
+    groups: Array<{ id: number; name: string | null }>;
+    risk_levels?: Array<{ id: number; name: string }>;
   };
 }
 

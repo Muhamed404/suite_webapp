@@ -10,7 +10,7 @@ import { getContentAssetUrl } from "@/utils/contentAssetUrl";
 import { authService } from "@/services/authService";
 import { useAuthStore } from "@/hooks/useAuthStore";
 import { clearAuthTokenCookie } from "@/services/httpClient";
-import { isOrgAdmin } from "@/utils/roles";
+import { canManageCampaigns } from "@/utils/roles";
 
 interface DashboardSidebarProps {
   /** On mobile: controls drawer visibility. On lg: ignored (sidebar always visible). */
@@ -37,7 +37,7 @@ export const DashboardSidebar = ({
     (typeof document !== "undefined" && document.documentElement.dir === "rtl");
   const user = useAuthStore((state) => state.user);
   const resetAuth = useAuthStore((state) => state.reset);
-  const isOrgAdminUser = isOrgAdmin(user?.role_id);
+  const showCreateCampaign = canManageCampaigns(user?.role_id);
 
   const handleLogout = async () => {
     try {
@@ -88,11 +88,15 @@ export const DashboardSidebar = ({
       icon: getContentAssetUrl("/images/awaremagnus_sidebar/Awareness_Solid.svg"),
       label: t("menu.launchAwareness"),
       children: [
-        {
-          href: "/dashboard/launch-awareness/campaigns/create",
-          icon: "",
-          label: t("menu.newCampaign"),
-        },
+        ...(showCreateCampaign
+          ? [
+              {
+                href: "/dashboard/launch-awareness/campaigns/create",
+                icon: "",
+                label: t("menu.newCampaign"),
+              },
+            ]
+          : []),
         {
           href: "/dashboard/launch-awareness/campaigns",
           icon: "",

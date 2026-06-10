@@ -11,13 +11,17 @@ import { CampaignStatsCards } from "@/components/campaigns/campaign-stats-cards"
 import { CampaignFilters } from "@/components/campaigns/campaign-filters";
 import { CampaignList } from "@/components/campaigns/campaign-list";
 import { useCampaigns } from "@/hooks/useCampaigns";
+import { useAuthStore } from "@/hooks/useAuthStore";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
+import { canManageCampaigns } from "@/utils/roles";
 
 export default function CampaignsPage() {
   const t = useTranslations("campaigns");
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
+  const user = useAuthStore((state) => state.user);
+  const showCreateCampaign = canManageCampaigns(user?.role_id);
 
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [dateFilter, setDateFilter] = useState<string>("all");
@@ -57,13 +61,15 @@ export default function CampaignsPage() {
           {/* Header */}
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-lg font-semibold text-gray-800">{t("title")}</h1>
-            <Button
-              as={Link}
-              className="px-6 py-2 rounded-full bg-[#3FBDFF] text-white text-sm font-medium hover:bg-[#29AAE8]"
-              href="/dashboard/launch-awareness/campaigns/create"
-            >
-              {t("createNew")}
-            </Button>
+            {showCreateCampaign && (
+              <Button
+                as={Link}
+                className="px-6 py-2 rounded-full bg-[#3FBDFF] text-white text-sm font-medium hover:bg-[#29AAE8]"
+                href="/dashboard/launch-awareness/campaigns/create"
+              >
+                {t("createNew")}
+              </Button>
+            )}
           </div>
 
           {/* Stats Cards */}

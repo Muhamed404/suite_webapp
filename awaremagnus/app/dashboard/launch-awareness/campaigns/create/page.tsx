@@ -32,6 +32,8 @@ import { WizardStep5 } from "@/components/campaigns/wizard/WizardStep5";
 import { WizardStep6 } from "@/components/campaigns/wizard/WizardStep6";
 import { WizardStep7 } from "@/components/campaigns/wizard/WizardStep7";
 import { UserModal } from "@/components/campaigns/wizard/UserModal";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { canManageCampaigns } from "@/utils/roles";
 
 interface FormData {
   campaignName: string;
@@ -69,14 +71,6 @@ interface FormData {
   schedules: Array<{ module_id: number; start_date: string }>;
 }
 
-interface CampaignDraftState {
-  currentStep: number;
-  formData: FormData;
-}
-
-const CAMPAIGN_DRAFT_STORAGE_KEY = "awaremagnus:create-campaign:draft";
-const CAMPAIGN_DRAFT_PRESERVE_ONCE_KEY = "awaremagnus:create-campaign:draft:preserve-once";
-
 export default function CreateCampaignPage() {
   const router = useRouter();
   const t = useTranslations("campaigns");
@@ -85,6 +79,13 @@ export default function CreateCampaignPage() {
   const { dir } = useI18n();
   const isRtl = dir === "rtl";
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
+
+  useEffect(() => {
+    if (user && !canManageCampaigns(user.role_id)) {
+      router.replace("/dashboard/launch-awareness/campaigns");
+    }
+  }, [user, router]);
 
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 7;
@@ -129,63 +130,13 @@ export default function CreateCampaignPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showUserModal, setShowUserModal] = useState(false);
-  const [isDraftHydrated, setIsDraftHydrated] = useState(false);
 
   const { data: modulesData } = useModules();
   const modules = modulesData?.success && Array.isArray(modulesData.data) ? modulesData.data : [];
 
-  useEffect(() => {
-    try {
-      const savedDraft = window.sessionStorage.getItem(CAMPAIGN_DRAFT_STORAGE_KEY);
-
-      if (!savedDraft) return;
-
-      const parsed = JSON.parse(savedDraft) as Partial<CampaignDraftState>;
-
-      if (parsed.formData) {
-        setFormData((prev) => ({ ...prev, ...parsed.formData }));
-      }
-
-      if (typeof parsed.currentStep === "number" && parsed.currentStep >= 1 && parsed.currentStep <= totalSteps) {
-        setCurrentStep(parsed.currentStep);
-      }
-    } catch {
-      window.sessionStorage.removeItem(CAMPAIGN_DRAFT_STORAGE_KEY);
-    } finally {
-      setIsDraftHydrated(true);
-    }
-  }, [totalSteps]);
-
-  useEffect(() => {
-    if (!isDraftHydrated) return;
-
-    const draft: CampaignDraftState = {
-      currentStep,
-      formData,
-    };
-
-    window.sessionStorage.setItem(CAMPAIGN_DRAFT_STORAGE_KEY, JSON.stringify(draft));
-  }, [currentStep, formData, isDraftHydrated]);
-
-  useEffect(() => {
-    return () => {
-      const shouldPreserveOnce =
-        window.sessionStorage.getItem(CAMPAIGN_DRAFT_PRESERVE_ONCE_KEY) === "1";
-
-      if (shouldPreserveOnce) {
-        window.sessionStorage.removeItem(CAMPAIGN_DRAFT_PRESERVE_ONCE_KEY);
-
-        return;
-      }
-
-      window.sessionStorage.removeItem(CAMPAIGN_DRAFT_STORAGE_KEY);
-    };
-  }, []);
-
   const createMutation = useMutation({
     mutationFn: (payload: any) => suiteAwmService.createCampaign(payload),
     onSuccess: () => {
-      window.sessionStorage.removeItem(CAMPAIGN_DRAFT_STORAGE_KEY);
       queryClient.invalidateQueries({ queryKey: CAMPAIGN_KEYS.campaigns() });
       console.log(t("form.saveSuccess"));
       router.push("/dashboard/launch-awareness/campaigns");

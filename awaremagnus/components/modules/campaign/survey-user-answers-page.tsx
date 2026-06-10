@@ -28,6 +28,7 @@ import {
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useOrgDepartmentsAndGroups } from "@/hooks/useOrgDepartmentsAndGroups";
 import { useSurvey, useSurveyUserAnswers } from "@/hooks/useSurvey";
 
 function formatDate(dateStr?: string | null) {
@@ -79,6 +80,7 @@ export function SurveyUserAnswersPage() {
 
   // Fetch survey name
   const { data: survey, isLoading: surveyLoading } = useSurvey(surveyId, !!surveyId);
+  const { getDepartmentName, getGroupName } = useOrgDepartmentsAndGroups();
 
   // Table state
   const [currentPage, setCurrentPage] = useState(1);
@@ -102,6 +104,12 @@ export function SurveyUserAnswersPage() {
   );
 
   const userInfo = answersData?.user;
+  const resolvedDepartmentName = userInfo
+    ? getDepartmentName(userInfo.department_id, userInfo.department_name)
+    : null;
+  const resolvedGroupName = userInfo
+    ? getGroupName(userInfo.group_id, userInfo.group_name)
+    : null;
   const surveyInfo = answersData?.survey;
   const statistics = answersData?.statistics;
   const answers = answersData?.answers ?? [];
@@ -229,11 +237,11 @@ export function SurveyUserAnswersPage() {
                         {userInfo.firstname} {userInfo.lastname}
                       </h3>
                       <p className="text-xs text-gray-500">{userInfo.email}</p>
-                      {(userInfo.department_name || userInfo.group_name) && (
+                      {(resolvedDepartmentName || resolvedGroupName) && (
                         <p className="text-[10px] text-gray-400 mt-0.5">
-                          {userInfo.department_name && `${userInfo.department_name}`}
-                          {userInfo.department_name && userInfo.group_name && " • "}
-                          {userInfo.group_name && `${userInfo.group_name}`}
+                          {resolvedDepartmentName}
+                          {resolvedDepartmentName && resolvedGroupName && " • "}
+                          {resolvedGroupName}
                         </p>
                       )}
                     </div>
