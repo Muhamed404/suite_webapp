@@ -13,6 +13,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { CertificationChart } from "@/components/modules/dashboard/charts/certification-chart";
 import { SemiCircleChart } from "@/components/modules/dashboard/charts/semi-circle-chart";
 import { useUpdateCampaign, useCampaignDashboard } from "@/hooks/useCampaigns";
+import { useOrgDepartmentsAndGroups } from "@/hooks/useOrgDepartmentsAndGroups";
 import { useI18n } from "@/i18n/I18nProvider";
 import { useTranslations } from "@/i18n/useTranslations";
 import {
@@ -52,6 +53,7 @@ export default function CampaignDetailsPage() {
   const updateCampaign = useUpdateCampaign();
 
   const { data: campaignDashboard, isLoading } = useCampaignDashboard(campaignId);
+  const { getDepartmentName, getGroupName } = useOrgDepartmentsAndGroups();
 
   const { data: leaderboardData } = useOrganizationLeaderboard({
     campaignId,
@@ -705,7 +707,8 @@ export default function CampaignDetailsPage() {
                       campaignDashboard.departments.list
                         .map(
                           (d: any) =>
-                            d.name || d.department_name || t("campaignReport.deptPrefix", { id: d.id })
+                            getDepartmentName(d.id, d.name || d.department_name) ||
+                            t("campaignReport.deptPrefix", { id: d.id })
                         )
                         .join(", ")
                     ) : (
@@ -723,7 +726,8 @@ export default function CampaignDetailsPage() {
                           key={idx}
                           className="px-2 py-[2px] border border-red-300 rounded-full text-red-400 text-[10px]"
                         >
-                          {g.name || g.group_name || t("campaignReport.groupPrefix", { id: g.id })}
+                          {getGroupName(g.id, g.name || g.group_name) ||
+                            t("campaignReport.groupPrefix", { id: g.id })}
                         </span>
                       ))
                     ) : (
