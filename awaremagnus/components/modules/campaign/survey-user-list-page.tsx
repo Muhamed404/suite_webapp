@@ -29,6 +29,7 @@ import {
 import { DashboardLayout } from "@/components/modules/dashboard/dashboard-layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { useI18n } from "@/i18n/I18nProvider";
+import { useOrgDepartmentsAndGroups } from "@/hooks/useOrgDepartmentsAndGroups";
 import { useSurvey, useSurveyUsers, useRetrySurveyUserFetch } from "@/hooks/useSurvey";
 import { addToast } from "@heroui/toast";
 
@@ -111,6 +112,7 @@ export function SurveyUserListPage() {
   const [submissionFilter, setSubmissionFilter] = useState<string>("");
 
   const retryFetchMutation = useRetrySurveyUserFetch();
+  const { getDepartmentName, getGroupName } = useOrgDepartmentsAndGroups();
 
   // Fetch users
   const { data: usersData, isLoading: usersLoading } = useSurveyUsers(
@@ -132,8 +134,51 @@ export function SurveyUserListPage() {
   const users = usersData?.users ?? [];
   const pagination = usersData?.pagination;
   const filters = usersData?.filters;
+  const riskLevelSelectItems = useMemo(() => {
+    const levels = filters?.risk_levels?.length
+      ? filters.risk_levels
+      : [
+          { id: 1, name: "Very Low" },
+          { id: 2, name: "Low" },
+          { id: 3, name: "Medium" },
+          { id: 4, name: "High" },
+          { id: 5, name: "Very High" },
+        ];
+
+    return [
+      { id: "all", name: "All Risk Levels" },
+      ...levels.map((level) => ({
+        id: String(level.id),
+        name: level.name,
+      })),
+    ];
+  }, [filters?.risk_levels]);
+
   const totalItems = pagination?.total_items ?? 0;
   const totalPages = pagination?.total_pages ?? 1;
+
+  const departmentSelectItems = useMemo(
+    () => [
+      { id: "all", name: "All Departments" },
+      ...(filters?.departments ?? []).map((department) => ({
+        id: String(department.id),
+        name:
+          getDepartmentName(department.id, department.name) || `Department ${department.id}`,
+      })),
+    ],
+    [filters?.departments, getDepartmentName],
+  );
+
+  const groupSelectItems = useMemo(
+    () => [
+      { id: "all", name: "All Groups" },
+      ...(filters?.groups ?? []).map((group) => ({
+        id: String(group.id),
+        name: getGroupName(group.id, group.name) || `Group ${group.id}`,
+      })),
+    ],
+    [filters?.groups, getGroupName],
+  );
 
   // Sort handler
   const handleSort = useCallback(
@@ -202,8 +247,8 @@ export function SurveyUserListPage() {
       u.correct_answers ?? "",
       u.incorrect_answers ?? "",
       u.skipped_answers ?? "",
-      u.group_name ?? "",
-      u.department_name ?? "",
+      getGroupName(u.group_id, u.group_name) ?? "",
+      getDepartmentName(u.department_id, u.department_name) ?? "",
     ]);
     const csv = [headers, ...rows].map((r) => r.map((c: string | number | null | undefined) => `"${c}"`).join(",")).join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -213,7 +258,7 @@ export function SurveyUserListPage() {
     a.download = `survey-${surveyId}-users.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  }, [users, surveyId]);
+  }, [users, surveyId, getGroupName, getDepartmentName]);
 
   const startIndex = totalItems > 0 ? (currentPage - 1) * perPage + 1 : 0;
   const endIndex = Math.min(currentPage * perPage, totalItems);
@@ -362,19 +407,20 @@ export function SurveyUserListPage() {
                       "h-9 bg-white border border-gray-200 rounded-full hover:border-gray-300",
                     value: "text-xs",
                   }}
+                  items={riskLevelSelectItems}
                   placeholder="All Risk Levels"
-                  selectedKeys={riskLevelFilter ? [riskLevelFilter] : []}
+                  selectedKeys={riskLevelFilter ? [riskLevelFilter] : ["all"]}
                   onSelectionChange={(keys) => {
-                    const v = Array.from(keys as Set<string>)[0] ?? "";
-                    setRiskLevelFilter(v);
+                    const v = Array.from(keys as Set<string>)[0] ?? "all";
+                    setRiskLevelFilter(v === "all" ? "" : v);
                     setCurrentPage(1);
                   }}
                 >
-                  <SelectItem key="1">Very Low</SelectItem>
-                  <SelectItem key="2">Low</SelectItem>
-                  <SelectItem key="3">Medium</SelectItem>
-                  <SelectItem key="4">High</SelectItem>
-                  <SelectItem key="5">Very High</SelectItem>
+                  {(item) => (
+                    <SelectItem key={item.id} textValue={item.name}>
+                      {item.name}
+                    </SelectItem>
+                  )}
                 </Select>
 
                 {(filters?.departments?.length ?? 0) > 0 && (
@@ -386,17 +432,20 @@ export function SurveyUserListPage() {
                         "h-9 bg-white border border-gray-200 rounded-full hover:border-gray-300",
                       value: "text-xs",
                     }}
+                    items={departmentSelectItems}
                     placeholder="All Departments"
-                    selectedKeys={departmentFilter ? [departmentFilter] : []}
+                    selectedKeys={departmentFilter ? [departmentFilter] : ["all"]}
                     onSelectionChange={(keys) => {
-                      const v = Array.from(keys as Set<string>)[0] ?? "";
-                      setDepartmentFilter(v);
+                      const v = Array.from(keys as Set<string>)[0] ?? "all";
+                      setDepartmentFilter(v === "all" ? "" : v);
                       setCurrentPage(1);
                     }}
                   >
-                    {(filters?.departments ?? []).map((d) => (
-                      <SelectItem key={String(d.id)}>{d.name}</SelectItem>
-                    ))}
+                    {(item) => (
+                      <SelectItem key={item.id} textValue={item.name}>
+                        {item.name}
+                      </SelectItem>
+                    )}
                   </Select>
                 )}
 
@@ -409,17 +458,20 @@ export function SurveyUserListPage() {
                         "h-9 bg-white border border-gray-200 rounded-full hover:border-gray-300",
                       value: "text-xs",
                     }}
+                    items={groupSelectItems}
                     placeholder="All Groups"
-                    selectedKeys={groupFilter ? [groupFilter] : []}
+                    selectedKeys={groupFilter ? [groupFilter] : ["all"]}
                     onSelectionChange={(keys) => {
-                      const v = Array.from(keys as Set<string>)[0] ?? "";
-                      setGroupFilter(v);
+                      const v = Array.from(keys as Set<string>)[0] ?? "all";
+                      setGroupFilter(v === "all" ? "" : v);
                       setCurrentPage(1);
                     }}
                   >
-                    {(filters?.groups ?? []).map((g) => (
-                      <SelectItem key={String(g.id)}>{g.name}</SelectItem>
-                    ))}
+                    {(item) => (
+                      <SelectItem key={item.id} textValue={item.name}>
+                        {item.name}
+                      </SelectItem>
+                    )}
                   </Select>
                 )}
 
@@ -575,10 +627,10 @@ export function SurveyUserListPage() {
                               {user.skipped_answers ?? "—"}
                             </td>
                             <td className="px-4 py-3.5 text-gray-600">
-                              {user.group_name ?? "—"}
+                              {getGroupName(user.group_id, user.group_name) ?? "—"}
                             </td>
                             <td className="px-4 py-3.5 text-gray-600">
-                              {user.department_name ?? "—"}
+                              {getDepartmentName(user.department_id, user.department_name) ?? "—"}
                             </td>
                             <td className="px-4 py-3.5 text-center">
                               <div className="flex flex-col items-center gap-1">

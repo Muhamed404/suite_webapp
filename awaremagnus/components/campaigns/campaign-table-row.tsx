@@ -10,6 +10,8 @@ import { CampaignStatusBadge } from "./campaign-status-badge";
 
 import { useTranslations } from "@/i18n/useTranslations";
 import { useUpdateCampaign } from "@/hooks/useCampaigns";
+import { useAuthStore } from "@/hooks/useAuthStore";
+import { canManageCampaigns } from "@/utils/roles";
 
 interface CampaignTableRowProps {
   campaign: CampaignWithDetails;
@@ -19,6 +21,8 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
   const t = useTranslations("campaigns");
   const updateCampaign = useUpdateCampaign();
   const [isLaunching, setIsLaunching] = useState(false);
+  const user = useAuthStore((state) => state.user);
+  const canLaunchCampaign = canManageCampaigns(user?.role_id);
 
   const formatDate = (date?: string) => {
     if (!date) return "-";
@@ -80,7 +84,7 @@ export function CampaignTableRow({ campaign }: CampaignTableRowProps) {
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
           {/* Show Launch button for In Progress (20) campaigns - with launch functionality */}
-          {campaign.status_id === 20 && (
+          {campaign.status_id === 20 && canLaunchCampaign && (
             <button
               className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 w-32 text-xs font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLaunching || updateCampaign.isPending}

@@ -37,6 +37,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { DonutChart } from "@/components/modules/dashboard/charts/donut-chart";
 import { AreaChart } from "@/components/modules/dashboard/charts/area-chart";
 import { SemiCircleChart } from "@/components/modules/dashboard/charts/semi-circle-chart";
+import { useOrgDepartmentsAndGroups } from "@/hooks/useOrgDepartmentsAndGroups";
 import {
   useSurvey,
   useSurveyStatistics,
@@ -149,6 +150,7 @@ export function SurveyStatsPage() {
   );
 
   const retryFetchMutation = useRetrySurveyUserFetch();
+  const { getDepartmentName, getGroupName } = useOrgDepartmentsAndGroups();
 
   const isLoading = surveyLoading || statsLoading;
 
@@ -161,12 +163,14 @@ export function SurveyStatsPage() {
   const deptDonutValues = deptRisk.map((d) => d.total_employees);
   const deptDonutLabels = deptRisk.map(
     (d) =>
-      d.department_name ??
+      getDepartmentName(d.department_id, d.department_name) ??
       t("fallback.department", { id: formatLocaleInteger(loc, d.department_id) })
   );
   const groupDonutValues = groupRisk.map((g) => g.total_employees);
   const groupDonutLabels = groupRisk.map(
-    (g) => g.group_name ?? t("fallback.group", { id: formatLocaleInteger(loc, g.group_id) })
+    (g) =>
+      getGroupName(g.group_id, g.group_name) ??
+      t("fallback.group", { id: formatLocaleInteger(loc, g.group_id) })
   );
 
   const timelineLabels = useMemo(
@@ -365,7 +369,7 @@ export function SurveyStatsPage() {
                             key={d.department_id}
                             color={donutColors[i % donutColors.length]}
                             label={
-                              d.department_name ??
+                              getDepartmentName(d.department_id, d.department_name) ??
                               t("fallback.department", { id: formatLocaleInteger(loc, d.department_id) })
                             }
                           />
@@ -398,7 +402,7 @@ export function SurveyStatsPage() {
                             key={g.group_id}
                             color={donutColors[i % donutColors.length]}
                             label={
-                              g.group_name ??
+                              getGroupName(g.group_id, g.group_name) ??
                               t("fallback.group", { id: formatLocaleInteger(loc, g.group_id) })
                             }
                           />

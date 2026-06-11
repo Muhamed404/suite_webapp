@@ -64,7 +64,7 @@ function generateSuiteManagementMenu(req, organization) {
       allowedRoles: [enums.userType.OrgSuperAdmin, enums.userType.OrgSubAdmin]
     },
     {
-      module: "Bulk import jobs",
+      module: "User Import Logs",
       labelKey: "menu.suite.bulkImportJobs",
       link: "/user/bulk-import/jobs",
       img_path: "/securemagnus_2025/images/icons/primary-uses.svg",
@@ -118,10 +118,6 @@ function generateSuiteManagementMenu(req, organization) {
         {
           labelKey: "menu.suite.smtpNotifications",
           link: "/settings/smtp/"
-        },
-        {
-          labelKey: "menu.suite.smtpNotifications",
-          link: "/settings/ldap/"
         },
         {
           labelKey: "menu.suite.notificationTemplates",

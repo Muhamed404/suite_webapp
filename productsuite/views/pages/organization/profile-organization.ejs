@@ -134,6 +134,8 @@
     const activeTab = urlParams.get('tab');
     if (activeTab === 'subscription') {
       activateTab('subscriptionTab');
+    } else if (activeTab === 'settings') {
+      activateTab('settingsTab');
     } else {
       activateTab('aboutme');
     }

@@ -42,6 +42,15 @@ exports.renderLdapImportModule = async (req, res, next) => {
       hasCreatePermission = true;
     }
 
+    let ldapConfigured = false;
+    try {
+      const ldapConfigResp = await apiClient.get(`/org/${organizationCode}/ldap/config`);
+      const cfg = ldapConfigResp.data?.data || ldapConfigResp.data?.message || null;
+      ldapConfigured = !!(cfg && cfg.host);
+    } catch (ldapErr) {
+      ldapConfigured = false;
+    }
+
     const renderData = {
       Applications: enums.Product_Selection,
       enableSuiteManagementLeftMenu: true,
@@ -51,7 +60,8 @@ exports.renderLdapImportModule = async (req, res, next) => {
       orgId: organizationCode,
       enumServices: enums.serviceTypes,
       disableSubmitBtn,
-      organization: organizationCode
+      organization: organizationCode,
+      ldapConfigured,
     };
 
     if (subscription !== null && subscription !== undefined && subscription !== false && subscription !== 0 && subscription !== '' && !Number.isNaN(subscription)) {
