@@ -83,7 +83,7 @@ pipeline {
                         'package.json',
                         '.github/workflows/deploy.yml',
                         '.github/scripts/deploy.sh',
-                        '.github/scripts/register-suite-webapp-service.sh'
+                        '.github/scripts/register-suite-webapp-service.sh',
                         'test-pipeline'
                     ]
 
