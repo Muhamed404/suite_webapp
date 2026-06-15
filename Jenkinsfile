@@ -2,6 +2,9 @@
 
 pipeline {
     agent any
+    tools {
+        nodejs 'nodejs-20.19.2'
+    }
 
     environment {
         GIT_REPO_URL        = 'https://github.com/SecureMagnusLLC/suite_webapp.git'
