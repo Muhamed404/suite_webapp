@@ -5,7 +5,7 @@ pipeline {
 
     environment {
         GIT_REPO_URL        = 'https://github.com/SecureMagnusLLC/suite_webapp.git'
-        GIT_BRANCH_NAME = 'development'
+        GIT_BRANCH_NAME = 'cicd/jenkins-pipeline'
 
         // OCI Server credentials
         OCI_HOST = credentials('OCI_HOST')
@@ -49,7 +49,7 @@ pipeline {
             ],
 
             regexpFilterText:       '$REF',
-            regexpFilterExpression: 'refs/heads/development',
+            regexpFilterExpression: 'refs/heads/cicd/jenkins-pipeline',
 
             token: 'suite_webapp_token'
         )
