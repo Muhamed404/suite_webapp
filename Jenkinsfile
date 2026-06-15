@@ -1,14 +1,10 @@
-// =============================================================================
-// Jenkinsfile — suite_webapp (without Docker)
-// Converted from GitHub Actions deploy.yml
-// Jenkins runs on separate server — deploys to OCI server via SSH
-// =============================================================================
+
 
 pipeline {
     agent any
 
     environment {
-        GIT_REPO        = 'git@github-gigate:SecureMagnusLLC/suite_webapp.git'
+        GIT_REPO_URL        = 'https://github.com/SecureMagnusLLC/suite_webapp.git'
         GIT_BRANCH_NAME = 'development'
 
         // OCI Server credentials
@@ -62,7 +58,7 @@ pipeline {
     stages {
 
         // ─────────────────────────────────────────────────────────────────────
-        // Same as: paths filter in GitHub Actions
+        // paths filter
         // ─────────────────────────────────────────────────────────────────────
         stage('Check Changed Files') {
             steps {
@@ -110,7 +106,7 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Same as: verify-development-branch job
+        //  verify-development-branch 
         // ─────────────────────────────────────────────────────────────────────
         stage('Verify Branch') {
             steps {
@@ -123,18 +119,18 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Same as: Checkout code step
+        // Checkout code 
         // ─────────────────────────────────────────────────────────────────────
         stage('Checkout Code') {
              steps {
                 git branch: "${GIT_BRANCH_NAME}",
-                credentialsId: 'github-SecureMagnus-ssh',
+                credentialsId: 'github-securemagnus-token',
                 url: "${GIT_REPO}"
             }
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Same as: suite_webapp_test job
+        //  suite_webapp_test 
         // ─────────────────────────────────────────────────────────────────────
         stage('Validate Service') {
             steps {
@@ -147,7 +143,7 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Same as: Log deployment info step
+        // Log deployment info 
         // ─────────────────────────────────────────────────────────────────────
         stage('Log Deployment Info') {
             steps {
@@ -161,7 +157,7 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Same as: Install production dependencies step
+        // Install dependencies
         // ─────────────────────────────────────────────────────────────────────
         stage('Install Dependencies') {
             steps {
@@ -173,7 +169,7 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Same as: Create deployment package step
+        // Create deployment package 
         // ─────────────────────────────────────────────────────────────────────
         stage('Create Package') {
             steps {
@@ -206,7 +202,7 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Same as: Check required secrets step
+        // Check required secrets 
         // ─────────────────────────────────────────────────────────────────────
         stage('Check Required Secrets') {
             steps {
@@ -226,7 +222,7 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Same as: Setup SSH + Add OCI server to known hosts + Deploy steps
+        // Setup SSH + Add OCI server to known hosts + Deploy 
         // ─────────────────────────────────────────────────────────────────────
         stage('Deploy to OCI Server') {
             steps {
@@ -256,7 +252,7 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Same as: Health check in deploy.sh
+        //  Health check 
         // ─────────────────────────────────────────────────────────────────────
         stage('Health Check') {
             steps {
@@ -291,7 +287,7 @@ pipeline {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Same as: Notify deployment status step
+    //  Notify deployment status 
     // ─────────────────────────────────────────────────────────────────────────
     post {
         success {
