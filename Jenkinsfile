@@ -127,7 +127,7 @@ pipeline {
              steps {
                 git branch: "${GIT_BRANCH_NAME}",
                 credentialsId: 'github-securemagnus-token',
-                url: "${GIT_REPO}"
+                url: "${GIT_REPO_URL}"
             }
         }
 
