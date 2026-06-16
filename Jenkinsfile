@@ -15,6 +15,9 @@ pipeline {
         GIT_REPO_URL    = 'https://github.com/SecureMagnusLLC/suite_webapp.git'
         GIT_BRANCH_NAME = 'cicd/jenkins-pipeline'
 
+        // Node.js version
+        NODE_VERSION    = '20.19.2'
+
         // Deployment paths
         DEPLOY_DIR      = '/app/secure_magnus/suite_webapp'
         WORKSPACE_DIR   = '/app/secure_magnus/secure_magnus_workspace'
@@ -77,7 +80,6 @@ pipeline {
         // ─────────────────────────────────────────────────────────────────────
         // paths filter
         // ─────────────────────────────────────────────────────────────────────
-        /*
         stage('Check Changed Files') {
             steps {
                 script {
@@ -120,7 +122,7 @@ pipeline {
                 }
             }
         }
-        */
+
         // ─────────────────────────────────────────────────────────────────────
         // Verify Branch
         // ─────────────────────────────────────────────────────────────────────
@@ -142,19 +144,6 @@ pipeline {
                 git branch: "${GIT_BRANCH_NAME}",
                     credentialsId: 'github-securemagnus-token',
                     url: "${GIT_REPO_URL}"
-            }
-        }
-
-        // ─────────────────────────────────────────────────────────────────────
-        // Validate Service
-        // ─────────────────────────────────────────────────────────────────────
-        stage('Validate Service') {
-            steps {
-                sh """
-                    node --version
-                    npm --version
-                    echo "Service validation completed"
-                """
             }
         }
 
@@ -256,6 +245,29 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
+        // Setup OCI Server — Install Node.js and PM2
+        // ─────────────────────────────────────────────────────────────────────
+        stage('Setup OCI Server') {
+            steps {
+                sshagent(['OCI_SSH_KEY']) {
+                    sh """
+                        ssh ${OCI_USER}@${OCI_HOST} "
+                            set -e
+                            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+                            export NVM_DIR=\\\$HOME/.nvm
+                            . \\\$NVM_DIR/nvm.sh
+                            nvm install ${NODE_VERSION}
+                            nvm alias default ${NODE_VERSION}
+                            npm install -g pm2
+                            echo 'Node: '\\\$(node --version)
+                            echo 'PM2 : '\\\$(pm2 --version)
+                        "
+                    """
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
         // Deploy Code on OCI Server
         // ─────────────────────────────────────────────────────────────────────
         stage('Deploy Code') {
@@ -282,7 +294,7 @@ pipeline {
 
         // ─────────────────────────────────────────────────────────────────────
         // Install Dependencies on OCI Server
-       
+        // installs all dependencies including devDependencies for nodemon
         // ─────────────────────────────────────────────────────────────────────
         stage('Install Dependencies') {
             steps {
@@ -292,8 +304,19 @@ pipeline {
                             set -e
                             cd ${DEPLOY_DIR}
                             rm -rf node_modules
-                            npm install --no-package-lock
-                            echo 'Dependencies installed successfully'
+                            MAX_RETRIES=3
+                            RETRY_COUNT=0
+                            while [ \\\$RETRY_COUNT -lt \\\$MAX_RETRIES ]; do
+                                if npm install --no-package-lock; then
+                                    echo 'Dependencies installed successfully'
+                                    break
+                                else
+                                    RETRY_COUNT=\\\$((\\\$RETRY_COUNT + 1))
+                                    rm -rf node_modules
+                                    npm cache clean --force
+                                    sleep 5
+                                fi
+                            done
                         "
                     """
                 }
