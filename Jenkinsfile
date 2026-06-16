@@ -1,14 +1,28 @@
-
+// =============================================================================
+// Jenkinsfile — suite_webapp (without Docker)
+// All deployment logic is inline — no external scripts
+// Deploys to OCI server via SSH from separate Jenkins server
+// =============================================================================
 
 pipeline {
     agent any
+
     tools {
         nodejs 'nodejs-20.19.2'
     }
 
     environment {
-        GIT_REPO_URL        = 'https://github.com/SecureMagnusLLC/suite_webapp.git'
+        GIT_REPO_URL    = 'https://github.com/SecureMagnusLLC/suite_webapp.git'
         GIT_BRANCH_NAME = 'cicd/jenkins-pipeline'
+
+        // Deployment paths
+        DEPLOY_DIR      = '/app/secure_magnus/suite_webapp'
+        WORKSPACE_DIR   = '/app/secure_magnus/secure_magnus_workspace'
+        LOGS_DIR        = '/app/secure_magnus/logs'
+        KEYS_DIR        = '/app/secure_magnus/service_suite/keys'
+        SERVICE_USER    = 'ubuntu'
+        SERVICE_NAME    = 'suite_webapp'
+        TEMP_DIR        = '/tmp/suite_webapp_deploy'
 
         // OCI Server credentials
         OCI_HOST = credentials('OCI_HOST')
@@ -63,8 +77,7 @@ pipeline {
         // ─────────────────────────────────────────────────────────────────────
         // paths filter
         // ─────────────────────────────────────────────────────────────────────
-        /*
-       stage('Check Changed Files') {
+        stage('Check Changed Files') {
             steps {
                 script {
                     def allChanged = "${env.CHANGED_FILES ?: ''} ${env.ADDED_FILES ?: ''}"
@@ -85,10 +98,7 @@ pipeline {
                         'utility/',
                         'server.js',
                         'package.json',
-                        '.github/workflows/deploy.yml',
-                        '.github/scripts/deploy.sh',
-                        '.github/scripts/register-suite-webapp-service.sh',
-                        'test-pipeline'
+                        'Jenkinsfile'
                     ]
 
                     def shouldDeploy = false
@@ -109,9 +119,9 @@ pipeline {
                 }
             }
         }
-        */
+
         // ─────────────────────────────────────────────────────────────────────
-        //  verify-development-branch 
+        // Verify Branch
         // ─────────────────────────────────────────────────────────────────────
         stage('Verify Branch') {
             steps {
@@ -124,18 +134,18 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Checkout code 
+        // Checkout Code
         // ─────────────────────────────────────────────────────────────────────
         stage('Checkout Code') {
-             steps {
+            steps {
                 git branch: "${GIT_BRANCH_NAME}",
-                credentialsId: 'github-securemagnus-token',
-                url: "${GIT_REPO_URL}"
+                    credentialsId: 'github-securemagnus-token',
+                    url: "${GIT_REPO_URL}"
             }
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        //  suite_webapp_test 
+        // Validate Service
         // ─────────────────────────────────────────────────────────────────────
         stage('Validate Service') {
             steps {
@@ -148,7 +158,7 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Log deployment info 
+        // Log Deployment Info
         // ─────────────────────────────────────────────────────────────────────
         stage('Log Deployment Info') {
             steps {
@@ -162,27 +172,14 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Install dependencies
-        // ─────────────────────────────────────────────────────────────────────
-        stage('Install Dependencies') {
-            steps {
-                sh """
-                    npm install --only=production --no-package-lock
-                    echo "Suite Webapp prepared for deployment"
-                """
-            }
-        }
-
-        // ─────────────────────────────────────────────────────────────────────
-        // Create deployment package 
+        // Create deployment package
+        // node_modules excluded — will be installed on OCI server
         // ─────────────────────────────────────────────────────────────────────
         stage('Create Package') {
             steps {
                 sh """
                     mkdir -p deployment/suite_webapp
-                    mkdir -p deployment/scripts
 
-                    # Same as GitHub Actions rsync
                     rsync -av --progress ./ deployment/suite_webapp/ \
                         --exclude 'node_modules' \
                         --exclude '.git' \
@@ -194,11 +191,6 @@ pipeline {
                         --exclude 'deployment' \
                         --exclude 'docs'
 
-                    # Copy scripts — same as GitHub Actions
-                    cp .github/scripts/deploy.sh deployment/scripts/
-                    cp .github/scripts/register-suite-webapp-service.sh deployment/scripts/
-
-                    # Create tar.gz — same as GitHub Actions
                     tar -czf suite_webapp_deployment.tar.gz deployment/
 
                     echo "Package created successfully"
@@ -207,7 +199,7 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Check required secrets 
+        // Check Required Secrets
         // ─────────────────────────────────────────────────────────────────────
         stage('Check Required Secrets') {
             steps {
@@ -227,37 +219,148 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // Setup SSH + Add OCI server to known hosts + Deploy 
+        // Transfer Package to OCI Server
         // ─────────────────────────────────────────────────────────────────────
-        stage('Deploy to OCI Server') {
+        stage('Transfer Package') {
             steps {
                 sshagent(['OCI_SSH_KEY']) {
                     sh """
-                        # Add OCI server to known hosts — same as ssh-keyscan in GitHub Actions
                         mkdir -p ~/.ssh
                         ssh-keyscan -H ${OCI_HOST} >> ~/.ssh/known_hosts
-
-                        # Transfer deployment package — same as GitHub Actions scp
-                        scp suite_webapp_deployment.tar.gz ${OCI_USER}@${OCI_HOST}:/tmp/suite_webapp_deployment.tar.gz || { echo "Failed to copy deployment package"; exit 1; }
-                        scp deployment/scripts/deploy.sh ${OCI_USER}@${OCI_HOST}:/tmp/ || { echo "Failed to copy deploy.sh"; exit 1; }
-                        scp deployment/scripts/register-suite-webapp-service.sh ${OCI_USER}@${OCI_HOST}:/tmp/ || { echo "Failed to copy register-suite-webapp-service.sh"; exit 1; }
-
-                        # Verify files exist on remote server — same as GitHub Actions
-                        ssh ${OCI_USER}@${OCI_HOST} "ls -la /tmp/deploy.sh /tmp/register-suite-webapp-service.sh"
-
-                        # Execute deployment with environment variables — same as GitHub Actions
-                        ssh ${OCI_USER}@${OCI_HOST} "chmod +x /tmp/deploy.sh && chmod +x /tmp/register-suite-webapp-service.sh && \
-                            REDIS_URL='${REDIS_URL}' \
-                            REDIS_SERVER_IP='${REDIS_SERVER_IP}' \
-                            REDIS_SERVER_PORT='${REDIS_SERVER_PORT}' \
-                            /tmp/deploy.sh"
+                        scp suite_webapp_deployment.tar.gz ${OCI_USER}@${OCI_HOST}:/tmp/ || { echo "Failed to copy package"; exit 1; }
+                        echo "Package transferred successfully"
                     """
                 }
             }
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        //  Health check 
+        // Setup Directories on OCI Server
+        // ─────────────────────────────────────────────────────────────────────
+        stage('Setup Directories') {
+            steps {
+                sshagent(['OCI_SSH_KEY']) {
+                    sh """
+                        ssh ${OCI_USER}@${OCI_HOST} "
+                            set -e
+                            sudo mkdir -p ${WORKSPACE_DIR}
+                            sudo mkdir -p ${LOGS_DIR}
+                            sudo mkdir -p ${KEYS_DIR}
+                            sudo chown -R ${SERVICE_USER}:${SERVICE_USER} /app/secure_magnus
+                            echo 'Directories created successfully'
+                        "
+                    """
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Deploy Code on OCI Server
+        // ─────────────────────────────────────────────────────────────────────
+        stage('Deploy Code') {
+            steps {
+                sshagent(['OCI_SSH_KEY']) {
+                    sh """
+                        ssh ${OCI_USER}@${OCI_HOST} "
+                            set -e
+                            pm2 stop ${SERVICE_NAME} 2>/dev/null || true
+                            pm2 delete ${SERVICE_NAME} 2>/dev/null || true
+                            sudo rm -rf ${DEPLOY_DIR}
+                            mkdir -p ${TEMP_DIR}
+                            cd ${TEMP_DIR}
+                            tar -xzf /tmp/suite_webapp_deployment.tar.gz
+                            sudo mv deployment/suite_webapp ${DEPLOY_DIR}
+                            sudo chown -R ${SERVICE_USER}:${SERVICE_USER} ${DEPLOY_DIR}
+                            sudo chmod -R 755 ${DEPLOY_DIR}
+                            echo 'Code deployed successfully'
+                        "
+                    """
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Install Dependencies on OCI Server
+        // installs all dependencies including devDependencies for nodemon
+        // ─────────────────────────────────────────────────────────────────────
+        stage('Install Dependencies') {
+            steps {
+                sshagent(['OCI_SSH_KEY']) {
+                    sh """
+                        ssh ${OCI_USER}@${OCI_HOST} "
+                            set -e
+                            cd ${DEPLOY_DIR}
+                            rm -rf node_modules
+                            npm install --no-package-lock
+                            echo 'Dependencies installed successfully'
+                        "
+                    """
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Create .env on OCI Server
+        // ─────────────────────────────────────────────────────────────────────
+        stage('Create .env') {
+            steps {
+                sshagent(['OCI_SSH_KEY']) {
+                    sh """
+                        ssh ${OCI_USER}@${OCI_HOST} "cat > ${DEPLOY_DIR}/.env << 'ENVEOF'
+NODE_ENV=development
+HOST=127.0.0.1
+PORT=8000
+BACKEND_EP=http://127.0.0.1:3000
+REDIS_URL=${REDIS_URL}
+REDIS_SERVER_IP=${REDIS_SERVER_IP}
+REDIS_SERVER_PORT=${REDIS_SERVER_PORT}
+REDIS_SESSION_SECRET_KEY=${REDIS_SESSION_SECRET_KEY}
+COOKIE_JWT_TOKEN_EXPIRY=10
+SECURE_MAGNUS_WORKSPACE=${WORKSPACE_DIR}
+BACKEND_TVBS_URL=https://dev-machine.securemagnus.com/tvb
+LOGS_DIR=${LOGS_DIR}
+LOGS_FILENAME=suite_webapp
+BACKEND_SUITE_PUBLIC_KEY_PATH=${KEYS_DIR}/public.key
+AWAREMAGNUS_DASHBOARD_URL=https://dev-machine.securemagnus.com/awm/
+WEB_TEMPLATE_BUCKET=https://objectstorage.me-riyadh-1.oraclecloud.com/p/OrpyV-tItnmm8cldPMTq9QM0v1o6aoplOpe27Sz92GcZjcG7uagcwnXshXMckKyB/n/axqfg50971fp/b/PHM_Templates/o/
+ENVEOF
+                        chmod 600 ${DEPLOY_DIR}/.env
+                        echo '.env created successfully'
+                        "
+                    """
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Start PM2 on OCI Server
+        // ─────────────────────────────────────────────────────────────────────
+        stage('Start PM2') {
+            steps {
+                sshagent(['OCI_SSH_KEY']) {
+                    sh """
+                        ssh ${OCI_USER}@${OCI_HOST} "
+                            set -e
+                            pm2 start npm \
+                                --name ${SERVICE_NAME} \
+                                --cwd ${DEPLOY_DIR} \
+                                --log ${LOGS_DIR}/suite_webapp.log \
+                                --error ${LOGS_DIR}/suite_webapp_error.log \
+                                --restart-delay 10000 \
+                                -- run development
+                            pm2 save
+                            pm2 startup systemd -u ${SERVICE_USER} --hp /home/${SERVICE_USER} || true
+                            rm -rf ${TEMP_DIR}
+                            rm -f /tmp/suite_webapp_deployment.tar.gz
+                            echo 'PM2 started successfully'
+                        "
+                    """
+                }
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Health Check
         // ─────────────────────────────────────────────────────────────────────
         stage('Health Check') {
             steps {
@@ -282,7 +385,7 @@ pipeline {
                         }
 
                         if (!passed) {
-                            sh "ssh ${OCI_USER}@${OCI_HOST} 'sudo journalctl -u suite_webapp --no-pager -n 50' || true"
+                            sh "ssh ${OCI_USER}@${OCI_HOST} 'pm2 logs ${SERVICE_NAME} --nostream --lines 50' || true"
                             error("suite_webapp health check failed")
                         }
                     }
@@ -291,9 +394,6 @@ pipeline {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    //  Notify deployment status 
-    // ─────────────────────────────────────────────────────────────────────────
     post {
         success {
             echo """
@@ -310,17 +410,16 @@ pipeline {
             sshagent(['OCI_SSH_KEY']) {
                 sh """
                     ssh ${OCI_USER}@${OCI_HOST} '
-                        echo "--- Service status ---"
-                        sudo systemctl status suite_webapp || true
-                        echo "--- Last 50 lines of logs ---"
-                        sudo journalctl -u suite_webapp --no-pager -n 50 || true
+                        echo "--- PM2 status ---"
+                        pm2 list || true
+                        echo "--- PM2 logs ---"
+                        pm2 logs suite_webapp --nostream --lines 50 || true
                     ' || true
                 """
             }
         }
         always {
             echo "Pipeline finished: ${currentBuild.currentResult}"
-            // Cleanup workspace
             cleanWs()
         }
     }
