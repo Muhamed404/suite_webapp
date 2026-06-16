@@ -80,7 +80,6 @@ pipeline {
         // ─────────────────────────────────────────────────────────────────────
         // paths filter
         // ─────────────────────────────────────────────────────────────────────
-        /*
         stage('Check Changed Files') {
             steps {
                 script {
@@ -123,7 +122,7 @@ pipeline {
                 }
             }
         }
-        */
+
         // ─────────────────────────────────────────────────────────────────────
         // Verify Branch
         // ─────────────────────────────────────────────────────────────────────
@@ -254,12 +253,35 @@ pipeline {
                     sh """
                         ssh ${OCI_USER}@${OCI_HOST} "
                             set -e
-                            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+
+                            # Check if nvm already installed
+                            if [ ! -d \\\$HOME/.nvm ]; then
+                                echo 'Installing nvm...'
+                                curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+                            else
+                                echo 'nvm already installed'
+                            fi
+
                             export NVM_DIR=\\\$HOME/.nvm
                             . \\\$NVM_DIR/nvm.sh
-                            nvm install ${NODE_VERSION}
-                            nvm alias default ${NODE_VERSION}
-                            npm install -g pm2
+
+                            # Check if correct Node.js version installed
+                            if ! node --version 2>/dev/null | grep -q ${NODE_VERSION}; then
+                                echo 'Installing Node.js ${NODE_VERSION}...'
+                                nvm install ${NODE_VERSION}
+                                nvm alias default ${NODE_VERSION}
+                            else
+                                echo 'Node.js ${NODE_VERSION} already installed'
+                            fi
+
+                            # Check if PM2 installed
+                            if ! command -v pm2 &>/dev/null; then
+                                echo 'Installing PM2...'
+                                npm install -g pm2
+                            else
+                                echo 'PM2 already installed'
+                            fi
+
                             echo 'Node: '\\\$(node --version)
                             echo 'PM2 : '\\\$(pm2 --version)
                         "
@@ -277,8 +299,11 @@ pipeline {
                     sh """
                         ssh ${OCI_USER}@${OCI_HOST} "
                             set -e
+                            export NVM_DIR=\\\$HOME/.nvm
+                            . \\\$NVM_DIR/nvm.sh
                             pm2 stop ${SERVICE_NAME} 2>/dev/null || true
                             pm2 delete ${SERVICE_NAME} 2>/dev/null || true
+                            sudo fuser -k 8000/tcp 2>/dev/null || true
                             sudo rm -rf ${DEPLOY_DIR}
                             mkdir -p ${TEMP_DIR}
                             cd ${TEMP_DIR}
@@ -303,7 +328,7 @@ pipeline {
                     sh """
                         ssh ${OCI_USER}@${OCI_HOST} "
                             set -e
-                            NVM_DIR=\\\$HOME/.nvm
+                            export NVM_DIR=\\\$HOME/.nvm
                             . \\\$NVM_DIR/nvm.sh
                             cd ${DEPLOY_DIR}
                             rm -rf node_modules

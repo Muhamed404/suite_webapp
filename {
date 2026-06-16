@@ -31,4 +31,31 @@ To github-gigate:SecureMagnusLLC/suite_webapp.git
 [?2004h]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ ثذاخ [K[K[K[K[Kث[Kس[Keho [K[K[K[Kecho [7m$HOME[27m$HOME
 [?2004l/home/abdallah
 [?2004h]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ لهف [K[K[K[Kل[Kgit add .
-[?2004l[?2004h]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ git commit -m ""U"p"d"a"t"e" "j"e"n"k"i"n"d"[1P"s"
+[?2004l[?2004h]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ git commit -m ""U"p"d"a"t"e" "j"e"n"k"i"n"d"[1P"s" "f"i"l"e" "
+[?2004l[cicd/jenkins-pipeline 1776baff] Update jenkins file
+ 1 file changed, 6 insertions(+), 15 deletions(-)
+[?2004h]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ got [K[K[Kit puh[Ksh 
+[?2004lEnumerating objects: 5, done.
+Counting objects:  20% (1/5)Counting objects:  40% (2/5)Counting objects:  60% (3/5)Counting objects:  80% (4/5)Counting objects: 100% (5/5)Counting objects: 100% (5/5), done.
+Delta compression using up to 4 threads
+Compressing objects:  33% (1/3)Compressing objects:  66% (2/3)Compressing objects: 100% (3/3)Compressing objects: 100% (3/3), done.
+Writing objects:  33% (1/3)Writing objects:  66% (2/3)Writing objects: 100% (3/3)Writing objects: 100% (3/3), 369 bytes | 369.00 KiB/s, done.
+Total 3 (delta 2), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas:   0% (0/2)[Kremote: Resolving deltas:  50% (1/2)[Kremote: Resolving deltas: 100% (2/2)[Kremote: Resolving deltas: 100% (2/2), completed with 2 local objects.[K
+To github-gigate:SecureMagnusLLC/suite_webapp.git
+   fb472272..1776baff  cicd/jenkins-pipeline -> cicd/jenkins-pipeline
+[?2004h]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ [K]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ hit [K[K[K[Kgit add .
+[?2004l[?2004h]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ git ci[Kommit -m ""d"u"a"[1P"[1P"i"s"a"b"l"e" "f"i"l"[1P"[1P"[1P"p"a"t"h" "f"i"l"t"e"r"
+[?2004l[cicd/jenkins-pipeline 882a63a9] disable path filter
+ 2 files changed, 36 insertions(+), 1 deletion(-)
+[?2004h]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ git push 
+[?2004lEnumerating objects: 7, done.
+Counting objects:  14% (1/7)Counting objects:  28% (2/7)Counting objects:  42% (3/7)Counting objects:  57% (4/7)Counting objects:  71% (5/7)Counting objects:  85% (6/7)Counting objects: 100% (7/7)Counting objects: 100% (7/7), done.
+Delta compression using up to 4 threads
+Compressing objects:  25% (1/4)Compressing objects:  50% (2/4)Compressing objects:  75% (3/4)Compressing objects: 100% (4/4)Compressing objects: 100% (4/4), done.
+Writing objects:  25% (1/4)Writing objects:  50% (2/4)Writing objects:  75% (3/4)Writing objects: 100% (4/4)Writing objects: 100% (4/4), 1.29 KiB | 1.29 MiB/s, done.
+Total 4 (delta 2), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas:   0% (0/2)[Kremote: Resolving deltas:  50% (1/2)[Kremote: Resolving deltas: 100% (2/2)[Kremote: Resolving deltas: 100% (2/2), completed with 2 local objects.[K
+To github-gigate:SecureMagnusLLC/suite_webapp.git
+   1776baff..882a63a9  cicd/jenkins-pipeline -> cicd/jenkins-pipeline
+[?2004h]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ [K]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ [7msudo openssl genrsa -out private.key 2048[27m[K]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ [7msudo openssl genrsa -out private.key 2048[27m[K]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ [7msudo openssl genrsa -out private.key 2048[27m[K]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ [7msudo openssl genrsa -out private.key 2048[27m[K]0;abdallah@server01: ~/SecureMagnus/suite_webapp[01;32mabdallah@server01[00m:[01;34m~/SecureMagnus/suite_webapp[00m$ [7msudo openssl genrsa -out private.key 2048[27m[
