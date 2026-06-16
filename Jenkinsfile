@@ -80,7 +80,6 @@ pipeline {
         // ─────────────────────────────────────────────────────────────────────
         // paths filter
         // ─────────────────────────────────────────────────────────────────────
-        /*
         stage('Check Changed Files') {
             steps {
                 script {
@@ -123,7 +122,6 @@ pipeline {
                 }
             }
         }
-        */
 
         // ─────────────────────────────────────────────────────────────────────
         // Verify Branch
@@ -304,21 +302,12 @@ pipeline {
                     sh """
                         ssh ${OCI_USER}@${OCI_HOST} "
                             set -e
+                            NVM_DIR=\\\$HOME/.nvm
+                            . \\\$NVM_DIR/nvm.sh
                             cd ${DEPLOY_DIR}
                             rm -rf node_modules
-                            MAX_RETRIES=3
-                            RETRY_COUNT=0
-                            while [ \\\$RETRY_COUNT -lt \\\$MAX_RETRIES ]; do
-                                if npm install --no-package-lock; then
-                                    echo 'Dependencies installed successfully'
-                                    break
-                                else
-                                    RETRY_COUNT=\\\$((\\\$RETRY_COUNT + 1))
-                                    rm -rf node_modules
-                                    npm cache clean --force
-                                    sleep 5
-                                fi
-                            done
+                            npm install --no-package-lock
+                            echo 'Dependencies installed successfully'
                         "
                     """
                 }
@@ -367,6 +356,8 @@ ENVEOF
                     sh """
                         ssh ${OCI_USER}@${OCI_HOST} "
                             set -e
+                            export NVM_DIR=\\\$HOME/.nvm
+                            . \\\$NVM_DIR/nvm.sh
                             pm2 start npm \
                                 --name ${SERVICE_NAME} \
                                 --cwd ${DEPLOY_DIR} \
