@@ -149,12 +149,12 @@ pipeline {
             // when { expression { env.DEPLOY_AWAREMAGNUS == 'true' } }
             steps {
                 sh """
-                    mkdir -p deployment_awm/awaremagnus
-                    rsync -av ./awaremagnus/. deployment_awm/awaremagnus/ \
+                    mkdir -p deployment/awaremagnus
+                    rsync -av ./awaremagnus/. deployment/awaremagnus/ \
                         --exclude 'node_modules' \
                         --exclude '.next' \
                         --exclude '.env'
-                    tar -czf awaremagnus_deployment.tar.gz deployment_awm/
+                    tar -czf awaremagnus_deployment.tar.gz deployment/
                     echo "awaremagnus package created"
                 """
             }
