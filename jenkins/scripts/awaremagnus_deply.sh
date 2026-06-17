@@ -14,6 +14,10 @@ AWAREMAGNUS_PORT=${AWAREMAGNUS_PORT:-8001}
 ISPRING_SOURCE="$WORKSPACE_DIR/service_awm/contents/interactive_modules/system_files"
 ISPRING_DEST="$DEPLOY_DIR/public/interactive_modules/system_files"
 
+# ── Load NVM ──────────────────────────────────────────────────────────────────
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
 echo "Starting AwareMagnus deployment..."
 
 # ── Create required directories ───────────────────────────────────────────────

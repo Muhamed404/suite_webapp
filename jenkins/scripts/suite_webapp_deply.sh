@@ -12,6 +12,10 @@ TEMP_DIR="/tmp/suite_webapp_deploy_$$"
 SERVICE_USER="ubuntu"
 SERVICE_NAME="suite_webapp"
 
+# ── Load NVM ──────────────────────────────────────────────────────────────────
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
 echo "Starting Suite Webapp deployment..."
 
 # ── Create required directories ──────────────────────────────────────────────
