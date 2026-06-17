@@ -106,6 +106,7 @@ pm2 start npm \
     --cwd "$DEPLOY_DIR" \
     --log "$LOGS_DIR/suite_webapp.log" \
     --error "$LOGS_DIR/suite_webapp_error.log" \
+    --log-date-format "YYYY-MM-DD HH:mm:ss" \
     --restart-delay 10000 \
     -- run development
 
