@@ -34,10 +34,9 @@ pm2 delete $SERVICE_NAME 2>/dev/null || true
 sudo fuser -k 8001/tcp 2>/dev/null || true
 
 # ── Remove existing deployment ────────────────────────────────────────────────
-if [ -d "$DEPLOY_DIR" ] && [ "$(ls -A $DEPLOY_DIR)" ]; then
+if [ -d "$DEPLOY_DIR" ]; then
     echo "Removing existing deployment..."
     sudo rm -rf "$DEPLOY_DIR"
-    sudo mkdir -p "$DEPLOY_DIR"
 else
     echo "Fresh installation"
 fi
@@ -49,7 +48,7 @@ tar -xzf /tmp/awaremagnus_deployment.tar.gz
 
 # ── Copy source files ─────────────────────────────────────────────────────────
 echo "Copying files to $DEPLOY_DIR..."
-sudo cp -r deployment/awaremagnus/. "$DEPLOY_DIR/"
+sudo cp -r deployment/awaremagnus "$DEPLOY_DIR"
 sudo chown -R $SERVICE_USER:$SERVICE_USER "$DEPLOY_DIR"
 sudo chmod -R 755 "$DEPLOY_DIR"
 
