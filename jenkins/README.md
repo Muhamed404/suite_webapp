@@ -136,7 +136,7 @@ Pipeline:
   SCM         : Git
   Repository  : https://github.com/SecureMagnusLLC/suite_webapp.git
   Credentials : github-securemagnus-token
-  Branch      : */cicd/jenkins-pipeline
+  Branch      : */development
   Script Path : jenkins/Jenkinsfile
 ```
 
