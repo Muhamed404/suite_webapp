@@ -166,10 +166,17 @@ pipeline {
         stage('Check Required Secrets') {
             steps {
                 script {
-                    if (!env.OCI_HOST)            { error("OCI_HOST not configured") }
-                    if (!env.OCI_USER)            { error("OCI_USER not configured") }
-                    if (!env.REDIS_URL)           { error("REDIS_URL not configured") }
-                    if (!env.AWAREMAGNUS_API_URL) { error("AWAREMAGNUS_API_URL not configured") }
+                    if (!env.OCI_HOST)                     { error("OCI_HOST not configured") }
+                    if (!env.OCI_USER)                     { error("OCI_USER not configured") }
+                    if (!env.REDIS_URL)                    { error("REDIS_URL not configured") }
+                    if (!env.REDIS_SERVER_IP)              { error("REDIS_SERVER_IP not configured") }
+                    if (!env.REDIS_SERVER_PORT)            { error("REDIS_SERVER_PORT not configured") }
+                    if (!env.REDIS_SESSION_SECRET_KEY)     { error("REDIS_SESSION_SECRET_KEY not configured") }
+                    if (!env.AWAREMAGNUS_API_URL)          { error("AWAREMAGNUS_API_URL not configured") }
+                    if (!env.AWAREMAGNUS_PORT)             { error("AWAREMAGNUS_PORT not configured") }
+                    if (!env.NEXT_PUBLIC_SERVICE_AWM_URL)  { error("NEXT_PUBLIC_SERVICE_AWM_URL not configured") }
+                    if (!env.NEXT_PUBLIC_SERVICE_SUITE_URL){ error("NEXT_PUBLIC_SERVICE_SUITE_URL not configured") }
+                    if (!env.NEXT_PUBLIC_SUITE_WEBAPP_URL) { error("NEXT_PUBLIC_SUITE_WEBAPP_URL not configured") }
                     echo "All required secrets are configured"
                 }
             }
