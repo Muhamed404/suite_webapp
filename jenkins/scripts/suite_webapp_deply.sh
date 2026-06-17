@@ -89,7 +89,7 @@ LOGS_FILENAME=suite_webapp
 BACKEND_SUITE_PUBLIC_KEY_PATH=$KEYS_DIR/public.key
 
 AWAREMAGNUS_DASHBOARD_URL=${AWAREMAGNUS_DASHBOARD_URL:-https://dev-machine.securemagnus.com/awm/}
-WEB_TEMPLATE_BUCKET=${WEB_TEMPLATE_BUCKET:-}
+WEB_TEMPLATE_BUCKET=${WEB_TEMPLATE_BUCKET:-https://objectstorage.me-riyadh-1.oraclecloud.com/p/OrpyV-tItnmm8cldPMTq9QM0v1o6aoplOpe27Sz92GcZjcG7uagcwnXshXMckKyB/n/axqfg50971fp/b/PHM_Templates/o/}
 ENVEOF
 
 chmod 600 "$DEPLOY_DIR/.env"
