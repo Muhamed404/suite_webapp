@@ -186,7 +186,7 @@ pipeline {
         // Transfer Files — suite_webapp
         // ─────────────────────────────────────────────────────────────────────
         stage('Transfer Files — suite_webapp') {
-            // when { expression { env.DEPLOY_WEBAPP == 'true' } }
+             when { expression { env.DEPLOY_WEBAPP == 'true' } }
             steps {
                 sshagent(['OCI_SSH_KEY']) {
                     sh """
@@ -204,7 +204,7 @@ pipeline {
         // Transfer Files — awaremagnus
         // ─────────────────────────────────────────────────────────────────────
         stage('Transfer Files — awaremagnus') {
-            // when { expression { env.DEPLOY_AWAREMAGNUS == 'true' } }
+            when { expression { env.DEPLOY_AWAREMAGNUS == 'true' } }
             steps {
                 sshagent(['OCI_SSH_KEY']) {
                     sh """
