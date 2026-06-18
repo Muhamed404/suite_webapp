@@ -42,7 +42,7 @@ pipeline {
             ],
             regexpFilterText:       '$REF',
             regexpFilterExpression: 'refs/heads/cicd/jenkins-pipeline',
-            token: 'suite_webapp_token'
+            token: 'suite_webapp_test_token'
         )
     }
 
