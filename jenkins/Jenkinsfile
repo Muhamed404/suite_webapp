@@ -61,7 +61,7 @@ pipeline {
                     def webappPaths = [
                         'phishmagnus/', 'productsuite/', 'commons/', 'config/',
                         'logger/', 'locales/', 'middleware/', 'routes/', 'views/',
-                        'public/', 'utility/', 'server.js', 'package.json', 'Jenkinsfile'
+                        'public/', 'utility/', 'server.js', 'package.json', 'jenkins/Jenkinsfile'
                     ]
 
                     env.DEPLOY_WEBAPP      = webappPaths.any { allChanged.contains(it) } ? 'true' : 'false'
